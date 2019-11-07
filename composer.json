@@ -1,11 +1,13 @@
 {
-  "name": "chrisjezowiczllc/wpforms",
-  "description": "",
-  "keywords": ["wordpress", "plugin"],
-  "homepage": "https://bitbucket.org/chrisjezowiczllc/wpforms/",
-  "authors": [],
-  "type": "wordpress-plugin",
-  "require": {
-    "php": ">=5.6"
-  }
+    "name": "cjezowicz/wpforms",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=5.6"
+    },
+    "authors": [
+        {
+            "name": "Chris Jezowicz",
+            "email": "me@chrisjezowicz.com"
+        }
+    ]
 }
