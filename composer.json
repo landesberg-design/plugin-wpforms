@@ -7,5 +7,12 @@
   "type": "wordpress-plugin",
   "require": {
     "php": ">=5.6"
-  }
+  },
+  "autoload": {
+    "classmap": [
+      "src"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
