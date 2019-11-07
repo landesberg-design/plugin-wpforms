@@ -1,0 +1,89 @@
+// Education styles.
+
+@media screen and (max-width: 1023px) {
+	.wpforms-dyk {
+		display: none !important;
+	}
+}
+
+.wpforms-dyk {
+	td {
+		background-color: #ffffff;
+		border-left: 4px solid #1073A7;
+		border-top: 1px solid #e5e5e5;
+		padding: 12px;
+	}
+
+	.wpforms-dyk-fbox {
+		align-items: center;
+		align-content: stretch;
+		justify-content: flex-start;
+		display: flex;
+
+		opacity: 1;
+		transition: all .3s;
+
+		&.out {
+			opacity: 0;
+			transform: scaleY(0);
+		}
+	}
+
+	.wpforms-dyk-bulb {
+		width: 25px;
+		height: 25px;
+		margin-right: 10px;
+		border-radius: 50%;
+		fill: #ffffff;
+		background-color: #1073A7;
+		padding: 8px;
+	}
+
+	.wpforms-dyk-message {
+		b {
+			font-weight: 700;
+		}
+	}
+
+	.wpforms-dyk-buttons {
+		margin-left: auto;
+		vertical-align: middle;
+		min-width: 280px;
+		text-align: right;
+
+		& > * {
+			vertical-align: middle;
+			margin-left: 15px;
+		}
+
+		.dismiss {
+			border: none;
+			padding: 5px;
+			margin-left: 5px;
+			background: 0 0;
+			color: #72777c;
+			cursor: pointer;
+		}
+
+		.dismiss:before {
+			background: 0 0;
+			color: #72777c;
+			content: "\f335";
+			display: block;
+			font: normal 20px/20px dashicons;
+			speak: none;
+			height: 20px;
+			text-align: center;
+			width: 20px;
+			-webkit-font-smoothing: antialiased;
+		}
+
+		.learn-more {
+			text-decoration: underline;
+		}
+
+		.wpforms-btn-md {
+			min-height: auto;
+		}
+	}
+}
