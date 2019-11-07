@@ -1,6 +1,7 @@
 {
-    "name": "cjezowicz/wpforms",
+    "name": "chrisjezowiczllc/wpforms",
     "type": "wordpress-plugin",
+    "homepage": "git@bitbucket.org:chrisjezowiczllc/wpforms.git",
     "require": {
         "php": ">=5.6"
     },
