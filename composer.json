@@ -1,7 +1,7 @@
 {
     "name": "chrisjezowiczllc/wpforms",
     "type": "wordpress-plugin",
-    "homepage": "git@bitbucket.org:chrisjezowiczllc/wpforms.git",
+    "description": "",
     "require": {
         "php": ">=5.6"
     },
@@ -10,5 +10,10 @@
             "name": "Chris Jezowicz",
             "email": "me@chrisjezowicz.com"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "WPForms\\" : ""
+        }
+    }
 }

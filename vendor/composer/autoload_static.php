@@ -6,9 +6,25 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit1f29cdf7e8428f38577ae10a21b01326
 {
+    public static $prefixLengthsPsr4 = array (
+        'W' => 
+        array (
+            'WPForms\\' => 8,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'WPForms\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/',
+        ),
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1f29cdf7e8428f38577ae10a21b01326::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1f29cdf7e8428f38577ae10a21b01326::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }
