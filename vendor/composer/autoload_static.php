@@ -16,7 +16,7 @@ class ComposerStaticInit1f29cdf7e8428f38577ae10a21b01326
     public static $prefixDirsPsr4 = array (
         'WPForms\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/',
+            0 => __DIR__ . '/../..' . '/src',
         ),
     );
 

@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'WPForms\\' => array($baseDir . '/'),
+    'WPForms\\' => array($baseDir . '/src'),
 );
