@@ -2,34 +2,34 @@
 /**
  * PRO Ajax actions used in by admin.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.2.1
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.2.1
  */
 
 /**
  * Toggle entry stars from Entries table.
  *
  * @since 1.1.6
+ * @since 1.5.7 Added an entry note about Star/Unstar action.
  */
 function wpforms_entry_list_star() {
 
 	// Run a security check.
 	check_ajax_referer( 'wpforms-admin', 'nonce' );
 
+	if ( empty( $_POST['entryId'] ) || empty( $_POST['task'] ) || empty( $_POST['formId'] ) ) {
+		wp_send_json_error();
+	}
+
+	$form_id = absint( $_POST['formId'] );
+
 	// Check for permissions.
-	if ( ! wpforms_current_user_can() ) {
+	if ( ! wpforms_current_user_can( 'view_entries_form_single', $form_id ) ) {
 		wp_send_json_error();
 	}
 
-	if ( empty( $_POST['entry_id'] ) || empty( $_POST['task'] ) ) {
-		wp_send_json_error();
-	}
-
-	$task       = $_POST['task'];
-	$entry_id   = absint( $_POST['entry_id'] );
+	$task       = sanitize_key( $_POST['task'] );
+	$entry_id   = absint( $_POST['entryId'] );
+	$user_id    = get_current_user_id();
 	$is_success = false;
 
 	if ( 'star' === $task ) {
@@ -39,6 +39,9 @@ function wpforms_entry_list_star() {
 				'starred' => '1',
 			)
 		);
+
+		$note_data = esc_html__( 'Entry starred.', 'wpforms' );
+
 	} elseif ( 'unstar' === $task ) {
 		$is_success = wpforms()->entry->update(
 			$entry_id,
@@ -46,9 +49,28 @@ function wpforms_entry_list_star() {
 				'starred' => '0',
 			)
 		);
+
+		$note_data = esc_html__( 'Entry unstarred.', 'wpforms' );
 	}
 
-	$is_success ? wp_send_json_success() : wp_send_json_error();
+	if ( $is_success ) {
+
+		// Add an entry note about Star/Unstar action.
+		wpforms()->entry_meta->add(
+			array(
+				'entry_id' => $entry_id,
+				'form_id'  => $form_id,
+				'user_id'  => $user_id,
+				'type'     => 'log',
+				'data'     => wpautop( sprintf( '<em>%s</em>', $note_data ) ),
+			),
+			'entry_meta'
+		);
+
+		wp_send_json_success();
+	}
+
+	wp_send_json_error();
 }
 
 add_action( 'wp_ajax_wpforms_entry_list_star', 'wpforms_entry_list_star' );
@@ -63,18 +85,22 @@ function wpforms_entry_list_read() {
 	// Run a security check.
 	check_ajax_referer( 'wpforms-admin', 'nonce' );
 
+	if ( empty( $_POST['entryId'] ) || empty( $_POST['task'] ) || empty( $_POST['formId'] ) ) {
+		wp_send_json_error();
+	}
+
+	$form_id = absint( $_POST['formId'] );
+
 	// Check for permissions.
-	if ( ! wpforms_current_user_can() ) {
+	if ( ! wpforms_current_user_can( 'view_entries_form_single', $form_id ) ) {
 		wp_send_json_error();
 	}
 
-	if ( empty( $_POST['entry_id'] ) || empty( $_POST['task'] ) ) {
-		wp_send_json_error();
-	}
-
-	$task       = $_POST['task'];
-	$entry_id   = absint( $_POST['entry_id'] );
+	$task       = sanitize_key( wp_unslash( $_POST['task'] ) );
+	$entry_id   = absint( $_POST['entryId'] );
+	$user_id    = get_current_user_id();
 	$is_success = false;
+	$note_data  = '';
 
 	if ( 'read' === $task ) {
 		$is_success = wpforms()->entry->update(
@@ -83,6 +109,9 @@ function wpforms_entry_list_read() {
 				'viewed' => '1',
 			)
 		);
+
+		$note_data = esc_html__( 'Entry read.', 'wpforms' );
+
 	} elseif ( 'unread' === $task ) {
 		$is_success = wpforms()->entry->update(
 			$entry_id,
@@ -90,9 +119,28 @@ function wpforms_entry_list_read() {
 				'viewed' => '0',
 			)
 		);
+
+		$note_data = esc_html__( 'Entry unread.', 'wpforms' );
 	}
 
-	$is_success ? wp_send_json_success() : wp_send_json_error();
+	if ( $is_success && ! empty( $note_data ) ) {
+
+		// Add an entry note about Star/Unstar action.
+		wpforms()->entry_meta->add(
+			array(
+				'entry_id' => $entry_id,
+				'form_id'  => $form_id,
+				'user_id'  => $user_id,
+				'type'     => 'log',
+				'data'     => wpautop( sprintf( '<em>%s</em>', $note_data ) ),
+			),
+			'entry_meta'
+		);
+
+		wp_send_json_success();
+	}
+
+	wp_send_json_error();
 }
 
 add_action( 'wp_ajax_wpforms_entry_list_read', 'wpforms_entry_list_read' );
@@ -196,11 +244,16 @@ function wpforms_builder_settings_block_state_save() {
 	// Run a security check.
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
-	if ( empty( $_POST ) || ! wpforms_current_user_can() ) {
+	if ( empty( $_POST ) ) {
 		wp_send_json_error();
 	}
 
-	$form_id    = ! empty( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
+	$form_id = ! empty( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
+
+	if ( ! wpforms_current_user_can( 'edit_form_single', $form_id ) ) {
+		wp_send_json_error();
+	}
+
 	$block_id   = ! empty( $_POST['block_id'] ) ? absint( $_POST['block_id'] ) : 0;
 	$block_type = ! empty( $_POST['block_type'] ) ? sanitize_key( $_POST['block_type'] ) : '';
 	$state      = ! empty( $_POST['state'] ) ? sanitize_key( $_POST['state'] ) : '';
@@ -255,11 +308,16 @@ function wpforms_builder_settings_block_state_remove() {
 	// Run a security check.
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
-	if ( empty( $_POST ) || ! wpforms_current_user_can() ) {
+	if ( empty( $_POST ) ) {
 		wp_send_json_error();
 	}
 
-	$form_id    = ! empty( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
+	$form_id = ! empty( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
+
+	if ( ! wpforms_current_user_can( 'edit_form_single', $form_id ) ) {
+		wp_send_json_error();
+	}
+
 	$block_id   = ! empty( $_POST['block_id'] ) ? absint( $_POST['block_id'] ) : 0;
 	$block_type = ! empty( $_POST['block_type'] ) ? sanitize_key( $_POST['block_type'] ) : '';
 

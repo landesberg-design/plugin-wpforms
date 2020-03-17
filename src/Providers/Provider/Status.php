@@ -6,11 +6,7 @@ namespace WPForms\Providers\Provider;
  * Class Status gives ability to check/work with provider statuses.
  * Might be used later to track Provider errors on data-delivery.
  *
- * @package    WPForms\Providers
- * @author     WPForms
- * @since      1.4.8
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.4.8
  */
 class Status {
 
@@ -48,6 +44,7 @@ class Status {
 	 * @example: Status::init( 'drip' )->is_ready();
 	 *
 	 * @since 1.4.8
+	 * @since 1.5.9 Added a check on provider.
 	 *
 	 * @param string $provider Provider slug.
 	 *
@@ -56,7 +53,7 @@ class Status {
 	public static function init( $provider ) {
 		static $instance;
 
-		if ( ! $instance ) {
+		if ( ! $instance || $provider !== $instance->provider ) {
 			$instance = new self( $provider );
 		}
 

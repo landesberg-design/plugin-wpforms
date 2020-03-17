@@ -5,11 +5,7 @@ namespace WPForms\Pro\Admin\Entries\Export;
 /**
  * Ajax endpoints and data processing.
  *
- * @since      1.5.5
- * @author     WPForms
- * @package    WPForms\Pro\Admin\Entries\Export
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.5
  */
 class Ajax {
 
@@ -130,7 +126,7 @@ class Ajax {
 				! check_ajax_referer( 'wpforms-tools-entries-export-nonce', 'nonce', false ) ||
 				empty( $args['nonce'] ) ||
 				empty( $args['action'] ) ||
-				! wpforms_current_user_can()
+				! wpforms_current_user_can( 'view_entries' )
 			) {
 				throw new \Exception( $this->export->errors['security'] );
 			}
@@ -141,7 +137,9 @@ class Ajax {
 			}
 
 			// Unlimited execution time.
-			set_time_limit( 0 );
+			if ( ! in_array( 'set_time_limit', explode( ',', ini_get( 'disable_functions' ) ), true ) ) {
+				set_time_limit( 0 );
+			}
 
 			// Getting request data.
 			if ( empty( $args['request_id'] ) ) {
@@ -354,7 +352,7 @@ class Ajax {
 					$f_id           = str_replace( 'del_field_', '', $col_id );
 					$row[ $col_id ] = ! empty( $fields[ $f_id ]['value'] ) ? $fields[ $f_id ]['value'] : '';
 				} else {
-					$row[ $col_id ] = $this->get_additional_info_value( $col_id, $entry );
+					$row[ $col_id ] = $this->get_additional_info_value( $col_id, $entry, $request_data['form_data'] );
 				}
 				$row[ $col_id ] = html_entity_decode( $row[ $col_id ], ENT_QUOTES );
 			}
@@ -383,13 +381,15 @@ class Ajax {
 	 * Get value of additional information column.
 	 *
 	 * @since 1.5.5
+	 * @since 1.5.9 Added $form_data parameter and Payment Status data processing.
 	 *
-	 * @param string $col_id Column id.
-	 * @param object $entry  Entry object.
+	 * @param string $col_id    Column id.
+	 * @param object $entry     Entry object.
+	 * @param array  $form_data Form data.
 	 *
 	 * @return string
 	 */
-	public function get_additional_info_value( $col_id, $entry ) {
+	public function get_additional_info_value( $col_id, $entry, $form_data = array() ) {
 
 		$entry = (array) $entry;
 
@@ -407,8 +407,20 @@ class Ajax {
 				$val = $this->get_additional_info_geodata_value( $entry );
 				break;
 
+			case 'pstatus':
+				$val = '';
+
+				if ( wpforms_has_payment( 'form', $form_data ) ) {
+					$val = $this->get_additional_info_pstatus_value( $entry );
+				}
+				break;
+
 			case 'pginfo':
-				$val = $this->get_additional_info_pginfo_value( $entry );
+				$val = '';
+
+				if ( wpforms_has_payment( 'form', $form_data ) ) {
+					$val = $this->get_additional_info_pginfo_value( $entry );
+				}
 				break;
 
 			default:
@@ -569,6 +581,34 @@ class Ajax {
 	}
 
 	/**
+	 * Get the value of additional payment status information.
+	 *
+	 * @since 1.5.9
+	 *
+	 * @param array $entry Entry array.
+	 *
+	 * @return string
+	 */
+	public function get_additional_info_pstatus_value( $entry ) {
+
+		if ( 'payment' === $entry['type'] ) {
+			if ( ! empty( $entry['status'] ) ) {
+				$val = ucwords( sanitize_text_field( $entry['status'] ) );
+			} else {
+				$val = esc_html__( 'Unknown', 'wpforms' );
+			}
+		} else {
+			if ( ! empty( $entry['status'] ) ) {
+				$val = ucwords( sanitize_text_field( $entry['status'] ) );
+			} else {
+				$val = esc_html__( 'Completed', 'wpforms' );
+			}
+		}
+
+		return $val;
+	}
+
+	/**
 	 * Get value of additional payment gateway information.
 	 *
 	 * @since 1.5.5
@@ -612,7 +652,7 @@ class Ajax {
 		$val = '';
 		array_walk(
 			$payment,
-			function ( $item, $key ) use ( $pginfo_labels, &$val ) {
+			static function( $item, $key ) use ( $pginfo_labels, &$val ) {
 				if ( strpos( $key, 'payment_' ) === false ) {
 					return;
 				}

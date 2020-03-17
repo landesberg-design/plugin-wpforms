@@ -8,11 +8,7 @@ use WPForms\Helpers\Templates;
 /**
  * Styler class inline style email templates.
  *
- * @package    WPForms\Emails
- * @author     WPForms
- * @since      1.5.4
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.4
  */
 class Styler {
 

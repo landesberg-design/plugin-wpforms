@@ -3,11 +3,7 @@
 /**
  * Settings class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Settings {
 
@@ -56,7 +52,7 @@ class WPForms_Settings {
 			add_action( 'wpforms_admin_page', array( $this, 'output' ) );
 
 			// Hook for addons.
-			do_action( 'wpforms_settings_init' );
+			do_action( 'wpforms_settings_init', $this );
 		}
 	}
 
@@ -84,9 +80,20 @@ class WPForms_Settings {
 			return;
 		}
 
+		$current_view = sanitize_key( $_POST['view'] );
+
 		// Get registered fields and current settings.
-		$fields   = $this->get_registered_settings( $_POST['view'] );
+		$fields   = $this->get_registered_settings( $current_view );
 		$settings = get_option( 'wpforms_settings', array() );
+
+		// Views excluded from saving list.
+		$exclude_views = apply_filters( 'wpforms_settings_exclude_view', array(), $fields, $settings );
+
+		if ( is_array( $exclude_views ) && in_array( $current_view, $exclude_views, true ) ) {
+			// Run a custom save processing for excluded views.
+			do_action( 'wpforms_settings_custom_process', $current_view, $fields, $settings );
+			return;
+		}
 
 		if ( empty( $fields ) || ! is_array( $fields ) ) {
 			return;
@@ -514,14 +521,14 @@ class WPForms_Settings {
 			'integrations' => array(
 				'integrations-heading'   => array(
 					'id'       => 'integrations-heading',
-					'content'  => '<h4>' . esc_html__( 'Integrations', 'wpforms-lite' ) . '</h4><p>' . esc_html__( 'Manage integrations with popular providers such as Constant Contact, MailChimp, Zapier, and more.', 'wpforms-lite' ) . '</p>',
+					'content'  => '<h4>' . esc_html__( 'Integrations', 'wpforms-lite' ) . '</h4><p>' . esc_html__( 'Manage integrations with popular providers such as Constant Contact, Mailchimp, Zapier, and more.', 'wpforms-lite' ) . '</p>',
 					'type'     => 'content',
 					'no_label' => true,
 					'class'    => array( 'section-heading' ),
 				),
 				'integrations-providers' => array(
 					'id'      => 'integrations-providers',
-					'content' => '<h4>' . esc_html__( 'Integrations', 'wpforms-lite' ) . '</h4><p>' . esc_html__( 'Manage integrations with popular providers such as Constant Contact, MailChimp, Zapier, and more.', 'wpforms-lite' ) . '</p>',
+					'content' => '<h4>' . esc_html__( 'Integrations', 'wpforms-lite' ) . '</h4><p>' . esc_html__( 'Manage integrations with popular providers such as Constant Contact, Mailchimp, Zapier, and more.', 'wpforms-lite' ) . '</p>',
 					'type'    => 'providers',
 					'wrap'    => 'none',
 				),
@@ -555,6 +562,12 @@ class WPForms_Settings {
 		}
 
 		$defaults = apply_filters( 'wpforms_settings_defaults', $defaults );
+
+		// Take care of invalid views.
+		if ( ! empty( $view ) && ! array_key_exists( $view, $defaults ) ) {
+			$this->view = key( $defaults );
+			return reset( $defaults );
+		}
 
 		return empty( $view ) ? $defaults : $defaults[ $view ];
 	}
@@ -604,7 +617,7 @@ class WPForms_Settings {
 			}
 			?>
 
-			<div class="wpforms-admin-content wpforms-admin-settings">
+			<div class="wpforms-admin-content wpforms-admin-settings wpforms-admin-content-<?php echo esc_attr( $this->view ); ?> wpforms-admin-settings-<?php echo esc_attr( $this->view ); ?>">
 
 				<?php
 				// Some tabs rely on AJAX and do not contain a form, such as Integrations.

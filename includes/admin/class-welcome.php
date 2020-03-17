@@ -5,11 +5,7 @@
  *
  * This page is shown when the plugin is activated.
  *
- * @since      1.0.0
- * @author     WPForms
- * @package    WPForms
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Welcome {
 

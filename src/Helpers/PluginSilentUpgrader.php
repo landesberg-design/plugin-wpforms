@@ -243,7 +243,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 	/**
 	 * Toggle maintenance mode for the site.
 	 *
-	 * Creates/deletes the maintenance file to enable/disable maintenance mode.
+	 * Create/delete the maintenance file to enable/disable maintenance mode.
 	 *
 	 * @since 2.8.0
 	 *

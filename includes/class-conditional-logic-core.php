@@ -10,11 +10,7 @@
  * This was contained in an addon until version 1.3.8 when it was rolled into
  * core.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.3.8
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2017, WPForms LLC
+ * @since 1.3.8
  */
 class WPForms_Conditional_Logic_Core {
 
@@ -139,7 +135,7 @@ class WPForms_Conditional_Logic_Core {
 	}
 
 	/**
-	 * Builds the conditional logic settings to display in the form builder.
+	 * Build the conditional logic settings to display in the form builder.
 	 *
 	 * @since 1.3.8
 	 *
@@ -418,7 +414,7 @@ class WPForms_Conditional_Logic_Core {
 												// these additional operators.
 												$disabled = '';
 												if ( ! empty( $rule['field'] ) && ! empty( $form_fields[ $rule['field'] ]['type'] ) ) {
-													$disabled = in_array( $form_fields[ $rule['field'] ]['type'], array( 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'net_promoter_score' ), true ) ? '' : ' disabled';
+													$disabled = in_array( $form_fields[ $rule['field'] ]['type'], array( 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'number-slider', 'net_promoter_score' ), true ) ? '' : ' disabled';
 												}
 
 												printf( '<option value="c" %s%s>%s</option>', selected( $operator, 'c', false ), $disabled, esc_html__( 'contains', 'wpforms-lite' ) );
@@ -447,9 +443,9 @@ class WPForms_Conditional_Logic_Core {
 													$disabled = '';
 												}
 
-												if ( isset( $form_fields[ $rule['field'] ]['type'] ) && in_array( $form_fields[ $rule['field'] ]['type'], array( 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'net_promoter_score' ), true ) ) {
+												if ( isset( $form_fields[ $rule['field'] ]['type'] ) && in_array( $form_fields[ $rule['field'] ]['type'], array( 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'number-slider', 'net_promoter_score' ), true ) ) {
 
-													$type = in_array( $form_fields[ $rule['field'] ]['type'], array( 'rating', 'net_promoter_score' ), true ) ? 'number' : 'text';
+													$type = in_array( $form_fields[ $rule['field'] ]['type'], array( 'rating', 'net_promoter_score', 'number-slider' ), true ) ? 'number' : 'text';
 
 													printf(
 														'<input type="%s" name="%s[conditionals][%s][%s][value]" value="%s" class="wpforms-conditional-value" %s>',
@@ -547,7 +543,7 @@ class WPForms_Conditional_Logic_Core {
 	/**
 	 * Process conditional rules.
 	 *
-	 * Checks if a form passes the conditional logic rules that are provided.
+	 * Check if a form passes the conditional logic rules that are provided.
 	 *
 	 * @since 1.3.8
 	 *
@@ -585,11 +581,11 @@ class WPForms_Conditional_Logic_Core {
 					$rule_operator = $rule['operator'];
 					$rule_value    = isset( $rule['value'] ) ? $rule['value'] : '';
 
-					if ( in_array( $fields[ $rule_field ]['type'], array( 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'net_promoter_score' ), true ) ) {
+					if ( in_array( $fields[ $rule_field ]['type'], array( 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'number-slider', 'net_promoter_score' ), true ) ) {
 
 						// Text based fields.
-						$left  = trim( strtolower( $fields[ $rule_field ]['value'] ) );
-						$right = trim( strtolower( $rule_value ) );
+						$left  = strtolower( trim( $fields[ $rule_field ]['value'] ) );
+						$right = strtolower( trim( $rule_value ) );
 
 						switch ( $rule_operator ) {
 							case '==':
@@ -617,11 +613,11 @@ class WPForms_Conditional_Logic_Core {
 								$pass_rule = ( '' != $left );
 								break;
 							case '>':
-								$left      = preg_replace( '/[^0-9.]/', '', $left );
+								$left      = preg_replace( '/[^-0-9.]/', '', $left );
 								$pass_rule = ( '' !== $left ) && ( floatval( $left ) > floatval( $right ) );
 								break;
 							case '<':
-								$left      = preg_replace( '/[^0-9.]/', '', $left );
+								$left      = preg_replace( '/[^-0-9.]/', '', $left );
 								$pass_rule = ( '' !== $left ) && ( floatval( $left ) < floatval( $right ) );
 								break;
 							default:
@@ -641,7 +637,7 @@ class WPForms_Conditional_Logic_Core {
 
 							// Payment Multiple/Checkbox fields store the option key,
 							// so we can reference that easily.
-							$provided_id = $fields[ $rule_field ]['value_raw'];
+							$provided_id = explode( ',', (string) $fields[ $rule_field ]['value_raw'] );
 
 						} elseif ( isset( $fields[ $rule_field ]['value'] ) && '' != $fields[ $rule_field ]['value'] ) {
 
@@ -685,10 +681,10 @@ class WPForms_Conditional_Logic_Core {
 								$pass_rule = ! in_array( $right, $left );
 								break;
 							case 'e':
-								$pass_rule = ( false === $left[0] );
+								$pass_rule = empty( $left[0] );
 								break;
 							case '!e':
-								$pass_rule = ( false !== $left[0] );
+								$pass_rule = ! empty( $left[0] );
 								break;
 							default:
 								$pass_rule = apply_filters( 'wpforms_process_conditional_logic', false, $rule_operator, $left, $right );

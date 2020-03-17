@@ -5,11 +5,7 @@ if ( ! class_exists( 'AM_Deactivation_Survey', false ) ) {
 	 *
 	 * This prompts the user for more details when they deactivate the plugin.
 	 *
-	 * @version    1.2.1
-	 * @package    AwesomeMotive
-	 * @author     Jared Atchison and Chris Christoff
-	 * @license    GPL-2.0+
-	 * @copyright  Copyright (c) 2018
+	 * @since 1.2.1
 	 */
 	class AM_Deactivation_Survey {
 
@@ -60,7 +56,7 @@ if ( ! class_exists( 'AM_Deactivation_Survey', false ) ) {
 		}
 
 		/**
-		 * Checks if current site is a development one.
+		 * Check if current site is a development one.
 		 *
 		 * @since 1.2.0
 		 * @return bool
@@ -116,7 +112,7 @@ if ( ! class_exists( 'AM_Deactivation_Survey', false ) ) {
 		}
 
 		/**
-		 * Checks if current admin screen is the plugins page.
+		 * Check if current admin screen is the plugins page.
 		 *
 		 * @since 1.0.0
 		 * @return bool

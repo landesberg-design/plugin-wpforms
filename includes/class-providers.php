@@ -3,11 +3,7 @@
 /**
  * Load the providers.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.3.6
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2017, WPForms LLC
+ * @since 1.3.6
  */
 class WPForms_Providers {
 

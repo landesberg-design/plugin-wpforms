@@ -5,11 +5,7 @@ namespace WPForms\Integrations;
 /**
  * Class Loader gives ability to track/load all integrations.
  *
- * @package    WPForms\Integrations
- * @author     WPForms
- * @since      1.4.8
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.4.8
  */
 class Loader {
 

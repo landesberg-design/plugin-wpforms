@@ -5,11 +5,7 @@ namespace WPForms\Admin\Pages;
 /**
  * Community Sub-page.
  *
- * @package    WPForms\Admin\Pages
- * @author     WPForms
- * @since      1.5.6
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.5.6
  */
 class Community {
 
@@ -29,7 +25,7 @@ class Community {
 	 */
 	public function __construct() {
 
-		if ( \current_user_can( \wpforms_get_capability_manage_options() ) ) {
+		if ( \wpforms_current_user_can() ) {
 			$this->hooks();
 		}
 	}

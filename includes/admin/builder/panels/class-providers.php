@@ -3,11 +3,7 @@
 /**
  * Providers panel.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Builder_Panel_Providers extends WPForms_Builder_Panel {
 
@@ -57,7 +53,7 @@ class WPForms_Builder_Panel_Providers extends WPForms_Builder_Panel {
 				'confirm_connection' => esc_html__( 'Are you sure you want to delete this connection?', 'wpforms-lite' ),
 				'prompt_connection'  => esc_html__( 'Enter a %type% nickname', 'wpforms-lite' ),
 				'prompt_placeholder' => esc_html__( 'Eg: Newsletter Optin', 'wpforms-lite' ),
-				'error_name'         => esc_html__( 'You must provide a connection nickname', 'wpforms-lite' ),
+				'error_name'         => esc_html__( 'You must provide a connection nickname.', 'wpforms-lite' ),
 				'required_field'     => esc_html__( 'Field required', 'wpforms-lite' ),
 			)
 		);

@@ -3,13 +3,27 @@
 /**
  * Generates the table on the entries overview page.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Entries_Table extends WP_List_Table {
+
+	/**
+	 * The ID of the table column called "Entry ID".
+	 *
+	 * @since 1.5.7
+	 *
+	 * @var int
+	 */
+	const COLUMN_ENTRY_ID = -1;
+
+	/**
+	 * The ID of the table column called "Entry Notes".
+	 *
+	 * @since 1.5.7
+	 *
+	 * @var int
+	 */
+	const COLUMN_NOTES_COUNT = -2;
 
 	/**
 	 * Number of entries to show per page.
@@ -175,12 +189,15 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * Retrieve the table's sortable columns.
 	 *
 	 * @since 1.2.6
+	 * @since 1.5.7 Added an `Entry Notes` column.
 	 *
 	 * @return array Array of all the sortable columns
 	 */
 	public function get_sortable_columns() {
 
 		$sortable = array(
+			'entry_id'      => array( 'id', false ),
+			'notes_count'   => array( 'notes_count', false ),
 			'id'            => array( 'title', false ),
 			'date'          => array( 'date', false ),
 			'status'        => array( 'status', false ),
@@ -198,6 +215,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * @return array
 	 */
 	public static function get_columns_form_disallowed_fields() {
+
 		return (array) apply_filters( 'wpforms_entries_table_fields_disallow', array( 'divider', 'html', 'pagebreak', 'captcha' ) );
 	}
 
@@ -205,9 +223,10 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * Logic to determine which fields are displayed in the table columns.
 	 *
 	 * @since 1.0.0
+	 * @since 1.5.7 Added an `Entry Notes` column.
 	 *
-	 * @param array $columns
-	 * @param int $display
+	 * @param array $columns List of columns.
+	 * @param int   $display Number of columns to display.
 	 *
 	 * @return array
 	 */
@@ -217,10 +236,26 @@ class WPForms_Entries_Table extends WP_List_Table {
 			return array();
 		}
 
-		$entry_columns = wpforms()->form->get_meta( $this->form_id, 'entry_columns' );
+		$entry_columns = wpforms()->form->get_meta( $this->form_id, 'entry_columns', array( 'cap' => 'view_entries_form_single' ) );
 
+		/*
+		 * Display those columns that were selected by a user.
+		 */
 		if ( $entry_columns ) {
 			foreach ( $entry_columns as $id ) {
+
+				// Check for special columns, like Entry ID.
+				if ( self::COLUMN_ENTRY_ID === $id ) {
+					$columns['entry_id'] = esc_html__( 'Entry ID', 'wpforms' );
+					continue;
+				}
+
+				// Check for special columns, like Entry Notes.
+				if ( self::COLUMN_NOTES_COUNT === $id ) {
+					$columns['notes_count'] = esc_html__( 'Entry Notes', 'wpforms' );
+					continue;
+				}
+
 				// Check to make sure the field has not been removed.
 				if ( empty( $this->form_data['fields'][ $id ] ) ) {
 					continue;
@@ -229,6 +264,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 				$columns[ 'wpforms_field_' . $id ] = ! empty( $this->form_data['fields'][ $id ]['label'] ) ? wp_strip_all_tags( $this->form_data['fields'][ $id ]['label'] ) : esc_html__( 'Field', 'wpforms' );
 			}
 		} else {
+			/*
+			 * Display default number of first fields in a form.
+			 */
 			$x = 0;
 			foreach ( $this->form_data['fields'] as $id => $field ) {
 				if ( ! in_array( $field['type'], self::get_columns_form_disallowed_fields(), true ) && $x < $display ) {
@@ -246,7 +284,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param object $entry
+	 * @param object $entry Entry data from DB.
 	 *
 	 * @return string
 	 */
@@ -255,16 +293,81 @@ class WPForms_Entries_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Show `status` value.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @param object $entry       Current entry data.
+	 * @param string $column_name Current column name.
+	 *
+	 * @return string
+	 */
+	public function column_status_field( $entry, $column_name ) {
+
+		if ( 'payment' === $entry->type ) {
+			// For payments, display dollar icon to easily indicate this
+			// status is related to a payment.
+			if ( ! empty( $entry->status ) ) {
+				$value = ucwords( sanitize_text_field( $entry->status ) );
+			} else {
+				$value = esc_html__( 'Unknown', 'wpforms' );
+			}
+			$value .= ' <i class="fa fa-money" aria-hidden="true" style="color:green;font-size: 16px;margin-left:4px;" title="' . esc_html__( 'Payment', 'wpforms' ) . '"></i>';
+		} else {
+			if ( ! empty( $entry->status ) ) {
+				$value = ucwords( sanitize_text_field( $entry->status ) );
+			} else {
+				$value = esc_html__( 'Completed', 'wpforms' );
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Show `payment_total` value.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @param object $entry       Current entry data.
+	 * @param string $column_name Current column name.
+	 *
+	 * @return string
+	 */
+	public function column_payment_total_field( $entry, $column_name ) {
+
+		$entry_meta = json_decode( $entry->meta, true );
+
+		if ( 'payment' === $entry->type && isset( $entry_meta['payment_total'] ) ) {
+			$amount = wpforms_sanitize_amount( $entry_meta['payment_total'], $entry_meta['payment_currency'] );
+			$total  = wpforms_format_amount( $amount, true, $entry_meta['payment_currency'] );
+			$value  = $total;
+
+			if ( ! empty( $entry_meta['payment_subscription'] ) ) {
+				$value .= ' <i class="fa fa-refresh" aria-hidden="true" style="color:#ccc;margin-left:4px;" title="' . esc_html__( 'Recurring', 'wpforms' ) . '"></i>';
+			}
+		} else {
+			$value = '-';
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Show specific form fields.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param object $entry
-	 * @param string $column_name
+	 * @param object $entry       Entry data from DB.
+	 * @param string $column_name Column unique name.
 	 *
 	 * @return string
 	 */
 	public function column_form_field( $entry, $column_name ) {
+
+		if ( false === strpos( $column_name, 'wpforms_field_' ) ) {
+			return '';
+		}
 
 		$field_id     = str_replace( 'wpforms_field_', '', $column_name );
 		$entry_fields = wpforms_decode( $entry->fields );
@@ -291,29 +394,35 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 			return apply_filters( 'wpforms_html_field_value', $value, $entry_fields[ $field_id ], $this->form_data, 'entry-table' );
 
-		} else {
-			return '-';
 		}
+
+		return '-';
 	}
 
 	/**
 	 * Renders the columns.
 	 *
 	 * @since 1.0.0
+	 * @since 1.5.7 Added an `Entry Notes` column.
 	 *
-	 * @param object $entry
-	 * @param string $column_name
+	 * @param object $entry       Current entry data.
+	 * @param string $column_name Current column name.
 	 *
 	 * @return string
 	 */
 	public function column_default( $entry, $column_name ) {
 
-		$entry_meta = json_decode( $entry->meta, true );
+		$field_type = $this->get_field_type( $entry, $column_name );
 
-		switch ( $column_name ) {
+		switch ( strtolower( $column_name ) ) {
 
+			case 'entry_id':
 			case 'id':
 				$value = absint( $entry->entry_id );
+				break;
+
+			case 'notes_count':
+				$value = absint( $entry->notes_count );
 				break;
 
 			case 'date':
@@ -321,48 +430,49 @@ class WPForms_Entries_Table extends WP_List_Table {
 				break;
 
 			case 'status':
-				if ( 'payment' === $entry->type ) {
-					// For payments, display dollar icon to easily indicate this
-					// status is related to a payment.
-					if ( ! empty( $entry->status ) ) {
-						$value = ucwords( sanitize_text_field( $entry->status ) );
-					} else {
-						$value = esc_html__( 'Unknown', 'wpforms' );
-					}
-					$value .= ' <i class="fa fa-money" aria-hidden="true" style="color:green;font-size: 16px;margin-left:4px;" title="' . esc_html__( 'Payment', 'wpforms' ) . '"></i>';
-				} else {
-					if ( ! empty( $entry->status ) ) {
-						$value = ucwords( sanitize_text_field( $entry->status ) );
-					} else {
-						$value = esc_html__( 'Completed', 'wpforms' );
-					}
-				}
+				$value = $this->column_status_field( $entry, $column_name );
 				break;
 
 			case 'payment_total':
-				if ( 'payment' === $entry->type && isset( $entry_meta['payment_total'] ) ) {
-					$amount = wpforms_sanitize_amount( $entry_meta['payment_total'], $entry_meta['payment_currency'] );
-					$total  = wpforms_format_amount( $amount, true, $entry_meta['payment_currency'] );
-					$value  = $total;
-
-					if ( ! empty( $entry_meta['payment_subscription'] ) ) {
-						$value .= ' <i class="fa fa-refresh" aria-hidden="true" style="color:#ccc;margin-left:4px;" title="' . esc_html__( 'Recurring', 'wpforms' ) . '"></i>';
-					}
-
-				} else {
-					$value = '-';
-				}
+				$value = $this->column_payment_total_field( $entry, $column_name );
 				break;
 
 			default:
-				if ( false !== strpos( $column_name, 'wpforms_field_' ) ) {
-					$value = $this->column_form_field( $entry, $column_name );
-				} else {
-					$value = '';
-				}
+				$value = $this->column_form_field( $entry, $column_name );
+		}
+
+		// Adds a wrapper with a field type in data attribute.
+		if ( ! empty( $value ) && ! empty( $field_type ) ) {
+			$value = sprintf( '<div data-field-type="%s">%s</div>', $field_type, $value );
 		}
 
 		return apply_filters( 'wpforms_entry_table_column_value', $value, $entry, $column_name );
+	}
+
+	/**
+	 * Retrieve a field type.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @param object $entry       Current entry data.
+	 * @param string $column_name Current column name.
+	 *
+	 * @return string
+	 */
+	public function get_field_type( $entry, $column_name ) {
+
+		$field_id     = str_replace( 'wpforms_field_', '', $column_name );
+		$entry_fields = wpforms_decode( $entry->fields );
+		$field_type   = '';
+
+		if (
+			! empty( $entry_fields[ $field_id ] ) &&
+			! wpforms_is_empty_string( $entry_fields[ $field_id ]['type'] )
+		) {
+			$field_type = $entry_fields[ $field_id ]['type'];
+		}
+
+		return $field_type;
 	}
 
 	/**
@@ -370,7 +480,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 *
 	 * @since 1.1.6
 	 *
-	 * @param object $entry
+	 * @param object $entry Entry data from DB.
 	 *
 	 * @return string
 	 */
@@ -379,12 +489,12 @@ class WPForms_Entries_Table extends WP_List_Table {
 		// Stars.
 		$star_action = ! empty( $entry->starred ) ? 'unstar' : 'star';
 		$star_title  = ! empty( $entry->starred ) ? esc_html__( 'Unstar entry', 'wpforms' ) : esc_html__( 'Star entry', 'wpforms' );
-		$star_icon   = '<a href="#" class="indicator-star ' . $star_action . '" data-id="' . absint( $entry->entry_id ) . '" title="' . esc_attr( $star_title ) . '"><span class="dashicons dashicons-star-filled"></span></a>';
+		$star_icon   = '<a href="#" class="indicator-star ' . $star_action . '" data-id="' . absint( $entry->entry_id ) . '" data-form-id="' . absint( $entry->form_id ) . '" title="' . esc_attr( $star_title ) . '"><span class="dashicons dashicons-star-filled"></span></a>';
 
 		// Viewed.
 		$read_action = ! empty( $entry->viewed ) ? 'unread' : 'read';
 		$read_title  = ! empty( $entry->viewed ) ? esc_html__( 'Mark entry unread', 'wpforms' ) : esc_html__( 'Mark entry read', 'wpforms' );
-		$read_icon   = '<a href="#" class="indicator-read ' . $read_action . '" data-id="' . absint( $entry->entry_id ) . '" title="' . esc_attr( $read_title ) . '"><span class="dashicons dashicons-marker"></span></a>';
+		$read_icon   = '<a href="#" class="indicator-read ' . $read_action . '" data-id="' . absint( $entry->entry_id ) . '" data-form-id="' . absint( $entry->form_id ) . '" title="' . esc_attr( $read_title ) . '"><span class="dashicons dashicons-marker"></span></a>';
 
 		return $star_icon . $read_icon;
 	}
@@ -394,7 +504,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param object $entry
+	 * @param object $entry Entry data from DB.
 	 *
 	 * @return string
 	 */
@@ -405,35 +515,40 @@ class WPForms_Entries_Table extends WP_List_Table {
 		// View.
 		$actions[] = sprintf(
 			'<a href="%s" title="%s" class="view">%s</a>',
-			add_query_arg(
-				array(
-					'view'     => 'details',
-					'entry_id' => $entry->entry_id,
-				),
-				admin_url( 'admin.php?page=wpforms-entries'
+			esc_url(
+				add_query_arg(
+					array(
+						'view'     => 'details',
+						'entry_id' => $entry->entry_id,
+					),
+					admin_url( 'admin.php?page=wpforms-entries' )
 				)
 			),
-			esc_html__( 'View Form Entry', 'wpforms' ),
+			esc_attr__( 'View Form Entry', 'wpforms' ),
 			esc_html__( 'View', 'wpforms' )
 		);
 
-		// Delete.
-		$actions[] = sprintf(
-			'<a href="%s" title="%s" class="delete">%s</a>',
-			wp_nonce_url(
-				add_query_arg(
-					array(
-						'view'     => 'list',
-						'action'   => 'delete',
-						'form_id'  => $this->form_id,
-						'entry_id' => $entry->entry_id,
+		if ( wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
+			// Delete.
+			$actions[] = sprintf(
+				'<a href="%s" title="%s" class="delete">%s</a>',
+				esc_url(
+					wp_nonce_url(
+						add_query_arg(
+							array(
+								'view'     => 'list',
+								'action'   => 'delete',
+								'form_id'  => $this->form_id,
+								'entry_id' => $entry->entry_id,
+							)
+						),
+						'bulk-entries'
 					)
 				),
-				'bulk-entries'
-			),
-			esc_html__( 'Delete Form Entry', 'wpforms' ),
-			esc_html__( 'Delete', 'wpforms' )
-		);
+				esc_attr__( 'Delete Form Entry', 'wpforms' ),
+				esc_html__( 'Delete', 'wpforms' )
+			);
+		}
 
 		return implode( ' <span class="sep">|</span> ', apply_filters( 'wpforms_entry_table_actions', $actions, $entry ) );
 	}
@@ -443,7 +558,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 *
 	 * @since 1.4.4
 	 *
-	 * @param string $which
+	 * @param string $which Either top or bottom of the page.
 	 */
 	protected function extra_tablenav( $which ) {
 
@@ -514,7 +629,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 
-		$actions = array(
+		return array(
 			'read'   => esc_html__( 'Mark Read', 'wpforms' ),
 			'unread' => esc_html__( 'Mark Unread', 'wpforms' ),
 			'star'   => esc_html__( 'Star', 'wpforms' ),
@@ -522,8 +637,6 @@ class WPForms_Entries_Table extends WP_List_Table {
 			'null'   => esc_html__( '----------', 'wpforms' ),
 			'delete' => esc_html__( 'Delete', 'wpforms' ),
 		);
-
-		return $actions;
 	}
 
 	/**
@@ -537,153 +650,388 @@ class WPForms_Entries_Table extends WP_List_Table {
 			return;
 		}
 
-		if ( ! wpforms_current_user_can() ) {
-			return;
-		}
-
 		if (
-			! wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-entries' ) &&
-			! wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-entries-nonce' )
+			! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'bulk-entries' ) &&
+			! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'bulk-entries-nonce' )
 		) {
 			return;
 		}
 
-		$ids = isset( $_GET['entry_id'] ) ? $_GET['entry_id'] : false;
+		$this->process_bulk_action_single();
+		$this->display_bulk_action_message();
+	}
+
+	/**
+	 * Process single bulk action.
+	 *
+	 * @since 1.5.7
+	 */
+	protected function process_bulk_action_single() {
+
+		$doaction = $this->current_action();
+
+		if ( empty( $doaction ) || $doaction === 'filter_date' ) {
+			return;
+		}
+
+		$ids = isset( $_GET['entry_id'] ) ? wp_unslash( $_GET['entry_id'] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( ! is_array( $ids ) ) {
 			$ids = array( $ids );
 		}
 
-		$ids    = array_map( 'absint', $ids );
-		$action = ! empty( $_REQUEST['action'] ) ? $_REQUEST['action'] : false;
+		$ids = array_map( 'absint', $ids );
 
-		if ( empty( $ids ) || empty( $action ) ) {
+		if ( empty( $ids ) ) {
 			return;
 		}
 
-		// Mark as read.
-		if ( 'read' === $this->current_action() ) {
+		// Get entries, that would be affected.
+		$entries_list = wpforms()->entry->get_entries(
+			array(
+				'entry_id'    => $ids,
+				'is_filtered' => true,
+				'number'      => $this->get_items_per_page( 'wpforms_entries_per_page', $this->per_page ),
+			)
+		);
 
-			foreach ( $ids as $id ) {
-				wpforms()->entry->update(
-					$id,
-					array(
-						'viewed' => '1',
-					)
-				);
-			}
-			?>
-			<div class="updated notice">
-				<p>
-					<?php
-					if ( count( $ids ) === 1 ) {
-						esc_html_e( 'Entry was successfully marked as read.', 'wpforms' );
-					} else {
-						esc_html_e( 'Entries were successfully marked as read.', 'wpforms' );
-					}
-					?>
-				</p>
-			</div>
-			<?php
+		$sendback = remove_query_arg( array( 'read', 'unread', 'starred', 'unstarred', 'deleted' ) );
+
+		switch ( $doaction ) {
+
+			// Mark as read.
+			case 'read':
+				$sendback = $this->process_bulk_action_single_read( $entries_list, $ids, $sendback );
+				break;
+
+			// Mark as unread.
+			case 'unread':
+				$sendback = $this->process_bulk_action_single_unread( $entries_list, $ids, $sendback );
+				break;
+
+			// Star entry.
+			case 'star':
+				$sendback = $this->process_bulk_action_single_star( $entries_list, $ids, $sendback );
+				break;
+
+			// Unstar entry.
+			case 'unstar':
+				$sendback = $this->process_bulk_action_single_unstar( $entries_list, $ids, $sendback );
+				break;
+
+			// Delete entries.
+			case 'delete':
+				$sendback = $this->process_bulk_action_single_delete( $ids, $sendback );
+				break;
 		}
 
-		// Mark as unread.
-		if ( 'unread' === $this->current_action() ) {
+		$sendback = remove_query_arg( array( 'action', 'action2', 'entry_id' ), $sendback );
 
-			foreach ( $ids as $id ) {
-				wpforms()->entry->update(
-					$id,
-					array(
-						'viewed' => '0',
-					)
-				);
-			}
-			?>
-			<div class="updated notice">
-				<p>
-					<?php
-					if ( count( $ids ) === 1 ) {
-						esc_html_e( 'Entry was successfully marked as unread.', 'wpforms' );
-					} else {
-						esc_html_e( 'Entries were successfully marked as unread.', 'wpforms' );
-					}
-					?>
-				</p>
-			</div>
-			<?php
+		wp_safe_redirect( $sendback );
+		exit();
+	}
+
+	/**
+	 * Process the bulk action read.
+	 *
+	 * @since 1.5.7
+	 *
+	 * @param array  $entries_list Filtered entries list.
+	 * @param array  $ids          IDs to process.
+	 * @param string $sendback     URL query string.
+	 *
+	 * @return string
+	 */
+	protected function process_bulk_action_single_read( $entries_list, $ids, $sendback ) {
+
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
+
+		if ( empty( $form_id ) ) {
+			return $sendback;
 		}
 
-		// Star entry.
-		if ( 'star' === $this->current_action() ) {
+		$user_id = get_current_user_id();
+		$entries = wp_list_pluck( $entries_list, 'viewed', 'entry_id' );
+		$read    = 0;
 
-			foreach ( $ids as $id ) {
-				wpforms()->entry->update(
-					$id,
-					array(
-						'starred' => '1',
-					)
-				);
+		foreach ( $ids as $id ) {
+
+			if ( ! array_key_exists( $id, $entries ) ) {
+				continue;
 			}
-			?>
-			<div class="updated notice">
-				<p>
-					<?php
-					if ( count( $ids ) === 1 ) {
-						esc_html_e( 'Entry was successfully starred.', 'wpforms' );
-					} else {
-						esc_html_e( 'Entries were successfully starred.', 'wpforms' );
-					}
-					?>
-				</p>
-			</div>
-			<?php
+
+			if ( '1' === $entries[ $id ] ) {
+				continue;
+			}
+
+			$success = wpforms()->entry->update(
+				$id,
+				array(
+					'viewed' => '1',
+				)
+			);
+
+			if ( $success ) {
+
+				wpforms()->entry_meta->add(
+					array(
+						'entry_id' => $id,
+						'form_id'  => $form_id,
+						'user_id'  => $user_id,
+						'type'     => 'log',
+						'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry read.', 'wpforms' ) ) ),
+					),
+					'entry_meta'
+				);
+
+				$read++;
+			}
 		}
 
-		// Star entry.
-		if ( 'unstar' === $this->current_action() ) {
+		return add_query_arg( 'read', $read, $sendback );
+	}
 
-			foreach ( $ids as $id ) {
-				wpforms()->entry->update(
-					$id,
-					array(
-						'starred' => '0',
-					)
-				);
-			}
-			?>
-			<div class="updated notice">
-				<p>
-					<?php
-					if ( count( $ids ) === 1 ) {
-						esc_html_e( 'Entry was successfully unstarred.', 'wpforms' );
-					} else {
-						esc_html_e( 'Entries were successfully unstarred.', 'wpforms' );
-					}
-					?>
-				</p>
-			</div>
-			<?php
+	/**
+	 * Process the bulk action unread.
+	 *
+	 * @since 1.5.7
+	 *
+	 * @param array  $entries_list Filtered entries list.
+	 * @param array  $ids          IDs to process.
+	 * @param string $sendback     URL query string.
+	 *
+	 * @return string
+	 */
+	protected function process_bulk_action_single_unread( $entries_list, $ids, $sendback ) {
+
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
+
+		if ( empty( $form_id ) ) {
+			return $sendback;
 		}
 
-		// Delete entries.
-		if ( 'delete' === $this->current_action() ) {
+		$user_id = get_current_user_id();
+		$entries = wp_list_pluck( $entries_list, 'viewed', 'entry_id' );
+		$unread  = 0;
 
-			foreach ( $ids as $id ) {
-				wpforms()->entry->delete( $id );
+		foreach ( $ids as $id ) {
+
+			if ( ! array_key_exists( $id, $entries ) ) {
+				continue;
 			}
-			?>
-			<div class="updated notice">
-				<p>
-					<?php
-					if ( count( $ids ) === 1 ) {
-						esc_html_e( 'Entry was successfully deleted.', 'wpforms' );
-					} else {
-						esc_html_e( 'Entries were successfully deleted.', 'wpforms' );
-					}
-					?>
-				</p>
-			</div>
-			<?php
+
+			if ( '0' === $entries[ $id ] ) {
+				continue;
+			}
+
+			$success = wpforms()->entry->update(
+				$id,
+				array(
+					'viewed' => '0',
+				)
+			);
+
+			if ( $success ) {
+				wpforms()->entry_meta->add(
+					array(
+						'entry_id' => $id,
+						'form_id'  => $form_id,
+						'user_id'  => $user_id,
+						'type'     => 'log',
+						'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry unread.', 'wpforms' ) ) ),
+					),
+					'entry_meta'
+				);
+
+				$unread++;
+			}
+		}
+
+		return add_query_arg( 'unread', $unread, $sendback );
+	}
+
+	/**
+	 * Process the bulk action star.
+	 *
+	 * @since 1.5.7
+	 *
+	 * @param array  $entries_list Filtered entries list.
+	 * @param array  $ids          IDs to process.
+	 * @param string $sendback     URL query string.
+	 *
+	 * @return string
+	 */
+	protected function process_bulk_action_single_star( $entries_list, $ids, $sendback ) {
+
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
+
+		if ( empty( $form_id ) ) {
+			return $sendback;
+		}
+
+		$user_id = get_current_user_id();
+		$entries = wp_list_pluck( $entries_list, 'starred', 'entry_id' );
+		$starred = 0;
+
+		foreach ( $ids as $id ) {
+
+			if ( ! array_key_exists( $id, $entries ) ) {
+				continue;
+			}
+
+			if ( '1' === $entries[ $id ] ) {
+				continue;
+			}
+
+			$success = wpforms()->entry->update(
+				$id,
+				array(
+					'starred' => '1',
+				)
+			);
+
+			if ( $success ) {
+				wpforms()->entry_meta->add(
+					array(
+						'entry_id' => $id,
+						'form_id'  => $form_id,
+						'user_id'  => $user_id,
+						'type'     => 'log',
+						'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry starred.', 'wpforms' ) ) ),
+					),
+					'entry_meta'
+				);
+
+				$starred++;
+			}
+		}
+
+		return add_query_arg( 'starred', $starred, $sendback );
+	}
+
+	/**
+	 * Process the bulk action unstar.
+	 *
+	 * @since 1.5.7
+	 *
+	 * @param array  $entries_list Filtered entries list.
+	 * @param array  $ids          IDs to process.
+	 * @param string $sendback     URL query string.
+	 *
+	 * @return string
+	 */
+	protected function process_bulk_action_single_unstar( $entries_list, $ids, $sendback ) {
+
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
+
+		if ( empty( $form_id ) ) {
+			return $sendback;
+		}
+
+		$user_id   = get_current_user_id();
+		$entries   = wp_list_pluck( $entries_list, 'starred', 'entry_id' );
+		$unstarred = 0;
+
+		foreach ( $ids as $id ) {
+
+			if ( ! array_key_exists( $id, $entries ) ) {
+				continue;
+			}
+
+			if ( '0' === $entries[ $id ] ) {
+				continue;
+			}
+
+			$success = wpforms()->entry->update(
+				$id,
+				array(
+					'starred' => '0',
+				)
+			);
+
+			if ( $success ) {
+				wpforms()->entry_meta->add(
+					array(
+						'entry_id' => $id,
+						'form_id'  => $form_id,
+						'user_id'  => $user_id,
+						'type'     => 'log',
+						'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry unstarred.', 'wpforms' ) ) ),
+					),
+					'entry_meta'
+				);
+
+				$unstarred++;
+			}
+		}
+
+		return add_query_arg( 'unstarred', $unstarred, $sendback );
+	}
+
+	/**
+	 * Process the bulk action delete.
+	 *
+	 * @since 1.5.7
+	 *
+	 * @param array  $ids      IDs to process.
+	 * @param string $sendback URL query string.
+	 *
+	 * @return string
+	 */
+	protected function process_bulk_action_single_delete( $ids, $sendback ) {
+
+		$deleted = 0;
+
+		foreach ( $ids as $id ) {
+			if ( wpforms()->entry->delete( $id ) ) {
+				$deleted++;
+			}
+		}
+
+		return add_query_arg( 'deleted', $deleted, $sendback );
+	}
+
+	/**
+	 * Display bulk action result message.
+	 *
+	 * @since 1.5.7
+	 */
+	protected function display_bulk_action_message() {
+
+		$bulk_counts = array(
+			'read'      => isset( $_REQUEST['read'] ) ? absint( $_REQUEST['read'] ) : 0,
+			'unread'    => isset( $_REQUEST['unread'] ) ? absint( $_REQUEST['unread'] ) : 0,
+			'starred'   => isset( $_REQUEST['starred'] ) ? absint( $_REQUEST['starred'] ) : 0,
+			'unstarred' => isset( $_REQUEST['unstarred'] ) ? absint( $_REQUEST['unstarred'] ) : 0,
+			'deleted'   => isset( $_REQUEST['deleted'] ) ? absint( $_REQUEST['deleted'] ) : 0,
+		);
+
+		$bulk_messages = array(
+			/* translators: %d - number of processed entries. */
+			'read'      => _n( '%d entry was successfully marked as read.', '%d entries were successfully marked as read.', $bulk_counts['read'] ),
+			/* translators: %d - number of processed entries. */
+			'unread'    => _n( '%d entry was successfully marked as unread.', '%d entries were successfully marked as unread.', $bulk_counts['unread'] ),
+			/* translators: %d - number of processed entries. */
+			'starred'   => _n( '%d entry was successfully starred.', '%d entries were successfully starred.', $bulk_counts['starred'] ),
+			/* translators: %d - number of processed entries. */
+			'unstarred' => _n( '%d entry was successfully unstarred.', '%d entries were successfully unstarred.', $bulk_counts['unstarred'] ),
+			/* translators: %d - number of processed entries. */
+			'deleted'   => _n( '%d entry was successfully deleted.', '%d entries were successfully deleted.', $bulk_counts['deleted'] ),
+		);
+
+		// Leave only non-zero counts, so only those that were processed are left.
+		$bulk_counts = array_filter( $bulk_counts );
+
+		// If we have bulk messages to display.
+		$messages = array();
+		foreach ( $bulk_counts as $type => $count ) {
+			if ( isset( $bulk_messages[ $type ] ) ) {
+				$messages[] = sprintf( $bulk_messages[ $type ], $count );
+			}
+		}
+
+		if ( $messages ) {
+			WPForms_Admin_Notice::success( implode( '<br>', array_map( 'esc_html', $messages ) ) );
 		}
 	}
 
@@ -693,6 +1041,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * @since 1.0.0
 	 */
 	public function no_items() {
+
 		if ( isset( $_GET['search'] ) || isset( $_GET['date'] ) ) { // phpcs:ignore
 			esc_html_e( 'No entries found.', 'wpforms' );
 		} else {
@@ -705,12 +1054,12 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 *
 	 * @since 1.4.4
 	 *
-	 * @param string $text The 'submit' button label.
+	 * @param string $text     The 'submit' button label.
 	 * @param string $input_id ID attribute value for the search input field.
 	 */
 	public function search_box( $text, $input_id ) {
 
-		$input_id = $input_id . '-search-input';
+		$input_id .= '-search-input';
 
 		do_action( 'wpforms_entries_list_form_filters_before', $this->form_data );
 
@@ -785,11 +1134,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * Fetch and setup the final data for the table
 	 *
 	 * @since 1.0.0
+	 * @since 1.5.7 Added an `Entry Notes` column support.
 	 */
 	public function prepare_items() {
-
-		// Process bulk actions if found.
-		$this->process_bulk_actions();
 
 		// Retrieve count.
 		$this->get_counts();
@@ -833,6 +1180,10 @@ class WPForms_Entries_Table extends WP_List_Table {
 			$total_items         = $this->counts['abandoned'];
 		}
 
+		if ( array_key_exists( 'notes_count', $columns ) ) {
+			$data_args['notes_count'] = true;
+		}
+
 		$data_args = apply_filters( 'wpforms_entry_table_args', $data_args );
 		$data      = wpforms()->entry->get_entries( $data_args );
 
@@ -862,8 +1213,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 *
 	 * @since 1.2.6
 	 *
-	 * @param object $a
-	 * @param object $b
+	 * @param object $a First entry to sort.
+	 * @param object $b Second entry to sort.
 	 *
 	 * @return int
 	 */

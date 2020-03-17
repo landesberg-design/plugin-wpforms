@@ -4,13 +4,10 @@
  *
  * This class is forked from Easy Digital Downloads / Pippin Williamson.
  *
- * @link       https://github.com/easydigitaldownloads/Easy-Digital-Downloads/blob/master/includes/class-edd-logging.php
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
-*/
+ * @link https://github.com/easydigitaldownloads/Easy-Digital-Downloads/blob/master/includes/class-edd-logging.php
+ *
+ * @since 1.0.0
+ */
 class WPForms_Logging {
 
 	/**
@@ -42,11 +39,11 @@ class WPForms_Logging {
 			'show_ui'             => false,
 			'query_var'           => false,
 			'rewrite'             => false,
-			'capability_type'     => wpforms_get_capability_manage_options(),
 			'supports'            => array( 'title', 'editor' ),
 			'can_export'          => false,
 			'show_in_menu'        => 'wpforms-overview',
 			'show_in_admin_bar'   => false,
+			'capability_type'     => 'wpforms_log',
 		);
 
 		if ( wpforms_debug() ) {

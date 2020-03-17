@@ -3,11 +3,7 @@
 /**
  * Paragraph text field.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Field_Textarea extends WPForms_Field {
 
@@ -260,9 +256,8 @@ class WPForms_Field_Textarea extends WPForms_Field {
 		}
 	}
 
-
 	/**
-	 * Formats and sanitizes field.
+	 * Format and sanitize field.
 	 *
 	 * @since 1.5.6
 	 *
@@ -288,7 +283,7 @@ class WPForms_Field_Textarea extends WPForms_Field {
 			$mode  = sanitize_key( $field['limit_mode'] );
 
 			if ( 'characters' === $mode ) {
-				if ( mb_strlen( $value ) > $limit ) {
+				if ( mb_strlen( str_replace( "\r\n", "\n", $value ) ) > $limit ) {
 					/* translators: %s - limit characters number. */
 					wpforms()->process->errors[ $form_data['id'] ][ $field_id ] = sprintf( _n( 'Text can\'t exceed %d character.', 'Text can\'t exceed %d characters.', $limit, 'wpforms-lite' ), $limit );
 					return;

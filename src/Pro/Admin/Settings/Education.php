@@ -6,11 +6,7 @@ namespace WPForms\Pro\Admin\Settings;
  * Settings enhancements to educate users on what is
  * available in addons and high level licenses.
  *
- * @package    WPForms\Pro\Admin\Settings
- * @author     WPForms
- * @since      1.5.5
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.5
  */
 class Education {
 
@@ -199,7 +195,7 @@ class Education {
 	}
 
 	/**
-	 * Returns array of addons available.
+	 * Return a list of addons available.
 	 *
 	 * @since 1.5.5
 	 *
@@ -236,7 +232,7 @@ class Education {
 	}
 
 	/**
-	 * Returns download URL for an addon.
+	 * Return a download URL for an addon.
 	 *
 	 * @since 1.5.5
 	 *

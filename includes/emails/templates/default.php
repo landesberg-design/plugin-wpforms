@@ -2,17 +2,13 @@
 /**
  * Default email template.
  *
- * Don't forget to run final template through 
+ * Don't forget to run final template through
  * http://templates.mailchimp.com/resources/inline-css/
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.1.3
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
-*/
+ * @since 1.1.3
+ */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 $header_image = wpforms_setting( 'email-header-image', false );
@@ -228,24 +224,24 @@ $header_image = wpforms_setting( 'email-header-image', false );
 			body,table,td,p,a,li,blockquote{
 				-webkit-text-size-adjust:none !important;
 			}
-		}	
+		}
 		@media only screen and (max-width: 480px){
 			body{
 				width:100% !important;
 				min-width:100% !important;
 			}
-		}	
+		}
 		@media only screen and (max-width: 480px){
 			#bodyCell{
 				padding:20px !important;
 			}
-		}	
+		}
 		@media only screen and (max-width: 480px){
 			.mcnTextContentContainer{
 				max-width:100% !important;
 				width:100% !important;
 			}
-		}		
+		}
 	</style>
 </head>
 <body>
@@ -260,7 +256,7 @@ $header_image = wpforms_setting( 'email-header-image', false );
 					<td align="center" valign="top" width="600" style="width:600px;">
 					<![endif]-->
 					<table border="0" cellpadding="0" cellspacing="0" width="100%" class="templateContainer">
-						<?php 
+						<?php
 						if ( !empty( $header_image ) ) {
 							echo '<tr><td valign="top" align="center" id="templateHeader" style="padding-bottom:20px;text-align:center;">';
 								echo '<img src="' . esc_url( $header_image ) . '" alt="' . get_bloginfo( 'name' ) . '" />';
@@ -277,10 +273,10 @@ $header_image = wpforms_setting( 'email-header-image', false );
 													<tbody>
 														<tr>
 															<td valign="top" class="mcnTextContent" style="padding-top:30px; padding-right: 30px; padding-bottom: 30px; padding-left: 30px;">
-																
+
 																<!-- Content -->
 																<h1>Content.</h1>
-															
+
 															</td>
 														</tr>
 													</tbody>
@@ -301,10 +297,10 @@ $header_image = wpforms_setting( 'email-header-image', false );
 													<tbody>
 														<tr>
 															<td valign="top" class="mcnTextContent" style="padding-top:9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;">
-															
+
 																<!-- Footer content -->
 																Footer
-															
+
 															</td>
 														</tr>
 													</tbody>

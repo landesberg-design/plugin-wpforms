@@ -3,11 +3,7 @@
 /**
  * Dropdown payment field.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.3.1
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.3.1
  */
 class WPForms_Field_Payment_Select extends WPForms_Field {
 
@@ -124,11 +120,21 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Get the value, that is used to prefill via dynamic or fallback population.
+	 * Based on field data and current properties.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @param string $raw_value  Value from a GET param, always a string.
+	 * @param string $input      Represent a subfield inside the field. May be empty.
+	 * @param array  $properties Field properties.
+	 * @param array  $field      Current field specific data.
+	 *
+	 * @return array Modified field properties.
 	 */
 	protected function get_field_populated_single_property_value( $raw_value, $input, $properties, $field ) {
 		/*
-		 * When the form is submitted we get from Fallback only values (prices).
+		 * When the form is submitted we get from Fallback only values (choice ID).
 		 * As payment-dropdown field doesn't support 'show_values' option -
 		 * we should transform value into label to check against using general logic in parent method.
 		 */
@@ -141,29 +147,19 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 			return $properties;
 		}
 
-		// The form submits only the sum, so shortcut for Dynamic.
+		// The form submits only the choice ID, so shortcut for Dynamic when we have a label there.
 		if ( ! is_numeric( $raw_value ) ) {
 			return parent::get_field_populated_single_property_value( $raw_value, $input, $properties, $field );
 		}
 
-		$get_value = wpforms_format_amount( wpforms_sanitize_amount( $raw_value ) );
-
-		foreach ( $field['choices'] as $choice ) {
-			if (
-				isset( $choice['label'], $choice['value'] ) &&
-				wpforms_format_amount( wpforms_sanitize_amount( $choice['value'] ) ) === $get_value
-			) {
-				$trans_value = $choice['label'];
-				// Stop iterating over choices.
-				break;
-			}
+		if (
+			! empty( $field['choices'][ $raw_value ]['label'] ) &&
+			! empty( $field['choices'][ $raw_value ]['value'] )
+		) {
+			return parent::get_field_populated_single_property_value( $field['choices'][ $raw_value ]['label'], $input, $properties, $field );
 		}
 
-		if ( empty( $trans_value ) ) {
-			return $properties;
-		}
-
-		return parent::get_field_populated_single_property_value( $trans_value, $input, $properties, $field );
+		return $properties;
 	}
 
 	/**
@@ -300,7 +296,7 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 	}
 
 	/**
-	 * Validates field on form submit.
+	 * Validate field on form submit.
 	 *
 	 * @since 1.3.1
 	 *
@@ -324,7 +320,7 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 	}
 
 	/**
-	 * Formats and sanitizes field.
+	 * Format and sanitize field.
 	 *
 	 * @since 1.3.1
 	 *

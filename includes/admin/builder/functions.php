@@ -2,11 +2,7 @@
 /**
  * Builder related functions.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 
 /**
@@ -364,4 +360,29 @@ function wpforms_builder_settings_block_get_state( $form_id, $block_id, $block_t
 	}
 
 	return apply_filters( 'wpforms_builder_settings_block_get_state', $state, $form_id, $block_id, $block_type );
+}
+
+/**
+ * Get the list of allowed tags, used in pair with wp_kses() function.
+ * Allows getting rid of all potentially harmful HTML tags and attributes.
+ *
+ * @since 1.5.9
+ *
+ * @return array Allowed Tags.
+ */
+function wpforms_builder_preview_get_allowed_tags() {
+
+	static $allowed_tags;
+
+	if ( ! empty( $allowed_tags ) ) {
+		return $allowed_tags;
+	}
+
+	$atts = [ 'align', 'class', 'type', 'id', 'for', 'style', 'src', 'rel', 'href', 'target', 'value', 'width', 'height' ];
+	$tags = [ 'label', 'iframe', 'style', 'button', 'strong', 'small', 'table', 'span', 'abbr', 'code', 'pre', 'div', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ol', 'ul', 'li', 'em', 'hr', 'br', 'th', 'tr', 'td', 'p', 'a', 'b', 'i' ];
+
+	$allowed_atts = array_fill_keys( $atts, [] );
+	$allowed_tags = array_fill_keys( $tags, $allowed_atts );
+
+	return $allowed_tags;
 }

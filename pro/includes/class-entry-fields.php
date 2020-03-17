@@ -3,11 +3,7 @@
 /**
  * Entry fields DB class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.4.3
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2017, WPForms LLC
+ * @since 1.4.3
  */
 class WPForms_Entry_Fields_Handler extends WPForms_DB {
 

@@ -2,11 +2,7 @@
 /**
  * Helper functions to work with multidimensional arrays easier.
  *
- * @since      1.5.6
- * @author     WPForms
- * @package    WPForms
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.6
  */
 
 /**
@@ -155,7 +151,7 @@ function wpforms_list_has( $array, $key ) {
 }
 
 /**
- * Determines if an array is associative.
+ * Determine if an array is associative.
  *
  * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
  *
@@ -226,4 +222,25 @@ function wpforms_list_forget( $array, $keys ) {
 	}
 
 	return $array;
+}
+
+/**
+ * Insert a value or key/value pair after a specific key in an array.
+ * If key doesn't exist, value is appended to the end of the array.
+ *
+ * @since 1.5.8
+ *
+ * @param array  $array Array where to insert.
+ * @param string $key   Insert after key.
+ * @param array  $new   Array to insert.
+ *
+ * @return array
+ */
+function wpforms_list_insert_after( $array, $key, $new ) {
+
+	$keys  = array_keys( $array );
+	$index = array_search( $key, $keys, true );
+	$pos   = false === $index ? count( $array ) : $index + 1;
+
+	return array_merge( array_slice( $array, 0, $pos ), $new, array_slice( $array, $pos ) );
 }

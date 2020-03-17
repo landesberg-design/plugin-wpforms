@@ -5,11 +5,7 @@ namespace WPForms\Providers\Provider;
 /**
  * Class Process handles entries processing using the provider settings and configuration.
  *
- * @package    WPForms\Providers\Provider
- * @author     WPForms
- * @since      1.4.7
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.4.7
  */
 abstract class Process {
 

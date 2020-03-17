@@ -3,11 +3,7 @@
 /**
  * WPForms widget.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.2
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.2
  */
 class WPForms_Widget extends WP_Widget {
 

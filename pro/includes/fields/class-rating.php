@@ -3,11 +3,7 @@
 /**
  * Rating field.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.4.4
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.4.4
  */
 class WPForms_Rating_Text extends WPForms_Field {
 
@@ -491,7 +487,7 @@ class WPForms_Rating_Text extends WPForms_Field {
 	}
 
 	/**
-	 * Formats field.
+	 * Format field.
 	 *
 	 * @since 1.4.4
 	 *

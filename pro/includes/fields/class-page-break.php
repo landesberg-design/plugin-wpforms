@@ -3,11 +3,7 @@
 /**
  * Pagebreak field.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Field_Page_Break extends WPForms_Field {
 
@@ -37,7 +33,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	}
 
 	/**
-	 * Adds class to the builder field preview.
+	 * Add class to the builder field preview.
 	 *
 	 * @since 1.2.0
 	 *
@@ -83,14 +79,16 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 			'indicator' => sanitize_html_class( $top['indicator'] ),
 			'color'     => wpforms_sanitize_hex_color( $top['indicator_color'] ),
 			'pages'     => array_merge( array( wpforms()->frontend->pages['top'] ), wpforms()->frontend->pages['pages'] ),
+			'scroll'    => empty( $top['scroll_disabled'] ),
 		);
 		$p         = 1;
 
 		printf(
-			'<div class="wpforms-page-indicator %s" data-indicator="%s" data-indicator-color="%s">',
+			'<div class="wpforms-page-indicator %s" data-indicator="%s" data-indicator-color="%s" data-scroll="%d">',
 			esc_attr( $pagebreak['indicator'] ),
 			esc_attr( $pagebreak['indicator'] ),
-			esc_attr( $pagebreak['color'] )
+			esc_attr( $pagebreak['color'] ),
+			(int) $pagebreak['scroll']
 		);
 
 		if ( 'circles' === $pagebreak['indicator'] ) {
@@ -496,6 +494,35 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 					'slug'    => 'nav_align',
 					'content' => $lbl . $fld,
 				) );
+
+				// Scroll animation toggle.
+				$lbl = $this->field_element(
+					'label',
+					$field,
+					array(
+						'slug'    => 'scroll_disabled',
+						'value'   => esc_html__( 'Disable Scroll Animation', 'wpforms' ),
+						'tooltip' => esc_html__( 'By default, a user\'s view is pulled to the top of each form page. Set to ON to disable this animation.', 'wpforms' ),
+					),
+					false
+				);
+				$fld = $this->field_element(
+					'toggle',
+					$field,
+					array(
+						'slug'  => 'scroll_disabled',
+						'value' => ! empty( $field['scroll_disabled'] ) ? true : false,
+					),
+					false
+				);
+				$this->field_element(
+					'row',
+					$field,
+					array(
+						'slug'    => 'scroll_disabled',
+						'content' => $lbl . $fld,
+					)
+				);
 			}
 
 			// Custom CSS classes.
@@ -524,7 +551,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		$next_class = empty( $next ) ? 'wpforms-hidden' : '';
 		$position   = ! empty( $field['position'] ) ? esc_html( $field['position'] ) : 'normal';
 		$title      = ! empty( $field['title'] ) ? '(' . esc_html( $field['title'] ) . ')' : '';
-		$label      = 'top' === $position ? esc_html__( 'First Page', 'wpforms' ) : '';
+		$label      = 'top' === $position ? esc_html__( 'First Page / Progress Indicator', 'wpforms' ) : '';
 		$label      = 'normal' === $position && empty( $label ) ? esc_html__( 'Page Break', 'wpforms' ) : $label;
 
 		if ( 'top' !== $position ) {
@@ -608,8 +635,8 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		$total   = wpforms()->frontend->pages['total'];
 		$current = wpforms()->frontend->pages['current'];
 		$top     = wpforms()->frontend->pages['top'];
-		$next    = ! empty( $field['next'] ) ? esc_html( $field['next'] ) : '';
-		$prev    = ! empty( $field['prev'] ) ? esc_html( $field['prev'] ) : '';
+		$next    = ! empty( $field['next'] ) ? $field['next'] : '';
+		$prev    = ! empty( $field['prev'] ) ? $field['prev'] : '';
 		$align   = 'wpforms-pagebreak-center';
 
 		if ( ! empty( $top['nav_align'] ) ) {
@@ -620,19 +647,19 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 
 		if ( $current > 1 && ! empty( $prev ) ) {
 			printf(
-				'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%s">%s</button>',
-				$current,
-				$form_data['id'],
-				$prev
+				'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%d">%s</button>',
+				(int) $current,
+				(int) $form_data['id'],
+				esc_html( $prev )
 			);
 		}
 
 		if ( $current < $total && ! empty( $next ) ) {
 			printf(
-				'<button class="wpforms-page-button wpforms-page-next" data-action="next" data-page="%d" data-formid="%s">%s</button>',
-				$current,
-				$form_data['id'],
-				$next
+				'<button class="wpforms-page-button wpforms-page-next" data-action="next" data-page="%d" data-formid="%d">%s</button>',
+				(int) $current,
+				(int) $form_data['id'],
+				esc_html( $next )
 			);
 		}
 
@@ -640,7 +667,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	}
 
 	/**
-	 * Formats field.
+	 * Format field.
 	 *
 	 * @since 1.0.0
 	 *

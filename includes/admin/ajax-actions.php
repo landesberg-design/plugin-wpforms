@@ -2,11 +2,7 @@
 /**
  * Ajax actions used in by admin.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 
 /**
@@ -20,7 +16,7 @@ function wpforms_save_form() {
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
 	// Check for permissions.
-	if ( ! wpforms_current_user_can() ) {
+	if ( ! wpforms_current_user_can( 'edit_forms' ) ) {
 		die( esc_html__( 'You do not have permission.', 'wpforms-lite' ) );
 	}
 
@@ -120,22 +116,31 @@ function wpforms_new_form() {
 		);
 	}
 
-	if ( $form_id ) {
-		$data = array(
-			'id'       => $form_id,
-			'redirect' => add_query_arg(
-				array(
-					'view'    => 'fields',
-					'form_id' => $form_id,
-					'newform' => '1',
-				),
-				admin_url( 'admin.php?page=wpforms-builder' )
-			),
-		);
-		wp_send_json_success( $data );
-	} else {
+	if ( ! $form_id ) {
 		die( esc_html__( 'Error creating form', 'wpforms-lite' ) );
 	}
+
+	if ( wpforms_current_user_can( 'edit_form_single', $form_id ) ) {
+		wp_send_json_success(
+			array(
+				'id'       => $form_id,
+				'redirect' => add_query_arg(
+					array(
+						'view'    => 'fields',
+						'form_id' => $form_id,
+						'newform' => '1',
+					),
+					admin_url( 'admin.php?page=wpforms-builder' )
+				),
+			)
+		);
+	}
+
+	if ( wpforms_current_user_can( 'view_forms' ) ) {
+		wp_send_json_success( array( 'redirect' => admin_url( 'admin.php?page=wpforms-overview' ) ) );
+	}
+
+	wp_send_json_success( array( 'redirect' => admin_url() ) );
 }
 
 add_action( 'wp_ajax_wpforms_new_form', 'wpforms_new_form' );
@@ -199,7 +204,7 @@ function wpforms_builder_increase_next_field_id() {
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
 	// Check for permissions.
-	if ( ! wpforms_current_user_can() ) {
+	if ( ! wpforms_current_user_can( 'edit_forms' ) ) {
 		wp_send_json_error();
 	}
 
@@ -228,7 +233,7 @@ function wpforms_builder_dynamic_choices() {
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
 	// Check for permissions.
-	if ( ! wpforms_current_user_can() ) {
+	if ( ! wpforms_current_user_can( 'edit_forms' ) ) {
 		wp_send_json_error();
 	}
 
@@ -270,7 +275,7 @@ function wpforms_builder_dynamic_source() {
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
 	// Check for permissions.
-	if ( ! wpforms_current_user_can() ) {
+	if ( ! wpforms_current_user_can( 'edit_forms' ) ) {
 		wp_send_json_error();
 	}
 
@@ -346,6 +351,12 @@ function wpforms_builder_dynamic_source() {
 		}
 	}
 
+	if ( empty( $items ) ) {
+		$items = array(
+			esc_html__( '(empty)', 'wpforms-lite' ),
+		);
+	}
+
 	wp_send_json_success(
 		array(
 			'items'       => $items,
@@ -373,7 +384,11 @@ function wpforms_verify_ssl() {
 
 	// Check for permissions.
 	if ( ! wpforms_current_user_can() ) {
-		wp_send_json_error();
+		wp_send_json_error(
+			array(
+				'msg' => esc_html__( 'You do not have permission to perform this operation.', 'wpforms-lite' ),
+			)
+		);
 	}
 
 	$response = wp_remote_post( 'https://wpforms.com/connection-test.php' );

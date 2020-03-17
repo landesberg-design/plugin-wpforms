@@ -3,11 +3,7 @@
 /**
  * Entry meta DB class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.1.6
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.1.6
  */
 class WPForms_Entry_Meta_Handler extends WPForms_DB {
 

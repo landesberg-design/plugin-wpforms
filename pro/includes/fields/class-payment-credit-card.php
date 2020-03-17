@@ -3,11 +3,7 @@
 /**
  * Name text field.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Field_CreditCard extends WPForms_Field {
 
@@ -507,7 +503,7 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 	}
 
 	/**
-	 * Formats field.
+	 * Format field.
 	 *
 	 * @since 1.0.0
 	 *

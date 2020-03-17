@@ -14,14 +14,12 @@
 
 		<?php if ( (int) $max_file_number > 1 ) : ?>
 			<span class="modern-hint">
-				<?php
-				/* translators: %d - max number of files. */
-				printf( esc_html__( 'You can upload up to %d files.', 'wpforms' ), (int) $max_file_number );
-				?>
+				<?php echo esc_html( $preview_hint ); ?>
 			</span>
 		<?php endif; ?>
 	</div>
 </div>
 <input type="text" class="dropzone-input"
+	style="position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;"
 	id="wpforms-<?php echo (int) $form_id; ?>-field_<?php echo (int) $field_id; ?>"
 	name="<?php echo esc_attr( $input_name ); ?>" <?php echo esc_attr( $required ); ?>>

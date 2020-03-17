@@ -3,11 +3,7 @@
 /**
  * Settings management panel.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 
@@ -41,7 +37,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 		$sections = array(
 			'general'       => esc_html__( 'General', 'wpforms-lite' ),
 			'notifications' => esc_html__( 'Notifications', 'wpforms-lite' ),
-			'confirmation'  => esc_html__( 'Confirmation', 'wpforms-lite' ),
+			'confirmation'  => esc_html__( 'Confirmations', 'wpforms-lite' ),
 		);
 		$sections = apply_filters( 'wpforms_builder_settings_sections', $sections, $this->form_data );
 		foreach ( $sections as $slug => $section ) {

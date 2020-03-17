@@ -5,7 +5,7 @@
  * Description: Beginner friendly WordPress contact form plugin. Use our Drag & Drop form builder to create your WordPress forms.
  * Author:      WPForms
  * Author URI:  https://wpforms.com
- * Version:     1.5.6.2
+ * Version:     1.5.9.2
  * Text Domain: wpforms-lite
  * Domain Path: languages
  *
@@ -21,12 +21,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with WPForms. If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
  */
 
 // Exit if accessed directly.
@@ -36,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin version.
 if ( ! defined( 'WPFORMS_VERSION' ) ) {
-	define( 'WPFORMS_VERSION', '1.5.6.2' );
+	define( 'WPFORMS_VERSION', '1.5.9.2' );
 }
 
 // Plugin Folder Path.
@@ -57,32 +51,86 @@ if ( ! defined( 'WPFORMS_PLUGIN_FILE' ) ) {
 // Don't allow multiple versions to be active.
 if ( function_exists( 'wpforms' ) ) {
 
+	if ( ! function_exists( 'wpforms_lite_just_activated' ) ) {
+		/**
+		 * Store temporarily that the Lite version of the plugin was activated.
+		 * This is needed because WP does a redirect after activation and
+		 * we need to preserve this state to know whether user activated Lite or not.
+		 *
+		 * @since 1.5.8
+		 */
+		function wpforms_lite_just_activated() {
+
+			set_transient( 'wpforms_lite_just_activated', true );
+		}
+	}
+	add_action( 'activate_wpforms-lite/wpforms.php', 'wpforms_lite_just_activated' );
+
+	if ( ! function_exists( 'wpforms_lite_just_deactivated' ) ) {
+		/**
+		 * Store temporarily that Lite plugin was deactivated.
+		 * Convert temporary "activated" value to a global variable,
+		 * so it is available through the request. Remove from the storage.
+		 *
+		 * @since 1.5.8
+		 */
+		function wpforms_lite_just_deactivated() {
+
+			global $wpforms_lite_just_activated, $wpforms_lite_just_deactivated;
+
+			$wpforms_lite_just_activated   = (bool) get_transient( 'wpforms_lite_just_activated' );
+			$wpforms_lite_just_deactivated = true;
+
+			delete_transient( 'wpforms_lite_just_activated' );
+		}
+	}
+	add_action( 'deactivate_wpforms-lite/wpforms.php', 'wpforms_lite_just_deactivated' );
+
 	if ( ! function_exists( 'wpforms_deactivate' ) ) {
 		/**
-		 * Deactivate if WPForms already activated.
-		 * Called on-premise.
+		 * Deactivate Lite if WPForms already activated.
 		 *
 		 * @since 1.0.0
 		 */
 		function wpforms_deactivate() {
-			deactivate_plugins( plugin_basename( __FILE__ ) );
+			deactivate_plugins( 'wpforms-lite/wpforms.php' );
 		}
 	}
 	add_action( 'admin_init', 'wpforms_deactivate' );
 
 	if ( ! function_exists( 'wpforms_lite_notice' ) ) {
 		/**
-		 * Display the notice after deactivation.
+		 * Display the notice after deactivation when Pro is still active
+		 * and user wanted to activate the Lite version of the plugin.
 		 *
 		 * @since 1.0.0
 		 */
 		function wpforms_lite_notice() {
 
-			echo '<div class="notice notice-warning"><p>' . esc_html__( 'Please deactivate WPForms Lite before activating WPForms.', 'wpforms-lite' ) . '</p></div>';
+			global $wpforms_lite_just_activated, $wpforms_lite_just_deactivated;
 
-			if ( isset( $_GET['activate'] ) ) { //phpcs:ignore
-				unset( $_GET['activate'] );
+			if (
+				empty( $wpforms_lite_just_activated ) ||
+				empty( $wpforms_lite_just_deactivated )
+			) {
+				return;
 			}
+
+			// Currently tried to activate Lite with Pro still active, so display the message.
+			printf(
+				'<div class="notice notice-warning">
+					<p>%1$s</p>
+					<p>%2$s</p>
+				</div>',
+				esc_html__( 'Heads up!', 'wpforms-lite' ),
+				esc_html__( 'Your site already has WPForms Pro activated. If you want to switch to WPForms Lite, please first go to Plugins > Installed Plugins and deactivate WPForms. Then, you can activate WPForms Lite.', 'wpforms-lite' )
+			);
+
+			if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				unset( $_GET['activate'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			}
+
+			unset( $wpforms_lite_just_activated, $wpforms_lite_just_deactivated );
 		}
 	}
 	add_action( 'admin_notices', 'wpforms_lite_notice' );
@@ -91,8 +139,8 @@ if ( function_exists( 'wpforms' ) ) {
 	return;
 }
 
-// We require PHP 5.4 for the whole plugin to work.
-if ( version_compare( phpversion(), '5.4', '<' ) ) {
+// We require PHP 5.5+ for the whole plugin to work.
+if ( version_compare( phpversion(), '5.5', '<' ) ) {
 
 	if ( ! function_exists( 'wpforms_php52_notice' ) ) {
 		/**

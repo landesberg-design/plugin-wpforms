@@ -3,11 +3,7 @@
 /**
  * About WPForms admin page class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.5.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.5.0
  */
 class WPForms_About {
 
@@ -84,6 +80,7 @@ class WPForms_About {
 			'advanced'     => esc_html__( 'Advanced Form Features', 'wpforms-lite' ),
 			'addons'       => esc_html__( 'WPForms Addons', 'wpforms-lite' ),
 			'support'      => esc_html__( 'Customer Support', 'wpforms-lite' ),
+			'sites'        => esc_html__( 'Number of Sites', 'wpforms-lite' ),
 		);
 
 		// Maybe load tools page.
@@ -118,19 +115,28 @@ class WPForms_About {
 			)
 		);
 
-		$type = $this->get_license_type();
+		$license = $this->get_license_type();
 
 		if (
-			! in_array( $type, self::$licenses_top, true ) || wpforms_debug()
+			(
+				$license === 'pro' ||
+				! in_array( $license, self::$licenses_top, true )
+			) ||
+			wpforms_debug()
 		) {
-			/* translators: $s - license type. */
-			$this->views[ sprintf( esc_html__( '%s vs Pro', 'wpforms-lite' ), ucfirst( $type ) ) ] = array( 'versus' );
+			$vs_tab_name = sprintf( /* translators: %1$s - current license type, %2$s - suggested license type. */
+				esc_html__( '%1$s vs %2$s', 'wpforms-lite' ),
+				ucfirst( $license ),
+				$this->get_next_license( $license )
+			);
+
+			$this->views[ $vs_tab_name ] = array( 'versus' );
 		}
 
 		// Determine the current active settings tab.
 		$this->view = ! empty( $_GET['view'] ) ? esc_html( $_GET['view'] ) : self::DEFAULT_TAB;
 
-		// If the user tries to load an invalid view fallback to About Us.
+		// If the user tries to load an invalid view - fallback to About Us.
 		if (
 			! in_array( $this->view, call_user_func_array( 'array_merge', $this->views ), true ) &&
 			! has_action( 'wpforms_admin_about_display_tab_' . sanitize_key( $this->view ) )
@@ -180,15 +186,16 @@ class WPForms_About {
 
 			<?php
 			if ( $show_nav ) {
+				$license      = $this->get_license_type();
+				$next_license = $this->get_next_license( $license );
 				echo '<ul class="wpforms-admin-tabs">';
 				foreach ( $this->views as $label => $view ) {
-					$view  = (array) $view;
-					$class = in_array( $this->view, $view, true ) ? ' class="active"' : '';
+					$class = in_array( $this->view, $view, true ) ? 'active' : '';
 					echo '<li>';
 					printf(
-						'<a href="%s"%s>%s</a>',
-						admin_url( 'admin.php?page=' . self::SLUG . '&view=' . sanitize_key( $view[0] ) ),
-						$class,
+						'<a href="%s" class="%s">%s</a>',
+						esc_url( admin_url( 'admin.php?page=' . self::SLUG . '&view=' . sanitize_key( $view[0] ) ) ),
+						esc_attr( $class ),
 						esc_html( $label )
 					);
 					echo '</li>';
@@ -228,8 +235,17 @@ class WPForms_About {
 	 */
 	protected function output_about() {
 
-		$all_plugins = get_plugins();
-		$am_plugins  = $this->get_am_plugins();
+		$this->output_about_info();
+		$this->output_about_addons();
+	}
+
+	/**
+	 * Display the General Info section of About tab.
+	 *
+	 * @since 1.5.8
+	 */
+	protected function output_about_info() {
+
 		?>
 
 		<div class="wpforms-admin-about-section wpforms-admin-columns">
@@ -249,8 +265,8 @@ class WPForms_About {
 					<?php
 					printf(
 						wp_kses(
-							/* translators: %1$s - WPBeginner URL, %2$s - OptinMonster URL, %3$s - MonsterInsights URL. */
-							__( 'WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href="%1$s" target="_blank" rel="noopener noreferrer">WPBeginner</a>, the most popular lead-generation software, <a href="%2$s" target="_blank" rel="noopener noreferrer">OptinMonster</a>, and the best WordPress analytics plugin, <a href="%3$s" target="_blank" rel="noopener noreferrer">MonsterInsights</a>.', 'wpforms-lite' ),
+							/* translators: %1$s - WPBeginner URL, %2$s - OptinMonster URL, %3$s - MonsterInsights URL, %4$s - RafflePress URL. */
+							__( 'WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href="%1$s" target="_blank" rel="noopener noreferrer">WPBeginner</a>, the most popular lead-generation software, <a href="%2$s" target="_blank" rel="noopener noreferrer">OptinMonster</a>, the best WordPress analytics plugin, <a href="%3$s" target="_blank" rel="noopener noreferrer">MonsterInsights</a>, and the most powerful WordPress contest plugin, <a href="%4$s" target="_blank" rel="noopener noreferrer">RafflePress</a>.', 'wpforms-lite' ),
 							array(
 								'a' => array(
 									'href'   => array(),
@@ -261,7 +277,8 @@ class WPForms_About {
 						),
 						'https://www.wpbeginner.com/?utm_source=wpformsplugin&utm_medium=pluginaboutpage&utm_campaign=aboutwpforms',
 						'https://optinmonster.com/?utm_source=wpformsplugin&utm_medium=pluginaboutpage&utm_campaign=aboutwpforms',
-						'https://www.monsterinsights.com/?utm_source=wpformsplugin&utm_medium=pluginaboutpage&utm_campaign=aboutwpforms'
+						'https://www.monsterinsights.com/?utm_source=wpformsplugin&utm_medium=pluginaboutpage&utm_campaign=aboutwpforms',
+						'https://rafflepress.com/?utm_source=wpformsplugin&utm_medium=pluginaboutpage&utm_campaign=aboutwpforms'
 					);
 					?>
 				</p>
@@ -280,70 +297,41 @@ class WPForms_About {
 			</div>
 
 		</div>
+		<?php
+	}
 
+	/**
+	 * Display the Addons section of About tab.
+	 *
+	 * @since 1.5.8
+	 */
+	protected function output_about_addons() {
+
+		if ( ! wpforms_current_user_can() ) {
+			return;
+		}
+
+		$all_plugins = get_plugins();
+		$am_plugins  = $this->get_am_plugins();
+
+		?>
 		<div id="wpforms-admin-addons">
 			<div class="addons-container">
 				<?php
 				foreach ( $am_plugins as $plugin => $details ) :
 
-					$have_pro = ( ! empty( $details['pro'] ) && ! empty( $details['pro']['plug'] ) );
-					$show_pro = false;
-					if ( $have_pro ) {
-						if ( array_key_exists( $plugin, $all_plugins ) ) {
-							if ( is_plugin_active( $plugin ) ) {
-								$show_pro = true;
-							}
-						}
-						if ( array_key_exists( $details['pro']['plug'], $all_plugins ) ) {
-							$show_pro = true;
-						}
-						if ( $show_pro ) {
-							$plugin  = $details['pro']['plug'];
-							$details = $details['pro'];
-						}
-					}
+					$plugin_data = $this->get_plugin_data( $plugin, $details, $all_plugins );
 
-					if ( array_key_exists( $plugin, $all_plugins ) ) {
-						if ( is_plugin_active( $plugin ) ) {
-							// Status text/status.
-							$status_class = 'status-active';
-							$status_text  = esc_html__( 'Active', 'wpforms-lite' );
-							// Button text/status.
-							$action_class = $status_class . ' button button-secondary disabled';
-							$action_text  = esc_html__( 'Activated', 'wpforms-lite' );
-							$plugin_src   = esc_attr( $plugin );
-						} else {
-							// Status text/status.
-							$status_class = 'status-inactive';
-							$status_text  = esc_html__( 'Inactive', 'wpforms-lite' );
-							// Button text/status.
-							$action_class = $status_class . ' button button-secondary';
-							$action_text  = esc_html__( 'Activate', 'wpforms-lite' );
-							$plugin_src   = esc_attr( $plugin );
-						}
-					} else {
-						// Doesn't exist, install.
-						// Status text/status.
-						$status_class = 'status-download';
-						if ( isset( $details['act'] ) && 'go-to-url' === $details['act'] ) {
-							$status_class = 'status-go-to-url';
-						}
-						$status_text = esc_html__( 'Not Installed', 'wpforms-lite' );
-						// Button text/status.
-						$action_class = $status_class . ' button button-primary';
-						$action_text  = esc_html__( 'Install Plugin', 'wpforms-lite' );
-						$plugin_src   = esc_url( $details['url'] );
-					}
 					?>
 					<div class="addon-container">
 						<div class="addon-item">
 							<div class="details wpforms-clear">
-								<img src="<?php echo esc_url( $details['icon'] ); ?>">
+								<img src="<?php echo esc_url( $plugin_data['details']['icon'] ); ?>">
 								<h5 class="addon-name">
-									<?php echo $details['name']; ?>
+									<?php echo esc_html( $plugin_data['details']['name'] ); ?>
 								</h5>
 								<p class="addon-desc">
-									<?php echo $details['desc']; ?>
+									<?php echo wp_kses_post( $plugin_data['details']['desc'] ); ?>
 								</p>
 							</div>
 							<div class="actions wpforms-clear">
@@ -353,14 +341,14 @@ class WPForms_About {
 										printf(
 											/* translators: %s - addon status label. */
 											esc_html__( 'Status: %s', 'wpforms-lite' ),
-											'<span class="status-label ' . $status_class . '">' . $status_text . '</span>'
+											'<span class="status-label ' . esc_attr( $plugin_data['status_class'] ) . '">' . wp_kses_post( $plugin_data['status_text'] ) . '</span>'
 										);
 										?>
 									</strong>
 								</div>
 								<div class="action-button">
-									<button class="<?php echo esc_attr( $action_class ); ?>" data-plugin="<?php echo $plugin_src; ?>" data-type="plugin">
-										<?php echo $action_text; ?>
+									<button class="<?php echo esc_attr( $plugin_data['action_class'] ); ?>" data-plugin="<?php echo esc_attr( $plugin_data['plugin_src'] ); ?>" data-type="plugin">
+										<?php echo wp_kses_post( $plugin_data['action_text'] ); ?>
 									</button>
 								</div>
 							</div>
@@ -369,8 +357,77 @@ class WPForms_About {
 				<?php endforeach; ?>
 			</div>
 		</div>
-
 		<?php
+	}
+
+	/**
+	 * Get AM plugin data to display in the Addons section of About tab.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @param string $plugin      Plugin slug.
+	 * @param array  $details     Plugin details.
+	 * @param array  $all_plugins List of all plugins.
+	 *
+	 * @return array
+	 */
+	protected function get_plugin_data( $plugin, $details, $all_plugins ) {
+
+		$have_pro = ( ! empty( $details['pro'] ) && ! empty( $details['pro']['plug'] ) );
+		$show_pro = false;
+
+		$plugin_data = array();
+
+		if ( $have_pro ) {
+			if ( array_key_exists( $plugin, $all_plugins ) ) {
+				if ( is_plugin_active( $plugin ) ) {
+					$show_pro = true;
+				}
+			}
+			if ( array_key_exists( $details['pro']['plug'], $all_plugins ) ) {
+				$show_pro = true;
+			}
+			if ( $show_pro ) {
+				$plugin  = $details['pro']['plug'];
+				$details = $details['pro'];
+			}
+		}
+
+		if ( array_key_exists( $plugin, $all_plugins ) ) {
+			if ( is_plugin_active( $plugin ) ) {
+				// Status text/status.
+				$plugin_data['status_class'] = 'status-active';
+				$plugin_data['status_text']  = esc_html__( 'Active', 'wpforms-lite' );
+				// Button text/status.
+				$plugin_data['action_class'] = $plugin_data['status_class'] . ' button button-secondary disabled';
+				$plugin_data['action_text']  = esc_html__( 'Activated', 'wpforms-lite' );
+				$plugin_data['plugin_src']   = esc_attr( $plugin );
+			} else {
+				// Status text/status.
+				$plugin_data['status_class'] = 'status-inactive';
+				$plugin_data['status_text']  = esc_html__( 'Inactive', 'wpforms-lite' );
+				// Button text/status.
+				$plugin_data['action_class'] = $plugin_data['status_class'] . ' button button-secondary';
+				$plugin_data['action_text']  = esc_html__( 'Activate', 'wpforms-lite' );
+				$plugin_data['plugin_src']   = esc_attr( $plugin );
+			}
+		} else {
+			// Doesn't exist, install.
+			// Status text/status.
+			$plugin_data['status_class'] = 'status-download';
+			if ( isset( $details['act'] ) && 'go-to-url' === $details['act'] ) {
+				$plugin_data['status_class'] = 'status-go-to-url';
+			}
+			$plugin_data['status_text'] = esc_html__( 'Not Installed', 'wpforms-lite' );
+			// Button text/status.
+			$plugin_data['action_class'] = $plugin_data['status_class'] . ' button button-primary';
+			$plugin_data['action_text']  = esc_html__( 'Install Plugin', 'wpforms-lite' );
+			$plugin_data['plugin_src']   = esc_url( $details['url'] );
+		}
+
+		$plugin_data['details'] = $details;
+
+		return $plugin_data;
 	}
 
 	/**
@@ -424,7 +481,7 @@ class WPForms_About {
 			</div>
 
 			<div class="wpforms-admin-about-section-first-form-video">
-				<iframe src="https://www.youtube-nocookie.com/embed/yDyvSGV7tP4?rel=0" width="540" height="304" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+				<iframe src="https://www.youtube-nocookie.com/embed/o2nE1P74WxQ?rel=0" width="540" height="304" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 			</div>
 
 		</div>
@@ -454,7 +511,7 @@ class WPForms_About {
 						printf(
 							wp_kses(
 								/* translators: %s - stars. */
-								__( 'We know that you will truly love WPForms. It has over <strong>2000+ five star ratings</strong> (%s) and is active on over 1 million websites.', 'wpforms-lite' ),
+								__( 'We know that you will truly love WPForms. It has over <strong>5000+ five star ratings</strong> (%s) and is active on over 1 million websites.', 'wpforms-lite' ),
 								array(
 									'strong' => array(),
 								)
@@ -634,18 +691,41 @@ class WPForms_About {
 	}
 
 	/**
+	 * Get the next license type. Helper for Versus tab content.
+	 *
+	 * @since 1.5.5
+	 *
+	 * @param string $current Current license type slug.
+	 *
+	 * @return string Next license type slug.
+	 */
+	protected function get_next_license( $current ) {
+
+		$current       = ucfirst( $current );
+		$license_pairs = array(
+			'Lite'  => 'Pro',
+			'Basic' => 'Pro',
+			'Plus'  => 'Pro',
+			'Pro'   => 'Elite',
+		);
+
+		return ! empty( $license_pairs[ $current ] ) ? $license_pairs[ $current ] : 'Elite';
+	}
+
+	/**
 	 * Display the Versus tab content.
 	 *
 	 * @since 1.5.0
 	 */
 	protected function output_versus() {
 
-		$license = $this->get_license_type();
+		$license      = $this->get_license_type();
+		$next_license = $this->get_next_license( $license );
 		?>
 
 		<div class="wpforms-admin-about-section wpforms-admin-about-section-squashed">
 			<h1 class="centered">
-				<strong><?php echo esc_html( ucfirst( $license ) ); ?></strong> vs <strong>Pro</strong>
+				<strong><?php echo esc_html( ucfirst( $license ) ); ?></strong> vs <strong><?php echo esc_html( $next_license ); ?></strong>
 			</h1>
 
 			<p class="centered">
@@ -668,7 +748,7 @@ class WPForms_About {
 				</div>
 				<div class="wpforms-admin-column-33">
 					<h3 class="no-margin">
-						<?php esc_html_e( 'Pro', 'wpforms-lite' ); ?>
+						<?php echo esc_html( $next_license ); ?>
 					</h3>
 				</div>
 			</div>
@@ -678,23 +758,29 @@ class WPForms_About {
 					<?php
 					foreach ( self::$licenses_features as $slug => $name ) {
 						$current = $this->get_license_data( $slug, $license );
-						$pro     = $this->get_license_data( $slug, 'pro' );
+						$next    = $this->get_license_data( $slug, strtolower( $next_license ) );
+
+						if ( empty( $current ) || empty( $next ) ) {
+							continue;
+						}
 						?>
 						<tr class="wpforms-admin-columns">
 							<td class="wpforms-admin-column-33">
-								<p><?php echo $name; ?></p>
+								<p><?php echo esc_html( $name ); ?></p>
 							</td>
 							<td class="wpforms-admin-column-33">
-							<?php if ( ! empty( $current ) && is_array( $current ) ) : ?>
-								<p class="features-<?php echo esc_attr( $current['status'] ); ?>">
-									<?php echo implode( '<br>', $current['text'] ); ?>
-								</p>
-							<?php endif; ?>
+								<?php if ( is_array( $current ) ) : ?>
+									<p class="features-<?php echo esc_attr( $current['status'] ); ?>">
+										<?php echo wp_kses_post( implode( '<br>', $current['text'] ) ); ?>
+									</p>
+								<?php endif; ?>
 							</td>
 							<td class="wpforms-admin-column-33">
-								<p class="features-full">
-									<?php echo implode( '<br>', $pro['text'] ); ?>
-								</p>
+								<?php if ( is_array( $current ) ) : ?>
+									<p class="features-full">
+										<?php echo wp_kses_post( implode( '<br>', $next['text'] ) ); ?>
+									</p>
+								<?php endif; ?>
 							</td>
 						</tr>
 						<?php
@@ -711,11 +797,14 @@ class WPForms_About {
 				<h3 class="call-to-action centered">
 					<?php
 					if ( 'lite' === $license ) {
-						echo '<a href="' . wpforms_admin_upgrade_link( 'wpforms-about-page' ) . '" target="_blank" rel="noopener noreferrer">';
+						echo '<a href="' . esc_url( wpforms_admin_upgrade_link( 'wpforms-about-page' ) ) . '" target="_blank" rel="noopener noreferrer">';
 					} else {
 						echo '<a href="https://wpforms.com/pricing?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer">';
 					}
-						esc_html_e( 'Get WPForms Pro Today and Unlock all the Powerful Features', 'wpforms-lite' );
+						printf( /* translators: %s - next license level. */
+							esc_html__( 'Get WPForms %s Today and Unlock all the Powerful Features', 'wpforms-lite' ),
+							esc_html( $next_license )
+						);
 					?>
 					</a>
 				</h3>
@@ -749,16 +838,18 @@ class WPForms_About {
 	 */
 	protected function get_am_plugins() {
 
-		$data = array(
+		$images_url = WPFORMS_PLUGIN_URL . 'assets/images/about/';
+
+		return array(
 
 			'google-analytics-for-wordpress/googleanalytics.php' => array(
-				'icon' => WPFORMS_PLUGIN_URL . 'assets/images/about/plugin-mi.png',
+				'icon' => $images_url . 'plugin-mi.png',
 				'name' => esc_html__( 'MonsterInsights', 'wpforms-lite' ),
 				'desc' => esc_html__( 'MonsterInsights makes it “effortless” to properly connect your WordPress site with Google Analytics, so you can start making data-driven decisions to grow your business.', 'wpforms-lite' ),
 				'url'  => 'https://downloads.wordpress.org/plugin/google-analytics-for-wordpress.zip',
 				'pro'  => array(
 					'plug' => 'google-analytics-premium/googleanalytics-premium.php',
-					'icon' => WPFORMS_PLUGIN_URL . 'assets/images/about/plugin-mi.png',
+					'icon' => $images_url . 'plugin-mi.png',
 					'name' => esc_html__( 'MonsterInsights Pro', 'wpforms-lite' ),
 					'desc' => esc_html__( 'MonsterInsights makes it “effortless” to properly connect your WordPress site with Google Analytics, so you can start making data-driven decisions to grow your business.', 'wpforms-lite' ),
 					'url'  => 'https://www.monsterinsights.com/?utm_source=proplugin&utm_medium=pluginheader&utm_campaign=pluginurl&utm_content=7%2E0%2E0',
@@ -767,29 +858,42 @@ class WPForms_About {
 			),
 
 			'optinmonster/optin-monster-wp-api.php' => array(
-				'icon' => WPFORMS_PLUGIN_URL . 'assets/images/about/plugin-om.png',
+				'icon' => $images_url . 'plugin-om.png',
 				'name' => esc_html__( 'OptinMonster', 'wpforms-lite' ),
 				'desc' => esc_html__( 'Our high-converting optin forms like Exit-Intent® popups, Fullscreen Welcome Mats, and Scroll boxes help you dramatically boost conversions and get more email subscribers.', 'wpforms-lite' ),
 				'url'  => 'https://downloads.wordpress.org/plugin/optinmonster.zip',
 			),
 
 			'wp-mail-smtp/wp_mail_smtp.php'         => array(
-				'icon' => WPFORMS_PLUGIN_URL . 'assets/images/about/plugin-smtp.png',
+				'icon' => $images_url . 'plugin-smtp.png',
 				'name' => esc_html__( 'WP Mail SMTP', 'wpforms-lite' ),
 				'desc' => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 1 million websites.', 'wpforms-lite' ),
 				'url'  => 'https://downloads.wordpress.org/plugin/wp-mail-smtp.zip',
 				'pro'  => array(
 					'plug' => 'wp-mail-smtp-pro/wp_mail_smtp.php',
-					'icon' => WPFORMS_PLUGIN_URL . 'assets/images/about/plugin-smtp.png',
+					'icon' => $images_url . 'plugin-smtp.png',
 					'name' => esc_html__( 'WP Mail SMTP Pro', 'wpforms-lite' ),
 					'desc' => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 1 million websites.', 'wpforms-lite' ),
 					'url'  => 'https://wpmailsmtp.com/pricing/',
 					'act'  => 'go-to-url',
 				),
 			),
-		);
 
-		return $data;
+			'rafflepress/rafflepress.php'           => array(
+				'icon' => $images_url . 'plugin-rp.png',
+				'name' => esc_html__( 'RafflePress', 'wpforms-lite' ),
+				'desc' => esc_html__( 'Turn your visitors into brand ambassadors! Easily grow your email list, website traffic, and social media followers with powerful viral giveaways & contests.', 'wpforms-lite' ),
+				'url'  => 'https://downloads.wordpress.org/plugin/rafflepress.zip',
+				'pro'  => array(
+					'plug' => 'rafflepress-pro/rafflepress-pro.php',
+					'icon' => $images_url . 'plugin-rp.png',
+					'name' => esc_html__( 'RafflePress Pro', 'wpforms-lite' ),
+					'desc' => esc_html__( 'Turn your visitors into brand ambassadors! Easily grow your email list, website traffic, and social media followers with powerful viral giveaways & contests.', 'wpforms-lite' ),
+					'url'  => 'https://rafflepress.com/pricing/',
+					'act'  => 'go-to-url',
+				),
+			),
+		);
 	}
 
 	/**
@@ -939,7 +1043,7 @@ class WPForms_About {
 					'status' => 'full',
 					'text'   => array(
 						'<strong>' . esc_html__( 'All Marketing Integrations', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Constant Contact, MailChimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
+						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
 						'',
 						wp_kses(
 							__( '<strong>Bonus:</strong> 500+ integrations with Zapier.', 'wpforms-lite' ),
@@ -1060,28 +1164,84 @@ class WPForms_About {
 				),
 			),
 			'support'      => array(
-				'lite'  => array(
+				'lite'     => array(
 					'status' => 'none',
 					'text'   => array(
 						'<strong>' . esc_html__( 'Limited Support', 'wpforms-lite' ) . '</strong>',
 					),
 				),
-				'basic' => array(
+				'basic'    => array(
 					'status' => 'partial',
 					'text'   => array(
 						'<strong>' . esc_html__( 'Standard Support', 'wpforms-lite' ) . '</strong>',
 					),
 				),
-				'plus'  => array(
+				'plus'     => array(
 					'status' => 'partial',
 					'text'   => array(
 						'<strong>' . esc_html__( 'Standard Support', 'wpforms-lite' ) . '</strong>',
 					),
 				),
-				'pro'   => array(
+				'pro'      => array(
 					'status' => 'full',
 					'text'   => array(
 						'<strong>' . esc_html__( 'Priority Support', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+				'elite'    => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'Premium Support', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+				'ultimate' => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'Premium Support', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+				'agency'   => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'Premium Support', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+			),
+			'sites'        => array(
+				'basic'    => array(
+					'status' => 'partial',
+					'text'   => array(
+						'<strong>' . esc_html__( '1 Site', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+				'plus'     => array(
+					'status' => 'partial',
+					'text'   => array(
+						'<strong>' . esc_html__( '3 Sites', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+				'pro'      => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( '5 Sites', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+				'elite'    => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'Unlimited Sites', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+				'ultimate' => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'Unlimited Sites', 'wpforms-lite' ) . '</strong>',
+					),
+				),
+				'agency'   => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'Unlimited Sites', 'wpforms-lite' ) . '</strong>',
 					),
 				),
 			),
@@ -1100,7 +1260,12 @@ class WPForms_About {
 			return false;
 		}
 
-		// For debug purposes: all top level plans has no features difference and are equated to `pro` plan.
+		// Some licenses have partial data.
+		if ( isset( $data[ $feature ][ $license ] ) ) {
+			return $data[ $feature ][ $license ];
+		}
+
+		// Top level plans has no feature difference with `pro` plan in most cases.
 		return $is_licenses_top ? $data[ $feature ]['pro'] : $data[ $feature ][ $license ];
 	}
 
@@ -1122,4 +1287,5 @@ class WPForms_About {
 		return strtolower( $type );
 	}
 }
+
 new WPForms_About();

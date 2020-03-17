@@ -34,7 +34,7 @@ class Translations implements IntegrationInterface {
 	}
 
 	/**
-	 * Adds WPForms Lite translation files to the update checklist of installed plugins, to check for new translations.
+	 * Add WPForms Lite translation files to the update checklist of installed plugins, to check for new translations.
 	 *
 	 * @since 1.5.6
 	 *

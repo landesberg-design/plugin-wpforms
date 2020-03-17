@@ -50,6 +50,11 @@ div.wpforms-container-full .wpforms-form * {
 	box-shadow:none;
 }
 
+div.wpforms-container-full {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 div.wpforms-container-full .wpforms-form amp-img > img {
 	position: absolute; /* Override position:static from previous rule, to prevent breaking AMP layout. */
 }
@@ -541,8 +546,8 @@ div.wpforms-container-full .wpforms-form select:disabled {
 
 /* Errors, Warnings, etc
 ----------------------------------------------------------------------------- */
-
-div.wpforms-container-full .wpforms-form .wpforms-error-container {
+div.wpforms-container-full .wpforms-form .wpforms-error-container,
+div.wpforms-container-full .wpforms-form noscript.wpforms-error-noscript {
 	color: #990000;
 }
 
@@ -591,7 +596,7 @@ div.wpforms-container-full .wpforms-form .wpforms-error-alert {
 .wpforms-confirmation-container-full,
 div[submit-success] > .wpforms-confirmation-container-full {
 	color: #333;
-	margin: 0 0 24px 0;
+	margin: 0 auto 24px;
 	padding: 15px 15px;
 }
 
@@ -728,6 +733,54 @@ div.wpforms-container-full .wpforms-form .wpforms-field-credit-card-expiration s
 	width: 10%;
 	text-align: center;
 	line-height: 38px;
+}
+
+/* Number slider field
+----------------------------------------------------------------------------- */
+div.wpforms-container-full .wpforms-form .wpforms-field-number-slider input[type=range] {
+	-webkit-appearance: none;
+	appearance: none;
+	height: 10px;
+	background: #fff;
+	border: 1px solid #CCC;
+	border-radius: 5px;
+	outline: none;
+	padding: 0;
+	margin: 10px 0 5px;
+}
+
+div.wpforms-container-full .wpforms-form .wpforms-field-number-slider input[type=range]::-ms-track {
+	color: transparent;
+}
+
+div.wpforms-container-full .wpforms-form .wpforms-field-number-slider input[type=range]::-webkit-slider-thumb {
+	-webkit-appearance: none; /* Override default look */
+	appearance: none;
+	width: 17px;
+	height: 17px;
+	background: #B5B5B5;
+	cursor: pointer;
+	border-radius: 100%;
+}
+
+div.wpforms-container-full .wpforms-form .wpforms-field-number-slider input[type=range]::-moz-range-thumb {
+	width: 17px;
+	height: 17px;
+	background: #B5B5B5;
+	cursor: pointer;
+	border-radius: 100%;
+}
+
+div.wpforms-container-full .wpforms-form .wpforms-field-number-slider input[type=range]::-ms-thumb {
+	width: 17px;
+	height: 17px;
+	background: #B5B5B5;
+	cursor: pointer;
+	border-radius: 100%;
+}
+
+div.wpforms-container-full .wpforms-form .wpforms-field-number-slider .wpforms-field-number-slider-hint {
+	font-size: 13px;
 }
 
 /* Stripe Credit Card field
@@ -1000,7 +1053,7 @@ div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-modern img {
 	max-width: 100%;
 }
 
-div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-modern label {
+div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-modern label:not(.wpforms-error) {
 	background-color: #fff;
 	display: block;
 	margin: 0 auto;
@@ -1012,8 +1065,8 @@ div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-modern label {
 	text-align: center;
 }
 
-div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-modern label:hover,
-div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-modern label:focus {
+div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-modern label:not(.wpforms-error):hover,
+div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-modern label:not(.wpforms-error):focus {
 	border:1px solid #ddd;
 }
 
@@ -1067,7 +1120,7 @@ div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic img {
 	max-width: 100%;
 }
 
-div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic label {
+div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic label:not(.wpforms-error) {
 	background-color: #fff;
 	display: block;
 	margin: 0 auto;
@@ -1077,8 +1130,8 @@ div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic label 
 	text-align: center;
 }
 
-div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic label:hover,
-div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic label:focus {
+div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic label:not(.wpforms-error):hover,
+div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic label:not(.wpforms-error):focus {
 	border-color: #ddd;
 }
 
@@ -1087,7 +1140,7 @@ div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic .wpfor
 }
 
 div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic .wpforms-selected label {
-	border-color: #666;
+	border-color: #666 !important;
 }
 
 div.wpforms-container-full .wpforms-form ul.wpforms-image-choices-classic .wpforms-image-choices-label {
@@ -1423,24 +1476,12 @@ div.wpforms-container-full .wpforms-form .wpforms-limit-text{
 
 	/* Page indicator */
 	div.wpforms-container-full .wpforms-form .wpforms-page-indicator.circles .wpforms-page-indicator-page {
-		float: none;
-		display: block;
-		margin: 0 0 10px 0;
+		margin: 0 10px 0 0;
 	}
 	div.wpforms-container-full .wpforms-form .wpforms-page-indicator.circles .wpforms-page-indicator-page-number {
 		width: 30px;
 		height: 30px;
 		line-height: 30px;
-	}
-	div.wpforms-container-full .wpforms-form .wpforms-page-indicator.connector .wpforms-page-indicator-page {
-		width: 100% !important;
-		padding: 5px 10px;
-	}
-	div.wpforms-container-full .wpforms-form .wpforms-page-indicator.connector .wpforms-page-indicator-page.active {
-		font-weight: 700;
-	}
-	div.wpforms-container-full .wpforms-form .wpforms-page-indicator.connector .wpforms-page-indicator-page-number {
-		display: none;
 	}
 
 	/* Date-Time field */
@@ -1501,4 +1542,14 @@ div.components-panel__body .wpforms-gutenberg-panel-notice {
 	border: 1px solid #bce8f1;
 	color: #31708f;
 	padding: 10px;
+}
+
+/* RTL support
+----------------------------------------------------------------------------- */
+
+/* Phone US format */
+body.rtl .wpforms-field-phone input[type=tel] {
+	direction: ltr;
+	unicode-bidi: embed;
+	text-align: right;
 }

@@ -185,14 +185,12 @@
 						btnClass: 'btn-confirm',
 						keys: [ 'enter' ],
 						action: function() {
-							var input = this.$content.find( 'input#provider-connection-name' );
+							var name = this.$content.find( 'input#provider-connection-name' ).val().trim();
 							var error = this.$content.find( '.error' );
-							if ( input.val() === '' ) {
+							if ( name === '' ) {
 								error.show();
 								return false;
 							} else {
-
-								var name = input.val();
 
 								// Disable button.
 								WPFormsProviders.inputToggle( $this, 'disable' );

@@ -5,11 +5,7 @@ namespace WPForms\Helpers;
 /**
  * Chain monad, useful for chaining certain array or string related functions.
  *
- * @package    WPForms\Helpers
- * @author     WPForms
- * @since      1.5.6
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.6
  */
 class Chain {
 

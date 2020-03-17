@@ -3,11 +3,7 @@
 /**
  * Pirate Forms Importer class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.4.9
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.4.9
  */
 class WPForms_Pirate_Forms extends WPForms_Importer {
 
@@ -142,7 +138,7 @@ class WPForms_Pirate_Forms extends WPForms_Importer {
 		check_ajax_referer( 'wpforms-admin', 'nonce' );
 
 		// Check for permissions.
-		if ( ! wpforms_current_user_can() ) {
+		if ( ! wpforms_current_user_can( 'create_forms' ) ) {
 			wp_send_json_error();
 		}
 

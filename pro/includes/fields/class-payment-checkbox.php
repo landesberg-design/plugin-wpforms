@@ -3,11 +3,7 @@
 /**
  * Payment Checkbox Field.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.5.1
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.5.1
  */
 class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 
@@ -429,7 +425,7 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 	}
 
 	/**
-	 * Validates field on form submit.
+	 * Validate field on form submit.
 	 *
 	 * @since 1.5.1
 	 *
@@ -462,7 +458,7 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 	}
 
 	/**
-	 * Formats and sanitizes field.
+	 * Format and sanitize field.
 	 *
 	 * @since 1.5.1
 	 *

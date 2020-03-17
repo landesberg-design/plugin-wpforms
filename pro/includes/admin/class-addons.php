@@ -3,11 +3,7 @@
 /**
  * Addons class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Addons {
 
@@ -154,16 +150,21 @@ class WPForms_Addons {
 							if ( 'basic' === $type ) :
 
 								$this->addon_grid( $this->addons, $type, array( 'basic' ) );
-								$this->addon_grid( $this->addons, $type, array( 'plus', 'pro' ), true );
+								$this->addon_grid( $this->addons, $type, array( 'plus', 'pro', 'agency' ), true );
 
 							elseif ( 'plus' === $type ) :
 
-								$this->addon_grid( $this->addons, $type, array( 'plus' ) );
-								$this->addon_grid( $this->addons, $type, array( 'pro' ), true );
+								$this->addon_grid( $this->addons, $type, array( 'basic', 'plus' ) );
+								$this->addon_grid( $this->addons, $type, array( 'pro', 'agency' ), true );
 
-							elseif ( in_array( $type, array( 'elite', 'agency', 'ultimate', 'pro' ), true ) ) :
+							elseif ( 'pro' === $type ) :
 
 								$this->addon_grid( $this->addons, $type, array( 'basic', 'plus', 'pro' ) );
+								$this->addon_grid( $this->addons, $type, array( 'agency' ), true );
+
+							elseif ( in_array( $type, array( 'elite', 'agency', 'ultimate' ), true ) ) :
+
+								$this->addon_grid( $this->addons, $type, array( 'basic', 'plus', 'pro', 'agency' ) );
 
 							endif;
 
@@ -214,8 +215,8 @@ class WPForms_Addons {
 			echo '</div>';
 		}
 
-		if ( in_array( $type_current, array( 'ultimate', 'agency', 'elite' ), true ) ) {
-			$type_current = 'pro';
+		if ( in_array( $type_current, array( 'ultimate', 'elite' ), true ) ) {
+			$type_current = 'agency';
 		}
 
 		foreach ( $addons as $id => $addon ) {

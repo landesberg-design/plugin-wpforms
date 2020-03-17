@@ -8,11 +8,7 @@
  * Heavily influenced by the great AffiliateWP plugin by Pippin Williamson.
  * https://github.com/AffiliateWP/AffiliateWP/blob/master/includes/emails/class-affwp-emails.php
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.1.3
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.1.3
  */
 class WPForms_WP_Emails {
 
@@ -114,6 +110,15 @@ class WPForms_WP_Emails {
 	 * @var int
 	 */
 	public $entry_id = '';
+
+	/**
+	 * Notification ID that is currently being processed.
+	 *
+	 * @since 1.5.7
+	 *
+	 * @var int
+	 */
+	public $notification_id = '';
 
 	/**
 	 * Get things going.
@@ -346,12 +351,39 @@ class WPForms_WP_Emails {
 		// Hooks before email is sent.
 		do_action( 'wpforms_email_send_before', $this );
 
-		$message     = $this->build_email( $message );
-		$attachments = apply_filters( 'wpforms_email_attachments', $attachments, $this );
-		$subject     = wpforms_decode_string( $this->process_tag( $subject ) );
+		// Deprecated filter for $attachments.
+		$attachments = apply_filters_deprecated(
+			'wpforms_email_attachments',
+			array( $attachments, $this ),
+			'1.5.7 of the WPForms plugin',
+			'wpforms_emails_send_email_data'
+		);
+
+		/*
+		 * Allow to filter data on per-email basis,
+		 * useful for localizations based on recipient email address, form settings,
+		 * or for specific notifications - whatever available in WPForms_WP_Emails class.
+		 */
+		$data = apply_filters(
+			'wpforms_emails_send_email_data',
+			array(
+				'to'          => $to,
+				'subject'     => $subject,
+				'message'     => $message,
+				'headers'     => $this->get_headers(),
+				'attachments' => $attachments,
+			),
+			$this
+		);
 
 		// Let's do this.
-		$sent = wp_mail( $to, $subject, $message, $this->get_headers(), $attachments );
+		$sent = wp_mail(
+			$data['to'],
+			wpforms_decode_string( $this->process_tag( $data['subject'] ) ),
+			$this->build_email( $data['message'] ),
+			$data['headers'],
+			$data['attachments']
+		);
 
 		// Hooks after the email is sent.
 		do_action( 'wpforms_email_send_after', $this );
@@ -403,7 +435,7 @@ class WPForms_WP_Emails {
 	}
 
 	/**
-	 * Processes a smart tag.
+	 * Process a smart tag.
 	 *
 	 * @since 1.1.3
 	 *
@@ -499,13 +531,13 @@ class WPForms_WP_Emails {
 
 					if (
 						! apply_filters( 'wpforms_email_display_empty_fields', false ) &&
-						( empty( $this->fields[ $field_id ]['value'] ) && '0' !== $this->fields[ $field_id ]['value'] )
+						( ! isset( $this->fields[ $field_id ]['value'] ) || (string) $this->fields[ $field_id ]['value'] === '' )
 					) {
 						continue;
 					}
 
 					$field_name = $this->fields[ $field_id ]['name'];
-					$field_val  = empty( $this->fields[ $field_id ]['value'] ) && '0' !== $this->fields[ $field_id ]['value'] ? '<em>' . esc_html__( '(empty)', 'wpforms-lite' ) . '</em>' : $this->fields[ $field_id ]['value'];
+					$field_val  = empty( $this->fields[ $field_id ]['value'] ) && ! is_numeric( $this->fields[ $field_id ]['value'] ) ? '<em>' . esc_html__( '(empty)', 'wpforms-lite' ) . '</em>' : $this->fields[ $field_id ]['value'];
 				}
 
 				if ( empty( $field_name ) && ! is_null( $field_name ) ) {
@@ -543,11 +575,14 @@ class WPForms_WP_Emails {
 			 */
 			foreach ( $this->fields as $field ) {
 
-				if ( ! apply_filters( 'wpforms_email_display_empty_fields', false ) && ( empty( $field['value'] ) && '0' !== $field['value'] ) ) {
+				if (
+					! apply_filters( 'wpforms_email_display_empty_fields', false ) &&
+					( ! isset( $field['value'] ) || (string) $field['value'] === '' )
+				) {
 					continue;
 				}
 
-				$field_val  = empty( $field['value'] ) && '0' !== $field['value'] ? esc_html__( '(empty)', 'wpforms-lite' ) : $field['value'];
+				$field_val  = empty( $field['value'] ) && ! is_numeric( $field['value'] ) ? esc_html__( '(empty)', 'wpforms-lite' ) : $field['value'];
 				$field_name = $field['name'];
 
 				if ( empty( $field_name ) ) {
@@ -626,7 +661,7 @@ class WPForms_WP_Emails {
 	/**
 	 * Retrieve the name of the highest priority template file that exists.
 	 *
-	 * Searches in the STYLESHEETPATH before TEMPLATEPATH so that themes which
+	 * Search in the STYLESHEETPATH before TEMPLATEPATH so that themes which
 	 * inherit from a parent theme can just overload one file. If the template is
 	 * not found in either of those, it looks in the theme-compat folder last.
 	 *
@@ -674,7 +709,7 @@ class WPForms_WP_Emails {
 	}
 
 	/**
-	 * Returns a list of paths to check for template locations
+	 * Return a list of paths to check for template locations
 	 *
 	 * @since 1.1.3
 	 *

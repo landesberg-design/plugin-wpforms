@@ -337,11 +337,11 @@
 								pass_rule = ( left.length > 0 );
 								break;
 							case '>' :
-								left      = left.replace( /[^0-9.]/g, '' );
+								left      = left.replace( /[^-0-9.]/g, '' );
 								pass_rule = ( '' !== left ) && ( WPFormsConditionals.floatval( left ) > WPFormsConditionals.floatval( right ) );
 								break;
 							case '<' :
-								left      = left.replace( /[^0-9.]/g, '' );
+								left      = left.replace( /[^-0-9.]/g, '' );
 								pass_rule = ( '' !== left ) && ( WPFormsConditionals.floatval( left ) < WPFormsConditionals.floatval( right ) );
 								break;
 						}

@@ -3,11 +3,7 @@
 /**
  * Ask for some love.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.3.2
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2017, WPForms LLC
+ * @since 1.3.2
  */
 class WPForms_Review {
 

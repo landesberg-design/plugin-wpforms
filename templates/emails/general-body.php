@@ -4,11 +4,7 @@
  *
  * This template can be overridden by copying it to yourtheme/wpforms/emails/general-body.php.
  *
- * @package    WPForms\Emails\Templates
- * @author     WPForms
- * @since      1.5.4
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.4
  *
  * @version 1.5.4
  *

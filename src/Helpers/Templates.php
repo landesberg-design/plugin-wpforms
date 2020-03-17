@@ -5,16 +5,12 @@ namespace WPForms\Helpers;
 /**
  * Template related helper methods.
  *
- * @package    WPForms\Helpers
- * @author     WPForms
- * @since      1.5.4
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.4
  */
 class Templates {
 
 	/**
-	 * Returns a list of paths to check for template locations
+	 * Return a list of paths to check for template locations
 	 *
 	 * @since 1.5.4
 	 *

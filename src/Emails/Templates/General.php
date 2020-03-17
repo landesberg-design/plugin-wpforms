@@ -8,11 +8,7 @@ use WPForms\Helpers\Templates;
 /**
  * Base email template class.
  *
- * @package    WPForms\Emails\Templates
- * @author     WPForms
- * @since      1.5.4
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.4
  */
 class General {
 

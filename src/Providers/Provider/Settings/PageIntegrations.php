@@ -7,11 +7,7 @@ use WPForms\Providers\Provider\Core;
 /**
  * Class PageIntegrations handles the WPForms -> Settings -> Integrations page.
  *
- * @package    WPForms\Providers\Provider\Settings
- * @author     WPForms
- * @since      1.4.7
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.4.7
  */
 abstract class PageIntegrations implements PageIntegrationsInterface {
 
@@ -45,10 +41,10 @@ abstract class PageIntegrations implements PageIntegrationsInterface {
 	protected function ajax() {
 
 		// Remove provider from Settings Integrations tab.
-		\add_action( 'wp_ajax_wpforms_settings_provider_disconnect', array( $this, 'ajax_disconnect' ) );
+		\add_action( "wp_ajax_wpforms_settings_provider_disconnect_{$this->core->slug}", array( $this, 'ajax_disconnect' ) );
 
 		// Add new provider from Settings Integrations tab.
-		\add_action( 'wp_ajax_wpforms_settings_provider_add', array( $this, 'ajax_connect' ) );
+		\add_action( "wp_ajax_wpforms_settings_provider_add_{$this->core->slug}", array( $this, 'ajax_connect' ) );
 	}
 
 	/**
@@ -220,10 +216,6 @@ abstract class PageIntegrations implements PageIntegrationsInterface {
 	 * @return bool False when not own provider is processed.
 	 */
 	public function ajax_connect() {
-
-		if ( $_POST['provider'] !== $this->core->slug ) { // phpcs:ignore
-			return false;
-		}
 
 		// Run a security check.
 		\check_ajax_referer( 'wpforms-admin', 'nonce' );

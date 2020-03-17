@@ -5,11 +5,7 @@ namespace WPForms\Pro\Admin\Entries;
 /**
  * Print view for single form entries.
  *
- * @package    WPForms\Pro\Admin\Entries
- * @author     WPForms
- * @since      1.5.1
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 201p, WPForms LLC
+ * @since 1.5.1
  */
 class PrintPreview {
 
@@ -65,18 +61,20 @@ class PrintPreview {
 			return false;
 		}
 
-		// Check for user with correct capabilities.
-		if ( ! \wpforms_current_user_can() ) {
-			return false;
-		}
-
 		// Check that entry ID was passed.
 		if ( empty( $_GET['entry_id'] ) ) { //phpcs:ignore;
 			return false;
 		}
 
+		$entry_id = \absint( $_GET['entry_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		// Check for user with correct capabilities.
+		if ( ! \wpforms_current_user_can( 'view_entry_single', $entry_id ) ) {
+			return false;
+		}
+
 		// Fetch the entry.
-		$this->entry = \wpforms()->entry->get( \absint( $_GET['entry_id'] ) ); //phpcs:ignore
+		$this->entry = \wpforms()->entry->get( $entry_id );
 
 		// Check valid entry was found.
 		if ( empty( $this->entry ) ) {

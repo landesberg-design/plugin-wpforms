@@ -3,11 +3,7 @@
 /**
  * Checkbox field.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Field_Checkbox extends WPForms_Field {
 
@@ -574,7 +570,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 	}
 
 	/**
-	 * Validates field on form submit.
+	 * Validate field on form submit.
 	 *
 	 * @since 1.5.2
 	 *
@@ -597,7 +593,13 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 		// Basic required check - If field is marked as required, check for entry data.
 		if (
 			! empty( $form_data['fields'][ $field_id ]['required'] ) &&
-			( empty( $field_submit ) || ( 1 === count( $field_submit ) && empty( $field_submit[0] ) ) )
+			(
+				empty( $field_submit ) ||
+				(
+					count( $field_submit ) === 1 &&
+					( ! isset( $field_submit[0] ) || (string) $field_submit[0] === '' )
+				)
+			)
 		) {
 			$error = wpforms_get_required_label();
 		}
@@ -608,7 +610,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 	}
 
 	/**
-	 * Formats and sanitizes field.
+	 * Format and sanitize field.
 	 *
 	 * @since 1.0.2
 	 *

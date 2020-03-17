@@ -38,15 +38,12 @@ div.wpforms-container .wpforms-form,
 div.wpforms-container-full .wpforms-form,
 #wpforms-conversational-form-page {
 
-	.intl-tel-input {
-
+	.iti {
 		// need position on the container so the selected flag can be
 		// absolutely positioned over the input
 		position: relative;
 		// keep the input's default inline properties
 		display: inline-block;
-
-		width: 100%;
 
 		// paul irish says this is ok
 		// http://www.paulirish.com/2012/box-sizing-border-box-ftw/
@@ -55,12 +52,11 @@ div.wpforms-container-full .wpforms-form,
 			-moz-box-sizing: border-box;
 		}
 
-		.hide {
+		&__hide {
 			display: none;
 		}
-
 		// need this during init, to get the height of the dropdown
-		.v-hide {
+		&__v-hide {
 			visibility: hidden;
 		}
 
@@ -87,7 +83,7 @@ div.wpforms-container-full .wpforms-form,
 			margin-right: 0;
 		}
 
-		.flag-container {
+		&__flag-container {
 			// positioned over the top of the input
 			position: absolute;
 			// full height
@@ -98,7 +94,7 @@ div.wpforms-container-full .wpforms-form,
 			padding: $borderWidth;
 		}
 
-		.selected-flag {
+		&__selected-flag {
 			// render above the input
 			z-index: 1;
 			position: relative;
@@ -108,54 +104,48 @@ div.wpforms-container-full .wpforms-form,
 			// dropdown so it appears below the input
 			height: 100%;
 			padding: 0 $arrowPadding 0 $flagPadding;
+		}
 
-			.iti-arrow {
-				margin-left: $arrowPadding;
+		&__arrow {
+			margin-left: $arrowPadding;
 
-				// css triangle
-				width: 0;
-				height: 0;
-				border-left: $triangleBorder solid transparent;
-				border-right: $triangleBorder solid transparent;
-				border-top: $arrowHeight solid $arrowColor;
+			// css triangle
+			width: 0;
+			height: 0;
+			border-left: $triangleBorder solid transparent;
+			border-right: $triangleBorder solid transparent;
+			border-top: $arrowHeight solid $arrowColor;
 
-				&.up {
-					border-top: none;
-					border-bottom: $arrowHeight solid $arrowColor;
-				}
+			&--up {
+				border-top: none;
+				border-bottom: $arrowHeight solid $arrowColor;
 			}
 		}
 
 		// the dropdown
-		.country-list {
+		&__country-list {
 			position: absolute;
 			// popup so render above everything else
 			z-index: 2;
 
 			// override default list styles
-			list-style: none !important;
+			list-style: none;
 			// in case any container has text-align:center
 			text-align: left;
 
 			// place menu above the input element
-			&.dropup {
+			&--dropup {
 				bottom: 100%;
 				margin-bottom: (-$borderWidth);
 			}
 
-			// dropdown flags need consistent width, so wrap in a container
-			.flag-box {
-				display: inline-block;
-				width: $flagWidth;
-			}
-
-			padding: 0 !important;
+			padding: 0;
 			// margin-left to compensate for the padding on the parent
-			margin: 0 0 0 (-$borderWidth) !important;
+			margin: 0 0 0 (-$borderWidth);
 
-			box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+			box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
 			background-color: white !important;
-			border: $borderWidth solid $greyBorder !important;
+			border: $borderWidth solid $greyBorder;
 
 			// don't let the contents wrap AKA the container will be as wide as the contents
 			white-space: nowrap;
@@ -172,85 +162,89 @@ div.wpforms-container-full .wpforms-form,
 			// If this is not set, then the country list scroll stops moving after rasing a finger, and users report that scroll is slow
 			// Stackoverflow question about it: https://stackoverflow.com/questions/33601165/scrolling-slow-on-mobile-ios-when-using-overflowscroll
 			-webkit-overflow-scrolling: touch;
+		}
 
-			// the divider below the preferred countries
-			.divider {
-				padding-bottom: 5px !important;
-				margin-bottom: 5px !important;
-				border-bottom: $borderWidth solid $greyBorder !important;
-			}
+		// dropdown flags need consistent width, so wrap in a container
+		&__flag-box {
+			display: inline-block;
+			width: $flagWidth;
+		}
 
-			// each country item in dropdown (we must have separate class to differentiate from dividers)
-			.country {
-				// Note: decided not to use line-height here for alignment because it causes issues e.g. large font-sizes will overlap, and also looks bad if one country overflows onto 2 lines
-				padding: 5px 10px !important;
-				// the dial codes after the country names are greyed out
-				.dial-code {
-					color: $greyText;
-				}
-			}
+		// the divider below the preferred countries
+		&__divider {
+			border-bottom: $borderWidth solid $greyBorder !important;
+			margin: 0 !important;
+		}
 
-			.country.highlight {
-				background-color: $hoverColor;
-			}
+		// each country item in dropdown (we must have separate class to differentiate from dividers)
+		&__country {
+			// Note: decided not to use line-height here for alignment because it causes issues e.g. large font-sizes will overlap, and also looks bad if one country overflows onto 2 lines
+			padding: 5px 10px;
+			outline: none;
+		}
 
-			// spacing between country flag, name and dial code
-			.flag-box, .country-name, .dial-code {
-				vertical-align: middle;
-			}
+		// the dial codes after the country names are greyed out
+		&__dial-code {
+			color: $greyText;
+			vertical-align: baseline;
+			line-height: 1;
+		}
+		&__country.iti__highlight {
+			background-color: $hoverColor !important;
+		}
 
-			.flag-box, .country-name {
-				margin-right: 6px;
-			}
+		// spacing between country flag, name and dial code
+		&__flag-box, &__country-name {
+			vertical-align: middle;
+			line-height: 1;
+		}
+		&__flag-box, &__country-name {
+			margin-right: 10px;
 		}
 
 		// these settings are independent of each other, but both move selected flag to left of input
-		&.allow-dropdown, &.separate-dial-code {
+		&--allow-dropdown, &--separate-dial-code {
 			input, input[type=text], input[type=tel] {
 				padding-right: $inputPadding;
 				padding-left: $selectedFlagArrowWidth + $inputPadding;
 				margin-left: 0;
 			}
-
-			.flag-container {
+			.iti__flag-container {
 				right: auto;
 				left: 0;
 			}
 		}
 
-		&.allow-dropdown {
+		&--allow-dropdown {
 			// hover state - show flag is clickable
-			.flag-container:hover {
+			.iti__flag-container:hover {
 				cursor: pointer;
-
-				.selected-flag {
+				.iti__selected-flag {
 					background-color: $hoverColor;
 				}
 			}
-
 			// disable hover state when input is disabled
-			input[disabled] + .flag-container:hover, input[readonly] + .flag-container:hover {
+			input[disabled] + .iti__flag-container:hover,
+			input[readonly] + .iti__flag-container:hover {
 				cursor: default;
-
-				.selected-flag {
+				.iti__selected-flag {
 					background-color: transparent;
 				}
 			}
 		}
 
-		&.separate-dial-code {
-			.selected-flag {
+		&--separate-dial-code {
+			.iti__selected-flag {
 				// now that we have digits in this section, it needs this visual separation
 				background-color: $hoverColor;
 			}
-
-			.selected-dial-code {
+			.iti__selected-dial-code {
 				margin-left: $arrowPadding;
 			}
 		}
 
 		// if dropdownContainer option is set, increase z-index to prevent display issues
-		&.iti-container {
+		&--container {
 			position: absolute;
 			top: -1000px;
 			left: -1000px;
@@ -258,16 +252,35 @@ div.wpforms-container-full .wpforms-form,
 			z-index: 1060;
 			// to keep styling consistent with .flag-container
 			padding: $borderWidth;
-
 			&:hover {
 				cursor: pointer;
 			}
 		}
 	}
 
+	// overrides for mobile popup (note: .iti-mobile class is applied on body)
+	.iti-mobile .iti {
+		&--container {
+			top: $mobilePopupMargin;
+			bottom: $mobilePopupMargin;
+			left: $mobilePopupMargin;
+			right: $mobilePopupMargin;
+			position: fixed;
+		}
+		&__country-list {
+			max-height: 100%;
+			width: 100%;
+		}
+		&__country {
+			padding: 10px 10px;
+			// increase line height because dropdown copy is v likely to overflow on mobile and when it does it needs to be well spaced
+			line-height: 1.5em;
+		}
+	}
+
 	@import "partials/intl-tel-input-sprite";
 
-	.iti-flag {
+	.iti__flag {
 		height: $flagHeight;
 		box-shadow: 0px 0px 1px 0px #888;
 		background-image: url("#{$flagsImagePath}#{$flagsImageName}.#{$flagsImageExtension}");
@@ -282,7 +295,7 @@ div.wpforms-container-full .wpforms-form,
 	}
 
 	// hack for Nepal which is the only flag that is not square/rectangle, so it has transparency, so you can see the default grey behind it
-	.iti-flag.np {
+	.iti__flag.iti__np {
 		background-color: transparent;
 	}
 }
@@ -305,6 +318,76 @@ div.wpforms-container-full .wpforms-form,
 			padding: 10px 10px;
 			// increase line height because dropdown copy is v likely to overflow on mobile and when it does it needs to be well spaced
 			line-height: 1.5em;
+		}
+	}
+}
+
+body.rtl,
+body.rtl div.wpforms-container .wpforms-form,
+body.rtl div.wpforms-container-full .wpforms-form,
+body.rtl #wpforms-conversational-form-page {
+	.intl-tel-input {
+
+		input, input[type=text], input[type=tel] {
+			padding-right: 0;
+			padding-left: $selectedFlagWidth;
+		}
+
+		.flag-container {
+			right: auto;
+			left: 0;
+		}
+
+		.selected-flag {
+			padding-right: $flagPadding;
+			padding-left: $arrowPadding;
+
+			.iti-arrow {
+				margin-right: $arrowPadding;
+				margin-left: 0;
+			}
+		}
+
+		.country-list {
+			text-align: right;
+
+			.flag-box, .country-name {
+				margin-right: 0;
+				margin-left: 6px;
+			}
+
+			.country-name {
+				unicode-bidi: embed;
+				direction: rtl;
+			}
+		}
+
+		&.allow-dropdown, &.separate-dial-code {
+			input, input[type=text], input[type=tel] {
+				padding-right: $selectedFlagArrowWidth + $inputPadding;
+				padding-left: $inputPadding;
+			}
+
+			.flag-container {
+				right: 0;
+				left: auto;
+			}
+		}
+	}
+}
+
+// Fixes for update to v.16.0.8
+body,
+div.wpforms-container .wpforms-form,
+div.wpforms-container-full .wpforms-form,
+#wpforms-conversational-form-page {
+	.iti {
+		&--allow-dropdown {
+			width: 100%;
+		}
+		.iti__country {
+			padding: 5px 10px !important;
+			margin: 0 !important;
 		}
 	}
 }

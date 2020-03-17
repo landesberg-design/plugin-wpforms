@@ -7,11 +7,7 @@ use WPForms\Integrations\IntegrationInterface;
 /**
  * Site Health WPForms Info.
  *
- * @since      1.5.5
- * @author     WPForms
- * @package    WPForms\Integrations\SiteHealth
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.5
  */
 class SiteHealth implements IntegrationInterface {
 
@@ -46,11 +42,11 @@ class SiteHealth implements IntegrationInterface {
 	 */
 	protected function hooks() {
 
-		\add_filter( 'debug_information', array( $this, 'add_info_section' ) );
+		add_filter( 'debug_information', array( $this, 'add_info_section' ) );
 	}
 
 	/**
-	 * Add WPForms section to .
+	 * Add WPForms section to Info tab.
 	 *
 	 * @since 1.5.5
 	 *
@@ -96,15 +92,15 @@ class SiteHealth implements IntegrationInterface {
 		}
 
 		// DB tables.
-		global $wpdb;
-		$results   = $wpdb->get_results( "SHOW TABLES LIKE '" . $wpdb->prefix . "wpforms_%'", 'ARRAY_N' ); // phpcs:ignore
-		$results   = wp_list_pluck( $results, 0 );
-		$db_tables = empty( $results ) ? esc_html__( 'Not found', 'wpforms-lite' ) : implode( ', ', $results );
+		if ( wpforms()->pro ) {
+			$db_tables     = wpforms()->get( 'pro' )->get_existing_custom_tables();
+			$db_tables_str = empty( $db_tables ) ? esc_html__( 'Not found', 'wpforms-lite' ) : implode( ', ', $db_tables );
 
-		$wpforms['fields']['db_tables'] = array(
-			'label' => esc_html__( 'DB tables', 'wpforms-lite' ),
-			'value' => $db_tables,
-		);
+			$wpforms['fields']['db_tables'] = array(
+				'label' => esc_html__( 'DB tables', 'wpforms-lite' ),
+				'value' => $db_tables_str,
+			);
+		}
 
 		// Total forms.
 		$wpforms['fields']['total_forms'] = array(
@@ -137,7 +133,7 @@ class SiteHealth implements IntegrationInterface {
 			);
 		}
 
-		$debug_info[] = $wpforms;
+		$debug_info['wpforms'] = $wpforms;
 
 		return $debug_info;
 	}

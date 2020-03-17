@@ -3,14 +3,9 @@
 namespace WPForms\Pro\Admin\Builder;
 
 /**
- * Form Builder changes and enhancements to educate Basic/Plus users on what is
- * available in WPForms Pro.
+ * Form Builder changes and enhancements to educate Basic/Plus users on what is available in WPForms Pro.
  *
- * @package    WPForms\Pro\Admin\Builder
- * @author     WPForms
- * @since      1.5.1
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.5.1
  */
 class Education {
 
@@ -48,6 +43,9 @@ class Education {
 	 * @since 1.5.1
 	 */
 	public function hooks() {
+
+		// AJAX-callback on targeting `reCAPTCHA` field button.
+		add_action( 'wp_ajax_wpforms_update_field_recaptcha', array( $this, 'recaptcha_field_callback' ) );
 
 		// Only proceed for the form builder.
 		if ( ! \wpforms_is_admin_page( 'builder' ) ) {
@@ -148,9 +146,18 @@ class Education {
 	 */
 	public function fields( $fields ) {
 
+		// Add reCAPTCHA field to Standard group.
+		$fields['standard']['fields'][] = array(
+			'icon'  => 'fa-google',
+			'name'  => \esc_html__( 'reCAPTCHA', 'wpforms' ),
+			'type'  => 'recaptcha',
+			'order' => 180,
+			'class' => 'not-draggable',
+		);
+
 		$addons = array(
 			array(
-				'name'        => 'Captcha',
+				'name'        => esc_html__( 'Captcha', 'wpforms' ),
 				'slug'        => 'captcha',
 				'plugin'      => 'wpforms-captcha/wpforms-captcha.php',
 				'plugin_slug' => 'wpforms-captcha',
@@ -163,7 +170,7 @@ class Education {
 				),
 			),
 			array(
-				'name'        => 'Signatures',
+				'name'        => esc_html__( 'Signatures', 'wpforms' ),
 				'slug'        => 'signatures',
 				'plugin'      => 'wpforms-signatures/wpforms-signatures.php',
 				'plugin_slug' => 'wpforms-signatures',
@@ -176,7 +183,7 @@ class Education {
 				),
 			),
 			array(
-				'name'        => 'Surveys and Polls',
+				'name'        => esc_html__( 'Surveys and Polls', 'wpforms' ),
 				'slug'        => 'surveys-polls',
 				'plugin'      => 'wpforms-surveys-polls/wpforms-surveys-polls.php',
 				'plugin_slug' => 'wpforms-surveys-polls',
@@ -189,7 +196,7 @@ class Education {
 				),
 			),
 			array(
-				'name'        => 'Surveys and Polls',
+				'name'        => esc_html__( 'Surveys and Polls', 'wpforms' ),
 				'slug'        => 'surveys-polls',
 				'plugin'      => 'wpforms-surveys-polls/wpforms-surveys-polls.php',
 				'plugin_slug' => 'wpforms-surveys-polls',
@@ -227,9 +234,9 @@ class Education {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param string $atts      Button attributes.
-	 * @param array  $field     Button properties
-	 * @param array  $form_data Form data.
+	 * @param array $atts      Button attributes.
+	 * @param array $field     Button properties.
+	 * @param array $form_data Form data.
 	 *
 	 * @return array
 	 */
@@ -239,16 +246,14 @@ class Education {
 			return $atts;
 		}
 
+		/* translators: %s - field name*/
+		$atts['data']['field-name'] = sprintf( \esc_html__( '%s field', 'wpforms' ), $field['name'] );
 		$atts['data']['action']     = $field['action'];
 		$atts['data']['nonce']      = \wp_create_nonce( 'wpforms-admin' );
-		/* translators: %s - field name*/
-		$field_name                 = sprintf( \esc_html__( '%s field', 'wpforms' ), $field['name'] );
-		$atts['data']['field-name'] = $field_name;
 
 		if ( ! empty( $field['plugin_name'] ) ) {
 			/* translators: %s - addon name*/
-			$modal_name           = sprintf( \esc_html__( '%s addon', 'wpforms' ), $field['plugin_name'] );
-			$atts['data']['name'] = $modal_name;
+			$atts['data']['name'] = sprintf( \esc_html__( '%s addon', 'wpforms' ), $field['plugin_name'] );
 		}
 
 		if ( ! empty( $field['plugin'] ) ) {
@@ -267,8 +272,8 @@ class Education {
 	 *
 	 * @since 1.5.1
 	 *
-	 * @param object $form Current form.
-	 * @param string $slug Panel slug.
+	 * @param \WPForms_Form_Handler $form Current form.
+	 * @param string                $slug Panel slug.
 	 */
 	public function settings( $form, $slug ) {
 
@@ -278,37 +283,37 @@ class Education {
 
 		$addons = array(
 			array(
-				'name'        => 'Conversational Forms',
+				'name'        => esc_html__( 'Conversational Forms', 'wpforms' ),
 				'slug'        => 'conversational-forms',
 				'plugin'      => 'wpforms-conversational-forms/wpforms-conversational-forms.php',
 				'plugin_slug' => 'wpforms-conversational-forms',
 			),
 			array(
-				'name'        => 'Surveys and Polls',
+				'name'        => esc_html__( 'Surveys and Polls', 'wpforms' ),
 				'slug'        => 'surveys-polls',
 				'plugin'      => 'wpforms-surveys-polls/wpforms-surveys-polls.php',
 				'plugin_slug' => 'wpforms-surveys-polls',
 			),
 			array(
-				'name'        => 'Form Pages',
+				'name'        => esc_html__( 'Form Pages', 'wpforms' ),
 				'slug'        => 'form-pages',
 				'plugin'      => 'wpforms-form-pages/wpforms-form-pages.php',
 				'plugin_slug' => 'wpforms-form-pages',
 			),
 			array(
-				'name'        => 'Form Locker',
+				'name'        => esc_html__( 'Form Locker', 'wpforms' ),
 				'slug'        => 'form-locker',
 				'plugin'      => 'wpforms-form-locker/wpforms-form-locker.php',
 				'plugin_slug' => 'wpforms-form-locker',
 			),
 			array(
-				'name'        => 'Form Abandonment',
+				'name'        => esc_html__( 'Form Abandonment', 'wpforms' ),
 				'slug'        => 'form-abandonment',
 				'plugin'      => 'wpforms-form-abandonment/wpforms-form-abandonment.php',
 				'plugin_slug' => 'wpforms-form-abandonment',
 			),
 			array(
-				'name'        => 'Post Submissions',
+				'name'        => esc_html__( 'Post Submissions', 'wpforms' ),
 				'slug'        => 'post-submissions',
 				'plugin'      => 'wpforms-post-submissions/wpforms-post-submissions.php',
 				'plugin_slug' => 'wpforms-post-submissions',
@@ -332,7 +337,7 @@ class Education {
 				\esc_attr( $setting['action'] ),
 				\esc_attr( $setting['plugin'] ),
 				isset( $setting['url'] ) ? \esc_attr( $setting['url'] ) : '',
-				\wp_create_nonce( 'wpforms-admin' ) //phpcs:ignore
+				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) )
 			);
 				echo \esc_html( $setting['name'] );
 				echo '<i class="fa fa-angle-right wpforms-toggle-arrow"></i>';
@@ -349,42 +354,49 @@ class Education {
 
 		$addons = array(
 			array(
-				'name'        => 'AWeber',
+				'name'        => esc_html__( 'ActiveCampaign', 'wpforms' ),
+				'slug'        => 'activecampaign',
+				'img'         => 'addon-icon-activecampaign.png',
+				'plugin'      => 'wpforms-activecampaign/wpforms-activecampaign.php',
+				'plugin_slug' => 'wpforms-activecampaign',
+			),
+			array(
+				'name'        => esc_html__( 'AWeber', 'wpforms' ),
 				'slug'        => 'aweber',
 				'img'         => 'addon-icon-aweber.png',
 				'plugin'      => 'wpforms-aweber/wpforms-aweber.php',
 				'plugin_slug' => 'wpforms-aweber',
 			),
 			array(
-				'name'        => 'Campaign Monitor',
+				'name'        => esc_html__( 'Campaign Monitor', 'wpforms' ),
 				'slug'        => 'campaign-monitor',
 				'img'         => 'addon-icon-campaign-monitor.png',
 				'plugin'      => 'wpforms-campaign-monitor/wpforms-campaign-monitor.php',
 				'plugin_slug' => 'wpforms-campaign-monitor',
 			),
 			array(
-				'name'        => 'Drip',
+				'name'        => esc_html__( 'Drip', 'wpforms' ),
 				'slug'        => 'drip',
 				'img'         => 'addon-icon-drip.png',
 				'plugin'      => 'wpforms-drip/wpforms-drip.php',
 				'plugin_slug' => 'wpforms-drip',
 			),
 			array(
-				'name'        => 'GetResponse',
+				'name'        => esc_html__( 'GetResponse', 'wpforms' ),
 				'slug'        => 'getresponse',
 				'img'         => 'addon-icon-getresponse.png',
 				'plugin'      => 'wpforms-getresponse/wpforms-getresponse.php',
 				'plugin_slug' => 'wpforms-getresponse',
 			),
 			array(
-				'name'        => 'MailChimp',
+				'name'        => esc_html__( 'Mailchimp', 'wpforms' ),
 				'slug'        => 'mailchimp',
 				'img'         => 'addon-icon-mailchimp.png',
 				'plugin'      => 'wpforms-mailchimp/wpforms-mailchimp.php',
 				'plugin_slug' => 'wpforms-mailchimp',
 			),
 			array(
-				'name'        => 'Zapier',
+				'name'        => esc_html__( 'Zapier', 'wpforms' ),
 				'slug'        => 'zapier',
 				'img'         => 'addon-icon-zapier.png',
 				'plugin'      => 'wpforms-zapier/wpforms-zapier.php',
@@ -409,9 +421,9 @@ class Education {
 				\esc_attr( $provider['action'] ),
 				\esc_attr( $provider['plugin'] ),
 				isset( $provider['url'] ) ? \esc_attr( $provider['url'] ) : '',
-				\wp_create_nonce( 'wpforms-admin' ) //phpcs:ignore
+				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) )
 			);
-				echo '<img src="' . \esc_attr( WPFORMS_PLUGIN_URL ) . 'assets/images/' . \esc_attr( $provider['img'] ) . '">';
+				echo '<img src="' . \esc_url( WPFORMS_PLUGIN_URL . 'assets/images/' . $provider['img'] ) . '">';
 				echo \esc_html( $provider['name'] );
 				echo '<i class="fa fa-angle-right wpforms-toggle-arrow"></i>';
 			echo '</a>';
@@ -427,14 +439,14 @@ class Education {
 
 		$addons = array(
 			array(
-				'name'        => 'PayPal Standard',
+				'name'        => esc_html__( 'PayPal Standard', 'wpforms' ),
 				'slug'        => 'paypal_standard',
 				'img'         => 'addon-icon-paypal.png',
 				'plugin'      => 'wpforms-paypal-standard/wpforms-paypal-standard.php',
 				'plugin_slug' => 'wpforms-paypal-standard',
 			),
 			array(
-				'name'        => 'Stripe',
+				'name'        => esc_html__( 'Stripe', 'wpforms' ),
 				'slug'        => 'stripe',
 				'img'         => 'addon-icon-stripe.png',
 				'plugin'      => 'wpforms-stripe/wpforms-stripe.php',
@@ -459,9 +471,9 @@ class Education {
 				\esc_attr( $payment['action'] ),
 				\esc_attr( $payment['plugin'] ),
 				isset( $payment['url'] ) ? \esc_attr( $payment['url'] ) : '',
-				\wp_create_nonce( 'wpforms-admin' ) //phpcs:ignore
+				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) )
 			);
-				echo '<img src="' . \esc_attr( WPFORMS_PLUGIN_URL ) . 'assets/images/' . \esc_attr( $payment['img'] ) . '">';
+				echo '<img src="' . \esc_url( WPFORMS_PLUGIN_URL . 'assets/images/' . $payment['img'] ) . '">';
 				echo \esc_html( $payment['name'] );
 				echo '<i class="fa fa-angle-right wpforms-toggle-arrow"></i>';
 			echo '</a>';
@@ -493,7 +505,7 @@ class Education {
 	}
 
 	/**
-	 * Returns array of addons available.
+	 * Return array of addons available.
 	 *
 	 * @since 1.5.1
 	 *
@@ -530,7 +542,7 @@ class Education {
 	}
 
 	/**
-	 * Returns download URL for an addon.
+	 * Return download URL for an addon.
 	 *
 	 * @since 1.5.1
 	 *
@@ -602,5 +614,126 @@ class Education {
 		}
 
 		return strtolower( $type );
+	}
+
+	/**
+	 * Targeting on `reCAPTCHA` field button in the builder.
+	 *
+	 * TODO: Lite and Pro Education duplicate this code.
+	 *
+	 * @since 1.5.7
+	 */
+	public function recaptcha_field_callback() {
+
+		// Run a security check.
+		check_ajax_referer( 'wpforms-builder', 'nonce' );
+
+		// Check for permissions.
+		if ( ! wpforms_current_user_can() ) {
+			die( esc_html__( 'You do not have permission.', 'wpforms' ) );
+		}
+
+		// Check for form ID.
+		if ( ! isset( $_POST['id'] ) || empty( $_POST['id'] ) ) {
+			die( esc_html__( 'No form ID found.', 'wpforms' ) );
+		}
+
+		// Get an actual form data.
+		$form_id   = absint( $_POST['id'] );
+		$form_data = wpforms()->form->get( $form_id, array( 'content_only' => true ) );
+
+		if ( empty( $form_data ) ) {
+			wp_send_json_error( esc_html__( 'Something wrong. Please, try again later.', 'wpforms' ) );
+		}
+
+		// Check that recaptcha is configured in the settings.
+		$site_key       = wpforms_setting( 'recaptcha-site-key' );
+		$secret_key     = wpforms_setting( 'recaptcha-secret-key' );
+		$recaptcha_name = $this->get_recaptcha_name();
+
+		if ( empty( $recaptcha_name ) ) {
+			wp_send_json_error( esc_html__( 'Something wrong. Please, try again later.', 'wpforms' ) );
+		}
+
+		// Prepare a result array.
+		$data = array(
+			'current' => false,
+			'cases'   => array(
+				'not_configured'         => array(
+					'title'   => esc_html__( 'Heads up!', 'wpforms' ),
+					'content' => sprintf(
+						wp_kses( /* translators: %1$s - reCaptcha settings page URL; %2$s - WPForms.com doc URL. */
+							__( 'Google reCAPTCHA isn\'t configured yet. Please complete the setup in your <a href="%1$s" target="_blank">WPForms Settings</a>, and check out our <a href="%2$s" target="_blank" rel="noopener noreferrer">step by step tutorial</a> for full details.', 'wpforms' ),
+							array(
+								'a' => array(
+									'href'   => true,
+									'rel'    => true,
+									'target' => true,
+								),
+							)
+						),
+						esc_url( admin_url( 'admin.php?page=wpforms-settings&view=recaptcha' ) ),
+						'https://wpforms.com/docs/setup-captcha-wpforms/'
+					),
+				),
+				'configured_not_enabled' => array(
+					'title'   => false,
+					/* translators: %s - reCAPTCHA type. */
+					'content' => sprintf( esc_html__( '%s has been enabled for this form. Don\'t forget to save your form!', 'wpforms' ), $recaptcha_name ),
+				),
+				'configured_enabled'     => array(
+					'title'   => false,
+					'content' => esc_html__( 'Are you sure you want to disable Google reCAPTCHA for this form?', 'wpforms' ),
+					'cancel'  => true,
+				),
+			),
+		);
+
+		if ( ! $site_key || ! $secret_key ) {
+
+			// If reCAPTCHA is not configured in the WPForms plugin settings.
+			$data['current'] = 'not_configured';
+
+		} elseif ( ! isset( $form_data['settings']['recaptcha'] ) || '1' !== $form_data['settings']['recaptcha'] ) {
+
+			// If reCAPTCHA is configured in WPForms plugin settings, but wasn't set in form settings.
+			$data['current'] = 'configured_not_enabled';
+
+		} else {
+
+			// If reCAPTCHA is configured in WPForms plugin and form settings.
+			$data['current'] = 'configured_enabled';
+		}
+
+		wp_send_json_success( $data );
+	}
+
+	/**
+	 * Retrive a reCAPTCHA type name.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @return string
+	 */
+	public function get_recaptcha_name() {
+		$recaptcha_type = wpforms_setting( 'recaptcha-type', 'v2' );
+
+		// Get a recaptcha name.
+		switch ( $recaptcha_type ) {
+			case 'v2':
+				$recaptcha_name = esc_html__( 'Google Checkbox v2 reCAPTCHA', 'wpforms' );
+				break;
+			case 'invisible':
+				$recaptcha_name = esc_html__( 'Google Invisible v2 reCAPTCHA', 'wpforms' );
+				break;
+			case 'v3':
+				$recaptcha_name = esc_html__( 'Google v3 reCAPTCHA', 'wpforms' );
+				break;
+			default:
+				$recaptcha_name = '';
+				break;
+		}
+
+		return $recaptcha_name;
 	}
 }

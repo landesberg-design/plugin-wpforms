@@ -3,11 +3,7 @@
 /**
  * Entry DB class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Entry_Handler extends WPForms_DB {
 
@@ -29,11 +25,13 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * Get table columns.
 	 *
 	 * @since 1.0.0
+	 * @since 1.5.7 Added an `Entry Notes` column.
 	 */
 	public function get_columns() {
 
 		return array(
 			'entry_id'      => '%d',
+			'notes_count'   => '%d',
 			'form_id'       => '%d',
 			'post_id'       => '%d',
 			'user_id'       => '%d',
@@ -75,17 +73,76 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	}
 
 	/**
-	 * Deletes an entry from the database, also removes entry meta.
+	 * Retrieves an entry from the database based on a given entry ID.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @param int   $id   Entry ID.
+	 * @param array $args Additional arguments.
+	 *
+	 * @return object|null
+	 */
+	public function get( $id, $args = array() ) {
+
+		if ( ! isset( $args['cap'] ) && wpforms()->get( 'access' )->init_allowed() ) {
+			$args['cap'] = 'view_entry_single';
+		}
+
+		if ( ! empty( $args['cap'] ) && ! wpforms_current_user_can( $args['cap'], $id ) ) {
+			return null;
+		}
+
+		return parent::get( $id );
+	}
+
+	/**
+	 * Update an existing entry in the database.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @param string $id    Entry ID.
+	 * @param array  $data  Array of columns and associated data to update.
+	 * @param string $where Column to match against in the WHERE clause. If empty, $primary_key
+	 *                      will be used.
+	 * @param string $type  Data type context.
+	 * @param array  $args  Additional arguments.
+	 *
+	 * @return bool|null
+	 */
+	public function update( $id, $data = array(), $where = '', $type = '', $args = array() ) {
+
+		if ( ! isset( $args['cap'] ) ) {
+			$args['cap'] = ( array_key_exists( 'viewed', $data ) || array_key_exists( 'starred', $data ) ) ? 'view_entry_single' : 'edit_entry_single';
+		}
+
+		if ( ! empty( $args['cap'] ) && ! wpforms_current_user_can( $args['cap'], $id ) ) {
+			return null;
+		}
+
+		return parent::update( $id, $data, $where, $type );
+	}
+
+	/**
+	 * Delete an entry from the database, also removes entry meta.
 	 *
 	 * Please note: successfully deleting a record flushes the cache.
 	 *
 	 * @since 1.1.6
 	 *
-	 * @param int $row_id Entry ID.
+	 * @param int   $row_id Entry ID.
+	 * @param array $args   Additional arguments.
 	 *
 	 * @return bool False if the record could not be deleted, true otherwise.
 	 */
-	public function delete( $row_id = 0 ) {
+	public function delete( $row_id = 0, $args = array() ) {
+
+		if ( ! isset( $args['cap'] ) ) {
+			$args['cap'] = 'delete_entry_single';
+		}
+
+		if ( ! empty( $args['cap'] ) && ! wpforms_current_user_can( $args['cap'], $row_id ) ) {
+			return false;
+		}
 
 		$entry  = parent::delete( $row_id );
 		$meta   = wpforms()->entry_meta->delete_by( 'entry_id', $row_id );
@@ -276,6 +333,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * Get entries from the database.
 	 *
 	 * @since 1.0.0
+	 * @since 1.5.7 Added a `notes_count` argument to request the count of notes for each entry.
 	 *
 	 * @param array $args  Redefine query parameters by providing own arguments.
 	 * @param bool  $count Whether to just count entries or get the list of them. True to just count.
@@ -303,6 +361,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			'date'          => '',
 			'date_modified' => '',
 			'ip_address'    => '',
+			'notes_count'   => false,
 			'orderby'       => 'entry_id',
 			'order'         => 'DESC',
 		);
@@ -450,8 +509,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		/*
 		 * Modify the ORDER BY.
 		 */
-		$args['orderby']  = "{$this->table_name}.";
-		$args['orderby'] .= ! array_key_exists( $args['orderby'], $this->get_columns() ) ? $this->primary_key : $args['orderby'];
+		$args['orderby'] = ! array_key_exists( $args['orderby'], $this->get_columns() ) ? $this->primary_key : $args['orderby'];
+		$args['orderby'] = "{$this->table_name}.{$args['orderby']}";
 
 		if ( 'ASC' === strtoupper( $args['order'] ) ) {
 			$args['order'] = 'ASC';
@@ -473,6 +532,23 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		 */
 
 		$sql_from = $this->table_name;
+
+		// Add a LEFT OUTER JOIN for retrieve a notes count.
+		if ( true === $args['notes_count'] ) {
+			$meta_table = wpforms()->entry_meta->table_name;
+			$sql_from  .= ' LEFT JOIN';
+			$sql_from  .= " ( SELECT {$meta_table}.entry_id AS meta_entry_id, COUNT({$meta_table}.id) AS notes_count";
+			$sql_from  .= " FROM {$meta_table}";
+			$sql_from  .= " WHERE {$meta_table}.type = 'note'";
+			$sql_from  .= ' GROUP BY meta_entry_id )';
+			$sql_from  .= " notes_counts ON notes_counts.meta_entry_id = {$this->table_name}.entry_id";
+
+			// Changed the ORDER BY - notes count sorting support.
+			if ( "{$this->table_name}.notes_count" === $args['orderby'] ) {
+				$args['orderby'] = 'notes_counts.notes_count';
+			}
+		}
+
 		if ( ! empty( $args['value'] ) || ! empty( $args['value_compare'] ) ) {
 			$sql_from .= " JOIN {$fields_table} ON {$this->table_name}.entry_id={$fields_table}.entry_id";
 		}

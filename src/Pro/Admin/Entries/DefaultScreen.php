@@ -5,11 +5,7 @@ namespace WPForms\Pro\Admin\Entries;
 /**
  * Default Entries screen shows a chart and the form entries stats if no form selected.
  *
- * @package    WPForms\Pro\Admin\Entries
- * @author     WPForms
- * @since      1.5.5
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.5
  */
 class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 
@@ -29,7 +25,7 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	 */
 	public function init() {
 
-		$is_admin_page   = wpforms_is_admin_page( 'entries' ) && empty( $_GET['form_id'] ) && empty( $_GET['entry_id'] ); // phpcs:ignore
+		$is_admin_page   = wpforms_is_admin_page( 'entries' ) && empty( $_GET['view'] ); // phpcs:ignore WordPress.Security.NonceVerification
 		$is_ajax_request = ( wp_doing_ajax() && false !== strpos( $_REQUEST['action'], 'wpforms_entries_default_screen' ) ); // phpcs:ignore
 
 		if ( ! $is_admin_page && ! $is_ajax_request ) {

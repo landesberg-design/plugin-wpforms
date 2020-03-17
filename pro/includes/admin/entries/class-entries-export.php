@@ -5,12 +5,9 @@
  *
  * Inspired by Easy Digital Download's EDD_Export class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.1.5
+ * @since 1.1.5
+ *
  * @deprecated 1.5.5
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
  */
 class WPForms_Entries_Export {
 
@@ -80,6 +77,7 @@ class WPForms_Entries_Export {
 		return array(
 			'text',
 			'textarea',
+			'number-slider',
 			'select',
 			'radio',
 			'checkbox',
@@ -199,6 +197,7 @@ class WPForms_Entries_Export {
 				$this->form_id,
 				array(
 					'content_only' => true,
+					'cap'          => 'view_entries_form_single',
 				)
 			);
 
@@ -358,7 +357,9 @@ class WPForms_Entries_Export {
 	 */
 	public function export() {
 
-		if ( ! wpforms_current_user_can() ) {
+		$form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( empty( $form_id ) || ! wpforms_current_user_can( 'view_entries_form_single', $form_id ) ) {
 			wp_die(
 				esc_html__( 'You do not have permission to export entries.', 'wpforms' ),
 				esc_html__( 'Error', 'wpforms' ),

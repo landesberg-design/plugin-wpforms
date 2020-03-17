@@ -1,12 +1,9 @@
 <?php
+
 /**
  * Handles plugin installation upon activation.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Install {
 
@@ -19,6 +16,7 @@ class WPForms_Install {
 
 		// When activated, trigger install method.
 		register_activation_hook( WPFORMS_PLUGIN_FILE, array( $this, 'install' ) );
+		register_deactivation_hook( WPFORMS_PLUGIN_FILE, array( $this, 'deactivate' ) );
 
 		// Watch for new multisite blogs.
 		add_action( 'wpmu_new_blog', array( $this, 'new_multisite_blog' ), 10, 6 );
@@ -28,11 +26,12 @@ class WPForms_Install {
 	}
 
 	/**
-	 * Let's get the party started.
+	 * Perform certain actions on plugin activation.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param boolean $network_wide
+	 * @param boolean $network_wide Whether to enable the plugin for all sites in the network
+	 *                              or just the current site. Multisite only. Default is false.
 	 */
 	public function install( $network_wide = false ) {
 
@@ -76,7 +75,7 @@ class WPForms_Install {
 	}
 
 	/**
-	 * Runs manual install.
+	 * Run manual installation.
 	 *
 	 * @since 1.5.4.2
 	 *
@@ -89,6 +88,17 @@ class WPForms_Install {
 		if ( $silent ) {
 			delete_transient( 'wpforms_activation_redirect' );
 		}
+	}
+
+	/**
+	 * Perform certain actions on plugin deactivation.
+	 *
+	 * @since 1.5.9
+	 */
+	public function deactivate() {
+
+		// Unschedule all ActionScheduler actions by group.
+		wpforms()->get( 'tasks' )->cancel_all();
 	}
 
 	/**

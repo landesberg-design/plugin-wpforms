@@ -8,11 +8,7 @@ use WPForms\Providers\Provider\Status;
 /**
  * Class FormBuilder handles functionality inside the form builder.
  *
- * @package    WPForms\Providers\Provider\Settings
- * @author     WPForms
- * @since      1.4.7
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.4.7
  */
 abstract class FormBuilder implements FormBuilderInterface {
 
@@ -117,14 +113,32 @@ abstract class FormBuilder implements FormBuilderInterface {
 							<# _.each( data.connection.fields_meta, function( item, meta_id ) { #>
 								<tr class="wpforms-builder-provider-connection-fields-table-row">
 									<td>
-										<input type="text" value="{{ item.name }}"
-										       name="providers[<?php echo \esc_attr( $this->core->slug ); ?>][{{ data.connection.id }}][fields_meta][{{ meta_id }}][name]"
-										       placeholder="<?php \esc_attr_e( 'Field Name', 'wpforms-lite' ); ?>"
-										/>
+										<# if ( ! _.isEmpty( data.provider.fields ) ) { #>
+											<select class="wpforms-builder-provider-connection-field-name"
+												name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][{{ meta_id }}][name]">
+												<option value="" selected disabled><?php \esc_attr_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
+
+												<# _.each( data.provider.fields, function( field_name, field_id ) { #>
+													<option value="{{ field_id }}"
+														<# if ( field_id === item.name ) { #>selected="selected"<# } #>
+													>
+														{{ field_name }}
+													</option>
+												<# } ); #>
+
+											</select>
+										<# } else { #>
+											<input type="text" value="{{ item.name }}"
+												class="wpforms-builder-provider-connection-field-name"
+												name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][{{ meta_id }}][name]"
+												placeholder="<?php \esc_attr_e( 'Field Name', 'wpforms-lite' ); ?>"
+											/>
+										<# } #>
 									</td>
 									<td>
-										<select name="providers[<?php echo \esc_attr( $this->core->slug ); ?>][{{ data.connection.id }}][fields_meta][{{ meta_id }}][field_id]">
-											<option value=""><?php \esc_html_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
+										<select class="wpforms-builder-provider-connection-field-value"
+											name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][{{ meta_id }}][field_id]">
+											<option value="" selected disabled><?php \esc_html_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
 
 											<# _.each( data.fields, function( field, key ) { #>
 												<option value="{{ field.id }}"
@@ -152,14 +166,30 @@ abstract class FormBuilder implements FormBuilderInterface {
 						<# } else { #>
 							<tr class="wpforms-builder-provider-connection-fields-table-row">
 								<td>
-									<input type="text" value=""
-									       name="providers[<?php echo \esc_attr( $this->core->slug ); ?>][{{ data.connection.id }}][fields_meta][0][name]"
-									       placeholder="<?php \esc_attr_e( 'Field Name', 'wpforms-lite' ); ?>"
-									/>
+									<# if ( ! _.isEmpty( data.provider.fields ) ) { #>
+										<select class="wpforms-builder-provider-connection-field-name"
+											name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][0][name]">
+											<option value="" selected disabled><?php \esc_attr_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
+
+											<# _.each( data.provider.fields, function( field_name, field_id ) { #>
+												<option value="{{ field_id }}">
+													{{ field_name }}
+												</option>
+											<# } ); #>
+
+										</select>
+									<# } else { #>
+										<input type="text" value=""
+											class="wpforms-builder-provider-connection-field-name"
+											name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][0][name]"
+											placeholder="<?php \esc_attr_e( 'Field Name', 'wpforms-lite' ); ?>"
+										/>
+									<# } #>
 								</td>
 								<td>
-									<select name="providers[<?php echo \esc_attr( $this->core->slug ); ?>][{{ data.connection.id }}][fields_meta][0][field_id]">
-										<option value=""><?php \esc_html_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
+									<select class="wpforms-builder-provider-connection-field-value"
+										name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][0][field_id]">
+										<option value="" selected disabled><?php \esc_html_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
 
 										<# _.each( data.fields, function( field, key ) { #>
 											<option value="{{ field.id }}">
@@ -249,7 +279,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 		\check_ajax_referer( 'wpforms-builder', 'nonce' );
 
 		// Check for permissions.
-		if ( ! \wpforms_current_user_can() ) {
+		if ( ! \wpforms_current_user_can( 'edit_forms' ) ) {
 			\wp_send_json_error(
 				array(
 					'error' => \esc_html__( 'You do not have permission to perform this action.', 'wpforms-lite' ),
@@ -343,8 +373,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 	public function display_content() {
 		?>
 
-		<div class="wpforms-panel-content-section wpforms-builder-provider wpforms-panel-content-section-<?php echo \esc_attr( $this->core->slug ); ?>"
-		     id="<?php echo \esc_attr( $this->core->slug ); ?>-provider">
+		<div class="wpforms-panel-content-section wpforms-builder-provider wpforms-panel-content-section-<?php echo \esc_attr( $this->core->slug ); ?>" id="<?php echo \esc_attr( $this->core->slug ); ?>-provider" data-provider="<?php echo \esc_attr( $this->core->slug ); ?>">
 
 			<!-- Provider content goes here. -->
 			<?php $this->display_content_header(); ?>

@@ -2,11 +2,7 @@
 /**
  * Base Importer class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.4.2
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2017, WPForms LLC
+ * @since 1.4.2
  */
 abstract class WPForms_Importer implements WPForms_Importer_Interface {
 

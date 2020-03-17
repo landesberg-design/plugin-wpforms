@@ -5,11 +5,7 @@ namespace WPForms\Providers;
 /**
  * Class Loader gives ability to track/load all providers.
  *
- * @package    WPForms\Providers
- * @author     WPForms
- * @since      1.4.7
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.4.7
  */
 class Loader {
 

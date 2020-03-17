@@ -5,11 +5,7 @@ namespace WPForms\Pro\Admin\Entries\Export;
 /**
  * HTML-related stuff for Admin page.
  *
- * @since      1.5.5
- * @author     WPForms
- * @package    WPForms\Pro\Admin\Entries\Export
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2019, WPForms LLC
+ * @since 1.5.5
  */
 class Admin {
 
@@ -119,7 +115,14 @@ class Admin {
 	public function display_form_selection_block() {
 
 		// Retrieve available forms.
-		$forms   = wpforms()->form->get( '', array( 'orderby' => 'title' ) );
+		$forms = wpforms()->form->get(
+			'',
+			array(
+				'orderby' => 'title',
+				'cap'     => 'view_entries_form_single',
+			)
+		);
+
 		$form_id = $this->export->data['get_args']['form_id'];
 
 		if ( ! empty( $forms ) ) {
@@ -196,7 +199,7 @@ class Admin {
 			if ( 'geodata' === $slug && ! class_exists( 'WPForms_Geolocation' ) ) {
 				continue;
 			}
-			if ( 'pginfo' === $slug && ! ( class_exists( 'WPForms_Paypal_Standard' ) || class_exists( 'WPFormsStripe\StripePayment' ) ) ) {
+			if ( 'pginfo' === $slug && ! ( class_exists( 'WPForms_Paypal_Standard' ) || function_exists( 'wpforms_stripe' ) ) ) {
 				continue;
 			}
 			printf(

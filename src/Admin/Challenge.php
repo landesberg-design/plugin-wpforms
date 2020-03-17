@@ -5,11 +5,7 @@ namespace WPForms\Admin;
 /**
  * Challenges and guides a user to set up a first form once WPForms is installed.
  *
- * @package    WPForms\Admin
- * @author     WPForms
- * @since      1.5.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2018, WPForms LLC
+ * @since 1.5.0
  */
 class Challenge {
 

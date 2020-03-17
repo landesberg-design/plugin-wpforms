@@ -2,11 +2,7 @@
 /**
  * Contact Form 7 Importer class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.4.2
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2017, WPForms LLC
+ * @since 1.4.2
  */
 class WPForms_Contact_Form_7 extends WPForms_Importer {
 
@@ -78,7 +74,7 @@ class WPForms_Contact_Form_7 extends WPForms_Importer {
 		check_ajax_referer( 'wpforms-admin', 'nonce' );
 
 		// Check for permissions.
-		if ( ! wpforms_current_user_can() ) {
+		if ( ! wpforms_current_user_can( 'create_forms' ) ) {
 			wp_send_json_error();
 		}
 

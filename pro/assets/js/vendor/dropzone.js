@@ -3461,7 +3461,7 @@ ExifRestore.initClass();
  * Summary: cross-browser wrapper for DOMContentLoaded
  * Updated: 20101020
  * License: MIT
- * Version: 1.2
+ * Version:     1.5.9.2
  *
  * URL:
  * http://javascript.nwbox.com/ContentLoaded/

@@ -29,7 +29,7 @@
 	padding: 0 30px;
 }
 
-#wpforms-setup-name {
+#wpforms-builder #wpforms-setup-name {
 	float: left;
 	margin: 17px 0 18px 18px;
 	height: 55px;
@@ -40,11 +40,11 @@
 	padding: 0 20px;
 }
 
-#wpforms-setup-name:focus {
+#wpforms-builder #wpforms-setup-name:focus {
 	border: 1px solid #999;
 }
 
-#wpforms-setup-name.error {
+#wpforms-builder #wpforms-setup-name.error {
 	border-color: red;
 }
 

@@ -92,7 +92,7 @@ class Education {
 	 */
 	public function dyk_messages() {
 
-		$dyk_messages = array(
+		return array(
 			array(
 				'desc' => esc_html__( 'You can capture email addresses from partial form entries to get more leads. Abandoned cart emails have an average open rate of 45%!', 'wpforms' ),
 				'more' => 'https://wpforms.com/addons/form-abandonment-addon/',
@@ -289,8 +289,6 @@ class Education {
 				'item' => 39,
 			),
 		);
-
-		return $dyk_messages;
 	}
 
 	/**
@@ -310,7 +308,7 @@ class Education {
 	 *
 	 * @since 1.5.6
 	 *
-	 * @param object $wp_list_table Instance of WP_List_Table.
+	 * @param \WP_List_Table $wp_list_table Instance of WP_List_Table.
 	 */
 	public function dyk_display( $wp_list_table ) {
 
@@ -332,7 +330,7 @@ class Education {
 
 		$translations = array(
 			'upgrade_to_pro' => __( 'Upgrade to Pro', 'wpforms' ),
-			'dissmiss_title' => __( 'Dissmiss this message.', 'wpforms' ),
+			'dismiss_title'  => __( 'Dismiss this message.', 'wpforms' ),
 			'did_you_know'   => __( 'Did You Know?', 'wpforms' ),
 			'learn_more'     => __( 'Learn More', 'wpforms' ),
 		);
@@ -370,10 +368,10 @@ class Education {
 			\esc_html( $translations['did_you_know'] ),
 			\esc_html( $dyk_message['desc'] ),
 			$learn_more,  // phpcs:ignore
-			ucfirst( $this->page ),
-			$dyk_message['item'],
+			esc_attr( ucfirst( $this->page ) ),
+			(int) $dyk_message['item'],
 			\esc_html( $translations['upgrade_to_pro'] ),
-			\esc_attr( $translations['dissmiss_title'] ),
+			\esc_attr( $translations['dismiss_title'] ),
 			\esc_attr( $this->page )
 		);
 	}
@@ -392,7 +390,7 @@ class Education {
 		if ( ! \wpforms_current_user_can() ) {
 			\wp_send_json_error(
 				array(
-					'error' => \esc_html__( 'You do not have permission to perform this action.', 'wpforms-lite' ),
+					'error' => \esc_html__( 'You do not have permission to perform this action.', 'wpforms' ),
 				)
 			);
 		}

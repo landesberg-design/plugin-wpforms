@@ -3,11 +3,7 @@
 /**
  * Updater class.
  *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
+ * @since 1.0.0
  */
 class WPForms_Updater {
 
@@ -167,7 +163,7 @@ class WPForms_Updater {
 	}
 
 	/**
-	 * Disables SSL verification to prevent download package failures.
+	 * Disable SSL verification to prevent download package failures.
 	 *
 	 * @since 2.0.0
 	 *
@@ -181,7 +177,7 @@ class WPForms_Updater {
 	}
 
 	/**
-	 * Filters the plugins_api function to get our own custom plugin information
+	 * Filter the plugins_api function to get our own custom plugin information
 	 * from our private repo.
 	 *
 	 * @since 2.0.0
@@ -205,7 +201,7 @@ class WPForms_Updater {
 	}
 
 	/**
-	 * Pings a remote API to retrieve plugin information for WordPress to display.
+	 * Ping a remote API to retrieve plugin information for WordPress to display.
 	 *
 	 * @since 2.0.0
 	 *
@@ -246,7 +242,7 @@ class WPForms_Updater {
 	}
 
 	/**
-	 * Queries the remote URL via wp_remote_post and returns a json decoded response.
+	 * Query the remote URL via wp_remote_post and returns a json decoded response.
 	 *
 	 * @since 2.0.0
 	 *
