@@ -1,10 +1,4 @@
 <?php
-/**
- * Contains various functions that may be potentially used throughout
- * the WPForms plugin.
- *
- * @since 1.0.0
- */
 
 /**
  * Helper function to trigger displaying a form.
@@ -1178,28 +1172,47 @@ function wpforms_sanitize_error( $error = '' ) {
 
 /**
  * Sanitize a string, that can be a multiline.
- * If WP core `sanitize_textarea_field()` exists (after 4.7.0) - use it.
- * Otherwise - split onto separate lines, sanitize each one, merge again.
+ *
+ * @uses wpforms_sanitize_text_deeply()
  *
  * @since 1.4.1
  *
- * @param string $string
+ * @param string $string String to deeply sanitize.
  *
- * @return string If empty var is passed, or not a string - return unmodified. Otherwise - sanitize.
+ * @return string Sanitized string, or empty string if not a string provided.
  */
 function wpforms_sanitize_textarea_field( $string ) {
 
-	if ( empty( $string ) || ! is_string( $string ) ) {
-		return $string;
+	return wpforms_sanitize_text_deeply( $string, true );
+}
+
+/**
+ * Deeply sanitize the string, preserve newlines if needed.
+ * Prevent maliciously prepared strings from containing HTML tags.
+ *
+ * @since 1.6.0
+ *
+ * @param string $string        String to deeply sanitize.
+ * @param bool   $keep_newlines Whether to keep newlines. Default: false.
+ *
+ * @return string Sanitized string, or empty string if not a string provided.
+ */
+function wpforms_sanitize_text_deeply( $string, $keep_newlines = false ) {
+
+	if ( is_object( $string ) || is_array( $string ) ) {
+		return '';
 	}
 
-	if ( function_exists( 'sanitize_textarea_field' ) ) {
-		$string = sanitize_textarea_field( $string );
-	} else {
-		$string = implode( "\n", array_map( 'sanitize_text_field', explode( "\n", $string ) ) );
+	$string        = (string) $string;
+	$keep_newlines = (bool) $keep_newlines;
+
+	$new_value = _sanitize_text_fields( $string, $keep_newlines );
+
+	if ( strlen( $new_value ) !== strlen( $string ) ) {
+		$new_value = wpforms_sanitize_text_deeply( $new_value, $keep_newlines );
 	}
 
-	return $string;
+	return $new_value;
 }
 
 /**
@@ -1562,7 +1575,7 @@ function wpforms_debug_data( $data, $echo = true ) {
 
 	if ( wpforms_debug() ) {
 
-		$output = '<textarea style="background:#fff;margin: 20px 0;width:100%;height:500px;font-size:12px;font-family: Consolas,Monaco,monospace;direction: ltr;unicode-bidi: embed;line-height: 1.4;padding: 4px 6px 1px;" readonly>';
+		$output = '<div><textarea style="background:#fff;margin: 20px 0;width:100%;height:500px;font-size:12px;font-family: Consolas,Monaco,monospace;direction: ltr;unicode-bidi: embed;line-height: 1.4;padding: 4px 6px 1px;" readonly>';
 
 		$output .= "=================== WPFORMS DEBUG ===================\n\n";
 
@@ -1572,7 +1585,7 @@ function wpforms_debug_data( $data, $echo = true ) {
 			$output .= $data;
 		}
 
-		$output .= '</textarea>';
+		$output .= '</textarea></div>';
 
 		if ( $echo ) {
 			echo $output; // phpcs:ignore
@@ -1673,8 +1686,11 @@ function wpforms_is_amp( $check_theme_support = true ) {
 
 /**
  * Decode special characters, both alpha- (<) and numeric-based (').
+ * Sanitize recursively, preserve new lines.
+ * Handle all the possible mixed variations of < and `&lt;` that can be processed into tags.
  *
  * @since 1.4.1
+ * @since 1.6.0 Sanitize recursively, preserve new lines.
  *
  * @param string $string Raw string to decode.
  *
@@ -1686,10 +1702,18 @@ function wpforms_decode_string( $string ) {
 		return $string;
 	}
 
-	return wp_kses_decode_entities( html_entity_decode( $string, ENT_QUOTES ) );
-}
+	/*
+	 * Sanitization should be done first, so tags are stripped and < is converted to &lt; etc.
+	 * This iteration may do nothing when the string already comes with &lt; and &gt; only.
+	 */
+	$string = wpforms_sanitize_text_deeply( $string, true );
 
-add_filter( 'wpforms_email_message', 'wpforms_decode_string' );
+	// Now we need to convert the string without tags: &lt; back to < (same for quotes).
+	$string = wp_kses_decode_entities( html_entity_decode( $string, ENT_QUOTES ) );
+
+	// And now we need to sanitize AGAIN, to avoid unwanted tags that appeared after decoding.
+	return wpforms_sanitize_text_deeply( $string, true );
+}
 
 /**
  * Get a suffix for assets, `.min` if debug is disabled.
@@ -1807,59 +1831,64 @@ function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d
  */
 function wpforms_get_providers_all() {
 
-	$providers = array(
-		array(
+	return [
+		[
 			'name'        => 'ActiveCampaign',
 			'slug'        => 'activecampaign',
 			'img'         => 'addon-icon-activecampaign.png',
 			'plugin'      => 'wpforms-activecampaign/wpforms-activecampaign.php',
 			'plugin_slug' => 'wpforms-activecampaign',
-		),
-		array(
+			'license'     => 'elite',
+		],
+		[
 			'name'        => 'AWeber',
 			'slug'        => 'aweber',
 			'img'         => 'addon-icon-aweber.png',
 			'plugin'      => 'wpforms-aweber/wpforms-aweber.php',
 			'plugin_slug' => 'wpforms-aweber',
-		),
-		array(
+			'license'     => 'pro',
+		],
+		[
 			'name'        => 'Campaign Monitor',
 			'slug'        => 'campaign-monitor',
 			'img'         => 'addon-icon-campaign-monitor.png',
 			'plugin'      => 'wpforms-campaign-monitor/wpforms-campaign-monitor.php',
 			'plugin_slug' => 'wpforms-campaign-monitor',
-		),
-		array(
+			'license'     => 'pro',
+		],
+		[
 			'name'        => 'Drip',
 			'slug'        => 'drip',
 			'img'         => 'addon-icon-drip.png',
 			'plugin'      => 'wpforms-drip/wpforms-drip.php',
 			'plugin_slug' => 'wpforms-drip',
-		),
-		array(
+			'license'     => 'pro',
+		],
+		[
 			'name'        => 'GetResponse',
 			'slug'        => 'getresponse',
 			'img'         => 'addon-icon-getresponse.png',
 			'plugin'      => 'wpforms-getresponse/wpforms-getresponse.php',
 			'plugin_slug' => 'wpforms-getresponse',
-		),
-		array(
+			'license'     => 'pro',
+		],
+		[
 			'name'        => 'Mailchimp',
 			'slug'        => 'mailchimp',
 			'img'         => 'addon-icon-mailchimp.png',
 			'plugin'      => 'wpforms-mailchimp/wpforms-mailchimp.php',
 			'plugin_slug' => 'wpforms-mailchimp',
-		),
-		array(
+			'license'     => 'pro',
+		],
+		[
 			'name'        => 'Zapier',
 			'slug'        => 'zapier',
 			'img'         => 'addon-icon-zapier.png',
 			'plugin'      => 'wpforms-zapier/wpforms-zapier.php',
 			'plugin_slug' => 'wpforms-zapier',
-		),
-	);
-
-	return $providers;
+			'license'     => 'pro',
+		],
+	];
 }
 
 /**
@@ -1934,10 +1963,11 @@ function wpforms_update_providers_options( $provider, $options, $key = '' ) {
  * @param string $slug Slug identifier for a specific WPForms admin page.
  * @param string $view Slug identifier for a specific WPForms admin page view ("subpage").
  *
- * @return boolean
+ * @return bool
  */
 function wpforms_is_admin_page( $slug = '', $view = '' ) {
 
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
 	// Check against basic requirements.
 	if (
 		! is_admin() ||
@@ -1962,6 +1992,7 @@ function wpforms_is_admin_page( $slug = '', $view = '' ) {
 	) {
 		return false;
 	}
+	// phpcs:enable
 
 	return true;
 }
@@ -2050,7 +2081,7 @@ function wpforms_get_form_preview_url( $form_id, $new_window = false ) {
 
 /**
  * Include a template - alias to \WPForms\Helpers\Template::get_html.
- * Uses 'require' if $args are passed or 'load_template' if not.
+ * Use 'require' if $args are passed or 'load_template' if not.
  *
  * @since 1.5.6
  *
@@ -2097,6 +2128,29 @@ function wpforms_get_license_type() {
 	}
 
 	return strtolower( $type );
+}
+
+/**
+ * Get when WPForms was first installed.
+ *
+ * @since 1.6.0
+ *
+ * @param string $type Specific install type to check for.
+ *
+ * @return int|false
+ */
+function wpforms_get_activated_timestamp( $type = '' ) {
+
+	$activated = get_option( 'wpforms_activated', [] );
+	$types     = ! empty( $type ) ? [ $type ] : [ 'lite', 'pro' ];
+
+	foreach ( $types as $type ) {
+		if ( ! empty( $activated[ $type ] ) ) {
+			return absint( $activated[ $type ] );
+		}
+	}
+
+	return false;
 }
 
 /**

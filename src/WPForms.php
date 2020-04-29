@@ -123,7 +123,7 @@ namespace WPForms {
 		 *
 		 * @since 1.3.9
 		 *
-		 * @var boolean
+		 * @var bool
 		 */
 		public $pro = false;
 
@@ -145,8 +145,8 @@ namespace WPForms {
 		/**
 		 * Main WPForms Instance.
 		 *
-		 * Insures that only one instance of WPForms exists in memory at any one
-		 * time. Also prevents needing to define globals all over the place.
+		 * Only one instance of WPForms exists in memory at any one time.
+		 * Also prevent the need to define globals all over the place.
 		 *
 		 * @since 1.0.0
 		 *
@@ -197,7 +197,7 @@ namespace WPForms {
 		}
 
 		/**
-		 * Loads the plugin language files.
+		 * Load the plugin language files.
 		 *
 		 * @since 1.0.0
 		 * @since 1.5.0 Load only the lite translation.
@@ -253,7 +253,6 @@ namespace WPForms {
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-importers.php';
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-about.php';
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/ajax-actions.php';
-				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-am-deactivation-survey.php';
 			}
 		}
 
@@ -321,12 +320,6 @@ namespace WPForms {
 			$this->process    = new \WPForms_Process();
 			$this->smart_tags = new \WPForms_Smart_Tags();
 			$this->logs       = new \WPForms_Logging();
-
-			if ( is_admin() ) {
-				if ( $this->pro || ( ! $this->pro && ! file_exists( WP_PLUGIN_DIR . '/wpforms/wpforms.php' ) ) ) {
-					new \AM_Deactivation_Survey( 'WPForms', basename( dirname( __DIR__ ) ) );
-				}
-			}
 
 			// Hook now that all of the WPForms stuff is loaded.
 			do_action( 'wpforms_loaded' );
@@ -407,7 +400,7 @@ namespace WPForms {
 		 *
 		 * @param string $name Class name or an alias.
 		 *
-		 * @return mixed|null
+		 * @return mixed|\stdClass
 		 */
 		public function get( $name ) {
 
@@ -415,7 +408,7 @@ namespace WPForms {
 				return $this->registry[ $name ];
 			}
 
-			return null;
+			return new \stdClass();
 		}
 	}
 }

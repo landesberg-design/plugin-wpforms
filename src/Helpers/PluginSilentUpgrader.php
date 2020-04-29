@@ -26,7 +26,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 	/**
 	 * Run an upgrade/installation.
 	 *
-	 * Attempts to download the package (if it is not a local file), unpack it, and
+	 * Attempt to download the package (if it is not a local file), unpack it, and
 	 * install it in the destination folder.
 	 *
 	 * @since 1.5.6.1
@@ -71,7 +71,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 		$options = wp_parse_args( $options, $defaults );
 
 		/**
-		 * Filters the package options before running an update.
+		 * Filter the package options before running an update.
 		 *
 		 * See also {@see 'upgrader_process_complete'}.
 		 *
@@ -203,7 +203,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 		if ( ! $options['is_multi'] ) {
 
 			/**
-			 * Fires when the upgrader process is complete.
+			 * Fire when the upgrader process is complete.
 			 *
 			 * See also {@see 'upgrader_package_options'}.
 			 *
@@ -279,7 +279,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 	public function download_package( $package, $check_signatures = false ) {
 
 		/**
-		 * Filters whether to return the package.
+		 * Filter whether to return the package.
 		 *
 		 * @since 3.7.0
 		 *
@@ -423,7 +423,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 		//$this->skin->feedback( 'installing_package' );
 
 		/**
-		 * Filters the install response before the installation has started.
+		 * Filter the install response before the installation has started.
 		 *
 		 * Returning a truthy value, or one that could be evaluated as a WP_Error
 		 * will effectively short-circuit the installation, returning that value
@@ -457,7 +457,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 		}
 
 		/**
-		 * Filters the source file location for the upgrade package.
+		 * Filter the source file location for the upgrade package.
 		 *
 		 * @since 2.8.0
 		 * @since 4.4.0 The $hook_extra parameter became available.
@@ -503,7 +503,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 			$removed = $this->clear_destination( $remote_destination );
 
 			/**
-			 * Filters whether the upgrader cleared the destination.
+			 * Filter whether the upgrader cleared the destination.
 			 *
 			 * @since 2.8.0
 			 *
@@ -555,7 +555,7 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 		$this->result = compact( 'source', 'source_files', 'destination', 'destination_name', 'local_destination', 'remote_destination', 'clear_destination' );
 
 		/**
-		 * Filters the installation response after the installation has finished.
+		 * Filter the installation response after the installation has finished.
 		 *
 		 * @since 2.8.0
 		 *

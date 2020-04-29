@@ -117,7 +117,7 @@ class Chain {
 	}
 
 	/**
-	 * Applies the callback to the elements of the given arrays.
+	 * Apply the callback to the elements of the given arrays.
 	 *
 	 * @since 1.5.6
 	 *

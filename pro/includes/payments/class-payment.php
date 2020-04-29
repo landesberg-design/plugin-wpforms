@@ -151,7 +151,7 @@ abstract class WPForms_Payment {
 	}
 
 	/**
-	 * Wraps the builder content with the required markup.
+	 * Wrap the builder content with the required markup.
 	 *
 	 * @since 1.0.0
 	 */

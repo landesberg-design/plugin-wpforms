@@ -70,7 +70,7 @@ class WPForms_Field_GDPR_Checkbox extends WPForms_Field {
 		// Define data.
 		$form_id  = absint( $form_data['id'] );
 		$field_id = absint( $field['id'] );
-		$choices  = $field['choices'];
+		$choices  = ! empty( $field['choices'] ) ? $field['choices'] : [];
 
 		// Remove primary input.
 		unset( $properties['inputs']['primary'] );

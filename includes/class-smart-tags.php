@@ -308,9 +308,9 @@ class WPForms_Smart_Tags {
 			foreach ( $value_ids[1] as $key => $field_id ) {
 
 				if ( isset( $fields[ $field_id ]['value_raw'] ) && ! is_array( $fields[ $field_id ]['value_raw'] ) && (string) $fields[ $field_id ]['value_raw'] !== '' ) {
-					$value = sanitize_text_field( $fields[ $field_id ]['value_raw'] );
+					$value = wpforms_sanitize_textarea_field( $fields[ $field_id ]['value_raw'] );
 				} else {
-					$value = isset( $fields[ $field_id ]['value'] ) ? sanitize_text_field( $fields[ $field_id ]['value'] ) : '';
+					$value = isset( $fields[ $field_id ]['value'] ) ? wpforms_sanitize_textarea_field( $fields[ $field_id ]['value'] ) : '';
 				}
 
 				$content = $this->parse( '{field_value_id="' . $field_id . '"}', $value, $content );
@@ -326,10 +326,10 @@ class WPForms_Smart_Tags {
 			foreach ( $html_ids[1] as $key => $field_id ) {
 				$value = '';
 				if ( ! empty( $fields[ $field_id ] ) ) {
-					$value = ! isset( $fields[ $field_id ]['value'] ) || (string) $fields[ $field_id ]['value'] === '' ? '<em>' . esc_html__( '(empty)', 'wpforms-lite' ) . '</em>' : sanitize_text_field( $fields[ $field_id ]['value'] );
+					$value = ! isset( $fields[ $field_id ]['value'] ) || (string) $fields[ $field_id ]['value'] === '' ? '<em>' . esc_html__( '(empty)', 'wpforms-lite' ) . '</em>' : wpforms_sanitize_textarea_field( $fields[ $field_id ]['value'] );
 					$value = apply_filters(
 						'wpforms_html_field_value',
-						wpforms_decode_string( $value ),
+						$value,
 						$fields[ $field_id ],
 						$form_data,
 						'smart-tag'

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles plugin installation upon activation.
+ * Handle plugin installation upon activation.
  *
  * @since 1.0.0
  */
@@ -30,8 +30,8 @@ class WPForms_Install {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param boolean $network_wide Whether to enable the plugin for all sites in the network
-	 *                              or just the current site. Multisite only. Default is false.
+	 * @param bool $network_wide Whether to enable the plugin for all sites in the network
+	 *                           or just the current site. Multisite only. Default is false.
 	 */
 	public function install( $network_wide = false ) {
 

@@ -1,5 +1,50 @@
 # Changelog
-All notable changes to this project will be documented in this file, formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
+All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
+
+## [1.6.0.1] - 2020-04-16
+### Fixed
+- Compatibility issues with older versions of Surveys and Polls addon.
+
+## [1.6.0] - 2020-04-15
+### Added
+- Forms entry editing.
+- Admin bar menu item.
+- Conditional logic support for the Divider field.
+- Form Builder alert when using browser "Back" button if form contains unsaved changes.
+- Settings > Emails: "Optimize Email Sending" option which enables sending emails asynchronously.
+- Auto-download translations on plugin activation.
+
+### Changed
+- Async form notification emails are now off by default.
+- Date field can be cleared when using the Date Picker.
+- Number Slider field display improvements on small devices.
+- Do not cache entry counts on Entries Overview page.
+
+### Fixed
+- Error if there are some plugins or themes add `widget_title` filter.
+- Frontend compatibility with Rating field and jQuery 3.x.
+- Choice Images not displaying in form notifications if no label is set.
+- Email/Password field Advanced Options not always displaying correct options.
+- Page Break field "Disable Scroll Animation" option not working as expected.
+- Form Builder "drag zone" not available when all fields are deleted.
+- Uploaded file names are not truly unique in very rare cases.
+- Empty `div` appended to end of form display.
+- Block alignment issues (WordPress 5.4+).
+- Form Builder field option panel is not available if field is placed before the last form field.
+- Conditional confirmation error when '<' symbol is used as a field option.
+- Display placeholders for Date/Time field when dropdown date option is selected and Conditional Logic applied to the field.
+- Fallback population for fields with choices (checkbox, radio etc) when special characters are used.
+- Entries export support external storage for temporary CSV files.
+- Integrity of decoded data with additional sanitizing.
+- Compatibility issues with Elementor.
+
+## [1.5.9.4] - 2020-03-19
+### Changed
+- Improve async notification emails scheduling compatibility with certain caching plugins and site installs.
+
+## [1.5.9.3] - 2020-03-18
+### Fixed
+- Some smart tags are not rendered correctly in the email notifications if sent asynchronously.
 
 ## [1.5.9.2] - 2020-03-09
 ### Fixed

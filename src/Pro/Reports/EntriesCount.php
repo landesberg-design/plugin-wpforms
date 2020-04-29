@@ -3,7 +3,7 @@
 namespace WPForms\Pro\Reports;
 
 /**
- * Generates form submissions reports.
+ * Generate form submissions reports.
  *
  * @since 1.5.4
  */
@@ -19,11 +19,11 @@ class EntriesCount {
 	/**
 	 * Get entries count grouped by $param.
 	 * Main point of entry to fetch form entry count data from DB.
-	 * Caches the result.
+	 * Cache the result.
 	 *
 	 * @since 1.5.4
 	 *
-	 * @param string $param        'date' or 'form'.
+	 * @param string $param        Could be 'date' or 'form'.
 	 * @param int    $form_id      Form ID to fetch the data for.
 	 * @param int    $days         Timespan (in days) to fetch the data for.
 	 * @param string $date_end_str End date of the timespan (PHP DateTime supported string, see http://php.net/manual/en/datetime.formats.php).

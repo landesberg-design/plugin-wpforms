@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays information about a single form entry.
+ * Display information about a single form entry.
  *
  * Previously list and single views were contained in a single class,
  * however were separated in v1.3.9.
@@ -10,9 +10,10 @@
 class WPForms_Entries_Single {
 
 	/**
-	 * Holds admin alerts.
+	 * Hold admin alerts.
 	 *
 	 * @since 1.1.6
+	 *
 	 * @var array
 	 */
 	public $alerts = array();
@@ -114,7 +115,7 @@ class WPForms_Entries_Single {
 	}
 
 	/**
-	 * Watches for and runs single entry exports.
+	 * Watch for and run single entry exports.
 	 *
 	 * @since 1.1.6
 	 */
@@ -137,7 +138,7 @@ class WPForms_Entries_Single {
 	}
 
 	/**
-	 * Watches for and runs starring/unstarring entry.
+	 * Watch for and run starring/unstarring entry.
 	 *
 	 * @since 1.1.6
 	 * @since 1.5.7 Added creation entry note for Entry Star action.
@@ -225,10 +226,11 @@ class WPForms_Entries_Single {
 	}
 
 	/**
-	 * Watches for and entry unread toggle.
+	 * Watch for and run entry unread toggle.
+	 *
+	 * @todo Convert to AJAX.
 	 *
 	 * @since 1.1.6
-	 * @todo Convert to AJAX
 	 */
 	public function process_unread() {
 
@@ -281,10 +283,11 @@ class WPForms_Entries_Single {
 	}
 
 	/**
-	 * Watches for and runs entry note deletion.
+	 * Watch for and run entry note deletion.
+	 *
+	 * @todo Convert to AJAX.
 	 *
 	 * @since 1.1.6
-	 * @todo Convert to AJAX
 	 */
 	public function process_note_delete() {
 
@@ -323,10 +326,11 @@ class WPForms_Entries_Single {
 	}
 
 	/**
-	 * Watches for and runs creating entry notes.
+	 * Watch for and run creating entry notes.
+	 *
+	 * @todo Convert to AJAX
 	 *
 	 * @since 1.1.6
-	 * @todo Convert to AJAX
 	 */
 	public function process_note_add() {
 
@@ -364,7 +368,7 @@ class WPForms_Entries_Single {
 	}
 
 	/**
-	 * Watches for and runs single entry notifications.
+	 * Watch for and run single entry notifications.
 	 *
 	 * @since 1.1.6
 	 */
@@ -903,10 +907,13 @@ class WPForms_Entries_Single {
 	 *
 	 * @since 1.1.5
 	 *
-	 * @param object $entry
-	 * @param array $form_data
+	 * @param object $entry     Entry data.
+	 * @param array  $form_data Form data.
 	 */
 	public function details_meta( $entry, $form_data ) {
+
+		$datetime_format = get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' );
+		$datetime_offset = get_option( 'gmt_offset' ) * 3600;
 
 		?>
 		<!-- Entry Details metabox -->
@@ -937,7 +944,7 @@ class WPForms_Entries_Single {
 						$entry_post_id  = absint( $entry->post_id );
 						$entry_post_obj = get_post_type_object( get_post_type( $entry_post_id ) );
 
-						if ( $entry_post_obj instanceof WP_Post_Type ) {
+						if ( $entry_post_obj instanceof \WP_Post_Type ) {
 							?>
 							<p class="wpforms-entry-postid">
 								<span class="dashicons dashicons-edit"></span>
@@ -955,34 +962,32 @@ class WPForms_Entries_Single {
 					<p class="wpforms-entry-date">
 						<span class="dashicons dashicons-calendar"></span>
 						<?php esc_html_e( 'Submitted:', 'wpforms' ); ?>
-						<strong><?php echo date_i18n( esc_html__( 'M j, Y @ g:ia' ), strtotime( $entry->date ) + ( get_option( 'gmt_offset' ) * 3600 ) ); ?> </strong>
+						<strong class="date-time"><?php echo esc_html( date_i18n( $datetime_format, strtotime( $entry->date ) + $datetime_offset ) ); ?></strong>
 					</p>
 
 					<?php if ( '0000-00-00 00:00:00' !== $entry->date_modified ) : ?>
 						<p class="wpforms-entry-modified">
 							<span class="dashicons dashicons-calendar-alt"></span>
 							<?php esc_html_e( 'Modified:', 'wpforms' ); ?>
-							<strong><?php echo date_i18n( esc_html__( 'M j, Y @ H:i' ), strtotime( $entry->date_modified ) + ( get_option( 'gmt_offset' ) * 3600 ) ); ?> </strong>
+							<strong class="date-time"><?php echo esc_html( date_i18n( $datetime_format, strtotime( $entry->date_modified ) + $datetime_offset ) ); ?></strong>
 						</p>
 					<?php endif; ?>
 
-					<?php if ( ! empty( $entry->user_id ) && '0' != $entry->user_id ) : ?>
+					<?php if ( ! empty( $entry->user_id ) && 0 !== (int) $entry->user_id ) : ?>
 						<p class="wpforms-entry-user">
 							<span class="dashicons dashicons-admin-users"></span>
 							<?php
 							esc_html_e( 'User:', 'wpforms' );
 							$user      = get_userdata( $entry->user_id );
 							$user_name = esc_html( ! empty( $user->display_name ) ? $user->display_name : $user->user_login );
-							$user_url = esc_url(
-								add_query_arg(
-									array(
-										'user_id' => absint( $user->ID ),
-									),
-									admin_url( 'user-edit.php' )
-								)
+							$user_url  = add_query_arg(
+								array(
+									'user_id' => absint( $user->ID ),
+								),
+								admin_url( 'user-edit.php' )
 							);
 							?>
-							<strong><a href="<?php echo $user_url; ?>"><?php echo $user_name; ?></a></strong>
+							<strong><a href="<?php echo esc_url( $user_url ); ?>"><?php echo esc_html( $user_name ); ?></a></strong>
 						</p>
 					<?php endif; ?>
 
@@ -998,7 +1003,7 @@ class WPForms_Entries_Single {
 						<p class="wpforms-entry-status">
 							<span class="dashicons dashicons-category"></span>
 							<?php esc_html_e( 'Status:', 'wpforms' ); ?>
-							<strong><?php echo ! empty( $entry->status ) ? ucwords( sanitize_text_field( $entry->status ) ) : esc_html__( 'Completed', 'wpforms' ); ?></strong>
+							<strong><?php echo ! empty( $entry->status ) ? esc_html( ucwords( sanitize_text_field( $entry->status ) ) ) : esc_html__( 'Completed', 'wpforms' ); ?></strong>
 						</p>
 					<?php endif; ?>
 
@@ -1008,7 +1013,11 @@ class WPForms_Entries_Single {
 
 				<div id="major-publishing-actions">
 
-					<?php if ( \wpforms_current_user_can( 'delete_entries_form_single', $form_data['id'] ) ) : ?>
+					<?php
+						do_action( 'wpforms_entry_details_sidebar_details_action',  $entry, $form_data );
+					?>
+
+					<?php if ( wpforms_current_user_can( 'delete_entries_form_single', $form_data['id'] ) ) : ?>
 						<div id="delete-action">
 							<?php
 							$delete_link = wp_nonce_url(
@@ -1028,10 +1037,6 @@ class WPForms_Entries_Single {
 							</a>
 						</div>
 					<?php endif; ?>
-
-					<!-- Phase 2 <div id="publishing-action">
-						<input name="" type="submit" class="button button-primary button-large" value="Edit">
-					</div> -->
 
 					<div class="clear"></div>
 				</div>
@@ -1197,34 +1202,37 @@ class WPForms_Entries_Single {
 	 */
 	public function details_actions( $entry, $form_data ) {
 
+		$entry->starred  = (string) $entry->starred;
+		$entry->entry_id = (int) $entry->entry_id;
+
 		$base = add_query_arg(
 			array(
 				'page'     => 'wpforms-entries',
 				'view'     => 'details',
-				'entry_id' => absint( $entry->entry_id ),
+				'entry_id' => $entry->entry_id,
 			),
 			admin_url( 'admin.php' )
 		);
 
-		// Print Entry URL
+		// Print Entry URL.
 		$print_url = add_query_arg(
 			array(
 				'page'     => 'wpforms-entries',
 				'view'     => 'print',
-				'entry_id' => absint( $entry->entry_id ),
+				'entry_id' => $entry->entry_id,
 			),
 			admin_url( 'admin.php' )
 		);
 
-		// Export Entry URL
+		// Export Entry URL.
 		$export_url = wp_nonce_url(
 			add_query_arg(
 				array(
 					'page'     => 'wpforms-tools',
 					'view'     => 'export',
 					'action'   => 'wpforms_tools_single_entry_export_download',
-					'form'     => absint( $form_data['id'] ),
-					'entry_id' => absint( $entry->entry_id ),
+					'form'     => (int) $form_data['id'],
+					'entry_id' => $entry->entry_id,
 				),
 				admin_url( 'admin.php' )
 			),
@@ -1232,37 +1240,37 @@ class WPForms_Entries_Single {
 			'nonce'
 		);
 
-		// Resend Entry Notifications URL
+		// Resend Entry Notifications URL.
 		$notifications_url = wp_nonce_url(
 			add_query_arg(
 				array(
-					'action'   => 'notifications',
+					'action' => 'notifications',
 				),
 				$base
 			),
 			'wpforms_entry_details_notifications'
 		);
 
-		// Star Entry URL
-		$star_url = wp_nonce_url(
+		// Star Entry URL.
+		$star_url  = wp_nonce_url(
 			add_query_arg(
 				array(
-					'action' => '1' == $entry->starred ? 'unstar' : 'star',
+					'action' => '1' === $entry->starred ? 'unstar' : 'star',
 					'form'   => absint( $form_data['id'] ),
 				),
 				$base
 			),
 			'wpforms_entry_details_star'
 		);
-		$star_icon = '1' == $entry->starred ? 'dashicons-star-empty' : 'dashicons-star-filled';
-		$star_text = '1' == $entry->starred ? esc_html__( 'Unstar', 'wpforms' ) : esc_html__( 'Star', 'wpforms' );
+		$star_icon = '1' === $entry->starred ? 'dashicons-star-empty' : 'dashicons-star-filled';
+		$star_text = '1' === $entry->starred ? esc_html__( 'Unstar', 'wpforms' ) : esc_html__( 'Star', 'wpforms' );
 
-		// Unread URL
+		// Unread URL.
 		$unread_url = wp_nonce_url(
 			add_query_arg(
 				array(
 					'action' => 'unread',
-					'form'   => absint( $form_data['id'] ),
+					'form'   => (int) $form_data['id'],
 				),
 				$base
 			),
@@ -1271,33 +1279,33 @@ class WPForms_Entries_Single {
 
 		$action_links = array();
 
-		$action_links['print'] = array(
+		$action_links['print']         = array(
 			'url'    => $print_url,
 			'target' => 'blank',
 			'icon'   => 'dashicons-media-text',
 			'label'  => esc_html__( 'Print', 'wpforms' ),
 		);
-		$action_links['export'] = array(
-			'url'    => $export_url,
-			'icon'   => 'dashicons-migrate',
-			'label'  => esc_html__( 'Export (CSV)', 'wpforms' ),
+		$action_links['export']        = array(
+			'url'   => $export_url,
+			'icon'  => 'dashicons-migrate',
+			'label' => esc_html__( 'Export (CSV)', 'wpforms' ),
 		);
 		$action_links['notifications'] = array(
-			'url'    => $notifications_url,
-			'icon'   => 'dashicons-email-alt',
-			'label'  => esc_html__( 'Resend Notifications', 'wpforms' ),
+			'url'   => $notifications_url,
+			'icon'  => 'dashicons-email-alt',
+			'label' => esc_html__( 'Resend Notifications', 'wpforms' ),
 		);
-		if ( '1' == $entry->viewed ) {
+		if ( '1' === (string) $entry->viewed ) {
 			$action_links['read'] = array(
-				'url'    => $unread_url,
-				'icon'   => 'dashicons-hidden',
-				'label'  => esc_html__( 'Mark Unread', 'wpforms' ),
+				'url'   => $unread_url,
+				'icon'  => 'dashicons-hidden',
+				'label' => esc_html__( 'Mark Unread', 'wpforms' ),
 			);
 		}
 		$action_links['star'] = array(
-			'url'    => $star_url,
-			'icon'   => $star_icon,
-			'label'  => $star_text,
+			'url'   => $star_url,
+			'icon'  => $star_icon,
+			'label' => $star_text,
 		);
 
 		$action_links = apply_filters( 'wpforms_entry_details_sidebar_actions_link', $action_links, $entry, $form_data );

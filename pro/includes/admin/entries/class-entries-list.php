@@ -8,7 +8,7 @@
 class WPForms_Entries_List {
 
 	/**
-	 * Holds admin alerts.
+	 * Store admin alerts.
 	 *
 	 * @since 1.1.6
 	 *
@@ -219,7 +219,7 @@ class WPForms_Entries_List {
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
 			array( 'jquery' ),
-			'4.5.5'
+			'4.6.3'
 		);
 
 		// CSS.
@@ -227,7 +227,7 @@ class WPForms_Entries_List {
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
 			array(),
-			'4.5.5'
+			'4.6.3'
 		);
 
 		// Hook for addons.
@@ -235,7 +235,7 @@ class WPForms_Entries_List {
 	}
 
 	/**
-	 * Watches for and runs complete form exports.
+	 * Watch for and run complete form exports.
 	 *
 	 * @since 1.1.6
 	 */
@@ -260,7 +260,7 @@ class WPForms_Entries_List {
 	}
 
 	/**
-	 * Watches for and runs complete marking all entries as read.
+	 * Watch for and run complete marking all entries as read.
 	 *
 	 * @since 1.1.6
 	 */
@@ -286,7 +286,7 @@ class WPForms_Entries_List {
 	}
 
 	/**
-	 * Watches for and updates list column settings.
+	 * Watch for and update list column settings.
 	 *
 	 * @since 1.4.0
 	 */
@@ -318,7 +318,7 @@ class WPForms_Entries_List {
 	}
 
 	/**
-	 * Watches for mass entry deletion and triggers if needed.
+	 * Watch for mass entry deletion and trigger if needed.
 	 *
 	 * @since 1.4.0
 	 */
@@ -349,7 +349,7 @@ class WPForms_Entries_List {
 	}
 
 	/**
-	 * Watches for filtering requests from a dates range selection.
+	 * Watch for filtering requests from a dates range selection.
 	 *
 	 * @since 1.4.4
 	 */
@@ -396,7 +396,7 @@ class WPForms_Entries_List {
 	}
 
 	/**
-	 * Watches for filtering requests from a search field.
+	 * Watch for filtering requests from a search field.
 	 *
 	 * @since 1.4.4
 	 */

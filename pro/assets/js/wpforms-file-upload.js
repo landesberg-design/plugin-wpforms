@@ -448,10 +448,29 @@
 		window.wpforms.dropzones = [].slice.call( document.querySelectorAll( '.wpforms-uploader' ) ).map( dropZoneInit );
 	}
 
-	if ( document.readyState === 'loading' ) {
-		document.addEventListener( 'DOMContentLoaded', ready );
-	} else {
-		ready();
-	}
+	/**
+	 * Moden File Uplaod engine.
+	 *
+	 * @since 1.6.0
+	 */
+	var wpformsModernFileUpload = {
 
+		/**
+		 * Start the initialization.
+		 *
+		 * @since 1.6.0
+		 */
+		init: function() {
+
+			if ( document.readyState === 'loading' ) {
+				document.addEventListener( 'DOMContentLoaded', ready );
+			} else {
+				ready();
+			}
+		},
+	};
+
+	// Call init and save in global variable.
+	wpformsModernFileUpload.init();
+	window.wpformsModernFileUpload = wpformsModernFileUpload;
 }() );

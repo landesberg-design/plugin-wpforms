@@ -178,18 +178,18 @@ class Mailer {
 	/**
 	 * Sanitize the string.
 	 *
-	 * @since 1.5.4
+	 * @uses \wpforms_decode_string()
 	 *
-	 * @param string $string     String that may contain tags.
-	 * @param bool   $linebreaks Toggle to process linebreaks.
+	 * @since 1.5.4
+	 * @since 1.6.0 Deprecated param: $linebreaks. This is handled by wpforms_decode_string().
+	 *
+	 * @param string $string String that may contain tags.
 	 *
 	 * @return string
 	 */
-	public function sanitize( $string = '', $linebreaks = false ) {
+	public function sanitize( $string = '' ) {
 
-		$string = \wpforms_decode_string( $string );
-
-		return $linebreaks ? \wpforms_sanitize_textarea_field( $string ) : \sanitize_text_field( $string );
+		return \wpforms_decode_string( $string );
 	}
 
 	/**

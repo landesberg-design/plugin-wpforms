@@ -44,7 +44,7 @@ var WPFormsAdminEducation = window.WPFormsAdminEducation || ( function( document
 		 */
 		events: function() {
 
-			// "Did You Know?" Click on the dissmiss button.
+			// "Did You Know?" Click on the dismiss button.
 			$( '.wpforms-dyk' ).on( 'click', '.dismiss', function( e ) {
 				var $t = $( this ),
 					$tr = $t.closest( '.wpforms-dyk' ),

@@ -79,10 +79,10 @@ class File {
 	public function get_tmpdir() {
 
 		$uploads              = wp_upload_dir();
-		$wpforms_uploads_root = trailingslashit( $uploads['basedir'] ) . 'wpforms';
+		$wpforms_uploads_root = trailingslashit( realpath( $uploads['basedir'] ) ) . 'wpforms';
 
 		// Apply filter to allow redefine tmp directory.
-		$custom_uploads_root = apply_filters( 'wpforms_upload_root', $wpforms_uploads_root );
+		$custom_uploads_root = realpath( (string) apply_filters( 'wpforms_upload_root', $wpforms_uploads_root ) );
 		if ( wp_is_writable( $custom_uploads_root ) ) {
 			$wpforms_uploads_root = $custom_uploads_root;
 		}

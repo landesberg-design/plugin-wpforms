@@ -106,7 +106,7 @@ class PrintPreview {
 	}
 
 	/**
-	 * Outputs HTML markup for the print preview page.
+	 * Output HTML markup for the print preview page.
 	 *
 	 * @since 1.5.1
 	 */

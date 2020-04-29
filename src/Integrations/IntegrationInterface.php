@@ -10,7 +10,7 @@ namespace WPForms\Integrations;
 interface IntegrationInterface {
 
 	/**
-	 * Indicates if current integration is allowed to load.
+	 * Indicate if current integration is allowed to load.
 	 *
 	 * @since 1.4.8
 	 *
@@ -19,7 +19,7 @@ interface IntegrationInterface {
 	public function allow_load();
 
 	/**
-	 * Loads an integration.
+	 * Load an integration.
 	 *
 	 * @since 1.4.8
 	 */

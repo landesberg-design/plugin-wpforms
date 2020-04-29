@@ -366,7 +366,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 	}
 
 	/**
-	 * Wraps the builder section content with the required (for tabs switching) markup.
+	 * Wrap the builder section content with the required (for tabs switching) markup.
 	 *
 	 * @since 1.4.7
 	 */

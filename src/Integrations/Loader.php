@@ -33,6 +33,7 @@ class Loader {
 	public function __construct() {
 
 		$core_class_names = array(
+			'Elementor\Elementor',
 			'Gutenberg\FormSelector',
 			'SiteHealth\SiteHealth',
 			'WPMailSMTP\Notifications',

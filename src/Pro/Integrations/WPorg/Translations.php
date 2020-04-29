@@ -12,7 +12,7 @@ use WPForms\Integrations\IntegrationInterface;
 class Translations implements IntegrationInterface {
 
 	/**
-	 * Indicates if current integration is allowed to load.
+	 * Indicate if current integration is allowed to load.
 	 *
 	 * @since 1.5.6
 	 *
@@ -24,7 +24,7 @@ class Translations implements IntegrationInterface {
 	}
 
 	/**
-	 * Loads an integration.
+	 * Load an integration.
 	 *
 	 * @since 1.5.6
 	 */

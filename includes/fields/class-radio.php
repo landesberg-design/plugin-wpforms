@@ -125,6 +125,10 @@ class WPForms_Field_Radio extends WPForms_Field {
 			// Used for dynamic choices.
 			$depth = isset( $choice['depth'] ) ? absint( $choice['depth'] ) : 1;
 
+			$value = isset( $field['show_values'] ) ? $choice['value'] : $choice['label'];
+			/* translators: %s - choice number. */
+			$value = ( '' === $value ) ? sprintf( esc_html__( 'Choice %s', 'wpforms-lite' ), $key ) : $value;
+
 			$properties['inputs'][ $key ] = array(
 				'container' => array(
 					'attr'  => array(),
@@ -143,7 +147,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 				),
 				'attr'      => array(
 					'name'  => "wpforms[fields][{$field_id}]",
-					'value' => isset( $field['show_values'] ) ? $choice['value'] : $choice['label'],
+					'value' => $value,
 				),
 				'class'     => array(),
 				'data'      => array(),
@@ -531,7 +535,8 @@ class WPForms_Field_Radio extends WPForms_Field {
 
 				// Determine choice key, this is needed for image choices.
 				foreach ( $field['choices'] as $key => $choice ) {
-					if ( $choice['label'] === $field_submit ) {
+					/* translators: %s - choice number. */
+					if ( $value_raw === $choice['label'] || $value_raw === sprintf( esc_html__( 'Choice %s', 'wpforms-lite' ), $key ) ) {
 						$choice_key = $key;
 						break;
 					}

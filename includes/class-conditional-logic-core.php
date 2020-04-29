@@ -76,7 +76,7 @@ class WPForms_Conditional_Logic_Core {
 	}
 
 	/**
-	 * Outputs footer scripts inside the form builder.
+	 * Output footer scripts inside the form builder.
 	 *
 	 * @since 1.3.8
 	 */
@@ -584,7 +584,7 @@ class WPForms_Conditional_Logic_Core {
 					if ( in_array( $fields[ $rule_field ]['type'], array( 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'number-slider', 'net_promoter_score' ), true ) ) {
 
 						// Text based fields.
-						$left  = strtolower( trim( $fields[ $rule_field ]['value'] ) );
+						$left  = strtolower( trim( wpforms_decode_string( $fields[ $rule_field ]['value'] ) ) );
 						$right = strtolower( trim( $rule_value ) );
 
 						switch ( $rule_operator ) {
@@ -654,7 +654,7 @@ class WPForms_Conditional_Logic_Core {
 
 							foreach ( $form_data['fields'][ $rule_field ]['choices'] as $key => $choice ) {
 
-								$choice = array_map( 'sanitize_text_field', $choice );
+								$choice = array_map( 'wpforms_decode_string', $choice );
 
 								foreach ( $values as $value ) {
 									$value = wpforms_decode_string( $value );

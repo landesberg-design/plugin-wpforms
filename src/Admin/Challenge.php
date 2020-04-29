@@ -3,7 +3,7 @@
 namespace WPForms\Admin;
 
 /**
- * Challenges and guides a user to set up a first form once WPForms is installed.
+ * Challenge and guide a user to set up a first form once WPForms is installed.
  *
  * @since 1.5.0
  */

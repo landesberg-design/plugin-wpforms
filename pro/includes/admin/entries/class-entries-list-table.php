@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Generates the table on the entries overview page.
+ * Generate the table on the entries overview page.
  *
  * @since 1.0.0
  */
@@ -400,7 +400,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Renders the columns.
+	 * Render the columns.
 	 *
 	 * @since 1.0.0
 	 * @since 1.5.7 Added an `Entry Notes` column.
@@ -527,6 +527,24 @@ class WPForms_Entries_Table extends WP_List_Table {
 			esc_attr__( 'View Form Entry', 'wpforms' ),
 			esc_html__( 'View', 'wpforms' )
 		);
+
+		if ( wpforms_current_user_can( 'edit_entries_form_single', $this->form_id ) ) {
+			// Edit.
+			$actions[] = sprintf(
+				'<a href="%s" title="%s" class="edit">%s</a>',
+				esc_url(
+					add_query_arg(
+						array(
+							'view'     => 'edit',
+							'entry_id' => $entry->entry_id,
+						),
+						admin_url( 'admin.php?page=wpforms-entries' )
+					)
+				),
+				esc_attr__( 'Edit Form Entry', 'wpforms' ),
+				esc_html__( 'Edit', 'wpforms' )
+			);
+		}
 
 		if ( wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
 			// Delete.

@@ -25,7 +25,7 @@ class WPForms_Form_Handler {
 	}
 
 	/**
-	 * Registers the custom post type to be used for forms.
+	 * Register the custom post type to be used for forms.
 	 *
 	 * @since 1.0.0
 	 */
@@ -76,7 +76,7 @@ class WPForms_Form_Handler {
 	}
 
 	/**
-	 * Fetches forms
+	 * Fetch forms.
 	 *
 	 * @since 1.0.0
 	 *
@@ -103,7 +103,7 @@ class WPForms_Form_Handler {
 	}
 
 	/**
-	 * Fetches single form
+	 * Fetch a single form.
 	 *
 	 * @since 1.5.8
 	 *
@@ -136,7 +136,7 @@ class WPForms_Form_Handler {
 	}
 
 	/**
-	 * Fetches multiple forms
+	 * Fetch multiple forms.
 	 *
 	 * @since 1.5.8
 	 *
@@ -170,7 +170,7 @@ class WPForms_Form_Handler {
 	 *
 	 * @param array $ids Form IDs.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function delete( $ids = array() ) {
 
@@ -187,13 +187,13 @@ class WPForms_Form_Handler {
 				return false;
 			}
 
-			$form = wp_delete_post( $id, true );
-
 			if ( class_exists( 'WPForms_Entry_Handler', false ) ) {
 				wpforms()->entry->delete_by( 'form_id', $id );
 				wpforms()->entry_meta->delete_by( 'form_id', $id );
 				wpforms()->entry_fields->delete_by( 'form_id', $id );
 			}
+
+			$form = wp_delete_post( $id, true );
 
 			if ( ! $form ) {
 				return false;
@@ -440,7 +440,7 @@ class WPForms_Form_Handler {
 	 *
 	 * @param array $ids Form IDs to duplicate.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function duplicate( $ids = array() ) {
 

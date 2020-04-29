@@ -60,7 +60,7 @@ class Education {
 		$this->addons = \wpforms()->license->addons();
 
 		// Load license level.
-		$this->license = $this->get_license_type();
+		$this->license = wpforms_get_license_type();
 
 		\add_filter( 'wpforms_builder_strings', array( $this, 'js_strings' ) );
 
@@ -98,19 +98,25 @@ class Education {
 		$strings['education_activated']        = \esc_html__( 'Addon activated', 'wpforms' );
 		$strings['education_save_prompt']      = \esc_html__( 'Almost done! Would you like to save and refresh the form builder?', 'wpforms' );
 		$strings['education_save_confirm']     = \esc_html__( 'Yes, save and refresh', 'wpforms' );
-		$strings['education_upgrade_title']    = \esc_html__( 'is a PRO Feature', 'wpforms' );
-		$strings['education_upgrade_message']  = '<p>' . \esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wpforms' ) . '</p>';
-		$strings['education_upgrade_confirm']  = \esc_html__( 'Upgrade to PRO', 'wpforms' );
-		$strings['education_upgrade_url']      = 'https://wpforms.com/pricing/?utm_source=WordPress&utm_medium=builder-modal&utm_campaign=plugin';
 		$strings['education_license_prompt']   = \esc_html__( 'To access addons please enter and activate your WPForms license key in the plugin settings.', 'wpforms' );
+
+		$strings['education_upgrade']['pro']['title']   = \esc_html__( 'is a PRO Feature', 'wpforms' );
+		$strings['education_upgrade']['pro']['message'] = '<p>' . \esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wpforms' ) . '</p>';
+		$strings['education_upgrade']['pro']['confirm'] = \esc_html__( 'Upgrade to PRO', 'wpforms' );
+		$strings['education_upgrade']['pro']['url']     = 'https://wpforms.com/pricing/?utm_source=WordPress&utm_medium=builder-modal&utm_campaign=plugin';
+
+		$strings['education_upgrade']['elite']['title']   = \esc_html__( 'is an Elite Feature', 'wpforms' );
+		$strings['education_upgrade']['elite']['message'] = '<p>' . \esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the Elite plan to unlock all these awesome features.', 'wpforms' ) . '</p>';
+		$strings['education_upgrade']['elite']['confirm'] = \esc_html__( 'Upgrade to Elite', 'wpforms' );
+		$strings['education_upgrade']['elite']['url']     = 'https://wpforms.com/pricing/?utm_source=WordPress&utm_medium=builder-modal&utm_campaign=plugin';
 
 		$license_key = \wpforms()->license->get();
 		if ( ! empty( $license_key ) ) {
-			$strings['education_upgrade_url'] = \add_query_arg(
+			$strings['education_upgrade']['pro']['url'] = \add_query_arg(
 				array(
 					'license_key' => \sanitize_text_field( $license_key ),
 				),
-				$strings['education_upgrade_url']
+				$strings['education_upgrade']['pro']['url']
 			);
 		}
 
@@ -161,6 +167,7 @@ class Education {
 				'slug'        => 'captcha',
 				'plugin'      => 'wpforms-captcha/wpforms-captcha.php',
 				'plugin_slug' => 'wpforms-captcha',
+				'license'     => 'pro',
 				'field'       => array(
 					'icon'  => 'fa-question-circle',
 					'name'  => \esc_html__( 'Captcha', 'wpforms' ),
@@ -174,6 +181,7 @@ class Education {
 				'slug'        => 'signatures',
 				'plugin'      => 'wpforms-signatures/wpforms-signatures.php',
 				'plugin_slug' => 'wpforms-signatures',
+				'license'     => 'pro',
 				'field'       => array(
 					'icon'  => 'fa-pencil',
 					'name'  => \esc_html__( 'Signature', 'wpforms' ),
@@ -187,6 +195,7 @@ class Education {
 				'slug'        => 'surveys-polls',
 				'plugin'      => 'wpforms-surveys-polls/wpforms-surveys-polls.php',
 				'plugin_slug' => 'wpforms-surveys-polls',
+				'license'     => 'pro',
 				'field'       => array(
 					'icon'  => 'fa-ellipsis-h',
 					'name'  => \esc_html__( 'Likert Scale', 'wpforms' ),
@@ -200,6 +209,7 @@ class Education {
 				'slug'        => 'surveys-polls',
 				'plugin'      => 'wpforms-surveys-polls/wpforms-surveys-polls.php',
 				'plugin_slug' => 'wpforms-surveys-polls',
+				'license'     => 'pro',
 				'field'       => array(
 					'icon'  => 'fa-tachometer',
 					'name'  => \esc_html__( 'Net Promoter Score', 'wpforms' ),
@@ -252,7 +262,7 @@ class Education {
 		$atts['data']['nonce']      = \wp_create_nonce( 'wpforms-admin' );
 
 		if ( ! empty( $field['plugin_name'] ) ) {
-			/* translators: %s - addon name*/
+			/* translators: %s - addon name. */
 			$atts['data']['name'] = sprintf( \esc_html__( '%s addon', 'wpforms' ), $field['plugin_name'] );
 		}
 
@@ -287,36 +297,42 @@ class Education {
 				'slug'        => 'conversational-forms',
 				'plugin'      => 'wpforms-conversational-forms/wpforms-conversational-forms.php',
 				'plugin_slug' => 'wpforms-conversational-forms',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Surveys and Polls', 'wpforms' ),
 				'slug'        => 'surveys-polls',
 				'plugin'      => 'wpforms-surveys-polls/wpforms-surveys-polls.php',
 				'plugin_slug' => 'wpforms-surveys-polls',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Form Pages', 'wpforms' ),
 				'slug'        => 'form-pages',
 				'plugin'      => 'wpforms-form-pages/wpforms-form-pages.php',
 				'plugin_slug' => 'wpforms-form-pages',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Form Locker', 'wpforms' ),
 				'slug'        => 'form-locker',
 				'plugin'      => 'wpforms-form-locker/wpforms-form-locker.php',
 				'plugin_slug' => 'wpforms-form-locker',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Form Abandonment', 'wpforms' ),
 				'slug'        => 'form-abandonment',
 				'plugin'      => 'wpforms-form-abandonment/wpforms-form-abandonment.php',
 				'plugin_slug' => 'wpforms-form-abandonment',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Post Submissions', 'wpforms' ),
 				'slug'        => 'post-submissions',
 				'plugin'      => 'wpforms-post-submissions/wpforms-post-submissions.php',
 				'plugin_slug' => 'wpforms-post-submissions',
+				'license'     => 'pro',
 			),
 		);
 
@@ -328,16 +344,17 @@ class Education {
 
 		foreach ( $settings as $setting ) {
 
-			/* translators: %s - addon name*/
+			/* translators: %s - addon name. */
 			$modal_name = sprintf( \esc_html__( '%s addon', 'wpforms' ), $setting['name'] );
 			printf(
-				'<a href="#" class="wpforms-panel-sidebar-section wpforms-panel-sidebar-section-%s education-modal" data-name="%s" data-action="%s" data-path="%s" data-url="%s" data-nonce="%s">',
+				'<a href="#" class="wpforms-panel-sidebar-section wpforms-panel-sidebar-section-%s education-modal" data-name="%s" data-action="%s" data-path="%s" data-url="%s" data-nonce="%s" data-license="%s">',
 				\esc_attr( $setting['slug'] ),
 				\esc_attr( $modal_name ),
 				\esc_attr( $setting['action'] ),
 				\esc_attr( $setting['plugin'] ),
 				isset( $setting['url'] ) ? \esc_attr( $setting['url'] ) : '',
-				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) )
+				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) ),
+				\esc_attr( $setting['license'] )
 			);
 				echo \esc_html( $setting['name'] );
 				echo '<i class="fa fa-angle-right wpforms-toggle-arrow"></i>';
@@ -359,6 +376,7 @@ class Education {
 				'img'         => 'addon-icon-activecampaign.png',
 				'plugin'      => 'wpforms-activecampaign/wpforms-activecampaign.php',
 				'plugin_slug' => 'wpforms-activecampaign',
+				'license'     => 'elite',
 			),
 			array(
 				'name'        => esc_html__( 'AWeber', 'wpforms' ),
@@ -366,6 +384,7 @@ class Education {
 				'img'         => 'addon-icon-aweber.png',
 				'plugin'      => 'wpforms-aweber/wpforms-aweber.php',
 				'plugin_slug' => 'wpforms-aweber',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Campaign Monitor', 'wpforms' ),
@@ -373,6 +392,7 @@ class Education {
 				'img'         => 'addon-icon-campaign-monitor.png',
 				'plugin'      => 'wpforms-campaign-monitor/wpforms-campaign-monitor.php',
 				'plugin_slug' => 'wpforms-campaign-monitor',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Drip', 'wpforms' ),
@@ -380,6 +400,7 @@ class Education {
 				'img'         => 'addon-icon-drip.png',
 				'plugin'      => 'wpforms-drip/wpforms-drip.php',
 				'plugin_slug' => 'wpforms-drip',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'GetResponse', 'wpforms' ),
@@ -387,6 +408,7 @@ class Education {
 				'img'         => 'addon-icon-getresponse.png',
 				'plugin'      => 'wpforms-getresponse/wpforms-getresponse.php',
 				'plugin_slug' => 'wpforms-getresponse',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Mailchimp', 'wpforms' ),
@@ -394,6 +416,7 @@ class Education {
 				'img'         => 'addon-icon-mailchimp.png',
 				'plugin'      => 'wpforms-mailchimp/wpforms-mailchimp.php',
 				'plugin_slug' => 'wpforms-mailchimp',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Zapier', 'wpforms' ),
@@ -401,6 +424,7 @@ class Education {
 				'img'         => 'addon-icon-zapier.png',
 				'plugin'      => 'wpforms-zapier/wpforms-zapier.php',
 				'plugin_slug' => 'wpforms-zapier',
+				'license'     => 'pro',
 			),
 		);
 
@@ -412,16 +436,17 @@ class Education {
 
 		foreach ( $providers as $provider ) {
 
-			/* translators: %s - addon name*/
+			/* translators: %s - addon name. */
 			$modal_name = sprintf( \esc_html__( '%s addon', 'wpforms' ), $provider['name'] );
 			printf(
-				'<a href="#" class="wpforms-panel-sidebar-section icon wpforms-panel-sidebar-section-%s education-modal" data-name="%s" data-action="%s" data-path="%s" data-url="%s" data-nonce="%s">',
+				'<a href="#" class="wpforms-panel-sidebar-section icon wpforms-panel-sidebar-section-%s education-modal" data-name="%s" data-action="%s" data-path="%s" data-url="%s" data-nonce="%s" data-license="%s">',
 				\esc_attr( $provider['slug'] ),
 				\esc_attr( $modal_name ),
 				\esc_attr( $provider['action'] ),
 				\esc_attr( $provider['plugin'] ),
 				isset( $provider['url'] ) ? \esc_attr( $provider['url'] ) : '',
-				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) )
+				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) ),
+				\esc_attr( $provider['license'] )
 			);
 				echo '<img src="' . \esc_url( WPFORMS_PLUGIN_URL . 'assets/images/' . $provider['img'] ) . '">';
 				echo \esc_html( $provider['name'] );
@@ -444,6 +469,7 @@ class Education {
 				'img'         => 'addon-icon-paypal.png',
 				'plugin'      => 'wpforms-paypal-standard/wpforms-paypal-standard.php',
 				'plugin_slug' => 'wpforms-paypal-standard',
+				'license'     => 'pro',
 			),
 			array(
 				'name'        => esc_html__( 'Stripe', 'wpforms' ),
@@ -451,6 +477,7 @@ class Education {
 				'img'         => 'addon-icon-stripe.png',
 				'plugin'      => 'wpforms-stripe/wpforms-stripe.php',
 				'plugin_slug' => 'wpforms-stripe',
+				'license'     => 'pro',
 			),
 		);
 
@@ -462,16 +489,17 @@ class Education {
 
 		foreach ( $payments as $payment ) {
 
-			/* translators: %s - addon name*/
+			/* translators: %s - addon name. */
 			$modal_name = sprintf( \esc_html__( '%s addon', 'wpforms' ), $payment['name'] );
 			printf(
-				'<a href="#" class="wpforms-panel-sidebar-section icon wpforms-panel-sidebar-section-%s education-modal" data-name="%s" data-action="%s" data-path="%s" data-url="%s" data-nonce="%s">',
+				'<a href="#" class="wpforms-panel-sidebar-section icon wpforms-panel-sidebar-section-%s education-modal" data-name="%s" data-action="%s" data-path="%s" data-url="%s" data-nonce="%s" data-license="%s">',
 				\esc_attr( $payment['slug'] ),
 				\esc_attr( $modal_name ),
 				\esc_attr( $payment['action'] ),
 				\esc_attr( $payment['plugin'] ),
 				isset( $payment['url'] ) ? \esc_attr( $payment['url'] ) : '',
-				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) )
+				\esc_attr( \wp_create_nonce( 'wpforms-admin' ) ),
+				\esc_attr( $payment['license'] )
 			);
 				echo '<img src="' . \esc_url( WPFORMS_PLUGIN_URL . 'assets/images/' . $payment['img'] ) . '">';
 				echo \esc_html( $payment['name'] );
@@ -601,19 +629,18 @@ class Education {
 	/**
 	 * Get the current installation license type (always lowercase).
 	 *
+	 * @deprecated Use wpforms_get_license_type().
+	 *
 	 * @since 1.5.1
+	 * @since 1.5.9.3 Deprecated.
 	 *
 	 * @return string|false
 	 */
 	public function get_license_type() {
 
-		$type = \wpforms_setting( 'type', '', 'wpforms_license' );
+		_deprecated_function( __FUNCTION__, '1.5.9.3 of the WPForms plugin', 'wpforms_get_license_type()' );
 
-		if ( empty( $type ) || ! \wpforms()->pro ) {
-			return false;
-		}
-
-		return strtolower( $type );
+		return wpforms_get_license_type();
 	}
 
 	/**
@@ -709,13 +736,14 @@ class Education {
 	}
 
 	/**
-	 * Retrive a reCAPTCHA type name.
+	 * Retrieve a reCAPTCHA type name.
 	 *
 	 * @since 1.5.8
 	 *
 	 * @return string
 	 */
 	public function get_recaptcha_name() {
+
 		$recaptcha_type = wpforms_setting( 'recaptcha-type', 'v2' );
 
 		// Get a recaptcha name.

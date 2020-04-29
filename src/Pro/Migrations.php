@@ -21,7 +21,7 @@ class Migrations {
 	 *
 	 * @since 1.5.9
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $is_migrated = false;
 
@@ -394,7 +394,7 @@ class Migrations {
 	}
 
 	/**
-	 * Generates the upgrade tab inside the Tools page if needed.
+	 * Generate the upgrade tab inside the Tools page if needed.
 	 *
 	 * @since 1.4.3
 	 */

@@ -3,7 +3,17 @@
 var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) {
 
 	var s,
-		$builder;
+		$builder,
+		elements = {};
+
+	/**
+	 * Whether to show the close confirmation dialog or not.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @type {boolean}
+	 */
+	var close_confirmation = true;
 
 	var app = {
 
@@ -23,6 +33,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 */
 		init: function() {
 
+			var that = this;
+
 			wpforms_panel_switch = true;
 			s = this.settings;
 
@@ -31,6 +43,12 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			// Page load.
 			$( window ).on( 'load', app.load );
+
+			$( window ).on( 'beforeunload', function() {
+				if ( ! that.formIsSaved() && close_confirmation ) {
+					return wpforms_builder.are_you_sure_to_close;
+				}
+			} );
 		},
 
 		/**
@@ -70,6 +88,12 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			// Cache builder element.
 			$builder = $( '#wpforms-builder' );
+
+			// Cache other elements.
+			elements.$fieldOptions       = $( '#wpforms-field-options' );
+			elements.$sortableFieldsWrap = $( '.wpforms-field-wrap' );
+			elements.$noFieldsOptions    = $( '.wpforms-no-fields-holder .no-fields' );
+			elements.$noFieldsPreview    = $( '.wpforms-no-fields-holder .no-fields-preview' );
 
 			// Bind all actions.
 			app.bindUIActions();
@@ -1622,7 +1646,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 									$('.wpforms-field, .wpforms-title-desc').removeClass('active');
 									app.fieldTabToggle('add-fields');
 									if ( $('.wpforms-field').length < 1 ) {
-										$( '#wpforms-builder-form .no-fields, #wpforms-builder-form .no-fields-preview' ).show();
+										elements.$fieldOptions.append( elements.$noFieldsOptions.clone() );
+										elements.$sortableFieldsWrap.append( elements.$noFieldsPreview.clone() );
 									}
 									$builder.trigger('wpformsFieldDelete', [id, type ]);
 								});
@@ -1852,10 +1877,11 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 							$('.wpforms-field-wrap').children(':eq('+(totalFields-1)+')').before($newField);
 							$('.wpforms-field-options').children(':eq('+(totalFields-1)+')').before($newOptions);
 
-						} else if ($('.wpforms-field-wrap').children(':eq('+options.position+')').length) {
+						} else if ( $( '.wpforms-field-wrap' ).children( ':eq(' + options.position + ')' ).length ) {
+
 							// Add field to a specific location
-							$('.wpforms-field-wrap').children(':eq('+options.position+')').before($newField);
-							$('.wpforms-field-options').children(':eq('+options.position+')').before($newOptions);
+							$( '.wpforms-field-wrap' ).children( ':eq(' + options.position + ')' ).before( $newField );
+							$( '.wpforms-field-options' ).children( ':eq(' + options.position + ')' ).before( $newOptions );
 
 						} else {
 							// Something's wrong, just add the field. This should never occur.
@@ -1866,7 +1892,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 					$newField.fadeIn();
 
-					$('#wpforms-builder-form .no-fields, #wpforms-builder-form .no-fields-preview').hide();
+					$builder.find( '.no-fields, .no-fields-preview' ).remove();
+
 					$('#wpforms-field-id').val(res.data.field.id+1);
 
 					wpf.initTooltips();
@@ -1975,7 +2002,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				fieldNew;
 
 			$('.wpforms-field-wrap').sortable({
-				items  : '> .wpforms-field:not(.wpforms-field-stick)',
+				items  : '> .wpforms-field:not(.wpforms-field-stick):not(.no-fields-preview)',
 				axis   : 'y',
 				delay  : 100,
 				opacity: 0.75,
@@ -1999,7 +2026,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					$el.addClass('wpforms-field-dragging');
 
 					if ( $el.hasClass('wpforms-field-drag')){
-						var width = $('.wpforms-field').first().outerWidth();
+						var width = $( '.wpforms-field' ).outerWidth() || elements.$sortableFieldsWrap.find( '.no-fields-preview' ).outerWidth();
 						$el.addClass('wpforms-field-drag-over').removeClass('wpforms-field-drag-out').css('width', width).css('height', 'auto');
 					}
 				},
@@ -2037,6 +2064,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				.not( '.not-draggable' )
 				.not( '.upgrade-modal' )
 				.not( '.warning-modal' )
+				.not( '.education-modal' )
 				.draggable( {
 					connectToSortable: '.wpforms-field-wrap',
 					delay: 200,
@@ -3528,6 +3556,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						cancel: {
 							text: wpforms_builder.exit,
 							action: function(){
+								close_confirmation = false;
 								window.location.href = wpforms_builder.exit_url;
 							}
 						}

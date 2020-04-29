@@ -71,7 +71,7 @@ class WPForms_Updater {
 	public $key = false;
 
 	/**
-	 * Holds the update data returned from the API.
+	 * Store the update data returned from the API.
 	 *
 	 * @since 2.1.3
 	 *
@@ -80,7 +80,7 @@ class WPForms_Updater {
 	public $update = false;
 
 	/**
-	 * Holds the plugin info details for the update.
+	 * Store the plugin info details for the update.
 	 *
 	 * @since 2.1.3
 	 *

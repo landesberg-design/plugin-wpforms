@@ -383,7 +383,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 			// Only load if jQuery datepicker library exists.
 			if ( typeof $.fn.flatpickr !== 'undefined' ) {
-				$( '.wpforms-datepicker' ).each( function() {
+				$( '.wpforms-datepicker-wrap' ).each( function() {
 					var element = $( this ),
 						form    = element.closest( '.wpforms-form' ),
 						formID  = form.data( 'formid' ),
@@ -410,6 +410,15 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					) {
 						properties.locale = wpforms_settings.locale;
 					}
+
+					properties.wrap = true;
+
+					// Toggle clear date icon.
+					properties.onChange = function( selectedDates, dateStr, instance ) {
+
+						var display = dateStr === '' ? 'none' : 'block';
+						element.find( '.wpforms-datepicker-clear' ).css( 'display', display );
+					};
 
 					element.flatpickr( properties );
 				} );
@@ -524,8 +533,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 				// Instantly update a hidden form input with a correct data.
 				// Previously "blur" only was used, which is broken in case Enter was used to submit the form.
-				$el.on( 'blur keydown', function() {
-					if ( $el.intlTelInput( 'isValidNumber' ) ) {
+				$el.on( 'blur input', function() {
+					if ( $el.intlTelInput( 'isValidNumber' ) || ! app.empty( window.WPFormsEditEntry ) ) {
 						$el.siblings( 'input[type="hidden"]' ).val( $el.intlTelInput( 'getNumber' ) );
 					}
 				} );
@@ -663,11 +672,11 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			$( '.wpforms-field-rating-item' ).hover(
 				function() {
 					$( this ).parent().find( '.wpforms-field-rating-item' ).removeClass( 'selected hover' );
-					$( this ).prevAll().andSelf().addClass( 'hover' );
+					$( this ).prevAll().addBack().addClass( 'hover' );
 				},
 				function() {
 					$( this ).parent().find( '.wpforms-field-rating-item' ).removeClass( 'selected hover' );
-					$( this ).parent().find( 'input:checked' ).parent().prevAll().andSelf().addClass( 'selected' );
+					$( this ).parent().find( 'input:checked' ).parent().prevAll().addBack().addClass( 'selected' );
 				}
 			);
 
@@ -679,7 +688,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					$items = $wrap.find( '.wpforms-field-rating-item' );
 
 				$items.removeClass( 'hover selected' );
-				$this.parent().prevAll().andSelf().addClass( 'selected' );
+				$this.parent().prevAll().addBack().addClass( 'selected' );
 			} );
 
 			// Rating field: preselect the selected rating (from dynamic/fallback population).
@@ -907,7 +916,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			} else if ( ! app.empty( window.wpform_pageScroll ) ) {
 				pageScroll = window.wpform_pageScroll;
 			} else {
-				pageScroll = $indicator.attr( 'scroll' ) !== '0' ? 75 : false;
+				pageScroll = $indicator.data( 'scroll' ) !== 0 ? 75 : false;
 			}
 
 			// Toggling between the pages.
@@ -1388,10 +1397,23 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		 */
 		currentIpToCountry: function( callback ) {
 
-			$.get( 'https://geo.wpforms.com/v2/geolocate/json/' )
+			var fallback = function() {
+
+				$.get( 'https://ipapi.co/jsonp', function() {}, 'jsonp' )
+					.always( function( resp ) {
+						var countryCode = ( resp && resp.country ) ? resp.country : '';
+						if ( ! countryCode ) {
+							var lang = app.getFirstBrowserLanguage();
+							countryCode = lang.indexOf( '-' ) > -1 ? lang.split( '-' ).pop() : '';
+						}
+						callback( countryCode );
+					} );
+			};
+
+			$.get( 'https://geo.wpforms.com/v3/geolocate/json' )
 				.done( function( resp ) {
-					if ( resp && resp.country_code ) {
-						callback( resp.country_code );
+					if ( resp && resp.country_iso ) {
+						callback( resp.country_iso );
 					} else {
 						fallback();
 					}
@@ -1399,19 +1421,6 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				.fail( function( resp ) {
 					fallback();
 				} );
-
-			var fallback = function() {
-
-				$.get( 'https://ipapi.co/jsonp', function() {}, 'jsonp' )
-					 .always( function( resp ) {
-						 var countryCode = ( resp && resp.country ) ? resp.country : '';
-						 if ( ! countryCode ) {
-							 var lang = app.getFirstBrowserLanguage();
-							 countryCode = lang.indexOf( '-' ) > -1 ? lang.split( '-' ).pop() : '';
-						 }
-						 callback( countryCode );
-					 } );
-			};
 		},
 
 		/**
@@ -1517,7 +1526,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				return;
 			}
 
-			errors = 'errors' in errors ? errors.errors : null;
+			errors = errors && ( 'errors' in errors ) ? errors.errors : null;
 
 			if ( app.empty( errors ) || ( app.empty( errors.general ) && app.empty( errors.field ) ) ) {
 				app.consoleLogAjaxError();

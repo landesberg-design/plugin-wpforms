@@ -85,10 +85,10 @@ class WPForms_Field_HTML extends WPForms_Field {
 	 *
 	 * @since 1.5.7
 	 *
-	 * @param string  $option Field option to render.
-	 * @param array   $field  Field data and settings.
-	 * @param array   $args   Field preview arguments.
-	 * @param boolean $echo   Print or return the value. Print by default.
+	 * @param string $option Field option to render.
+	 * @param array  $field  Field data and settings.
+	 * @param array  $args   Field preview arguments.
+	 * @param bool   $echo   Print or return the value. Print by default.
 	 *
 	 * @return mixed echo or return string
 	 */

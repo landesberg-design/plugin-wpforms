@@ -21,7 +21,7 @@ class Notifications implements IntegrationInterface {
 	public $options;
 
 	/**
-	 * Indicates if current integration is allowed to load.
+	 * Indicate if current integration is allowed to load.
 	 *
 	 * @since 1.4.8
 	 *
@@ -32,7 +32,7 @@ class Notifications implements IntegrationInterface {
 	}
 
 	/**
-	 * Loads an integration.
+	 * Load an integration.
 	 *
 	 * @since 1.4.8
 	 */

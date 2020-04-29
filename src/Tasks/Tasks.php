@@ -37,6 +37,18 @@ class Tasks {
 
 		add_action( 'admin_menu', [ $this, 'admin_hide_as_menu' ], PHP_INT_MAX );
 
+		/*
+		 * By default we send emails in the same process as the form submission is done.
+		 * That means that when many emails are set in form Notifications -
+		 * the form submission can take a while because of all those emails that are sending in the background.
+		 * Since WPForms 1.6.0 users can enable a new option in Settings > Emails,
+		 * called "Optimize Email Sending", to send email in async way.
+		 * This feature was enabled for WPForms 1.5.9, but some users were not happy.
+		 */
+		if ( ! (bool) wpforms_setting( 'email-async', false ) ) {
+			add_filter( 'wpforms_tasks_entry_emails_trigger_send_same_process', '__return_true' );
+		}
+
 		add_action( EntryEmailsTask::ACTION, [ EntryEmailsTask::class, 'process' ] );
 	}
 
@@ -51,6 +63,10 @@ class Tasks {
 	 * @return Task[] List of tasks classes.
 	 */
 	public function get_tasks() {
+
+		if ( ! $this->is_usable() ) {
+			return [];
+		}
 
 		$tasks = [
 			Actions\EntryEmailsMetaCleanupTask::class,
@@ -84,8 +100,13 @@ class Tasks {
 	 *              ->params( 'The Big Lebowski', 1998 )
 	 *              ->register();
 	 *
-	 * This `wpforms_do_something_special` action will be later processed as:
+	 * This `i_am_the_dude` action will be later processed as:
 	 *     add_action( 'i_am_the_dude', 'thats_what_you_call_me' );
+	 *
+	 * Function `thats_what_you_call_me()` will receive `$meta_id` param,
+	 * and you will be able to receive all params from the action like this:
+	 *     $params = ( new Meta() )->get( (int) $meta_id );
+	 *     list( $name, $year ) = $meta->data;
 	 *
 	 * @since 1.5.9
 	 *
@@ -116,5 +137,40 @@ class Tasks {
 		if ( class_exists( 'ActionScheduler_DBStore' ) ) {
 			\ActionScheduler_DBStore::instance()->cancel_actions_by_group( $group );
 		}
+	}
+
+	/**
+	 * Whether ActionScheduler thinks that it has migrated or not.
+	 *
+	 * @since 1.5.9.3
+	 *
+	 * @return bool
+	 */
+	public function is_usable() {
+
+		// No tasks if ActionScheduler wasn't loaded.
+		if ( ! class_exists( 'ActionScheduler_DataController' ) ) {
+			return false;
+		}
+
+		return \ActionScheduler_DataController::is_migration_complete();
+	}
+
+	/**
+	 * Whether task has been scheduled and is pending.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param string $hook Hook to check for.
+	 *
+	 * @return bool
+	 */
+	public function is_scheduled( $hook ) {
+
+		if ( ! function_exists( 'as_next_scheduled_action' ) ) {
+			return false;
+		}
+
+		return as_next_scheduled_action( $hook );
 	}
 }

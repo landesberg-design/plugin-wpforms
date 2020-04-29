@@ -7,7 +7,7 @@
 class WPForms_Frontend {
 
 	/**
-	 * Contains form data to be referenced later.
+	 * Store form data to be referenced later.
 	 *
 	 * @since 1.0.0
 	 * @var array
@@ -15,7 +15,7 @@ class WPForms_Frontend {
 	public $forms;
 
 	/**
-	 * Contains information for multi-page forms.
+	 * Store information for multi-page forms.
 	 *
 	 * Forms that do not contain pages return false, otherwise returns an array
 	 * that contains the number of total pages and page counter used when
@@ -28,7 +28,7 @@ class WPForms_Frontend {
 	public $pages = false;
 
 	/**
-	 * Contains a form confirmation message.
+	 * Store a form confirmation message.
 	 *
 	 * @since 1.4.8
 	 * @todo Remove in favor of \WPForms_Process::$confirmation_message().
@@ -184,9 +184,7 @@ class WPForms_Frontend {
 			absint( wpforms()->process->form_data['id'] ) === $form_id
 		) {
 			do_action( 'wpforms_frontend_output_success', wpforms()->process->form_data, wpforms()->process->fields, wpforms()->process->entry_id );
-			echo '<div>';
 			wpforms_debug_data( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			echo '</div>';
 			return;
 		}
 
@@ -198,9 +196,7 @@ class WPForms_Frontend {
 			absint( $_POST['wpforms']['id'] ) === $form_id
 		) {
 			do_action( 'wpforms_frontend_output_success', $form_data, false, false );
-			echo '<div>';
 			wpforms_debug_data( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			echo '</div>';
 			return;
 		}
 
@@ -320,9 +316,7 @@ class WPForms_Frontend {
 		$this->forms[ $form_id ] = $form_data;
 
 		// Optional debug information if WPFORMS_DEBUG is defined.
-		echo '<div>';
 		wpforms_debug_data( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		echo '</div>';
 
 		// After output hook.
 		do_action( 'wpforms_frontend_output_after', $form_data, $form );
@@ -1056,6 +1050,8 @@ class WPForms_Frontend {
 
 		do_action( 'wpforms_frontend_css', $this->forms );
 
+		$min = wpforms_get_min_suffix();
+
 		// jQuery date/time library CSS.
 		if (
 			$this->assets_global() ||
@@ -1071,7 +1067,7 @@ class WPForms_Frontend {
 				'wpforms-flatpickr',
 				WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
 				array(),
-				'4.5.5'
+				'4.6.3'
 			);
 		}
 
@@ -1087,7 +1083,7 @@ class WPForms_Frontend {
 		if ( wpforms_setting( 'disable-css', '1' ) == '2' ) {
 			wp_enqueue_style(
 				'wpforms-base',
-				WPFORMS_PLUGIN_URL . 'assets/css/wpforms-base.css',
+				WPFORMS_PLUGIN_URL . "assets/css/wpforms-base{$min}.css",
 				array(),
 				WPFORMS_VERSION
 			);
@@ -1124,7 +1120,7 @@ class WPForms_Frontend {
 				'wpforms-flatpickr',
 				WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
 				array( 'jquery' ),
-				'4.5.5',
+				'4.6.3',
 				true
 			);
 			wp_enqueue_script(
@@ -1219,7 +1215,7 @@ class WPForms_Frontend {
 				true
 			);
 			if ( 'v3' === $type ) {
-				$recaptch_inline  = 'grecaptcha.ready(function(){grecaptcha.execute("' . esc_html( $site_key ) . '",{action:"wpforms"}).then(function(token){var f=document.getElementsByName("wpforms[recaptcha]");for(var i=0;i<f.length;i++){f[i].value = token;}});});';
+				$recaptch_inline = 'var wpformsRecaptchaLoad = function(){grecaptcha.execute("' . esc_html( $site_key ) . '",{action:"wpforms"}).then(function(token){var f=document.getElementsByName("wpforms[recaptcha]");for(var i=0;i<f.length;i++){f[i].value = token;}});}; grecaptcha.ready(wpformsRecaptchaLoad);';
 			} elseif ( 'invisible' === $type ) {
 				$recaptch_inline  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index,el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).closest("form").find("button[type=submit]").get(0).recaptchaID = recaptchaID;});};';
 				$recaptch_inline .= 'var wpformsRecaptchaCallback = function(el){var $form = jQuery(el).closest("form");if(typeof wpforms.formSubmit === "function"){wpforms.formSubmit($form);}else{$form.find("button[type=submit]").get(0).recaptchaID = false;$form.submit();}};';
@@ -1280,21 +1276,13 @@ class WPForms_Frontend {
 	}
 
 	/**
-	 * Hook at fires at a later priority in wp_footer
+	 * Get strings to localize.
 	 *
-	 * @since 1.0.5
+	 * @since 1.6.0
+	 *
+	 * @return array Array of strings to localize.
 	 */
-	public function footer_end() {
-
-		if ( ( empty( $this->forms ) && ! $this->assets_global() ) || wpforms_is_amp() ) {
-			return;
-		}
-
-		/*
-		 * Below we do our own implementation of wp_localize_script in an effort
-		 * to be better compatible with caching plugins which were causing
-		 * conflicts.
-		 */
+	public function get_strings() {
 
 		// Define base strings.
 		$strings = array(
@@ -1345,6 +1333,27 @@ class WPForms_Frontend {
 			$strings[ $key ] = html_entity_decode( (string) $value, ENT_QUOTES, 'UTF-8' );
 		}
 
+		return $strings;
+	}
+
+	/**
+	 * Hook at fires at a later priority in wp_footer
+	 *
+	 * @since 1.0.5
+	 */
+	public function footer_end() {
+
+		if ( ( empty( $this->forms ) && ! $this->assets_global() ) || wpforms_is_amp() ) {
+			return;
+		}
+
+		$strings = $this->get_strings();
+
+		/*
+		 * Below we do our own implementation of wp_localize_script in an effort
+		 * to be better compatible with caching plugins which were causing
+		 * conflicts.
+		 */
 		echo "<script type='text/javascript'>\n";
 		echo "/* <![CDATA[ */\n";
 		echo 'var wpforms_settings = ' . wp_json_encode( $strings ) . "\n";

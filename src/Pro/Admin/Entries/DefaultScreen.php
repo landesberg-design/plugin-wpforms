@@ -33,13 +33,12 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 		}
 
 		$this->hooks();
-
 		$this->settings();
-		$this->settings['forms_list_number_to_display'] = 0;
 	}
 
 	/**
-	 * Hooks.
+	 * Hooks. We use filters here to redefine certain settings.
+	 * So this method should be called before settings() method.
 	 *
 	 * @since 1.5.5
 	 */
@@ -47,23 +46,43 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 
 		parent::hooks();
 
-		\add_action( 'wpforms_admin_page', array( $this, 'content' ) );
+		add_action( 'wpforms_admin_page', array( $this, 'content' ) );
 
 		// Disable "Screen Options" on Default Screen only.
 		add_filter(
 			'screen_options_show_screen',
-			function () {
+			static function () {
 				return ! ( wpforms_is_admin_page( 'entries' ) && empty( $_GET['form_id'] ) ); // phpcs:ignore
 			}
 		);
 
-		\add_filter( 'wpforms_entries_default_screen_forms_list_columns', array( $this, 'forms_list_columns' ), 10, 2 );
-		\add_filter( 'wpforms_entries_default_screen_forms_list_form_title', array( $this, 'forms_list_form_title' ), 10, 2 );
-		\add_filter( 'wpforms_entries_default_screen_form_item_fields', array( $this, 'form_item_fields' ), 10, 2 );
-		\add_filter( 'wpforms_entries_default_screen_forms_list_additional_cells', array( $this, 'forms_list_additional_cells' ), 10, 2 );
-		\add_filter( 'wpforms_entries_default_screen_forms_list_additional_buttons', array( $this, 'forms_list_additional_buttons' ), 10, 2 );
-		\add_filter( 'wpforms_entries_default_screen_timespan_at_top', '__return_true' );
-		\add_filter( 'wpforms_entries_default_screen_total_entries_title', array( $this, 'total_entries_title' ) );
+		// Display all forms.
+		add_filter(
+			'wpforms_entries_default_screen_forms_list_number_to_display',
+			static function () {
+
+				return 0;
+			}
+		);
+
+		add_filter( 'wpforms_entries_default_screen_forms_list_columns', array( $this, 'forms_list_columns' ), 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_forms_list_form_title', array( $this, 'forms_list_form_title' ), 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_form_item_fields', array( $this, 'form_item_fields' ), 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_forms_list_additional_cells', array( $this, 'forms_list_additional_cells' ), 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_forms_list_additional_buttons', array( $this, 'forms_list_additional_buttons' ), 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_timespan_at_top', '__return_true' );
+		add_filter( 'wpforms_entries_default_screen_total_entries_title', array( $this, 'total_entries_title' ) );
+
+		// Do not cache results in a table - always display up-to-date information.
+		add_filter(
+			'wpforms_entries_default_screen_date_end_str',
+			static function () {
+
+				return 'today';
+			}
+		);
+		add_filter( 'wpforms_entries_default_screen_allow_data_caching', '__return_false' );
+		add_filter( 'wpforms_entries_default_screen_cached_data', '__return_false' );
 	}
 
 	/**
@@ -135,13 +154,13 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	 * @since 1.5.5
 	 *
 	 * @param string $form_title Form title.
-	 * @param array  $form Form data.
+	 * @param array  $form       Form data.
 	 *
 	 * @return string Link to form entries.
 	 */
 	public function forms_list_form_title( $form_title, $form ) {
 
-		$form_title = '<a href="' . \esc_url( $form['total_url'] ) . '" class="">' . $form_title . '</a>';
+		$form_title = '<a href="' . \esc_url( $form['total_url'] ) . '" class="">' . esc_html( $form_title ) . '</a>';
 
 		return $form_title;
 	}
@@ -192,14 +211,14 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	public function form_item_fields( $form_item, $form ) {
 
 		$form_item['created_date'] = date_i18n( get_option( 'date_format' ), strtotime( $form->post_date ) );
+		$form_item['total_url']    = $form_item['edit_url'];
 
-		$form_item['total']     = wpforms()->entry->get_entries(
+		$form_item['total'] = wpforms()->entry->get_entries(
 			array(
 				'form_id' => $form_item['form_id'],
 			),
 			true
 		);
-		$form_item['total_url'] = $form_item['edit_url'];
 
 		$dates = $this->get_days_interval();
 		if ( ! ( empty( $dates['start'] ) || empty( $dates['end'] ) ) ) {

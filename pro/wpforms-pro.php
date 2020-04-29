@@ -167,10 +167,48 @@ class WPForms_Pro {
 			$wpforms_install->license->validate_key( $license );
 			delete_option( 'wpforms_connect' );
 		}
+
+		$this->force_translations_update();
 	}
 
 	/**
-	 * Loads the separate PRO plugin translation file.
+	 * Force WPForms Lite languages download on Pro activation.
+	 *
+	 * This action will force to download any new translations for WPForms Lite
+	 * right away instead of waiting for 12 hours.
+	 *
+	 * @since 1.6.0
+	 */
+	protected function force_translations_update() {
+
+		include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		require_once ABSPATH . 'wp-admin/includes/class-automatic-upgrader-skin.php';
+
+		$locales = array_unique( array( get_locale(), get_user_locale() ) );
+
+		if ( 1 === count( $locales ) && 'en_US' === $locales[0] ) {
+			return;
+		}
+
+		$to_update = [];
+
+		foreach ( $locales as $locale ) {
+			$to_update[] = (object) array(
+				'type'       => 'plugin',
+				'slug'       => 'wpforms-lite',
+				'language'   => $locale,
+				'version'    => WPFORMS_VERSION,
+				'package'    => 'https://downloads.wordpress.org/translation/plugin/wpforms-lite/' . WPFORMS_VERSION . '/' . $locale . '.zip',
+				'autoupdate' => true,
+			);
+		}
+
+		$upgrader = new Language_Pack_Upgrader( new Automatic_Upgrader_Skin() );
+		$upgrader->bulk_upgrade( $to_update );
+	}
+
+	/**
+	 * Load the separate PRO plugin translation file.
 	 *
 	 * @since 1.5.0
 	 */

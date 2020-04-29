@@ -185,6 +185,11 @@ class Task {
 
 		$action_id = null;
 
+		// No processing if ActionScheduler is not usable.
+		if ( ! wpforms()->get( 'tasks' )->is_usable() ) {
+			return $action_id;
+		}
+
 		// Save data to tasks meta table.
 		$task_meta     = new Meta();
 		$this->meta_id = $task_meta->add(

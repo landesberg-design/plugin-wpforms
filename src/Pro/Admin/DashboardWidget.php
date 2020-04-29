@@ -324,8 +324,7 @@ class DashboardWidget {
 	 *
 	 * @since 1.5.0
 	 *
-	 * @param array  $options Timespan options (in days).
-	 * @param string $meta    Widget meta name to get user saved timespan from.
+	 * @param array $options Timespan options (in days).
 	 */
 	public function timespan_options_html( $options ) {
 
@@ -364,6 +363,8 @@ class DashboardWidget {
 	 * @since 1.5.0
 	 *
 	 * @param int $days Timespan (in days) to fetch the data for.
+	 *
+	 * @throws \Exception When date is failing.
 	 */
 	public function forms_list_block( $days ) {
 
@@ -395,7 +396,7 @@ class DashboardWidget {
 	 *
 	 * @since 1.5.0
 	 *
-	 * @param array   $forms Forms to display in the list.
+	 * @param array $forms Forms to display in the list.
 	 */
 	public function forms_list_block_html( $forms ) {
 
@@ -508,9 +509,11 @@ class DashboardWidget {
 	 * Get timespan options for $element (in days).
 	 *
 	 * @since 1.5.0
+	 *
 	 * @deprecated 1.5.2
 	 *
-	 * @param string $element 'chart' or 'forms_list'.
+	 * @param string $element Possible value: 'chart' or 'forms_list'.
+	 *
 	 * @return array
 	 */
 	public function get_timespan_options_for( $element ) {
@@ -561,9 +564,11 @@ class DashboardWidget {
 	 * Get default timespan option for $element.
 	 *
 	 * @since 1.5.0
+	 *
 	 * @deprecated 1.5.2
 	 *
-	 * @param string $element 'chart' or 'forms_list'.
+	 * @param string $element Possible value: 'chart' or 'forms_list'.
+	 *
 	 * @return int|null
 	 */
 	public function get_timespan_default_for( $element ) {
@@ -597,9 +602,9 @@ class DashboardWidget {
 	 *
 	 * @since 1.5.0
 	 *
-	 * @param string $action  'get' or 'set'.
-	 * @param string $meta    Meta name.
-	 * @param int    $value   Value to set.
+	 * @param string $action Possible value: 'get' or 'set'.
+	 * @param string $meta   Meta name.
+	 * @param int    $value  Value to set.
 	 *
 	 * @return mixed
 	 */
@@ -696,11 +701,12 @@ class DashboardWidget {
 	 *
 	 * @since 1.5.0
 	 *
-	 * @param string $param   'date' or 'form'.
+	 * @param string $param   Possible value: 'date' or 'form'.
 	 * @param int    $days    Timespan (in days) to fetch the data for.
 	 * @param int    $form_id Form ID to fetch the data for.
 	 *
 	 * @return array
+	 * @throws \Exception When dates management fails.
 	 */
 	public function get_entries_count_by( $param, $days = 0, $form_id = 0 ) {
 
@@ -711,6 +717,7 @@ class DashboardWidget {
 		}
 
 		$dates = $this->get_days_interval( $days );
+		$cache = false;
 
 		// Allow results caching to reduce DB load.
 		$allow_caching = $this->settings['allow_data_caching'];
@@ -725,6 +732,7 @@ class DashboardWidget {
 
 		// is_array() detects cached empty searches.
 		if ( $allow_caching && \is_array( $cache ) ) {
+
 			return $cache;
 		}
 
@@ -760,6 +768,7 @@ class DashboardWidget {
 	 * @param \DateTime $date_end   End date for the search.
 	 *
 	 * @return array
+	 * @throws \Exception When dates are failing.
 	 */
 	public function get_entries_count_by_date_sql( $form_id = 0, $date_start = null, $date_end = null ) {
 
@@ -778,7 +787,7 @@ class DashboardWidget {
 				WHERE 1=1";
 
 		if ( ! empty( $form_id ) ) {
-			$sql .= ' AND form_id = %d';
+			$sql           .= ' AND form_id = %d';
 			$placeholders[] = $form_id;
 		} else {
 			$allowed_forms = \wpforms()->form->get( '', array( 'fields' => 'ids' ) );

@@ -265,7 +265,7 @@ class WPForms_About {
 					<?php
 					printf(
 						wp_kses(
-							/* translators: %1$s - WPBeginner URL, %2$s - OptinMonster URL, %3$s - MonsterInsights URL, %4$s - RafflePress URL. */
+						/* translators: %1$s - WPBeginner URL, %2$s - OptinMonster URL, %3$s - MonsterInsights URL, %4$s - RafflePress URL. */
 							__( 'WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href="%1$s" target="_blank" rel="noopener noreferrer">WPBeginner</a>, the most popular lead-generation software, <a href="%2$s" target="_blank" rel="noopener noreferrer">OptinMonster</a>, the best WordPress analytics plugin, <a href="%3$s" target="_blank" rel="noopener noreferrer">MonsterInsights</a>, and the most powerful WordPress contest plugin, <a href="%4$s" target="_blank" rel="noopener noreferrer">RafflePress</a>.', 'wpforms-lite' ),
 							array(
 								'a' => array(
@@ -339,7 +339,7 @@ class WPForms_About {
 									<strong>
 										<?php
 										printf(
-											/* translators: %s - addon status label. */
+										/* translators: %s - addon status label. */
 											esc_html__( 'Status: %s', 'wpforms-lite' ),
 											'<span class="status-label ' . esc_attr( $plugin_data['status_class'] ) . '">' . wp_kses_post( $plugin_data['status_text'] ) . '</span>'
 										);
@@ -510,7 +510,7 @@ class WPForms_About {
 						<?php
 						printf(
 							wp_kses(
-								/* translators: %s - stars. */
+							/* translators: %s - stars. */
 								__( 'We know that you will truly love WPForms. It has over <strong>5000+ five star ratings</strong> (%s) and is active on over 1 million websites.', 'wpforms-lite' ),
 								array(
 									'strong' => array(),
@@ -587,7 +587,7 @@ class WPForms_About {
 						} else {
 							echo '<a href="https://wpforms.com/pricing?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer">';
 						}
-							 esc_html_e( 'Get WPForms Pro Today and Unlock all the Powerful Features', 'wpforms-lite' );
+						esc_html_e( 'Get WPForms Pro Today and Unlock all the Powerful Features', 'wpforms-lite' );
 						?>
 						</a>
 					</h3>
@@ -763,6 +763,11 @@ class WPForms_About {
 						if ( empty( $current ) || empty( $next ) ) {
 							continue;
 						}
+
+						$current_status = $current['status'];
+						if ( $current['text'] !== $next['text'] && $current_status === 'full' ) {
+							$current_status = 'partial';
+						}
 						?>
 						<tr class="wpforms-admin-columns">
 							<td class="wpforms-admin-column-33">
@@ -770,7 +775,7 @@ class WPForms_About {
 							</td>
 							<td class="wpforms-admin-column-33">
 								<?php if ( is_array( $current ) ) : ?>
-									<p class="features-<?php echo esc_attr( $current['status'] ); ?>">
+									<p class="features-<?php echo esc_attr( $current_status ); ?>">
 										<?php echo wp_kses_post( implode( '<br>', $current['text'] ) ); ?>
 									</p>
 								<?php endif; ?>
@@ -801,10 +806,10 @@ class WPForms_About {
 					} else {
 						echo '<a href="https://wpforms.com/pricing?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer">';
 					}
-						printf( /* translators: %s - next license level. */
-							esc_html__( 'Get WPForms %s Today and Unlock all the Powerful Features', 'wpforms-lite' ),
-							esc_html( $next_license )
-						);
+					printf( /* translators: %s - next license level. */
+						esc_html__( 'Get WPForms %s Today and Unlock all the Powerful Features', 'wpforms-lite' ),
+						esc_html( $next_license )
+					);
 					?>
 					</a>
 				</h3>
@@ -864,7 +869,7 @@ class WPForms_About {
 				'url'  => 'https://downloads.wordpress.org/plugin/optinmonster.zip',
 			),
 
-			'wp-mail-smtp/wp_mail_smtp.php'         => array(
+			'wp-mail-smtp/wp_mail_smtp.php' => array(
 				'icon' => $images_url . 'plugin-smtp.png',
 				'name' => esc_html__( 'WP Mail SMTP', 'wpforms-lite' ),
 				'desc' => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 1 million websites.', 'wpforms-lite' ),
@@ -879,7 +884,7 @@ class WPForms_About {
 				),
 			),
 
-			'rafflepress/rafflepress.php'           => array(
+			'rafflepress/rafflepress.php' => array(
 				'icon' => $images_url . 'plugin-rp.png',
 				'name' => esc_html__( 'RafflePress', 'wpforms-lite' ),
 				'desc' => esc_html__( 'Turn your visitors into brand ambassadors! Easily grow your email list, website traffic, and social media followers with powerful viral giveaways & contests.', 'wpforms-lite' ),
@@ -1018,32 +1023,74 @@ class WPForms_About {
 				),
 			),
 			'marketing'    => array(
-				'lite'  => array(
+				'lite'     => array(
 					'status' => 'partial',
 					'text'   => array(
 						'<strong>' . esc_html__( 'Limited Marketing Integration', 'wpforms-lite' ) . '</strong>',
 						esc_html__( 'Constant Contact only', 'wpforms-lite' ),
 					),
 				),
-				'basic' => array(
+				'basic'    => array(
 					'status' => 'partial',
 					'text'   => array(
 						'<strong>' . esc_html__( 'Limited Marketing Integration', 'wpforms-lite' ) . '</strong>',
 						esc_html__( 'Constant Contact only', 'wpforms-lite' ),
 					),
 				),
-				'plus'  => array(
+				'plus'     => array(
 					'status' => 'partial',
 					'text'   => array(
-						'<strong>' . esc_html__( '6 Email Marketing Integrations', 'wpforms-lite' ) . '</strong>',
+						'<strong>' . esc_html__( 'Additional Marketing Integrations', 'wpforms-lite' ) . '</strong>',
 						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip', 'wpforms-lite' ),
 					),
 				),
-				'pro'   => array(
+				'pro'      => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'Additional Marketing Integrations', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
+						'',
+						wp_kses(
+							__( '<strong>Bonus:</strong> 500+ integrations with Zapier.', 'wpforms-lite' ),
+							array(
+								'strong' => array(),
+							)
+						),
+					),
+				),
+				'elite'    => array(
 					'status' => 'full',
 					'text'   => array(
 						'<strong>' . esc_html__( 'All Marketing Integrations', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
+						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
+						'',
+						wp_kses(
+							__( '<strong>Bonus:</strong> 500+ integrations with Zapier.', 'wpforms-lite' ),
+							array(
+								'strong' => array(),
+							)
+						),
+					),
+				),
+				'ultimate' => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'All Marketing Integrations', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
+						'',
+						wp_kses(
+							__( '<strong>Bonus:</strong> 500+ integrations with Zapier.', 'wpforms-lite' ),
+							array(
+								'strong' => array(),
+							)
+						),
+					),
+				),
+				'agency'   => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'All Marketing Integrations', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
 						'',
 						wp_kses(
 							__( '<strong>Bonus:</strong> 500+ integrations with Zapier.', 'wpforms-lite' ),
@@ -1137,29 +1184,50 @@ class WPForms_About {
 				),
 			),
 			'addons'       => array(
-				'lite'  => array(
+				'lite'     => array(
 					'status' => 'none',
 					'text'   => array(
 						'<strong>' . esc_html__( 'No Addons Included', 'wpforms-lite' ) . '</strong>',
 					),
 				),
-				'basic' => array(
+				'basic'    => array(
 					'status' => 'partial',
 					'text'   => array(
 						'<strong>' . esc_html__( 'Custom Captcha Addon included', 'wpforms-lite' ) . '</strong>',
 					),
 				),
-				'plus'  => array(
+				'plus'     => array(
 					'status' => 'partial',
 					'text'   => array(
 						'<strong>' . esc_html__( 'Email Marketing Addons included', 'wpforms-lite' ) . '</strong>',
 					),
 				),
-				'pro'   => array(
+				'pro'      => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'Pro Addons Included', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (21 total)', 'wpforms-lite' ),
+					),
+				),
+				'elite'    => array(
 					'status' => 'full',
 					'text'   => array(
 						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (17 total)', 'wpforms-lite' ),
+						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (22 total)', 'wpforms-lite' ),
+					),
+				),
+				'ultimate' => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (22 total)', 'wpforms-lite' ),
+					),
+				),
+				'agency'   => array(
+					'status' => 'full',
+					'text'   => array(
+						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (22 total)', 'wpforms-lite' ),
 					),
 				),
 			),
@@ -1278,13 +1346,13 @@ class WPForms_About {
 	 */
 	protected function get_license_type() {
 
-		$type = wpforms_setting( 'type', '', 'wpforms_license' );
+		$type = wpforms_get_license_type();
 
-		if ( empty( $type ) || ! wpforms()->pro ) {
+		if ( empty( $type ) ) {
 			$type = 'lite';
 		}
 
-		return strtolower( $type );
+		return $type;
 	}
 }
 

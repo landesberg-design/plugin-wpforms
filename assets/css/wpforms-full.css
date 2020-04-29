@@ -840,17 +840,50 @@ div.wpforms-container-full .wpforms-form .wpforms-field-html li > ol {
 ----------------------------------------------------------------------------- */
 
 div.wpforms-container-full .wpforms-field-date-time-date-sep {
-	display:inline-block;
-	padding:0 5px;
+	display: inline-block;
+	padding: 0 5px;
 }
 
 div.wpforms-container-full .wpforms-form .wpforms-field-date-time-date-year,
 div.wpforms-container-full .wpforms-form .wpforms-field-date-time-date-day,
 div.wpforms-container-full .wpforms-form .wpforms-field-date-time-date-month {
-	display:inline-block;
-	width:auto;
+	display: inline-block;
+	width: auto;
 }
 
+div.wpforms-container-full .wpforms-datepicker-wrap {
+	position: relative;
+}
+
+div.wpforms-container-full .wpforms-datepicker-wrap .wpforms-datepicker-clear {
+	position: absolute;
+	background-image: url(../images/times-solid-white.svg);
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-color: #cccccc;
+	background-size: 8px;
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+	display: block;
+	border-radius: 50%;
+	right: 10px;
+	top: 50%;
+	margin-top: -8px;
+	transition: all 0.3s;
+}
+
+div.wpforms-container-full .wpforms-datepicker-wrap .wpforms-datepicker-clear:hover {
+	background-color: red;
+}
+
+div.wpforms-container-full .wpforms-datepicker-wrap .wpforms-field-small + .wpforms-datepicker-clear {
+	right: calc( 75% + 10px );
+}
+
+div.wpforms-container-full .wpforms-datepicker-wrap .wpforms-field-medium + .wpforms-datepicker-clear {
+	right: calc( 40% + 10px );
+}
 
 /* Custom Captcha field
 ----------------------------------------------------------------------------- */
@@ -1503,25 +1536,45 @@ div.wpforms-container-full .wpforms-form .wpforms-limit-text{
 	div.wpforms-container-full.inline-fields .wpforms-form .wpforms-submit-container {
 		width: 100%;
 	}
+
+	/* Number Slider field */
+	div.wpforms-container-full .wpforms-form .wpforms-field-number-slider input[type=range] {
+		margin: 20px 0 15px;
+	}
+	div.wpforms-container-full .wpforms-form .wpforms-field-number-slider input[type=range]::-webkit-slider-thumb {
+		width: 30px;
+		height: 30px;
+	}
 }
 
 /* Gutenberg Block
 ----------------------------------------------------------------------------- */
+
+.edit-post-visual-editor .wpforms-gutenberg-form-selector-wrap {
+	align-items: center;
+}
 
 .edit-post-visual-editor .wpforms-gutenberg-form-selector-wrap h3 {
 	width: 100%;
 	margin: 10px 0 5px;
 	font-weight: 700;
 	font-size: 20px;
+	text-align: center;
 }
 
 .edit-post-visual-editor .wpforms-gutenberg-form-selector-wrap img {
-	margin-right: 25px;
-	width: initial;
+	margin-right: 15px;
+	height: 100px;
+	width: auto;
 }
 
 .edit-post-visual-editor .wpforms-gutenberg-form-selector-wrap .components-base-control {
 	width: 100%;
+}
+
+.edit-post-visual-editor .wpforms-gutenberg-form-selector-wrap .components-placeholder__fieldset {
+	justify-content: center;
+	max-width: 400px;
 }
 
 div.wpforms-gutenberg-form-selector .wpforms-form input:disabled,
@@ -1553,3 +1606,4 @@ body.rtl .wpforms-field-phone input[type=tel] {
 	unicode-bidi: embed;
 	text-align: right;
 }
+

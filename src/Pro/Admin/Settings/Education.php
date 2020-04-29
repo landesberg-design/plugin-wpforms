@@ -51,7 +51,7 @@ class Education {
 		}
 
 		// Load license level.
-		$this->license = $this->get_license_type();
+		$this->license = \wpforms_get_license_type();
 
 		// Load addon data.
 		$this->addons = \wpforms()->license->addons();
@@ -85,19 +85,25 @@ class Education {
 		$strings['education_activated']        = \esc_html__( 'Addon activated', 'wpforms' );
 		$strings['education_save_prompt']      = \esc_html__( 'Almost done! Would you like to refresh the page?', 'wpforms' );
 		$strings['education_save_confirm']     = \esc_html__( 'Refresh page', 'wpforms' );
-		$strings['education_upgrade_title']    = \esc_html__( 'is a PRO Feature', 'wpforms' );
-		$strings['education_upgrade_message']  = '<p>' . \esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wpforms' ) . '</p>';
-		$strings['education_upgrade_confirm']  = \esc_html__( 'Upgrade to PRO', 'wpforms' );
-		$strings['education_upgrade_url']      = 'https://wpforms.com/pricing/?utm_source=WordPress&utm_medium=settings-modal&utm_campaign=plugin';
 		$strings['education_license_prompt']   = \esc_html__( 'To access addons please enter and activate your WPForms license key in the plugin settings.', 'wpforms' );
+
+		$strings['education_upgrade']['pro']['title']   = \esc_html__( 'is a PRO Feature', 'wpforms' );
+		$strings['education_upgrade']['pro']['message'] = '<p>' . \esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wpforms' ) . '</p>';
+		$strings['education_upgrade']['pro']['confirm'] = \esc_html__( 'Upgrade to PRO', 'wpforms' );
+		$strings['education_upgrade']['pro']['url']     = 'https://wpforms.com/pricing/?utm_source=WordPress&utm_medium=settings-modal&utm_campaign=plugin';
+
+		$strings['education_upgrade']['elite']['title']   = \esc_html__( 'is an Elite Feature', 'wpforms' );
+		$strings['education_upgrade']['elite']['message'] = '<p>' . \esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the Elite plan to unlock all these awesome features.', 'wpforms' ) . '</p>';
+		$strings['education_upgrade']['elite']['confirm'] = \esc_html__( 'Upgrade to Elite', 'wpforms' );
+		$strings['education_upgrade']['elite']['url']     = 'https://wpforms.com/pricing/?utm_source=WordPress&utm_medium=settings-modal&utm_campaign=plugin';
 
 		$license_key = \wpforms()->license->get();
 		if ( ! empty( $license_key ) ) {
-			$strings['education_upgrade_url'] = \add_query_arg(
+			$strings['education_upgrade']['pro']['url'] = \add_query_arg(
 				array(
 					'license_key' => \sanitize_text_field( $license_key ),
 				),
-				$strings['education_upgrade_url']
+				$strings['education_upgrade']['pro']['url']
 			);
 		}
 
@@ -146,15 +152,15 @@ class Education {
 			$descr = sprintf( \__( 'Integrate %s with WPForms', 'wpforms' ), $provider['name'] );
 
 			printf(
-				'<div id="wpforms-integration-%1$s" class="wpforms-settings-provider wpforms-clear focus-out education-modal" data-name="%2$s" data-action="%3$s" data-path="%4$s" data-url="%5$s">
+				'<div id="wpforms-integration-%1$s" class="wpforms-settings-provider wpforms-clear focus-out education-modal" data-name="%2$s" data-action="%3$s" data-path="%4$s" data-url="%5$s" data-license="%6$s">
 					<div class="wpforms-settings-provider-header wpforms-clear">
 						<div class="wpforms-settings-provider-logo ">
 							<i class="fa fa-chevron-right"></i>
-							%6$s
+							%7$s
 						</div>
 						<div class="wpforms-settings-provider-info">
-							<h3>%7$s</h3>
-							<p>%8$s</p>
+							<h3>%8$s</h3>
+							<p>%9$s</p>
 						</div>
 					</div>
 				</div>',
@@ -163,6 +169,7 @@ class Education {
 				\esc_attr( $provider['action'] ),
 				\esc_attr( $provider['plugin'] ),
 				isset( $provider['url'] ) ? \esc_attr( $provider['url'] ) : '',
+				\esc_attr( $provider['license'] ),
 				'<img src="' . \esc_attr( WPFORMS_PLUGIN_URL ) . 'assets/images/' . \esc_attr( $provider['img'] ) . '">',
 				\esc_html( $provider['name'] ),
 				\esc_html( $descr )
@@ -291,18 +298,17 @@ class Education {
 	/**
 	 * Get the current installation license type (always lowercase).
 	 *
+	 * @deprecated Use wpforms_get_license_type().
+	 *
 	 * @since 1.5.5
+	 * @since 1.5.9.3 Deprecated.
 	 *
 	 * @return string|false
 	 */
 	public function get_license_type() {
 
-		$type = \wpforms_setting( 'type', '', 'wpforms_license' );
+		_deprecated_function( __FUNCTION__, '1.5.9.3 of the WPForms plugin', 'wpforms_get_license_type()' );
 
-		if ( empty( $type ) || ! \wpforms()->pro ) {
-			return false;
-		}
-
-		return strtolower( $type );
+		return wpforms_get_license_type();
 	}
 }

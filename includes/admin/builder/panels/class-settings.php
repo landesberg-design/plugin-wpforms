@@ -23,7 +23,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 	}
 
 	/**
-	 * Outputs the Settings panel sidebar.
+	 * Output the Settings panel sidebar.
 	 *
 	 * @since 1.0.0
 	 */
@@ -46,7 +46,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 	}
 
 	/**
-	 * Outputs the Settings panel primary content.
+	 * Output the Settings panel primary content.
 	 *
 	 * @since 1.0.0
 	 */

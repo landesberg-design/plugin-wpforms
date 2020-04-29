@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Generates the table on the plugin overview page.
+ * Generate the table on the plugin overview page.
  *
  * @since 1.0.0
  */
@@ -70,12 +70,12 @@ class WPForms_Overview_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Renders the columns.
+	 * Render the columns.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param WP_Post $form
-	 * @param string $column_name
+	 * @param string  $column_name
 	 *
 	 * @return string
 	 */

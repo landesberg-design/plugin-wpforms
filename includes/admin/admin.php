@@ -50,7 +50,6 @@ function wpforms_admin_styles() {
 		WPFORMS_VERSION
 	);
 }
-
 add_action( 'admin_enqueue_scripts', 'wpforms_admin_styles' );
 
 /**
@@ -226,7 +225,7 @@ function wpforms_admin_body_class( $classes ) {
 add_filter( 'admin_body_class', 'wpforms_admin_body_class', 10, 1 );
 
 /**
- * Outputs the WPForms admin header.
+ * Output the WPForms admin header.
  *
  * @since 1.3.9
  */
@@ -404,13 +403,27 @@ add_action( 'admin_init', 'wpforms_check_php_version' );
  *
  * @since 1.4.4
  *
+ * @param string $type Either "pro" or "elite". Default is "pro".
+ *
  * @return string
  */
-function wpforms_get_upgrade_modal_text() {
+function wpforms_get_upgrade_modal_text( $type = 'pro' ) {
+
+	switch ( $type ) {
+		case 'elite':
+			$level = 'WPForms Elite';
+			break;
+		case 'pro':
+		default:
+			$level = 'WPForms Pro';
+	}
 
 	return
 		'<p>' .
-		esc_html__( 'Thanks for your interest in WPForms Pro!', 'wpforms-lite' ) . '<br>' .
+		sprintf( /* translators: %s - license level, WPForms Pro or WPForms Elite. */
+			esc_html__( 'Thanks for your interest in %s!', 'wpforms-lite' ),
+			$level
+		) . '<br>' .
 		sprintf(
 			wp_kses(
 				/* translators: %s - WPForms.com contact page URL. */
@@ -427,19 +440,21 @@ function wpforms_get_upgrade_modal_text() {
 		) .
 		'</p>' .
 		'<p>' .
-		wp_kses(
-			__( 'After purchasing a license,<br>just <strong>enter your license key on the WPForms Settings page</strong>.<br>This will let your site automatically upgrade to WPForms Pro!', 'wpforms-lite' ),
-			array(
-				'strong' => array(),
-				'br'     => array(),
-			)
+		sprintf(
+			wp_kses( /* translators: %s - license level, WPForms Pro or WPForms Elite. */
+				__( 'After purchasing a license,<br>just <strong>enter your license key on the WPForms Settings page</strong>.<br>This will let your site automatically upgrade to %s!', 'wpforms-lite' ),
+				[
+					'strong' => [],
+					'br'     => [],
+				]
+			),
+			$level
 		) . '<br>' .
 		esc_html__( '(Don\'t worry, all your forms and settings will be preserved.)', 'wpforms-lite' ) .
 		'</p>' .
 		'<p>' .
 		sprintf(
-			wp_kses(
-				/* translators: %s - WPForms.com upgrade from Lite to paid docs page URL. */
+			wp_kses( /* translators: %s - WPForms.com upgrade from Lite to paid docs page URL. */
 				__( 'Check out <a href="%s" target="_blank" rel="noopener noreferrer">our documentation</a> for step-by-step instructions.', 'wpforms-lite' ),
 				array(
 					'a' => array(

@@ -25,7 +25,7 @@ class WPForms_Logging {
 	}
 
 	/**
-	 * Registers the log post type.
+	 * Register the log post type.
 	 *
 	 * @since 1.0.0
 	 */
@@ -54,7 +54,7 @@ class WPForms_Logging {
 	}
 
 	/**
-	 * Registers the Log Type taxonomy.
+	 * Register the Log Type taxonomy.
 	 *
 	 * @since 1.0.0
 	*/
@@ -134,7 +134,7 @@ class WPForms_Logging {
 	}
 
 	/**
-	 * Stores a log entry.
+	 * Store a log entry.
 	 *
 	 * @since 1.0.0
 	 * @param array $log_data Log entry data
@@ -247,7 +247,7 @@ class WPForms_Logging {
 	}
 
 	/**
-	 * Retrieves number of log entries connected to particular object ID
+	 * Retrieve number of log entries connected to particular object ID
 	 *
 	 * @since 1.0.0
 	 * @param int $object_id (default: 0)

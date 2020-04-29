@@ -67,7 +67,7 @@ class Templates {
 
 	/**
 	 * Include a template.
-	 * Uses 'require' if $args are passed or 'load_template' if not.
+	 * Use 'require' if $args are passed or 'load_template' if not.
 	 *
 	 * @since 1.5.4
 	 *

@@ -404,12 +404,15 @@ class WPForms_Field_Email extends WPForms_Field {
 	/**
 	 * Validate field on form submit.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @param int   $field_id     Field ID.
 	 * @param mixed $field_submit Field value that was submitted.
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
-		$form_id = $form_data['id'];
+
+		$form_id = (int) $form_data['id'];
 
 		parent::validate( $field_id, $field_submit, $form_data );
 
@@ -425,7 +428,6 @@ class WPForms_Field_Email extends WPForms_Field {
 			wpforms()->process->errors[ $form_id ][ $field_id ]['secondary'] = esc_html__( 'The provided emails do not match.', 'wpforms-lite' );
 		}
 	}
-
 }
 
 new WPForms_Field_Email();

@@ -7,7 +7,13 @@
  */
 class WPForms_Field_Page_Break extends WPForms_Field {
 
-	/** @var bool|array */
+	/**
+	 * Pages information.
+	 *
+	 * @since 1.3.7
+	 *
+	 * @var array|bool
+	 */
 	protected $pagebreak;
 
 	/**

@@ -38,7 +38,7 @@ class WPForms_Builder_Panel_Setup extends WPForms_Builder_Panel {
 	}
 
 	/**
-	 * Outputs the Settings panel primary content.
+	 * Output the Settings panel primary content.
 	 *
 	 * @since 1.0.0
 	 */

@@ -61,7 +61,7 @@ class WPForms_Template_Subscribe extends WPForms_Template {
 	 *
 	 * @param array $form_data Form data and settings.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function template_modal_conditional( $form_data ) {
 

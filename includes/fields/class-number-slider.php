@@ -357,8 +357,9 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 
 		$value_display = isset( $field['value_display'] ) ? esc_attr( $field['value_display'] ) : esc_html__( 'Selected Value: {value}', 'wpforms-lite' );
 		$default_value = ! empty( $field['default_value'] ) ? (float) $field['default_value'] : 0;
+		$hint_value    = ! empty( $primary['attr']['value'] ) ? (float) $primary['attr']['value'] : $default_value;
 
-		$hint = str_replace( '{value}', '<b>' . $default_value . '</b>', $value_display );
+		$hint = str_replace( '{value}', '<b>' . $hint_value . '</b>', $value_display );
 
 		// phpcs:ignore
 		echo wpforms_render(

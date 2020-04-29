@@ -1,22 +1,17 @@
 <?php
-/**
- * Builder related functions.
- *
- * @since 1.0.0
- */
 
 /**
- * Outputs fields to be used on panels (settings etc).
+ * Output fields to be used on panels (settings etc).
  *
  * @since 1.0.0
  *
  * @param string $option
  * @param string $panel
  * @param string $field
- * @param array $form_data
+ * @param array  $form_data
  * @param string $label
- * @param array $args
- * @param boolean $echo
+ * @param array  $args
+ * @param bool   $echo
  *
  * @return string
  */
@@ -364,7 +359,7 @@ function wpforms_builder_settings_block_get_state( $form_id, $block_id, $block_t
 
 /**
  * Get the list of allowed tags, used in pair with wp_kses() function.
- * Allows getting rid of all potentially harmful HTML tags and attributes.
+ * This allows getting rid of all potentially harmful HTML tags and attributes.
  *
  * @since 1.5.9
  *

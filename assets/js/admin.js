@@ -322,10 +322,10 @@
 				event.preventDefault();
 
 				// Handle cookie.
-				if ( wpCookies.get( 'wpforms_entry_hide_empty' ) === 'true') {
+				if ( wpCookies.get( 'wpforms_entry_hide_empty' ) === 'true' ) {
 
 					// User was hiding empty fields, so now display them.
-					wpCookies.remove('wpforms_entry_hide_empty');
+					wpCookies.remove( 'wpforms_entry_hide_empty' );
 					$( this ).text( wpforms_admin.entry_empty_fields_hide );
 				} else {
 
@@ -334,7 +334,7 @@
 					$( this ).text( wpforms_admin.entry_empty_fields_show );
 				}
 
-				$( '.wpforms-entry-field.empty' ).toggle();
+				$( '.wpforms-entry-field.empty, .wpforms-edit-entry-field.empty' ).toggle();
 			});
 
 			// Display notes editor.

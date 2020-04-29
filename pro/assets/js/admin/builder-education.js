@@ -64,15 +64,15 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 						event.preventDefault();
 						event.stopImmediatePropagation();
 
-						switch( $this.data( 'action' ) ) {
+						switch ( $this.data( 'action' ) ) {
 							case 'activate':
 								app.activateModal( $this.data( 'name' ), $this.data( 'path' ), $this.data( 'nonce' )  );
 								break;
 							case 'install':
-								app.installModal( $this.data( 'name' ), $this.data( 'url' ), $this.data( 'nonce' ) );
+								app.installModal( $this.data( 'name' ), $this.data( 'url' ), $this.data( 'nonce' ), $this.data( 'license' ) );
 								break;
 							case 'upgrade':
-								app.upgradeModal( $this.data( 'name' ), $this.data( 'field-name' ) );
+								app.upgradeModal( $this.data( 'name' ), $this.data( 'field-name' ), $this.data( 'license' ) );
 								break;
 							case 'license':
 								app.licenseModal();
@@ -215,11 +215,12 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 		 * @param {string} feature Feature name.
 		 * @param {string} url     Install URL.
 		 * @param {string} nonce   Action nonce.
+		 * @param {string} type    License level.
 		 */
-		installModal: function( feature, url, nonce ) {
+		installModal: function( feature, url, nonce, type ) {
 
 			if ( ! url || '' === url ) {
-				app.upgradeModal( feature, false );
+				app.upgradeModal( feature, '', type );
 				return;
 			}
 
@@ -301,32 +302,44 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 		 *
 		 * @since 1.5.1
 		 *
-		 * @param {string} feature Feature name.
+		 * @param {string} feature   Feature name.
+		 * @param {string} fieldName Field name.
+		 * @param {string} type 	 License type.
 		 */
-		upgradeModal: function( feature, fieldName ) {
+		upgradeModal: function( feature, fieldName, type ) {
 
-			var modalTitle = feature + ' ' + wpforms_builder.education_upgrade_title;
+			// Provide a default value.
+			if ( typeof type === 'undefined' || type.length === 0 ) {
+				type = 'pro';
+			}
 
-			if ( fieldName ) {
-				modalTitle = fieldName + ' ' + wpforms_builder.education_upgrade_title;
+			// Make sure we received only supported type.
+			if ( $.inArray( type, [ 'pro', 'elite' ] ) < 0 ) {
+				return;
+			}
+
+			var modalTitle = feature + ' ' + wpforms_builder.education_upgrade[type].title;
+
+			if ( typeof fieldName !== 'undefined' && fieldName.length > 0 ) {
+				modalTitle = fieldName + ' ' + wpforms_builder.education_upgrade[type].title;
 			}
 
 			$.alert( {
 				title       : modalTitle,
 				icon        : 'fa fa-lock',
-				content     : wpforms_builder.education_upgrade_message.replace( /%name%/g, feature ),
+				content     : wpforms_builder.education_upgrade[type].message.replace( /%name%/g, feature ),
 				boxWidth    : '550px',
 				onOpenBefore: function() {
 					this.$body.find( '.jconfirm-content' ).addClass( 'lite-upgrade' );
 				},
 				buttons     : {
 					confirm: {
-						text    : wpforms_builder.education_upgrade_confirm,
+						text    : wpforms_builder.education_upgrade[type].confirm,
 						btnClass: 'btn-confirm',
 						keys    : [ 'enter' ],
-						action  : function () {
+						action  : function() {
 							window.open(
-								wpforms_builder.education_upgrade_url + '&utm_content=' + encodeURI( feature.trim() ),
+								wpforms_builder.education_upgrade[type].url + '&utm_content=' + encodeURI( feature.trim() ),
 								'_blank'
 							);
 						}

@@ -267,11 +267,10 @@ function wpforms_sanitize_amount( $amount, $currency = '' ) {
  * Return a nicely formatted amount.
  *
  * @since 1.2.6
- * @link https://github.com/easydigitaldownloads/easy-digital-downloads/blob/master/includes/formatting.php#L83
  *
- * @param string  $amount
- * @param boolean $symbol
- * @param string  $currency
+ * @param string $amount
+ * @param bool   $symbol
+ * @param string $currency
  *
  * @return string $amount Newly formatted amount or Price Not Available
  */

@@ -35,9 +35,34 @@ class Loader {
 	 */
 	protected function populate_classes() {
 
+		$this->populate_admin();
 		$this->populate_migrations();
 		$this->populate_capabilities();
 		$this->populate_tasks();
+	}
+
+	/**
+	 * Populate Admin related classes.
+	 *
+	 * @since 1.6.0
+	 */
+	private function populate_admin() {
+
+		array_push(
+			$this->classes,
+			[
+				'name' => 'Admin\AdminBarMenu',
+			],
+			[
+				'name' => 'Admin\Notifications',
+				'id'   => 'notifications',
+			],
+			[
+				'name' => 'Admin\Entries\Edit',
+				'id'   => 'entries_edit',
+				'hook' => 'admin_init',
+			]
+		);
 	}
 
 	/**

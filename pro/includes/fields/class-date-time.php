@@ -623,6 +623,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		$date_prop['data']                = isset( $date_prop['data'] ) ? $date_prop['data'] : array();
 		$date_prop['data']['date-format'] = isset( $date_prop['data']['date-format'] ) ? $date_prop['data']['date-format'] : $this->defaults['date_format'];
 		$date_prop['data']['date-format'] = apply_filters( 'wpforms_datetime_date_format', $date_prop['data']['date-format'], $form_data, $field );
+		$date_prop['data']['input']       = 'true';
 
 		$time_prop['data']                = isset( $time_prop['data'] ) ? $time_prop['data'] : array();
 		$time_prop['data']['step']        = isset( $time_prop['data']['step'] ) ? $time_prop['data']['step'] : $this->defaults['time_interval'];
@@ -657,9 +658,11 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				} else {
 
 					printf(
-						'<input type="text" %s %s>',
+						'<div class="wpforms-datepicker-wrap"><input type="text" %s %s><a title="%s" data-clear class="wpforms-datepicker-clear" style="display:%s;"></a></div>',
 						wpforms_html_attributes( $date_prop['id'], $date_prop['class'], $date_prop['data'], $date_prop['attr'] ),
-						$date_prop['required']
+						esc_attr( $date_prop['required'] ),
+						esc_attr__( 'Clear Date', 'wpforms' ),
+						empty( $date_prop['attr']['value'] ) ? 'none' : 'block'
 					);
 				}
 
@@ -698,9 +701,11 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				} else {
 
 					printf(
-						'<input type="text" %s %s>',
+						'<div class="wpforms-datepicker-wrap"><input type="text" %s %s><a title="%s" data-clear class="wpforms-datepicker-clear" style="display:%s;"></a></div>',
 						wpforms_html_attributes( $date_prop['id'], $date_prop['class'], $date_prop['data'], $date_prop['attr'] ),
-						$date_prop['required']
+						esc_attr( $date_prop['required'] ),
+						esc_attr__( 'Clear Date', 'wpforms' ),
+						empty( $date_prop['attr']['value'] ) ? 'none' : 'block'
 					);
 				}
 				break;
@@ -771,7 +776,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				esc_attr( $month_class ),
 				$field_required
 			);
-				echo '<option class="placeholder" selected disabled>' . esc_html( $ranges['months_label'] ) . '</option>';
+				echo '<option value="" class="placeholder" selected disabled>' . esc_html( $ranges['months_label'] ) . '</option>';
 				foreach ( $ranges['months'] as $month ) {
 					$month = (int) $month;
 					printf(
@@ -796,7 +801,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				esc_attr( $day_class ),
 				$field_required
 			);
-			echo '<option class="placeholder" selected disabled>' . esc_html( $ranges['days_label'] ) . '</option>';
+			echo '<option value="" class="placeholder" selected disabled>' . esc_html( $ranges['days_label'] ) . '</option>';
 			foreach ( $ranges['days'] as $day ) {
 				$day = (int) $day;
 				printf(
@@ -821,7 +826,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				esc_attr( $day_class ),
 				$field_required
 			);
-			echo '<option class="placeholder" selected disabled>' . esc_html( $ranges['days_label'] ) . '</option>';
+			echo '<option value="" class="placeholder" selected disabled>' . esc_html( $ranges['days_label'] ) . '</option>';
 			foreach ( $ranges['days'] as $day ) {
 				$day = (int) $day;
 				printf(
@@ -846,7 +851,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				esc_attr( $month_class ),
 				$field_required
 			);
-			echo '<option class="placeholder" selected disabled>' . esc_html( $ranges['months_label'] ) . '</option>';
+			echo '<option value="" class="placeholder" selected disabled>' . esc_html( $ranges['months_label'] ) . '</option>';
 			foreach ( $ranges['months'] as $month ) {
 				$month = (int) $month;
 				printf(
@@ -872,7 +877,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			esc_attr( $year_class ),
 			$field_required
 		);
-		echo '<option class="placeholder" selected disabled>' . esc_html( $ranges['years_label'] ) . '</option>';
+		echo '<option value="" class="placeholder" selected disabled>' . esc_html( $ranges['years_label'] ) . '</option>';
 		foreach ( $ranges['years'] as $year ) {
 			$year = (int) $year;
 			printf(

@@ -12,7 +12,7 @@ use WPForms\Integrations\IntegrationInterface;
 class SiteHealth implements IntegrationInterface {
 
 	/**
-	 * Indicates if current integration is allowed to load.
+	 * Indicate if current integration is allowed to load.
 	 *
 	 * @since 1.5.5
 	 *
@@ -26,7 +26,7 @@ class SiteHealth implements IntegrationInterface {
 	}
 
 	/**
-	 * Loads an integration.
+	 * Load an integration.
 	 *
 	 * @since 1.5.5
 	 */
@@ -69,7 +69,7 @@ class SiteHealth implements IntegrationInterface {
 		// License key type.
 		$wpforms['fields']['license'] = array(
 			'label' => esc_html__( 'License key type', 'wpforms-lite' ),
-			'value' => wpforms_setting( 'type', '', 'wpforms_license' ),
+			'value' => wpforms_get_license_type(),
 		);
 
 		// Install date.

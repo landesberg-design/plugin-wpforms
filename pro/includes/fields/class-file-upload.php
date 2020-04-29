@@ -877,8 +877,8 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		// Define data.
 		$file_name            = sanitize_file_name( $file['name'] );
 		$file_ext             = pathinfo( $file_name, PATHINFO_EXTENSION );
-		$file_base            = wp_basename( $file_name, ".$file_ext" );
-		$file_name_new        = sprintf( '%s-%s.%s', $file_base, wp_hash( $file_name . $this->form_id . $this->field_id ), strtolower( $file_ext ) );
+		$file_base            = wp_basename( $file_name, '.' . $file_ext );
+		$file_name_new        = sprintf( '%s-%s.%s', $file_base, wp_hash( wp_rand() . microtime() . $this->form_id . $this->field_id ), strtolower( $file_ext ) );
 		$uploads              = wp_upload_dir();
 		$wpforms_uploads_root = trailingslashit( $uploads['basedir'] ) . 'wpforms';
 
@@ -905,23 +905,23 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			}
 		}
 		$file_new      = trailingslashit( $wpforms_uploads_form ) . $file_name_new;
-		$file_name_new = wp_basename( wp_unique_filename( dirname( $file_new ), $file_name_new ) );
+		$file_name_new = wp_basename( trailingslashit( dirname( $file_new ) ) . $file_name_new );
 		$file_new      = trailingslashit( dirname( $file_new ) ) . $file_name_new;
 		$file_url      = trailingslashit( $uploads['baseurl'] ) . 'wpforms/' . trailingslashit( $form_directory ) . $file_name_new;
 		$attachment_id = '0';
 
-		// Check if the index.html exists in the root uploads director, if not create it.
+		// Check if the index.html exists in the root uploads director, if not - create it.
 		if ( ! file_exists( trailingslashit( $wpforms_uploads_root ) . 'index.html' ) ) {
 			file_put_contents( trailingslashit( $wpforms_uploads_root ) . 'index.html', '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 		}
 
-		// Check if the index.html exists in the form uploads director, if not create it.
+		// Check if the index.html exists in the form uploads director, if not - create it.
 		if ( ! file_exists( trailingslashit( $wpforms_uploads_form ) . 'index.html' ) ) {
 			file_put_contents( trailingslashit( $wpforms_uploads_form ) . 'index.html', '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 		}
 
 		// Move the file to the uploads dir - similar to _wp_handle_upload().
-		$move_new_file = @ move_uploaded_file( $file['tmp_name'], $file_new );
+		$move_new_file = @move_uploaded_file( $file['tmp_name'], $file_new ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		if ( false === $move_new_file ) {
 			wpforms_log(
 				'Upload Error, could not upload file',
@@ -1054,7 +1054,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			$raw_files,
 			static function ( $file ) {
 
-				return count( $file ) === 2 && ! empty( $file['file'] ) && ! empty( $file['name'] );
+				return is_array( $file ) && count( $file ) === 2 && ! empty( $file['file'] ) && ! empty( $file['name'] );
 			}
 		);
 
@@ -1126,9 +1126,8 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		// Data for no media case.
 		$file_ext              = pathinfo( $file['name'], PATHINFO_EXTENSION );
-		$file_base             = wp_basename( $file['name'], ".$file_ext" );
-		$file['file_name_new'] = sprintf( '%s-%s.%s', $file_base, wp_hash( $dir['path'] . $this->form_data['id'] . $this->field_id ), strtolower( $file_ext ) );
-		$file['file_name_new'] = wp_unique_filename( trailingslashit( $dir['path'] ), sanitize_file_name( $file['file_name_new'] ) );
+		$file_base             = wp_basename( $file['name'], '.' . $file_ext );
+		$file['file_name_new'] = sanitize_file_name( sprintf( '%s-%s.%s', $file_base, wp_hash( wp_rand() . microtime() . $this->form_data['id'] . $this->field_id ), strtolower( $file_ext ) ) );
 		$file['file_url']      = trailingslashit( $dir['url'] ) . $file['file_name_new'];
 		$file['path']          = trailingslashit( $dir['path'] ) . $file['file_name_new'];
 		$file['attachment_id'] = 0;
@@ -1704,8 +1703,11 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 */
 	protected function get_extensions() {
 
-		// Input Primary: allowed file extensions.
-		$extensions = ! empty( $this->field_data['extensions'] ) ? explode( ',', $this->field_data['extensions'] ) : $this->get_default_extensions();
+		// Allowed file extensions by default.
+		$default_extensions = $this->get_default_extensions();
+
+		// Allowed file extensions.
+		$extensions = ! empty( $this->field_data['extensions'] ) ? explode( ',', $this->field_data['extensions'] ) : $default_extensions;
 
 		return wpforms_chain( $extensions )
 			->map(
@@ -1715,7 +1717,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 				}
 			)
 			->array_filter()
-			->array_diff( $this->blacklist )
+			->array_intersect( $default_extensions )
 			->value();
 	}
 

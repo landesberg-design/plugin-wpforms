@@ -21,7 +21,7 @@ class Migrations {
 	 *
 	 * @since 1.5.9
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	private $is_migrated = false;
 

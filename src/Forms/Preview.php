@@ -159,7 +159,7 @@ class Preview {
 				 		admin_url( 'admin.php' )
 					)
 				),
-				'text' => esc_html__( 'Edit Form', 'wpform-lite' ),
+				'text' => esc_html__( 'Edit Form', 'wpforms-lite' ),
 			];
 		}
 
@@ -175,7 +175,7 @@ class Preview {
 						admin_url( 'admin.php' )
 					)
 				),
-				'text' => esc_html__( 'View Entries', 'wpform-lite' ),
+				'text' => esc_html__( 'View Entries', 'wpforms-lite' ),
 			];
 		}
 

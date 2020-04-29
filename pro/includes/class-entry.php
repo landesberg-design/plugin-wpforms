@@ -73,7 +73,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	}
 
 	/**
-	 * Retrieves an entry from the database based on a given entry ID.
+	 * Retrieve an entry from the database based on a given entry ID.
 	 *
 	 * @since 1.5.8
 	 *

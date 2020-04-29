@@ -23,7 +23,7 @@ class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 	}
 
 	/**
-	 * Outputs the Payments panel sidebar.
+	 * Output the Payments panel sidebar.
 	 *
 	 * @since 1.0.0
 	 */
@@ -40,7 +40,7 @@ class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 	}
 
 	/**
-	 * Outputs the Payments panel primary content.
+	 * Output the Payments panel primary content.
 	 *
 	 * @since 1.0.0
 	 */

@@ -155,7 +155,7 @@ var wpf = {
 				fields         = formData.fields,
 				fieldOrder     = [],
 				fieldsOrdered  = [],
-				fieldBlacklist = ['html','divider','pagebreak'];
+				fieldBlacklist = [ 'html', 'pagebreak' ];
 
 			if (!fields) {
 				return false;

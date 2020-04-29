@@ -78,7 +78,7 @@ class WPForms_Overview {
 	}
 
 	/**
-	 * Forms table per-page screen option value.
+	 * Form table per-page screen option value.
 	 *
 	 * @since 1.0.0
 	 *
@@ -133,6 +133,8 @@ class WPForms_Overview {
 			?>
 
 			<div class="wpforms-admin-content">
+
+				<?php do_action( 'wpforms_admin_overview_before_table' ); ?>
 
 				<form id="wpforms-overview-table" method="get" action="<?php echo esc_url( admin_url( 'admin.php?page=wpforms-overview' ) ); ?>">
 

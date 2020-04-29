@@ -44,7 +44,7 @@ class Admin {
 	}
 
 	/**
-	 * Outputs HTML of the Entries export form.
+	 * Output HTML of the Entries export form.
 	 *
 	 * @since 1.5.5
 	 */
@@ -128,7 +128,7 @@ class Admin {
 		if ( ! empty( $forms ) ) {
 			?>
 			<span class="choicesjs-select-wrap">
-				<select id="wpforms-tools-entries-export-selectform" class="choicesjs-select" name="form">';
+				<select id="wpforms-tools-entries-export-selectform" class="choicesjs-select" name="form">
 					<option value="" placeholder><?php esc_attr_e( 'Select a Form', 'wpforms' ); ?></option>
 					<?php
 					foreach ( $forms as $form ) {
@@ -276,7 +276,7 @@ class Admin {
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
 			array(),
-			'4.5.5'
+			'4.6.3'
 		);
 
 		/*
@@ -287,7 +287,7 @@ class Admin {
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
 			array( 'jquery' ),
-			'4.5.5',
+			'4.6.3',
 			true
 		);
 

@@ -34,9 +34,10 @@ class EntryEmailsTask extends Task {
 
 	/**
 	 * Get the data from Tasks meta table, check/unpack it and
-	 * pass further to \WPForms_Process::entry_email().
+	 * send the email straight away.
 	 *
 	 * @since 1.5.9
+	 * @since 1.5.9.3 Send immediately instead of calling \WPForms_Process::entry_email() method.
 	 *
 	 * @param int $meta_id ID for meta information for a task.
 	 */
@@ -56,9 +57,9 @@ class EntryEmailsTask extends Task {
 		}
 
 		// We expect a certain meta data structure for this task.
-		list( $fields, $entry, $form_data, $entry_id, $context ) = $meta->data;
+		list( $to, $subject, $message, $headers, $attachments ) = $meta->data;
 
-		// Finally, start the email sending.
-		wpforms()->process->entry_email( $fields, $entry, $form_data, $entry_id, $context );
+		// Let's do this NOW, finally.
+		wp_mail( $to, $subject, $message, $headers, $attachments );
 	}
 }

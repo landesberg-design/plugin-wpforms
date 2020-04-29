@@ -110,7 +110,7 @@ class WPForms_Template_Order extends WPForms_Template {
 	 *
 	 * @param array $form_data Form data and settings.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function template_modal_conditional( $form_data ) {
 
@@ -118,12 +118,8 @@ class WPForms_Template_Order extends WPForms_Template {
 		// method has not yet been configured, so we display the modal to
 		// remind the user they need to set it up for the form to work
 		// correctly.
-		if ( empty( $form_data['payments'] ) ) {
-			return true;
-		} else {
-			return false;
-		}
+		return empty( $form_data['payments'] );
 	}
 }
 
-new WPForms_Template_Order;
+new WPForms_Template_Order();

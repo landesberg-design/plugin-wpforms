@@ -180,7 +180,7 @@ class WPForms_Addons {
 	}
 
 	/**
-	 * Renders grid of addons.
+	 * Render grid of addons.
 	 *
 	 * @since 1.0.0
 	 *

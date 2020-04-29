@@ -1,9 +1,4 @@
 <?php
-/**
- * Contains various WPForms integrations.
- *
- * @since 1.3.0
- */
 
 /**
  * Register and setup WPForms as a Visual Composer element.

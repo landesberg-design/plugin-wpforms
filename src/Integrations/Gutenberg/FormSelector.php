@@ -12,7 +12,7 @@ use WPForms\Integrations\IntegrationInterface;
 class FormSelector implements IntegrationInterface {
 
 	/**
-	 * Indicates if current integration is allowed to load.
+	 * Indicate if current integration is allowed to load.
 	 *
 	 * @since 1.4.8
 	 *
@@ -23,7 +23,7 @@ class FormSelector implements IntegrationInterface {
 	}
 
 	/**
-	 * Loads an integration.
+	 * Load an integration.
 	 *
 	 * @since 1.4.8
 	 */
@@ -128,7 +128,7 @@ class FormSelector implements IntegrationInterface {
 			'wpforms-gutenberg-form-selector',
 			'wpforms_gutenberg_form_selector',
 			array(
-				'logo_url' => WPFORMS_PLUGIN_URL . 'assets/images/sullie-vc.png',
+				'logo_url' => WPFORMS_PLUGIN_URL . 'assets/images/sullie-alt.png',
 				'wpnonce'  => \wp_create_nonce( 'wpforms-gutenberg-form-selector' ),
 				'forms'    => $forms,
 				'i18n'     => $i18n,

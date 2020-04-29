@@ -50,8 +50,8 @@ class Capabilities {
 
 		\add_filter( 'map_meta_cap', array( $this, 'filter_map_meta_cap' ), 10, 4 );
 		\add_filter( 'wpforms_get_multiple_forms_args', array( $this, 'filter_wpforms_get_multiple_forms_args' ) );
-		\add_filter( 'wpforms_entry_fields_get_fields_where', array( $this, 'filter_wpforms_get_fields_get_entries_where' ), 10, 2 );
-		\add_filter( 'wpforms_entry_handler_get_entries_where', array( $this, 'filter_wpforms_get_fields_get_entries_where' ), 10, 2 );
+		\add_filter( 'wpforms_entry_fields_get_fields_where', array( $this, 'filter_get_fields_where' ), 10, 2 );
+		\add_filter( 'wpforms_entry_handler_get_entries_where', array( $this, 'filter_get_entries_where' ), 10, 2 );
 	}
 
 	/**
@@ -333,18 +333,52 @@ class Capabilities {
 	}
 
 	/**
-	 * Filter wpforms()->entry_fields->get_fields() or wpforms()->entry->get_entries()
+	 * Filter wpforms()->entry_fields->get_fields()
 	 * arguments to fetch the same results as if a full list of entries was filtered using a meta capability.
 	 * Save the resources by making the filtering upfront.
 	 *
-	 * @since 1.5.9
+	 * @since 1.6.0
 	 *
 	 * @param array $where Array of 'where' clauses.
-	 * @param array $args  Array of wpforms()->entry_fields->get_fields() or wpforms()->entry->get_entries() arguments.
+	 * @param array $args  Array of wpforms()->entry_fields->get_fields() arguments.
 	 *
 	 * @return array
 	 */
-	public function filter_wpforms_get_fields_get_entries_where( $where, $args ) {
+	public function filter_get_fields_where( $where, $args ) {
+
+		return $this->get_allowed_form_ids_where( $where, $args );
+	}
+
+	/**
+	 * Filter wpforms()->entry->get_entries()
+	 * arguments to fetch the same results as if a full list of entries was filtered using a meta capability.
+	 * Save the resources by making the filtering upfront.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param array $where Array of 'where' clauses.
+	 * @param array $args  Array of wpforms()->entry->get_entries() arguments.
+	 *
+	 * @return array
+	 */
+	public function filter_get_entries_where( $where, $args ) {
+
+		return $this->get_allowed_form_ids_where( $where, $args, wpforms()->entry->table_name );
+	}
+
+	/**
+	 * Get a set of WHERE clauses for wpforms()->entry_fields->get_fields() or wpforms()->entry->get_entries()
+	 * filtering a result by the allowed form ids.
+	 *
+	 * @since 1.6.0
+	 *
+	 * @param array  $where Array of 'where' clauses.
+	 * @param array  $args  Array of wpforms()->entry_fields->get_fields() or wpforms()->entry->get_entries() arguments.
+	 * @param string $table DB table to use in the "form_id IN" part of the query.
+	 *
+	 * @return array
+	 */
+	protected function get_allowed_form_ids_where( $where, $args, $table = '' ) {
 
 		if ( ! isset( $args['cap'] ) ) {
 			$args['cap'] = 'view_entries_form_single';
@@ -379,9 +413,8 @@ class Capabilities {
 		}
 
 		$allowed_forms = implode( ',', array_map( 'intval', $allowed_forms ) );
-		$table         = wpforms()->entry->table_name;
 
-		$where['arg_form_id'] = "{$table}.form_id IN ( {$allowed_forms} )";
+		$where['arg_form_id'] = $table ? "{$table}.form_id IN ( {$allowed_forms} )" : "form_id IN ( {$allowed_forms} )";
 
 		return $where;
 	}

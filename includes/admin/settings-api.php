@@ -144,7 +144,7 @@ function wpforms_settings_license_callback( $args ) {
 	}
 
 	$key  = wpforms_setting( 'key', '', 'wpforms_license' );
-	$type = wpforms_setting( 'type', '', 'wpforms_license' );
+	$type = wpforms_get_license_type();
 
 	$output  = '<input type="password" id="wpforms-setting-license-key" value="' . esc_attr( $key ) . '" />';
 	$output .= '<button id="wpforms-setting-license-key-verify" class="wpforms-btn wpforms-btn-md wpforms-btn-orange">' . esc_html__( 'Verify Key', 'wpforms-lite' ) . '</button>';
