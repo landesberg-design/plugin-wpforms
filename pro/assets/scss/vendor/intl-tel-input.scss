@@ -149,10 +149,6 @@ div.wpforms-container-full .wpforms-form,
 
 			// don't let the contents wrap AKA the container will be as wide as the contents
 			white-space: nowrap;
-			// except on small screens, where we force the dropdown width to match the input
-			@media (max-width: 500px) {
-				white-space: normal;
-			}
 
 			max-height: 200px;
 			overflow-y: scroll;
@@ -162,6 +158,11 @@ div.wpforms-container-full .wpforms-form,
 			// If this is not set, then the country list scroll stops moving after rasing a finger, and users report that scroll is slow
 			// Stackoverflow question about it: https://stackoverflow.com/questions/33601165/scrolling-slow-on-mobile-ios-when-using-overflowscroll
 			-webkit-overflow-scrolling: touch;
+
+			// Limit maximum width on mobiles (small screens) to avoid horizontal scrolling.
+			@media (max-width: 600px) {
+				max-width: 90vw;
+			}
 		}
 
 		// dropdown flags need consistent width, so wrap in a container
@@ -258,26 +259,6 @@ div.wpforms-container-full .wpforms-form,
 		}
 	}
 
-	// overrides for mobile popup (note: .iti-mobile class is applied on body)
-	.iti-mobile .iti {
-		&--container {
-			top: $mobilePopupMargin;
-			bottom: $mobilePopupMargin;
-			left: $mobilePopupMargin;
-			right: $mobilePopupMargin;
-			position: fixed;
-		}
-		&__country-list {
-			max-height: 100%;
-			width: 100%;
-		}
-		&__country {
-			padding: 10px 10px;
-			// increase line height because dropdown copy is v likely to overflow on mobile and when it does it needs to be well spaced
-			line-height: 1.5em;
-		}
-	}
-
 	@import "partials/intl-tel-input-sprite";
 
 	.iti__flag {
@@ -300,25 +281,27 @@ div.wpforms-container-full .wpforms-form,
 	}
 }
 
-// overrides for mobile popup
-.iti-mobile .intl-tel-input {
-	&.iti-container {
+/*
+	Overrides for mobile popup.
+	Note:
+	.iti-mobile class is applied on the body only if the page loaded initially on mobile but not when the browser window was resized.
+*/
+.iti-mobile .iti {
+	&--container {
 		top: $mobilePopupMargin;
 		bottom: $mobilePopupMargin;
 		left: $mobilePopupMargin;
 		right: $mobilePopupMargin;
 		position: fixed;
 	}
-
-	.country-list {
+	&__country-list {
 		max-height: 100%;
 		width: 100%;
-
-		.country {
-			padding: 10px 10px;
-			// increase line height because dropdown copy is v likely to overflow on mobile and when it does it needs to be well spaced
-			line-height: 1.5em;
-		}
+	}
+	&__country {
+		padding: 10px 10px;
+		// increase line height because dropdown copy is v likely to overflow on mobile and when it does it needs to be well spaced
+		line-height: 1.5em;
 	}
 }
 

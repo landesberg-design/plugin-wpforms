@@ -1182,8 +1182,8 @@ class WPForms_Pro {
 
 		$notice = sprintf(
 			wp_kses(
-				/* translators: %1$s - WPForms.com Account dashboard URL */
-				__( 'Your WPForms license key has expired. In order to continue receiving support and plugin updates you must renew your license key. Please log in to <a href="%1$s" target="_blank" rel="noopener noreferrer">your WPForms.com account</a> to renew your license.', 'wpforms' ),
+				/* translators: %s - WPForms.com Account dashboard URL. */
+				__( 'Your WPForms license key has expired. In order to continue receiving support and plugin updates you must renew your license key. Please log in to <a href="%s" target="_blank" rel="noopener noreferrer">your WPForms.com account</a> to renew your license.', 'wpforms' ),
 				array(
 					'a'      => array(
 						'href'   => array(),

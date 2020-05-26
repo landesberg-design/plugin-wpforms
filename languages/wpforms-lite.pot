@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms Lite 1.6.0\n"
+"Project-Id-Version: WPForms Lite 1.6.0.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms-lite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-04-16T13:52:55+03:00\n"
+"POT-Creation-Date: 2020-05-19T13:49:49+03:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: wpforms-lite\n"
@@ -23,8 +23,6 @@ msgstr ""
 #: src/Emails/Templates/General.php:93
 #: src/Integrations/Gutenberg/FormSelector.php:92
 #: src/Lite/Admin/DashboardWidget.php:162
-#: src/Pro/Access/Integrations.php:94
-#: src/Pro/Access/Integrations.php:151
 msgid "WPForms"
 msgstr ""
 
@@ -88,7 +86,6 @@ msgstr ""
 #: includes/admin/admin.php:127
 #: includes/admin/builder/class-builder.php:349
 #: includes/admin/class-editor.php:72
-#: src/Pro/Admin/Entries/PrintPreview.php:193
 msgid "Close"
 msgstr ""
 
@@ -1072,7 +1069,7 @@ msgstr ""
 msgid "Additional Templates"
 msgstr ""
 
-#. translators: %1$s - WPForms.com URL to a template suggestion, %2$s - WPForms.com URL to a doc about custom templates.
+#. translators: %1$s - WPForms.com URL to a template suggestion; %2$s - WPForms.com URL to a doc about custom templates.
 #: includes/admin/builder/panels/class-setup.php:89
 msgid "Have a suggestion for a new template? <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">We'd love to hear it</a>. Also, you can <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">create your own templates</a>!"
 msgstr ""
@@ -1081,7 +1078,7 @@ msgstr ""
 msgid "Search additional templates..."
 msgstr ""
 
-#. translators: %1$s - WPForms.com URL to an addon page, %2$s - WPForms.com URL to a docs article.
+#. translators: %1$s - WPForms.com URL to an addon page; %2$s - WPForms.com URL to a docs article.
 #: includes/admin/builder/panels/class-setup.php:118
 msgid "More are available in the <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">Form Templates Pack addon</a> or by <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">creating your own</a>."
 msgstr ""
@@ -1159,7 +1156,7 @@ msgstr ""
 msgid "Getting Started"
 msgstr ""
 
-#. translators: %1$s - current license type, %2$s - suggested license type.
+#. translators: %1$s - current license type; %2$s - suggested license type.
 #: includes/admin/class-about.php:128
 msgid "%1$s vs %2$s"
 msgstr ""
@@ -1176,7 +1173,7 @@ msgstr ""
 msgid "Our goal is to take the pain out of creating online forms and make it easy."
 msgstr ""
 
-#. translators: %1$s - WPBeginner URL, %2$s - OptinMonster URL, %3$s - MonsterInsights URL, %4$s - RafflePress URL.
+#. translators: %1$s - WPBeginner URL; %2$s - OptinMonster URL; %3$s - MonsterInsights URL; %4$s - RafflePress URL.
 #: includes/admin/class-about.php:269
 msgid "WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WPBeginner</a>, the most popular lead-generation software, <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">OptinMonster</a>, the best WordPress analytics plugin, <a href=\"%3$s\" target=\"_blank\" rel=\"noopener noreferrer\">MonsterInsights</a>, and the most powerful WordPress contest plugin, <a href=\"%4$s\" target=\"_blank\" rel=\"noopener noreferrer\">RafflePress</a>."
 msgstr ""
@@ -1752,7 +1749,6 @@ msgstr ""
 #: includes/admin/class-settings.php:188
 #: includes/admin/class-settings.php:193
 #: includes/admin/class-settings.php:203
-#: src/Pro/Admin/Settings/Access.php:197
 msgid "Save Settings"
 msgstr ""
 
@@ -2564,7 +2560,7 @@ msgstr ""
 
 #: includes/admin/overview/class-overview-table.php:50
 #: includes/fields/class-name.php:18
-#: includes/fields/class-name.php:264
+#: includes/fields/class-name.php:271
 #: includes/templates/class-contact.php:31
 #: includes/templates/class-subscribe.php:33
 #: includes/templates/class-suggestion.php:30
@@ -2639,54 +2635,54 @@ msgid "Security check failed. Please try again."
 msgstr ""
 
 #. translators: %s - ID of a setting.
-#: includes/admin/settings-api.php:74
+#: includes/admin/settings-api.php:77
 msgid "The callback function used for the %s setting is missing."
 msgstr ""
 
-#: includes/admin/settings-api.php:106
+#: includes/admin/settings-api.php:109
 msgid "You're using WPForms Lite - no license needed. Enjoy!"
 msgstr ""
 
 #. translators: %s - WPForms.com upgrade URL.
-#: includes/admin/settings-api.php:112
+#: includes/admin/settings-api.php:115
 msgid "To unlock more features consider <strong><a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"wpforms-upgrade-modal\">upgrading to PRO</a></strong>."
 msgstr ""
 
-#: includes/admin/settings-api.php:129
+#: includes/admin/settings-api.php:132
 msgid "As a valued WPForms Lite user you receive <strong>50% off</strong>, automatically applied at checkout!"
 msgstr ""
 
-#: includes/admin/settings-api.php:137
+#: includes/admin/settings-api.php:140
 msgid "Already purchased?  Simply enter your license key below to connect with WPForms PRO!"
 msgstr ""
 
-#: includes/admin/settings-api.php:139
+#: includes/admin/settings-api.php:142
 msgid "Paste license key here"
 msgstr ""
 
-#: includes/admin/settings-api.php:140
+#: includes/admin/settings-api.php:143
 #: includes/providers/class-constant-contact.php:507
 msgid "Connect"
 msgstr ""
 
-#: includes/admin/settings-api.php:150
+#: includes/admin/settings-api.php:153
 msgid "Verify Key"
 msgstr ""
 
-#: includes/admin/settings-api.php:154
+#: includes/admin/settings-api.php:157
 msgid "Deactivate Key"
 msgstr ""
 
 #. translators: $s - license type.
-#: includes/admin/settings-api.php:161
+#: includes/admin/settings-api.php:164
 msgid "Your license key type is %s."
 msgstr ""
 
-#: includes/admin/settings-api.php:167
+#: includes/admin/settings-api.php:170
 msgid "If your license has been upgraded or is incorrect, <a href=\"#\" id=\"wpforms-setting-license-key-refresh\">click here to force a refresh</a>."
 msgstr ""
 
-#: includes/admin/settings-api.php:380
+#: includes/admin/settings-api.php:383
 #: includes/fields/class-base.php:905
 #: includes/fields/class-base.php:1036
 msgid "Upload Image"
@@ -2982,7 +2978,6 @@ msgstr ""
 #. translators: %d - field ID.
 #: includes/emails/class-emails.php:570
 #: includes/emails/class-emails.php:615
-#: src/Pro/Admin/Entries/PrintPreview.php:230
 msgid "Field ID #%d"
 msgstr ""
 
@@ -3001,7 +2996,6 @@ msgid "Enter text for the form field label. Field labels are recommended and can
 msgstr ""
 
 #: includes/fields/class-base.php:779
-#: pro/includes/fields/class-html.php:106
 msgid "Label"
 msgstr ""
 
@@ -3075,10 +3069,10 @@ msgid "Enter text for the default form field value."
 msgstr ""
 
 #: includes/fields/class-base.php:1154
-#: includes/fields/class-name.php:271
-#: includes/fields/class-name.php:286
-#: includes/fields/class-name.php:301
-#: includes/fields/class-name.php:316
+#: includes/fields/class-name.php:278
+#: includes/fields/class-name.php:293
+#: includes/fields/class-name.php:308
+#: includes/fields/class-name.php:323
 #: includes/fields/class-number-slider.php:200
 msgid "Default Value"
 msgstr ""
@@ -3318,72 +3312,72 @@ msgid "Agreement"
 msgstr ""
 
 #: includes/fields/class-name.php:80
-#: includes/fields/class-name.php:366
+#: includes/fields/class-name.php:373
 msgid "First"
 msgstr ""
 
 #: includes/fields/class-name.php:101
-#: includes/fields/class-name.php:371
+#: includes/fields/class-name.php:378
 msgid "Middle"
 msgstr ""
 
 #: includes/fields/class-name.php:122
-#: includes/fields/class-name.php:376
+#: includes/fields/class-name.php:383
 msgid "Last"
 msgstr ""
 
-#: includes/fields/class-name.php:208
+#: includes/fields/class-name.php:215
 msgid "Format"
 msgstr ""
 
-#: includes/fields/class-name.php:209
+#: includes/fields/class-name.php:216
 msgid "Select format to use for the name form field"
 msgstr ""
 
-#: includes/fields/class-name.php:220
+#: includes/fields/class-name.php:227
 msgid "Simple"
 msgstr ""
 
-#: includes/fields/class-name.php:221
+#: includes/fields/class-name.php:228
 msgid "First Last"
 msgstr ""
 
-#: includes/fields/class-name.php:222
+#: includes/fields/class-name.php:229
 msgid "First Middle Last"
 msgstr ""
 
-#: includes/fields/class-name.php:264
+#: includes/fields/class-name.php:271
 msgid "Name field advanced options."
 msgstr ""
 
-#: includes/fields/class-name.php:267
-#: includes/fields/class-name.php:282
-#: includes/fields/class-name.php:297
-#: includes/fields/class-name.php:312
+#: includes/fields/class-name.php:274
+#: includes/fields/class-name.php:289
+#: includes/fields/class-name.php:304
+#: includes/fields/class-name.php:319
 msgid "Placeholder"
 msgstr ""
 
-#: includes/fields/class-name.php:279
+#: includes/fields/class-name.php:286
 msgid "First Name"
 msgstr ""
 
-#: includes/fields/class-name.php:279
+#: includes/fields/class-name.php:286
 msgid "First name field advanced options."
 msgstr ""
 
-#: includes/fields/class-name.php:294
+#: includes/fields/class-name.php:301
 msgid "Middle Name"
 msgstr ""
 
-#: includes/fields/class-name.php:294
+#: includes/fields/class-name.php:301
 msgid "Middle name field advanced options."
 msgstr ""
 
-#: includes/fields/class-name.php:309
+#: includes/fields/class-name.php:316
 msgid "Last Name"
 msgstr ""
 
-#: includes/fields/class-name.php:309
+#: includes/fields/class-name.php:316
 msgid "Last name field advanced options."
 msgstr ""
 
@@ -3391,7 +3385,7 @@ msgstr ""
 msgid "Number Slider"
 msgstr ""
 
-#. translators: %1$s - Number slider selected value, %2$s - its minimum value, %3$s - its maximum value.
+#. translators: %1$s - Number slider selected value; %2$s - its minimum value; %3$s - its maximum value.
 #: includes/fields/class-number-slider.php:75
 msgid "%1$s (%2$s min / %3$s max)"
 msgstr ""
@@ -4225,7 +4219,7 @@ msgid "Macao"
 msgstr ""
 
 #: includes/functions.php:913
-msgid "Macedonia (Republic of)"
+msgid "North Macedonia (Republic of)"
 msgstr ""
 
 #: includes/functions.php:914
@@ -5436,13 +5430,9 @@ msgstr ""
 msgid "Please upgrade to the PRO plan to unlock them and more awesome features."
 msgstr ""
 
-#. translators: %s - addon name
+#. translators: %s - addon name.
 #: lite/wpforms-lite.php:1120
 msgid "%s Addon"
-msgstr ""
-
-#: pro/includes/fields/class-html.php:107
-msgid "Enter text for the form field label. It will help identify your HTML blocks inside the form builder, but will not be displayed in the form."
 msgstr ""
 
 #: src/Admin/AdminBarMenu.php:230
@@ -5938,9 +5928,9 @@ msgstr ""
 msgid "This is a preview of your form. This page is not publicly accessible."
 msgstr ""
 
-#. translators: %1$s - WPForms doc link.
+#. translators: %s - WPForms doc link.
 #: src/Forms/Preview.php:207
-msgid "For form testing tips, check out our <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">complete guide!</a>"
+msgid "For form testing tips, check out our <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">complete guide!</a>"
 msgstr ""
 
 #: src/Integrations/Gutenberg/FormSelector.php:93
@@ -6381,8 +6371,6 @@ msgid "Dismiss this message."
 msgstr ""
 
 #: src/Lite/Admin/Settings/Access.php:84
-#: src/Pro/Admin/Settings/Access.php:195
-#: src/Pro/Admin/Settings/Access.php:217
 msgid "Access"
 msgstr ""
 
@@ -6477,63 +6465,6 @@ msgstr ""
 msgid "Upgrade to WPForms Now"
 msgstr ""
 
-#: src/Pro/Admin/Entries/PrintPreview.php:153
-msgid "Hide empty fields"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:155
-#: src/Pro/Admin/Entries/PrintPreview.php:198
-msgid "Show empty fields"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:164
-msgid "Hide notes"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:166
-#: src/Pro/Admin/Entries/PrintPreview.php:199
-msgid "Show notes"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:175
-msgid "Normal view"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:177
-#: src/Pro/Admin/Entries/PrintPreview.php:200
-msgid "Compact view"
-msgstr ""
-
-#. translators: %d - entry ID.
-#: src/Pro/Admin/Entries/PrintPreview.php:191
-msgid "Entry #%d"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:194
-msgid "Print"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:215
-msgid "This entry does not have any fields"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:233
-msgid "Empty"
-msgstr ""
-
-#: src/Pro/Admin/Entries/PrintPreview.php:250
-msgid "Notes"
-msgstr ""
-
-#. translators: %1$s - user name; %2$s - date
-#: src/Pro/Admin/Entries/PrintPreview.php:263
-msgid "Added by %1$s on %2$s"
-msgstr ""
-
-#: src/Pro/Admin/Settings/Access.php:217
-msgid "Select the user roles that are allowed access to WPForms."
-msgstr ""
-
 #: src/Providers/Provider/Settings/FormBuilder.php:107
 msgid "Custom Field Name"
 msgstr ""
@@ -6607,12 +6538,12 @@ msgstr ""
 msgid "Your site already has WPForms Pro activated. If you want to switch to WPForms Lite, please first go to Plugins > Installed Plugins and deactivate WPForms. Then, you can activate WPForms Lite."
 msgstr ""
 
-#. translators: %1$s - WPBeginner URL for recommended WordPress hosting.
+#. translators: %s - WPBeginner URL for recommended WordPress hosting.
 #: wpforms.php:159
-msgid "Your site is running an <strong>insecure version</strong> of PHP that is no longer supported. Please contact your web hosting provider to update your PHP version or switch to a <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">recommended WordPress hosting company</a>."
+msgid "Your site is running an <strong>insecure version</strong> of PHP that is no longer supported. Please contact your web hosting provider to update your PHP version or switch to a <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">recommended WordPress hosting company</a>."
 msgstr ""
 
-#. translators: %1$s - WPForms.com URL for documentation with more details.
+#. translators: %s - WPForms.com URL for documentation with more details.
 #: wpforms.php:177
-msgid "<strong>Note:</strong> WPForms plugin is disabled on your site until you fix the issue. <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">Read more for additional information.</a>"
+msgid "<strong>Note:</strong> WPForms plugin is disabled on your site until you fix the issue. <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Read more for additional information.</a>"
 msgstr ""

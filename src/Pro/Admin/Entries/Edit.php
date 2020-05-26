@@ -107,7 +107,11 @@ class Edit {
 	 */
 	public function init() {
 
-		$entry_id = isset( $_GET['entry_id'] ) ? absint( wp_unslash( $_GET['entry_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification
+		if ( $this->is_admin_entry_editing_ajax() ) {
+			$entry_id = isset( $_POST['wpforms']['entry_id'] ) ? absint( wp_unslash( $_POST['wpforms']['entry_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification
+		} else {
+			$entry_id = isset( $_GET['entry_id'] ) ? absint( wp_unslash( $_GET['entry_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification
+		}
 
 		// Check permissions and other constraints.
 		if ( ! is_admin() || ! wpforms_current_user_can( 'edit_entry_single', $entry_id ) ) {
@@ -192,6 +196,10 @@ class Edit {
 
 		$this->enqueue_styles();
 		$this->enqueue_scripts();
+
+		if ( empty( $this->form_data['fields'] ) || ! is_array( $this->form_data['fields'] ) ) {
+			return;
+		}
 
 		// Get a list of unique field types used in a form.
 		$field_types = array_filter( wp_list_pluck( $this->form_data['fields'], 'type' ) );
@@ -576,6 +584,14 @@ class Edit {
 		echo '<input type="hidden" name="wpforms[entry_id]" value="' . esc_attr( $this->entry->entry_id ) . '">';
 		echo '<input type="hidden" name="nonce" value="' . esc_attr( wp_create_nonce( 'wpforms-entry-edit-' . $form_id . '-' . $this->entry->entry_id ) ) . '">';
 
+		if ( empty( $form_data['fields'] ) || ! is_array( $form_data['fields'] ) ) {
+			echo '<div class="wpforms-edit-entry-field empty">';
+			$this->display_edit_form_field_no_fields();
+			echo '</div>';
+
+			return;
+		}
+
 		foreach ( $form_data['fields'] as $field_id => $field ) {
 			$this->display_edit_form_field( $field_id, $field, $entry_fields, $form_data, $hide_empty );
 		}
@@ -667,6 +683,42 @@ class Edit {
 		echo ! wpforms_is_empty_string( $field_value ) ?
 			nl2br( make_clickable( $field_value ) ) : // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			esc_html__( 'Empty', 'wpforms' );
+		echo '</p>';
+	}
+
+	/**
+	 * Display a message about no fields in a form.
+	 *
+	 * @since 1.6.0.2
+	 */
+	private function display_edit_form_field_no_fields() {
+
+		echo '<p class="wpforms-entry-field-value">';
+
+		if ( \wpforms_current_user_can( 'edit_form_single', $this->form_data['id'] ) ) {
+			$edit_url = add_query_arg(
+				array(
+					'page'    => 'wpforms-builder',
+					'view'    => 'fields',
+					'form_id' => absint( $this->form_data['id'] ),
+				),
+				admin_url( 'admin.php' )
+			);
+			printf(
+				wp_kses( /* translators: %s - form edit URL. */
+					__( 'You don\'t have any fields in this form. <a href="%s">Add some!</a>', 'wpforms' ),
+					[
+						'a' => [
+							'href' => [],
+						],
+					]
+				),
+				esc_url( $edit_url )
+			);
+		} else {
+			esc_html_e( 'You don\'t have any fields in this form.', 'wpforms' );
+		}
+
 		echo '</p>';
 	}
 

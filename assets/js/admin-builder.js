@@ -1036,7 +1036,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			$builder.on('change', '.wpforms-field-option-row-choices_images input', function() {
 
 				var $this         = $( this ),
-					fieldID       = $this.parent().data( 'field-id' )
+					fieldID       = $this.parent().data( 'field-id' ),
 					$fieldOptions = $( '#wpforms-field-option-'+fieldID ),
 					checked       = $this.is( ':checked' ),
 					type          = $( '#wpforms-field-option-'+fieldID ).find( '.wpforms-field-option-hidden-type' ).val();
@@ -1171,27 +1171,27 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				$('#wpforms-field-'+id).removeClass('size-small size-medium size-large').addClass('size-'+value);
 			});
 
-			// Real-time updates for "Placeholder" field option
-			$builder.on('input', '.wpforms-field-option-row-placeholder input', function(e) {
-				var $this   = $(this),
-					value   = $this.val(),
-					id      = $this.parent().data('field-id'),
-					$primary = $('#wpforms-field-'+id).find('.primary-input');
+			// Real-time updates for "Placeholder" field option.
+			$builder.on( 'input', '.wpforms-field-option-row-placeholder input', function() {
+				var $this = $( this ),
+					value = wpf.sanitizeHTML( $this.val() ),
+					id = $this.parent().data( 'field-id' ),
+					$primary = $( '#wpforms-field-' + id ).find( '.primary-input' );
 
-				if ($primary.is('select')) {
-					if (!value.length) {
-						$primary.find('.placeholder').remove();
+				if ( $primary.is( 'select' ) ) {
+					if ( ! value.length ) {
+						$primary.find( '.placeholder' ).remove();
 					} else {
-						if ($primary.find('.placeholder').length) {
-							$primary.find('.placeholder').text(value);
+						if ( $primary.find( '.placeholder' ).length ) {
+							$primary.find( '.placeholder' ).text( value );
 						} else {
-							$primary.prepend('<option class="placeholder" selected>'+value+'</option>')
+							$primary.prepend( '<option class="placeholder" selected>' + value + '</option>' );
 						}
 					}
 				} else {
-					$primary.attr('placeholder', value);
+					$primary.attr( 'placeholder', value );
 				}
-			});
+			} );
 
 			// Real-time updates for "Confirmation Placeholder" field option
 			$builder.on('input', '.wpforms-field-option-row-confirmation_placeholder input', function(e) {
@@ -1842,11 +1842,12 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					// Determine where field gets placed
 					if ( 'bottom' === options.position ) {
 
-						if ( $lastField.length && $lastField.hasClass('wpforms-field-stick')) {
+						if ( $lastField.length && $lastField.hasClass( 'wpforms-field-stick' ) ) {
+
 							// Check to see if the last field we have is configured to
 							// be stuck to the bottom, if so add the field above it.
-							$('.wpforms-field-wrap').children(':eq('+(totalFields-1)+')').before($newField);
-							$('.wpforms-field-options').children(':eq('+(totalFields-1)+')').before($newOptions);
+							$( '.wpforms-field-wrap' ).children( ':eq(' + ( totalFields - 1 ) + ')' ).before( $newField );
+							$( '.wpforms-field-options' ).children( ':eq(' + ( totalFields - 1 ) + ')' ).before( $newOptions );
 
 						} else {
 							// Add field to bottom
@@ -1870,12 +1871,13 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 					} else {
 
-						if ( options.position === totalFields && $lastField.length && $lastField.hasClass('wpforms-field-stick') ) {
+						if ( options.position === totalFields && $lastField.length && $lastField.hasClass( 'wpforms-field-stick' ) ) {
+
 							// Check to see if the user tried to add the field at
 							// the end BUT the last field we have is configured to
 							// be stuck to the bottom, if so add the field above it.
-							$('.wpforms-field-wrap').children(':eq('+(totalFields-1)+')').before($newField);
-							$('.wpforms-field-options').children(':eq('+(totalFields-1)+')').before($newOptions);
+							$( '.wpforms-field-wrap' ).children( ':eq(' + ( totalFields - 1 ) + ')' ).before( $newField );
+							$( '.wpforms-field-options' ).children( ':eq(' + ( totalFields - 1 ) + ')' ).before( $newOptions );
 
 						} else if ( $( '.wpforms-field-wrap' ).children( ':eq(' + options.position + ')' ).length ) {
 
@@ -2323,14 +2325,13 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				if ( ! newValues.hasOwnProperty( key ) ) {
 					continue;
 				}
-				var value     = wpf.sanitizeHTML( newValues[ key ] ),
+				var value     = wpf.sanitizeHTML( newValues[ key ] ).trim().replace( /"/g, '&quot;' ),
 					newChoice = choice;
-				value = value.trim();
 				newChoice = newChoice.replace( /\[choices\]\[(\d+)\]/g, '[choices][' + nextID + ']' );
 				newChoice = newChoice.replace( /data-key="(\d+)"/g, 'data-key="' + nextID + '"' );
 				newChoice = newChoice.replace( /value="" class="label"/g, 'value="' + value + '" class="label"' );
 
-				// For some reasons IE has its own atrribute order.
+				// For some reasons IE has its own attribute order.
 				newChoice = newChoice.replace( /class="label" type="text" value=""/g, 'class="label" type="text" value="' + value + '"' );
 				newChoices += newChoice;
 				nextID++;

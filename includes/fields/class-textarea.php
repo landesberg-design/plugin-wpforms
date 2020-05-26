@@ -185,7 +185,7 @@ class WPForms_Field_Textarea extends WPForms_Field {
 		$primary = $field['properties']['inputs']['primary'];
 		$value   = '';
 
-		if ( ! empty( $primary['attr']['value'] ) ) {
+		if ( isset( $primary['attr']['value'] ) ) {
 			$value = wpforms_sanitize_textarea_field( $primary['attr']['value'] );
 			unset( $primary['attr']['value'] );
 		}

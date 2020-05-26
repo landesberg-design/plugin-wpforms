@@ -321,7 +321,7 @@ var WPFormsSettingsEducation = window.WPFormsSettingsEducation || ( function( do
 						keys    : [ 'enter' ],
 						action  : function() {
 							window.open(
-								wpforms_admin.education_upgrade[type].url + '&utm_content=' + encodeURI( feature.trim() ),
+								wpforms_admin.education_upgrade[type].url + '&utm_content=' + encodeURIComponent( feature.trim() ),
 								'_blank'
 							);
 						},

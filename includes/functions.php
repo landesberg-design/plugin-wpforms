@@ -910,7 +910,7 @@ function wpforms_countries() {
 		'LT' => esc_html__( 'Lithuania', 'wpforms-lite' ),
 		'LU' => esc_html__( 'Luxembourg', 'wpforms-lite' ),
 		'MO' => esc_html__( 'Macao', 'wpforms-lite' ),
-		'MK' => esc_html__( 'Macedonia (Republic of)', 'wpforms-lite' ),
+		'MK' => esc_html__( 'North Macedonia (Republic of)', 'wpforms-lite' ),
 		'MG' => esc_html__( 'Madagascar', 'wpforms-lite' ),
 		'MW' => esc_html__( 'Malawi', 'wpforms-lite' ),
 		'MY' => esc_html__( 'Malaysia', 'wpforms-lite' ),

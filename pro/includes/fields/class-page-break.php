@@ -32,10 +32,52 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 
 		add_filter( 'wpforms_field_preview_class', array( $this, 'preview_field_class' ), 10, 2 );
 		add_filter( 'wpforms_field_new_class', array( $this, 'preview_field_class' ), 10, 2 );
+		add_filter( 'wpforms_frontend_form_data', array( $this, 'maybe_sort_fields' ), PHP_INT_MAX );
 		add_action( 'wpforms_frontend_output', array( $this, 'display_page_indicator' ), 9, 5 );
 		add_action( 'wpforms_display_fields_before', array( $this, 'display_fields_before' ), 20, 2 );
 		add_action( 'wpforms_display_fields_after', array( $this, 'display_fields_after' ), 5, 2 );
 		add_action( 'wpforms_display_field_after', array( $this, 'display_field_after' ), 20, 2 );
+	}
+
+	/**
+	 * Sort fields to make sure that bottom page break elements are in their place.
+	 * Need to correctly display existing forms with wrong page-break bottom element positioning.
+	 *
+	 * @since 1.6.0.2
+	 *
+	 * @param array $form_data Form data.
+	 *
+	 * @return array Form data.
+	 */
+	public function maybe_sort_fields( $form_data ) {
+
+		if ( empty( $form_data['fields'] ) ) {
+			return $form_data;
+		};
+
+		$bottom = [];
+		$fields = $form_data['fields'];
+
+		foreach ( $fields as $id => $field ) {
+			// Process only pagebreak fields.
+			if ( $field['type'] !== 'pagebreak' ) {
+				continue;
+			}
+			if ( empty( $field['position'] ) ) {
+				continue;
+			}
+
+			if ( $field['position'] === 'bottom' ) {
+				$bottom = $field;
+				unset( $fields[ $id ] );
+			}
+		}
+
+		if ( ! empty( $bottom ) ) {
+			$form_data['fields'] = $fields + [ $bottom['id'] => $bottom ];
+		}
+
+		return $form_data;
 	}
 
 	/**
@@ -189,31 +231,29 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	 */
 	public function display_fields_after( $form_data ) {
 
-		// Check if the current form utilizes pagebreaks, if not bail.
-		$pages = ! empty( wpforms()->frontend->pages ) ? true : false;
+		if ( empty( wpforms()->frontend->pages ) ) {
+			return;
+		}
 
-		if ( $pages ) {
+		// If we don't have a bottom pagebreak, the form is pre-v1.2.1 and
+		// this is for backwards compatibility.
+		$bottom = ! empty( wpforms()->frontend->pages['bottom'] ) ? wpforms()->frontend->pages['top'] : false;
 
-			// If we don't have a bottom pagebreak, the form is pre-v1.2.1 and
-			// this is for backwards compatibility.
-			$bottom = ! empty( wpforms()->frontend->pages['bottom'] ) ? wpforms()->frontend->pages['top'] : false;
+		if ( ! $bottom ) {
 
-			if ( ! $bottom ) {
+			$prev = ! empty( $form_data['settings']['pagebreak_prev'] ) ? $form_data['settings']['pagebreak_prev'] : esc_html__( 'Previous', 'wpforms' );
 
-				$prev = ! empty( $form_data['settings']['pagebreak_prev'] ) ? $form_data['settings']['pagebreak_prev'] : esc_html__( 'Previous', 'wpforms' );
-
-				echo '<div class="wpforms-field wpforms-field-pagebreak">';
-					printf(
-						'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%d">%s</button>',
-						absint( wpforms()->frontend->pages['current'] + 1 ),
-						absint( $form_data['id'] ),
-						esc_html( $prev )
-					);
-				echo '</div>';
-			}
-
+			echo '<div class="wpforms-field wpforms-field-pagebreak">';
+				printf(
+					'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%d">%s</button>',
+					absint( wpforms()->frontend->pages['current'] + 1 ),
+					absint( $form_data['id'] ),
+					esc_html( $prev )
+				);
 			echo '</div>';
 		}
+
+		echo '</div>';
 	}
 
 	/**
@@ -226,27 +266,28 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	 */
 	public function display_field_after( $field, $form_data ) {
 
-		if ( 'pagebreak' === $field['type'] ) {
+		if ( 'pagebreak' !== $field['type'] ) {
+			return;
+		}
 
-			$total   = wpforms()->frontend->pages['total'];
-			$current = wpforms()->frontend->pages['current'];
+		$total   = wpforms()->frontend->pages['total'];
+		$current = wpforms()->frontend->pages['current'];
 
-			if ( ( empty( $field['position'] ) || 'top' !== $field['position'] ) && $current !== $total ) {
+		if ( ( empty( $field['position'] ) || 'top' !== $field['position'] ) && $current !== $total ) {
 
-				$next = $current + 1;
-				$last = $next === $total ? 'last' : '';
-				$css  = ! empty( $field['css'] ) ? $field['css'] : '';
+			$next = $current + 1;
+			$last = $next === $total ? 'last' : '';
+			$css  = ! empty( $field['css'] ) ? $field['css'] : '';
 
-				printf(
-					'</div><div class="wpforms-page wpforms-page-%s %s %s" style="display:none;">',
-					absint( $next ),
-					esc_html( $last ),
-					wpforms_sanitize_classes( $css )
-				);
+			printf(
+				'</div><div class="wpforms-page wpforms-page-%s %s %s" style="display:none;">',
+				absint( $next ),
+				esc_html( $last ),
+				wpforms_sanitize_classes( $css ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
 
-				// Increase count for next page.
-				wpforms()->frontend->pages['current'] ++;
-			}
+			// Increase count for next page.
+			wpforms()->frontend->pages['current'] ++;
 		}
 	}
 

@@ -91,7 +91,7 @@ class Integrations {
 		members_register_cap_group(
 			'wpforms',
 			array(
-				'label' => esc_html__( 'WPForms', 'wpforms-lite' ),
+				'label' => esc_html__( 'WPForms', 'wpforms' ),
 				'icon'  => 'dashicons-wpforms',
 				'caps'  => array(),
 			)
@@ -148,7 +148,7 @@ class Integrations {
 	public function ure_capabilities_groups_tree( $groups = array() ) {
 
 		$groups['wpforms_caps'] = array(
-			'caption' => esc_html__( 'WPForms', 'wpforms-lite' ),
+			'caption' => esc_html__( 'WPForms', 'wpforms' ),
 			'parent'  => 'custom',
 			'level'   => 2,
 		);

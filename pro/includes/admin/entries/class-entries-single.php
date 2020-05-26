@@ -651,9 +651,15 @@ class WPForms_Entries_Single {
 					// Display the fields and their values
 					foreach ( $fields as $key => $field ) {
 
-						$field_value  = apply_filters( 'wpforms_html_field_value', wp_strip_all_tags( $field['value'] ), $field, $form_data, 'entry-single' );
+						// We can't display the field of unknown type.
+						if ( empty( $field['type'] ) ) {
+							continue;
+						}
+
+						$field_value  = isset( $field['value'] ) ? $field['value'] : '';
+						$field_value  = apply_filters( 'wpforms_html_field_value', wp_strip_all_tags( $field_value ), $field, $form_data, 'entry-single' );
 						$field_class  = sanitize_html_class( 'wpforms-field-' . $field['type'] );
-						$field_class .= wpforms_is_empty_string( $field_value )  ? ' empty' : '';
+						$field_class .= wpforms_is_empty_string( $field_value ) ? ' empty' : '';
 						$field_style  = $hide_empty && empty( $field_value ) ? 'display:none;' : '';
 
 						echo '<div class="wpforms-entry-field ' . $field_class . '" style="' . $field_style . '">';
@@ -775,7 +781,7 @@ class WPForms_Entries_Single {
 							<div class="wpforms-entry-notes-byline">
 								<?php
 								printf(
-									/* translators: %1$s - user link; %2$s - date; */
+									/* translators: %1$s - user link; %2$s - date. */
 									esc_html__( 'Added by %1$s on %2$s', 'wpforms' ),
 									'<a href="' . esc_url( $user_url ) . '" class="note-user">' . esc_html( $user_name ) . '</a>',
 									esc_html( $date )
@@ -847,7 +853,7 @@ class WPForms_Entries_Single {
 							<div class="wpforms-entry-logs-byline">
 								<?php
 								printf(
-									/* translators: %1$s - user link; %2$s - date; */
+									/* translators: %1$s - user link; %2$s - date. */
 									esc_html__( 'Added by %1$s on %2$s', 'wpforms' ),
 									'<a href="' . esc_url( $user_url ) . '" class="log-user">' . esc_html( $user_name ) . '</a>',
 									esc_html( $date )
@@ -949,7 +955,7 @@ class WPForms_Entries_Single {
 							<p class="wpforms-entry-postid">
 								<span class="dashicons dashicons-edit"></span>
 								<?php
-								printf( /* translators: %1$s - post type; %2$s - ID. */
+								printf( /* translators: %1$s - post type name; %2$s - post type ID. */
 									esc_html__( '%1$s ID: %2$s', 'wpforms' ),
 									esc_html( $entry_post_obj->labels->singular_name ),
 									'<strong><a href="' . esc_url( get_edit_post_link( $entry_post_id ) ) . '" target="_blank">' . $entry_post_id . '</a></strong>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -1062,14 +1068,15 @@ class WPForms_Entries_Single {
 		}
 
 		$entry_meta   = json_decode( $entry->meta, true );
-		$status       = ! empty( $entry->status ) ? ucwords( sanitize_text_field( $entry->status ) ) : esc_html__( 'Unknown', 'wpforms' );
+		$status       = ! empty( $entry->status ) ? $entry->status : esc_html__( 'Unknown', 'wpforms' );
 		$currency     = ! empty( $entry_meta['payment_currency'] ) ? $entry_meta['payment_currency'] : wpforms_setting( 'currency', 'USD' );
 		$total        = isset( $entry_meta['payment_total'] ) ? wpforms_format_amount( wpforms_sanitize_amount( $entry_meta['payment_total'], $currency ), true, $currency ) : '-';
+		$total        = apply_filters( 'wpforms_entry_details_payment_total', $total, $entry_meta, $entry, $form_data );
 		$note         = ! empty( $entry_meta['payment_note'] ) ? esc_html( $entry_meta['payment_note'] ) : '';
-		$gateway      = esc_html( apply_filters( 'wpforms_entry_details_payment_gateway', '-', $entry_meta, $entry, $form_data ) );
-		$transaction  = esc_html( apply_filters( 'wpforms_entry_details_payment_transaction', '-', $entry_meta, $entry, $form_data ) );
-		$subscription = '';
-		$customer     = '';
+		$gateway      = apply_filters( 'wpforms_entry_details_payment_gateway', '-', $entry_meta, $entry, $form_data );
+		$transaction  = apply_filters( 'wpforms_entry_details_payment_transaction', '-', $entry_meta, $entry, $form_data );
+		$subscription = apply_filters( 'wpforms_entry_details_payment_subscription', '', $entry_meta, $entry, $form_data );
+		$customer     = apply_filters( 'wpforms_entry_details_payment_customer', '', $entry_meta, $entry, $form_data );
 		$mode         = ! empty( $entry_meta['payment_mode'] ) && 'test' === $entry_meta['payment_mode'] ? 'test' : 'production';
 
 		switch ( $entry_meta['payment_type'] ) {
@@ -1114,7 +1121,7 @@ class WPForms_Entries_Single {
 						printf(
 							/* translators: %s - entry payment status. */
 							esc_html__( 'Status: %s', 'wpforms' ),
-							'<strong>' . $status . '</strong>'
+							'<strong>' . esc_html( ucwords( $status ) ) . '</strong>'
 						);
 						?>
 					</p>
@@ -1124,7 +1131,7 @@ class WPForms_Entries_Single {
 						printf(
 							/* translators: %s - entry payment total. */
 							esc_html__( 'Total: %s', 'wpforms' ),
-							'<strong>' . $total . '</strong>'
+							'<strong>' . wp_kses_post( $total ) . '</strong>'
 						);
 						?>
 					</p>
@@ -1134,7 +1141,7 @@ class WPForms_Entries_Single {
 						printf(
 							/* translators: %s - entry payment gateway. */
 							esc_html__( 'Gateway: %s', 'wpforms' ),
-							'<strong>' . $gateway . '</strong>'
+							'<strong>' . wp_kses_post( $gateway ) . '</strong>'
 						);
 						if ( 'test' === $mode ) {
 							printf( ' (%s)', esc_html( _x( 'Test', 'Gateway mode', 'wpforms' ) ) );
@@ -1147,7 +1154,7 @@ class WPForms_Entries_Single {
 						printf(
 							/* translators: %s - entry payment transaction. */
 							esc_html__( 'Transaction ID: %s', 'wpforms' ),
-							'<strong>' . $transaction . '</strong>'
+							'<strong>' . wp_kses_post( $transaction ) . '</strong>'
 						);
 						?>
 					</p>
@@ -1158,7 +1165,7 @@ class WPForms_Entries_Single {
 						printf(
 							/* translators: %s - entry payment subscription. */
 							esc_html__( 'Subscription ID: %s', 'wpforms' ),
-							'<strong>' . $subscription . '</strong>'
+							'<strong>' . wp_kses_post( $subscription ) . '</strong>'
 						);
 						?>
 					</p>
@@ -1170,7 +1177,7 @@ class WPForms_Entries_Single {
 						printf(
 							/* translators: %s - entry payment customer. */
 							esc_html__( 'Customer ID: %s', 'wpforms' ),
-							'<strong>' . $customer . '</strong>'
+							'<strong>' . wp_kses_post( $customer ) . '</strong>'
 						);
 						?>
 					</p>

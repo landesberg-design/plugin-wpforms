@@ -203,17 +203,26 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				// Validate Smart Phone Field.
 				if ( typeof $.fn.intlTelInput !== 'undefined' ) {
 					$.validator.addMethod( 'smart-phone-field', function( value, element ) {
+						if ( value.match( /[^\d()\-+\s]/ ) ) {
+							return false;
+						}
 						return this.optional( element ) || $( element ).intlTelInput( 'isValidNumber' );
 					}, wpforms_settings.val_phone );
 				}
 
 				// Validate US Phone Field.
 				$.validator.addMethod( 'us-phone-field', function( value, element ) {
+					if ( value.match( /[^\d()\-+\s]/ ) ) {
+						return false;
+					}
 					return this.optional( element ) || value.replace( /[^\d]/g, '' ).length === 10;
 				}, wpforms_settings.val_phone );
 
 				// Validate International Phone Field.
 				$.validator.addMethod( 'int-phone-field', function( value, element ) {
+					if ( value.match( /[^\d()\-+\s]/ ) ) {
+						return false;
+					}
 					return this.optional( element ) || value.replace( /[^\d]/g, '' ).length > 0;
 				}, wpforms_settings.val_phone );
 
@@ -252,6 +261,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 									}
 								} else if ( element.hasClass( 'wpforms-smart-phone-field' ) ) {
 									element.parent().after( error );
+								} else if ( element.hasClass( 'wpforms-validation-group-member' ) ) {
+									element.closest( '.wpforms-field' ).append( error );
 								} else {
 									error.insertAfter( element );
 								}
@@ -261,7 +272,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 									$field    = $element.closest( '.wpforms-field' ),
 									inputName = $element.attr( 'name' );
 								if ( 'radio' === $element.attr( 'type' ) || 'checkbox' === $element.attr( 'type' ) ) {
-									$field.find( 'input[name=\'' + inputName + '\']' ).addClass( errorClass ).removeClass( validClass );
+									$field.find( 'input[name="' + inputName + '"]' ).addClass( errorClass ).removeClass( validClass );
 								} else {
 									$element.addClass( errorClass ).removeClass( validClass );
 								}
@@ -272,7 +283,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 									$field    = $element.closest( '.wpforms-field' ),
 									inputName = $element.attr( 'name' );
 								if ( 'radio' === $element.attr( 'type' ) || 'checkbox' === $element.attr( 'type' ) ) {
-									$field.find( 'input[name=\'' + inputName + '\']' ).addClass( validClass ).removeClass( errorClass );
+									$field.find( 'input[name="' + inputName + '"]' ).addClass( validClass ).removeClass( errorClass );
 								} else {
 									$element.addClass( validClass ).removeClass( errorClass );
 								}
@@ -412,6 +423,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					}
 
 					properties.wrap = true;
+					properties.dateFormat = element.find( 'input' ).data( 'date-format' );
 
 					// Toggle clear date icon.
 					properties.onChange = function( selectedDates, dateStr, instance ) {
@@ -1298,6 +1310,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		 * Create cookie.
 		 *
 		 * @since 1.3.3
+		 *
+		 * @param {string} name  Cookie name.
+		 * @param {string} value Cookie value.
+		 * @param {string} days  Whether it should expire and when.
 		 */
 		createCookie: function( name, value, days ) {
 
@@ -1319,13 +1335,17 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			}
 
 			// Write the cookie.
-			document.cookie = name + '=' + value + expires + '; path=/';
+			document.cookie = name + '=' + value + expires + '; path=/; samesite=strict';
 		},
 
 		/**
 		 * Retrieve cookie.
 		 *
 		 * @since 1.3.3
+		 *
+		 * @param {string} name Cookie name.
+		 *
+		 * @returns {string|null} Cookie value or null when it doesn't exist.
 		 */
 		getCookie: function( name ) {
 
@@ -1337,7 +1357,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				while ( ' ' === c.charAt( 0 ) ) {
 					c = c.substring( 1, c.length );
 				}
-				if ( 0 == c.indexOf( nameEQ ) ) {
+				if ( 0 === c.indexOf( nameEQ ) ) {
 					return c.substring( nameEQ.length, c.length );
 				}
 			}
@@ -1347,6 +1367,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 		/**
 		 * Delete cookie.
+		 *
+		 * @since 1.3.3
+		 *
+		 * @param {string} name Cookie name.
 		 */
 		removeCookie: function( name ) {
 

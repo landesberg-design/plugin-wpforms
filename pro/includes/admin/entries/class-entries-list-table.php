@@ -1168,8 +1168,11 @@ class WPForms_Entries_Table extends WP_List_Table {
 		// Define which columns can be sorted.
 		$sortable = $this->get_sortable_columns();
 
+		// Get a primary column. It's will be a 3-rd column.
+		$primary = key( array_slice( $columns, 2, 1 ) );
+
 		// Set column headers.
-		$this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->_column_headers = array( $columns, $hidden, $sortable, $primary );
 
 		// Get entries.
 		$total_items = $this->counts['total'];

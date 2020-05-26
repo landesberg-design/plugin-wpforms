@@ -1468,8 +1468,10 @@ div.wpforms-container-full .wpforms-form .wpforms-limit-text{
 /* Small devices */
 @media only screen and (max-width: 600px) {
 
-	/* Аvoid horizontal scroll on mobiles */
-	div.wpforms-container-full .wpforms-form .wpforms-field {
+	/* Avoid horizontal scroll on mobiles.
+	   Skip for phone field, otherwise country dropdown (Smart format) would be cropped.
+	*/
+	div.wpforms-container-full .wpforms-form .wpforms-field:not(.wpforms-field-phone) {
 		overflow-x: hidden;
 	}
 	div.wpforms-container-full .wpforms-form .wpforms-field > * {

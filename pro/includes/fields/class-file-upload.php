@@ -1233,6 +1233,17 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		// Loop through each field that has conditional logic rules.
 		foreach ( $form_data['conditional_fields'] as $key => $field_id ) {
+
+			// Check if the field exists.
+			if ( empty( wpforms()->process->fields[ $field_id ] ) ) {
+				continue;
+			}
+
+			// Check if the 'type' exists.
+			if ( empty( wpforms()->process->fields[ $field_id ]['type'] ) ) {
+				continue;
+			}
+
 			// We are only concerned with file upload fields.
 			if ( wpforms()->process->fields[ $field_id ]['type'] !== $this->type ) {
 				continue;

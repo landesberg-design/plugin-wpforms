@@ -92,7 +92,7 @@ class WPForms_Field_Payment_Total extends WPForms_Field {
 		$amount = wpforms_sanitize_amount( $total );
 
 		foreach ( $fields as $id => $field ) {
-			if ( 'payment-total' === $field['type'] ) {
+			if ( ! empty( $field['type'] ) && 'payment-total' === $field['type'] ) {
 				$fields[ $id ]['value']      = wpforms_format_amount( $amount, true );
 				$fields[ $id ]['amount']     = wpforms_format_amount( $amount );
 				$fields[ $id ]['amount_raw'] = $amount;

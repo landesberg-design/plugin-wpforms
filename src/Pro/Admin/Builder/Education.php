@@ -256,7 +256,7 @@ class Education {
 			return $atts;
 		}
 
-		/* translators: %s - field name*/
+		/* translators: %s - field name. */
 		$atts['data']['field-name'] = sprintf( \esc_html__( '%s field', 'wpforms' ), $field['name'] );
 		$atts['data']['action']     = $field['action'];
 		$atts['data']['nonce']      = \wp_create_nonce( 'wpforms-admin' );

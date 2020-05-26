@@ -62,10 +62,20 @@ class EntryEmailsMetaCleanupTask extends Task {
 	 *
 	 * @since 1.5.9
 	 *
-	 * @param int $interval Data older than this interval will be removed.
+	 * @param int $meta_id ID for meta information for a task.
 	 */
-	public function process( $interval ) {
+	public function process( $meta_id ) {
 
-		( new Meta() )->clean_by( EntryEmailsTask::ACTION, (int) $interval );
+		$task_meta = new Meta();
+		$meta      = $task_meta->get( (int) $meta_id );
+
+		// We should actually receive something.
+		if ( empty( $meta ) || empty( $meta->data ) ) {
+			return;
+		}
+
+		list( $interval ) = $meta->data;
+
+		$task_meta->clean_by( EntryEmailsTask::ACTION, (int) $interval );
 	}
 }

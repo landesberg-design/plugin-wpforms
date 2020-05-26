@@ -136,7 +136,7 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	public function forms_list_columns( $columns, $forms ) {
 
 		$days = empty( $this->runtime_data['days'] ) ? $this->widget_meta( 'get', 'timespan' ) : $this->runtime_data['days'];
-		/* translators: %d - Selected timespan (in days) */
+		/* translators: %d - Selected timespan (in days). */
 		$last_n_days = sprintf( esc_html__( 'Last %d days', 'wpforms' ), (int) $days );
 
 		return '<tr class="wpforms-dash-widget-forms-list-columns">

@@ -232,6 +232,14 @@ class Capabilities {
 			return $caps;
 		}
 
+		if ( ! is_a( $form, 'WP_Post' ) ) {
+			return $caps;
+		}
+
+		if ( 'wpforms' !== $form->post_type ) {
+			return $caps;
+		}
+
 		if ( (int) $user_id === (int) $form->post_author ) {
 			$mapped_cap = ! empty( $meta_caps['own'] ) ? $meta_caps['own'] : '';
 		} else {

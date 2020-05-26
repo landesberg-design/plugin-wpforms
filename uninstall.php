@@ -86,16 +86,25 @@ $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_site\_tran
 $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_timeout\_wpforms\_%'" );
 $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_site\_transient\_timeout\_wpforms\_%'" );
 
+global $wp_filesystem;
+
+// Remove uploaded files.
+$uploads_directory = wp_upload_dir();
+if ( empty( $uploads_directory['error'] ) ) {
+	$wp_filesystem->rmdir( $uploads_directory['basedir'] . '/wpforms/', true );
+}
+
+// Remove translation files.
+$languages_directory = defined( 'WP_LANG_DIR' ) ? trailingslashit( WP_LANG_DIR ) : trailingslashit( WP_CONTENT_DIR ) . 'languages/';
+$translations        = glob( wp_normalize_path( $languages_directory . 'plugins/wpforms-*' ) );
+if ( ! empty( $translations ) ) {
+	foreach ( $translations as $file ) {
+		$wp_filesystem->delete( $file );
+	}
+}
+
 // Remove plugin cron jobs.
 wp_clear_scheduled_hook( 'wpforms_email_summaries_cron' );
 
 // Unschedule all ActionScheduler actions by group.
 wpforms()->get( 'tasks' )->cancel_all();
-
-// Remove uploaded files.
-$uploads_directory = wp_upload_dir();
-if ( ! empty( $uploads_directory['error'] ) ) {
-	return;
-}
-global $wp_filesystem;
-$wp_filesystem->rmdir( $uploads_directory['basedir'] . '/wpforms/', true );

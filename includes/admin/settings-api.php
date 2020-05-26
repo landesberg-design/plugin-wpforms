@@ -35,8 +35,11 @@ function wpforms_settings_output_field( $args ) {
 	// Custom row classes.
 	$class = ! empty( $args['class'] ) ? wpforms_sanitize_classes( (array) $args['class'], true ) : '';
 
+	// Allow hiding blocks on page load (useful for JS toggles).
+	$display_none = ! empty( $args['is_hidden'] ) ? 'style="display:none;"' : '';
+
 	// Build standard field markup and return.
-	$output = '<div class="wpforms-setting-row wpforms-setting-row-' . sanitize_html_class( $args['type'] ) . ' wpforms-clear ' . $class . '" id="wpforms-setting-row-' . wpforms_sanitize_key( $args['id'] ) . '">';
+	$output = '<div class="wpforms-setting-row wpforms-setting-row-' . sanitize_html_class( $args['type'] ) . ' wpforms-clear ' . $class . '" id="wpforms-setting-row-' . wpforms_sanitize_key( $args['id'] ) . '" ' . $display_none . '>';
 
 	if ( ! empty( $args['name'] ) && empty( $args['no_label'] ) ) {
 		$output .= '<span class="wpforms-setting-label">';

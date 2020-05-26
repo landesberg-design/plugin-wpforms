@@ -103,8 +103,8 @@ class WPForms_Field_HTML extends WPForms_Field {
 			$field,
 			array(
 				'slug'    => 'name',
-				'value'   => esc_html__( 'Label', 'wpforms-lite' ),
-				'tooltip' => esc_html__( 'Enter text for the form field label. It will help identify your HTML blocks inside the form builder, but will not be displayed in the form.', 'wpforms-lite' ),
+				'value'   => esc_html__( 'Label', 'wpforms' ),
+				'tooltip' => esc_html__( 'Enter text for the form field label. It will help identify your HTML blocks inside the form builder, but will not be displayed in the form.', 'wpforms' ),
 			),
 			false
 		);

@@ -339,7 +339,7 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 						keys    : [ 'enter' ],
 						action  : function() {
 							window.open(
-								wpforms_builder.education_upgrade[type].url + '&utm_content=' + encodeURI( feature.trim() ),
+								wpforms_builder.education_upgrade[type].url + '&utm_content=' + encodeURIComponent( feature.trim() ),
 								'_blank'
 							);
 						}

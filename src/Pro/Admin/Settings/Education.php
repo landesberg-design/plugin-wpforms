@@ -145,10 +145,10 @@ class Education {
 
 		foreach ( $providers as $provider ) {
 
-			/* translators: %s - addon name*/
+			/* translators: %s - addon name. */
 			$modal_name = sprintf( \__( '%s addon', 'wpforms' ), $provider['name'] );
 
-			/* translators: %s - addon name*/
+			/* translators: %s - addon name. */
 			$descr = sprintf( \__( 'Integrate %s with WPForms', 'wpforms' ), $provider['name'] );
 
 			printf(

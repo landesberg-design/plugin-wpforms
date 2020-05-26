@@ -148,6 +148,10 @@ class Ajax {
 				$this->request_data = get_transient( 'wpforms-tools-entries-export-request-' . $args['request_id'] );
 			}
 
+			if ( empty( $this->request_data ) ) {
+				throw new \Exception( $this->export->errors['unknown_request'] );
+			}
+
 			// Prepare entries DB query args.
 			$this->request_data['db_args']['offset'] = $this->request_data['step'] * $this->request_data['db_args']['number'];
 

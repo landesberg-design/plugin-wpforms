@@ -159,3 +159,12 @@
 	padding: 6px 8px;
 	box-shadow: none;
 }
+
+#wpforms-panel-providers .wpforms-builder-provider-connection-setting .choices {
+	margin-bottom: 0;
+}
+
+#wpforms-panel-providers .wpforms-builder-provider-connection-setting .choices[data-type*="select-multiple"] .choices__input:focus {
+	border: none !important;
+	box-shadow: none !important;
+}

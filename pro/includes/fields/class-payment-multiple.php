@@ -67,6 +67,7 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 		// provides a filter to disable fancy display.
 		if (
 			'entry-table' !== $context &&
+			! empty( $field['type'] ) &&
 			'payment-multiple' === $field['type'] &&
 			! empty( $field['value'] ) &&
 			! empty( $field['image'] ) &&

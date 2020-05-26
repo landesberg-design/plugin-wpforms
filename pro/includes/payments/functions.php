@@ -444,6 +444,7 @@ function wpforms_get_payment_items( $fields = array() ) {
 
 	foreach ( $fields as $id => $field ) {
 		if (
+			empty( $field['type'] ) ||
 			! in_array( $field['type'], $payment_fields, true ) ||
 			empty( $field['amount'] ) ||
 			$field['amount'] == wpforms_sanitize_amount( '0' )

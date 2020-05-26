@@ -319,7 +319,7 @@ class WPForms_Conditional_Logic_Fields {
 
 				$allowed_keys = array( 'name', 'id', 'type' );
 
-				$fields = wpforms()->process->fields[ $field_id ];
+				$fields = ! empty( wpforms()->process->fields[ $field_id ] ) ? wpforms()->process->fields[ $field_id ] : false;
 
 				if ( is_array( $fields ) ) {
 					// Remove any values.

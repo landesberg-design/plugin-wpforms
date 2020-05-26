@@ -192,9 +192,9 @@ class Access {
 
 		$tab = array(
 			self::SLUG => array(
-				'name'   => \esc_html__( 'Access', 'wpforms-lite' ),
+				'name'   => \esc_html__( 'Access', 'wpforms' ),
 				'form'   => true,
-				'submit' => \esc_html__( 'Save Settings', 'wpforms-lite' ),
+				'submit' => \esc_html__( 'Save Settings', 'wpforms' ),
 			),
 		);
 
@@ -214,7 +214,7 @@ class Access {
 
 		$settings[ self::SLUG ][ self::SLUG . '-heading' ] = array(
 			'id'       => self::SLUG . '-heading',
-			'content'  => '<h4>' . \esc_html__( 'Access', 'wpforms-lite' ) . '</h4><p>' . \esc_html__( 'Select the user roles that are allowed access to WPForms.', 'wpforms-lite' ) . '</p>',
+			'content'  => '<h4>' . \esc_html__( 'Access', 'wpforms' ) . '</h4><p>' . \esc_html__( 'Select the user roles that are allowed access to WPForms.', 'wpforms' ) . '</p>',
 			'type'     => 'content',
 			'no_label' => true,
 			'class'    => array( 'section-heading' ),

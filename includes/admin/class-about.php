@@ -124,7 +124,7 @@ class WPForms_About {
 			) ||
 			wpforms_debug()
 		) {
-			$vs_tab_name = sprintf( /* translators: %1$s - current license type, %2$s - suggested license type. */
+			$vs_tab_name = sprintf( /* translators: %1$s - current license type; %2$s - suggested license type. */
 				esc_html__( '%1$s vs %2$s', 'wpforms-lite' ),
 				ucfirst( $license ),
 				$this->get_next_license( $license )
@@ -265,7 +265,7 @@ class WPForms_About {
 					<?php
 					printf(
 						wp_kses(
-						/* translators: %1$s - WPBeginner URL, %2$s - OptinMonster URL, %3$s - MonsterInsights URL, %4$s - RafflePress URL. */
+						/* translators: %1$s - WPBeginner URL; %2$s - OptinMonster URL; %3$s - MonsterInsights URL; %4$s - RafflePress URL. */
 							__( 'WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href="%1$s" target="_blank" rel="noopener noreferrer">WPBeginner</a>, the most popular lead-generation software, <a href="%2$s" target="_blank" rel="noopener noreferrer">OptinMonster</a>, the best WordPress analytics plugin, <a href="%3$s" target="_blank" rel="noopener noreferrer">MonsterInsights</a>, and the most powerful WordPress contest plugin, <a href="%4$s" target="_blank" rel="noopener noreferrer">RafflePress</a>.', 'wpforms-lite' ),
 							array(
 								'a' => array(
