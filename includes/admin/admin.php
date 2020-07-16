@@ -187,7 +187,6 @@ function wpforms_admin_scripts() {
 		'upload_image_title'              => esc_html__( 'Upload or Choose Your Image', 'wpforms-lite' ),
 		'upload_image_button'             => esc_html__( 'Use Image', 'wpforms-lite' ),
 		'upgrade_modal'                   => wpforms_get_upgrade_modal_text(),
-		'choicesjs_fields_select'         => esc_html__( 'Select fields', 'wpforms-lite' ),
 		'choicesjs_loading'               => esc_html__( 'Loading...', 'wpforms-lite' ),
 		'choicesjs_no_results'            => esc_html__( 'No results found', 'wpforms-lite' ),
 		'choicesjs_no_choices'            => esc_html__( 'No choices to choose from', 'wpforms-lite' ),

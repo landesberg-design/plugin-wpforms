@@ -1,11 +1,57 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.1.2] - 2020-07-08
+### Added
+- Data encryption/decryption tools to use within the WPForms ecosystem.
+- PHPMailer v6 compatibility that will come with WordPress 5.5.
+
+### Fixed
+- Entries export fails to finish when the number of entries is too large.
+
+## [1.6.1.1] - 2020-06-30
+### Fixed
+- Smart Phone field should correctly submit its default value.
+- Properly handle nested Conditional Logic for Dropdown fields (field depends on a field that depends on a field that depends on a field etc).
+
+## [1.6.1] - 2020-06-23
+### Added
+- Display a list of scheduled actions on WPForms > Tools > Scheduled Actions page.
+- Multiple select option for Dropdown field (off by default).
+- New Modern style option for Dropdown and Payment Dropdown fields (off by default).
+- Support Smart Tags in form descriptions.
+
+### Changed
+- Uploaded files to the WordPress Media library will now have a generated title and description based on field label and description.
+
+### Fixed
+- Properly handle multiple clicks on various accordion-like elements on Form Builder and Settings > Integrations pages.
+- Remove all the plugin-related information on uninstall from the DB when opted-in in plugin settings.
+- Avoid unnecessary DB queries when loading the Export Entries functionality.
+- Some plugins when generating own errors displayed the source of the issue in WPForms, not anymore. We simplified error handling.
+- Replace all new lines characters with spaces in notification email subjects (e.g., when an address field value is used in a subject via a smart tag).
+- Use a new filter `set_screen_option_{$option}` on the Forms and Entries pages for better compatibility with WP 5.4.2.
+- Make sure the plugin doesn't crash when `iconv` PHP extension is not installed on a server.
+- Improve the look of the Conditional Logic configuration area in the Form Builder on tablets.
+- Conditional logic should work correctly when it depends on a field with ID=0.
+- HTML Field Label should be carried over when the field is duplicated.
+- Properly handle fields with choices with new lines in their labels when connected to Conditional Logic.
+- Google Invisible v2 reCAPTCHA should show Submit Button Processing Text when the form is submitted.
+- A lot of searches on the Entries page could result in server failure.
+- Display inline validation for required Smart Phone field, when there are multiple such fields in a form.
+- Update the library used for Smart Phone field, which has fixed known mobile issues and duplicated IDs for the field.
+- Display the list of countries in the "Countries" preset and in the Address field in alphabetical order regardless of the current site language.
+- Entry editing not properly displaying all 0 (zero) field values.
+- Error if entry editing contained an empty required field.
+
 ## [1.6.0.2] - 2020-05-19
+### Added
+- Helper functions to dequeue scripts/styles by URI.
+
 ### Fixed
 - Phone field should not allow alphabet input but allow spaces.
 - Product education URL encoding issues.
-- Large forms with a numerous conditional logic rules experience significant UI slowdowns in the Form Builder.
+- Large forms with numerous conditional logic rules experience significant UI slowdowns in the Form Builder.
 - The default value 0 (zero) of the Paragraph Text field does not display on the frontend.
 - Securely store WPForms anonymized cookie, so it cannot be sent along with cross-site requests (samesite).
 - Entries list page on mobile devices was unusable: columns were not shown properly, links for each entry in a table were unclickable.
@@ -13,9 +59,9 @@ All notable changes to this project will be documented in this file and formatte
 - Improved escaping inside Form Builder live preview, props Fortinet Fortiguard Labs.
 - Date field format defaults to YYYY-MM-DD format no matter what format is selected.
 - Page break field should always behave correctly on front-end even when its settings are broken.
-- Incorrect interval value was used when running a clean up job after notifications sent.
+- Incorrect interval value was used when running a cleanup job after notifications sent.
 - Correctly display Smart phone field country selection on mobile.
-- Improved plugin custom capabilities handling inside WordPress admin area. 
+- Improved plugin custom capabilities handling inside the WordPress admin area. 
 - Do not generate errors when editing entries for forms that don't have fields anymore.
 - Delete orphaned plugin translation files when cleanup option in plugin settings is checked and the plugin is deleted from the site.
 - Prevent entry duplicates creation by improving permissions check when allowing non-admins to edit entries.

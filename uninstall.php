@@ -30,7 +30,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 require_once 'wpforms.php';
 
 // Confirm user has decided to remove all data, otherwise stop.
-$settings = get_option( 'wpforms_settings', array() );
+$settings = get_option( 'wpforms_settings', [] );
 if ( empty( $settings['uninstall-data'] ) ) {
 	return;
 }
@@ -58,12 +58,12 @@ if ( ! empty( $preview_page ) ) {
 
 // Delete wpforms and wpforms_log post type posts/post_meta.
 $wpforms_posts = get_posts(
-	array(
-		'post_type'   => array( 'wpforms_log', 'wpforms' ),
+	[
+		'post_type'   => [ 'wpforms_log', 'wpforms' ],
 		'post_status' => 'any',
 		'numberposts' => - 1,
 		'fields'      => 'ids',
-	)
+	]
 );
 if ( $wpforms_posts ) {
 	foreach ( $wpforms_posts as $wpforms_post ) {
@@ -71,8 +71,14 @@ if ( $wpforms_posts ) {
 	}
 }
 
-// Delete plugin settings.
+// Delete all the plugin settings.
 $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'wpforms\_%'" );
+
+// Delete widget settings.
+$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'widget\_wpforms%'" );
+
+// Delete options from the previous version of the Notifications functionality.
+$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_amn\_wpforms\_%'" );
 
 // Delete plugin user meta.
 $wpdb->query( "DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE 'wpforms\_%'" );
@@ -106,5 +112,7 @@ if ( ! empty( $translations ) ) {
 // Remove plugin cron jobs.
 wp_clear_scheduled_hook( 'wpforms_email_summaries_cron' );
 
-// Unschedule all ActionScheduler actions by group.
-wpforms()->get( 'tasks' )->cancel_all();
+// Unschedule all plugin ActionScheduler actions.
+// Don't use wpforms() because 'tasks' in core are registered on `init` hook,
+// which is not executed on uninstall.
+( new \WPForms\Tasks\Tasks() )->cancel_all();

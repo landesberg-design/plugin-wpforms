@@ -149,6 +149,10 @@ div.wpforms-container-full .wpforms-form,
 
 			// don't let the contents wrap AKA the container will be as wide as the contents
 			white-space: nowrap;
+			// except on small screens, where we force the dropdown width to match the input
+			@media (max-width: 500px) {
+				white-space: normal;
+			}
 
 			max-height: 200px;
 			overflow-y: scroll;
@@ -195,12 +199,12 @@ div.wpforms-container-full .wpforms-form,
 		}
 
 		// spacing between country flag, name and dial code
-		&__flag-box, &__country-name {
+		&__flag-box, &__country-name, &__dial-code {
 			vertical-align: middle;
 			line-height: 1;
 		}
 		&__flag-box, &__country-name {
-			margin-right: 10px;
+			margin-right: 6px;
 		}
 
 		// these settings are independent of each other, but both move selected flag to left of input

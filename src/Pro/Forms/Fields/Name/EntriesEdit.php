@@ -32,9 +32,9 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 
 		foreach ( [ 'primary', 'first', 'middle', 'last' ] as $input ) {
 			if ( $input === 'primary' ) {
-				$entry_field[ $input ] = $entry_field['value'];
+				$entry_field[ $input ] = isset( $entry_field['value'] ) ? $entry_field['value'] : '';
 			}
-			if ( ! empty( $entry_field[ $input ] ) ) {
+			if ( isset( $entry_field[ $input ] ) ) {
 				$field['properties'] = $this->field_object->get_field_populated_single_property_value_public( $entry_field[ $input ], $input, $field['properties'], $field );
 			}
 		}

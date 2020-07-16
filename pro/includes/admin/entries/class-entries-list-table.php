@@ -1156,6 +1156,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function prepare_items() {
 
+		$_SERVER['REQUEST_URI'] = remove_query_arg( '_wp_http_referer', $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+
 		// Retrieve count.
 		$this->get_counts();
 

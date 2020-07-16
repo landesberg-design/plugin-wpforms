@@ -82,7 +82,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 			'wpforms-smart-phone-field',
 			WPFORMS_PLUGIN_URL . "pro/assets/css/vendor/intl-tel-input{$min}.css",
 			array(),
-			'16.0.8'
+			'17.0.3'
 		);
 	}
 
@@ -100,7 +100,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 			'wpforms-smart-phone-field',
 			WPFORMS_PLUGIN_URL . "pro/assets/js/vendor/jquery.intl-tel-input{$min}.js",
 			array( 'jquery' ),
-			'16.0.8',
+			'17.0.3',
 			true
 		);
 	}

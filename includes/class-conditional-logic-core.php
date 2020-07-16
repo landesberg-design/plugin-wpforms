@@ -546,6 +546,7 @@ class WPForms_Conditional_Logic_Core {
 	 * Check if a form passes the conditional logic rules that are provided.
 	 *
 	 * @since 1.3.8
+	 * @since 1.6.1 Added multiple select support.
 	 *
 	 * @param array $fields       List of fields with data and settings.
 	 * @param array $form_data    Form data and settings.
@@ -646,7 +647,7 @@ class WPForms_Conditional_Logic_Core {
 							// it ourselves.
 							$provided_id = array();
 
-							if ( 'checkbox' === $fields[ $rule_field ]['type'] ) {
+							if ( in_array( $fields[ $rule_field ]['type'], array( 'checkbox', 'select' ), true ) ) {
 								$values = explode( "\n", $fields[ $rule_field ]['value'] );
 							} else {
 								$values = (array) $fields[ $rule_field ]['value'];
@@ -655,6 +656,12 @@ class WPForms_Conditional_Logic_Core {
 							foreach ( $form_data['fields'][ $rule_field ]['choices'] as $key => $choice ) {
 
 								$choice = array_map( 'wpforms_decode_string', $choice );
+
+								if ( in_array( $fields[ $rule_field ]['type'], [ 'radio', 'checkbox', 'select' ], true ) ) {
+									// Remove newlines from the choice (label or value) before comparing.
+									// Newlines can be pasted with a long text to the choice label (or value) in the form builder.
+									$choice = array_map( 'sanitize_text_field', $choice );
+								}
 
 								foreach ( $values as $value ) {
 									$value = wpforms_decode_string( $value );

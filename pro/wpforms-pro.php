@@ -84,6 +84,7 @@ class WPForms_Pro {
 		add_filter( 'wpforms_email_footer_text', array( $this, 'form_notification_footer' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueues' ) );
 		add_filter( 'wpforms_helpers_templates_get_theme_template_paths', array( $this, 'add_templates' ) );
+		add_filter( 'wpforms_integrations_usagetracking_is_enabled', '__return_true' );
 	}
 
 	/**
@@ -213,7 +214,7 @@ class WPForms_Pro {
 	 * @since 1.5.0
 	 */
 	public function load_textdomain() {
-		load_plugin_textdomain( 'wpforms', false, dirname( plugin_basename( WPFORMS_PLUGIN_FILE ) ) . '/pro/languages/' );
+		load_plugin_textdomain( 'wpforms', false, dirname( plugin_basename( WPFORMS_PLUGIN_FILE ) ) . '/pro/assets/languages/' );
 	}
 
 	/**
@@ -425,6 +426,8 @@ class WPForms_Pro {
 			),
 			'gdpr'
 		);
+
+		unset( $settings['misc'][ \WPForms\Integrations\UsageTracking\UsageTracking::SETTINGS_SLUG ] );
 
 		return $settings;
 	}

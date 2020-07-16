@@ -43,6 +43,7 @@ body {
 	line-height: 18px;
 	color: #444;
 	margin: 1px;
+	height: auto;
 }
 #wpforms-builder input[type=radio],
 #wpforms-builder input[type=checkbox] {

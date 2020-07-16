@@ -47,10 +47,19 @@
 }
 
 .wpforms-conditional-block .field {
-	width: 130px;
+	width: 35%;
+	max-width: 35%;
 }
-.wpforms-conditional-block .value {
 
+.wpforms-conditional-block .operator {
+	width: 20%;
+	min-width: 80px;
+	max-width: 140px;
+}
+
+.wpforms-conditional-block .value {
+	width: 35%;
+	max-width: 250px;
 }
 
 .wpforms-conditional-block .value :disabled {
@@ -58,20 +67,23 @@
 	cursor:not-allowed;
 }
 
-.wpforms-conditional-block .operator {
-	width: 68px;
-}
-
 .wpforms-conditional-block .actions {
 	width: 66px;
+	min-width: 66px;
 }
 
 .wpforms-conditional-block .wpforms-conditional-row input,
 .wpforms-conditional-block .wpforms-conditional-row select {
 	font-size: 13px;
-	width: 100%;
+	width: 100% !important;
+	max-width: 100%;
 	box-shadow: none;
 	margin: 0;
+	text-overflow: ellipsis;
+}
+
+.wpforms-conditional-block h4 select {
+	margin-right: 10px !important;
 }
 
 .wpforms-conditional-block .wpforms-conditional-rule-add {
@@ -112,4 +124,36 @@
 	color: #fff;
 	padding: 6px 12px;
 	border-radius: 2px;
+}
+
+@media screen and (min-width: 1440px) {
+
+	.wpforms-conditional-block .field {
+		width: 264px;
+		max-width: 264px;
+	}
+
+	.wpforms-conditional-block .operator {
+		width: 150px;
+		max-width: 150px;
+	}
+
+	.wpforms-conditional-block .value {
+		width: 264px;
+		max-width: 264px;
+	}
+
+	.wpforms-conditional-block .actions {
+		width: auto;
+		min-width: 66px;
+	}
+}
+
+@media screen and (max-width: 960px) {
+
+	.wpforms-builder-settings-block .wpforms-conditional-block .wpforms-conditional-row td {
+		display: block;
+		width: 100%;
+		max-width: 100%;
+	}
 }

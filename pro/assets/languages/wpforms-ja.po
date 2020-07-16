@@ -1,0 +1,3363 @@
+# Translation of WPForms - WPForms in Japanese
+# This file is distributed under the same license as the WPForms - WPForms package.
+msgid ""
+msgstr ""
+"Project-Id-Version: WPForms - WPForms\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms\n"
+"POT-Creation-Date: 2020-06-17T11:44:43+03:00\n"
+"PO-Revision-Date: 2020-06-17 11:47+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 2.3.1\n"
+
+#. Plugin Name of the plugin
+#. Author of the plugin
+#: src/Pro/Access/Integrations.php:94 src/Pro/Access/Integrations.php:151
+#: src/Pro/Admin/DashboardWidget.php:200
+msgid "WPForms"
+msgstr "WPForms"
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://wpforms.com"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"Beginner friendly WordPress contact form plugin. Use our Drag & Drop form "
+"builder to create your WordPress forms."
+msgstr ""
+
+#: includes/admin/class-settings.php:523
+msgid ""
+"Check this if you would like to remove ALL WPForms data upon plugin "
+"deletion. All forms, entries, and uploaded files will be unrecoverable."
+msgstr ""
+"プラグインの削除時にすべての WPForms データを削除したい場合はこれをチェックし"
+"てください。すべてのフォーム、エントリー、およびアップロードされたファイルは"
+"回復不可能になります。"
+
+#. translators: %1$s - source name; %2$s - type name.
+#: includes/fields/class-base.php:945
+msgid "Choices are dynamically populated from the %1$s %2$s."
+msgstr "選択肢は、%1$s%2$s から動的に取り込まれます。"
+
+#: pro/includes/admin/ajax-actions.php:43
+#: pro/includes/admin/entries/class-entries-list-table.php:918
+#: pro/includes/admin/entries/class-entries-single.php:174
+msgid "Entry starred."
+msgstr "エントリーにスターを付けました。"
+
+#: pro/includes/admin/ajax-actions.php:53
+#: pro/includes/admin/entries/class-entries-list-table.php:977
+#: pro/includes/admin/entries/class-entries-single.php:206
+msgid "Entry unstarred."
+msgstr "スターなしのエントリー。"
+
+#: pro/includes/admin/ajax-actions.php:113
+#: pro/includes/admin/entries/class-entries-list-table.php:800
+#: pro/includes/admin/entries/class-entries-single.php:520
+#: src/Pro/Admin/Entries/Edit.php:401
+msgid "Entry read."
+msgstr "エントリーが読み取られました。"
+
+#: pro/includes/admin/ajax-actions.php:123
+#: pro/includes/admin/entries/class-entries-list-table.php:859
+#: pro/includes/admin/entries/class-entries-single.php:272
+msgid "Entry unread."
+msgstr "未読のエントリー。"
+
+#: pro/includes/admin/ajax-actions.php:165
+#: pro/includes/admin/ajax-actions.php:209
+msgid "Please enter a license key."
+msgstr "ライセンスキーを入力してください。"
+
+#: pro/includes/admin/class-addons.php:89
+msgid "WPForms Addons"
+msgstr "WPFormsのアドオン"
+
+#: pro/includes/admin/class-addons.php:91
+msgid "Refresh Addons"
+msgstr "アドオンを更新"
+
+#: pro/includes/admin/class-addons.php:93
+msgid "Search Addons"
+msgstr "アドオンを検索"
+
+#: pro/includes/admin/class-addons.php:99
+msgid ""
+"There was an issue retrieving Addons for this site. Please click on the "
+"button above to refresh."
+msgstr ""
+"このサイトのアドオンの取得中に問題が発生しました。更新するには、上のボタンを"
+"クリックしてください。"
+
+#: pro/includes/admin/class-addons.php:105
+msgid ""
+"In order to get access to Addons, you need to resolve your license key "
+"errors."
+msgstr ""
+"アドオンにアクセスするには、ライセンスキーのエラーを解決する必要があります。"
+
+#: pro/includes/admin/class-addons.php:111
+msgid ""
+"In order to get access to Addons, you need to verify your license key for "
+"WPForms."
+msgstr ""
+"アドオンにアクセスするには、WPFormsのライセンスキーを確認する必要があります。"
+
+#: pro/includes/admin/class-addons.php:119
+msgid "Addons have successfully been refreshed."
+msgstr "アドオンは正常に更新されました。"
+
+#. translators: %s - refresh addons page URL.
+#: pro/includes/admin/class-addons.php:132
+msgid ""
+"Improve your forms with our premium addons. Missing an addon that you think "
+"you should be able to see? Click the <a href=\"%s\">Refresh Addons</a> "
+"button above."
+msgstr ""
+"プレミアムアドオンでフォームを改良する。見ることができるはずであると思うアド"
+"オンを逃していますか？上の<a href=\"%s\">「アドオンを更新」</a>ボタンをクリッ"
+"クしてください。"
+
+#: pro/includes/admin/class-addons.php:144
+msgid "Available Addons"
+msgstr "可用なアドオン"
+
+#: pro/includes/admin/class-addons.php:198
+msgid "Unlock More Features..."
+msgstr "もっと機能を見る"
+
+#. translators: %s - WPForms.com Account page URL.
+#: pro/includes/admin/class-addons.php:203
+msgid ""
+"Want to get even more features? <a href=\"%s\" target=\"_blank\" rel="
+"\"noopener noreferrer\">Upgrade your WPForms account</a> and unlock the "
+"following extensions."
+msgstr ""
+"さらに多くの機能を入手したいですか？次の拡張子を表示するように<a href=\"%s\" "
+"target=\"_blank\" rel=\"noopener noreferrer\">WPFormsアカウントをアップグレー"
+"ドしてください</a>。"
+
+#: pro/includes/admin/class-addons.php:244
+msgid "Active"
+msgstr "有効"
+
+#: pro/includes/admin/class-addons.php:247
+msgid "Not Installed"
+msgstr "未インストール"
+
+#: pro/includes/admin/class-addons.php:250
+msgid "Inactive"
+msgstr "停止中"
+
+#. translators: %s - addon status label.
+#. translators: %s - entry payment status.
+#: pro/includes/admin/class-addons.php:275
+#: pro/includes/admin/entries/class-entries-single.php:1123
+msgid "Status: %s"
+msgstr "ステータス: %s"
+
+#: pro/includes/admin/class-addons.php:289
+msgid "Deactivate"
+msgstr "停止"
+
+#: pro/includes/admin/class-addons.php:294
+msgid "Activate"
+msgstr "有効化"
+
+#: pro/includes/admin/class-addons.php:299
+msgid "Install Addon"
+msgstr "アドオンをインストールする"
+
+#: pro/includes/admin/class-addons.php:302
+msgid "Upgrade Now"
+msgstr "今すぐアップグレード"
+
+#: pro/includes/admin/class-license.php:97
+#: pro/includes/admin/class-license.php:193
+#: pro/includes/admin/class-license.php:289
+msgid ""
+"There was an error connecting to the remote key API. Please try again later."
+msgstr ""
+"リモートキーAPIへの接続中にエラーが発生しました。後でもう一度やり直してくださ"
+"い。"
+
+#: pro/includes/admin/class-license.php:118
+msgid "Congratulations! This site is now receiving automatic updates."
+msgstr "おめでとうございます！ このサイトは現在自動更新を受けています。"
+
+#: pro/includes/admin/class-license.php:212
+#: pro/includes/admin/class-license.php:422
+msgid ""
+"Your license key for WPForms is invalid. The key no longer exists or the "
+"user associated with the key has been deleted. Please use a different key to "
+"continue receiving automatic updates."
+msgstr ""
+"WPFormsのライセンスキーが無効です。キーが存在しないか、キーに関連付けられてい"
+"るユーザーが削除されました。自動更新を引き続き受信するには、別のキーを使用し"
+"てください。"
+
+#: pro/includes/admin/class-license.php:226
+msgid ""
+"Your license key for WPForms has expired. Please renew your license key on "
+"WPForms.com to continue receiving automatic updates."
+msgstr ""
+"WPFormsのライセンスキーは期限切れです。自動更新の受信を継続するには、WPForms."
+"comでライセンスキーを更新してください。"
+
+#: pro/includes/admin/class-license.php:240
+#: pro/includes/admin/class-license.php:413
+msgid ""
+"Your license key for WPForms has been disabled. Please use a different key "
+"to continue receiving automatic updates."
+msgstr ""
+"WPFormsのライセンスキーが無効になっています。自動更新を引き続き受信するには、"
+"別のキーを使用してください。"
+
+#: pro/includes/admin/class-license.php:256
+msgid "Your key has been refreshed successfully."
+msgstr "キーは正常に更新されました。"
+
+#: pro/includes/admin/class-license.php:311
+msgid "You have deactivated the key from this site successfully."
+msgstr "このサイトからキーを無効にしました。"
+
+#. translators: %s - plugin settings page URL.
+#: pro/includes/admin/class-license.php:357
+msgid ""
+"Please <a href=\"%s\">enter and activate</a> your license key for WPForms to "
+"enable automatic updates."
+msgstr ""
+"WPFormsによる自動更新を有効にするには、ライセンスキーを<a href=\"%s\">入力し"
+"て有効化して</a>ください。"
+
+#: pro/includes/admin/class-license.php:396
+#: src/Pro/Admin/Builder/LicenseAlert.php:143
+msgid "Heads up! Your WPForms license has expired."
+msgstr "注意喚起！ WPForms ライセンスの有効期限が切れています。"
+
+#: pro/includes/admin/class-license.php:399
+msgid ""
+"An active license is needed to create new forms and edit existing forms. It "
+"also provides access to new features & addons, plugin updates (including "
+"security improvements), and our world class support!"
+msgstr ""
+"新しいフォームを作成し、既存のフォームを編集するには、有効化済みライセンスが"
+"必要です。また、新機能やアドオン、プラグインの更新（セキュリティーの改善を含"
+"む）、そして素晴らしいサポートへのアクセスも提供します！"
+
+#: pro/includes/admin/class-license.php:402
+#: src/Pro/Admin/Builder/LicenseAlert.php:145
+msgid "Renew Now"
+msgstr "今すぐ更新"
+
+#: pro/includes/admin/class-license.php:403
+#: src/Lite/Admin/Builder/Education.php:710
+#: src/Pro/Admin/Builder/LicenseAlert.php:146
+#: src/Pro/Admin/DashboardWidget.php:264 src/Pro/Admin/DashboardWidget.php:477
+#: src/Pro/Admin/Education.php:335
+msgid "Learn More"
+msgstr "続きを読む"
+
+#: pro/includes/admin/entries/class-entries-export.php:221
+#: pro/includes/admin/entries/class-entries-list-table.php:179
+#: pro/includes/fields/class-date-time.php:105
+#: pro/includes/fields/class-date-time.php:264
+#: pro/includes/fields/class-date-time.php:344
+#: pro/includes/fields/class-date-time.php:582
+#: pro/includes/fields/class-date-time.php:590
+msgid "Date"
+msgstr "日付"
+
+#: pro/includes/admin/entries/class-entries-export.php:222
+msgid "Date GMT"
+msgstr "日付GMT"
+
+#: pro/includes/admin/entries/class-entries-export.php:223
+msgid "ID"
+msgstr "ID"
+
+#: pro/includes/admin/entries/class-entries-export.php:366
+msgid "You do not have permission to export entries."
+msgstr "エントリーをエクスポートする権限がありません。"
+
+#: pro/includes/admin/entries/class-entries-export.php:367
+msgid "Error"
+msgstr "エラー"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:142
+msgid "All"
+msgstr "以下のすべて"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:143
+msgid "Unread"
+msgstr "未読"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:144
+#: src/Pro/Admin/Entries/Export/Export.php:136
+msgid "Starred"
+msgstr "スター付き"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:170
+#: pro/includes/fields/class-payment-total.php:18
+#: src/Pro/Admin/Entries/Export/Ajax.php:648
+msgid "Total"
+msgstr "合計"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:176
+msgid "Status"
+msgstr "ステータス"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:181
+#: pro/includes/admin/entries/class-entries-single.php:1325
+msgid "Actions"
+msgstr "操作"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:182
+msgid "Change columns to display"
+msgstr "表示する列を変更する"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:249
+#: pro/includes/admin/entries/class-entries-list.php:664
+#: pro/includes/admin/entries/class-entries-list.php:691
+#: src/Pro/Admin/Entries/Export/Export.php:132
+msgid "Entry ID"
+msgstr "回答 ID"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:255
+#: pro/includes/admin/entries/class-entries-list.php:668
+#: pro/includes/admin/entries/class-entries-list.php:698
+#: src/Pro/Admin/Entries/Export/Export.php:134
+msgid "Entry Notes"
+msgstr "エントリーノート"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:264
+#: pro/includes/admin/entries/class-entries-list-table.php:273
+#: pro/includes/admin/entries/class-entries-list-table.php:1090
+#: pro/includes/admin/entries/class-entries-list.php:675
+#: pro/includes/admin/entries/class-entries-list.php:711
+msgid "Field"
+msgstr "フィールド"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:313
+#: pro/includes/admin/entries/class-entries-single.php:1071
+#: src/Pro/Admin/Entries/Export/Ajax.php:602
+msgid "Unknown"
+msgstr "不明"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:315
+msgid "Payment"
+msgstr "支払い"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:320
+#: pro/includes/admin/entries/class-entries-single.php:1012
+#: src/Pro/Admin/Entries/Export/Ajax.php:608
+msgid "Completed"
+msgstr "完了"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:347
+msgid "Recurring"
+msgstr "繰り返し"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:491
+msgid "Unstar entry"
+msgstr "エントリーからスターを削除"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:491
+msgid "Star entry"
+msgstr "エントリーにスターを追加"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:496
+msgid "Mark entry unread"
+msgstr "エントリを「未読」としてマークします。"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:496
+msgid "Mark entry read"
+msgstr "エントリを「既読」として記号をつける。"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:527
+msgid "View Form Entry"
+msgstr "フォームエントリーを表示する"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:528
+msgid "View"
+msgstr "表示"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:544
+msgid "Edit Form Entry"
+msgstr "フォームエントリーの編集"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:545
+#: src/Pro/Admin/Entries/Edit.php:451
+msgid "Edit"
+msgstr "編集"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:566
+msgid "Delete Form Entry"
+msgstr "フォームエントリーを削除する"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:567
+#: pro/includes/admin/entries/class-entries-list-table.php:656
+msgid "Delete"
+msgstr "削除"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:591
+#: src/Pro/Admin/Entries/Export/Admin.php:86
+msgid "Select a date range"
+msgstr "日付の範囲を選択"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:595
+msgid "Filter"
+msgstr "フィルター"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:651
+msgid "Mark Read"
+msgstr "「既読」としてマークする。"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:652
+#: pro/includes/admin/entries/class-entries-single.php:1309
+msgid "Mark Unread"
+msgstr "「未読」としてマークする。"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:653
+#: pro/includes/admin/entries/class-entries-single.php:1273
+#: pro/includes/fields/class-rating.php:239
+msgid "Star"
+msgstr "スター"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:654
+#: pro/includes/admin/entries/class-entries-single.php:1273
+msgid "Unstar"
+msgstr "スターを削除"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:655
+msgid "----------"
+msgstr "----------"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1064
+msgid "No entries found."
+msgstr "エントリーが見つかりませんでした。"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1066
+msgid "Whoops, it appears you do not have any form entries yet."
+msgstr "おっと、まだフォームのエントリーがないようです。"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1108
+#: src/Pro/Admin/Entries/Export/Admin.php:228
+msgid "Any form field"
+msgstr "すべてのフィールド"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1126
+#: src/Pro/Admin/Entries/Export/Admin.php:248
+msgid "contains"
+msgstr "次の文字列を含む"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1127
+#: src/Pro/Admin/Entries/Export/Admin.php:249
+msgid "does not contain"
+msgstr "含まない"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1128
+#: src/Pro/Admin/Entries/Export/Admin.php:250
+msgid "is"
+msgstr "＝"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1129
+#: src/Pro/Admin/Entries/Export/Admin.php:251
+msgid "is not"
+msgstr "≠"
+
+#: pro/includes/admin/entries/class-entries-list.php:184
+msgid "Number of entries per page:"
+msgstr "ページあたりの回答数:"
+
+#: pro/includes/admin/entries/class-entries-list.php:284
+msgid "All entries marked as read."
+msgstr "すべてのエントリーが「既読」としてマークされました。"
+
+#: pro/includes/admin/entries/class-entries-list.php:347
+msgid "All entries for the currently selected form were successfully deleted."
+msgstr "現在選択されているフォームのすべてのエントリーは正常に削除されました。"
+
+#. translators: %s - WPForms Builder page.
+#: pro/includes/admin/entries/class-entries-list.php:529
+msgid ""
+"Whoops, you haven't created a form yet. Want to <a href=\"%s\">give it a go</"
+"a>?"
+msgstr ""
+"おっと、まだフォームを作成していません。それを<a href=\"%s\">試してみません"
+"か？</a>"
+
+#: pro/includes/admin/entries/class-entries-list.php:580
+#: pro/wpforms-pro.php:571 src/Pro/Admin/AdminBarMenu.php:103
+#: src/Pro/Admin/DashboardWidget.php:181
+#: src/Pro/Admin/Entries/DefaultScreen.php:97
+msgid "Entries"
+msgstr "回答"
+
+#: pro/includes/admin/entries/class-entries-list.php:612
+#: src/Pro/Admin/Entries/Export/Admin.php:90
+msgid "Search"
+msgstr "検索"
+
+#: pro/includes/admin/entries/class-entries-list.php:648
+msgid "Select the fields to show when viewing the entries list for this form."
+msgstr ""
+"このフォームのエントリーリストを表示するときに表示するフィールドを選択しま"
+"す。"
+
+#: pro/includes/admin/entries/class-entries-list.php:650
+msgid ""
+"Currently columns have not been configured, so we're showing the first 3 "
+"fields."
+msgstr "現在列は構成されていないので、最初の3つのフィールドを表示しています。"
+
+#: pro/includes/admin/entries/class-entries-list.php:792
+msgid "Select Form"
+msgstr "フォームを選択"
+
+#: pro/includes/admin/entries/class-entries-list.php:808
+msgid "All Entries"
+msgstr "すべてのエントリー"
+
+#: pro/includes/admin/entries/class-entries-list.php:815
+msgid "Edit This Form"
+msgstr "フォームを編集"
+
+#: pro/includes/admin/entries/class-entries-list.php:822
+msgid "Preview Form"
+msgstr "フォームをプレビュー"
+
+#: pro/includes/admin/entries/class-entries-list.php:829
+msgid "Export Filtered (CSV)"
+msgstr "フィルターされたエクスポート (CSV)"
+
+#: pro/includes/admin/entries/class-entries-list.php:829
+msgid "Export All (CSV)"
+msgstr "すべてエクスポート（CSV）"
+
+#: pro/includes/admin/entries/class-entries-list.php:834
+msgid "Mark All Read"
+msgstr "すべてを「既読」としてマークする"
+
+#: pro/includes/admin/entries/class-entries-list.php:840
+msgid "Delete All"
+msgstr "すべてを削除"
+
+#: pro/includes/admin/entries/class-entries-list.php:867
+msgid "Open form selector"
+msgstr "フォームセレクターをオープン"
+
+#. translators: %d - Number of form entries.
+#: pro/includes/admin/entries/class-entries-list.php:964
+msgid "See %d new entry"
+msgid_plural "See %d new entries"
+msgstr[0] "%d件の新しいエントリーを表示"
+
+#: pro/includes/admin/entries/class-entries-single.php:184
+msgid "This entry has been starred."
+msgstr "スターがこのエントリに追加されました。"
+
+#: pro/includes/admin/entries/class-entries-single.php:216
+msgid "This entry has been unstarred."
+msgstr "スターはこのエントリーから削除されました。"
+
+#: pro/includes/admin/entries/class-entries-single.php:280
+msgid "This entry has been marked unread."
+msgstr "このエントリーは「未読」としてマークされています。"
+
+#: pro/includes/admin/entries/class-entries-single.php:323
+msgid "Note deleted."
+msgstr "メモを削除しました。"
+
+#: pro/includes/admin/entries/class-entries-single.php:365
+msgid "Note added."
+msgstr "メモを追加しました。"
+
+#: pro/includes/admin/entries/class-entries-single.php:399
+msgid "Notifications were resent!"
+msgstr "通知を正常に再送しました。"
+
+#: pro/includes/admin/entries/class-entries-single.php:417
+#: src/Pro/Admin/Entries/Edit.php:342
+msgid "Invalid entry ID."
+msgstr "エントリー ID が無効です。"
+
+#: pro/includes/admin/entries/class-entries-single.php:430
+#: src/Pro/Admin/Entries/Edit.php:352
+msgid "Entry not found."
+msgstr "エントリーが見つかりません。"
+
+#: pro/includes/admin/entries/class-entries-single.php:443
+#: src/Pro/Admin/Entries/Edit.php:362
+msgid "Form not found."
+msgstr "フォームが見つかりません。"
+
+#: pro/includes/admin/entries/class-entries-single.php:559
+#: src/Pro/Admin/Entries/Edit.php:314
+msgid "View Entry"
+msgstr "エントリーを表示"
+
+#: pro/includes/admin/entries/class-entries-single.php:561
+#: src/Pro/Admin/Entries/Edit.php:488
+msgid "Back to All Entries"
+msgstr "すべてのエントリーに戻る"
+
+#. translators: %1$s - current number of entry; %2$s - total number of entries.
+#: pro/includes/admin/entries/class-entries-single.php:568
+msgid "Entry %1$s of %2$s"
+msgstr "%2$sの%1$sエントリー"
+
+#: pro/includes/admin/entries/class-entries-single.php:575
+msgid "Previous form entry"
+msgstr "前のフォームエントリー"
+
+#: pro/includes/admin/entries/class-entries-single.php:579
+msgid "Current form entry"
+msgstr "現在のフォームエントリー"
+
+#: pro/includes/admin/entries/class-entries-single.php:581
+msgid "Next form entry"
+msgstr "次のフォームエントリー"
+
+#: pro/includes/admin/entries/class-entries-single.php:635
+#: src/Pro/Admin/Entries/Edit.php:544
+msgid "Show Empty Fields"
+msgstr "空のフィールドを表示"
+
+#: pro/includes/admin/entries/class-entries-single.php:635
+#: src/Pro/Admin/Entries/Edit.php:544
+msgid "Hide Empty Fields"
+msgstr "空のフィールドを隠す"
+
+#: pro/includes/admin/entries/class-entries-single.php:647
+#: src/Pro/Admin/Entries/Edit.php:554
+#: src/Pro/Admin/Entries/PrintPreview.php:215
+msgid "This entry does not have any fields"
+msgstr "このエントリーにはフィールドがありません"
+
+#. translators: %d - field ID.
+#: pro/includes/admin/entries/class-entries-single.php:670
+#: src/Pro/Admin/Entries/Edit.php:637
+#: src/Pro/Admin/Entries/PrintPreview.php:230
+msgid "Field ID #%d"
+msgstr "フィールド ID #%d"
+
+#: pro/includes/admin/entries/class-entries-single.php:675
+#: src/Pro/Admin/Entries/Edit.php:685
+#: src/Pro/Admin/Entries/PrintPreview.php:233
+msgid "Empty"
+msgstr "空"
+
+#: pro/includes/admin/entries/class-entries-single.php:712
+#: src/Pro/Admin/Entries/PrintPreview.php:250
+msgid "Notes"
+msgstr "メモ"
+
+#: pro/includes/admin/entries/class-entries-single.php:721
+#: pro/includes/admin/entries/class-entries-single.php:736
+msgid "Add Note"
+msgstr "メモを追加"
+
+#: pro/includes/admin/entries/class-entries-single.php:737
+#: src/Pro/Admin/Entries/Export/Admin.php:100
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: pro/includes/admin/entries/class-entries-single.php:746
+msgid "No notes."
+msgstr "メモがありません。"
+
+#. translators: %1$s - user link; %2$s - date.
+#. translators: %1$s - user name; %2$s - date.
+#: pro/includes/admin/entries/class-entries-single.php:785
+#: pro/includes/admin/entries/class-entries-single.php:857
+#: src/Pro/Admin/Entries/PrintPreview.php:263
+msgid "Added by %1$s on %2$s"
+msgstr "%2$s に %1$s によって追加されました"
+
+#: pro/includes/admin/entries/class-entries-single.php:793
+msgctxt "Entry: note"
+msgid "Delete"
+msgstr "削除"
+
+#: pro/includes/admin/entries/class-entries-single.php:827
+msgid "Log"
+msgstr "ログ"
+
+#: pro/includes/admin/entries/class-entries-single.php:834
+msgid "No logs."
+msgstr "ログはありません。"
+
+#: pro/includes/admin/entries/class-entries-single.php:897
+msgid "Debug Information"
+msgstr "デバッグ情報"
+
+#: pro/includes/admin/entries/class-entries-single.php:929
+msgid "Entry Details"
+msgstr "エントリー詳細"
+
+#. translators: %s - entry ID.
+#: pro/includes/admin/entries/class-entries-single.php:941
+msgid "Entry ID: %s"
+msgstr "エントリー ID：%s"
+
+#. translators: %1$s - post type name; %2$s - post type ID.
+#: pro/includes/admin/entries/class-entries-single.php:959
+msgid "%1$s ID: %2$s"
+msgstr "%1$s ID: %2$s"
+
+#: pro/includes/admin/entries/class-entries-single.php:970
+msgid "Submitted:"
+msgstr "提出された："
+
+#: pro/includes/admin/entries/class-entries-single.php:977
+msgid "Modified:"
+msgstr "修正："
+
+#: pro/includes/admin/entries/class-entries-single.php:986
+msgid "User:"
+msgstr "ユーザー："
+
+#: pro/includes/admin/entries/class-entries-single.php:1003
+msgid "User IP:"
+msgstr "ユーザー IP："
+
+#: pro/includes/admin/entries/class-entries-single.php:1011
+msgid "Status:"
+msgstr "ステータス:"
+
+#: pro/includes/admin/entries/class-entries-single.php:1042
+msgid "Delete Entry"
+msgstr "エントリーを消す"
+
+#: pro/includes/admin/entries/class-entries-single.php:1084
+#: src/Pro/Admin/Builder/Education.php:475
+msgid "Stripe"
+msgstr "Stripe"
+
+#: pro/includes/admin/entries/class-entries-single.php:1099
+#: src/Pro/Admin/Builder/Education.php:467
+msgid "PayPal Standard"
+msgstr "PayPal スタンダード"
+
+#: pro/includes/admin/entries/class-entries-single.php:1112
+msgid "Payment Details"
+msgstr "支払情報の詳細"
+
+#. translators: %s - entry payment total.
+#: pro/includes/admin/entries/class-entries-single.php:1133
+msgid "Total: %s"
+msgstr "合計: %s"
+
+#. translators: %s - entry payment gateway.
+#: pro/includes/admin/entries/class-entries-single.php:1143
+msgid "Gateway: %s"
+msgstr "ゲートウェイ: %s"
+
+#: pro/includes/admin/entries/class-entries-single.php:1147
+msgctxt "Gateway mode"
+msgid "Test"
+msgstr "テスト"
+
+#. translators: %s - entry payment transaction.
+#: pro/includes/admin/entries/class-entries-single.php:1156
+msgid "Transaction ID: %s"
+msgstr "取引の ID：%s"
+
+#. translators: %s - entry payment subscription.
+#: pro/includes/admin/entries/class-entries-single.php:1167
+msgid "Subscription ID: %s"
+msgstr "購読の ID：%s"
+
+#. translators: %s - entry payment customer.
+#: pro/includes/admin/entries/class-entries-single.php:1179
+msgid "Customer ID: %s"
+msgstr "顧客 ID：%s"
+
+#: pro/includes/admin/entries/class-entries-single.php:1188
+msgid "Note:"
+msgstr "注:"
+
+#: pro/includes/admin/entries/class-entries-single.php:1293
+#: src/Pro/Admin/Entries/PrintPreview.php:194
+msgid "Print"
+msgstr "印刷"
+
+#: pro/includes/admin/entries/class-entries-single.php:1298
+msgid "Export (CSV)"
+msgstr "エクスポート（CSV）"
+
+#: pro/includes/admin/entries/class-entries-single.php:1303
+msgid "Resend Notifications"
+msgstr "通知を再送"
+
+#: pro/includes/admin/entries/class-entries-single.php:1374
+msgid "Related Entries"
+msgstr "関連エントリー"
+
+#: pro/includes/admin/entries/class-entries-single.php:1379
+msgid "The user who created this entry also submitted the entries below."
+msgstr "このエントリーを作成したユーザーは以下のエントリーも送信しました。"
+
+#: pro/includes/class-conditional-logic-fields.php:94
+msgid "Conditionals"
+msgstr "条件付き"
+
+#: pro/includes/class-conditional-logic-fields.php:383
+msgid "Entry Notification stopped by conditional logic."
+msgstr "エントリーの通知は条件付きロジックによって停止されました。"
+
+#: pro/includes/class-conditional-logic-fields.php:439
+msgid "Entry Confirmation stopped by conditional logic."
+msgstr "エントリーの確認は条件付きロジックによって停止されました。"
+
+#: pro/includes/fields/class-address.php:26
+#: pro/includes/templates/class-order.php:55
+msgid "Address"
+msgstr "住所"
+
+#: pro/includes/fields/class-address.php:37
+#: pro/includes/fields/class-phone.php:164
+msgid "US"
+msgstr "US"
+
+#: pro/includes/fields/class-address.php:38
+#: pro/includes/fields/class-address.php:47
+#: pro/includes/fields/class-address.php:353
+msgid "Address Line 1"
+msgstr "住所1"
+
+#: pro/includes/fields/class-address.php:39
+#: pro/includes/fields/class-address.php:48
+#: pro/includes/fields/class-address.php:372
+msgid "Address Line 2"
+msgstr "住所2"
+
+#: pro/includes/fields/class-address.php:40
+#: pro/includes/fields/class-address.php:49
+#: pro/includes/fields/class-address.php:393
+msgid "City"
+msgstr "区市町村"
+
+#: pro/includes/fields/class-address.php:41
+msgid "Zip Code"
+msgstr "郵便番号"
+
+#: pro/includes/fields/class-address.php:42
+msgid "State"
+msgstr "州"
+
+#: pro/includes/fields/class-address.php:46
+#: pro/includes/fields/class-phone.php:165
+msgid "International"
+msgstr "海外"
+
+#: pro/includes/fields/class-address.php:50
+msgid "Postal Code"
+msgstr "郵便番号"
+
+#: pro/includes/fields/class-address.php:51
+#: pro/includes/fields/class-address.php:411
+msgid "State / Province / Region"
+msgstr "州 / 都道府県"
+
+#: pro/includes/fields/class-address.php:53
+#: pro/includes/fields/class-address.php:455
+#: src/Pro/Admin/Entries/Export/Ajax.php:567
+msgid "Country"
+msgstr "国"
+
+#: pro/includes/fields/class-address.php:282
+msgid "Select scheme format for the address field."
+msgstr "住所フィールドにスキーム形式を選択します。"
+
+#: pro/includes/fields/class-address.php:292
+msgid "Scheme"
+msgstr "スキーム"
+
+#: pro/includes/fields/class-address.php:357
+#: pro/includes/fields/class-address.php:376
+#: pro/includes/fields/class-address.php:397
+#: pro/includes/fields/class-address.php:415
+#: pro/includes/fields/class-address.php:435
+#: pro/includes/fields/class-address.php:459
+#: pro/includes/fields/class-date-time.php:358
+#: pro/includes/fields/class-date-time.php:461
+msgid "Placeholder"
+msgstr "プレースホルダー"
+
+#: pro/includes/fields/class-address.php:361
+#: pro/includes/fields/class-address.php:380
+#: pro/includes/fields/class-address.php:401
+#: pro/includes/fields/class-address.php:419
+#: pro/includes/fields/class-address.php:439
+#: pro/includes/fields/class-address.php:463
+msgid "Default Value"
+msgstr "デフォルト値"
+
+#: pro/includes/fields/class-address.php:431
+msgid "ZIP / Postal"
+msgstr "郵便番号"
+
+#: pro/includes/fields/class-date-time.php:18
+msgid "Date / Time"
+msgstr "日付/時間"
+
+#: pro/includes/fields/class-date-time.php:136
+#: pro/includes/fields/class-date-time.php:265
+#: pro/includes/fields/class-date-time.php:447
+#: pro/includes/fields/class-date-time.php:597
+msgid "Time"
+msgstr "時間"
+
+#: pro/includes/fields/class-date-time.php:251
+#: pro/includes/fields/class-date-time.php:389
+#: pro/includes/fields/class-date-time.php:482
+#: pro/includes/fields/class-phone.php:151
+msgid "Format"
+msgstr "フォーマット"
+
+#: pro/includes/fields/class-date-time.php:252
+msgid "Select format for the date field."
+msgstr "日付フィールドの形式を選択します。"
+
+#: pro/includes/fields/class-date-time.php:263
+msgid "Date and Time"
+msgstr "日付と時刻"
+
+#: pro/includes/fields/class-date-time.php:345
+msgid "Advanced date options."
+msgstr "高度な日付設定 "
+
+#: pro/includes/fields/class-date-time.php:401
+msgid "Date Picker"
+msgstr "日付ピッカー"
+
+#: pro/includes/fields/class-date-time.php:406
+msgid "Date Dropdown"
+msgstr "日付ドロップダウン"
+
+#: pro/includes/fields/class-date-time.php:412
+msgid "Type"
+msgstr "種類"
+
+#: pro/includes/fields/class-date-time.php:432
+msgid "15 minutes"
+msgstr "15分"
+
+#: pro/includes/fields/class-date-time.php:433
+msgid "30 minutes"
+msgstr "30分"
+
+#: pro/includes/fields/class-date-time.php:434
+msgid "1 hour"
+msgstr "1時間"
+
+#: pro/includes/fields/class-date-time.php:448
+msgid "Advanced time options."
+msgstr "高度な時間設定 "
+
+#: pro/includes/fields/class-date-time.php:503
+msgid "Interval"
+msgstr "間隔"
+
+#: pro/includes/fields/class-date-time.php:664
+#: pro/includes/fields/class-date-time.php:707
+msgid "Clear Date"
+msgstr "日付を削除"
+
+#: pro/includes/fields/class-date-time.php:757
+msgid "MM"
+msgstr "分"
+
+#: pro/includes/fields/class-date-time.php:758
+msgid "DD"
+msgstr "DD"
+
+#: pro/includes/fields/class-date-time.php:759
+msgid "YYYY"
+msgstr "YYYY"
+
+#: pro/includes/fields/class-divider.php:18
+msgid "Section Divider"
+msgstr "セクションデバイダー"
+
+#: pro/includes/fields/class-file-upload.php:63
+msgid "File Upload"
+msgstr "ファイルアップロード"
+
+#: pro/includes/fields/class-file-upload.php:147
+msgid "This file was not uploaded."
+msgstr "このファイルはアップロードされませんでした。"
+
+#: pro/includes/fields/class-file-upload.php:148
+msgid "File limit has been reached ({fileLimit})."
+msgstr "ファイルの制限に達しました。({fileLimit})"
+
+#: pro/includes/fields/class-file-upload.php:149
+#: pro/includes/fields/class-file-upload.php:1546
+#: pro/includes/fields/class-file-upload.php:1574 pro/wpforms-pro.php:352
+msgid "File type is not allowed."
+msgstr "ファイルタイプはサポートしていません。"
+
+#: pro/includes/fields/class-file-upload.php:150
+msgid "File exceeds the max size allowed."
+msgstr "ファイルサイズが上限を超えています。"
+
+#. translators: %s - max allowed file size by a server.
+#: pro/includes/fields/class-file-upload.php:152
+msgid "File exceeds the upload limit allowed (%s)."
+msgstr "ファイルが許可されているアップロード制限を超えています。(%s)"
+
+#: pro/includes/fields/class-file-upload.php:156
+msgid ""
+"File upload is in progress. Please submit the form once uploading is "
+"completed."
+msgstr ""
+"ファイルのアップロードが進行中です。アップロードが完了したらフォームを送信し"
+"てください。"
+
+#: pro/includes/fields/class-file-upload.php:375
+#: pro/templates/fields/file-upload-backend.php:4
+#: pro/templates/fields/file-upload-frontend.php:12
+msgid "Click or drag a file to this area to upload."
+msgid_plural "Click or drag files to this area to upload."
+msgstr[0] "この領域にファイルをクリックまたはドラッグしてアップロードします。"
+
+#: pro/includes/fields/class-file-upload.php:376
+msgid "Click or drag files to this area to upload."
+msgstr "このエリアにファイルをクリックまたはドラッグしてアップロードします。"
+
+#. translators: % - max number of files as a template string (not a number), replaced by a number later.
+#: pro/includes/fields/class-file-upload.php:378
+msgid "You can upload up to %s files."
+msgstr "最大 %s 個のファイルをアップロードできます。"
+
+#: pro/includes/fields/class-file-upload.php:432
+msgid "Allowed File Extensions"
+msgstr "利用可能なファイル拡張子"
+
+#: pro/includes/fields/class-file-upload.php:433
+msgid "Enter the extensions you would like to allow, comma separated."
+msgstr "許可する拡張子をカンマ区切りで入力します。"
+
+#: pro/includes/fields/class-file-upload.php:461
+msgid "Max File Size"
+msgstr "最大ファイルサイズ"
+
+#. translators: %s - max upload size.
+#: pro/includes/fields/class-file-upload.php:463
+msgid ""
+"Enter the max size of each file, in megabytes, to allow. If left blank, the "
+"value defaults to the maximum size the server allows which is %s."
+msgstr ""
+"許可する最大ファイルサイズをメガバイト単位で入力します。空白のままにすると、"
+"デフォルトでサーバーが許容する最大サイズ%sになります。"
+
+#: pro/includes/fields/class-file-upload.php:498
+msgid "Max File Number"
+msgstr "最大ファイル番号"
+
+#: pro/includes/fields/class-file-upload.php:499
+msgid ""
+"Enter the max file number, to allow. If left blank, the value defaults to 1."
+msgstr ""
+"許可する最大ファイル数を入力します。空白のままにすると、値はデフォルトで1にな"
+"ります。"
+
+#: pro/includes/fields/class-file-upload.php:544
+msgid "Style"
+msgstr "スタイル"
+
+#: pro/includes/fields/class-file-upload.php:545
+msgid ""
+"Modern Style supports multiple file uploads, displays a drag-and-drop upload "
+"box, and uses AJAX. Classic Style supports single file upload and displays a "
+"traditional upload button."
+msgstr ""
+"Modern Style は複数のファイルのアップロードをサポートし、ドラッグアンドドロッ"
+"プのアップロードボックスを表示し、AJAX を使用します。Classic Style は単一ファ"
+"イルのアップロードをサポートし、従来のアップロードボタンを表示します。"
+
+#: pro/includes/fields/class-file-upload.php:556
+msgid "Modern"
+msgstr "モダーン"
+
+#: pro/includes/fields/class-file-upload.php:557
+msgid "Classic"
+msgstr "クラシック"
+
+#: pro/includes/fields/class-file-upload.php:577
+msgid "Store file in WordPress Media Library"
+msgstr "WordPressのメディアライブラリにファイルを保存する"
+
+#: pro/includes/fields/class-file-upload.php:578
+msgid ""
+"Check this option to store the final uploaded file in the WordPress Media "
+"Library"
+msgstr ""
+"このオプションをチェックすると、WordPressメディアライブラリに最終アップロード"
+"ファイルが保存されます。"
+
+#: pro/includes/fields/class-file-upload.php:1339
+msgid "Something went wrong while removing the file."
+msgstr "ファイルの削除中に問題が発生しました。"
+
+#: pro/includes/fields/class-file-upload.php:1372
+msgid "Something went wrong, please try again."
+msgstr "何かが間違っていました。もう一度やり直してください。"
+
+#: pro/includes/fields/class-file-upload.php:1483
+msgid "The uploaded file exceeds the upload_max_filesize directive in php.ini."
+msgstr ""
+"アップロードしたファイルは php.ini で定義された upload_max_filesize を超過し"
+"ています。"
+
+#: pro/includes/fields/class-file-upload.php:1484
+msgid ""
+"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
+"the HTML form."
+msgstr ""
+"アップロードしたファイルは HTML フォームで指定された MAX_FILE_SIZE を超過して"
+"います。"
+
+#: pro/includes/fields/class-file-upload.php:1485
+msgid "The uploaded file was only partially uploaded."
+msgstr "部分的にしかアップロードできませんでした。"
+
+#: pro/includes/fields/class-file-upload.php:1486
+msgid "No file was uploaded."
+msgstr "ファイルをアップロードできませんでした。"
+
+#: pro/includes/fields/class-file-upload.php:1488
+msgid "Missing a temporary folder."
+msgstr "一時フォルダーが見つかりません。"
+
+#: pro/includes/fields/class-file-upload.php:1489
+msgid "Failed to write file to disk."
+msgstr "ディスクへのファイルの書き込みに失敗しました。"
+
+#: pro/includes/fields/class-file-upload.php:1490
+msgid "File upload stopped by extension."
+msgstr "拡張モジュールによってファイルアップロードが停止しました。"
+
+#. translators: %s - error text.
+#: pro/includes/fields/class-file-upload.php:1495
+msgid "File upload error. %s"
+msgstr "ファイルアップロードエラー%s"
+
+#. translators: $s - allowed file size in Mb.
+#: pro/includes/fields/class-file-upload.php:1516
+msgid "File exceeds max size allowed (%s)."
+msgstr "ファイルサイズが上限を超えています (%s)。"
+
+#: pro/includes/fields/class-file-upload.php:1541
+msgid "File must have an extension."
+msgstr "ファイルには拡張子が必要です。"
+
+#: pro/includes/fields/class-hidden.php:18
+msgid "Hidden Field"
+msgstr "非表示フィールド"
+
+#: pro/includes/fields/class-html.php:18
+msgid "HTML"
+msgstr "HTML"
+
+#: pro/includes/fields/class-html.php:106
+msgid "Label"
+msgstr "ラベル"
+
+#: pro/includes/fields/class-html.php:107
+msgid ""
+"Enter text for the form field label. It will help identify your HTML blocks "
+"inside the form builder, but will not be displayed in the form."
+msgstr ""
+"フォームフィールドラベルのテキストを入力します。フォームビルダー内のHTMLブ"
+"ロックを識別するのに役立ちますが、フォームには表示されません。"
+
+#: pro/includes/fields/class-html.php:210
+msgid "HTML / Code Block"
+msgstr "HTML /コードブロック"
+
+#: pro/includes/fields/class-html.php:212
+msgid "Contents of this field are not displayed in the form builder preview."
+msgstr ""
+"このフィールドの内容は、フォームビルダーのプレビューには表示されません。"
+
+#: pro/includes/fields/class-page-break.php:27
+#: pro/includes/fields/class-page-break.php:602
+msgid "Page Break"
+msgstr "改ページ"
+
+#. translators: %1$s - current step in multi-page form; %2$d - total number of pages.
+#: pro/includes/fields/class-page-break.php:191
+msgid "Step %1$s of %2$d"
+msgstr "%2$dのステップ%1$s"
+
+#: pro/includes/fields/class-page-break.php:244
+#: pro/includes/fields/class-page-break.php:595
+msgid "Previous"
+msgstr "前へ"
+
+#: pro/includes/fields/class-page-break.php:329
+msgid "Progress Bar"
+msgstr "進捗バー"
+
+#: pro/includes/fields/class-page-break.php:330
+msgid "Circles"
+msgstr "サークル"
+
+#: pro/includes/fields/class-page-break.php:331
+msgid "Connector"
+msgstr "コネクター"
+
+#: pro/includes/fields/class-page-break.php:332
+msgid "None"
+msgstr "なし"
+
+#: pro/includes/fields/class-page-break.php:339
+msgid "Progress Indicator"
+msgstr "進捗インジケーター"
+
+#: pro/includes/fields/class-page-break.php:340
+msgid ""
+"Select theme for Page Indicator which is displayed at the top of the form."
+msgstr "フォームの上部に表示されている Page Indicator のテーマを選択します。"
+
+#: pro/includes/fields/class-page-break.php:365
+msgid "Page Indicator Color"
+msgstr "Page Indicator の色"
+
+#: pro/includes/fields/class-page-break.php:366
+msgid "Select the primary color for the Page Indicator theme."
+msgstr "Page Indicator テーマの原色を選択します。"
+
+#: pro/includes/fields/class-page-break.php:394
+msgid "Page Title"
+msgstr "ページタイトル"
+
+#: pro/includes/fields/class-page-break.php:395
+msgid "Enter text for the page title."
+msgstr "ページタイトルのテキストを入力してください。"
+
+#: pro/includes/fields/class-page-break.php:421
+msgid "Next Label"
+msgstr "次のラベル"
+
+#: pro/includes/fields/class-page-break.php:422
+msgid "Enter text for Next page navigation button."
+msgstr "「次のページ」のナビゲーションボタンのテキストを入力してください。"
+
+#: pro/includes/fields/class-page-break.php:431
+#: pro/includes/fields/class-page-break.php:597
+msgid "Next"
+msgstr "次ヘ"
+
+#: pro/includes/fields/class-page-break.php:450
+msgid "Display Previous"
+msgstr "前を表示"
+
+#: pro/includes/fields/class-page-break.php:451
+msgid "Toggle displaying the Previous page navigation button."
+msgstr "前のページのナビゲーションボタンの表示を切り替えます。"
+
+#: pro/includes/fields/class-page-break.php:475
+msgid "Previous Label"
+msgstr "前のラベル"
+
+#: pro/includes/fields/class-page-break.php:476
+msgid "Enter text for Previous page navigation button."
+msgstr "「前のページ」のナビゲーションボタンのテキストを入力してください。 "
+
+#: pro/includes/fields/class-page-break.php:521
+msgid "Page Navigation Alignment"
+msgstr "ページナビゲーション配置"
+
+#: pro/includes/fields/class-page-break.php:522
+msgid "Select the alignment for the Next/Previous page navigation buttons"
+msgstr "「次」や「前」のページのナビゲーションボタンの配置を選択してください。"
+
+#: pro/includes/fields/class-page-break.php:532
+msgid "Left"
+msgstr "左"
+
+#: pro/includes/fields/class-page-break.php:533
+msgid "Right"
+msgstr "右"
+
+#: pro/includes/fields/class-page-break.php:534
+msgid "Center"
+msgstr "中央"
+
+#: pro/includes/fields/class-page-break.php:535
+msgid "Split"
+msgstr "スプリット"
+
+#: pro/includes/fields/class-page-break.php:551
+msgid "Disable Scroll Animation"
+msgstr "スクロールアニメーションを無効化"
+
+#: pro/includes/fields/class-page-break.php:552
+msgid ""
+"By default, a user's view is pulled to the top of each form page. Set to ON "
+"to disable this animation."
+msgstr ""
+"デフォルトでは、ユーザーの表示は各フォームページの上部に表示されます。このア"
+"ニメーションを無効にするには、ON に設定します。"
+
+#: pro/includes/fields/class-page-break.php:601
+msgid "First Page / Progress Indicator"
+msgstr "最初のページ / 進行状況インジケーター"
+
+#: pro/includes/fields/class-password.php:18
+#: pro/includes/fields/class-password.php:65
+#: pro/includes/fields/class-password.php:298
+msgid "Password"
+msgstr "パスワード"
+
+#: pro/includes/fields/class-password.php:88
+#: pro/includes/fields/class-password.php:303
+msgid "Confirm Password"
+msgstr "パスワードを確認"
+
+#: pro/includes/fields/class-password.php:199
+msgid "Enable Password Confirmation"
+msgstr "パスワード確認を有効化"
+
+#: pro/includes/fields/class-password.php:200
+msgid "Check this option to ask users to provide their password twice."
+msgstr ""
+"ユーザーにパスワードを2回入力するように求めるには、このオプションをチェックし"
+"てください。"
+
+#: pro/includes/fields/class-password.php:238
+msgid "Confirmation Placeholder Text"
+msgstr "確認プレースホルダーテキスト"
+
+#: pro/includes/fields/class-password.php:239
+msgid "Enter text for the confirmation field placeholder."
+msgstr "確認フィールドのプレースホルダーのテキストを入力してください。"
+
+#: pro/includes/fields/class-password.php:409
+msgid "Field values do not match."
+msgstr "フィールド値が一致しません。"
+
+#: pro/includes/fields/class-payment-checkbox.php:18
+msgid "Checkbox Items"
+msgstr "チェックボックスの項目"
+
+#: pro/includes/fields/class-payment-checkbox.php:25
+#: pro/includes/fields/class-payment-dropdown.php:25
+#: pro/includes/fields/class-payment-multiple.php:25
+#: pro/includes/templates/class-order.php:68
+msgid "First Item"
+msgstr "1番目の項目"
+
+#: pro/includes/fields/class-payment-checkbox.php:31
+#: pro/includes/fields/class-payment-dropdown.php:30
+#: pro/includes/fields/class-payment-multiple.php:31
+#: pro/includes/templates/class-order.php:72
+msgid "Second Item"
+msgstr "2番目の項目"
+
+#: pro/includes/fields/class-payment-checkbox.php:37
+#: pro/includes/fields/class-payment-dropdown.php:35
+#: pro/includes/fields/class-payment-multiple.php:37
+#: pro/includes/templates/class-order.php:76
+msgid "Third Item"
+msgstr "3番目の項目"
+
+#: pro/includes/fields/class-payment-checkbox.php:135
+msgid "Checked"
+msgstr "チェックあり"
+
+#. translators: %s - item number.
+#: pro/includes/fields/class-payment-checkbox.php:138
+msgid "Item %s"
+msgstr "項目%s"
+
+#: pro/includes/fields/class-payment-checkbox.php:449
+#: pro/includes/fields/class-payment-multiple.php:422
+msgid "Invalid payment option."
+msgstr "支払い方法が無効です"
+
+#: pro/includes/fields/class-payment-credit-card.php:18 pro/wpforms-pro.php:380
+msgid "Credit Card"
+msgstr "クレジットカード"
+
+#: pro/includes/fields/class-payment-credit-card.php:75
+#: pro/includes/fields/class-payment-credit-card.php:342
+msgid "Card Number"
+msgstr "カード番号"
+
+#: pro/includes/fields/class-payment-credit-card.php:98
+#: pro/includes/fields/class-payment-credit-card.php:347
+msgid "Security Code"
+msgstr "セキュリティコード"
+
+#: pro/includes/fields/class-payment-credit-card.php:119
+#: pro/includes/fields/class-payment-credit-card.php:354
+msgid "Name on Card"
+msgstr "カードの名義"
+
+#: pro/includes/fields/class-payment-credit-card.php:133
+#: pro/includes/fields/class-payment-credit-card.php:359
+msgid "Expiration"
+msgstr "有効期限"
+
+#: pro/includes/fields/class-payment-credit-card.php:280
+msgid "Card Number Placeholder Text"
+msgstr "カード番号プレースホルダーテキスト"
+
+#: pro/includes/fields/class-payment-credit-card.php:289
+msgid "Security Code Placeholder Text"
+msgstr "セキュリティーコードのプレースホルダーテキスト"
+
+#: pro/includes/fields/class-payment-credit-card.php:298
+msgid "Name on Card Placeholder Text"
+msgstr "カードの名義のプレースホルダーテキスト"
+
+#: pro/includes/fields/class-payment-credit-card.php:402
+msgid ""
+"This page is insecure. Credit Card field should be used for testing purposes "
+"only."
+msgstr ""
+"このページはセキュリティで保護されていません。クレジットカードフィールドはテ"
+"スト目的でのみ使用してください。"
+
+#: pro/includes/fields/class-payment-dropdown.php:18
+msgid "Dropdown Items"
+msgstr "ドロップダウンアイテム"
+
+#: pro/includes/fields/class-payment-dropdown.php:318
+msgid "Invalid payment option"
+msgstr "支払い方法が無効です"
+
+#: pro/includes/fields/class-payment-multiple.php:18
+msgid "Multiple Items"
+msgstr "複数アイテム"
+
+#: pro/includes/fields/class-payment-single.php:18
+#: pro/includes/fields/class-payment-single.php:146
+msgid "Single Item"
+msgstr "単一項目"
+
+#: pro/includes/fields/class-payment-single.php:127
+msgid "Enter the price of the item, without a currency symbol."
+msgstr "通貨記号なしで項目の価格を入力してください。"
+
+#: pro/includes/fields/class-payment-single.php:128
+msgid "Item Price"
+msgstr "価格"
+
+#: pro/includes/fields/class-payment-single.php:144
+msgid "Select the item type."
+msgstr "項目のタイプを選択してください。"
+
+#: pro/includes/fields/class-payment-single.php:147
+msgid "User Defined"
+msgstr "ユーザー定義"
+
+#: pro/includes/fields/class-payment-single.php:148
+msgid "Hidden"
+msgstr "非表示"
+
+#: pro/includes/fields/class-payment-single.php:150
+msgid "Item Type"
+msgstr "項目タイプ"
+
+#. translators: %s - price amount.
+#: pro/includes/fields/class-payment-single.php:190
+#: pro/includes/fields/class-payment-single.php:234
+msgid "Price: %s"
+msgstr "価格: %s"
+
+#: pro/includes/fields/class-payment-single.php:204
+msgid ""
+"Note: Item type is set to hidden and will not be visible when viewing the "
+"form."
+msgstr ""
+"注: 項目タイプは非表示に設定されています。フォームを表示しても表示されませ"
+"ん。"
+
+#: pro/includes/fields/class-payment-single.php:285
+msgid "Amount mismatch"
+msgstr "金額の不一致"
+
+#: pro/includes/fields/class-payment-total.php:220 pro/wpforms-pro.php:376
+msgid "Payment is required."
+msgstr "支払いが必要です。"
+
+#: pro/includes/fields/class-phone.php:18
+#: pro/includes/templates/class-order.php:47
+#: pro/includes/templates/class-request-quote.php:51 pro/wpforms-pro.php:344
+msgid "Phone"
+msgstr "電話番号"
+
+#: pro/includes/fields/class-phone.php:119
+#: pro/includes/fields/class-phone.php:307 pro/wpforms-pro.php:346
+msgid "Please enter a valid phone number."
+msgstr "有効な電話番号を入力してください。"
+
+#: pro/includes/fields/class-phone.php:152
+msgid "Select format for the phone form field"
+msgstr "電話フォームフィールドの形式を選択してください。"
+
+#: pro/includes/fields/class-phone.php:163
+msgid "Smart"
+msgstr "Smart"
+
+#: pro/includes/fields/class-rating.php:18
+msgid "Rating"
+msgstr "評価"
+
+#: pro/includes/fields/class-rating.php:162
+msgid "Scale"
+msgstr "縮尺変更"
+
+#: pro/includes/fields/class-rating.php:163
+msgid "Select rating scale"
+msgstr "評価尺度を選択してください。"
+
+#: pro/includes/fields/class-rating.php:227
+msgid "Icon"
+msgstr "アイコン"
+
+#: pro/includes/fields/class-rating.php:228
+msgid "Select icon to display"
+msgstr "表示するアイコンを選択してください。"
+
+#: pro/includes/fields/class-rating.php:240
+msgid "Heart"
+msgstr "ハート"
+
+#: pro/includes/fields/class-rating.php:241
+msgid "Thumb"
+msgstr "親指"
+
+#: pro/includes/fields/class-rating.php:242
+msgid "Smiley Face"
+msgstr "笑顔"
+
+#: pro/includes/fields/class-rating.php:262
+msgid "Icon Size"
+msgstr "アイコンのサイズ"
+
+#: pro/includes/fields/class-rating.php:263
+msgid "Select the size of the rating icon"
+msgstr "評価アイコンのサイズを選択してください。"
+
+#: pro/includes/fields/class-rating.php:274
+msgid "Small"
+msgstr "小さい"
+
+#: pro/includes/fields/class-rating.php:275
+msgid "Medium"
+msgstr "中サイズ"
+
+#: pro/includes/fields/class-rating.php:276
+msgid "Large"
+msgstr "大サイズ"
+
+#: pro/includes/fields/class-rating.php:296
+msgid "Icon Color"
+msgstr "アイコンの色"
+
+#: pro/includes/fields/class-rating.php:297
+msgid "Select the color for the rating icon"
+msgstr "評価アイコンの色を選択してください。"
+
+#. translators: %1$s - rating value; %2$s - rating scale.
+#: pro/includes/fields/class-rating.php:441
+msgid "Rate %1$d out of %2$d"
+msgstr "%2$dのうち%1$dを評価してください。"
+
+#: pro/includes/fields/class-url.php:18
+msgid "Website / URL"
+msgstr "サイト／URL"
+
+#: pro/includes/fields/class-url.php:154
+msgid "Please enter a valid URL."
+msgstr "有効な URL を入力してください。"
+
+#: pro/includes/payments/functions.php:19
+msgid "U.S. Dollar"
+msgstr "アメリカドル"
+
+#: pro/includes/payments/functions.php:27
+msgid "Pound Sterling"
+msgstr "イギリスポンド"
+
+#: pro/includes/payments/functions.php:35
+msgid "Euro"
+msgstr "ユーロ"
+
+#: pro/includes/payments/functions.php:43
+msgid "Australian Dollar"
+msgstr "オーストラリアドル"
+
+#: pro/includes/payments/functions.php:51
+msgid "Brazilian Real"
+msgstr "ブラジル レアル"
+
+#: pro/includes/payments/functions.php:59
+msgid "Canadian Dollar"
+msgstr "カナダドル"
+
+#: pro/includes/payments/functions.php:67
+msgid "Czech Koruna"
+msgstr "チェココルナ"
+
+#: pro/includes/payments/functions.php:75
+msgid "Danish Krone"
+msgstr "デンマーククローネ"
+
+#: pro/includes/payments/functions.php:83
+msgid "Hong Kong Dollar"
+msgstr "香港ドル"
+
+#: pro/includes/payments/functions.php:91
+msgid "Hungarian Forint"
+msgstr "ハンガリーフォリント"
+
+#: pro/includes/payments/functions.php:99
+msgid "Israeli New Sheqel"
+msgstr "イスラエル新シェケル"
+
+#: pro/includes/payments/functions.php:107
+msgid "Malaysian Ringgit"
+msgstr "マレーシアリンギット"
+
+#: pro/includes/payments/functions.php:115
+msgid "Mexican Peso"
+msgstr "メキシコペソ"
+
+#: pro/includes/payments/functions.php:123
+msgid "Norwegian Krone"
+msgstr "ノルウェークローネ"
+
+#: pro/includes/payments/functions.php:131
+msgid "New Zealand Dollar"
+msgstr "ニュージーランドドル"
+
+#: pro/includes/payments/functions.php:139
+msgid "Philippine Peso"
+msgstr "フィリピンペソ"
+
+#: pro/includes/payments/functions.php:147
+msgid "Polish Zloty"
+msgstr "ポーランドズロティ"
+
+#: pro/includes/payments/functions.php:155
+msgid "Russian Ruble"
+msgstr "ロシアルーブル"
+
+#: pro/includes/payments/functions.php:163
+msgid "Singapore Dollar"
+msgstr "シンガポールドル"
+
+#: pro/includes/payments/functions.php:171
+msgid "South African Rand"
+msgstr "南アフリカランド"
+
+#: pro/includes/payments/functions.php:179
+msgid "Swedish Krona"
+msgstr "スウェーデンクローナ"
+
+#: pro/includes/payments/functions.php:187
+msgid "Swiss Franc"
+msgstr "スイスフラン"
+
+#: pro/includes/payments/functions.php:195
+msgid "Taiwan New Dollar"
+msgstr "台湾ニュードル"
+
+#: pro/includes/payments/functions.php:203
+msgid "Thai Baht"
+msgstr "タイバーツ"
+
+#: pro/includes/templates/class-donation.php:17
+msgid "Donation Form"
+msgstr "寄付フォーム"
+
+#: pro/includes/templates/class-donation.php:19
+msgid ""
+"Start collecting donation payments on your website with this ready-made "
+"Donation form. You can add and remove fields as needed."
+msgstr ""
+"この既製の寄付フォームを使ってサイトで寄付の支払いを集め始めてね。必要に応じ"
+"てフィールドを追加および削除できます。"
+
+#: pro/includes/templates/class-donation.php:24
+#: pro/includes/templates/class-order.php:24
+msgid "Don&#39;t Forget"
+msgstr "忘れないでください"
+
+#: pro/includes/templates/class-donation.php:25
+#: pro/includes/templates/class-order.php:25
+msgid "Click the Payments tab to configure your payment provider"
+msgstr ""
+"支払いプロバイダーを設定するには、「支払い」のタブをクリックしてください。"
+
+#: pro/includes/templates/class-donation.php:33
+#: pro/includes/templates/class-order.php:33
+#: pro/includes/templates/class-request-quote.php:30
+msgid "Name"
+msgstr "名前"
+
+#: pro/includes/templates/class-donation.php:40
+#: pro/includes/templates/class-order.php:40
+#: pro/includes/templates/class-request-quote.php:44
+msgid "Email"
+msgstr "メール"
+
+#: pro/includes/templates/class-donation.php:47
+msgid "Donation Amount"
+msgstr "寄付金額"
+
+#: pro/includes/templates/class-donation.php:55
+#: pro/includes/templates/class-order.php:89
+msgid "Comment or Message"
+msgstr "コメントやメッセージ"
+
+#: pro/includes/templates/class-donation.php:63
+#: pro/includes/templates/class-order.php:97
+#: pro/includes/templates/class-request-quote.php:67
+msgid "Sending..."
+msgstr "送信中・・・"
+
+#: pro/includes/templates/class-order.php:17
+msgid "Billing / Order Form"
+msgstr "請求書 / 注文書"
+
+#: pro/includes/templates/class-order.php:19
+msgid ""
+"Collect Payments for product and service orders with this ready-made form "
+"template. You can add and remove fields as needed."
+msgstr ""
+"この既製のフォームテンプレートを使用して製品とサービスの注文の支払いを回収し"
+"ます。必要に応じてフィールドを追加および削除できます。 "
+
+#: pro/includes/templates/class-order.php:64
+msgid "Available Items"
+msgstr "利用可能な項目"
+
+#: pro/includes/templates/class-order.php:84
+msgid "Total Amount"
+msgstr "合計金額"
+
+#: pro/includes/templates/class-request-quote.php:17
+msgid "Request A Quote Form"
+msgstr "見積もりフォーム依頼"
+
+#: pro/includes/templates/class-request-quote.php:19
+msgid ""
+"Start collecting leads with this pre-made Request a quote form. You can add "
+"and remove fields as needed."
+msgstr ""
+"この事前作成済みの「見積依頼」フォームでリードの収集を開始します。必要に応じ"
+"てフィールドを追加および削除できます。 "
+
+#: pro/includes/templates/class-request-quote.php:37
+msgid "Business / Organization"
+msgstr "事業や組織"
+
+#: pro/includes/templates/class-request-quote.php:59
+msgid "Request"
+msgstr "要求"
+
+#: pro/wpforms-pro.php:262
+msgid "Go to WPForms.com Docs page"
+msgstr "WPForms.com ドキュメンテーションページに移動"
+
+#: pro/wpforms-pro.php:263
+msgid "Docs"
+msgstr "ドキュメンテーション"
+
+#: pro/wpforms-pro.php:268
+msgid "Go to WPForms.com Support page"
+msgstr "WPForms.com サポートページに移動"
+
+#: pro/wpforms-pro.php:269
+msgid "Support"
+msgstr "サポート"
+
+#: pro/wpforms-pro.php:289 pro/wpforms-pro.php:394
+msgid "Payments"
+msgstr "支払い"
+
+#: pro/wpforms-pro.php:291 src/Pro/Admin/Settings/Access.php:197
+msgid "Save Settings"
+msgstr "設定を保存"
+
+#: pro/wpforms-pro.php:350
+msgid "File Extension"
+msgstr "ファイル拡張子"
+
+#: pro/wpforms-pro.php:356
+msgid "File Size"
+msgstr "ファイルサイズ"
+
+#: pro/wpforms-pro.php:358
+msgid "File exceeds max size allowed. File was not uploaded."
+msgstr ""
+"ファイルが許可されている最大サイズを超えています。ファイルはアップロードされ"
+"ませんでした。"
+
+#: pro/wpforms-pro.php:362
+msgid "Time (12 hour)"
+msgstr "時間（12時間形式）"
+
+#: pro/wpforms-pro.php:364
+msgid "Please enter time in 12-hour AM/PM format (eg 8:45 AM)."
+msgstr "時間を12時間の午前/午後の形式で入力してください。（例：8:45 AM）"
+
+#: pro/wpforms-pro.php:368
+msgid "Time (24 hour)"
+msgstr "時間（24時間形式）"
+
+#: pro/wpforms-pro.php:370
+msgid "Please enter time in 24-hour format (eg 22:45)."
+msgstr "時間を24時間の午前/午後の形式で入力してください。（例：22:45）"
+
+#: pro/wpforms-pro.php:374
+msgid "Payment Required"
+msgstr "支払いが必要です。"
+
+#: pro/wpforms-pro.php:382
+msgid "Please enter a valid credit card number."
+msgstr "有効なクレジットカード番号を入力してください。"
+
+#: pro/wpforms-pro.php:386
+msgid "File Upload Total Size"
+msgstr "ファイルアップロードの合計サイズ"
+
+#: pro/wpforms-pro.php:388
+msgid ""
+"The total size of the selected files {totalSize} Mb exceeds the allowed "
+"limit {maxSize} Mb."
+msgstr ""
+"選択されたファイルの合計サイズ {totalSize} Mb が許可されている上限 {maxSize} "
+"Mb を超えています。"
+
+#: pro/wpforms-pro.php:401 src/Pro/Admin/Entries/Export/Ajax.php:649
+msgid "Currency"
+msgstr "通貨"
+
+#: pro/wpforms-pro.php:415
+msgid "Disable User Cookies"
+msgstr "ユーザークッキーを無効にする"
+
+#: pro/wpforms-pro.php:416
+msgid ""
+"Check this to disable user tracking cookies (UUIDs). This will disable the "
+"Related Entries feature and the Form Abandonment/Geolocation addons."
+msgstr ""
+"これをチェックすると、ユーザートラッキングクッキー（UUID）が無効になります。"
+"これにより、 「関連エントリー」の機能とフォーム放棄や地理位置情報のアドオンが"
+"無効になります。"
+
+#: pro/wpforms-pro.php:421
+msgid "Disable User Details"
+msgstr "ユーザー詳細を無効にする"
+
+#: pro/wpforms-pro.php:422
+msgid ""
+"Check this to disable storing the IP address and User Agent on all forms. If "
+"unchecked this can be managed on a form by form basis inside the form "
+"settings."
+msgstr ""
+"これをチェックすると、すべてのフォームにIPアドレスとユーザーエージェントを保"
+"存できなくなります。チェックしない場合は、フォーム設定内でフォームごとに管理"
+"できます。"
+
+#: pro/wpforms-pro.php:539
+msgid "Disable storing entry information in WordPress"
+msgstr "WordPressにエントリー情報を保存しない。"
+
+#: pro/wpforms-pro.php:551
+msgid "Disable storing user details (IP address and user agent)"
+msgstr "ユーザー詳細の保存を無効にする（IPアドレスとユーザーエージェント）"
+
+#. translators: %s - form name.
+#: pro/wpforms-pro.php:639
+msgid "New %s Entry"
+msgstr "新しい%sのエントリー"
+
+#: pro/wpforms-pro.php:649 pro/wpforms-pro.php:658
+msgid "Notifications"
+msgstr "通知"
+
+#: pro/wpforms-pro.php:650
+msgid "Add New Notification"
+msgstr "新しい通知を追加"
+
+#: pro/wpforms-pro.php:662
+msgid "On"
+msgstr "オン"
+
+#: pro/wpforms-pro.php:663
+msgid "Off"
+msgstr "オフ"
+
+#: pro/wpforms-pro.php:670
+msgid "Default Notification"
+msgstr "デフォルトの通知"
+
+#: pro/wpforms-pro.php:711
+msgid "Send To Email Address"
+msgstr "送信先メールアドレス"
+
+#: pro/wpforms-pro.php:714
+msgid ""
+"Enter the email address to receive form entry notifications. For multiple "
+"notifications, separate email addresses with a comma."
+msgstr ""
+"フォーム入力通知を受け取るメールアドレスを入力してください。複数の通知を送信"
+"する場合は、メールアドレスをカンマで区切ります。"
+
+#: pro/wpforms-pro.php:731
+msgid "CC"
+msgstr "CC"
+
+#: pro/wpforms-pro.php:748
+msgid "Email Subject"
+msgstr "メールの件名"
+
+#. translators: %s - form name.
+#: pro/wpforms-pro.php:751
+msgid "New Entry: %s"
+msgstr "新しいエントリー：%s"
+
+#: pro/wpforms-pro.php:765
+msgid "From Name"
+msgstr "送信者名"
+
+#: pro/wpforms-pro.php:784
+msgid "From Email"
+msgstr "送信元メールアドレス"
+
+#: pro/wpforms-pro.php:803
+msgid "Reply-To"
+msgstr "返信先"
+
+#: pro/wpforms-pro.php:819 pro/wpforms-pro.php:948
+msgid "Message"
+msgstr "メッセージ"
+
+#. translators: %s - all fields smart tag.
+#: pro/wpforms-pro.php:831
+msgid "To display all form fields, use the %s Smart Tag."
+msgstr ""
+"すべてのフォームフィールドを表示するには、%s「スマートタグ」を使用してくださ"
+"い。"
+
+#: pro/wpforms-pro.php:842
+msgid "Send"
+msgstr "送る"
+
+#: pro/wpforms-pro.php:843
+msgid "Don't send"
+msgstr "送信しない"
+
+#: pro/wpforms-pro.php:845
+msgid "this notification if"
+msgstr "この通知"
+
+#: pro/wpforms-pro.php:846
+msgid "Email notifications"
+msgstr "メール通知"
+
+#: pro/wpforms-pro.php:879 pro/wpforms-pro.php:966
+msgid "Thanks for contacting us! We will be in touch with you shortly."
+msgstr "お問い合わせいただきありがとうございます！まもなくご連絡いたします。"
+
+#: pro/wpforms-pro.php:892
+msgid "Confirmations"
+msgstr "確認"
+
+#: pro/wpforms-pro.php:893
+msgid "Add New Confirmation"
+msgstr "新しい確認を追加"
+
+#: pro/wpforms-pro.php:898
+msgid "Default Confirmation"
+msgstr "デフォルトの確認"
+
+#: pro/wpforms-pro.php:944
+msgid "Confirmation Type"
+msgstr "確認のタイプ"
+
+#: pro/wpforms-pro.php:949
+msgid "Show Page"
+msgstr "ページを表示"
+
+#: pro/wpforms-pro.php:950
+msgid "Go to URL (Redirect)"
+msgstr "URLに移動（リダイレクト）"
+
+#: pro/wpforms-pro.php:964 pro/wpforms-pro.php:1140
+msgid "Confirmation Message"
+msgstr "確認メッセージ"
+
+#: pro/wpforms-pro.php:981
+msgid "Automatically scroll to the confirmation message"
+msgstr "確認メッセージまで自動的にスクロールする"
+
+#: pro/wpforms-pro.php:1000
+msgid "Confirmation Page"
+msgstr "確認ページ"
+
+#: pro/wpforms-pro.php:1014
+msgid "Confirmation Redirect URL"
+msgstr "確認リダイレクト URL"
+
+#: pro/wpforms-pro.php:1030
+msgid "Use"
+msgstr "使う"
+
+#: pro/wpforms-pro.php:1031
+msgid "Don't use"
+msgstr "使わない"
+
+#: pro/wpforms-pro.php:1033
+msgid "this confirmation if"
+msgstr "この確認"
+
+#: pro/wpforms-pro.php:1034
+msgid "Form confirmations"
+msgstr "フォームの確認"
+
+#. translators: %s - WPForms.com announcement page URL.
+#: pro/wpforms-pro.php:1112
+msgid ""
+"Conditional logic functionality is now included in the core WPForms plugin! "
+"The WPForms Conditional Logic addon can be removed without affecting your "
+"forms. For more details <a href=\"%s\" target=\"_blank\" rel=\"noopener "
+"noreferrer\">read our announcement</a>."
+msgstr ""
+"条件付き論理機能はコアWPFormsプラグインに含まれています！「WPForms "
+"Conditional Logic」のアドオンはフォームに影響を与えずに削除できます。詳細につ"
+"いては、<a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">発表を読"
+"んでください</a>。"
+
+#: pro/wpforms-pro.php:1134
+msgid "How to use Conditional Logic"
+msgstr "条件付きロジックの使い方"
+
+#: pro/wpforms-pro.php:1153
+msgid "Enable conditional logic"
+msgstr "条件付きロジックの有効化"
+
+#. translators: %s - WPForms.com Account dashboard URL.
+#: pro/wpforms-pro.php:1186
+msgid ""
+"Your WPForms license key has expired. In order to continue receiving support "
+"and plugin updates you must renew your license key. Please log in to <a href="
+"\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">your WPForms.com "
+"account</a> to renew your license."
+msgstr ""
+"WPFormsのライセンスキーは期限が切れています。引き続きサポートとプラグインの"
+"アップデートを受け取るには、ライセンスキーを更新する必要があります。<a href="
+"\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WPForms.comのアカウン"
+"ト</a>にログインしてライセンスを更新してください。"
+
+#. translators: %s - addon name.
+#: src/Lite/Admin/Builder/Education.php:447
+#: src/Lite/Admin/Settings/Education.php:124
+#: src/Pro/Admin/Builder/Education.php:266
+#: src/Pro/Admin/Builder/Education.php:348
+#: src/Pro/Admin/Builder/Education.php:440
+#: src/Pro/Admin/Builder/Education.php:501
+#: src/Pro/Admin/Settings/Education.php:149
+msgid "%s addon"
+msgstr "%s アドオン "
+
+#: src/Lite/Admin/Builder/Education.php:707
+msgid "Upgrade to Pro."
+msgstr "Pro へアップグレード"
+
+#: src/Lite/Admin/Builder/Education.php:708 src/Pro/Admin/Education.php:333
+msgid "Dismiss this message."
+msgstr "この通知を無視"
+
+#: src/Lite/Admin/Builder/Education.php:709 src/Pro/Admin/Education.php:334
+msgid "Did You Know?"
+msgstr "ご存知ですか ?"
+
+#. translators: %s - addon name.
+#: src/Lite/Admin/Settings/Education.php:127
+#: src/Pro/Admin/Settings/Education.php:152
+msgid "Integrate %s with WPForms"
+msgstr "%s をWPFormsと統合する"
+
+#: src/Pro/Access/Capabilities.php:68 src/Pro/Admin/Settings/Access.php:92
+msgid "Create Forms"
+msgstr "フォームの作成"
+
+#: src/Pro/Access/Capabilities.php:69
+msgid "View Own Forms"
+msgstr "自分のフォームを表示"
+
+#: src/Pro/Access/Capabilities.php:70
+msgid "View Others' Forms"
+msgstr "他の人のフォームを表示"
+
+#: src/Pro/Access/Capabilities.php:71
+msgid "Edit Own Forms"
+msgstr "自分のフォームを編集"
+
+#: src/Pro/Access/Capabilities.php:72
+msgid "Edit Others' Forms"
+msgstr "他人のフォームを編集"
+
+#: src/Pro/Access/Capabilities.php:73
+msgid "Delete Own Forms"
+msgstr "自分のフォームを削除"
+
+#: src/Pro/Access/Capabilities.php:74
+msgid "Delete Others' Forms"
+msgstr "他人のフォームを削除"
+
+#: src/Pro/Access/Capabilities.php:76
+msgid "View Own Forms Entries"
+msgstr "自分のフォームエントリーを表示"
+
+#: src/Pro/Access/Capabilities.php:77
+msgid "View Others' Forms Entries"
+msgstr "他のユーザーのフォームエントリーを表示"
+
+#: src/Pro/Access/Capabilities.php:78
+msgid "Edit Own Forms Entries"
+msgstr "自分のフォームエントリーを編集する"
+
+#: src/Pro/Access/Capabilities.php:79
+msgid "Edit Others' Forms Entries"
+msgstr "他のユーザーのフォームエントリーを編集する"
+
+#: src/Pro/Access/Capabilities.php:80
+msgid "Delete Own Forms Entries"
+msgstr "自分のフォームエントリを削除する"
+
+#: src/Pro/Access/Capabilities.php:81
+msgid "Delete Others' Forms Entries"
+msgstr "他のユーザーのフォームエントリーを削除する"
+
+#: src/Pro/Admin/AdminBarMenu.php:73 src/Pro/Admin/Settings/Access.php:141
+msgid "View Entries"
+msgstr "エントリーを表示"
+
+#: src/Pro/Admin/AdminBarMenu.php:83
+msgid "Survey Results"
+msgstr "調査結果"
+
+#: src/Pro/Admin/Builder/Education.php:91
+#: src/Pro/Admin/Settings/Education.php:78
+msgid ""
+"The %name% is installed but not activated. Would you like to activate it?"
+msgstr ""
+"%name% はインストールされていますが、有効化されていません。有効化にしますか？"
+
+#: src/Pro/Admin/Builder/Education.php:92
+#: src/Pro/Admin/Settings/Education.php:79
+msgid "Yes, activate"
+msgstr "有効化"
+
+#: src/Pro/Admin/Builder/Education.php:93
+#: src/Pro/Admin/Builder/Education.php:98
+#: src/Pro/Admin/Settings/Education.php:80
+#: src/Pro/Admin/Settings/Education.php:85
+msgid "Addon activated"
+msgstr "アドオンを有効化しました"
+
+#: src/Pro/Admin/Builder/Education.php:94
+#: src/Pro/Admin/Settings/Education.php:81
+msgid "Activating"
+msgstr "有効化しています"
+
+#: src/Pro/Admin/Builder/Education.php:95
+#: src/Pro/Admin/Settings/Education.php:82
+msgid "The %name% is not installed. Would you like to install and activate it?"
+msgstr "%name% がインストールされていません。インストールして有効化しますか？"
+
+#: src/Pro/Admin/Builder/Education.php:96
+#: src/Pro/Admin/Settings/Education.php:83
+msgid "Yes, install and activate"
+msgstr "インストールと有効化"
+
+#: src/Pro/Admin/Builder/Education.php:97
+#: src/Pro/Admin/Settings/Education.php:84
+msgid "Installing"
+msgstr "インストール中"
+
+#: src/Pro/Admin/Builder/Education.php:99
+msgid "Almost done! Would you like to save and refresh the form builder?"
+msgstr "ほとんど終わった！フォームビルダーを保存して更新しますか？"
+
+#: src/Pro/Admin/Builder/Education.php:100
+msgid "Yes, save and refresh"
+msgstr "保存して更新"
+
+#: src/Pro/Admin/Builder/Education.php:101
+#: src/Pro/Admin/Settings/Education.php:88
+msgid ""
+"To access addons please enter and activate your WPForms license key in the "
+"plugin settings."
+msgstr ""
+"アドオンにアクセスするには、プラグイン設定でWPFormsのライセンスキーを入力して"
+"有効にしてください。"
+
+#: src/Pro/Admin/Builder/Education.php:103
+#: src/Pro/Admin/Settings/Education.php:90
+msgid "is a PRO Feature"
+msgstr "PRO バージョンの機能です"
+
+#: src/Pro/Admin/Builder/Education.php:104
+#: src/Pro/Admin/Settings/Education.php:91
+msgid ""
+"We're sorry, the %name% is not available on your plan. Please upgrade to the "
+"PRO plan to unlock all these awesome features."
+msgstr ""
+"申し訳ありません、%name% はこのプランには含まれていません。すべての素晴らしい"
+"機能をアンロックするために、PROプランにアップグレードしてください。"
+
+#: src/Pro/Admin/Builder/Education.php:105
+#: src/Pro/Admin/Settings/Education.php:92
+msgid "Upgrade to PRO"
+msgstr "プロ版にアップグレード"
+
+#: src/Pro/Admin/Builder/Education.php:108
+#: src/Pro/Admin/Settings/Education.php:95
+msgid "is an Elite Feature"
+msgstr "は Elite 機能です"
+
+#: src/Pro/Admin/Builder/Education.php:109
+#: src/Pro/Admin/Settings/Education.php:96
+msgid ""
+"We're sorry, the %name% is not available on your plan. Please upgrade to the "
+"Elite plan to unlock all these awesome features."
+msgstr ""
+"申し訳ありません、%name% はこのプランには含まれていません。すべての素晴らしい"
+"機能をアンロックするために、Elite プランにアップグレードしてください。"
+
+#: src/Pro/Admin/Builder/Education.php:110
+#: src/Pro/Admin/Settings/Education.php:97
+msgid "Upgrade to Elite"
+msgstr "Elite へアップグレード"
+
+#: src/Pro/Admin/Builder/Education.php:158
+msgid "reCAPTCHA"
+msgstr "reCAPTCHA"
+
+#: src/Pro/Admin/Builder/Education.php:166
+#: src/Pro/Admin/Builder/Education.php:173
+msgid "Captcha"
+msgstr "Captcha"
+
+#: src/Pro/Admin/Builder/Education.php:180
+msgid "Signatures"
+msgstr "署名"
+
+#: src/Pro/Admin/Builder/Education.php:187
+msgid "Signature"
+msgstr "署名"
+
+#: src/Pro/Admin/Builder/Education.php:194
+#: src/Pro/Admin/Builder/Education.php:208
+#: src/Pro/Admin/Builder/Education.php:303
+msgid "Surveys and Polls"
+msgstr "Surveys and Polls"
+
+#: src/Pro/Admin/Builder/Education.php:201
+msgid "Likert Scale"
+msgstr "リッカートスケール"
+
+#: src/Pro/Admin/Builder/Education.php:215
+msgid "Net Promoter Score"
+msgstr "ネットプロモータースコア"
+
+#. translators: %s - field name.
+#: src/Pro/Admin/Builder/Education.php:260
+msgid "%s field"
+msgstr "%sフィールド"
+
+#: src/Pro/Admin/Builder/Education.php:296
+msgid "Conversational Forms"
+msgstr "Conversational Forms"
+
+#: src/Pro/Admin/Builder/Education.php:310
+msgid "Form Pages"
+msgstr "フォームページ"
+
+#: src/Pro/Admin/Builder/Education.php:317
+msgid "Form Locker"
+msgstr "Form Locker"
+
+#: src/Pro/Admin/Builder/Education.php:324
+msgid "Form Abandonment"
+msgstr "Form Abandonment"
+
+#: src/Pro/Admin/Builder/Education.php:331
+msgid "Post Submissions"
+msgstr "Post Submissions"
+
+#: src/Pro/Admin/Builder/Education.php:374
+msgid "ActiveCampaign"
+msgstr "ActiveCampaign"
+
+#: src/Pro/Admin/Builder/Education.php:382
+msgid "AWeber"
+msgstr "AWeber"
+
+#: src/Pro/Admin/Builder/Education.php:390
+msgid "Campaign Monitor"
+msgstr "Campaign Monitor"
+
+#: src/Pro/Admin/Builder/Education.php:398
+msgid "Drip"
+msgstr "Drip"
+
+#: src/Pro/Admin/Builder/Education.php:406
+msgid "GetResponse"
+msgstr "GetResponse"
+
+#: src/Pro/Admin/Builder/Education.php:414
+msgid "Mailchimp"
+msgstr "Mailchimp"
+
+#: src/Pro/Admin/Builder/Education.php:422
+msgid "Zapier"
+msgstr "Zapier"
+
+#: src/Pro/Admin/Builder/Education.php:483
+msgid "Authorize.Net"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:668
+msgid "You do not have permission."
+msgstr "権限がありません。"
+
+#: src/Pro/Admin/Builder/Education.php:673
+msgid "No form ID found."
+msgstr "フォーム ID が見つかりませんでした。"
+
+#: src/Pro/Admin/Builder/Education.php:681
+#: src/Pro/Admin/Builder/Education.php:690
+msgid "Something wrong. Please, try again later."
+msgstr "問題が発生しました。後でもう一度やり直してください。"
+
+#: src/Pro/Admin/Builder/Education.php:698
+msgid "Heads up!"
+msgstr "注意 !"
+
+#. translators: %1$s - reCaptcha settings page URL; %2$s - WPForms.com doc URL.
+#: src/Pro/Admin/Builder/Education.php:701
+msgid ""
+"Google reCAPTCHA isn't configured yet. Please complete the setup in your <a "
+"href=\"%1$s\" target=\"_blank\">WPForms Settings</a>, and check out our <a "
+"href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">step by step "
+"tutorial</a> for full details."
+msgstr ""
+"Google reCAPTCHA はまだ設定されていません。<a href=\"%1$s\" target=\"_blank"
+"\">WPForms 設定</a>でセットアップを完了し、詳細については<a href=\"%2$s\" "
+"target=\"_blank\" rel=\"noopener noreferrer\">ステップバイステップ</a>の"
+"チュートリアルを確認してください。"
+
+#. translators: %s - reCAPTCHA type.
+#: src/Pro/Admin/Builder/Education.php:717
+msgid "%s has been enabled for this form. Don't forget to save your form!"
+msgstr ""
+"%s はこのフォームで無効化になっています。フォームを保存することを忘れないでく"
+"ださい！"
+
+#: src/Pro/Admin/Builder/Education.php:721
+msgid "Are you sure you want to disable Google reCAPTCHA for this form?"
+msgstr "このフォームで Google reCAPTCHA を無効にしてもよろしいですか？"
+
+#: src/Pro/Admin/Builder/Education.php:760
+msgid "Google Checkbox v2 reCAPTCHA"
+msgstr "Google Checkbox v2 reCAPTCHA"
+
+#: src/Pro/Admin/Builder/Education.php:763
+msgid "Google Invisible v2 reCAPTCHA"
+msgstr "Google Invisible v2 reCAPTCHA"
+
+#: src/Pro/Admin/Builder/Education.php:766
+msgid "Google v3 reCAPTCHA"
+msgstr "Google v3 reCAPTCHA"
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:144
+msgid ""
+"An active license is needed to access new features & addons, plugin updates "
+"(including security improvements), and our world class support!"
+msgstr ""
+"新しい機能とアドオン、プラグインの更新（セキュリティーの改善を含む）、そして"
+"素晴らしいサポートにアクセスするには、有効化済みライセンスが必要です！"
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:170
+msgid "Heads up! A WPForms license key is required."
+msgstr "注意喚起！ WPForms ライセンスキーが必要です。"
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:171
+msgid "To create more forms, please verify your WPForms license."
+msgstr "さらにフォームを作成するには、WPForms ライセンスを確認してください。"
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:172
+msgid "Enter license key"
+msgstr "ライセンスキーを入力してください"
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:173
+msgid "Get WPForms pro"
+msgstr "WPForms プロを取得"
+
+#: src/Pro/Admin/DashboardWidget.php:177 src/Pro/Admin/DashboardWidget.php:451
+msgid "Show More"
+msgstr "もっと見る"
+
+#: src/Pro/Admin/DashboardWidget.php:178
+msgid "Show Less"
+msgstr "少なく表示"
+
+#: src/Pro/Admin/DashboardWidget.php:180 src/Pro/Admin/DashboardWidget.php:280
+msgid "Total Entries"
+msgstr "すべての回答"
+
+#: src/Pro/Admin/DashboardWidget.php:257
+msgid "Sullie the WPForms mascot"
+msgstr "Sullie、WPForms のマスコット"
+
+#: src/Pro/Admin/DashboardWidget.php:258
+msgid "Create Your First Form to Start Collecting Leads"
+msgstr "リードの収集を開始するための最初のフォームを作成"
+
+#: src/Pro/Admin/DashboardWidget.php:259
+msgid ""
+"You can use WPForms to build contact forms, surveys, payment forms, and more "
+"with just a few clicks."
+msgstr ""
+"数回クリックするだけで、WPForms を使用して連絡先フォーム、アンケート、支払い"
+"フォームなどを作成できます。"
+
+#: src/Pro/Admin/DashboardWidget.php:261
+msgid "Create Your Form"
+msgstr "フォームを作成"
+
+#: src/Pro/Admin/DashboardWidget.php:291
+#: src/Pro/Admin/Entries/DefaultScreen.php:196
+msgid "Reset chart to display all forms"
+msgstr "チャートをリセットしてすべてのフォームを表示"
+
+#: src/Pro/Admin/DashboardWidget.php:311
+msgid "Total Entries by Form"
+msgstr "フォームごとの合計エントリー数"
+
+#. translators: %d - Number of days.
+#: src/Pro/Admin/DashboardWidget.php:337
+msgid "Last %d day"
+msgid_plural "Last %d days"
+msgstr[0] "過去%d日"
+
+#: src/Pro/Admin/DashboardWidget.php:352
+msgid "Select timespan"
+msgstr "期間を選択"
+
+#: src/Pro/Admin/DashboardWidget.php:389
+msgid "No entries for selected period."
+msgstr "選択した期間にエントリーがありません"
+
+#: src/Pro/Admin/DashboardWidget.php:441
+msgid "Display only this form data on a chart"
+msgstr "このフォームデータのみをチャートに表示"
+
+#: src/Pro/Admin/DashboardWidget.php:450
+msgid "Show all forms"
+msgstr "すべてのフォームの表示"
+
+#: src/Pro/Admin/DashboardWidget.php:473
+msgid "Recommended Plugin:"
+msgstr "おすすめプラグイン"
+
+#: src/Pro/Admin/DashboardWidget.php:475
+msgid "MonsterInsights"
+msgstr "MonsterInsights"
+
+#: src/Pro/Admin/DashboardWidget.php:476
+msgid "Install"
+msgstr "インストール"
+
+#: src/Pro/Admin/DashboardWidget.php:480
+msgid "Dismiss recommended plugin block"
+msgstr "推奨プラグインブロックを閉じる"
+
+#: src/Pro/Admin/DashboardWidget.php:499
+msgid "No entries for selected period"
+msgstr "選択した期間にエントリーがありません"
+
+#: src/Pro/Admin/DashboardWidget.php:500
+msgid "Please select a different period or check back later."
+msgstr "別の期間を選択するか、後でもう一度確認してください。"
+
+#: src/Pro/Admin/Education.php:97
+msgid ""
+"You can capture email addresses from partial form entries to get more leads. "
+"Abandoned cart emails have an average open rate of 45%!"
+msgstr ""
+"一部のフォームエントリーからメールアドレスを取得して、より多くのリードを得る"
+"ことができます。放棄されたカートのメールの平均開封率は 45％ です。"
+
+#: src/Pro/Admin/Education.php:102
+msgid ""
+"You can easily integrate your forms with 1,500+ useful apps by using WPForms "
+"+ Zapier."
+msgstr ""
+"WPForms + Zapier を使用して、フォームを 1,500 以上の便利なアプリと簡単に統合"
+"できます。"
+
+#: src/Pro/Admin/Education.php:107
+msgid ""
+"You can integrate your forms to automatically send entries to your most used "
+"apps. Perfect for users of Salesforce, Slack, Trello, and 1,500+ others."
+msgstr ""
+"フォームを統合して、使用頻度の高いアプリにエントリーを自動的に送信できます。"
+"Salesforce、Slack、Trello、および 1,500 以上のユーザーに最適です。"
+
+#: src/Pro/Admin/Education.php:112
+msgid ""
+"You can make distraction-free and custom landing pages in WPForms! Perfect "
+"for getting more leads."
+msgstr ""
+"WPForms で邪魔にならないカスタムランディングページを作成できます！より多くの"
+"リードを得るために最適です。"
+
+#: src/Pro/Admin/Education.php:117
+msgid ""
+"You can build and customize your own professional-looking landing page. A "
+"great alternative to Google Forms!"
+msgstr ""
+"独自のプロフェッショナルなランディングページを作成してカスタマイズできます。"
+"Google フォームの優れた代替手段です。"
+
+#: src/Pro/Admin/Education.php:122
+msgid ""
+"You don’t have to build your forms from scratch. The Form Templates Pack "
+"addon gives you access to 150+ additional templates."
+msgstr ""
+"フォームを最初から作成する必要はありません。Form Templates Pack アドオンを使"
+"用すると、150 以上の追加テンプレートにアクセスできます。"
+
+#: src/Pro/Admin/Education.php:127
+msgid ""
+"You can password-protect your forms. Perfect for collecting reviews or "
+"success stories from customers!"
+msgstr ""
+"フォームをパスワードで保護できます。お客様からのレビューや成功事例の収集に最"
+"適です。"
+
+#: src/Pro/Admin/Education.php:132
+msgid ""
+"You can automatically close a form at a specific date and time. Great for "
+"applications!"
+msgstr "特定の日時にフォームを自動的に閉じることができます。応募に最適！"
+
+#: src/Pro/Admin/Education.php:137
+msgid ""
+"You can generate more fresh content for your website for free by accepting "
+"guest blog posts."
+msgstr ""
+"ゲストのブログ投稿を受け入れることにより、サイトのコンテンツをより新鮮に無料"
+"で生成できます。"
+
+#: src/Pro/Admin/Education.php:142
+msgid ""
+"You can easily add a field to your forms that let users draw their signature "
+"then saves it as an image with their entry."
+msgstr ""
+"フォームにフィールドを簡単に追加して、ユーザーが自分の署名を描き、それをエン"
+"トリーとともに画像として保存することができます。"
+
+#: src/Pro/Admin/Education.php:147
+msgid ""
+"You can set up your forms to let your site visitors pick which payment "
+"method they want to use."
+msgstr ""
+"フォームを設定して、サイトの訪問者が使用する支払い方法を選択できるようにする"
+"ことができます。"
+
+#: src/Pro/Admin/Education.php:152
+msgid ""
+"You can increase your revenue by accepting recurring payments on your forms."
+msgstr ""
+"フォームで定期的な支払いを受け入れることで、収益を増やすことができます。"
+
+#: src/Pro/Admin/Education.php:157
+msgid ""
+"For added insight into your customers, you can collect your user's city, "
+"state, and country behind-the-scenes with Geolocation!"
+msgstr ""
+"顧客への追加の洞察を得るために、Geolocation を使用して、ユーザーの都市、州、"
+"および舞台裏を収集できます。"
+
+#: src/Pro/Admin/Education.php:162
+msgid ""
+"You can let people automatically register as users on your WordPress site. "
+"Perfect for things like accepting guest blog posts!"
+msgstr ""
+"WordPress サイトにユーザーとして自動的に登録させることができます。ゲストのブ"
+"ログ投稿の受け入れなどに最適です。"
+
+#: src/Pro/Admin/Education.php:167
+msgid ""
+"You can limit one form submission per person to avoid duplicate entries. "
+"Perfect for applications and giveaway!"
+msgstr ""
+"エントリーの重複を避けるために、1 人あたり 1 つのフォーム送信を制限できます。"
+"応用やプレゼントに最適！"
+
+#: src/Pro/Admin/Education.php:172
+msgid ""
+"You can use NPS Surveys to learn about your visitors. A tactic used by some "
+"of the biggest brands around!"
+msgstr ""
+"NPS サーベイを使用して、訪問者について学ぶことができます。周りのいくつかの最"
+"大のブランドが使用している戦術！"
+
+#: src/Pro/Admin/Education.php:177
+msgid ""
+"If you're planning an event, you can create an RSVP form to stay organized "
+"and get higher response rates!"
+msgstr ""
+"イベントを計画している場合は、RSVP フォームを作成して整理し、より高い回答率を"
+"得ることができます。"
+
+#: src/Pro/Admin/Education.php:182
+msgid ""
+"With the Offline Forms addon, you can save data entered into your forms even "
+"if the user loses their internet connection."
+msgstr ""
+"Offline Forms アドオンを使用すると、ユーザーがインターネット接続を失った場合"
+"でも、フォームに入力されたデータを保存できます。"
+
+#: src/Pro/Admin/Education.php:187
+msgid ""
+"You can accept PayPal on your website — a great way to increase your revenue."
+msgstr ""
+"サイトで PayPal を受け入れることができます — 収入を増やす素晴らしい方法です。"
+
+#: src/Pro/Admin/Education.php:192
+msgid ""
+"You can easily take payments by credit card on your website using the Stripe "
+"addon."
+msgstr ""
+"Stripe アドオンを使用すると、サイトでクレジットカードによる支払いを簡単に行う"
+"ことができます。"
+
+#: src/Pro/Admin/Education.php:197
+msgid ""
+"You can make money selling digital downloads on your site by using Stripe or "
+"PayPal."
+msgstr ""
+"サイト上で簡単な注文フォームを作成して、サービスや製品をオンラインで販売でき"
+"ます。"
+
+#: src/Pro/Admin/Education.php:202
+msgid ""
+"You can create a simple order form on your site to sell services or products "
+"online."
+msgstr ""
+"サイト上で簡単な注文フォームを作成して、サービスや製品をオンラインで販売でき"
+"ます。"
+
+#: src/Pro/Admin/Education.php:207
+msgid ""
+"You can create surveys or polls and see interactive visual reports of your "
+"user's answers."
+msgstr ""
+"調査または投票を作成し、ユーザーの回答のインタラクティブな視覚的レポートを表"
+"示できます。"
+
+#: src/Pro/Admin/Education.php:212
+msgid ""
+"You can add a customer feedback form to your site. Try automatically "
+"emailing it out after a sale!"
+msgstr ""
+"お客様のフィードバックフォームをサイトに追加できます。セール後に自動的にメー"
+"ルで送信してみてください！"
+
+#: src/Pro/Admin/Education.php:217
+msgid ""
+"You can add a Likert rating scale to your WordPress forms. Great for "
+"measuring your customer’s experience with your business!"
+msgstr ""
+"WordPress フォームにリッカート評価スケールを追加できます。お客様のビジネス体"
+"験を測定するのに最適です！"
+
+#: src/Pro/Admin/Education.php:222
+msgid ""
+"You can easily add a poll to your site! Helpful for making business "
+"decisions based on your audience's needs."
+msgstr ""
+"サイトに簡単に投票を追加できます！オーディエンスのニーズに基づいてビジネス上"
+"の意思決定を行うのに役立ちます。"
+
+#: src/Pro/Admin/Education.php:227
+msgid ""
+"You can create a customer cancellation survey to find out what you can do to "
+"improve."
+msgstr "顧客キャンセル調査を作成して、改善のために何ができるかを確認できます。"
+
+#: src/Pro/Admin/Education.php:232
+msgid ""
+"WPForms is a great alternative to SurveyMonkey! You can create your first "
+"survey or poll today."
+msgstr ""
+"WPForms は、SurveyMonkey の優れた代替品です！今日、最初の調査または投票を作成"
+"できます。"
+
+#: src/Pro/Admin/Education.php:237
+msgid ""
+"You can make your forms interactive and easier to complete. A great way to "
+"get more leads!"
+msgstr ""
+"フォームをインタラクティブにして入力を簡単にすることができます。より多くの"
+"リードを得るための素晴らしい方法！"
+
+#: src/Pro/Admin/Education.php:242
+msgid ""
+"You can easily display survey results graphically. Great for presentations!"
+msgstr ""
+"調査結果をグラフィカルに簡単に表示できます。プレゼンテーションに最適です。"
+
+#: src/Pro/Admin/Education.php:247
+msgid ""
+"You can make your forms feel like a one-on-one conversation and boost "
+"conversion rates."
+msgstr ""
+"フォームを1対1の会話のように感じさせ、コンバージョン率を高めることができま"
+"す。"
+
+#: src/Pro/Admin/Education.php:252
+msgid ""
+"You can put a pre-built job application form on your website. Perfect if "
+"you’re looking for new employees!"
+msgstr ""
+"作成済みの求人応募フォームをウサイトに配置できます。新入社員を探している場合"
+"に最適です。"
+
+#: src/Pro/Admin/Education.php:257
+msgid ""
+"You can automatically send form entries to your Google Calendar. Perfect for "
+"appointments!"
+msgstr ""
+"フォームのエントリーを Google カレンダーに自動的に送信できます。予約に最適！"
+
+#: src/Pro/Admin/Education.php:262
+msgid ""
+"You can automatically send uploaded files from your form entries to Dropbox "
+"for safekeeping and organization!"
+msgstr ""
+"アップロードしたファイルをフォームのエントリーから Dropbox に自動的に送信し"
+"て、保管と整理を行うことができます。"
+
+#: src/Pro/Admin/Education.php:267
+msgid ""
+"When a user submits an uploaded file to your form, it can upload "
+"automatically to your Google Drive for better organization!"
+msgstr ""
+"ユーザーがアップロードされたファイルをフォームに送信すると、組織化のために自"
+"動的に Google Drive にアップロードされます。"
+
+#: src/Pro/Admin/Education.php:272
+msgid ""
+"You can get notified via text when someone completes your form! Great for "
+"closing deals faster."
+msgstr ""
+"誰かがフォームに記入したときに SMS で通知を受け取ることができます！取引をより"
+"早く成立させるのに最適です。"
+
+#: src/Pro/Admin/Education.php:277
+msgid ""
+"Save time on invoicing! You can automatically add customers to Quickbooks "
+"after they complete a form."
+msgstr ""
+"請求の時間を節約しましょう！顧客がフォームに入力した後、顧客を Quickbooks に"
+"自動的に追加できます。"
+
+#: src/Pro/Admin/Education.php:282
+msgid ""
+"You can let users upload videos to your YouTube channel. Perfect for "
+"collecting testimonials!"
+msgstr ""
+"ユーザーが YouTube チャンネルに動画をアップロードできるようにすることができま"
+"す。推薦状の収集に最適です！"
+
+#: src/Pro/Admin/Education.php:287
+msgid ""
+"You can automatically save submitted form info in a free Google Sheets "
+"spreadsheet. Great for keeping track of your entries!"
+msgstr ""
+"送信されたフォーム情報を無料の Google Sheets のスプレッドシートに自動的に保存"
+"できます。エントリーを追跡するのに最適です！"
+
+#: src/Pro/Admin/Education.php:332
+msgid "Upgrade to Pro"
+msgstr "PRO へアップグレード"
+
+#: src/Pro/Admin/Education.php:393 src/Pro/Admin/Entries/Edit.php:765
+msgid "You do not have permission to perform this action."
+msgstr "この操作を実行する権限がありません。"
+
+#. translators: %d - Selected timespan (in days).
+#: src/Pro/Admin/Entries/DefaultScreen.php:140
+msgid "Last %d days"
+msgstr "過去 %d 日"
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:143
+msgid "Form Name"
+msgstr "フォームネーム"
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:144
+msgid "Created"
+msgstr "作成した"
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:145
+msgid "All Time"
+msgstr "いつも"
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:147
+msgid "Graph"
+msgstr "グラフ"
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:248
+msgid "Entries Overview"
+msgstr "エントリーの概要"
+
+#: src/Pro/Admin/Entries/Edit.php:311 src/Pro/Admin/Entries/Edit.php:740
+msgid "Update"
+msgstr "更新"
+
+#: src/Pro/Admin/Entries/Edit.php:312
+msgid "Success"
+msgstr "成功"
+
+#: src/Pro/Admin/Entries/Edit.php:313
+msgid "Continue Editing"
+msgstr "編集を続ける"
+
+#: src/Pro/Admin/Entries/Edit.php:315
+msgid "The entry was successfully saved."
+msgstr "エントリーは正常に保存されました。"
+
+#: src/Pro/Admin/Entries/Edit.php:487
+msgid "Edit Entry"
+msgstr "エントリーを編集"
+
+#. translators: %s - form edit URL.
+#: src/Pro/Admin/Entries/Edit.php:709
+msgid "You don't have any fields in this form. <a href=\"%s\">Add some!</a>"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Edit.php:719
+#, fuzzy
+#| msgid "The form does not have any fields for export."
+msgid "You don't have any fields in this form."
+msgstr "フォームにはエクスポート用のフィールドがありません。"
+
+#: src/Pro/Admin/Entries/Edit.php:757 src/Pro/Admin/Entries/Edit.php:796
+msgid "Invalid form."
+msgstr "不正なフォーム。"
+
+#: src/Pro/Admin/Entries/Edit.php:761
+msgid "Invalid Entry."
+msgstr "エントリーが無効"
+
+#: src/Pro/Admin/Entries/Edit.php:803
+msgid "Invalid entry."
+msgstr "エントリーが無効です。"
+
+#: src/Pro/Admin/Entries/Edit.php:830
+msgid "Entry has not been saved, please see the fields errors."
+msgstr "エントリーは保存されていません。フィールドのエラーをご覧ください。"
+
+#: src/Pro/Admin/Entries/Edit.php:916
+msgid "Entry edited."
+msgstr "回答を更新しました。"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:56
+msgid "Export Entries"
+msgstr "エントリーをエクスポート"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:58
+msgid ""
+"Select a form to export entries, then select the fields you would like to "
+"include. You can also define search and date filters to further personalize "
+"the list of entries you want to retrieve. WPForms will generate a "
+"downloadable CSV of your entries."
+msgstr ""
+"エントリーをエクスポートするフォームを選択してから、含めるフィールドを選択し"
+"ます。検索フィルターと日付フィルターを定義して、取得したいエントリーのリスト"
+"をさらにパーソナライズすることもできます。WPForms は、エントリーのダウンロー"
+"ド可能な CSV を生成します。"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:70
+msgid "Form Fields"
+msgstr "フォームのフィールド"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:78
+msgid "Additional Information"
+msgstr "追加情報"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:83
+msgid "Custom Date Range"
+msgstr "カスタム日付範囲"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:97
+msgid "Download Export File"
+msgstr "エクスポートファイルをダウンロード"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:132
+msgid "Select a Form"
+msgstr "フォームを選択"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:149
+msgid "You need to have at least one form before you can use entries export."
+msgstr ""
+"エントリーのエクスポートを使用するには、少なくとも1つのフォームが必要です。"
+
+#. translators: %d - Field ID.
+#: src/Pro/Admin/Entries/Export/Admin.php:175
+#: src/Pro/Admin/Entries/Export/Admin.php:236
+#: src/Pro/Admin/Entries/Export/Ajax.php:87
+#: src/Pro/Admin/Entries/Export/Ajax.php:290
+msgid "Field #%d"
+msgstr "フィールド #%d"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:531
+msgid "Lat/Long"
+msgstr "緯度/経度"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:543
+msgid "Map"
+msgstr "地図"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:550
+msgid "Location"
+msgstr "ロケーション"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:558
+msgid "Zipcode"
+msgstr "郵便番号"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:560
+msgid "Postal"
+msgstr "郵便"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:645
+msgid "Payment gateway"
+msgstr "支払いゲートウェイ"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:646
+msgid "Recipient"
+msgstr "受取人"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:647
+msgid "Transaction"
+msgstr "トランザクション"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:650
+msgid "Mode"
+msgstr "モード"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:651
+msgid "Subscription"
+msgstr "購読"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:652
+msgid "Customer"
+msgstr "客様"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:653
+msgid "Period"
+msgstr "期間"
+
+#. translators: %d - deleted field ID.
+#: src/Pro/Admin/Entries/Export/Ajax.php:698
+msgid "Deleted field #%d"
+msgstr "削除されたフィールド #%d"
+
+#: src/Pro/Admin/Entries/Export/Export.php:133
+msgid "Entry Date"
+msgstr "回答日"
+
+#: src/Pro/Admin/Entries/Export/Export.php:135
+msgid "Viewed"
+msgstr "表示"
+
+#: src/Pro/Admin/Entries/Export/Export.php:137
+msgid "User Agent"
+msgstr "ユーザーエージェント"
+
+#: src/Pro/Admin/Entries/Export/Export.php:138
+msgid "User IP"
+msgstr "ユーザー IP"
+
+#: src/Pro/Admin/Entries/Export/Export.php:139
+msgid "Unique Generated User ID"
+msgstr "一意に生成されたユーザーID"
+
+#: src/Pro/Admin/Entries/Export/Export.php:140
+msgid "Geolocation Details"
+msgstr "ジオロケーションの詳細"
+
+#: src/Pro/Admin/Entries/Export/Export.php:141
+msgid "Payment Status"
+msgstr "支払いステータス"
+
+#: src/Pro/Admin/Entries/Export/Export.php:142
+msgid "Payment Gateway Information"
+msgstr "支払いゲートウェイ情報"
+
+#: src/Pro/Admin/Entries/Export/Export.php:143
+msgid "Include data of previously deleted fields"
+msgstr "以前に削除したフィールドのデータを含める"
+
+#: src/Pro/Admin/Entries/Export/Export.php:149
+msgid ""
+"There were problems while preparing your export file. Please recheck export "
+"settings and try again."
+msgstr ""
+"エクスポートファイルの準備中に問題が発生しました。エクスポート設定を再確認し"
+"て、もう一度お試しください。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:150
+msgid "You don't have enough capabilities to complete this request."
+msgstr "このリクエストを完了するのに十分な機能がありません。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:151
+msgid "Incorrect form ID has been specified."
+msgstr "間違ったフォーム ID が指定されています。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:152
+msgid "Incorrect entry ID has been specified."
+msgstr "誤ったエントリー ID が指定されました。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:153
+msgid "Specified form seems to be broken."
+msgstr "指定されたフォームが壊れているようです。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:154
+msgid "Unknown request."
+msgstr "不明なリクエスト。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:155
+msgid "Export file cannot be retrieved from a file system."
+msgstr "ファイルシステムからエクスポートファイルを取得できません。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:156
+msgid "Export file is empty."
+msgstr "エクスポートファイルが空です。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:157
+msgid "The form does not have any fields for export."
+msgstr "フォームにはエクスポート用のフィールドがありません。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:164
+msgid "Generating a list of entries according to your filters."
+msgstr "フィルターに従ってエントリーのリストを生成します。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:165
+msgid "This can take a while. Please wait."
+msgstr "これには時間がかかる場合があります。お待ちください。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:166
+msgid "No entries found after applying your filters."
+msgstr "フィルターを適用した後、エントリーは見つかりませんでした。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:167
+msgid "Number of entries found: {total_entries}."
+msgstr "見つかったエントリーの数：{total_entries}"
+
+#: src/Pro/Admin/Entries/Export/Export.php:168
+msgid ""
+"Generating a CSV file: {progress}% completed. Please wait for generation to "
+"complete, file download will start automatically."
+msgstr ""
+"CSV ファイルの生成：{progress}％完了。生成が完了するまでお待ちください。ファ"
+"イルのダウンロードが自動的に開始されます。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:169
+msgid "The file was generated successfully."
+msgstr "ファイルは正常に生成されました。"
+
+#: src/Pro/Admin/Entries/Export/Export.php:170
+msgid "If the download does not start automatically"
+msgstr "ダウンロードが自動的に開始されない場合"
+
+#: src/Pro/Admin/Entries/Export/Export.php:171
+msgid "click here"
+msgstr "ここをクリック"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:153
+msgid "Hide empty fields"
+msgstr "空のフィールドを隠す"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:155
+#: src/Pro/Admin/Entries/PrintPreview.php:198
+msgid "Show empty fields"
+msgstr "空のフィールドを表示"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:164
+msgid "Hide notes"
+msgstr "ノートを非表示"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:166
+#: src/Pro/Admin/Entries/PrintPreview.php:199
+msgid "Show notes"
+msgstr "メモを表示"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:175
+msgid "Normal view"
+msgstr "通常表示"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:177
+#: src/Pro/Admin/Entries/PrintPreview.php:200
+msgid "Compact view"
+msgstr "コンパクト表示"
+
+#. translators: %d - entry ID.
+#: src/Pro/Admin/Entries/PrintPreview.php:191
+msgid "Entry #%d"
+msgstr "エントリー #%d"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:193
+msgid "Close"
+msgstr "閉じる"
+
+#. translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to.
+#: src/Pro/Admin/Settings/Access.php:75
+msgid "In order to give %1$s access, %2$s access is also required."
+msgstr "%1$s にアクセス権を与えるには、%2$s のアクセス権も必要です。"
+
+#. translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to.
+#: src/Pro/Admin/Settings/Access.php:75
+msgid "Would you like to also grant %2$s access to %3$s?"
+msgstr "%2$s に %3$s へのアクセスも許可しますか？"
+
+#. translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to.
+#: src/Pro/Admin/Settings/Access.php:77
+msgid ""
+"In order to remove %1$s access, %2$s access is also required to be removed."
+msgstr ""
+"%1$s のアクセス権を削除するには、%2$s のアクセス権も削除する必要があります。"
+
+#. translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to.
+#: src/Pro/Admin/Settings/Access.php:77
+msgid "Would you like to also remove %2$s access from %3$s?"
+msgstr "%3$s から %2$s のアクセスも削除しますか？"
+
+#: src/Pro/Admin/Settings/Access.php:101
+msgid "View Forms"
+msgstr "フォームを表示"
+
+#: src/Pro/Admin/Settings/Access.php:104 src/Pro/Admin/Settings/Access.php:117
+#: src/Pro/Admin/Settings/Access.php:130 src/Pro/Admin/Settings/Access.php:144
+#: src/Pro/Admin/Settings/Access.php:157 src/Pro/Admin/Settings/Access.php:170
+msgid "Own"
+msgstr "自分の"
+
+#: src/Pro/Admin/Settings/Access.php:105
+msgid "Can view forms created by themselves."
+msgstr "自分で作成したフォームを表示できます。"
+
+#: src/Pro/Admin/Settings/Access.php:108 src/Pro/Admin/Settings/Access.php:121
+#: src/Pro/Admin/Settings/Access.php:134 src/Pro/Admin/Settings/Access.php:148
+#: src/Pro/Admin/Settings/Access.php:161 src/Pro/Admin/Settings/Access.php:174
+msgid "Others"
+msgstr "他"
+
+#: src/Pro/Admin/Settings/Access.php:109
+msgid "Can view forms created by others."
+msgstr "他のユーザーが作成したフォームを表示できます。"
+
+#: src/Pro/Admin/Settings/Access.php:114
+msgid "Edit Forms"
+msgstr "フォームを編集"
+
+#: src/Pro/Admin/Settings/Access.php:118
+msgid "Can edit forms created by themselves."
+msgstr "自分で作成したフォームを編集できます。"
+
+#: src/Pro/Admin/Settings/Access.php:122
+msgid "Can edit forms created by others."
+msgstr "他のユーザーが作成したフォームを編集できます。"
+
+#: src/Pro/Admin/Settings/Access.php:127
+msgid "Delete Forms"
+msgstr "フォームを削除"
+
+#: src/Pro/Admin/Settings/Access.php:131
+msgid "Can delete forms created by themselves."
+msgstr "自分で作成したフォームを削除できます。"
+
+#: src/Pro/Admin/Settings/Access.php:135
+msgid "Can delete forms created by others."
+msgstr "他のユーザーが作成したフォームを削除できます。"
+
+#: src/Pro/Admin/Settings/Access.php:145
+msgid "Can view entries of forms created by themselves."
+msgstr "自分で作成したフォームのエントリーを表示できます。"
+
+#: src/Pro/Admin/Settings/Access.php:149
+msgid "Can view entries of forms created by others."
+msgstr "他のユーザーが作成したフォームのエントリーを表示できます。"
+
+#: src/Pro/Admin/Settings/Access.php:154
+msgid "Edit Entries"
+msgstr "エントリーを編集"
+
+#: src/Pro/Admin/Settings/Access.php:158
+msgid "Can edit entries of forms created by themselves."
+msgstr "自分で作成したフォームのエントリーを編集できます。"
+
+#: src/Pro/Admin/Settings/Access.php:162
+msgid "Can edit entries of forms created by others."
+msgstr "他のユーザーが作成したフォームのエントリーを編集できます。"
+
+#: src/Pro/Admin/Settings/Access.php:167
+msgid "Delete Entries"
+msgstr "エントリーを消す"
+
+#: src/Pro/Admin/Settings/Access.php:171
+msgid "Can delete entries of forms created by themselves."
+msgstr "自分で作成したフォームのエントリーを削除できます。"
+
+#: src/Pro/Admin/Settings/Access.php:175
+msgid "Can delete entries of forms created by others."
+msgstr "他のユーザーが作成したフォームのエントリーを削除できます。"
+
+#: src/Pro/Admin/Settings/Access.php:195 src/Pro/Admin/Settings/Access.php:217
+msgid "Access"
+msgstr "アクセス"
+
+#: src/Pro/Admin/Settings/Access.php:217
+msgid "Select the user roles that are allowed access to WPForms."
+msgstr "WPForms へのアクセスを許可するユーザーロールを選択します。"
+
+#: src/Pro/Admin/Settings/Education.php:86
+msgid "Almost done! Would you like to refresh the page?"
+msgstr "ほぼ完了しました！ページを更新しますか？"
+
+#: src/Pro/Admin/Settings/Education.php:87
+msgid "Refresh page"
+msgstr "ページの更新"
+
+#. translators: %s - resume page URL.
+#: src/Pro/Migrations.php:374
+msgid ""
+"WPForms database upgrade is incomplete, click <a href=\"%s\">here</a> to "
+"resume."
+msgstr ""
+"WPFormsデータベースのアップグレードは不完全です。再開するには<a href=\"%s\">"
+"ここ</a>をクリックしてください。"
+
+#. translators: %s - entries upgrade page URL.
+#: src/Pro/Migrations.php:377
+msgid ""
+"WPForms needs to upgrade the database, click <a href=\"%s\">here</a> to "
+"start the upgrade."
+msgstr ""
+"WPFormsはデータベースをアップグレードする必要があります。アップグレードを開始"
+"するには<a href=\"%s\">ここ</a>をクリックしてください。"
+
+#: src/Pro/Migrations.php:407
+msgid "WPForms needs to upgrade the database, click the button below to begin."
+msgstr ""
+"WPFormsはデータベースをアップグレードする必要があります。始めるために下のボタ"
+"ンをクリックしてください。"
+
+#: src/Pro/Migrations.php:408
+msgid "Run Upgrade"
+msgstr "アップグレードを実行"
+
+#: src/Pro/Migrations.php:411
+msgid ""
+"WPForms database upgrade is incomplete, click the button below to resume."
+msgstr ""
+"WPFormsデータベースのアップグレードは不完全です。再開するには、下のボタンをク"
+"リックしてください。"
+
+#: src/Pro/Migrations.php:412
+msgid "Resume Upgrade"
+msgstr "アップグレードを再開"
+
+#: src/Pro/Migrations.php:417
+msgid "Upgrade"
+msgstr "アップグレードする"
+
+#: src/Pro/Migrations.php:419
+msgid ""
+"Please do not leave this page or close the browser while the upgrade is in "
+"progress."
+msgstr ""
+"アップグレードの進行中は、このページを離れたりブラウザーを閉じたりしないでく"
+"ださい。"
+
+#. translators: %1$s - total number of entries upgraded; %2$s - total number of entries on site.
+#: src/Pro/Migrations.php:427
+msgid "Updated %1$s of %2$s entries."
+msgstr "%2$s件中%1$s件のエントリーを更新しました。"
+
+#: src/Pro/Migrations.php:439
+msgid "No updates are currently needed."
+msgstr "現在更新は必要ありません。"
+
+#: templates/emails/summary-body-plain.php:22
+#: templates/emails/summary-body.php:27
+msgid "Let’s see how your forms performed in the past week."
+msgstr "先週のフォームのパフォーマンスを見てみましょう。"
+
+#: templates/emails/summary-body.php:25
+msgid "Hi there!"
+msgstr "こんにちは！"
+
+#~ msgid "Mailchimp API error"
+#~ msgstr "MailChimp API エラー"
+
+#~ msgid "WPForms & Addons Release Status"
+#~ msgstr "WPForms とアドオンのリリースステータス"
+
+#~ msgid "Click here to authorize."
+#~ msgstr "承認するにはここをクリックしてください。"
+
+#~ msgid ""
+#~ "Credit Card field is disabled, Stripe payments are not enabled in the "
+#~ "form settings."
+#~ msgstr ""
+#~ "クレジットカードフィールドは無効になっています。Stripe 支払いはフォーム設"
+#~ "定では有効になっていません。"
+
+#~ msgid "Credit Card field is disabled, Stripe keys are missing."
+#~ msgstr ""
+#~ "クレジットカードフィールドは無効になっています。Stripe キーがありません。"
+
+#~ msgid "Card"
+#~ msgstr "カード"
+
+#~ msgid "Stripe Credit Card"
+#~ msgstr "Stripe クレジットカード"
+
+#~ msgid "Marketing provider connection"
+#~ msgstr "マーケティングプロバイダーの接続"
+
+#~ msgid "Disconnect"
+#~ msgstr "切る"
+
+#~ msgid "Connected on: %s"
+#~ msgstr "%s に接続"

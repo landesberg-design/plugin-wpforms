@@ -191,30 +191,37 @@ class Task {
 		}
 
 		// Save data to tasks meta table.
-		$task_meta     = new Meta();
-		$this->meta_id = $task_meta->add(
-			[
-				'action' => $this->action,
-				'data'   => $this->params,
-			]
-		);
+		if ( $this->params !== null ) {
+			$task_meta     = new Meta();
+			$this->meta_id = $task_meta->add(
+				[
+					'action' => $this->action,
+					'data'   => $this->params,
+				]
+			);
 
-		if ( empty( $this->meta_id ) ) {
-			return $action_id;
+			if ( empty( $this->meta_id ) ) {
+				return $action_id;
+			}
 		}
 
-		switch ( $this->type ) {
-			case self::TYPE_ASYNC:
-				$action_id = $this->register_async();
-				break;
+		// Prevent 500 errors when Action Scheduler tables don't exist.
+		try {
+			switch ( $this->type ) {
+				case self::TYPE_ASYNC:
+					$action_id = $this->register_async();
+					break;
 
-			case self::TYPE_RECURRING:
-				$action_id = $this->register_recurring();
-				break;
+				case self::TYPE_RECURRING:
+					$action_id = $this->register_recurring();
+					break;
 
-			case self::TYPE_ONCE:
-				$action_id = $this->register_once();
-				break;
+				case self::TYPE_ONCE:
+					$action_id = $this->register_once();
+					break;
+			}
+		} catch ( \RuntimeException $exception ) {
+			$action_id = null;
 		}
 
 		return $action_id;
@@ -281,5 +288,24 @@ class Task {
 			[ 'tasks_meta_id' => $this->meta_id ],
 			Tasks::GROUP
 		);
+	}
+
+	/**
+	 * Cancel all occurrences of this task.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @return null|bool|string Null if no matching action found,
+	 *                          false if AS library is missing,
+	 *                          string of the scheduled action ID if a scheduled action was found and unscheduled.
+	 */
+	public function cancel() {
+
+		// Exit if AS function does not exist.
+		if ( ! function_exists( 'as_unschedule_all_actions' ) ) {
+			return false;
+		}
+
+		return as_unschedule_all_actions( $this->action );
 	}
 }

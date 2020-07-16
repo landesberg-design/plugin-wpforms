@@ -402,7 +402,7 @@ class WPForms_WP_Emails {
 			// Let's do this NOW.
 			$result = wp_mail(
 				$data['to'],
-				wpforms_decode_string( $this->process_tag( $data['subject'] ) ),
+				$this->get_prepared_subject( $data['subject'] ),
 				$this->build_email( $data['message'] ),
 				$data['headers'],
 				$data['attachments']
@@ -412,7 +412,7 @@ class WPForms_WP_Emails {
 			$result = (bool) ( new EntryEmailsTask() )
 				->params(
 					$data['to'],
-					wpforms_decode_string( $this->process_tag( $data['subject'] ) ),
+					$this->get_prepared_subject( $data['subject'] ),
 					$this->build_email( $data['message'] ),
 					$data['headers'],
 					$data['attachments']
@@ -756,5 +756,23 @@ class WPForms_WP_Emails {
 		ksort( $file_paths, SORT_NUMERIC );
 
 		return array_map( 'trailingslashit', $file_paths );
+	}
+
+	/**
+	 * Perform email subject preparation: process tags, remove new lines, etc.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param string $subject Email subject to post-process.
+	 *
+	 * @return string
+	 */
+	private function get_prepared_subject( $subject ) {
+
+		$subject = $this->process_tag( $subject );
+
+		$subject = trim( str_replace( [ "\r\n", "\r", "\n" ], ' ', $subject ) );
+
+		return wpforms_decode_string( $subject );
 	}
 }

@@ -687,9 +687,11 @@ class WPForms_Conditional_Logic_Fields {
 
 			foreach ( $group as $rule_id => $rule ) {
 				// "field" is the only required key we need to have to be able to process the rule.
+				// "field" not selected equal ''.
+				// "field" may be '0' for first field in form.
 				// "operator" is preselected so it's always there.
 				// "value" may be empty.
-				if ( empty( $rule['field'] ) ) {
+				if ( ! isset( $rule['field'] ) || '' === $rule['field'] ) {
 					unset( $conditionals[ $group_id ][ $rule_id ] );
 				}
 			}

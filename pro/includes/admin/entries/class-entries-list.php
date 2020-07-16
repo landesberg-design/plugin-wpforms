@@ -83,6 +83,7 @@ class WPForms_Entries_List {
 		// Setup screen options - this needs to run early.
 		add_action( 'load-wpforms_page_wpforms-entries', array( $this, 'screen_options' ) );
 		add_filter( 'set-screen-option', array( $this, 'screen_options_set' ), 10, 3 );
+		add_filter( 'set_screen_option_wpforms_entries_per_page', [ $this, 'screen_options_set' ], 10, 3 );
 
 		// Heartbeat doesn't pass $_GET parameters checked by $this->init() condition.
 		add_filter( 'heartbeat_received', array( $this, 'heartbeat_new_entries_check' ), 10, 3 );
@@ -651,6 +652,7 @@ class WPForms_Entries_List {
 					?>
 				</p>
 				<select name="fields[]" multiple>
+					<option value="" placeholder><?php esc_html_e( 'Select columns&hellip;', 'wpforms' ); ?></option>
 					<?php
 					/*
 					 * Display first those that were already saved.

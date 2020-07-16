@@ -49,7 +49,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 
 		$inputs = [ 'address1', 'address2', 'city', 'state', 'postal', 'country' ];
 		foreach ( $inputs as $input ) {
-			if ( ! empty( $entry_field[ $input ] ) ) {
+			if ( isset( $entry_field[ $input ] ) ) {
 				$field['properties'] = $this->field_object->get_field_populated_single_property_value_public( $entry_field[ $input ], $input, $field['properties'], $field );
 			}
 		}

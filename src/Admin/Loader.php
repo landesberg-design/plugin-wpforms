@@ -46,7 +46,6 @@ class Loader {
 			'Settings\Education',
 			'Entries\PrintPreview',
 			'Entries\DefaultScreen',
-			'Entries\Export\Export',
 		);
 
 		$class_names = \apply_filters( 'wpforms_admin_classes_available', $core_class_names );

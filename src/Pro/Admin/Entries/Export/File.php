@@ -82,24 +82,25 @@ class File {
 	 */
 	public function get_tmpdir() {
 
-		$uploads              = wp_upload_dir();
-		$wpforms_uploads_root = trailingslashit( realpath( $uploads['basedir'] ) ) . 'wpforms';
+		$upload_dir  = wpforms_upload_dir();
+		$upload_path = $upload_dir['path'];
 
-		// Apply filter to allow redefine tmp directory.
-		$custom_uploads_root = realpath( (string) apply_filters( 'wpforms_upload_root', $wpforms_uploads_root ) );
-		if ( wp_is_writable( $custom_uploads_root ) ) {
-			$wpforms_uploads_root = $custom_uploads_root;
+		$export_path = trailingslashit( $upload_path ) . 'export';
+		if ( ! file_exists( $export_path ) ) {
+			wp_mkdir_p( $export_path );
 		}
 
-		$export_dir = trailingslashit( $wpforms_uploads_root ) . 'export';
-		if ( ! file_exists( $export_dir ) ) {
-			wp_mkdir_p( $export_dir );
-		}
+		// Check if the .htaccess exists in the upload directory, if not - create it.
+		wpforms_create_upload_dir_htaccess_file();
+
+		// Check if the index.html exists in the directories, if not - create it.
+		wpforms_create_index_html_file( $upload_path );
+		wpforms_create_index_html_file( $export_path );
 
 		// Normalize slashes for Windows.
-		$export_dir = wp_normalize_path( $export_dir );
+		$export_path = wp_normalize_path( $export_path );
 
-		return $export_dir;
+		return $export_path;
 	}
 
 	/**

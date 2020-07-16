@@ -210,8 +210,12 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 				$available_fields = wpforms_get_form_fields( $form_data, $args['field_map'] );
 				if ( ! empty( $available_fields ) ) {
 					foreach ( $available_fields as $id => $available_field ) {
-						$lbl            = ! empty( $available_field['label'] ) ? esc_attr( $available_field['label'] ) : esc_html__( 'Field #' ) . $id;
-						$options[ $id ] = $lbl;
+						$options[ $id ] = ! empty( $available_field['label'] )
+							? esc_attr( $available_field['label'] )
+							: sprintf( /* translators: %d - field ID. */
+								esc_html__( 'Field #%d', 'wpforms-lite' ),
+								absint( $id )
+							);
 					}
 				}
 				$input_class .= ' wpforms-field-map-select';

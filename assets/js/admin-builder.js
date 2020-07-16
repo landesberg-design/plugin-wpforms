@@ -1,4 +1,4 @@
-/* global wpforms_builder, wpf, List, jconfirm, wpforms_panel_switch, WPForms */
+/* global wpforms_builder, wpf, List, jconfirm, wpforms_panel_switch, Choices, WPForms */
 
 var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) {
 
@@ -200,6 +200,469 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				boxWidth: '400px',
 				animateFromElement: false
 			};
+
+			app.dropdownField.init();
+		},
+
+		/**
+		 * Dropdown field component.
+		 *
+		 * @since 1.6.1
+		 */
+		dropdownField: {
+
+			/**
+			 * Field configuration.
+			 *
+			 * @since 1.6.1
+			 */
+			config: {
+				modernClass: 'choicesjs-select',
+				args: {
+					searchEnabled: false,
+					searchChoices: false,
+					shouldSort: false,
+					callbackOnInit: function() {
+
+						// Turn off disabled styles.
+						if ( $( this.containerOuter.element ).hasClass( 'is-disabled' ) ) {
+							$( this.containerOuter.element ).removeClass( 'is-disabled' );
+						}
+
+						if ( this.passedElement.element.multiple ) {
+
+							// Hide a placeholder if field has selected choices.
+							if ( this.getValue( true ).length ) {
+								$( this.input.element ).addClass( 'wpforms-hidden' );
+							}
+						}
+					},
+				},
+			},
+
+			/**
+			 * Initialization for field component.
+			 *
+			 * @since 1.6.1
+			 */
+			init: function() {
+
+				// Choices.js init.
+				$builder.find( '.' + app.dropdownField.config.modernClass ).each( function() {
+					app.dropdownField.events.choicesInit( $( this ) );
+				} );
+
+				// Multiple option.
+				$builder.on(
+					'change',
+					'.wpforms-field-option-select .wpforms-field-option-row-multiple input',
+					app.dropdownField.events.multiple
+				);
+
+				// Style option.
+				$builder.on(
+					'change',
+					'.wpforms-field-option-select .wpforms-field-option-row-style select, .wpforms-field-option-payment-select .wpforms-field-option-row-style select',
+					app.dropdownField.events.applyStyle
+				);
+			},
+
+			/**
+			 * Field events.
+			 *
+			 * @since 1.6.1
+			 */
+			events: {
+
+				/**
+				 * Load Choices.js library.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {object} $element jQuery element selector.
+				 */
+				choicesInit: function( $element ) {
+
+					var instance = new Choices( $element[0], app.dropdownField.config.args );
+
+					app.dropdownField.helpers.setInstance( $element, instance );
+					app.dropdownField.helpers.addPlaceholderChoice( $element, instance );
+				},
+
+				/**
+				 * Multiple option callback.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {object} event Event object.
+				 */
+				multiple: function( event ) {
+
+					var fieldId             = $( this ).closest( '.wpforms-field-option-row-multiple' ).data().fieldId,
+						$primary            = app.dropdownField.helpers.getPrimarySelector( fieldId ),
+						$optionChoicesItems = $( '#wpforms-field-option-row-' + fieldId + '-choices input.default' ),
+						$placeholder        = $primary.find( '.placeholder' ),
+						isDynamicChoices    = app.dropdownField.helpers.isDynamicChoices( fieldId ),
+						isMultiple          = event.target.checked,
+						choicesType         = isMultiple ? 'checkbox' : 'radio',
+						selectedChoices;
+
+					// Add/remove a `multiple` attribute.
+					$primary.prop( 'multiple', isMultiple );
+
+					// Change a `Choices` fields type:
+					//    checkbox - needed for multiple selection
+					//    radio - needed for single selection
+					$optionChoicesItems.prop( 'type', choicesType );
+
+					// Dynamic Choices doesn't have default choices (selected options) - make all as unselected.
+					if ( isDynamicChoices ) {
+						$primary.find( 'option:selected' ).prop( 'selected', false );
+					}
+
+					// Gets default choices.
+					selectedChoices = $optionChoicesItems.filter( ':checked' );
+
+					if ( ! isMultiple && selectedChoices.length ) {
+
+						// Uncheck all choices.
+						$optionChoicesItems.prop( 'checked', false );
+
+						// For single selection we can choose only one.
+						$( selectedChoices.get( 0 ) ).prop( 'checked', true );
+					}
+
+					// Toggle selection for a placeholder option based on a select type.
+					if ( $placeholder.length ) {
+						$placeholder.prop( 'selected', ! isMultiple );
+					}
+
+					// Update a primary field.
+					app.dropdownField.helpers.update( fieldId, isDynamicChoices );
+				},
+
+				/**
+				 * Apply a style to <select> - modern or classic.
+				 *
+				 * @since 1.6.1
+				 */
+				applyStyle: function() {
+
+					var $field   = $( this ),
+						fieldId  = $field.closest( '.wpforms-field-option-row-style' ).data().fieldId,
+						fieldVal = $field.val();
+
+					if ( 'modern' === fieldVal ) {
+						app.dropdownField.helpers.convertClassicToModern( fieldId );
+
+					} else {
+						app.dropdownField.helpers.convertModernToClassic( fieldId );
+					}
+				},
+			},
+
+			helpers: {
+
+				/**
+				 * Get Modern select options and prepare them for the Classic <select>.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {string} fieldId Field ID.
+				 */
+				convertModernToClassic: function( fieldId ) {
+
+					var $primary         = app.dropdownField.helpers.getPrimarySelector( fieldId ),
+						isDynamicChoices = app.dropdownField.helpers.isDynamicChoices( fieldId ),
+						instance         = app.dropdownField.helpers.getInstance( $primary );
+
+					// Destroy the instance of Choices.js.
+					instance.destroy();
+
+					// Update a placeholder.
+					app.dropdownField.helpers.updatePlaceholderChoice( instance, fieldId );
+
+					// Update choices.
+					if ( ! isDynamicChoices ) {
+						app.fieldChoiceUpdate( 'select', fieldId );
+					}
+				},
+
+				/**
+				 * Convert a Classic to Modern style selector.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {string} fieldId Field ID.
+				 */
+				convertClassicToModern: function( fieldId ) {
+
+					var $primary         = app.dropdownField.helpers.getPrimarySelector( fieldId ),
+						isDynamicChoices = app.dropdownField.helpers.isDynamicChoices( fieldId );
+
+					// Update choices.
+					if ( ! isDynamicChoices ) {
+						app.fieldChoiceUpdate( 'select', fieldId );
+					}
+
+					// Call a Choices.js initialization.
+					app.dropdownField.events.choicesInit( $primary );
+				},
+
+				/**
+				 * Update a primary field.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {string} fieldId Field ID.
+				 * @param {boolean} isDynamicChoices True if `Dynamic Choices` is turned on.
+				 */
+				update: function( fieldId, isDynamicChoices ) {
+
+					var $primary = app.dropdownField.helpers.getPrimarySelector( fieldId );
+
+					if ( app.dropdownField.helpers.isModernSelect( $primary ) ) {
+
+						// If we had a `Modern` select before, then we need to make re-init - destroy() + init().
+						app.dropdownField.helpers.convertModernToClassic( fieldId );
+						app.dropdownField.events.choicesInit( $primary );
+
+					} else {
+
+						// Update choices.
+						if ( ! isDynamicChoices ) {
+							app.fieldChoiceUpdate( 'select', fieldId );
+						}
+					}
+				},
+
+				/**
+				 * Add a new choice to behave like a placeholder.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {object} $jquerySelector jQuery primary selector.
+				 * @param {object} instance The instance of Choices.js.
+				 *
+				 * @returns {boolean} False if a fake placeholder wasn't added.
+				 */
+				addPlaceholderChoice: function( $jquerySelector, instance ) {
+
+					var fieldId     = $jquerySelector.closest( '.wpforms-field' ).data().fieldId,
+						hasDefaults = app.dropdownField.helpers.hasDefaults( fieldId );
+
+					if ( app.dropdownField.helpers.isDynamicChoices( fieldId ) ) {
+						hasDefaults = false;
+					}
+
+					// Already has a placeholder.
+					if ( false !== app.dropdownField.helpers.searchPlaceholderChoice( instance ) ) {
+
+						return false;
+					}
+
+					// No choices.
+					if ( ! instance.config.choices.length ) {
+
+						return false;
+					}
+
+					var placeholder = instance.config.choices[0].label,
+						isMultiple  = $( instance.passedElement.element ).prop( 'multiple' ),
+						selected    = ! ( isMultiple || hasDefaults );
+
+					// Add a new choice as a placeholder.
+					instance.setChoices(
+						[
+							{ value: '', label: placeholder, selected: selected, placeholder: true },
+						],
+						'value',
+						'label',
+						false
+					);
+
+					// Additional case for multiple select.
+					if ( isMultiple ) {
+						$( instance.input.element ).prop( 'placeholder', placeholder );
+					}
+
+					return true;
+				},
+
+				/**
+				 * Search a choice-placeholder item.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {object} instance The instance of Choices.js.
+				 *
+				 * @returns {boolean|object} False if a field doesn't have a choice-placeholder. Otherwise - return choice item.
+				 */
+				searchPlaceholderChoice: function( instance ) {
+
+					var find = false;
+
+					instance.config.choices.forEach( function( item, i, choices ) {
+
+						if ( 'undefined' !== typeof item.placeholder && true === item.placeholder ) {
+							find = {
+								key: i,
+								item: item,
+							};
+
+							return false;
+						}
+					} );
+
+					return find;
+				},
+
+				/**
+				 * Add/update a placeholder.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {object} instance The instance of Choices.js.
+				 * @param {string} fieldId Field ID.
+				 */
+				updatePlaceholderChoice: function( instance, fieldId ) {
+
+					var $primary           = $( instance.passedElement.element ),
+						placeholderValue   = $( '#wpforms-field-option-' + fieldId + '-placeholder' ).val(),
+						placeholderChoice  = app.dropdownField.helpers.searchPlaceholderChoice( instance ),
+						$placeholderOption = {};
+
+					// Get an option with placeholder.
+					// Note: `.placeholder` class is skipped when calling Choices.js destroy() method.
+					if ( 'object' === typeof placeholderChoice ) {
+						$placeholderOption = $( $primary.find( 'option' ).get( placeholderChoice.key ) );
+					}
+
+					// We have a placeholder and need to update the UI with it.
+					if ( '' !== placeholderValue ) {
+						if ( ! $.isEmptyObject( $placeholderOption ) && $placeholderOption.length ) {
+
+							// Update a placeholder option.
+							$placeholderOption
+								.addClass( 'placeholder' )
+								.text( placeholderValue );
+
+						} else {
+
+							// Add a placeholder option.
+							$primary.prepend( '<option value="" class="placeholder">' + placeholderValue + '</option>' );
+						}
+
+					} else {
+
+						// Remove the placeholder as it's empty.
+						if ( $placeholderOption.length ) {
+							$placeholderOption.remove();
+						}
+					}
+				},
+
+				/**
+				 * Is it a `Modern` style dropdown field?
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {object} $jquerySelector jQuery primary selector.
+				 *
+				 * @returns {boolean} True if it's a `Modern` style select, false otherwise.
+				 */
+				isModernSelect: function( $jquerySelector ) {
+
+					var instance = app.dropdownField.helpers.getInstance( $jquerySelector );
+
+					if ( 'object' !== typeof instance ) {
+						return false;
+					}
+
+					if ( $.isEmptyObject( instance ) ) {
+						return false;
+					}
+
+					return instance.initialised;
+				},
+
+				/**
+				 * Save an instance of Choices.js.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {object} $jquerySelector jQuery primary selector.
+				 * @param {object} instance The instance of Choices.js.
+				 */
+				setInstance: function( $jquerySelector, instance ) {
+
+					$jquerySelector.data( 'choicesjs', instance );
+				},
+
+				/**
+				 * Retrieve an instance of Choices.js.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {object} $jquerySelector jQuery primary selector.
+				 *
+				 * @returns {object} The instance of Choices.js.
+				 */
+				getInstance: function( $jquerySelector ) {
+
+					return $jquerySelector.data( 'choicesjs' );
+				},
+
+				/**
+				 * Is `Dynamic Choices` used?
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {string} fieldId Field ID.
+				 *
+				 * @returns {boolean} True if a `Dynamic Choices` active, false otherwise.
+				 */
+				isDynamicChoices: function( fieldId ) {
+
+					var $fieldOption = $( '#wpforms-field-option-' + fieldId + '-dynamic_choices' );
+
+					if ( ! $fieldOption.length ) {
+						return false;
+					}
+
+					return '' !== $fieldOption.val();
+				},
+
+				/**
+				 * Is a field has default choices?
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {string} fieldId Field ID.
+				 *
+				 * @returns {boolean} True if a field has default choices.
+				 */
+				hasDefaults: function( fieldId ) {
+
+					var $choicesList = $( '#wpforms-field-option-row-' + fieldId + '-choices .choices-list' );
+
+					return !! $choicesList.find( 'input.default:checked' ).length;
+				},
+
+				/**
+				 * Retrieve a jQuery selector for the Primary field.
+				 *
+				 * @since 1.6.1
+				 *
+				 * @param {string} fieldId Field ID.
+				 *
+				 * @returns {object} jQuery primary selector.
+				 */
+				getPrimarySelector: function( fieldId ) {
+
+					return $( '#wpforms-field-' + fieldId + ' .primary-input' );
+				},
+			},
 		},
 
 		/**
@@ -1113,12 +1576,20 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			});
 
 			// Field Options group toggle
-			$builder.on('click', '.wpforms-field-option-group-toggle:not(.upgrade-modal)', function( e ) {
+			$builder.on( 'click', '.wpforms-field-option-group-toggle:not(.upgrade-modal):not(.disabled)', function( e ) {
 				e.preventDefault();
 				var $this = $( this );
-				$this.parent().toggleClass( 'wpforms-hide' ).find( '.wpforms-field-option-group-inner' ).slideToggle();
-				$this.find( 'i' ).toggleClass( 'fa-angle-down fa-angle-right' );
-			});
+
+				$this.addClass( 'disabled' );
+				$this
+					.parent()
+					.toggleClass( 'wpforms-hide' )
+					.find( '.wpforms-field-option-group-inner' )
+					.slideToggle( '', function() {
+						$this.removeClass( 'disabled' );
+						$this.find( 'i' ).toggleClass( 'fa-angle-down fa-angle-right' );
+					} );
+			} );
 
 			// Display toggle for Address field hide address line 2 option
 			$builder.on('change', '.wpforms-field-option-address input.hide', function(e) {
@@ -1173,23 +1644,47 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			// Real-time updates for "Placeholder" field option.
 			$builder.on( 'input', '.wpforms-field-option-row-placeholder input', function() {
-				var $this = $( this ),
-					value = wpf.sanitizeHTML( $this.val() ),
-					id = $this.parent().data( 'field-id' ),
-					$primary = $( '#wpforms-field-' + id ).find( '.primary-input' );
+				var $this    = $( this ),
+					value    = wpf.sanitizeHTML( $this.val() ),
+					id       = $this.parent().data( 'field-id' ),
+					$primary = $( '#wpforms-field-' + id + ' .primary-input' );
 
-				if ( $primary.is( 'select' ) ) {
-					if ( ! value.length ) {
-						$primary.find( '.placeholder' ).remove();
+				// Set the placeholder value for `input` fields.
+				if ( ! $primary.is( 'select' ) ) {
+					$primary.prop( 'placeholder', value );
+					return;
+				}
+
+				// Modern select style.
+				if ( app.dropdownField.helpers.isModernSelect( $primary ) ) {
+					var choicejsInstance = app.dropdownField.helpers.getInstance( $primary );
+
+					// Additional case for multiple select.
+					if ( $primary.prop( 'multiple' ) ) {
+						$( choicejsInstance.input.element ).prop( 'placeholder', value );
 					} else {
-						if ( $primary.find( '.placeholder' ).length ) {
-							$primary.find( '.placeholder' ).text( value );
-						} else {
-							$primary.prepend( '<option class="placeholder" selected>' + value + '</option>' );
-						}
+
+						choicejsInstance.setChoiceByValue( '' );
+						$primary.closest( '.choices' ).find( '.choices__inner .choices__placeholder' ).text( value );
 					}
+
+					return;
+				}
+
+				var $placeholder = $primary.find( '.placeholder' );
+
+				// Classic select style.
+				if ( ! value.length && $placeholder.length ) {
+					$placeholder.remove();
 				} else {
-					$primary.attr( 'placeholder', value );
+
+					if ( $placeholder.length ) {
+						$placeholder.text( value );
+					} else {
+						$primary.prepend( '<option value="" class="placeholder">' + value + '</option>' );
+					}
+
+					$primary.find( '.placeholder' ).prop( 'selected', ! $primary.prop( 'multiple' ) );
 				}
 			} );
 
@@ -1567,7 +2062,9 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * @since 1.0.0
 		 */
 		fieldGroupToggle: function(el, action) {
-
+			if ( el.hasClass( 'disabled' ) ) {
+				return;
+			}
 			if ( 'click' === action ) {
 
 				var $this      = $(el),
@@ -1576,15 +2073,17 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					$icon      = $this.find('i'),
 					groupName  = $this.data('group'),
 					cookieName = 'wpforms_field_group_'+groupName;
-
+				$this.addClass( 'disabled' );
 				if ($group.hasClass('wpforms-hide')) {
 					wpCookies.remove(cookieName);
 				} else {
 					wpCookies.set(cookieName,'true',2592000); // 1 month
 				}
 				$icon.toggleClass('fa-angle-down fa-angle-right');
-				$buttons.slideToggle();
-				$group.toggleClass('wpforms-hide');
+				$buttons.slideToggle( '', function() {
+					$this.removeClass( 'disabled' );
+					$group.toggleClass( 'wpforms-hide' );
+				} );
 
 			} else if ( 'load' === action ) {
 
@@ -1703,7 +2202,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 									$fieldOptions        = $('#wpforms-field-option-'+id),
 									newFieldOptions 	 = $fieldOptions.html(),
 									newFieldID           = $('#wpforms-field-id').val(),
-									newFieldLabel        = $('#wpforms-field-option-'+id+'-label').val()+' '+wpforms_builder.duplicate_copy,
+									$labelField          = $( '#wpforms-field-option-' + id + '-label' ).length ? $( '#wpforms-field-option-' + id + '-label' ) : $( '#wpforms-field-option-' + id + '-name' ),
+									newFieldLabel        = $labelField.length ? $labelField.val() + ' ' + wpforms_builder.duplicate_copy : wpforms_builder.field + ' #' + id + ' ' + wpforms_builder.duplicate_copy,
 									nextID               = Number(newFieldID)+1,
 									regex_fieldOptionsID = new RegExp( 'ID #'+id, "g"),
 									regex_fieldID        = new RegExp( 'fields\\['+id+'\\]', "g"),
@@ -2190,7 +2690,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 *
 		 * @since 1.0.0
 		 */
-		fieldChoiceUpdate: function(type, id) {
+		fieldChoiceUpdate: function( type, id ) {
+			var $primary = $( '#wpforms-field-' + id + ' .primary-input' );
 
 			// Radio, Checkbox, and Payment Multiple/Checkbox use _ template.
 			if ( 'radio' === type || 'checkbox' === type || 'payment-multiple' === type || 'payment-checkbox' === type ) {
@@ -2211,47 +2712,99 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				return;
 			}
 
-			var new_choice;
+			var isModernSelect = app.dropdownField.helpers.isModernSelect( $primary ),
+				newChoice      = '';
 
 			// Multiple payment choices are radio buttons.
-			if ( type === 'payment-multiple') {
+			if ( 'payment-multiple' === type ) {
 				type = 'radio';
 			}
+
 			// Checkbox payment choices are checkboxes.
-			if ( type === 'payment-checkbox') {
+			if ( 'payment-checkbox' === type ) {
 				type = 'checkbox';
 			}
+
 			// Dropdown payment choices are selects.
-			if ( type === 'payment-select') {
+			if ( 'payment-select' === type ) {
 				type = 'select';
 			}
 
-			if (type === 'select') {
-				$('#wpforms-field-'+id+' .primary-input option' ).not('.placeholder').remove();
-				new_choice = '<option>{label}</option>';
-			} else if (type === 'radio' || type === 'checkbox' || type === 'gdpr-checkbox' ) {
+			if ( 'select' === type ) {
+				if ( isModernSelect ) {
+					newChoice = '{label}';
+				} else {
+					newChoice = '<option value="{label}">{label}</option>';
+					$primary.find( 'option' ).not( '.placeholder' ).remove();
+				}
+
+			} else if ( 'radio' === type || 'checkbox' === type || 'gdpr-checkbox' === type ) {
 				type = 'gdpr-checkbox' === type ? 'checkbox' : type;
-				$('#wpforms-field-'+id+' .primary-input li' ).remove();
-				new_choice = '<li><input type="'+type+'" disabled>{label}</li>';
+				$primary.find( 'li' ).remove();
+				newChoice = '<li><input type="' + type + '" disabled>{label}</li>';
 			}
-			$('#wpforms-field-option-row-' + id + '-choices .choices-list li').each( function( index ) {
-				var $this    = $(this),
-					label    = wpf.sanitizeHTML( $this.find( 'input.label' ).val() ),
-					selected = $this.find('input.default').is(':checked'),
-					choice 	 = $( new_choice.replace('{label}',label) );
-				$('#wpforms-field-'+id+' .primary-input').append(choice);
-				if ( selected === true ) {
-					switch (type) {
+
+			// Building an inner content for Primary field.
+			var $choicesList        = $( '#wpforms-field-option-row-' + id + '-choices .choices-list' ),
+				hasDefaults         = !! $choicesList.find( 'input.default:checked' ).length,
+				modernSelectChoices = [];
+
+			$choicesList.find( 'li' ).each( function() {
+
+				var $this    = $( this ),
+					label    = wpf.sanitizeHTML( $this.find( 'input.label' ).val().trim() ),
+					selected = $this.find( 'input.default' ).is( ':checked' ),
+					choice;
+
+				if ( ! label ) {
+					return;
+				}
+
+				choice = $( newChoice.replace( /{label}/g, label ) );
+
+				// Append a new choice.
+				if ( ! isModernSelect ) {
+					$primary.append( choice );
+				} else {
+					modernSelectChoices.push(
+						{
+							value: label,
+							label: label,
+						}
+					);
+				}
+
+				if ( true === selected ) {
+					switch ( type ) {
 						case 'select':
-							choice.prop('selected', 'true');
+
+							if ( ! isModernSelect ) {
+								choice.prop( 'selected', 'true' );
+							} else {
+								modernSelectChoices[ modernSelectChoices.length - 1 ].selected = true;
+							}
 							break;
 						case 'radio':
 						case 'checkbox':
-							choice.find('input').prop('checked', 'true');
+							choice.find( 'input' ).prop( 'checked', 'true' );
 							break;
 					}
 				}
-			});
+			} );
+
+			if ( isModernSelect ) {
+				var placeholderClass  = $primary.prop( 'multiple' ) ? 'input.choices__input' : '.choices__inner .choices__placeholder',
+					choicesjsInstance = app.dropdownField.helpers.getInstance( $primary );
+
+				// Hide/show a placeholder for Modern select if it has or not default choices.
+				$primary
+					.closest( '.choices' )
+					.find( placeholderClass )
+					.toggleClass( 'wpforms-hidden', hasDefaults );
+
+				choicesjsInstance.removeActiveItems();
+				choicesjsInstance.setChoices( modernSelectChoices, 'value', 'label', true );
+			}
 		},
 
 		/**
@@ -2507,77 +3060,31 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 *
 		 * @since 1.2.8
 		 */
-		fieldDynamicChoiceToggle: function(el) {
+		fieldDynamicChoiceToggle: function( el ) {
 
-			var $this       = $(el),
+			var $this       = $( el ),
 				$thisOption = $this.parent(),
 				value       = $this.val(),
-				id          = $thisOption.data('field-id'),
-				type        = $( '#wpforms-field-option-'+id ).find( '.wpforms-field-option-hidden-type' ).val(),
-				$field      = $('#wpforms-field-'+id),
-				$choices    = $('#wpforms-field-option-row-'+id+'-choices'),
-				$images     = $( '#wpforms-field-option-'+id+'-choices_images' );
+				id          = $thisOption.data( 'field-id' ),
+				type        = $( '#wpforms-field-option-' + id ).find( '.wpforms-field-option-hidden-type' ).val(),
+				$field      = $( '#wpforms-field-' + id ),
+				$choices    = $( '#wpforms-field-option-row-' + id + '-choices' ),
+				$images     = $( '#wpforms-field-option-' + id + '-choices_images' );
 
 			// Hide image choices if dynamic choices is not off.
 			app.fieldDynamicChoiceToggleImageChoices();
 
 			// Loading
-			wpf.fieldOptionLoading($thisOption);
+			wpf.fieldOptionLoading( $thisOption );
 
 			// Remove previous dynamic post type or taxonomy source options.
-			$('#wpforms-field-option-row-'+id+'-dynamic_post_type').remove();
-			$('#wpforms-field-option-row-'+id+'-dynamic_taxonomy').remove();
+			$( '#wpforms-field-option-row-' + id + '-dynamic_post_type' ).remove();
+			$( '#wpforms-field-option-row-' + id + '-dynamic_taxonomy' ).remove();
 
-			if ( '' === value ) {
-				// "Off" - no dynamic populating.
-
-				// Show choice images option.
-				$images.removeClass( 'wpforms-hidden' );
-				$( '#wpforms-field-' + id ).find( '.wpforms-alert' ).remove();
-
-				if ( 'checkbox' === type || 'radio' === type || 'payment-multiple' === type || 'payment-checkbox' === type ) {
-
-					app.fieldChoiceUpdate( type, id );
-
-				} else {
-					// Get original field choices.
-					var choices = [];
-					$('#wpforms-field-option-row-'+id+'-choices .label').each(function(index) {
-						choices.push($(this).val());
-					});
-
-					// Restore field to display original field choices.
-					if ($field.hasClass('wpforms-field-select')) {
-
-						$field.find('select option:first').text(choices[0]);
-
-					} else {
-
-						var type  = 'radio',
-							$list = $field.find('.primary-input');
-
-						if ($field.hasClass('wpforms-field-checkbox')) {
-							type = 'checkbox';
-						}
-
-						// Remove previous items.
-						$list.empty();
-
-						// Add new items to radio or checkbox field.
-						for(var key in choices) {
-							$list.append('<li><input type="'+type+'" disabled> '+choices[key]+'</li>');
-						}
-					}
-				}
-
-				// Toggle elements and hide loading indicator
-				$choices.find('ul').removeClass('wpforms-hidden');
-				$choices.find('.wpforms-alert').addClass('wpforms-hidden');
-
-				wpf.fieldOptionLoading($thisOption, true);
-
-			} else {
-				// Post type or Taxonomy based dynamic populating.
+			/*
+			 * Post type or Taxonomy based dynamic populating.
+			 */
+			if ( '' !== value ) {
 
 				// Hide choice images option, not applicable.
 				$images.addClass( 'wpforms-hidden' );
@@ -2586,29 +3093,128 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					type    : value,
 					field_id: id,
 					action  : 'wpforms_builder_dynamic_choices',
-					nonce   : wpforms_builder.nonce
+					nonce   : wpforms_builder.nonce,
 				};
-				$.post(wpforms_builder.ajax_url, data, function(res) {
-					if (res.success){
-						// New option markup
-						$thisOption.after(res.data.markup)
+
+				$.post( wpforms_builder.ajax_url, data, function( res ) {
+					if ( res.success ) {
+
+						// New option markup.
+						$thisOption.after( res.data.markup );
+
 					} else {
-						console.log(res);
+						console.log( res );
 					}
+
 					// Hide loading indicator.
-					wpf.fieldOptionLoading($thisOption, true);
+					wpf.fieldOptionLoading( $thisOption, true );
 
 					// Re-init tooltips for new field.
 					wpf.initTooltips();
 
 					// Trigger Dynamic source updates.
-					$('#wpforms-field-option-'+id+'-dynamic_'+value).find('option:first').prop('selected', true);
-					$('#wpforms-field-option-'+id+'-dynamic_'+value).trigger('change');
+					$( '#wpforms-field-option-' + id + '-dynamic_' + value ).find( 'option:first' ).prop( 'selected', true );
+					$( '#wpforms-field-option-' + id + '-dynamic_' + value ).trigger( 'change' );
 
-				}).fail(function(xhr, textStatus, e) {
-					console.log(xhr.responseText);
-				});
+				} ).fail( function( xhr, textStatus, e ) {
+					console.log( xhr.responseText );
+				} );
+
+				return; // Nothing more for dynamic populating.
 			}
+
+			/*
+			 * "Off" - no dynamic populating.
+			 */
+
+			// Show choice images option.
+			$images.removeClass( 'wpforms-hidden' );
+			$( '#wpforms-field-' + id ).find( '.wpforms-alert' ).remove();
+
+			if ( 'checkbox' === type || 'radio' === type || 'payment-multiple' === type || 'payment-checkbox' === type ) {
+
+				app.fieldChoiceUpdate( type, id );
+
+				// Toggle elements and hide loading indicator.
+				$choices.find( 'ul' ).removeClass( 'wpforms-hidden' );
+				$choices.find( '.wpforms-alert' ).addClass( 'wpforms-hidden' );
+
+				wpf.fieldOptionLoading( $thisOption, true );
+
+				return; // Nothing more for those types.
+			}
+
+			// Get original field choices.
+			var choices  = [],
+				$primary = $field.find( '.primary-input' ),
+				key;
+
+			$( '#wpforms-field-option-row-' + id + '-choices li' ).each( function() {
+				var $this = $( this );
+
+				choices.push( {
+					label: $this.find( '.label' ).val(),
+					selected: $this.find( '.default' ).is( ':checked' ),
+				} );
+			} );
+
+			// Restore field to display original field choices.
+			if ( $field.hasClass( 'wpforms-field-select' ) ) {
+				var isModernSelect = app.dropdownField.helpers.isModernSelect( $primary ),
+					$choicesWrap   = isModernSelect ? $primary.closest( '.choices' ) : null,
+					optionHTML     = '',
+					selected       = false;
+
+				// Remove previous items.
+				$primary.find( 'option' ).not( '.placeholder' ).remove();
+
+				// Hide a placeholder input for Modern.
+				if ( isModernSelect && choices.length ) {
+					$choicesWrap.find( 'input.choices__input' ).addClass( 'wpforms-hidden' );
+				}
+
+				// Prepare HTML for options (items) to modern/single select field.
+				for ( key in choices ) {
+					selected = choices[ key ].selected;
+
+					if ( isModernSelect ) {
+						optionHTML = selected ? '<div class="choices__item choices__item--choice">' + choices[ key ].label + '</div>' : '';
+
+						$choicesWrap.find( '.choices__list--multiple' ).append( optionHTML );
+					} else {
+						optionHTML = '<option';
+						optionHTML += selected ? ' selected>' : '>';
+						optionHTML += choices[ key ].label + '</option>';
+
+						$primary.append( optionHTML );
+					}
+				}
+
+			} else {
+				type = 'radio';
+
+				if ( $field.hasClass( 'wpforms-field-checkbox' ) ) {
+					type = 'checkbox';
+				}
+
+				// Remove previous items.
+				$primary.empty();
+
+				// Add new items to radio or checkbox field.
+				for ( key in choices ) {
+					optionHTML = '<li><input type="' + type + '" disabled';
+					optionHTML += choices[ key ].selected ? ' selected>' : '>';
+					optionHTML += choices[ key ].label + '</li>';
+
+					$primary.append( optionHTML );
+				}
+			}
+
+			// Toggle elements and hide loading indicator.
+			$choices.find( 'ul' ).removeClass( 'wpforms-hidden' );
+			$choices.find( '.wpforms-alert' ).addClass( 'wpforms-hidden' );
+
+			wpf.fieldOptionLoading( $thisOption, true );
 		},
 
 		/**
@@ -2616,20 +3222,20 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 *
 		 * @since 1.2.8
 		 */
-		fieldDynamicChoiceSource: function(el) {
+		fieldDynamicChoiceSource: function( el ) {
 
-			var $this       = $(el),
+			var $this       = $( el ),
 				$thisOption = $this.parent(),
 				value       = $this.val(),
-				id          = $thisOption.data('field-id'),
-				form_id     = $('#wpforms-builder-form').data('id'),
-				$choices    = $('#wpforms-field-option-row-'+id+'-choices'),
-				$field      = $('#wpforms-field-'+id),
-				type        = $('#wpforms-field-option-'+id+'-dynamic_choices option:selected').val(),
+				id          = $thisOption.data( 'field-id' ),
+				form_id     = $( '#wpforms-builder-form' ).data( 'id' ),
+				$choices    = $( '#wpforms-field-option-row-' + id + '-choices' ),
+				$field      = $( '#wpforms-field-' + id ),
+				type        = $( '#wpforms-field-option-' + id + '-dynamic_choices option:selected' ).val(),
 				limit       = 20;
 
-			// Loading
-			wpf.fieldOptionLoading($thisOption);
+			// Loading.
+			wpf.fieldOptionLoading( $thisOption );
 
 			var data = {
 				type    : type,
@@ -2639,72 +3245,150 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				action  : 'wpforms_builder_dynamic_source',
 				nonce   : wpforms_builder.nonce
 			};
-			$.post(wpforms_builder.ajax_url, data, function(res) {
-				if (res.success){
 
-					// Update info box and remove old choices
-					$choices.find('.dynamic-name').text(res.data.source_name);
-					$choices.find('.dynamic-type').text(res.data.type_name);
-					$choices.find('ul').addClass('wpforms-hidden');
-					$choices.find('.wpforms-alert').removeClass('wpforms-hidden');
+			$.post( wpforms_builder.ajax_url, data, function( res ) {
 
-					if ($field.hasClass('wpforms-field-select')) {
+				if ( ! res.success ) {
+					console.log( res );
 
-						// Add new items to select field
-						$field.find('select option:first').text(res.data.items[0]);
-						limit = 200;
-
-					} else {
-
-						var type  = 'radio',
-							$list = $field.find('.primary-input');
-
-						if ($field.hasClass('wpforms-field-checkbox')) {
-							type = 'checkbox';
-						}
-
-						// Remove previous items
-						$list.empty();
-
-						// Add new items to radio or checkbox field
-						for(var key in res.data.items) {
-							$list.append('<li><input type="'+type+'" disabled> '+res.data.items[key]+'</li>');
-						}
-					}
-
-					// If the source has more items than the field type can
-					// ideally handle alert the user
-					if (Number(res.data.total) > limit) {
-						var msg = wpforms_builder.dynamic_choice_limit;
-						msg = msg.replace('{source}',res.data.source_name);
-						msg = msg.replace('{type}',res.data.type_name);
-						msg = msg.replace('{limit}',limit);
-						msg = msg.replace('{total}',res.data.total);
-						$.alert({
-							title: wpforms_builder.heads_up,
-							content: msg,
-							icon: 'fa fa-info-circle',
-							type: 'blue',
-							buttons: {
-								confirm: {
-									text: wpforms_builder.ok,
-									btnClass: 'btn-confirm',
-									keys: ['enter']
-								}
-							}
-						});
-					}
-				} else {
-					console.log(res);
+					// Toggle elements and hide loading indicator.
+					wpf.fieldOptionLoading( $thisOption, true );
+					return;
 				}
 
-				// Toggle elements and hide loading indicator
-				$choices.find('ul').addClass('wpforms-hidden');
-				wpf.fieldOptionLoading($thisOption, true);
+				// Update info box and remove old choices.
+				$choices.find( '.dynamic-name' ).text( res.data.source_name );
+				$choices.find( '.dynamic-type' ).text( res.data.type_name );
+				$choices.find( 'ul' ).addClass( 'wpforms-hidden' );
+				$choices.find( '.wpforms-alert' ).removeClass( 'wpforms-hidden' );
 
-			}).fail(function(xhr, textStatus, e) {
-				console.log(xhr.responseText);
-			});
+				// Update items.
+				app.fieldDynamicChoiceSourceItems( $field, res.data.items );
+
+				if ( $field.hasClass( 'wpforms-field-select' ) ) {
+					limit = 200;
+				}
+
+				// If the source has more items than the field type can
+				// ideally handle alert the user.
+				if ( Number( res.data.total ) > limit ) {
+					var msg = wpforms_builder.dynamic_choice_limit;
+
+					msg = msg.replace( '{source}', res.data.source_name );
+					msg = msg.replace( '{type}', res.data.type_name );
+					msg = msg.replace( '{limit}', limit );
+					msg = msg.replace( '{total}', res.data.total );
+
+					$.alert( {
+						title: wpforms_builder.heads_up,
+						content: msg,
+						icon: 'fa fa-info-circle',
+						type: 'blue',
+						buttons: {
+							confirm: {
+								text: wpforms_builder.ok,
+								btnClass: 'btn-confirm',
+								keys: [ 'enter' ],
+							},
+						},
+					} );
+				}
+
+				// Toggle elements and hide loading indicator.
+				wpf.fieldOptionLoading( $thisOption, true );
+
+			} ).fail( function( xhr, textStatus, e ) {
+				console.log( xhr.responseText );
+			} );
+		},
+
+		/**
+		 * Update a Field Items when `Dynamic Choice` Source is toggled.
+		 *
+		 * @since 1.6.1
+		 *
+		 * @param {object} $field jQuery selector for current field.
+		 * @param {object} items  Items collection.
+		 */
+		fieldDynamicChoiceSourceItems: function( $field, items ) {
+
+			var $primary = $field.find( '.primary-input' ),
+				key      = 0;
+
+			if ( $field.hasClass( 'wpforms-field-select' ) ) {
+				var isModernSelect = app.dropdownField.helpers.isModernSelect( $primary );
+
+				if ( isModernSelect ) {
+					app.fieldDynamicChoiceSourceForModernSelect( $primary, items );
+				} else {
+					app.fieldDynamicChoiceSourceForClassicSelect( $primary, items );
+				}
+
+			} else {
+				var type = 'radio';
+
+				if ( $field.hasClass( 'wpforms-field-checkbox' ) ) {
+					type = 'checkbox';
+				}
+
+				// Remove previous items.
+				$primary.empty();
+
+				// Add new items to radio or checkbox field.
+				for ( key in items ) {
+					$primary.append( '<li><input type="' + type + '" disabled> ' + items[ key ] + '</li>' );
+				}
+			}
+		},
+
+		/**
+		 * Update options for Modern style select when `Dynamic Choice` Source is toggled.
+		 *
+		 * @since 1.6.1
+		 *
+		 * @param {object} $jquerySelector jQuery selector for primary input.
+		 * @param {object} items Items collection.
+		 */
+		fieldDynamicChoiceSourceForModernSelect: function( $jquerySelector, items ) {
+
+			var instance = app.dropdownField.helpers.getInstance( $jquerySelector ),
+				fieldId  = $jquerySelector.closest( '.wpforms-field' ).data().fieldId;
+
+			// Destroy the instance of Choices.js.
+			instance.destroy();
+
+			// Update a placeholder.
+			app.dropdownField.helpers.updatePlaceholderChoice( instance, fieldId );
+
+			// Update options.
+			app.fieldDynamicChoiceSourceForClassicSelect( $jquerySelector, items );
+
+			// Choices.js init.
+			app.dropdownField.events.choicesInit( $jquerySelector );
+		},
+
+		/**
+		 * Update options for Classic style select when `Dynamic Choice` Source is toggled.
+		 *
+		 * @since 1.6.1
+		 *
+		 * @param {object} $jquerySelector jQuery selector for primary input.
+		 * @param {object} items Items collection.
+		 */
+		fieldDynamicChoiceSourceForClassicSelect: function( $jquerySelector, items ) {
+
+			var index     = 0,
+				itemsSize = items.length;
+
+			// Clear.
+			$jquerySelector.find( 'option' ).not( '.placeholder' ).remove();
+
+			// Add options (items) to a single <select> field.
+			for ( ; index < itemsSize; index++ ) {
+				var item = items[ index ];
+
+				$jquerySelector.append( '<option value="' + item + '">' + item + '</option>' );
+			}
 		},
 
 		/**
@@ -3035,11 +3719,11 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			});
 
 			// Toggle settings block - slide up or down
-			$builder.on('click', '.wpforms-builder-settings-block-toggle', function(e) {
+			$builder.on( 'click', '.wpforms-builder-settings-block-toggle', function( e ) {
 				e.preventDefault();
 
-				app.settingsBlockPanelToggle( $(this) );
-			});
+				app.settingsBlockPanelToggle( $( this ) );
+			} );
 
 			// Remove settings block
 			$builder.on('click', '.wpforms-builder-settings-block-delete', function(e) {
@@ -3159,6 +3843,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * Add new settings block.
 		 *
 		 * @since 1.4.8
+		 * @since 1.6.1 Added processing for Field Map table.
+		 * @since 1.6.1.2 Registered `wpformsSettingsBlockAdded` trigger.
 		 */
 		settingsBlockAdd: function($el) {
 
@@ -3244,10 +3930,32 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 										);
 								}
 
+								// Fields Map Table, if present.
+								var $fieldsMapTable = $newSettingsBlock.find( '.wpforms-field-map-table' );
+								if ( $fieldsMapTable.length ) {
+									$fieldsMapTable.each( function( index, el ) {
+
+										var $table = $( el );
+
+										// Clean table fields.
+										$table.find( 'tr:not(:first-child)' ).remove();
+
+										var $input  = $table.find( '.key input' ),
+											$select = $table.find( '.field select' ),
+											name    = $select.data( 'name' );
+
+										$input.attr( 'value', '' );
+										$select
+											.attr( 'name', '' )
+											.attr( 'data-name', name.replace( /\[(\d+)\]/, '[' + nextID + ']' ) );
+									} );
+								}
+
 								newSettingsBlock = $newSettingsBlock.wrap( '<div>' ).parent().html();
 								newSettingsBlock = newSettingsBlock.replace( /\[conditionals\]\[(\d+)\]\[(\d+)\]/g, '[conditionals][0][0]' );
 
 								$firstSettingsBlock.before( newSettingsBlock );
+								var $addedSettingBlock = $firstSettingsBlock.prev();
 
 								if ( blockType === 'confirmation' ) {
 									app.confirmationFieldsToggle( $( '.wpforms-panel-field-confirmations-type' ).first() );
@@ -3257,10 +3965,12 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 									wp.editor.initialize( 'wpforms-panel-field-confirmations-message-' + nextID, s.tinymceDefaults );
 								}
 
-								$el.attr( 'data-next-id', nextID + 1 );
-
 								// Re-init tooltips for new section.
 								wpf.initTooltips();
+
+								$builder.trigger( 'wpformsSettingsBlockAdded', [ $addedSettingBlock ] );
+
+								$el.attr( 'data-next-id', nextID + 1 );
 							}
 						},
 					},
@@ -3333,42 +4043,51 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 *
 		 * @since 1.4.8
 		 */
-		settingsBlockPanelToggle: function($el) {
+		settingsBlockPanelToggle: function( $el ) {
 
-			var $settingsBlock = $el.closest('.wpforms-builder-settings-block'),
-				settingsBlockId = $settingsBlock.data('block-id'),
-				settingsBlockType = $settingsBlock.data('block-type'),
-				$content = $settingsBlock.find('.wpforms-builder-settings-block-content'),
-				is_visible = $content.is(':visible');
+			if ( $el.hasClass( 'disabled' ) ) {
+				return;
+			}
+			$el.addClass( 'disabled' );
+			var $settingsBlock = $el.closest( '.wpforms-builder-settings-block' ),
+				settingsBlockId = $settingsBlock.data( 'block-id' ),
+				settingsBlockType = $settingsBlock.data( 'block-type' ),
+				$content = $settingsBlock.find( '.wpforms-builder-settings-block-content' ),
+				isVisible = $content.is( ':visible' );
 
-			$content.slideToggle({
+			$content.slideToggle( {
 				duration: 400,
-				start: function () {
+				start: function() {
+
 					// Send early to save fast.
 					// It's animation start, so we should save the state for animation end (reversed).
-					$.post(wpforms_builder.ajax_url, {
+					$.post( wpforms_builder.ajax_url, {
 						action: 'wpforms_builder_settings_block_state_save',
-						state: is_visible ? 'closed' : 'opened',
+						state: isVisible ? 'closed' : 'opened',
 						form_id: s.formID,
 						block_id: settingsBlockId,
 						block_type: settingsBlockType,
-						nonce : wpforms_builder.nonce
-					});
+						nonce: wpforms_builder.nonce,
+					} );
 				},
 				always: function() {
-					if ($content.is(':visible')) {
-						$el.html('<i class="fa fa-chevron-up"></i>');
+					if ( $content.is( ':visible' ) ) {
+						$el.html( '<i class="fa fa-chevron-up"></i>' );
 					} else {
-						$el.html('<i class="fa fa-chevron-down"></i>');
+						$el.html( '<i class="fa fa-chevron-down"></i>' );
 					}
-				}
-			});
+				},
+				complete: function() {
+					$el.removeClass( 'disabled' );
+				},
+			} );
 		},
 
 		/**
 		 * Delete settings block.
 		 *
 		 * @since 1.4.8
+		 * @since 1.6.1.2 Registered `wpformsSettingsBlockDeleted` trigger.
 		 */
 		settingsBlockDelete: function($el) {
 
@@ -3415,6 +4134,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 								} );
 
 								$current_block.remove();
+
+								$builder.trigger( 'wpformsSettingsBlockDeleted', [ blockType, settingsBlockId ] );
 							}
 						}
 					},
@@ -3888,102 +4609,124 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		},
 
 		/**
-		 * Field map table - Delete row
+		 * Field map table - Delete row.
 		 *
 		 * @since 1.2.0
+		 * @since 1.6.1.2 Registered `wpformsFieldMapTableDeletedRow` trigger.
 		 */
-		fieldMapTableDeleteRow: function(e, el) {
+		fieldMapTableDeleteRow: function( e, el ) {
 
-			var $this = $(el),
-				$row = $this.closest('tr'),
-				$table = $this.closest('table'),
-				total = $table.find('tr').length;
+			var $this  = $( el ),
+				$row   = $this.closest( 'tr' ),
+				$table = $this.closest( 'table' ),
+				$block = $row.closest( '.wpforms-builder-settings-block' ),
+				total  = $table.find( 'tr' ).length;
 
-			if (total > '1') {
+			if ( total > '1' ) {
 				$row.remove();
+
+				$builder.trigger( 'wpformsFieldMapTableDeletedRow', [ $block ] );
 			}
 		},
 
 		/**
-		 * Field map table - Add row
+		 * Field map table - Add row.
 		 *
 		 * @since 1.2.0
+		 * @since 1.6.1.2 Registered `wpformsFieldMapTableAddedRow` trigger.
 		 */
-		fieldMapTableAddRow: function(e, el) {
+		fieldMapTableAddRow: function( e, el ) {
 
-			var $this   = $(el),
-				$row    = $this.closest('tr'),
-				$table  = $this.closest('tbody'),
-				choice  = $row.clone().insertAfter($row);
+			var $this  = $( el ),
+				$row   = $this.closest( 'tr' ),
+				$block = $row.closest( '.wpforms-builder-settings-block' ),
+				choice = $row.clone().insertAfter( $row );
 
-			choice.find('input').val('');
-			choice.find('select :selected').prop('selected', false);
-			choice.find('.key-destination').attr('name','');
+			choice.find( 'input' ).val( '' );
+			choice.find( 'select :selected' ).prop( 'selected', false );
+			choice.find( '.key-destination' ).attr( 'name', '' );
+
+			$builder.trigger( 'wpformsFieldMapTableAddedRow', [ $block, choice ] );
 		},
 
 		/**
 		 * Update field mapped select items on form updates.
 		 *
 		 * @since 1.2.0
+		 * @since 1.6.1.2 Registered `wpformsFieldSelectMapped` trigger.
 		 */
-		fieldMapSelect: function(e, fields) {
+		fieldMapSelect: function( e, fields ) {
 
-			// Apply to all selects with identifier class
-			$('.wpforms-field-map-select').each(function(index, el) {
+			$( '.wpforms-field-map-select' ).each( function( index, el ) {
 
-				var $this         = $(this),
-					selected      = $this.find('option:selected').val(),
-					allowedFields = $this.data('field-map-allowed'),
-					placeholder   = $this.data('field-map-placeholder');
+				var $this         = $( this ),
+					selected      = $this.find( 'option:selected' ).val(),
+					allowedFields = $this.data( 'field-map-allowed' ),
+					placeholder   = $this.data( 'field-map-placeholder' );
 
-				// Check if custom placeholder was provided
-				if (typeof placeholder === 'undefined' ||  !placeholder) {
+				// Check if custom placeholder was provided.
+				if ( typeof placeholder === 'undefined' || ! placeholder ) {
 					placeholder = wpforms_builder.select_field;
 				}
 
-				// Reset select add placeholder option
-				$this.empty().append($('<option>', { value: '', text : placeholder }));
+				// Reset select and add a placeholder option.
+				$this.empty().append( $( '<option>', { value: '', text : placeholder } ) );
 
-				// If allowed fields are not defined, bail
-				if (typeof allowedFields !== 'undefined' && allowedFields) {
-					allowedFields = allowedFields.split(' ');
+				// If allowed fields are not defined, bail.
+				if ( typeof allowedFields !== 'undefined' && allowedFields ) {
+					allowedFields = allowedFields.split( ' ' );
 				} else {
 					return;
 				}
 
-				// If we have no fields for the form, bail
-				if ( !fields || $.isEmptyObject(fields) ) {
-					return;
+				// Loop through the current fields, if we have fields for the form.
+				if ( fields && ! $.isEmptyObject( fields ) ) {
+					for ( var key in wpf.orders.fields ) {
+
+						if ( ! Object.prototype.hasOwnProperty.call( wpf.orders.fields, key ) ) {
+							continue;
+						}
+
+						var fieldID = wpf.orders.fields[ key ],
+							label   = '';
+
+						if ( ! fields[ fieldID ] ) {
+							continue;
+						}
+
+						// Compile the label.
+						if ( typeof fields[ fieldID ].label !== 'undefined' && fields[ fieldID ].label.length ) {
+							label = wpf.sanitizeHTML( fields[ fieldID ].label );
+						} else {
+							label = wpforms_builder.field + ' #' + fieldID;
+						}
+
+						// Add to select if it is a field type allowed.
+						if ( $.inArray( fields[ fieldID ].type, allowedFields ) >= 0 || $.inArray( 'all-fields', allowedFields ) >= 0 ) {
+							$this.append( $( '<option>', { value: fields[ fieldID ].id, text : label } ) );
+						}
+					}
 				}
 
-				// Loop through the current fields
-				//for(var field_key in fields) {
-				for( key in wpf.orders.fields ) {
-					var field_id = wpf.orders.fields[key],
-						label    = '';
-
-					if ( ! fields[field_id] ) {
-						continue;
-					}
-
-					// Compile the label
-					if ( typeof fields[field_id].label !== 'undefined' && fields[field_id].label.length ) {
-						label = wpf.sanitizeHTML( fields[field_id].label );
-					} else {
-						label = wpforms_builder.field + ' #' + fields[field_id].val;
-					}
-
-					// Add to select if it is a field type allowed
-					if ($.inArray(fields[field_id].type, allowedFields) >= 0 || $.inArray('all-fields', allowedFields) >= 0) {
-						$this.append($('<option>', { value: fields[field_id].id, text : label }));
-					}
+				// Restore previous value if found.
+				if ( selected ) {
+					$this.find( 'option[value="' + selected + '"]' ).prop( 'selected', true );
 				}
 
-				// Restore previous value if found
-				if (selected) {
-					$this.find('option[value="'+selected+'"]').prop('selected',true);
+				// Add a "Custom Value" option, if it support.
+				var customValueSupport = $this.data( 'custom-value-support' );
+				if ( typeof customValueSupport === 'boolean' && customValueSupport ) {
+					$this.append(
+						$( '<option>', {
+							value: 'custom_value',
+							text: wpforms_builder.add_custom_value_label,
+							class: 'wpforms-field-map-option-custom-value',
+						} )
+					);
 				}
-			});
+
+				$builder.trigger( 'wpformsFieldSelectMapped', [ $this ] );
+			} );
 		},
 
 		/**

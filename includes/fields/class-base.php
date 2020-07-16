@@ -827,9 +827,14 @@ abstract class WPForms_Field {
 			 * Choices.
 			 */
 			case 'choices':
-				$values = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
-				$label  = ! empty( $args['label'] ) ? esc_html( $args['label'] ) : esc_html__( 'Choices', 'wpforms-lite' );
-				$class  = array();
+				$values     = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
+				$label      = ! empty( $args['label'] ) ? esc_html( $args['label'] ) : esc_html__( 'Choices', 'wpforms-lite' );
+				$class      = array();
+				$field_type = $this->type;
+
+				if ( ! empty( $field['multiple'] ) ) {
+					$field_type = 'checkbox';
+				}
 
 				if ( ! empty( $field['show_values'] ) ) {
 					$class[] = 'show-values';
@@ -871,7 +876,7 @@ abstract class WPForms_Field {
 					$fld .= '<li data-key="' . absint( $key ) . '">';
 					$fld .= sprintf(
 						'<input type="%s" name="%s[default]" class="default" value="1" %s>',
-						'checkbox' === $this->type ? 'checkbox' : 'radio',
+						'checkbox' === $field_type ? 'checkbox' : 'radio',
 						$base,
 						checked( '1', $default, false )
 					);
@@ -1389,6 +1394,7 @@ abstract class WPForms_Field {
 	 *
 	 * @since 1.0.0
 	 * @since 1.5.0 Added support for <select> HTML tag for choices.
+	 * @since 1.6.1 Added multiple select support.
 	 *
 	 * @param string $option Field option to render.
 	 * @param array  $field  Field data and settings.
@@ -1521,13 +1527,19 @@ abstract class WPForms_Field {
 					$list_class[] = 'wpforms-image-choices-' . sanitize_html_class( $field['choices_images_style'] );
 				}
 
+				if ( ! empty( $class ) ) {
+					$list_class[] = $class;
+				}
+
 				// Special rules for <select>-based fields.
 				if ( 'select' === $type ) {
+					$multiple    = ! empty( $field['multiple'] ) ? ' multiple' : '';
 					$placeholder = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
 
 					$output = sprintf(
-						'<select class="%s" disabled>',
-						wpforms_sanitize_classes( $list_class, true )
+						'<select class="%s"%s disabled>',
+						wpforms_sanitize_classes( $list_class, true ),
+						$multiple
 					);
 
 					// Optional placeholder.
@@ -1538,14 +1550,14 @@ abstract class WPForms_Field {
 						);
 					}
 
-					// Build the select options (even though user can only see 1st option).
+					// Build the select options.
 					foreach ( $values as $key => $value ) {
 
 						$default  = isset( $value['default'] ) ? (bool) $value['default'] : false;
-						$selected = ! empty( $placeholder ) ? '' : selected( true, $default, false );
+						$selected = ! empty( $placeholder ) && empty( $multiple ) ? '' : selected( true, $default, false );
 
 						$output .= sprintf(
-							'<option %s>%s</option>',
+							'<option value="%2$s" %1$s>%2$s</option>',
 							$selected,
 							esc_html( $value['label'] )
 						);

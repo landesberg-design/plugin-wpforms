@@ -86,8 +86,10 @@ class WPForms_Field_Address extends WPForms_Field {
 		// Remove primary for expanded formats.
 		unset( $properties['inputs']['primary'] );
 
-		$form_id  = absint( $form_data['id'] );
-		$field_id = absint( $field['id'] );
+		$form_id   = absint( $form_data['id'] );
+		$field_id  = absint( $field['id'] );
+		$countries = isset( $this->schemes[ $scheme ]['countries'] ) ? $this->schemes[ $scheme ]['countries'] : [];
+		asort( $countries );
 
 		// Properties shared by both core schemes.
 		$props      = array(
@@ -212,7 +214,7 @@ class WPForms_Field_Address extends WPForms_Field {
 					'data'     => array(),
 					'hidden'   => ! empty( $field['country_hide'] ) || ! isset( $this->schemes[ $scheme ]['countries'] ) ? true : false,
 					'id'       => "wpforms-{$form_id}-field_{$field_id}-country",
-					'options'  => isset( $this->schemes[ $scheme ]['countries'] ) ? $this->schemes[ $scheme ]['countries'] : '',
+					'options'  => $countries,
 					'required' => ! empty( $field['required'] ) ? 'required' : '',
 					'sublabel' => array(
 						'hidden' => ! empty( $field['sublabel_hide'] ),

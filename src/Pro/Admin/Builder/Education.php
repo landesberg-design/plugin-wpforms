@@ -334,6 +334,13 @@ class Education {
 				'plugin_slug' => 'wpforms-post-submissions',
 				'license'     => 'pro',
 			),
+			array(
+				'name'        => esc_html__( 'Webhooks', 'wpforms' ),
+				'slug'        => 'webhooks',
+				'plugin'      => 'wpforms-webhooks/wpforms-webhooks.php',
+				'plugin_slug' => 'wpforms-webhooks',
+				'license'     => 'elite',
+			),
 		);
 
 		$settings = $this->get_addons_available( $addons );
@@ -478,6 +485,14 @@ class Education {
 				'plugin'      => 'wpforms-stripe/wpforms-stripe.php',
 				'plugin_slug' => 'wpforms-stripe',
 				'license'     => 'pro',
+			),
+			array(
+				'name'        => esc_html__( 'Authorize.Net', 'wpforms' ),
+				'slug'        => 'authorize_net',
+				'img'         => 'addon-icon-authorize-net.png',
+				'plugin'      => 'wpforms-authorize-net/wpforms-authorize-net.php',
+				'plugin_slug' => 'wpforms-authorize-net',
+				'license'     => 'elite',
 			),
 		);
 

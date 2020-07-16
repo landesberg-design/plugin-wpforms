@@ -1,4 +1,4 @@
-/* global wpforms_settings, grecaptcha, wpformsRecaptchaCallback, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck */
+/* global wpforms_settings, grecaptcha, wpformsRecaptchaCallback, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices */
 
 'use strict';
 
@@ -43,6 +43,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			app.loadSmartPhoneField();
 			app.loadPayments();
 			app.loadMailcheck();
+			app.loadChoicesJS();
 
 			// Randomize elements.
 			$( '.wpforms-randomize' ).each( function() {
@@ -299,6 +300,11 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 								$submit.prop( 'disabled', true );
 								$form.find( '#wpforms-field_recaptcha-error' ).remove();
 
+								// Display processing text.
+								if ( altText ) {
+									$submit.text( altText );
+								}
+
 								if ( ! app.empty( recaptchaID ) || recaptchaID === 0 ) {
 
 									// Form contains invisible reCAPTCHA.
@@ -309,11 +315,6 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 										$submit.prop( 'disabled', false );
 									} );
 									return false;
-								}
-
-								// Normal form.
-								if ( altText ) {
-									$submit.text( altText );
 								}
 
 								// Remove name attributes if needed.
@@ -540,8 +541,13 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 				$el.intlTelInput( inputOptions );
 
-				// Remove original input name not to interfere with a hidden input.
-				$el.removeAttr( 'name' );
+				// For proper validation, we should preserve the name attribute of the input field.
+				// But we need to modify original input name not to interfere with a hidden input.
+				$el.attr( 'name', 'wpf-temp-' + $el.attr( 'name' ) );
+
+				// Add special class to remove name attribute before submitting.
+				// So, only the hidden input value will be submitted.
+				$el.addClass( 'wpforms-input-temp-name' );
 
 				// Instantly update a hidden form input with a correct data.
 				// Previously "blur" only was used, which is broken in case Enter was used to submit the form.
@@ -550,6 +556,12 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 						$el.siblings( 'input[type="hidden"]' ).val( $el.intlTelInput( 'getNumber' ) );
 					}
 				} );
+			} );
+
+			// Update hidden input of the `Smart` phone field to be sure the latest value will be submitted.
+			$( '.wpforms-form' ).on( 'wpformsBeforeFormSubmit', function() {
+
+				$( this ).find( '.wpforms-smart-phone-field' ).trigger( 'input' );
 			} );
 		},
 
@@ -623,6 +635,88 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				$t.parent().remove();
 			} );
 
+		},
+
+		/**
+		 * Load Choices.js library for all Modern style Dropdown fields (<select>).
+		 *
+		 * @since 1.6.1
+		 */
+		loadChoicesJS: function() {
+
+			// Loads if function exists.
+			if ( ! $.isFunction( window.Choices ) ) {
+
+				return;
+			}
+
+			$( '.wpforms-field-select-style-modern .choicesjs-select, .wpforms-field-payment-select .choicesjs-select' ).each( function( idx, el ) {
+
+				var args = window.wpforms_choicesjs_config || {};
+
+				args.callbackOnInit = function() {
+
+					var self      = this,
+						$element  = $( self.passedElement.element ),
+						$input    = $( self.input.element ),
+						sizeClass = $element.data( 'size-class' );
+
+					// Add CSS-class for size.
+					if ( sizeClass ) {
+						$( self.containerOuter.element ).addClass( sizeClass );
+					}
+
+					/**
+					 * If a multiple select has selected choices - hide a placeholder input.
+					 * We use custom styles like `.screen-reader-text` for it,
+					 * because it avoids an issue with closing a dropdown.
+					 */
+					if ( $element.prop( 'multiple' ) ) {
+
+						// On init event.
+						if ( self.getValue( true ).length ) {
+							$input.addClass( self.config.classNames.input + '--hidden' );
+						}
+
+						// On change event.
+						$element.on( 'change', function() {
+
+							self.getValue( true ).length ? $input.addClass( self.config.classNames.input + '--hidden' ) : $input.removeClass( self.config.classNames.input + '--hidden' );
+						} );
+					}
+				};
+
+				args.callbackOnCreateTemplates = function() {
+
+					var self      = this,
+						$element  = $( self.passedElement.element );
+
+					return {
+
+						// Change default template for option.
+						option: function( item ) {
+
+							var opt = Choices.defaults.templates.option.call( this, item );
+
+							// Add a `.placeholder` class for placeholder option - it needs for WPForm CL.
+							if ( 'undefined' !== typeof item.placeholder && true === item.placeholder ) {
+								opt.classList.add( 'placeholder' );
+							}
+
+							// Add a `data-amount` attribute for payment dropdown.
+							// It will be copy from a Choices.js `data-custom-properties` attribute.
+							if ( $element.hasClass( 'wpforms-payment-price' ) && 'undefined' !== typeof item.customProperties && null !== item.customProperties ) {
+								opt.dataset.amount = item.customProperties;
+							}
+
+							return opt;
+						},
+					};
+				};
+
+				// Save choicesjs instance for future access.
+				$( el ).data( 'choicesjs', new Choices( el, args ) );
+			} );
 		},
 
 		//--------------------------------------------------------------------//
@@ -1455,6 +1549,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		 * @param {jQuery} $form Form element.
 		 */
 		formSubmit: function( $form ) {
+
+			$form.trigger( 'wpformsBeforeFormSubmit' );
 
 			if ( $form.hasClass( 'wpforms-ajax-form' ) && typeof FormData !== 'undefined' ) {
 				app.formSubmitAjax( $form );

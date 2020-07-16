@@ -393,7 +393,10 @@ class WPForms_Frontend {
 				}
 
 				if ( true === $description && ! empty( $settings['form_desc'] ) ) {
-					echo '<div class="wpforms-description">' . $settings['form_desc'] . '</div>';
+					echo '<div class="wpforms-description">';
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo apply_filters( 'wpforms_process_smart_tags', $settings['form_desc'], $form_data );
+					echo '</div>';
 				}
 
 			echo '</div>';

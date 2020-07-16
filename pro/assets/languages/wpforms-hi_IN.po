@@ -1,0 +1,3294 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WPForms\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms\n"
+"POT-Creation-Date: 2020-06-17T11:44:43+03:00\n"
+"PO-Revision-Date: 2020-06-17 11:47+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.3.1\n"
+"X-Domain: wpforms\n"
+"Plural-Forms: nplurals=2; plural=(n==0 || n==1);\n"
+
+#. Plugin Name of the plugin
+#. Author of the plugin
+#: src/Pro/Access/Integrations.php:94 src/Pro/Access/Integrations.php:151
+#: src/Pro/Admin/DashboardWidget.php:200
+#, fuzzy
+#| msgid "WPForms Addons"
+msgid "WPForms"
+msgstr "WPForms Addons"
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://wpforms.com"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"Beginner friendly WordPress contact form plugin. Use our Drag & Drop form builder to create "
+"your WordPress forms."
+msgstr ""
+
+#: includes/admin/class-settings.php:523
+msgid ""
+"Check this if you would like to remove ALL WPForms data upon plugin deletion. All forms, "
+"entries, and uploaded files will be unrecoverable."
+msgstr ""
+
+#. translators: %1$s - source name; %2$s - type name.
+#: includes/fields/class-base.php:945
+msgid "Choices are dynamically populated from the %1$s %2$s."
+msgstr ""
+
+#: pro/includes/admin/ajax-actions.php:43
+#: pro/includes/admin/entries/class-entries-list-table.php:918
+#: pro/includes/admin/entries/class-entries-single.php:174
+#, fuzzy
+#| msgid "Entry Details"
+msgid "Entry starred."
+msgstr "प्रविष्टि विवरण"
+
+#: pro/includes/admin/ajax-actions.php:53
+#: pro/includes/admin/entries/class-entries-list-table.php:977
+#: pro/includes/admin/entries/class-entries-single.php:206
+#, fuzzy
+#| msgid "Entry was successfully unstarred."
+msgid "Entry unstarred."
+msgstr "प्रविष्टि को सफलतापूर्वक अतारांकित किया गया।"
+
+#: pro/includes/admin/ajax-actions.php:113
+#: pro/includes/admin/entries/class-entries-list-table.php:800
+#: pro/includes/admin/entries/class-entries-single.php:520 src/Pro/Admin/Entries/Edit.php:401
+#, fuzzy
+#| msgid "Mark entry read"
+msgid "Entry read."
+msgstr "प्रविष्टि पढ़ा हुआ चिह्नित करें"
+
+#: pro/includes/admin/ajax-actions.php:123
+#: pro/includes/admin/entries/class-entries-list-table.php:859
+#: pro/includes/admin/entries/class-entries-single.php:272
+#, fuzzy
+#| msgid "Mark entry unread"
+msgid "Entry unread."
+msgstr "प्रविष्टि अपठित चिह्नित करें"
+
+#: pro/includes/admin/ajax-actions.php:165 pro/includes/admin/ajax-actions.php:209
+msgid "Please enter a license key."
+msgstr "कृपया एक लाइसेंस कुंजी दर्ज करें।"
+
+#: pro/includes/admin/class-addons.php:89
+msgid "WPForms Addons"
+msgstr "WPForms Addons"
+
+#: pro/includes/admin/class-addons.php:91
+msgid "Refresh Addons"
+msgstr "Addons रिफ्रेश करें"
+
+#: pro/includes/admin/class-addons.php:93
+msgid "Search Addons"
+msgstr "Addons खोजें"
+
+#: pro/includes/admin/class-addons.php:99
+msgid ""
+"There was an issue retrieving Addons for this site. Please click on the button above to "
+"refresh."
+msgstr ""
+"इस साइट के लिए Addons को पुनर्प्राप्त करने वाला एक मुद्दा था। कृपया रिफ्रेश करने के लिए ऊपर दिए गए बटन पर "
+"क्लिक करें।"
+
+#: pro/includes/admin/class-addons.php:105
+msgid "In order to get access to Addons, you need to resolve your license key errors."
+msgstr "Addons तक पहुंचने के लिए, आपको अपनी लाइसेंस कुंजी त्रुटियों को हल करने की आवश्यकता है।"
+
+#: pro/includes/admin/class-addons.php:111
+msgid "In order to get access to Addons, you need to verify your license key for WPForms."
+msgstr "Addons तक पहुंचने के लिए, आपको WPForms के लिए अपनी लाइसेंस कुंजी सत्यापित करनी होगी।"
+
+#: pro/includes/admin/class-addons.php:119
+msgid "Addons have successfully been refreshed."
+msgstr "Addons सफलतापूर्वक रिफ्रेश कर दिए गए हैं।"
+
+#. translators: %s - refresh addons page URL.
+#: pro/includes/admin/class-addons.php:132
+msgid ""
+"Improve your forms with our premium addons. Missing an addon that you think you should be "
+"able to see? Click the <a href=\"%s\">Refresh Addons</a> button above."
+msgstr ""
+"हमारे प्रीमियम addons के साथ अपने रूपों में सुधार करें। एक addon को मिस करना जो आपको लगता है कि आपको देखने "
+"में सक्षम होना चाहिए? ऊपर दिए गए <a href=“%s”>Refresh Addons</a> बटन पर क्लिक करें।"
+
+#: pro/includes/admin/class-addons.php:144
+msgid "Available Addons"
+msgstr "उपलब्ध Addons"
+
+#: pro/includes/admin/class-addons.php:198
+msgid "Unlock More Features..."
+msgstr "अधिक सुविधाएँ अनलॉक करें…"
+
+#. translators: %s - WPForms.com Account page URL.
+#: pro/includes/admin/class-addons.php:203
+msgid ""
+"Want to get even more features? <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer"
+"\">Upgrade your WPForms account</a> and unlock the following extensions."
+msgstr ""
+"और भी अधिक सुविधाएँ प्राप्त करना चाहते हैं? <a href=“%s” target=“_blank” rel=“noopener noreferrer”> "
+"\\अपने WPForms खाते का नवीनीकरण करें</a> और निम्न एक्सटेंशन अनलॉक करें।"
+
+#: pro/includes/admin/class-addons.php:244
+msgid "Active"
+msgstr "सक्रिय"
+
+#: pro/includes/admin/class-addons.php:247
+msgid "Not Installed"
+msgstr "स्थापित नहीं है"
+
+#: pro/includes/admin/class-addons.php:250
+msgid "Inactive"
+msgstr "निष्क्रिय"
+
+#. translators: %s - addon status label.
+#. translators: %s - entry payment status.
+#: pro/includes/admin/class-addons.php:275
+#: pro/includes/admin/entries/class-entries-single.php:1123
+msgid "Status: %s"
+msgstr "स्थिति: %s"
+
+#: pro/includes/admin/class-addons.php:289
+msgid "Deactivate"
+msgstr "निष्क्रिय करें"
+
+#: pro/includes/admin/class-addons.php:294
+msgid "Activate"
+msgstr "सक्रिय"
+
+#: pro/includes/admin/class-addons.php:299
+msgid "Install Addon"
+msgstr "Addon स्थापित करें"
+
+#: pro/includes/admin/class-addons.php:302
+msgid "Upgrade Now"
+msgstr "अभी अपग्रेड करें"
+
+#: pro/includes/admin/class-license.php:97 pro/includes/admin/class-license.php:193
+#: pro/includes/admin/class-license.php:289
+msgid "There was an error connecting to the remote key API. Please try again later."
+msgstr "दूरस्थ कुंजी API से कनेक्ट करने में त्रुटि हुई थी। बाद में पुन: प्रयास करें।"
+
+#: pro/includes/admin/class-license.php:118
+msgid "Congratulations! This site is now receiving automatic updates."
+msgstr "बधाई हो! यह साइट अब स्वचालित अपडेट प्राप्त कर रही है।"
+
+#: pro/includes/admin/class-license.php:212 pro/includes/admin/class-license.php:422
+msgid ""
+"Your license key for WPForms is invalid. The key no longer exists or the user associated with "
+"the key has been deleted. Please use a different key to continue receiving automatic updates."
+msgstr ""
+"WPForms के लिए आपकी लाइसेंस कुंजी अमान्य है। कुंजी अब मौजूद नहीं है या कुंजी से संबद्ध उपयोगकर्ता हटा दिया गया "
+"है। स्वचालित अपडेट प्राप्त करने के लिए कृपया एक भिन्न कुंजी का उपयोग करें।"
+
+#: pro/includes/admin/class-license.php:226
+msgid ""
+"Your license key for WPForms has expired. Please renew your license key on WPForms.com to "
+"continue receiving automatic updates."
+msgstr ""
+"WPForms के लिए आपकी लाइसेंस कुंजी समाप्त हो गई है। स्वचालित अपडेट प्राप्त करने के लिए कृपया WPForms.com पर "
+"अपनी लाइसेंस कुंजी नवीनीकृत करें।"
+
+#: pro/includes/admin/class-license.php:240 pro/includes/admin/class-license.php:413
+msgid ""
+"Your license key for WPForms has been disabled. Please use a different key to continue "
+"receiving automatic updates."
+msgstr ""
+"WPForms के लिए आपकी लाइसेंस कुंजी अक्षम कर दी गई है। स्वचालित अपडेट प्राप्त करने के लिए कृपया एक भिन्न कुंजी "
+"का उपयोग करें।"
+
+#: pro/includes/admin/class-license.php:256
+msgid "Your key has been refreshed successfully."
+msgstr "आपकी कुंजी सफलतापूर्वक रिफ्रेश कर दी गई है।"
+
+#: pro/includes/admin/class-license.php:311
+msgid "You have deactivated the key from this site successfully."
+msgstr "आपने इस साइट से कुंजी को सफलतापूर्वक निष्क्रिय कर दिया है।"
+
+#. translators: %s - plugin settings page URL.
+#: pro/includes/admin/class-license.php:357
+msgid ""
+"Please <a href=\"%s\">enter and activate</a> your license key for WPForms to enable automatic "
+"updates."
+msgstr ""
+"स्वचालित अपडेट सक्षम करने के लिए कृपया WPForms के लिए अपनी लाइसेंस कुंजी <a href=“%s”>दर्ज और सक्रिय</a> "
+"करें।"
+
+#: pro/includes/admin/class-license.php:396 src/Pro/Admin/Builder/LicenseAlert.php:143
+msgid "Heads up! Your WPForms license has expired."
+msgstr ""
+
+#: pro/includes/admin/class-license.php:399
+msgid ""
+"An active license is needed to create new forms and edit existing forms. It also provides "
+"access to new features & addons, plugin updates (including security improvements), and our "
+"world class support!"
+msgstr ""
+
+#: pro/includes/admin/class-license.php:402 src/Pro/Admin/Builder/LicenseAlert.php:145
+msgid "Renew Now"
+msgstr ""
+
+#: pro/includes/admin/class-license.php:403 src/Lite/Admin/Builder/Education.php:710
+#: src/Pro/Admin/Builder/LicenseAlert.php:146 src/Pro/Admin/DashboardWidget.php:264
+#: src/Pro/Admin/DashboardWidget.php:477 src/Pro/Admin/Education.php:335
+msgid "Learn More"
+msgstr ""
+
+#: pro/includes/admin/entries/class-entries-export.php:221
+#: pro/includes/admin/entries/class-entries-list-table.php:179
+#: pro/includes/fields/class-date-time.php:105 pro/includes/fields/class-date-time.php:264
+#: pro/includes/fields/class-date-time.php:344 pro/includes/fields/class-date-time.php:582
+#: pro/includes/fields/class-date-time.php:590
+msgid "Date"
+msgstr "दिनांक"
+
+#: pro/includes/admin/entries/class-entries-export.php:222
+msgid "Date GMT"
+msgstr "दिनांक GMT"
+
+#: pro/includes/admin/entries/class-entries-export.php:223
+msgid "ID"
+msgstr "आईडी"
+
+#: pro/includes/admin/entries/class-entries-export.php:366
+msgid "You do not have permission to export entries."
+msgstr "आपको प्रविष्टियों को निर्यात करने की अनुमति नहीं है।"
+
+#: pro/includes/admin/entries/class-entries-export.php:367
+msgid "Error"
+msgstr "त्रुटि"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:142
+msgid "All"
+msgstr "सभी"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:143
+msgid "Unread"
+msgstr "अपठित"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:144
+#: src/Pro/Admin/Entries/Export/Export.php:136
+msgid "Starred"
+msgstr "तारांकित"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:170
+#: pro/includes/fields/class-payment-total.php:18 src/Pro/Admin/Entries/Export/Ajax.php:648
+msgid "Total"
+msgstr "कुल"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:176
+msgid "Status"
+msgstr "स्थिति"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:181
+#: pro/includes/admin/entries/class-entries-single.php:1325
+msgid "Actions"
+msgstr "कार्रवाइयाँ"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:182
+msgid "Change columns to display"
+msgstr "प्रदर्शित करने के लिए कॉलम बदलें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:249
+#: pro/includes/admin/entries/class-entries-list.php:664
+#: pro/includes/admin/entries/class-entries-list.php:691
+#: src/Pro/Admin/Entries/Export/Export.php:132
+#, fuzzy
+#| msgid "Entry ID: %s"
+msgid "Entry ID"
+msgstr "प्रविष्टि आईडी: %s"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:255
+#: pro/includes/admin/entries/class-entries-list.php:668
+#: pro/includes/admin/entries/class-entries-list.php:698
+#: src/Pro/Admin/Entries/Export/Export.php:134
+#, fuzzy
+#| msgid "Entry Details"
+msgid "Entry Notes"
+msgstr "प्रविष्टि विवरण"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:264
+#: pro/includes/admin/entries/class-entries-list-table.php:273
+#: pro/includes/admin/entries/class-entries-list-table.php:1090
+#: pro/includes/admin/entries/class-entries-list.php:675
+#: pro/includes/admin/entries/class-entries-list.php:711
+msgid "Field"
+msgstr "फ़ील्ड"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:313
+#: pro/includes/admin/entries/class-entries-single.php:1071
+#: src/Pro/Admin/Entries/Export/Ajax.php:602
+msgid "Unknown"
+msgstr "अज्ञात"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:315
+msgid "Payment"
+msgstr "भुगतान"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:320
+#: pro/includes/admin/entries/class-entries-single.php:1012
+#: src/Pro/Admin/Entries/Export/Ajax.php:608
+msgid "Completed"
+msgstr "पूरा"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:347
+msgid "Recurring"
+msgstr "आवर्ती"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:491
+msgid "Unstar entry"
+msgstr "अतारांकित प्रविष्टि"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:491
+msgid "Star entry"
+msgstr "तारांकित प्रविष्टि"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:496
+msgid "Mark entry unread"
+msgstr "प्रविष्टि अपठित चिह्नित करें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:496
+msgid "Mark entry read"
+msgstr "प्रविष्टि पढ़ा हुआ चिह्नित करें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:527
+msgid "View Form Entry"
+msgstr "फॉर्म प्रविष्टि देखें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:528
+msgid "View"
+msgstr "देखें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:544
+#, fuzzy
+#| msgid "View Form Entry"
+msgid "Edit Form Entry"
+msgstr "फॉर्म प्रविष्टि देखें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:545
+#: src/Pro/Admin/Entries/Edit.php:451
+msgid "Edit"
+msgstr ""
+
+#: pro/includes/admin/entries/class-entries-list-table.php:566
+msgid "Delete Form Entry"
+msgstr "फॉर्म प्रविष्टि हटाएं"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:567
+#: pro/includes/admin/entries/class-entries-list-table.php:656
+msgid "Delete"
+msgstr "हटाएँ"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:591
+#: src/Pro/Admin/Entries/Export/Admin.php:86
+msgid "Select a date range"
+msgstr "किसी दिनांक श्रेणी का चयन करें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:595
+msgid "Filter"
+msgstr "फिल्टर"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:651
+msgid "Mark Read"
+msgstr "पढ़ा हुआ चिह्नित करें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:652
+#: pro/includes/admin/entries/class-entries-single.php:1309
+msgid "Mark Unread"
+msgstr "अपठित को चिह्नित करें"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:653
+#: pro/includes/admin/entries/class-entries-single.php:1273
+#: pro/includes/fields/class-rating.php:239
+msgid "Star"
+msgstr "तारांकित"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:654
+#: pro/includes/admin/entries/class-entries-single.php:1273
+msgid "Unstar"
+msgstr "अतारांकित"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:655
+msgid "----------"
+msgstr "----------"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1064
+#, fuzzy
+#| msgid "Form not found."
+msgid "No entries found."
+msgstr "फॉर्म नहीं मिला।"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1066
+msgid "Whoops, it appears you do not have any form entries yet."
+msgstr "ओह, ऐसा प्रतीत होता है कि आपके पास अभी तक कोई फॉर्म प्रविष्टियां नहीं हैं।"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1108
+#: src/Pro/Admin/Entries/Export/Admin.php:228
+msgid "Any form field"
+msgstr "कोई भी फॉर्म फील्ड"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1126
+#: src/Pro/Admin/Entries/Export/Admin.php:248
+msgid "contains"
+msgstr "शामिल"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1127
+#: src/Pro/Admin/Entries/Export/Admin.php:249
+msgid "does not contain"
+msgstr "शामिल नहीं है"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1128
+#: src/Pro/Admin/Entries/Export/Admin.php:250
+msgid "is"
+msgstr "है"
+
+#: pro/includes/admin/entries/class-entries-list-table.php:1129
+#: src/Pro/Admin/Entries/Export/Admin.php:251
+msgid "is not"
+msgstr "नहीं है"
+
+#: pro/includes/admin/entries/class-entries-list.php:184
+msgid "Number of entries per page:"
+msgstr "प्रति पृष्ठ प्रविष्टियों की संख्या:"
+
+#: pro/includes/admin/entries/class-entries-list.php:284
+msgid "All entries marked as read."
+msgstr "सभी प्रविष्टियों को पढ़े गए के रूप में चिह्नित किया गया।"
+
+#: pro/includes/admin/entries/class-entries-list.php:347
+msgid "All entries for the currently selected form were successfully deleted."
+msgstr "वर्तमान में चयनित फ़ॉर्म की सभी प्रविष्टियों को सफलतापूर्वक हटा दिया गया था।"
+
+#. translators: %s - WPForms Builder page.
+#: pro/includes/admin/entries/class-entries-list.php:529
+msgid "Whoops, you haven't created a form yet. Want to <a href=\"%s\">give it a go</a>?"
+msgstr "ओह, आपने अभी तक कोई फॉर्म नहीं बनाया है। <a href=“%s”>इसे विदा देना</a> चाहते हैं?"
+
+#: pro/includes/admin/entries/class-entries-list.php:580 pro/wpforms-pro.php:571
+#: src/Pro/Admin/AdminBarMenu.php:103 src/Pro/Admin/DashboardWidget.php:181
+#: src/Pro/Admin/Entries/DefaultScreen.php:97
+msgid "Entries"
+msgstr "प्रविष्टियां"
+
+#: pro/includes/admin/entries/class-entries-list.php:612
+#: src/Pro/Admin/Entries/Export/Admin.php:90
+msgid "Search"
+msgstr "खोज"
+
+#: pro/includes/admin/entries/class-entries-list.php:648
+msgid "Select the fields to show when viewing the entries list for this form."
+msgstr "इस फॉर्म के लिए प्रविष्टियाँ सूची को देखने के लिए फ़ील्ड्स का चयन करें।"
+
+#: pro/includes/admin/entries/class-entries-list.php:650
+msgid "Currently columns have not been configured, so we're showing the first 3 fields."
+msgstr "वर्तमान में कॉलम कॉन्फ़िगर नहीं किए गए हैं, इसलिए हम पहले 3 फ़ील्ड दिखा रहे हैं।"
+
+#: pro/includes/admin/entries/class-entries-list.php:792
+msgid "Select Form"
+msgstr "फॉर्म का चयन करें"
+
+#: pro/includes/admin/entries/class-entries-list.php:808
+msgid "All Entries"
+msgstr "सभी प्रविष्टियां"
+
+#: pro/includes/admin/entries/class-entries-list.php:815
+msgid "Edit This Form"
+msgstr "यह फ़ॉर्म संपादित करें"
+
+#: pro/includes/admin/entries/class-entries-list.php:822
+msgid "Preview Form"
+msgstr "पूर्वावलोकन फ़ॉर्म"
+
+#: pro/includes/admin/entries/class-entries-list.php:829
+#, fuzzy
+#| msgid "Export (CSV)"
+msgid "Export Filtered (CSV)"
+msgstr "निर्यात (CSV)"
+
+#: pro/includes/admin/entries/class-entries-list.php:829
+#, fuzzy
+#| msgid "Export (CSV)"
+msgid "Export All (CSV)"
+msgstr "निर्यात (CSV)"
+
+#: pro/includes/admin/entries/class-entries-list.php:834
+msgid "Mark All Read"
+msgstr "सभी को पढ़ा दिखाएं"
+
+#: pro/includes/admin/entries/class-entries-list.php:840
+msgid "Delete All"
+msgstr "सभी हटाएं"
+
+#: pro/includes/admin/entries/class-entries-list.php:867
+msgid "Open form selector"
+msgstr "फॉर्म सेलेक्टर खोलें"
+
+#. translators: %d - Number of form entries.
+#: pro/includes/admin/entries/class-entries-list.php:964
+msgid "See %d new entry"
+msgid_plural "See %d new entries"
+msgstr[0] "%d नई प्रविष्टियाँ देखें"
+msgstr[1] "%d नई प्रविष्टि देखें"
+
+#: pro/includes/admin/entries/class-entries-single.php:184
+msgid "This entry has been starred."
+msgstr "यह प्रविष्टि तारांकित की गई है।"
+
+#: pro/includes/admin/entries/class-entries-single.php:216
+msgid "This entry has been unstarred."
+msgstr "यह प्रविष्टि अतारांकित की गई है।"
+
+#: pro/includes/admin/entries/class-entries-single.php:280
+msgid "This entry has been marked unread."
+msgstr "इस प्रविष्टि को अपठित के रूप में चिह्नित किया गया है।"
+
+#: pro/includes/admin/entries/class-entries-single.php:323
+msgid "Note deleted."
+msgstr "नोट हटाया गया।"
+
+#: pro/includes/admin/entries/class-entries-single.php:365
+msgid "Note added."
+msgstr "नोट जोड़ा गया।"
+
+#: pro/includes/admin/entries/class-entries-single.php:399
+msgid "Notifications were resent!"
+msgstr "सूचनाएं आक्रोशित थीं!"
+
+#: pro/includes/admin/entries/class-entries-single.php:417 src/Pro/Admin/Entries/Edit.php:342
+msgid "Invalid entry ID."
+msgstr "अमान्य प्रविष्टि ID ।"
+
+#: pro/includes/admin/entries/class-entries-single.php:430 src/Pro/Admin/Entries/Edit.php:352
+msgid "Entry not found."
+msgstr "प्रविष्टि नहीं मिली।"
+
+#: pro/includes/admin/entries/class-entries-single.php:443 src/Pro/Admin/Entries/Edit.php:362
+msgid "Form not found."
+msgstr "फॉर्म नहीं मिला।"
+
+#: pro/includes/admin/entries/class-entries-single.php:559 src/Pro/Admin/Entries/Edit.php:314
+msgid "View Entry"
+msgstr "प्रविष्टि देखें"
+
+#: pro/includes/admin/entries/class-entries-single.php:561 src/Pro/Admin/Entries/Edit.php:488
+msgid "Back to All Entries"
+msgstr "सभी प्रविष्टियों पर वापस जाएं"
+
+#. translators: %1$s - current number of entry; %2$s - total number of entries.
+#: pro/includes/admin/entries/class-entries-single.php:568
+msgid "Entry %1$s of %2$s"
+msgstr "%2$s की प्रविष्टि %1$s"
+
+#: pro/includes/admin/entries/class-entries-single.php:575
+msgid "Previous form entry"
+msgstr "पिछली फॉर्म प्रविष्टि"
+
+#: pro/includes/admin/entries/class-entries-single.php:579
+msgid "Current form entry"
+msgstr "वर्तमान फॉर्म प्रविष्टि"
+
+#: pro/includes/admin/entries/class-entries-single.php:581
+msgid "Next form entry"
+msgstr "अगला फॉर्म प्रविष्टि"
+
+#: pro/includes/admin/entries/class-entries-single.php:635 src/Pro/Admin/Entries/Edit.php:544
+msgid "Show Empty Fields"
+msgstr "रिक्त फ़ील्ड्स दिखाएं"
+
+#: pro/includes/admin/entries/class-entries-single.php:635 src/Pro/Admin/Entries/Edit.php:544
+msgid "Hide Empty Fields"
+msgstr "रिक्त फ़ील्ड्स छुपाएं"
+
+#: pro/includes/admin/entries/class-entries-single.php:647 src/Pro/Admin/Entries/Edit.php:554
+#: src/Pro/Admin/Entries/PrintPreview.php:215
+msgid "This entry does not have any fields"
+msgstr "इस प्रविष्टि में कोई फ़ील्ड नहीं है"
+
+#. translators: %d - field ID.
+#: pro/includes/admin/entries/class-entries-single.php:670 src/Pro/Admin/Entries/Edit.php:637
+#: src/Pro/Admin/Entries/PrintPreview.php:230
+msgid "Field ID #%d"
+msgstr "फ़ील्ड आईडी #%d"
+
+#: pro/includes/admin/entries/class-entries-single.php:675 src/Pro/Admin/Entries/Edit.php:685
+#: src/Pro/Admin/Entries/PrintPreview.php:233
+msgid "Empty"
+msgstr "रिक्त"
+
+#: pro/includes/admin/entries/class-entries-single.php:712
+#: src/Pro/Admin/Entries/PrintPreview.php:250
+msgid "Notes"
+msgstr "नोट्स"
+
+#: pro/includes/admin/entries/class-entries-single.php:721
+#: pro/includes/admin/entries/class-entries-single.php:736
+msgid "Add Note"
+msgstr "नोट जोड़ें"
+
+#: pro/includes/admin/entries/class-entries-single.php:737
+#: src/Pro/Admin/Entries/Export/Admin.php:100
+msgid "Cancel"
+msgstr "रद्द करना"
+
+#: pro/includes/admin/entries/class-entries-single.php:746
+msgid "No notes."
+msgstr "कोई नोट नहीं।"
+
+#. translators: %1$s - user link; %2$s - date.
+#. translators: %1$s - user name; %2$s - date.
+#: pro/includes/admin/entries/class-entries-single.php:785
+#: pro/includes/admin/entries/class-entries-single.php:857
+#: src/Pro/Admin/Entries/PrintPreview.php:263
+#, fuzzy
+#| msgid "Added by %1$s on %2$s %3$s %4$s"
+msgid "Added by %1$s on %2$s"
+msgstr "%2$s %3$s %4$s पर %1$s द्वारा जोड़ा गया"
+
+#: pro/includes/admin/entries/class-entries-single.php:793
+msgctxt "Entry: note"
+msgid "Delete"
+msgstr "हटाएँ"
+
+#: pro/includes/admin/entries/class-entries-single.php:827
+msgid "Log"
+msgstr ""
+
+#: pro/includes/admin/entries/class-entries-single.php:834
+msgid "No logs."
+msgstr ""
+
+#: pro/includes/admin/entries/class-entries-single.php:897
+msgid "Debug Information"
+msgstr "डीबग जानकारी"
+
+#: pro/includes/admin/entries/class-entries-single.php:929
+msgid "Entry Details"
+msgstr "प्रविष्टि विवरण"
+
+#. translators: %s - entry ID.
+#: pro/includes/admin/entries/class-entries-single.php:941
+msgid "Entry ID: %s"
+msgstr "प्रविष्टि आईडी: %s"
+
+#. translators: %1$s - post type name; %2$s - post type ID.
+#: pro/includes/admin/entries/class-entries-single.php:959
+#, fuzzy
+#| msgid "Entry %1$s of %2$s"
+msgid "%1$s ID: %2$s"
+msgstr "%2$s की प्रविष्टि %1$s"
+
+#: pro/includes/admin/entries/class-entries-single.php:970
+msgid "Submitted:"
+msgstr "प्रस्तुत:"
+
+#: pro/includes/admin/entries/class-entries-single.php:977
+msgid "Modified:"
+msgstr "संशोधित:"
+
+#: pro/includes/admin/entries/class-entries-single.php:986
+msgid "User:"
+msgstr "उपयोगकर्ता:"
+
+#: pro/includes/admin/entries/class-entries-single.php:1003
+msgid "User IP:"
+msgstr "उपयोगकर्ता IP:"
+
+#: pro/includes/admin/entries/class-entries-single.php:1011
+msgid "Status:"
+msgstr "स्थिति:"
+
+#: pro/includes/admin/entries/class-entries-single.php:1042
+msgid "Delete Entry"
+msgstr "प्रविष्टि हटाएं"
+
+#: pro/includes/admin/entries/class-entries-single.php:1084
+#: src/Pro/Admin/Builder/Education.php:475
+msgid "Stripe"
+msgstr "Stripe"
+
+#: pro/includes/admin/entries/class-entries-single.php:1099
+#: src/Pro/Admin/Builder/Education.php:467
+msgid "PayPal Standard"
+msgstr "PayPal मानक"
+
+#: pro/includes/admin/entries/class-entries-single.php:1112
+msgid "Payment Details"
+msgstr "भुगतान विवरण"
+
+#. translators: %s - entry payment total.
+#: pro/includes/admin/entries/class-entries-single.php:1133
+msgid "Total: %s"
+msgstr "कुल: %s"
+
+#. translators: %s - entry payment gateway.
+#: pro/includes/admin/entries/class-entries-single.php:1143
+msgid "Gateway: %s"
+msgstr "गेटवे: %s"
+
+#: pro/includes/admin/entries/class-entries-single.php:1147
+msgctxt "Gateway mode"
+msgid "Test"
+msgstr "परीक्षण"
+
+#. translators: %s - entry payment transaction.
+#: pro/includes/admin/entries/class-entries-single.php:1156
+msgid "Transaction ID: %s"
+msgstr "लेनदेन आईडी: %s"
+
+#. translators: %s - entry payment subscription.
+#: pro/includes/admin/entries/class-entries-single.php:1167
+msgid "Subscription ID: %s"
+msgstr "सदस्यता आईडी: %s"
+
+#. translators: %s - entry payment customer.
+#: pro/includes/admin/entries/class-entries-single.php:1179
+msgid "Customer ID: %s"
+msgstr "ग्राहक आईडी: %s"
+
+#: pro/includes/admin/entries/class-entries-single.php:1188
+msgid "Note:"
+msgstr "नोट:"
+
+#: pro/includes/admin/entries/class-entries-single.php:1293
+#: src/Pro/Admin/Entries/PrintPreview.php:194
+msgid "Print"
+msgstr "छाप"
+
+#: pro/includes/admin/entries/class-entries-single.php:1298
+msgid "Export (CSV)"
+msgstr "निर्यात (CSV)"
+
+#: pro/includes/admin/entries/class-entries-single.php:1303
+msgid "Resend Notifications"
+msgstr "सूचनाएं पुनः भेजें"
+
+#: pro/includes/admin/entries/class-entries-single.php:1374
+msgid "Related Entries"
+msgstr "संबंधित प्रविष्टियां"
+
+#: pro/includes/admin/entries/class-entries-single.php:1379
+msgid "The user who created this entry also submitted the entries below."
+msgstr "इस प्रविष्टि को बनाने वाले उपयोगकर्ता ने नीचे दी गई प्रविष्टियां भी सबमिट की हैं।"
+
+#: pro/includes/class-conditional-logic-fields.php:94
+msgid "Conditionals"
+msgstr "सशर्त"
+
+#: pro/includes/class-conditional-logic-fields.php:383
+msgid "Entry Notification stopped by conditional logic."
+msgstr "प्रविष्टि अधिसूचना को सशर्त तर्क द्वारा रोक दिया गया।"
+
+#: pro/includes/class-conditional-logic-fields.php:439
+msgid "Entry Confirmation stopped by conditional logic."
+msgstr "प्रवेश पुष्टिकरण को सशर्त तर्क द्वारा रोक दिया गया।"
+
+#: pro/includes/fields/class-address.php:26 pro/includes/templates/class-order.php:55
+msgid "Address"
+msgstr "पता"
+
+#: pro/includes/fields/class-address.php:37 pro/includes/fields/class-phone.php:164
+msgid "US"
+msgstr "US"
+
+#: pro/includes/fields/class-address.php:38 pro/includes/fields/class-address.php:47
+#: pro/includes/fields/class-address.php:353
+msgid "Address Line 1"
+msgstr "पता पंक्ति 1"
+
+#: pro/includes/fields/class-address.php:39 pro/includes/fields/class-address.php:48
+#: pro/includes/fields/class-address.php:372
+msgid "Address Line 2"
+msgstr "पता पंक्ति 2"
+
+#: pro/includes/fields/class-address.php:40 pro/includes/fields/class-address.php:49
+#: pro/includes/fields/class-address.php:393
+msgid "City"
+msgstr "शहर"
+
+#: pro/includes/fields/class-address.php:41
+msgid "Zip Code"
+msgstr "ज़िप कोड"
+
+#: pro/includes/fields/class-address.php:42
+msgid "State"
+msgstr "राज्य"
+
+#: pro/includes/fields/class-address.php:46 pro/includes/fields/class-phone.php:165
+msgid "International"
+msgstr "अंतरराष्ट्रीय"
+
+#: pro/includes/fields/class-address.php:50
+msgid "Postal Code"
+msgstr "डाक कोड"
+
+#: pro/includes/fields/class-address.php:51 pro/includes/fields/class-address.php:411
+msgid "State / Province / Region"
+msgstr "राज्य / प्रांत / क्षेत्र"
+
+#: pro/includes/fields/class-address.php:53 pro/includes/fields/class-address.php:455
+#: src/Pro/Admin/Entries/Export/Ajax.php:567
+msgid "Country"
+msgstr "देश"
+
+#: pro/includes/fields/class-address.php:282
+msgid "Select scheme format for the address field."
+msgstr "पता फ़ील्ड के लिए योजना प्रारूप का चयन करें।"
+
+#: pro/includes/fields/class-address.php:292
+msgid "Scheme"
+msgstr "योजना"
+
+#: pro/includes/fields/class-address.php:357 pro/includes/fields/class-address.php:376
+#: pro/includes/fields/class-address.php:397 pro/includes/fields/class-address.php:415
+#: pro/includes/fields/class-address.php:435 pro/includes/fields/class-address.php:459
+#: pro/includes/fields/class-date-time.php:358 pro/includes/fields/class-date-time.php:461
+msgid "Placeholder"
+msgstr "प्लेसहोल्डर"
+
+#: pro/includes/fields/class-address.php:361 pro/includes/fields/class-address.php:380
+#: pro/includes/fields/class-address.php:401 pro/includes/fields/class-address.php:419
+#: pro/includes/fields/class-address.php:439 pro/includes/fields/class-address.php:463
+msgid "Default Value"
+msgstr "डिफ़ॉल्ट मान"
+
+#: pro/includes/fields/class-address.php:431
+msgid "ZIP / Postal"
+msgstr "जिप / पोस्टल"
+
+#: pro/includes/fields/class-date-time.php:18
+msgid "Date / Time"
+msgstr "दिनांक / समय"
+
+#: pro/includes/fields/class-date-time.php:136 pro/includes/fields/class-date-time.php:265
+#: pro/includes/fields/class-date-time.php:447 pro/includes/fields/class-date-time.php:597
+msgid "Time"
+msgstr "समय"
+
+#: pro/includes/fields/class-date-time.php:251 pro/includes/fields/class-date-time.php:389
+#: pro/includes/fields/class-date-time.php:482 pro/includes/fields/class-phone.php:151
+msgid "Format"
+msgstr "प्रारूप"
+
+#: pro/includes/fields/class-date-time.php:252
+msgid "Select format for the date field."
+msgstr "दिनांक फ़ील्ड के लिए प्रारूप का चयन करें।"
+
+#: pro/includes/fields/class-date-time.php:263
+msgid "Date and Time"
+msgstr "दिनांक और समय"
+
+#: pro/includes/fields/class-date-time.php:345
+msgid "Advanced date options."
+msgstr "एडवांस्ड दिनांक विकल्प।"
+
+#: pro/includes/fields/class-date-time.php:401
+msgid "Date Picker"
+msgstr "दिनांक पिकर"
+
+#: pro/includes/fields/class-date-time.php:406
+msgid "Date Dropdown"
+msgstr "दिनांक ड्रॉपडाउन"
+
+#: pro/includes/fields/class-date-time.php:412
+msgid "Type"
+msgstr "प्रकार"
+
+#: pro/includes/fields/class-date-time.php:432
+msgid "15 minutes"
+msgstr "15 मिनट"
+
+#: pro/includes/fields/class-date-time.php:433
+msgid "30 minutes"
+msgstr "30 मिनट"
+
+#: pro/includes/fields/class-date-time.php:434
+msgid "1 hour"
+msgstr "1 घंटा"
+
+#: pro/includes/fields/class-date-time.php:448
+msgid "Advanced time options."
+msgstr "एडवांस्ड समय विकल्प।"
+
+#: pro/includes/fields/class-date-time.php:503
+msgid "Interval"
+msgstr "अंतराल"
+
+#: pro/includes/fields/class-date-time.php:664 pro/includes/fields/class-date-time.php:707
+#, fuzzy
+#| msgid "Entry Details"
+msgid "Clear Date"
+msgstr "प्रविष्टि विवरण"
+
+#: pro/includes/fields/class-date-time.php:757
+msgid "MM"
+msgstr "MM"
+
+#: pro/includes/fields/class-date-time.php:758
+msgid "DD"
+msgstr "DD"
+
+#: pro/includes/fields/class-date-time.php:759
+msgid "YYYY"
+msgstr "YYYY"
+
+#: pro/includes/fields/class-divider.php:18
+msgid "Section Divider"
+msgstr "खंड विभाजक"
+
+#: pro/includes/fields/class-file-upload.php:63
+msgid "File Upload"
+msgstr "फ़ाइल अपलोड"
+
+#: pro/includes/fields/class-file-upload.php:147
+#, fuzzy
+#| msgid "No file was uploaded."
+msgid "This file was not uploaded."
+msgstr "कोई फ़ाइल अपलोड नहीं की गई थी।"
+
+#: pro/includes/fields/class-file-upload.php:148
+msgid "File limit has been reached ({fileLimit})."
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:149 pro/includes/fields/class-file-upload.php:1546
+#: pro/includes/fields/class-file-upload.php:1574 pro/wpforms-pro.php:352
+msgid "File type is not allowed."
+msgstr "फ़ाइल प्रकार की अनुमति नहीं है।"
+
+#: pro/includes/fields/class-file-upload.php:150
+#, fuzzy
+#| msgid "File exceeds max size allowed."
+msgid "File exceeds the max size allowed."
+msgstr "फ़ाइल अधिकतम आकार की अनुमति से अधिक है।"
+
+#. translators: %s - max allowed file size by a server.
+#: pro/includes/fields/class-file-upload.php:152
+#, fuzzy
+#| msgid "File exceeds max size allowed."
+msgid "File exceeds the upload limit allowed (%s)."
+msgstr "फ़ाइल अधिकतम आकार की अनुमति से अधिक है।"
+
+#: pro/includes/fields/class-file-upload.php:156
+msgid "File upload is in progress. Please submit the form once uploading is completed."
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:375 pro/templates/fields/file-upload-backend.php:4
+#: pro/templates/fields/file-upload-frontend.php:12
+msgid "Click or drag a file to this area to upload."
+msgid_plural "Click or drag files to this area to upload."
+msgstr[0] ""
+msgstr[1] ""
+
+#: pro/includes/fields/class-file-upload.php:376
+msgid "Click or drag files to this area to upload."
+msgstr ""
+
+#. translators: % - max number of files as a template string (not a number), replaced by a number later.
+#: pro/includes/fields/class-file-upload.php:378
+msgid "You can upload up to %s files."
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:432
+msgid "Allowed File Extensions"
+msgstr "अनुमत फ़ाइल एक्सटेंशंस"
+
+#: pro/includes/fields/class-file-upload.php:433
+msgid "Enter the extensions you would like to allow, comma separated."
+msgstr "वे एक्सटेंशन दर्ज करें जिनकी आप अनुमति देना चाहते हैं, कॉमा सेपरेटेड।"
+
+#: pro/includes/fields/class-file-upload.php:461
+msgid "Max File Size"
+msgstr "अधिकतम फ़ाइल आकार"
+
+#. translators: %s - max upload size.
+#: pro/includes/fields/class-file-upload.php:463
+#, fuzzy
+#| msgid ""
+#| "Enter the max file size, in megabytes, to allow. If left blank, the value defaults to the "
+#| "maximum size the server allows which is %s."
+msgid ""
+"Enter the max size of each file, in megabytes, to allow. If left blank, the value defaults to "
+"the maximum size the server allows which is %s."
+msgstr ""
+"अनुमति देने के लिए, मेगाबाइट में अधिकतम फ़ाइल आकार दर्ज करें। यदि खाली छोड़ दिया जाता है, तो सर्वर अधिकतम "
+"आकार के लिए डिफॉल्ट करता है जो %s है।"
+
+#: pro/includes/fields/class-file-upload.php:498
+#, fuzzy
+#| msgid "Max File Size"
+msgid "Max File Number"
+msgstr "अधिकतम फ़ाइल आकार"
+
+#: pro/includes/fields/class-file-upload.php:499
+#, fuzzy
+#| msgid ""
+#| "Enter the max file size, in megabytes, to allow. If left blank, the value defaults to the "
+#| "maximum size the server allows which is %s."
+msgid "Enter the max file number, to allow. If left blank, the value defaults to 1."
+msgstr ""
+"अनुमति देने के लिए, मेगाबाइट में अधिकतम फ़ाइल आकार दर्ज करें। यदि खाली छोड़ दिया जाता है, तो सर्वर अधिकतम "
+"आकार के लिए डिफॉल्ट करता है जो %s है।"
+
+#: pro/includes/fields/class-file-upload.php:544
+msgid "Style"
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:545
+msgid ""
+"Modern Style supports multiple file uploads, displays a drag-and-drop upload box, and uses "
+"AJAX. Classic Style supports single file upload and displays a traditional upload button."
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:556
+msgid "Modern"
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:557
+msgid "Classic"
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:577
+msgid "Store file in WordPress Media Library"
+msgstr "वर्डप्रेस मीडिया लाइब्रेरी में स्टोर फ़ाइल"
+
+#: pro/includes/fields/class-file-upload.php:578
+msgid "Check this option to store the final uploaded file in the WordPress Media Library"
+msgstr "वर्डप्रेस मीडिया लाइब्रेरी में अंतिम अपलोड की गई फ़ाइल को संग्रहीत करने के लिए इस विकल्प की जाँच करें"
+
+#: pro/includes/fields/class-file-upload.php:1339
+msgid "Something went wrong while removing the file."
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:1372
+msgid "Something went wrong, please try again."
+msgstr ""
+
+#: pro/includes/fields/class-file-upload.php:1483
+msgid "The uploaded file exceeds the upload_max_filesize directive in php.ini."
+msgstr "अपलोड की गई फाइल php.ini में upload_max_filesize निर्देश से अधिक है।"
+
+#: pro/includes/fields/class-file-upload.php:1484
+msgid ""
+"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form."
+msgstr "अपलोड की गई फ़ाइल MAX_FILE_SIZE निर्देश से अधिक है जो HTML रूप में निर्दिष्ट की गई थी।"
+
+#: pro/includes/fields/class-file-upload.php:1485
+msgid "The uploaded file was only partially uploaded."
+msgstr "अपलोड की गई फ़ाइल केवल आंशिक रूप से अपलोड की गई थी।"
+
+#: pro/includes/fields/class-file-upload.php:1486
+msgid "No file was uploaded."
+msgstr "कोई फ़ाइल अपलोड नहीं की गई थी।"
+
+#: pro/includes/fields/class-file-upload.php:1488
+msgid "Missing a temporary folder."
+msgstr "कोई अस्थाई फ़ोल्डर अनुपलब्ध है।"
+
+#: pro/includes/fields/class-file-upload.php:1489
+msgid "Failed to write file to disk."
+msgstr "डिस्क पर फ़ाइल लिखने में विफल।"
+
+#: pro/includes/fields/class-file-upload.php:1490
+msgid "File upload stopped by extension."
+msgstr "फ़ाइल अपलोड एक्सटेंशन द्वारा रोकी गई।"
+
+#. translators: %s - error text.
+#: pro/includes/fields/class-file-upload.php:1495
+msgid "File upload error. %s"
+msgstr "फ़ाइल अपलोड त्रुटि। %s"
+
+#. translators: $s - allowed file size in Mb.
+#: pro/includes/fields/class-file-upload.php:1516
+#, fuzzy
+#| msgid "File exceeds max size allowed."
+msgid "File exceeds max size allowed (%s)."
+msgstr "फ़ाइल अधिकतम आकार की अनुमति से अधिक है।"
+
+#: pro/includes/fields/class-file-upload.php:1541
+msgid "File must have an extension."
+msgstr "फ़ाइल का एक्सटेंशन होना आवश्यक है।"
+
+#: pro/includes/fields/class-hidden.php:18
+msgid "Hidden Field"
+msgstr "छुपे हुए फ़ील्ड्स"
+
+#: pro/includes/fields/class-html.php:18
+msgid "HTML"
+msgstr "HTML"
+
+#: pro/includes/fields/class-html.php:106
+#, fuzzy
+#| msgid "Next Label"
+msgid "Label"
+msgstr "अगला लेबल"
+
+#: pro/includes/fields/class-html.php:107
+msgid ""
+"Enter text for the form field label. It will help identify your HTML blocks inside the form "
+"builder, but will not be displayed in the form."
+msgstr ""
+
+#: pro/includes/fields/class-html.php:210
+msgid "HTML / Code Block"
+msgstr "HTML / कोड ब्लॉक"
+
+#: pro/includes/fields/class-html.php:212
+#, fuzzy
+#| msgid "Contents of this field are not displayed in the admin area."
+msgid "Contents of this field are not displayed in the form builder preview."
+msgstr "इस फ़ील्ड की सामग्रियां व्यवस्थापक क्षेत्र में प्रदर्शित नहीं की जाती हैं।"
+
+#: pro/includes/fields/class-page-break.php:27 pro/includes/fields/class-page-break.php:602
+msgid "Page Break"
+msgstr "पृष्ठ ब्रेक"
+
+#. translators: %1$s - current step in multi-page form; %2$d - total number of pages.
+#: pro/includes/fields/class-page-break.php:191
+msgid "Step %1$s of %2$d"
+msgstr "%2$d का चरण %1$s"
+
+#: pro/includes/fields/class-page-break.php:244 pro/includes/fields/class-page-break.php:595
+msgid "Previous"
+msgstr "पिछला"
+
+#: pro/includes/fields/class-page-break.php:329
+msgid "Progress Bar"
+msgstr "प्रगति बार"
+
+#: pro/includes/fields/class-page-break.php:330
+msgid "Circles"
+msgstr "वृत्त"
+
+#: pro/includes/fields/class-page-break.php:331
+msgid "Connector"
+msgstr "कनेक्टर"
+
+#: pro/includes/fields/class-page-break.php:332
+msgid "None"
+msgstr "कोई नहीं"
+
+#: pro/includes/fields/class-page-break.php:339
+msgid "Progress Indicator"
+msgstr "प्रगति संकेतक"
+
+#: pro/includes/fields/class-page-break.php:340
+msgid "Select theme for Page Indicator which is displayed at the top of the form."
+msgstr "पृष्ठ संकेतक के लिए थीम का चयन करें जो फॉर्म के शीर्ष पर प्रदर्शित किया गया है।"
+
+#: pro/includes/fields/class-page-break.php:365
+msgid "Page Indicator Color"
+msgstr "पृष्ठ संकेतक रंग"
+
+#: pro/includes/fields/class-page-break.php:366
+msgid "Select the primary color for the Page Indicator theme."
+msgstr "पृष्ठ संकेतक थीम के लिए प्राथमिक रंग का चयन करें।"
+
+#: pro/includes/fields/class-page-break.php:394
+msgid "Page Title"
+msgstr "पृष्ठ शीर्षक"
+
+#: pro/includes/fields/class-page-break.php:395
+msgid "Enter text for the page title."
+msgstr "पृष्ठ शीर्षक के लिए टेक्स्ट दर्ज करें।"
+
+#: pro/includes/fields/class-page-break.php:421
+msgid "Next Label"
+msgstr "अगला लेबल"
+
+#: pro/includes/fields/class-page-break.php:422
+msgid "Enter text for Next page navigation button."
+msgstr "अगले पृष्ठ नेविगेशन बटन के लिए टेक्स्ट दर्ज करें।"
+
+#: pro/includes/fields/class-page-break.php:431 pro/includes/fields/class-page-break.php:597
+msgid "Next"
+msgstr "अगला"
+
+#: pro/includes/fields/class-page-break.php:450
+msgid "Display Previous"
+msgstr "पिछला प्रदर्शित करें"
+
+#: pro/includes/fields/class-page-break.php:451
+msgid "Toggle displaying the Previous page navigation button."
+msgstr "पिछला पृष्ठ नेविगेशन बटन प्रदर्शित करने वाला टॉगल करें।"
+
+#: pro/includes/fields/class-page-break.php:475
+msgid "Previous Label"
+msgstr "पिछला लेबल"
+
+#: pro/includes/fields/class-page-break.php:476
+msgid "Enter text for Previous page navigation button."
+msgstr "पिछले पृष्ठ नेविगेशन बटन के लिए टेक्स्ट दर्ज करें।"
+
+#: pro/includes/fields/class-page-break.php:521
+msgid "Page Navigation Alignment"
+msgstr "पृष्ठ नेविगेशन संरेखण"
+
+#: pro/includes/fields/class-page-break.php:522
+msgid "Select the alignment for the Next/Previous page navigation buttons"
+msgstr "अगले/पिछले पृष्ठ नेविगेशन बटनों के लिए संरेखण का चयन करें"
+
+#: pro/includes/fields/class-page-break.php:532
+msgid "Left"
+msgstr "बाएं"
+
+#: pro/includes/fields/class-page-break.php:533
+msgid "Right"
+msgstr "दायें"
+
+#: pro/includes/fields/class-page-break.php:534
+msgid "Center"
+msgstr "मध्य"
+
+#: pro/includes/fields/class-page-break.php:535
+msgid "Split"
+msgstr "विभाजित करें"
+
+#: pro/includes/fields/class-page-break.php:551
+msgid "Disable Scroll Animation"
+msgstr ""
+
+#: pro/includes/fields/class-page-break.php:552
+msgid ""
+"By default, a user's view is pulled to the top of each form page. Set to ON to disable this "
+"animation."
+msgstr ""
+
+#: pro/includes/fields/class-page-break.php:601
+#, fuzzy
+#| msgid "Progress Indicator"
+msgid "First Page / Progress Indicator"
+msgstr "प्रगति संकेतक"
+
+#: pro/includes/fields/class-password.php:18 pro/includes/fields/class-password.php:65
+#: pro/includes/fields/class-password.php:298
+msgid "Password"
+msgstr "पासवर्ड"
+
+#: pro/includes/fields/class-password.php:88 pro/includes/fields/class-password.php:303
+msgid "Confirm Password"
+msgstr "पासवर्ड की पुष्टि कीजिये"
+
+#: pro/includes/fields/class-password.php:199
+msgid "Enable Password Confirmation"
+msgstr "पासवर्ड की पुष्टि सक्षम करें"
+
+#: pro/includes/fields/class-password.php:200
+msgid "Check this option to ask users to provide their password twice."
+msgstr "उपयोगकर्ताओं को अपना पासवर्ड दो बार प्रदान करने के लिए कहने के लिए इस विकल्प की जाँच करें।"
+
+#: pro/includes/fields/class-password.php:238
+msgid "Confirmation Placeholder Text"
+msgstr "पुष्टिकरण प्लेसहोल्डर टेक्स्ट"
+
+#: pro/includes/fields/class-password.php:239
+msgid "Enter text for the confirmation field placeholder."
+msgstr "पुष्टिकरण फ़ील्ड प्लेसहोल्डर के लिए टेक्स्ट दर्ज करें।"
+
+#: pro/includes/fields/class-password.php:409
+msgid "Field values do not match."
+msgstr "फ़ील्ड मान मेल नहीं खाते हैं।"
+
+#: pro/includes/fields/class-payment-checkbox.php:18
+#, fuzzy
+#| msgid "Second Item"
+msgid "Checkbox Items"
+msgstr "दूसरा आइटम"
+
+#: pro/includes/fields/class-payment-checkbox.php:25
+#: pro/includes/fields/class-payment-dropdown.php:25
+#: pro/includes/fields/class-payment-multiple.php:25 pro/includes/templates/class-order.php:68
+msgid "First Item"
+msgstr "पहला आइटम"
+
+#: pro/includes/fields/class-payment-checkbox.php:31
+#: pro/includes/fields/class-payment-dropdown.php:30
+#: pro/includes/fields/class-payment-multiple.php:31 pro/includes/templates/class-order.php:72
+msgid "Second Item"
+msgstr "दूसरा आइटम"
+
+#: pro/includes/fields/class-payment-checkbox.php:37
+#: pro/includes/fields/class-payment-dropdown.php:35
+#: pro/includes/fields/class-payment-multiple.php:37 pro/includes/templates/class-order.php:76
+msgid "Third Item"
+msgstr "तीसरा आइटम"
+
+#: pro/includes/fields/class-payment-checkbox.php:135
+msgid "Checked"
+msgstr ""
+
+#. translators: %s - item number.
+#: pro/includes/fields/class-payment-checkbox.php:138
+#, fuzzy
+#| msgid "Item Type"
+msgid "Item %s"
+msgstr "आइटम प्रकार"
+
+#: pro/includes/fields/class-payment-checkbox.php:449
+#: pro/includes/fields/class-payment-multiple.php:422
+msgid "Invalid payment option."
+msgstr "अमान्य भुगतान विकल्प।"
+
+#: pro/includes/fields/class-payment-credit-card.php:18 pro/wpforms-pro.php:380
+msgid "Credit Card"
+msgstr "क्रेडिट कार्ड"
+
+#: pro/includes/fields/class-payment-credit-card.php:75
+#: pro/includes/fields/class-payment-credit-card.php:342
+msgid "Card Number"
+msgstr "कार्ड नंबर"
+
+#: pro/includes/fields/class-payment-credit-card.php:98
+#: pro/includes/fields/class-payment-credit-card.php:347
+msgid "Security Code"
+msgstr "सुरक्षा कोड"
+
+#: pro/includes/fields/class-payment-credit-card.php:119
+#: pro/includes/fields/class-payment-credit-card.php:354
+msgid "Name on Card"
+msgstr "कार्ड पर नाम"
+
+#: pro/includes/fields/class-payment-credit-card.php:133
+#: pro/includes/fields/class-payment-credit-card.php:359
+msgid "Expiration"
+msgstr "समय सीमा समाप्ति"
+
+#: pro/includes/fields/class-payment-credit-card.php:280
+msgid "Card Number Placeholder Text"
+msgstr "कार्ड नंबर प्लेसहोल्डर टेक्स्ट"
+
+#: pro/includes/fields/class-payment-credit-card.php:289
+msgid "Security Code Placeholder Text"
+msgstr "सुरक्षा कोड प्लेसहोल्डर टेक्स्ट"
+
+#: pro/includes/fields/class-payment-credit-card.php:298
+msgid "Name on Card Placeholder Text"
+msgstr "कार्ड प्लेसहोल्डर टेक्स्ट पर नाम"
+
+#: pro/includes/fields/class-payment-credit-card.php:402
+msgid "This page is insecure. Credit Card field should be used for testing purposes only."
+msgstr "यह पृष्ठ असुरक्षित है। क्रेडिट कार्ड फ़ील्ड का उपयोग केवल परीक्षण उद्देश्यों के लिए किया जाना चाहिए।"
+
+#: pro/includes/fields/class-payment-dropdown.php:18
+msgid "Dropdown Items"
+msgstr "ड्रॉपडाउन आइटम"
+
+#: pro/includes/fields/class-payment-dropdown.php:318
+msgid "Invalid payment option"
+msgstr "अमान्य भुगतान विकल्प"
+
+#: pro/includes/fields/class-payment-multiple.php:18
+msgid "Multiple Items"
+msgstr "विभिन्न आइटम्स"
+
+#: pro/includes/fields/class-payment-single.php:18
+#: pro/includes/fields/class-payment-single.php:146
+msgid "Single Item"
+msgstr "एकल आइटम"
+
+#: pro/includes/fields/class-payment-single.php:127
+msgid "Enter the price of the item, without a currency symbol."
+msgstr "मुद्रा प्रतीक के बिना, आइटम का मूल्य दर्ज करें।"
+
+#: pro/includes/fields/class-payment-single.php:128
+msgid "Item Price"
+msgstr "आइटम की कीमत"
+
+#: pro/includes/fields/class-payment-single.php:144
+msgid "Select the item type."
+msgstr "आइटम प्रकार का चयन करें।"
+
+#: pro/includes/fields/class-payment-single.php:147
+msgid "User Defined"
+msgstr "यूज़र डिफ़ाइंड"
+
+#: pro/includes/fields/class-payment-single.php:148
+msgid "Hidden"
+msgstr "छिपा हुआ"
+
+#: pro/includes/fields/class-payment-single.php:150
+msgid "Item Type"
+msgstr "आइटम प्रकार"
+
+#. translators: %s - price amount.
+#: pro/includes/fields/class-payment-single.php:190
+#: pro/includes/fields/class-payment-single.php:234
+msgid "Price: %s"
+msgstr "कीमत: %s"
+
+#: pro/includes/fields/class-payment-single.php:204
+msgid "Note: Item type is set to hidden and will not be visible when viewing the form."
+msgstr "नोट: आइटम प्रकार छिपा हुआ है और फ़ॉर्म को देखते समय दिखाई नहीं देगा।"
+
+#: pro/includes/fields/class-payment-single.php:285
+msgid "Amount mismatch"
+msgstr "राशि बेमेल"
+
+#: pro/includes/fields/class-payment-total.php:220 pro/wpforms-pro.php:376
+msgid "Payment is required."
+msgstr "भुगतान की आवश्यकता है।"
+
+#: pro/includes/fields/class-phone.php:18 pro/includes/templates/class-order.php:47
+#: pro/includes/templates/class-request-quote.php:51 pro/wpforms-pro.php:344
+msgid "Phone"
+msgstr "फ़ोन"
+
+#: pro/includes/fields/class-phone.php:119 pro/includes/fields/class-phone.php:307
+#: pro/wpforms-pro.php:346
+#, fuzzy
+#| msgid "Please enter a valid credit card number."
+msgid "Please enter a valid phone number."
+msgstr "कृपया एक वैध क्रेडिट कार्ड नंबर दर्ज करें।"
+
+#: pro/includes/fields/class-phone.php:152
+msgid "Select format for the phone form field"
+msgstr "फ़ोन फ़ॉर्म फ़ील्ड के लिए प्रारूप का चयन करें"
+
+#: pro/includes/fields/class-phone.php:163
+msgid "Smart"
+msgstr ""
+
+#: pro/includes/fields/class-rating.php:18
+msgid "Rating"
+msgstr "रेटिंग"
+
+#: pro/includes/fields/class-rating.php:162
+msgid "Scale"
+msgstr "स्केल"
+
+#: pro/includes/fields/class-rating.php:163
+msgid "Select rating scale"
+msgstr "रेटिंग स्केल का चयन करें"
+
+#: pro/includes/fields/class-rating.php:227
+msgid "Icon"
+msgstr "आइकन"
+
+#: pro/includes/fields/class-rating.php:228
+msgid "Select icon to display"
+msgstr "प्रदर्शित करने के लिए आइकन का चयन करें"
+
+#: pro/includes/fields/class-rating.php:240
+msgid "Heart"
+msgstr "दिल"
+
+#: pro/includes/fields/class-rating.php:241
+msgid "Thumb"
+msgstr "अंगूठा"
+
+#: pro/includes/fields/class-rating.php:242
+msgid "Smiley Face"
+msgstr "स्माइली चेहरा"
+
+#: pro/includes/fields/class-rating.php:262
+msgid "Icon Size"
+msgstr "आइकन का आकार"
+
+#: pro/includes/fields/class-rating.php:263
+msgid "Select the size of the rating icon"
+msgstr "रेटिंग आइकन के आकार का चयन करें"
+
+#: pro/includes/fields/class-rating.php:274
+msgid "Small"
+msgstr "छोटा"
+
+#: pro/includes/fields/class-rating.php:275
+msgid "Medium"
+msgstr "मध्यम"
+
+#: pro/includes/fields/class-rating.php:276
+msgid "Large"
+msgstr "बड़ा"
+
+#: pro/includes/fields/class-rating.php:296
+msgid "Icon Color"
+msgstr "आइकन रंग"
+
+#: pro/includes/fields/class-rating.php:297
+msgid "Select the color for the rating icon"
+msgstr "रेटिंग आइकन के लिए रंग का चयन करें"
+
+#. translators: %1$s - rating value; %2$s - rating scale.
+#: pro/includes/fields/class-rating.php:441
+msgid "Rate %1$d out of %2$d"
+msgstr "%2$d में से %1$d को रेट करें"
+
+#: pro/includes/fields/class-url.php:18
+msgid "Website / URL"
+msgstr "वेबसाइट / यूआरएल"
+
+#: pro/includes/fields/class-url.php:154
+msgid "Please enter a valid URL."
+msgstr "कृपया एक मान्य URL दर्ज करें।"
+
+#: pro/includes/payments/functions.php:19
+msgid "U.S. Dollar"
+msgstr "अमेरिकी डॉलर"
+
+#: pro/includes/payments/functions.php:27
+msgid "Pound Sterling"
+msgstr "पाउंड स्टर्लिंग"
+
+#: pro/includes/payments/functions.php:35
+msgid "Euro"
+msgstr "यूरो"
+
+#: pro/includes/payments/functions.php:43
+msgid "Australian Dollar"
+msgstr "ऑस्ट्रेलियन डॉलर"
+
+#: pro/includes/payments/functions.php:51
+msgid "Brazilian Real"
+msgstr "ब्राज़ीलियन रियल"
+
+#: pro/includes/payments/functions.php:59
+msgid "Canadian Dollar"
+msgstr "कैनेडियन डॉलर"
+
+#: pro/includes/payments/functions.php:67
+msgid "Czech Koruna"
+msgstr "चेक कोरुना"
+
+#: pro/includes/payments/functions.php:75
+msgid "Danish Krone"
+msgstr "डेनिश क्रोन"
+
+#: pro/includes/payments/functions.php:83
+msgid "Hong Kong Dollar"
+msgstr "हांग कांग डॉलर"
+
+#: pro/includes/payments/functions.php:91
+msgid "Hungarian Forint"
+msgstr "हंगेरियन फ़ोरिंट"
+
+#: pro/includes/payments/functions.php:99
+msgid "Israeli New Sheqel"
+msgstr "इज़राइली न्यू शेकेल"
+
+#: pro/includes/payments/functions.php:107
+msgid "Malaysian Ringgit"
+msgstr "मलेशियाई रिंग्गित"
+
+#: pro/includes/payments/functions.php:115
+msgid "Mexican Peso"
+msgstr "मैक्सिकन पेसो"
+
+#: pro/includes/payments/functions.php:123
+msgid "Norwegian Krone"
+msgstr "नॉर्वेजियन क्रोन"
+
+#: pro/includes/payments/functions.php:131
+msgid "New Zealand Dollar"
+msgstr "न्यूज़ीलैंड डॉलर"
+
+#: pro/includes/payments/functions.php:139
+msgid "Philippine Peso"
+msgstr "फिलीपीन पेसो"
+
+#: pro/includes/payments/functions.php:147
+msgid "Polish Zloty"
+msgstr "पोलिश ज़्लॉटी"
+
+#: pro/includes/payments/functions.php:155
+msgid "Russian Ruble"
+msgstr "रूसी रूबल"
+
+#: pro/includes/payments/functions.php:163
+msgid "Singapore Dollar"
+msgstr "सिंगापुर डॉलर"
+
+#: pro/includes/payments/functions.php:171
+msgid "South African Rand"
+msgstr "दक्षिण अफ़्रीकी रैंड"
+
+#: pro/includes/payments/functions.php:179
+msgid "Swedish Krona"
+msgstr "स्वीडिश क्रोना"
+
+#: pro/includes/payments/functions.php:187
+msgid "Swiss Franc"
+msgstr "स्विस फ़्रैंक"
+
+#: pro/includes/payments/functions.php:195
+msgid "Taiwan New Dollar"
+msgstr "ताइवान नई डॉलर"
+
+#: pro/includes/payments/functions.php:203
+msgid "Thai Baht"
+msgstr "थाई Baht"
+
+#: pro/includes/templates/class-donation.php:17
+msgid "Donation Form"
+msgstr "दान फार्म"
+
+#: pro/includes/templates/class-donation.php:19
+msgid ""
+"Start collecting donation payments on your website with this ready-made Donation form. You "
+"can add and remove fields as needed."
+msgstr ""
+"इस रेडी-मेड डोनेशन फॉर्म के साथ अपनी वेबसाइट पर डोनेशन भुगतान एकत्र करना शुरू करें। आप आवश्यकतानुसार फ़ील्ड "
+"जोड़ और हटा सकते हैं।"
+
+#: pro/includes/templates/class-donation.php:24 pro/includes/templates/class-order.php:24
+msgid "Don&#39;t Forget"
+msgstr "मत भूलना"
+
+#: pro/includes/templates/class-donation.php:25 pro/includes/templates/class-order.php:25
+msgid "Click the Payments tab to configure your payment provider"
+msgstr "अपने भुगतान प्रदाता को कॉन्फ़िगर करने के लिए भुगतान टैब पर क्लिक करें"
+
+#: pro/includes/templates/class-donation.php:33 pro/includes/templates/class-order.php:33
+#: pro/includes/templates/class-request-quote.php:30
+msgid "Name"
+msgstr "नाम"
+
+#: pro/includes/templates/class-donation.php:40 pro/includes/templates/class-order.php:40
+#: pro/includes/templates/class-request-quote.php:44
+msgid "Email"
+msgstr "ईमेल"
+
+#: pro/includes/templates/class-donation.php:47
+msgid "Donation Amount"
+msgstr "दान राशि"
+
+#: pro/includes/templates/class-donation.php:55 pro/includes/templates/class-order.php:89
+msgid "Comment or Message"
+msgstr "टिप्पणी या संदेश"
+
+#: pro/includes/templates/class-donation.php:63 pro/includes/templates/class-order.php:97
+#: pro/includes/templates/class-request-quote.php:67
+msgid "Sending..."
+msgstr "भेजना…"
+
+#: pro/includes/templates/class-order.php:17
+msgid "Billing / Order Form"
+msgstr "बिलिंग / आदेश फार्म"
+
+#: pro/includes/templates/class-order.php:19
+msgid ""
+"Collect Payments for product and service orders with this ready-made form template. You can "
+"add and remove fields as needed."
+msgstr ""
+"इस तैयार फॉर्म टेम्पलेट के साथ उत्पाद और सेवा के आदेश के लिए भुगतान लीजिए। आप आवश्यकतानुसार फ़ील्ड जोड़ और हटा "
+"सकते हैं।"
+
+#: pro/includes/templates/class-order.php:64
+msgid "Available Items"
+msgstr "उपलब्ध आइटम"
+
+#: pro/includes/templates/class-order.php:84
+msgid "Total Amount"
+msgstr "कुल राशि"
+
+#: pro/includes/templates/class-request-quote.php:17
+msgid "Request A Quote Form"
+msgstr "उद्धरण फॉर्म का अनुरोध करें"
+
+#: pro/includes/templates/class-request-quote.php:19
+msgid ""
+"Start collecting leads with this pre-made Request a quote form. You can add and remove fields "
+"as needed."
+msgstr ""
+"इस पूर्व-निर्मित अनुरोध के साथ एक उद्धरण फ़ॉर्म के साथ संग्रह करना शुरू करें। आप आवश्यकतानुसार फ़ील्ड जोड़ और हटा "
+"सकते हैं।"
+
+#: pro/includes/templates/class-request-quote.php:37
+msgid "Business / Organization"
+msgstr "व्यापार / संगठन"
+
+#: pro/includes/templates/class-request-quote.php:59
+msgid "Request"
+msgstr "अनुरोध"
+
+#: pro/wpforms-pro.php:262
+msgid "Go to WPForms.com Docs page"
+msgstr ""
+
+#: pro/wpforms-pro.php:263
+msgid "Docs"
+msgstr ""
+
+#: pro/wpforms-pro.php:268
+msgid "Go to WPForms.com Support page"
+msgstr ""
+
+#: pro/wpforms-pro.php:269
+msgid "Support"
+msgstr ""
+
+#: pro/wpforms-pro.php:289 pro/wpforms-pro.php:394
+msgid "Payments"
+msgstr "भुगतान"
+
+#: pro/wpforms-pro.php:291 src/Pro/Admin/Settings/Access.php:197
+msgid "Save Settings"
+msgstr "सेटिंग्स सहेजें"
+
+#: pro/wpforms-pro.php:350
+msgid "File Extension"
+msgstr "फाइल एक्सटेंशन"
+
+#: pro/wpforms-pro.php:356
+msgid "File Size"
+msgstr "फ़ाइल का आकार"
+
+#: pro/wpforms-pro.php:358
+#, fuzzy
+#| msgid "File exceeds max size allowed."
+msgid "File exceeds max size allowed. File was not uploaded."
+msgstr "फ़ाइल अधिकतम आकार की अनुमति से अधिक है।"
+
+#: pro/wpforms-pro.php:362
+msgid "Time (12 hour)"
+msgstr "समय (12 घंटा)"
+
+#: pro/wpforms-pro.php:364
+msgid "Please enter time in 12-hour AM/PM format (eg 8:45 AM)."
+msgstr "कृपया 12-घंटे AM / PM प्रारूप (जैसे 8:45 AM) में समय दर्ज करें।"
+
+#: pro/wpforms-pro.php:368
+msgid "Time (24 hour)"
+msgstr "समय (24 घंटा)"
+
+#: pro/wpforms-pro.php:370
+msgid "Please enter time in 24-hour format (eg 22:45)."
+msgstr "कृपया 24-घंटे के प्रारूप (जैसे 22:45) में समय दर्ज करें।"
+
+#: pro/wpforms-pro.php:374
+msgid "Payment Required"
+msgstr "भुगतान की आवश्यकता है"
+
+#: pro/wpforms-pro.php:382
+msgid "Please enter a valid credit card number."
+msgstr "कृपया एक वैध क्रेडिट कार्ड नंबर दर्ज करें।"
+
+#: pro/wpforms-pro.php:386
+#, fuzzy
+#| msgid "File Upload"
+msgid "File Upload Total Size"
+msgstr "फ़ाइल अपलोड"
+
+#: pro/wpforms-pro.php:388
+msgid ""
+"The total size of the selected files {totalSize} Mb exceeds the allowed limit {maxSize} Mb."
+msgstr ""
+
+#: pro/wpforms-pro.php:401 src/Pro/Admin/Entries/Export/Ajax.php:649
+msgid "Currency"
+msgstr "मुद्रा"
+
+#: pro/wpforms-pro.php:415
+msgid "Disable User Cookies"
+msgstr "उपयोगकर्ता कुकीज़ अक्षम करें"
+
+#: pro/wpforms-pro.php:416
+msgid ""
+"Check this to disable user tracking cookies (UUIDs). This will disable the Related Entries "
+"feature and the Form Abandonment/Geolocation addons."
+msgstr ""
+"उपयोगकर्ता ट्रैकिंग कुकीज़ (UUIDs) को अक्षम करने के लिए इसे जांचें। यह संबंधित प्रविष्टि सुविधा और फॉर्म "
+"परित्याग / जियोलोकेशन अतिरिक्त को अक्षम कर देगा।"
+
+#: pro/wpforms-pro.php:421
+msgid "Disable User Details"
+msgstr "उपयोगकर्ता विवरण अक्षम करें"
+
+#: pro/wpforms-pro.php:422
+msgid ""
+"Check this to disable storing the IP address and User Agent on all forms. If unchecked this "
+"can be managed on a form by form basis inside the form settings."
+msgstr ""
+"सभी फॉर्म पर IP पते और उपयोगकर्ता एजेंट को संग्रहीत करने के लिए इसे जांचें। यदि अनियंत्रित यह फॉर्म सेटिंग्स के "
+"अंदर फॉर्म के आधार पर किसी फॉर्म पर प्रबंधित किया जा सकता है।"
+
+#: pro/wpforms-pro.php:539
+msgid "Disable storing entry information in WordPress"
+msgstr "वर्डप्रेस में भंडारण जानकारी दर्ज करना अक्षम करें"
+
+#: pro/wpforms-pro.php:551
+msgid "Disable storing user details (IP address and user agent)"
+msgstr "उपयोगकर्ता विवरण (IP पता और उपयोगकर्ता एजेंट) संग्रहीत करना अक्षम करें"
+
+#. translators: %s - form name.
+#: pro/wpforms-pro.php:639
+msgid "New %s Entry"
+msgstr "नई %s प्रविष्टि"
+
+#: pro/wpforms-pro.php:649 pro/wpforms-pro.php:658
+msgid "Notifications"
+msgstr "सूचनाएँ"
+
+#: pro/wpforms-pro.php:650
+msgid "Add New Notification"
+msgstr "नई सूचना जोड़ें"
+
+#: pro/wpforms-pro.php:662
+msgid "On"
+msgstr "चालू करना"
+
+#: pro/wpforms-pro.php:663
+msgid "Off"
+msgstr "बंद करना"
+
+#: pro/wpforms-pro.php:670
+msgid "Default Notification"
+msgstr "डिफ़ॉल्ट सूचना"
+
+#: pro/wpforms-pro.php:711
+msgid "Send To Email Address"
+msgstr "ईमेल पते पर भेजें"
+
+#: pro/wpforms-pro.php:714
+msgid ""
+"Enter the email address to receive form entry notifications. For multiple notifications, "
+"separate email addresses with a comma."
+msgstr ""
+"फॉर्म प्रविष्टि सूचनाएँ प्राप्त करने के लिए ईमेल पता दर्ज करें। एकाधिक सूचनाओं के लिए, अल्पविराम के साथ अलग ईमेल "
+"पते।"
+
+#: pro/wpforms-pro.php:731
+msgid "CC"
+msgstr "प्रतिलिपि"
+
+#: pro/wpforms-pro.php:748
+msgid "Email Subject"
+msgstr "ईमेल विषय"
+
+#. translators: %s - form name.
+#: pro/wpforms-pro.php:751
+msgid "New Entry: %s"
+msgstr "नई प्रविष्टि: %s"
+
+#: pro/wpforms-pro.php:765
+msgid "From Name"
+msgstr "नाम से"
+
+#: pro/wpforms-pro.php:784
+msgid "From Email"
+msgstr "ईमेल से"
+
+#: pro/wpforms-pro.php:803
+msgid "Reply-To"
+msgstr "को उत्तर"
+
+#: pro/wpforms-pro.php:819 pro/wpforms-pro.php:948
+msgid "Message"
+msgstr "संदेश"
+
+#. translators: %s - all fields smart tag.
+#: pro/wpforms-pro.php:831
+msgid "To display all form fields, use the %s Smart Tag."
+msgstr "सभी फ़ॉर्म फ़ील्ड प्रदर्शित करने के लिए, %s स्मार्ट टैग का उपयोग करें।"
+
+#: pro/wpforms-pro.php:842
+msgid "Send"
+msgstr "भेजना"
+
+#: pro/wpforms-pro.php:843
+msgid "Don't send"
+msgstr "नहीं भेजें"
+
+#: pro/wpforms-pro.php:845
+msgid "this notification if"
+msgstr "यह सूचना यदि"
+
+#: pro/wpforms-pro.php:846
+msgid "Email notifications"
+msgstr "ईमेल सूचनाएं"
+
+#: pro/wpforms-pro.php:879 pro/wpforms-pro.php:966
+msgid "Thanks for contacting us! We will be in touch with you shortly."
+msgstr "हमे संपर्क करने के लिए धन्यवाद! हम जल्द ही आपके संपर्क में होंगे।"
+
+#: pro/wpforms-pro.php:892
+msgid "Confirmations"
+msgstr "पुष्टिकरण"
+
+#: pro/wpforms-pro.php:893
+msgid "Add New Confirmation"
+msgstr "नई पुष्टि जोड़ें"
+
+#: pro/wpforms-pro.php:898
+msgid "Default Confirmation"
+msgstr "डिफ़ॉल्ट पुष्टिकरण"
+
+#: pro/wpforms-pro.php:944
+msgid "Confirmation Type"
+msgstr "पुष्टिकरण प्रकार"
+
+#: pro/wpforms-pro.php:949
+msgid "Show Page"
+msgstr "पृष्ठ दिखाएं"
+
+#: pro/wpforms-pro.php:950
+msgid "Go to URL (Redirect)"
+msgstr "URL पर जाएं (रीडायरेक्ट करें)"
+
+#: pro/wpforms-pro.php:964 pro/wpforms-pro.php:1140
+msgid "Confirmation Message"
+msgstr "पुष्टि संदेश"
+
+#: pro/wpforms-pro.php:981
+msgid "Automatically scroll to the confirmation message"
+msgstr "पुष्टि संदेश पर स्वचालित रूप से स्क्रॉल करें"
+
+#: pro/wpforms-pro.php:1000
+msgid "Confirmation Page"
+msgstr "पुष्टिकरण पृष्ठ"
+
+#: pro/wpforms-pro.php:1014
+msgid "Confirmation Redirect URL"
+msgstr "पुष्टिकरण रीडायरेक्ट URL"
+
+#: pro/wpforms-pro.php:1030
+msgid "Use"
+msgstr "उपयोग"
+
+#: pro/wpforms-pro.php:1031
+msgid "Don't use"
+msgstr "उपयोग न करें"
+
+#: pro/wpforms-pro.php:1033
+msgid "this confirmation if"
+msgstr "यह पुष्टि यदि"
+
+#: pro/wpforms-pro.php:1034
+msgid "Form confirmations"
+msgstr "फॉर्म की पुष्टि"
+
+#. translators: %s - WPForms.com announcement page URL.
+#: pro/wpforms-pro.php:1112
+msgid ""
+"Conditional logic functionality is now included in the core WPForms plugin! The WPForms "
+"Conditional Logic addon can be removed without affecting your forms. For more details <a href="
+"\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">read our announcement</a>."
+msgstr ""
+"सशर्त तर्क कार्यक्षमता अब कोर WPForms प्लगइन में शामिल है! WPForms सशर्त लॉजिक एडऑन को आपके फॉर्म को "
+"प्रभावित किए बिना हटाया जा सकता है। अधिक जानकारी के लिए <a href=“%s” target=“_blank” "
+"rel=“noopener noreferrer”>हमारी घोषणा पढ़ें</a>।"
+
+#: pro/wpforms-pro.php:1134
+#, fuzzy
+#| msgid "Enable conditional logic"
+msgid "How to use Conditional Logic"
+msgstr "सशर्त तर्क सक्षम करें"
+
+#: pro/wpforms-pro.php:1153
+msgid "Enable conditional logic"
+msgstr "सशर्त तर्क सक्षम करें"
+
+#. translators: %s - WPForms.com Account dashboard URL.
+#: pro/wpforms-pro.php:1186
+#, fuzzy
+#| msgid ""
+#| "Your WPForms license key has expired. In order to continue receiving support and plugin "
+#| "updates you must renew your license key. Please log in to <a href=\"%1$s\" target=\"_blank"
+#| "\" rel=\"noopener noreferrer\">your WPForms.com account</a> to renew your license."
+msgid ""
+"Your WPForms license key has expired. In order to continue receiving support and plugin "
+"updates you must renew your license key. Please log in to <a href=\"%s\" target=\"_blank\" "
+"rel=\"noopener noreferrer\">your WPForms.com account</a> to renew your license."
+msgstr ""
+"आपकी WPForms लाइसेंस कुंजी समाप्त हो गई है। समर्थन और प्लगइन अपडेट प्राप्त करना जारी रखने के लिए आपको अपनी "
+"लाइसेंस कुंजी को नवीनीकृत करना होगा। अपना लाइसेंस नवीनीकृत करने के लिए कृपया <a href=“%1$s” "
+"target=“_blank” rel=“noopener noreferrer”>अपने WPForms.com खाते</a> में लॉग इन करें।"
+
+#. translators: %s - addon name.
+#: src/Lite/Admin/Builder/Education.php:447 src/Lite/Admin/Settings/Education.php:124
+#: src/Pro/Admin/Builder/Education.php:266 src/Pro/Admin/Builder/Education.php:348
+#: src/Pro/Admin/Builder/Education.php:440 src/Pro/Admin/Builder/Education.php:501
+#: src/Pro/Admin/Settings/Education.php:149
+msgid "%s addon"
+msgstr ""
+
+#: src/Lite/Admin/Builder/Education.php:707
+#, fuzzy
+#| msgid "Upgrade Now"
+msgid "Upgrade to Pro."
+msgstr "अभी अपग्रेड करें"
+
+#: src/Lite/Admin/Builder/Education.php:708 src/Pro/Admin/Education.php:333
+msgid "Dismiss this message."
+msgstr ""
+
+#: src/Lite/Admin/Builder/Education.php:709 src/Pro/Admin/Education.php:334
+msgid "Did You Know?"
+msgstr ""
+
+#. translators: %s - addon name.
+#: src/Lite/Admin/Settings/Education.php:127 src/Pro/Admin/Settings/Education.php:152
+msgid "Integrate %s with WPForms"
+msgstr ""
+
+#: src/Pro/Access/Capabilities.php:68 src/Pro/Admin/Settings/Access.php:92
+#, fuzzy
+#| msgid "Preview Form"
+msgid "Create Forms"
+msgstr "पूर्वावलोकन फ़ॉर्म"
+
+#: src/Pro/Access/Capabilities.php:69
+#, fuzzy
+#| msgid "View Form Entry"
+msgid "View Own Forms"
+msgstr "फॉर्म प्रविष्टि देखें"
+
+#: src/Pro/Access/Capabilities.php:70
+msgid "View Others' Forms"
+msgstr ""
+
+#: src/Pro/Access/Capabilities.php:71
+#, fuzzy
+#| msgid "Edit This Form"
+msgid "Edit Own Forms"
+msgstr "यह फ़ॉर्म संपादित करें"
+
+#: src/Pro/Access/Capabilities.php:72
+#, fuzzy
+#| msgid "Edit This Form"
+msgid "Edit Others' Forms"
+msgstr "यह फ़ॉर्म संपादित करें"
+
+#: src/Pro/Access/Capabilities.php:73
+#, fuzzy
+#| msgid "Select Form"
+msgid "Delete Own Forms"
+msgstr "फॉर्म का चयन करें"
+
+#: src/Pro/Access/Capabilities.php:74
+#, fuzzy
+#| msgid "Select Form"
+msgid "Delete Others' Forms"
+msgstr "फॉर्म का चयन करें"
+
+#: src/Pro/Access/Capabilities.php:76
+#, fuzzy
+#| msgid "View Form Entry"
+msgid "View Own Forms Entries"
+msgstr "फॉर्म प्रविष्टि देखें"
+
+#: src/Pro/Access/Capabilities.php:77
+#, fuzzy
+#| msgid "View Form Entry"
+msgid "View Others' Forms Entries"
+msgstr "फॉर्म प्रविष्टि देखें"
+
+#: src/Pro/Access/Capabilities.php:78
+#, fuzzy
+#| msgid "View Form Entry"
+msgid "Edit Own Forms Entries"
+msgstr "फॉर्म प्रविष्टि देखें"
+
+#: src/Pro/Access/Capabilities.php:79
+#, fuzzy
+#| msgid "Edit This Form"
+msgid "Edit Others' Forms Entries"
+msgstr "यह फ़ॉर्म संपादित करें"
+
+#: src/Pro/Access/Capabilities.php:80
+#, fuzzy
+#| msgid "Delete Form Entry"
+msgid "Delete Own Forms Entries"
+msgstr "फॉर्म प्रविष्टि हटाएं"
+
+#: src/Pro/Access/Capabilities.php:81
+#, fuzzy
+#| msgid "Delete Form Entry"
+msgid "Delete Others' Forms Entries"
+msgstr "फॉर्म प्रविष्टि हटाएं"
+
+#: src/Pro/Admin/AdminBarMenu.php:73 src/Pro/Admin/Settings/Access.php:141
+#, fuzzy
+#| msgid "View Entry"
+msgid "View Entries"
+msgstr "प्रविष्टि देखें"
+
+#: src/Pro/Admin/AdminBarMenu.php:83
+msgid "Survey Results"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:91 src/Pro/Admin/Settings/Education.php:78
+msgid "The %name% is installed but not activated. Would you like to activate it?"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:92 src/Pro/Admin/Settings/Education.php:79
+#, fuzzy
+#| msgid "Deactivate"
+msgid "Yes, activate"
+msgstr "निष्क्रिय करें"
+
+#: src/Pro/Admin/Builder/Education.php:93 src/Pro/Admin/Builder/Education.php:98
+#: src/Pro/Admin/Settings/Education.php:80 src/Pro/Admin/Settings/Education.php:85
+#, fuzzy
+#| msgid "Activate"
+msgid "Addon activated"
+msgstr "सक्रिय"
+
+#: src/Pro/Admin/Builder/Education.php:94 src/Pro/Admin/Settings/Education.php:81
+#, fuzzy
+#| msgid "Activate"
+msgid "Activating"
+msgstr "सक्रिय"
+
+#: src/Pro/Admin/Builder/Education.php:95 src/Pro/Admin/Settings/Education.php:82
+msgid "The %name% is not installed. Would you like to install and activate it?"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:96 src/Pro/Admin/Settings/Education.php:83
+msgid "Yes, install and activate"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:97 src/Pro/Admin/Settings/Education.php:84
+#, fuzzy
+#| msgid "Install Addon"
+msgid "Installing"
+msgstr "Addon स्थापित करें"
+
+#: src/Pro/Admin/Builder/Education.php:99
+msgid "Almost done! Would you like to save and refresh the form builder?"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:100
+msgid "Yes, save and refresh"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:101 src/Pro/Admin/Settings/Education.php:88
+msgid ""
+"To access addons please enter and activate your WPForms license key in the plugin settings."
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:103 src/Pro/Admin/Settings/Education.php:90
+msgid "is a PRO Feature"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:104 src/Pro/Admin/Settings/Education.php:91
+msgid ""
+"We're sorry, the %name% is not available on your plan. Please upgrade to the PRO plan to "
+"unlock all these awesome features."
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:105 src/Pro/Admin/Settings/Education.php:92
+#, fuzzy
+#| msgid "Upgrade Now"
+msgid "Upgrade to PRO"
+msgstr "अभी अपग्रेड करें"
+
+#: src/Pro/Admin/Builder/Education.php:108 src/Pro/Admin/Settings/Education.php:95
+msgid "is an Elite Feature"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:109 src/Pro/Admin/Settings/Education.php:96
+msgid ""
+"We're sorry, the %name% is not available on your plan. Please upgrade to the Elite plan to "
+"unlock all these awesome features."
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:110 src/Pro/Admin/Settings/Education.php:97
+#, fuzzy
+#| msgid "Upgrade Now"
+msgid "Upgrade to Elite"
+msgstr "अभी अपग्रेड करें"
+
+#: src/Pro/Admin/Builder/Education.php:158
+msgid "reCAPTCHA"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:166 src/Pro/Admin/Builder/Education.php:173
+msgid "Captcha"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:180
+msgid "Signatures"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:187
+msgid "Signature"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:194 src/Pro/Admin/Builder/Education.php:208
+#: src/Pro/Admin/Builder/Education.php:303
+msgid "Surveys and Polls"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:201
+msgid "Likert Scale"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:215
+msgid "Net Promoter Score"
+msgstr ""
+
+#. translators: %s - field name.
+#: src/Pro/Admin/Builder/Education.php:260
+#, fuzzy
+#| msgid "Field"
+msgid "%s field"
+msgstr "फ़ील्ड"
+
+#: src/Pro/Admin/Builder/Education.php:296
+#, fuzzy
+#| msgid "Donation Form"
+msgid "Conversational Forms"
+msgstr "दान फार्म"
+
+#: src/Pro/Admin/Builder/Education.php:310
+#, fuzzy
+#| msgid "From Name"
+msgid "Form Pages"
+msgstr "नाम से"
+
+#: src/Pro/Admin/Builder/Education.php:317
+#, fuzzy
+#| msgid "From Name"
+msgid "Form Locker"
+msgstr "नाम से"
+
+#: src/Pro/Admin/Builder/Education.php:324
+#, fuzzy
+#| msgid "From Name"
+msgid "Form Abandonment"
+msgstr "नाम से"
+
+#: src/Pro/Admin/Builder/Education.php:331
+msgid "Post Submissions"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:374
+#, fuzzy
+#| msgid "Activate"
+msgid "ActiveCampaign"
+msgstr "सक्रिय"
+
+#: src/Pro/Admin/Builder/Education.php:382
+msgid "AWeber"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:390
+msgid "Campaign Monitor"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:398
+msgid "Drip"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:406
+msgid "GetResponse"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:414
+msgid "Mailchimp"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:422
+msgid "Zapier"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:483
+msgid "Authorize.Net"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:668
+#, fuzzy
+#| msgid "You do not have permission to export entries."
+msgid "You do not have permission."
+msgstr "आपको प्रविष्टियों को निर्यात करने की अनुमति नहीं है।"
+
+#: src/Pro/Admin/Builder/Education.php:673
+#, fuzzy
+#| msgid "Form not found."
+msgid "No form ID found."
+msgstr "फॉर्म नहीं मिला।"
+
+#: src/Pro/Admin/Builder/Education.php:681 src/Pro/Admin/Builder/Education.php:690
+msgid "Something wrong. Please, try again later."
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:698
+msgid "Heads up!"
+msgstr ""
+
+#. translators: %1$s - reCaptcha settings page URL; %2$s - WPForms.com doc URL.
+#: src/Pro/Admin/Builder/Education.php:701
+msgid ""
+"Google reCAPTCHA isn't configured yet. Please complete the setup in your <a href=\"%1$s\" "
+"target=\"_blank\">WPForms Settings</a>, and check out our <a href=\"%2$s\" target=\"_blank\" "
+"rel=\"noopener noreferrer\">step by step tutorial</a> for full details."
+msgstr ""
+
+#. translators: %s - reCAPTCHA type.
+#: src/Pro/Admin/Builder/Education.php:717
+msgid "%s has been enabled for this form. Don't forget to save your form!"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:721
+msgid "Are you sure you want to disable Google reCAPTCHA for this form?"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:760
+msgid "Google Checkbox v2 reCAPTCHA"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:763
+msgid "Google Invisible v2 reCAPTCHA"
+msgstr ""
+
+#: src/Pro/Admin/Builder/Education.php:766
+msgid "Google v3 reCAPTCHA"
+msgstr ""
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:144
+msgid ""
+"An active license is needed to access new features & addons, plugin updates (including "
+"security improvements), and our world class support!"
+msgstr ""
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:170
+msgid "Heads up! A WPForms license key is required."
+msgstr ""
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:171
+msgid "To create more forms, please verify your WPForms license."
+msgstr ""
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:172
+#, fuzzy
+#| msgid "Please enter a license key."
+msgid "Enter license key"
+msgstr "कृपया एक लाइसेंस कुंजी दर्ज करें।"
+
+#: src/Pro/Admin/Builder/LicenseAlert.php:173
+#, fuzzy
+#| msgid "WPForms Addons"
+msgid "Get WPForms pro"
+msgstr "WPForms Addons"
+
+#: src/Pro/Admin/DashboardWidget.php:177 src/Pro/Admin/DashboardWidget.php:451
+#, fuzzy
+#| msgid "Show Page"
+msgid "Show More"
+msgstr "पृष्ठ दिखाएं"
+
+#: src/Pro/Admin/DashboardWidget.php:178
+#, fuzzy
+#| msgid "Show Page"
+msgid "Show Less"
+msgstr "पृष्ठ दिखाएं"
+
+#: src/Pro/Admin/DashboardWidget.php:180 src/Pro/Admin/DashboardWidget.php:280
+#, fuzzy
+#| msgid "All Entries"
+msgid "Total Entries"
+msgstr "सभी प्रविष्टियां"
+
+#: src/Pro/Admin/DashboardWidget.php:257
+msgid "Sullie the WPForms mascot"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:258
+msgid "Create Your First Form to Start Collecting Leads"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:259
+msgid ""
+"You can use WPForms to build contact forms, surveys, payment forms, and more with just a few "
+"clicks."
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:261
+msgid "Create Your Form"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:291 src/Pro/Admin/Entries/DefaultScreen.php:196
+msgid "Reset chart to display all forms"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:311
+msgid "Total Entries by Form"
+msgstr ""
+
+#. translators: %d - Number of days.
+#: src/Pro/Admin/DashboardWidget.php:337
+msgid "Last %d day"
+msgid_plural "Last %d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Pro/Admin/DashboardWidget.php:352
+#, fuzzy
+#| msgid "Select icon to display"
+msgid "Select timespan"
+msgstr "प्रदर्शित करने के लिए आइकन का चयन करें"
+
+#: src/Pro/Admin/DashboardWidget.php:389
+msgid "No entries for selected period."
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:441
+msgid "Display only this form data on a chart"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:450
+msgid "Show all forms"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:473
+msgid "Recommended Plugin:"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:475
+msgid "MonsterInsights"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:476
+#, fuzzy
+#| msgid "Not Installed"
+msgid "Install"
+msgstr "स्थापित नहीं है"
+
+#: src/Pro/Admin/DashboardWidget.php:480
+msgid "Dismiss recommended plugin block"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:499
+msgid "No entries for selected period"
+msgstr ""
+
+#: src/Pro/Admin/DashboardWidget.php:500
+msgid "Please select a different period or check back later."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:97
+msgid ""
+"You can capture email addresses from partial form entries to get more leads. Abandoned cart "
+"emails have an average open rate of 45%!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:102
+msgid "You can easily integrate your forms with 1,500+ useful apps by using WPForms + Zapier."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:107
+msgid ""
+"You can integrate your forms to automatically send entries to your most used apps. Perfect "
+"for users of Salesforce, Slack, Trello, and 1,500+ others."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:112
+msgid ""
+"You can make distraction-free and custom landing pages in WPForms! Perfect for getting more "
+"leads."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:117
+msgid ""
+"You can build and customize your own professional-looking landing page. A great alternative "
+"to Google Forms!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:122
+msgid ""
+"You don’t have to build your forms from scratch. The Form Templates Pack addon gives you "
+"access to 150+ additional templates."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:127
+msgid ""
+"You can password-protect your forms. Perfect for collecting reviews or success stories from "
+"customers!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:132
+msgid "You can automatically close a form at a specific date and time. Great for applications!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:137
+msgid ""
+"You can generate more fresh content for your website for free by accepting guest blog posts."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:142
+msgid ""
+"You can easily add a field to your forms that let users draw their signature then saves it as "
+"an image with their entry."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:147
+msgid ""
+"You can set up your forms to let your site visitors pick which payment method they want to "
+"use."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:152
+msgid "You can increase your revenue by accepting recurring payments on your forms."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:157
+msgid ""
+"For added insight into your customers, you can collect your user's city, state, and country "
+"behind-the-scenes with Geolocation!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:162
+msgid ""
+"You can let people automatically register as users on your WordPress site. Perfect for things "
+"like accepting guest blog posts!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:167
+msgid ""
+"You can limit one form submission per person to avoid duplicate entries. Perfect for "
+"applications and giveaway!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:172
+msgid ""
+"You can use NPS Surveys to learn about your visitors. A tactic used by some of the biggest "
+"brands around!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:177
+msgid ""
+"If you're planning an event, you can create an RSVP form to stay organized and get higher "
+"response rates!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:182
+msgid ""
+"With the Offline Forms addon, you can save data entered into your forms even if the user "
+"loses their internet connection."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:187
+msgid "You can accept PayPal on your website — a great way to increase your revenue."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:192
+msgid "You can easily take payments by credit card on your website using the Stripe addon."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:197
+msgid "You can make money selling digital downloads on your site by using Stripe or PayPal."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:202
+msgid "You can create a simple order form on your site to sell services or products online."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:207
+msgid ""
+"You can create surveys or polls and see interactive visual reports of your user's answers."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:212
+msgid ""
+"You can add a customer feedback form to your site. Try automatically emailing it out after a "
+"sale!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:217
+msgid ""
+"You can add a Likert rating scale to your WordPress forms. Great for measuring your "
+"customer’s experience with your business!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:222
+msgid ""
+"You can easily add a poll to your site! Helpful for making business decisions based on your "
+"audience's needs."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:227
+msgid "You can create a customer cancellation survey to find out what you can do to improve."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:232
+msgid ""
+"WPForms is a great alternative to SurveyMonkey! You can create your first survey or poll "
+"today."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:237
+msgid ""
+"You can make your forms interactive and easier to complete. A great way to get more leads!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:242
+msgid "You can easily display survey results graphically. Great for presentations!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:247
+msgid "You can make your forms feel like a one-on-one conversation and boost conversion rates."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:252
+msgid ""
+"You can put a pre-built job application form on your website. Perfect if you’re looking for "
+"new employees!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:257
+msgid ""
+"You can automatically send form entries to your Google Calendar. Perfect for appointments!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:262
+msgid ""
+"You can automatically send uploaded files from your form entries to Dropbox for safekeeping "
+"and organization!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:267
+msgid ""
+"When a user submits an uploaded file to your form, it can upload automatically to your Google "
+"Drive for better organization!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:272
+msgid ""
+"You can get notified via text when someone completes your form! Great for closing deals "
+"faster."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:277
+msgid ""
+"Save time on invoicing! You can automatically add customers to Quickbooks after they complete "
+"a form."
+msgstr ""
+
+#: src/Pro/Admin/Education.php:282
+msgid ""
+"You can let users upload videos to your YouTube channel. Perfect for collecting testimonials!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:287
+msgid ""
+"You can automatically save submitted form info in a free Google Sheets spreadsheet. Great for "
+"keeping track of your entries!"
+msgstr ""
+
+#: src/Pro/Admin/Education.php:332
+#, fuzzy
+#| msgid "Upgrade Now"
+msgid "Upgrade to Pro"
+msgstr "अभी अपग्रेड करें"
+
+#: src/Pro/Admin/Education.php:393 src/Pro/Admin/Entries/Edit.php:765
+#, fuzzy
+#| msgid "You do not have permission to export entries."
+msgid "You do not have permission to perform this action."
+msgstr "आपको प्रविष्टियों को निर्यात करने की अनुमति नहीं है।"
+
+#. translators: %d - Selected timespan (in days).
+#: src/Pro/Admin/Entries/DefaultScreen.php:140
+msgid "Last %d days"
+msgstr ""
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:143
+#, fuzzy
+#| msgid "From Name"
+msgid "Form Name"
+msgstr "नाम से"
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:144
+msgid "Created"
+msgstr ""
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:145
+#, fuzzy
+#| msgid "Time"
+msgid "All Time"
+msgstr "समय"
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:147
+msgid "Graph"
+msgstr ""
+
+#: src/Pro/Admin/Entries/DefaultScreen.php:248
+#, fuzzy
+#| msgid "Entries"
+msgid "Entries Overview"
+msgstr "प्रविष्टियां"
+
+#: src/Pro/Admin/Entries/Edit.php:311 src/Pro/Admin/Entries/Edit.php:740
+msgid "Update"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Edit.php:312
+msgid "Success"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Edit.php:313
+msgid "Continue Editing"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Edit.php:315
+#, fuzzy
+#| msgid "Entry was successfully starred."
+msgid "The entry was successfully saved."
+msgstr "प्रविष्टि को सफलतापूर्वक तारांकित किया गया ।"
+
+#: src/Pro/Admin/Entries/Edit.php:487
+#, fuzzy
+#| msgid "View Entry"
+msgid "Edit Entry"
+msgstr "प्रविष्टि देखें"
+
+#. translators: %s - form edit URL.
+#: src/Pro/Admin/Entries/Edit.php:709
+msgid "You don't have any fields in this form. <a href=\"%s\">Add some!</a>"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Edit.php:719
+#, fuzzy
+#| msgid "This entry does not have any fields"
+msgid "You don't have any fields in this form."
+msgstr "इस प्रविष्टि में कोई फ़ील्ड नहीं है"
+
+#: src/Pro/Admin/Entries/Edit.php:757 src/Pro/Admin/Entries/Edit.php:796
+#, fuzzy
+#| msgid "Invalid entry ID."
+msgid "Invalid form."
+msgstr "अमान्य प्रविष्टि ID ।"
+
+#: src/Pro/Admin/Entries/Edit.php:761
+#, fuzzy
+#| msgid "Invalid entry ID."
+msgid "Invalid Entry."
+msgstr "अमान्य प्रविष्टि ID ।"
+
+#: src/Pro/Admin/Entries/Edit.php:803
+#, fuzzy
+#| msgid "Invalid entry ID."
+msgid "Invalid entry."
+msgstr "अमान्य प्रविष्टि ID ।"
+
+#: src/Pro/Admin/Entries/Edit.php:830
+msgid "Entry has not been saved, please see the fields errors."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Edit.php:916
+#, fuzzy
+#| msgid "Entry Details"
+msgid "Entry edited."
+msgstr "प्रविष्टि विवरण"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:56
+#, fuzzy
+#| msgid "Entries"
+msgid "Export Entries"
+msgstr "प्रविष्टियां"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:58
+msgid ""
+"Select a form to export entries, then select the fields you would like to include. You can "
+"also define search and date filters to further personalize the list of entries you want to "
+"retrieve. WPForms will generate a downloadable CSV of your entries."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Admin.php:70
+#, fuzzy
+#| msgid "Show Empty Fields"
+msgid "Form Fields"
+msgstr "रिक्त फ़ील्ड्स दिखाएं"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:78
+#, fuzzy
+#| msgid "Add New Confirmation"
+msgid "Additional Information"
+msgstr "नई पुष्टि जोड़ें"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:83
+msgid "Custom Date Range"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Admin.php:97
+#, fuzzy
+#| msgid "Download Export (CSV)"
+msgid "Download Export File"
+msgstr "डाउनलोड निर्यात (CSV)"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:132
+#, fuzzy
+#| msgid "Select Form"
+msgid "Select a Form"
+msgstr "फॉर्म का चयन करें"
+
+#: src/Pro/Admin/Entries/Export/Admin.php:149
+msgid "You need to have at least one form before you can use entries export."
+msgstr ""
+
+#. translators: %d - Field ID.
+#: src/Pro/Admin/Entries/Export/Admin.php:175 src/Pro/Admin/Entries/Export/Admin.php:236
+#: src/Pro/Admin/Entries/Export/Ajax.php:87 src/Pro/Admin/Entries/Export/Ajax.php:290
+#, fuzzy
+#| msgid "Field ID #%d"
+msgid "Field #%d"
+msgstr "फ़ील्ड आईडी #%d"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:531
+msgid "Lat/Long"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:543
+msgid "Map"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:550
+#, fuzzy
+#| msgid "Notifications"
+msgid "Location"
+msgstr "सूचनाएँ"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:558
+msgid "Zipcode"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:560
+#, fuzzy
+#| msgid "Postal Code"
+msgid "Postal"
+msgstr "डाक कोड"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:645
+#, fuzzy
+#| msgid "Payment Details"
+msgid "Payment gateway"
+msgstr "भुगतान विवरण"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:646
+msgid "Recipient"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:647
+#, fuzzy
+#| msgid "Transaction ID: %s"
+msgid "Transaction"
+msgstr "लेनदेन आईडी: %s"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:650
+msgid "Mode"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:651
+#, fuzzy
+#| msgid "Subscription ID: %s"
+msgid "Subscription"
+msgstr "सदस्यता आईडी: %s"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:652
+#, fuzzy
+#| msgid "Customer ID: %s"
+msgid "Customer"
+msgstr "ग्राहक आईडी: %s"
+
+#: src/Pro/Admin/Entries/Export/Ajax.php:653
+msgid "Period"
+msgstr ""
+
+#. translators: %d - deleted field ID.
+#: src/Pro/Admin/Entries/Export/Ajax.php:698
+msgid "Deleted field #%d"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:133
+#, fuzzy
+#| msgid "Entry Details"
+msgid "Entry Date"
+msgstr "प्रविष्टि विवरण"
+
+#: src/Pro/Admin/Entries/Export/Export.php:135
+#, fuzzy
+#| msgid "View"
+msgid "Viewed"
+msgstr "देखें"
+
+#: src/Pro/Admin/Entries/Export/Export.php:137
+#, fuzzy
+#| msgid "User Defined"
+msgid "User Agent"
+msgstr "यूज़र डिफ़ाइंड"
+
+#: src/Pro/Admin/Entries/Export/Export.php:138
+#, fuzzy
+#| msgid "User IP:"
+msgid "User IP"
+msgstr "उपयोगकर्ता IP:"
+
+#: src/Pro/Admin/Entries/Export/Export.php:139
+msgid "Unique Generated User ID"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:140
+msgid "Geolocation Details"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:141
+#, fuzzy
+#| msgid "Payment Details"
+msgid "Payment Status"
+msgstr "भुगतान विवरण"
+
+#: src/Pro/Admin/Entries/Export/Export.php:142
+msgid "Payment Gateway Information"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:143
+msgid "Include data of previously deleted fields"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:149
+msgid ""
+"There were problems while preparing your export file. Please recheck export settings and try "
+"again."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:150
+msgid "You don't have enough capabilities to complete this request."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:151
+msgid "Incorrect form ID has been specified."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:152
+#, fuzzy
+#| msgid "This entry has been starred."
+msgid "Incorrect entry ID has been specified."
+msgstr "यह प्रविष्टि तारांकित की गई है।"
+
+#: src/Pro/Admin/Entries/Export/Export.php:153
+msgid "Specified form seems to be broken."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:154
+#, fuzzy
+#| msgid "Unknown"
+msgid "Unknown request."
+msgstr "अज्ञात"
+
+#: src/Pro/Admin/Entries/Export/Export.php:155
+msgid "Export file cannot be retrieved from a file system."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:156
+msgid "Export file is empty."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:157
+#, fuzzy
+#| msgid "This entry does not have any fields"
+msgid "The form does not have any fields for export."
+msgstr "इस प्रविष्टि में कोई फ़ील्ड नहीं है"
+
+#: src/Pro/Admin/Entries/Export/Export.php:164
+msgid "Generating a list of entries according to your filters."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:165
+msgid "This can take a while. Please wait."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:166
+msgid "No entries found after applying your filters."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:167
+#, fuzzy
+#| msgid "Number of entries per page:"
+msgid "Number of entries found: {total_entries}."
+msgstr "प्रति पृष्ठ प्रविष्टियों की संख्या:"
+
+#: src/Pro/Admin/Entries/Export/Export.php:168
+msgid ""
+"Generating a CSV file: {progress}% completed. Please wait for generation to complete, file "
+"download will start automatically."
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:169
+#, fuzzy
+#| msgid "Your key has been refreshed successfully."
+msgid "The file was generated successfully."
+msgstr "आपकी कुंजी सफलतापूर्वक रिफ्रेश कर दी गई है।"
+
+#: src/Pro/Admin/Entries/Export/Export.php:170
+msgid "If the download does not start automatically"
+msgstr ""
+
+#: src/Pro/Admin/Entries/Export/Export.php:171
+msgid "click here"
+msgstr ""
+
+#: src/Pro/Admin/Entries/PrintPreview.php:153
+#, fuzzy
+#| msgid "Hide Empty Fields"
+msgid "Hide empty fields"
+msgstr "रिक्त फ़ील्ड्स छुपाएं"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:155 src/Pro/Admin/Entries/PrintPreview.php:198
+#, fuzzy
+#| msgid "Show Empty Fields"
+msgid "Show empty fields"
+msgstr "रिक्त फ़ील्ड्स दिखाएं"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:164
+#, fuzzy
+#| msgid "No notes."
+msgid "Hide notes"
+msgstr "कोई नोट नहीं।"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:166 src/Pro/Admin/Entries/PrintPreview.php:199
+#, fuzzy
+#| msgid "No notes."
+msgid "Show notes"
+msgstr "कोई नोट नहीं।"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:175
+msgid "Normal view"
+msgstr ""
+
+#: src/Pro/Admin/Entries/PrintPreview.php:177 src/Pro/Admin/Entries/PrintPreview.php:200
+msgid "Compact view"
+msgstr ""
+
+#. translators: %d - entry ID.
+#: src/Pro/Admin/Entries/PrintPreview.php:191
+#, fuzzy
+#| msgid "Entry ID: %s"
+msgid "Entry #%d"
+msgstr "प्रविष्टि आईडी: %s"
+
+#: src/Pro/Admin/Entries/PrintPreview.php:193
+msgid "Close"
+msgstr ""
+
+#. translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to.
+#: src/Pro/Admin/Settings/Access.php:75
+msgid "In order to give %1$s access, %2$s access is also required."
+msgstr ""
+
+#. translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to.
+#: src/Pro/Admin/Settings/Access.php:75
+msgid "Would you like to also grant %2$s access to %3$s?"
+msgstr ""
+
+#. translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to.
+#: src/Pro/Admin/Settings/Access.php:77
+msgid "In order to remove %1$s access, %2$s access is also required to be removed."
+msgstr ""
+
+#. translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to.
+#: src/Pro/Admin/Settings/Access.php:77
+msgid "Would you like to also remove %2$s access from %3$s?"
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:101
+#, fuzzy
+#| msgid "Preview Form"
+msgid "View Forms"
+msgstr "पूर्वावलोकन फ़ॉर्म"
+
+#: src/Pro/Admin/Settings/Access.php:104 src/Pro/Admin/Settings/Access.php:117
+#: src/Pro/Admin/Settings/Access.php:130 src/Pro/Admin/Settings/Access.php:144
+#: src/Pro/Admin/Settings/Access.php:157 src/Pro/Admin/Settings/Access.php:170
+#, fuzzy
+#| msgid "On"
+msgid "Own"
+msgstr "चालू करना"
+
+#: src/Pro/Admin/Settings/Access.php:105
+msgid "Can view forms created by themselves."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:108 src/Pro/Admin/Settings/Access.php:121
+#: src/Pro/Admin/Settings/Access.php:134 src/Pro/Admin/Settings/Access.php:148
+#: src/Pro/Admin/Settings/Access.php:161 src/Pro/Admin/Settings/Access.php:174
+msgid "Others"
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:109
+msgid "Can view forms created by others."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:114
+#, fuzzy
+#| msgid "Edit This Form"
+msgid "Edit Forms"
+msgstr "यह फ़ॉर्म संपादित करें"
+
+#: src/Pro/Admin/Settings/Access.php:118
+msgid "Can edit forms created by themselves."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:122
+msgid "Can edit forms created by others."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:127
+#, fuzzy
+#| msgid "Select Form"
+msgid "Delete Forms"
+msgstr "फॉर्म का चयन करें"
+
+#: src/Pro/Admin/Settings/Access.php:131
+msgid "Can delete forms created by themselves."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:135
+msgid "Can delete forms created by others."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:145
+msgid "Can view entries of forms created by themselves."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:149
+msgid "Can view entries of forms created by others."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:154
+#, fuzzy
+#| msgid "Entries"
+msgid "Edit Entries"
+msgstr "प्रविष्टियां"
+
+#: src/Pro/Admin/Settings/Access.php:158
+msgid "Can edit entries of forms created by themselves."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:162
+msgid "Can edit entries of forms created by others."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:167
+#, fuzzy
+#| msgid "Delete Entry"
+msgid "Delete Entries"
+msgstr "प्रविष्टि हटाएं"
+
+#: src/Pro/Admin/Settings/Access.php:171
+msgid "Can delete entries of forms created by themselves."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:175
+msgid "Can delete entries of forms created by others."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:195 src/Pro/Admin/Settings/Access.php:217
+msgid "Access"
+msgstr ""
+
+#: src/Pro/Admin/Settings/Access.php:217
+msgid "Select the user roles that are allowed access to WPForms."
+msgstr ""
+
+#: src/Pro/Admin/Settings/Education.php:86
+msgid "Almost done! Would you like to refresh the page?"
+msgstr ""
+
+#: src/Pro/Admin/Settings/Education.php:87
+#, fuzzy
+#| msgid "Refresh Addons"
+msgid "Refresh page"
+msgstr "Addons रिफ्रेश करें"
+
+#. translators: %s - resume page URL.
+#: src/Pro/Migrations.php:374
+msgid "WPForms database upgrade is incomplete, click <a href=\"%s\">here</a> to resume."
+msgstr "WPForms डेटाबेस अपग्रेड अधूरा है, फिर से शुरू करने के लिए <a href=“%s”> यहां </a> क्लिक करें।"
+
+#. translators: %s - entries upgrade page URL.
+#: src/Pro/Migrations.php:377
+msgid ""
+"WPForms needs to upgrade the database, click <a href=\"%s\">here</a> to start the upgrade."
+msgstr ""
+"WPForms को अपग्रेड शुरू करने के लिए, डेटाबेस को अपग्रेड करने के लिए <a href=“%s”> यहां </a> पर क्लिक करना "
+"होगा।"
+
+#: src/Pro/Migrations.php:407
+msgid "WPForms needs to upgrade the database, click the button below to begin."
+msgstr "WPForms को डेटाबेस को अपग्रेड करने की आवश्यकता है, शुरू करने के लिए नीचे दिए गए बटन पर क्लिक करें।"
+
+#: src/Pro/Migrations.php:408
+msgid "Run Upgrade"
+msgstr "अपग्रेड चलाएं"
+
+#: src/Pro/Migrations.php:411
+msgid "WPForms database upgrade is incomplete, click the button below to resume."
+msgstr "WPForms डेटाबेस अपग्रेड अधूरा है, फिर से शुरू करने के लिए नीचे दिए गए बटन पर क्लिक करें।"
+
+#: src/Pro/Migrations.php:412
+msgid "Resume Upgrade"
+msgstr "अपग्रेड फिर से शुरू करें"
+
+#: src/Pro/Migrations.php:417
+msgid "Upgrade"
+msgstr "अपग्रेड"
+
+#: src/Pro/Migrations.php:419
+msgid "Please do not leave this page or close the browser while the upgrade is in progress."
+msgstr "कृपया इस पृष्ठ को न छोड़ें या नवीनीकरण चालू होने पर ब्राउज़र को बंद न करें।"
+
+#. translators: %1$s - total number of entries upgraded; %2$s - total number of entries on site.
+#: src/Pro/Migrations.php:427
+msgid "Updated %1$s of %2$s entries."
+msgstr "%2$s प्रविष्टियों का %1$s अपडेट किया गया।"
+
+#: src/Pro/Migrations.php:439
+msgid "No updates are currently needed."
+msgstr "वर्तमान में किसी अपडेट की आवश्यकता नहीं है।"
+
+#: templates/emails/summary-body-plain.php:22 templates/emails/summary-body.php:27
+msgid "Let’s see how your forms performed in the past week."
+msgstr ""
+
+#: templates/emails/summary-body.php:25
+msgid "Hi there!"
+msgstr ""
+
+#~ msgid ""
+#~ "Your license key for WPForms has expired. <a href=\"%s\" target=\"_blank\" rel=\"noopener "
+#~ "noreferrer\">Please click here to renew your license key and continue receiving automatic "
+#~ "updates.</a>"
+#~ msgstr ""
+#~ "WPForms के लिए आपकी लाइसेंस कुंजी समाप्त हो गई है। <a href=“%s” target=“_blank” rel=“noopener "
+#~ "noreferrer”>अपनी लाइसेंस कुंजी नवीनीकृत करने और स्वचालित अपडेट प्राप्त करने के लिए कृपया यहां क्लिक करें।</"
+#~ "a>"
+
+#~ msgid "Entry was successfully marked as read."
+#~ msgstr "प्रविष्टि को सफलतापूर्वक पढ़े गए के रूप में चिह्नित किया गया था।"
+
+#~ msgid "Entries were successfully marked as read."
+#~ msgstr "प्रविष्टियों को सफलतापूर्वक पढ़े गए के रूप में चिह्नित किया गया था।"
+
+#~ msgid "Entry was successfully marked as unread."
+#~ msgstr "प्रविष्टि को सफलतापूर्वक अपठित के रूप में चिह्नित किया गया था।"
+
+#~ msgid "Entries were successfully marked as unread."
+#~ msgstr "प्रविष्टियों को सफलतापूर्वक अपठित के रूप में चिह्नित किया गया था।"
+
+#~ msgid "Entries were successfully starred."
+#~ msgstr "प्रविष्टियों को सफलतापूर्वक तारांकित किया गया था।"
+
+#~ msgid "Entries were successfully unstarred."
+#~ msgstr "प्रविष्टियों को सफलतापूर्वक अतारांकित किया गया।"
+
+#~ msgid "Entry was successfully deleted."
+#~ msgstr "प्रविष्टि को सफलतापूर्वक हटा दिया गया था।"
+
+#~ msgid "Entries were successfully deleted."
+#~ msgstr "प्रविष्टियां सफलतापूर्वक हटा दी गईं।"
+
+#~ msgid "First Page"
+#~ msgstr "प्रथम पृष्ठ"
+
+#~ msgid "File exceeds max size allowed"
+#~ msgstr "फ़ाइल अधिकतम आकार की अनुमति से अधिक है"

@@ -203,7 +203,7 @@ namespace WPForms {
 		 * @since 1.5.0 Load only the lite translation.
 		 */
 		public function load_textdomain() {
-			load_plugin_textdomain( 'wpforms-lite', false, dirname( plugin_basename( WPFORMS_PLUGIN_FILE ) ) . '/languages/' );
+			load_plugin_textdomain( 'wpforms-lite', false, dirname( plugin_basename( WPFORMS_PLUGIN_FILE ) ) . '/assets/languages/' );
 		}
 
 		/**

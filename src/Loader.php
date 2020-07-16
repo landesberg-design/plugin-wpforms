@@ -61,6 +61,10 @@ class Loader {
 				'name' => 'Admin\Entries\Edit',
 				'id'   => 'entries_edit',
 				'hook' => 'admin_init',
+			],
+			[
+				'name' => 'Admin\Entries\Export\Export',
+				'hook' => 'admin_init',
 			]
 		);
 	}

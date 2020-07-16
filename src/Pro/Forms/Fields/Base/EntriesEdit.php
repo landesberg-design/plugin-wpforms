@@ -50,9 +50,9 @@ class EntriesEdit {
 	 */
 	public function field_display( $entry_field, $field, $form_data ) {
 
-		$value = ! empty( $entry_field['value'] ) ? $entry_field['value'] : '';
+		$value = isset( $entry_field['value'] ) ? $entry_field['value'] : '';
 
-		if ( ! empty( $value ) ) {
+		if ( $value !== '' ) {
 			$field['properties'] = $this->field_object->get_field_populated_single_property_value_public( (string) $value, 'primary', $field['properties'], $field );
 		}
 

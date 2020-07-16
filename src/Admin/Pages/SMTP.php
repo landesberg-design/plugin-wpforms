@@ -417,16 +417,57 @@ class SMTP {
 	 * Get $phpmailer instance.
 	 *
 	 * @since 1.5.7
+	 * @since 1.6.1.2 Conditionally returns $phpmailer v5 or v6.
 	 *
-	 * @return \PHPMailer Instance of PHPMailer.
+	 * @return \PHPMailer|\PHPMailer\PHPMailer\PHPMailer Instance of PHPMailer.
 	 */
 	protected function get_phpmailer() {
 
+		if ( version_compare( get_bloginfo( 'version' ), '5.5-alpha', '<' ) ) {
+			$phpmailer = $this->get_phpmailer_v5();
+		} else {
+			$phpmailer = $this->get_phpmailer_v6();
+		}
+
+		return $phpmailer;
+	}
+
+	/**
+	 * Get $phpmailer v5 instance.
+	 *
+	 * @since 1.6.1.2
+	 *
+	 * @return \PHPMailer Instance of PHPMailer.
+	 */
+	private function get_phpmailer_v5() {
+
 		global $phpmailer;
 
-		if ( ! is_object( $phpmailer ) || ! is_a( $phpmailer, 'PHPMailer' ) ) {
+		if ( ! ( $phpmailer instanceof \PHPMailer ) ) {
 			require_once ABSPATH . WPINC . '/class-phpmailer.php';
-			$phpmailer = new \PHPMailer( true ); // phpcs:ignore
+			require_once ABSPATH . WPINC . '/class-smtp.php';
+			$phpmailer = new \PHPMailer( true ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		}
+
+		return $phpmailer;
+	}
+
+	/**
+	 * Get $phpmailer v6 instance.
+	 *
+	 * @since 1.6.1.2
+	 *
+	 * @return \PHPMailer\PHPMailer\PHPMailer Instance of PHPMailer.
+	 */
+	private function get_phpmailer_v6() {
+
+		global $phpmailer;
+
+		if ( ! ( $phpmailer instanceof \PHPMailer\PHPMailer\PHPMailer ) ) {
+			require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
+			require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
+			require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
+			$phpmailer = new \PHPMailer\PHPMailer\PHPMailer( true ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 
 		return $phpmailer;

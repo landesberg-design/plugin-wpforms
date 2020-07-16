@@ -2195,3 +2195,165 @@ function wpforms_is_frontend_ajax() {
 
 	return true;
 }
+
+/**
+ * Dequeue enqueues by URI list.
+ * Parts of URI (e.g. filename) is also supported.
+ *
+ * @since 1.6.1
+ *
+ * @param array|string           $uris     List of URIs or individual URI to dequeue.
+ * @param \WP_Scripts|\WP_Styles $enqueues Enqueues list to dequeue from.
+ */
+function wpforms_dequeue_by_uri( $uris, $enqueues ) {
+
+	if ( empty( $enqueues->queue ) ) {
+		return;
+	}
+
+	foreach ( $enqueues->queue as $handle ) {
+
+		if ( empty( $enqueues->registered[ $handle ]->src ) ) {
+			continue;
+		}
+
+		$src = wp_make_link_relative( $enqueues->registered[ $handle ]->src );
+
+		// Support full URLs.
+		$src = site_url( $src );
+
+		foreach ( (array) $uris as $uri ) {
+			if ( strpos( $src, $uri ) !== false ) {
+				wp_dequeue_script( $handle );
+				break;
+			}
+		}
+	}
+}
+
+/**
+ * Dequeue scripts by URI list.
+ * Parts of URI (e.g. filename) is also supported.
+ *
+ * @since 1.6.1
+ *
+ * @param array|string $uris List of URIs or individual URI to dequeue.
+ */
+function wpforms_dequeue_scripts_by_uri( $uris ) {
+
+	wpforms_dequeue_by_uri( $uris, wp_scripts() );
+}
+
+/**
+ * Dequeue styles by URI list.
+ * Parts of URI (e.g. filename) is also supported.
+ *
+ * @since 1.6.1
+ *
+ * @param array|string $uris List of URIs or individual URI to dequeue.
+ */
+function wpforms_dequeue_styles_by_uri( $uris ) {
+
+	wpforms_dequeue_by_uri( $uris, wp_styles() );
+}
+
+/**
+ * Get WPForms upload root path (e.g. /wp-content/uploads/wpforms).
+ *
+ * @since 1.6.1
+ *
+ * @return array WPForms upload root path (no trailing slash).
+ */
+function wpforms_upload_dir() {
+
+	$upload_dir = wp_upload_dir();
+
+	if ( ! empty( $upload_dir['error'] ) ) {
+		return [ 'error' => $upload_dir['error'] ];
+	}
+
+	$wpforms_upload_root = trailingslashit( realpath( $upload_dir['basedir'] ) ) . 'wpforms';
+
+	// Add filter to allow redefine store directory.
+	$custom_uploads_root = apply_filters( 'wpforms_upload_root', $wpforms_upload_root );
+	if ( wp_is_writable( $custom_uploads_root ) ) {
+		$wpforms_upload_root = $custom_uploads_root;
+	}
+
+	return [
+		'path'  => $wpforms_upload_root,
+		'url'   => trailingslashit( $upload_dir['baseurl'] ) . 'wpforms',
+		'error' => false,
+	];
+}
+
+/**
+ * Create index.html file in the specified directory if it doesn't exist.
+ *
+ * @since 1.6.1
+ *
+ * @param string $path Path to the directory.
+ *
+ * @return int|false Number of bytes that were written to the file, or false on failure.
+ */
+function wpforms_create_index_html_file( $path ) {
+
+	if ( ! is_dir( $path ) || is_link( $path ) ) {
+		return false;
+	}
+
+	$index_file = wp_normalize_path( trailingslashit( $path ) . 'index.html' );
+
+	// Do nothing if index.html exists in the directory.
+	if ( file_exists( $index_file ) ) {
+		return false;
+	}
+
+	// Create empty index.html.
+	return file_put_contents( $index_file, '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+}
+
+/**
+ * Create .htaccess file in the WPForms upload directory.
+ *
+ * @since 1.6.1
+ *
+ * @return bool True on write success, false on failure.
+ */
+function wpforms_create_upload_dir_htaccess_file() {
+
+	$upload_dir = wpforms_upload_dir();
+
+	if ( ! empty( $upload_dir['error'] ) ) {
+		return false;
+	}
+
+	$htaccess_file = wp_normalize_path( trailingslashit( $upload_dir['path'] ) . '.htaccess' );
+
+	if ( file_exists( $htaccess_file ) ) {
+		@unlink( $htaccess_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	}
+
+	if ( ! function_exists( 'insert_with_markers' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+	}
+
+	$contents = '# Disable PHP and Python scripts parsing.
+<Files *>
+  SetHandler none
+  SetHandler default-handler
+  RemoveHandler .cgi .php .php3 .php4 .php5 .phtml .pl .py .pyc .pyo
+  RemoveType .cgi .php .php3 .php4 .php5 .phtml .pl .py .pyc .pyo
+</Files>
+<IfModule mod_php5.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule headers_module>
+  Header set X-Robots-Tag "noindex"
+</IfModule>';
+
+	return insert_with_markers( $htaccess_file, 'WPForms', $contents );
+}

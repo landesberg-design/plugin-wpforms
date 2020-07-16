@@ -294,6 +294,13 @@ class WPForms_Builder {
 		);
 
 		wp_enqueue_script(
+			'choicesjs',
+			WPFORMS_PLUGIN_URL . 'assets/js/choices.min.js',
+			array(),
+			'9.0.1'
+		);
+
+		wp_enqueue_script(
 			'listjs',
 			WPFORMS_PLUGIN_URL . 'assets/js/list.min.js',
 			array( 'jquery' ),
@@ -432,6 +439,7 @@ class WPForms_Builder {
 			'is_gutenberg'                   => version_compare( get_bloginfo( 'version' ), '5.0', '>=' ) && ! is_plugin_active( 'classic-editor/classic-editor.php' ),
 			'cl_fields_supported'            => wpforms_get_conditional_logic_form_fields_supported(),
 			'redirect_url_field_error'       => esc_html__( 'You should enter a valid absolute address to the Confirmation Redirect URL field.', 'wpforms-lite' ),
+			'add_custom_value_label'         => esc_html__( 'Add Custom Value', 'wpforms-lite' ),
 		);
 
 		$strings = apply_filters( 'wpforms_builder_strings', $strings, $this->form );
@@ -462,14 +470,20 @@ class WPForms_Builder {
 	 */
 	public function footer_scripts() {
 
+		$countries        = wpforms_countries();
+		$countries_postal = array_keys( $countries );
+		$countries        = array_values( $countries );
+		sort( $countries_postal );
+		sort( $countries );
+
 		$choices = array(
 			'countries'        => array(
 				'name'    => esc_html__( 'Countries', 'wpforms-lite' ),
-				'choices' => array_values( wpforms_countries() ),
+				'choices' => $countries,
 			),
 			'countries_postal' => array(
 				'name'    => esc_html__( 'Countries Postal Code', 'wpforms-lite' ),
-				'choices' => array_keys( wpforms_countries() ),
+				'choices' => $countries_postal,
 			),
 			'states'           => array(
 				'name'    => esc_html__( 'States', 'wpforms-lite' ),

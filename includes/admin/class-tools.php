@@ -80,7 +80,7 @@ class WPForms_Tools {
 	public function init() {
 
 		// Check what page we are on.
-		$page = isset( $_GET['page'] ) ? $_GET['page'] : '';
+		$page = isset( $_GET['page'] ) ? $_GET['page'] : ''; // phpcs:ignore WordPress.Security
 
 		// Only load if we are actually on the settings page.
 		if ( 'wpforms-tools' !== $page ) {
@@ -98,7 +98,12 @@ class WPForms_Tools {
 		}
 
 		if ( wpforms_current_user_can() ) {
-			$views[ esc_html__( 'System Info', 'wpforms-lite' ) ] = array( 'system' );
+			$views[ esc_html__( 'System Info', 'wpforms-lite' ) ]       = array( 'system' );
+			$views[ esc_html__( 'Scheduled Actions', 'wpforms-lite' ) ] = array( 'action-scheduler' );
+		}
+
+		if ( wpforms_current_user_can() && class_exists( 'ActionScheduler_AdminView' ) ) {
+			$views[ esc_html__( 'Scheduled Actions', 'wpforms-lite' ) ] = array( 'action-scheduler' );
 		}
 
 		// Define the core views for the tools tab.
@@ -107,7 +112,7 @@ class WPForms_Tools {
 		$view_ids = call_user_func_array( 'array_merge', $views );
 
 		// Determine the current active settings tab.
-		$this->view = ! empty( $_GET['view'] ) ? esc_html( $_GET['view'] ) : 'import';
+		$this->view = ! empty( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : 'import'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// If the user tries to load an invalid view - fallback to the first available.
 		if (
@@ -119,6 +124,11 @@ class WPForms_Tools {
 
 		if ( empty( $this->view ) ) {
 			return;
+		}
+
+		// This is required to catch all manual "Cancel" and "Run" events performed for hooks.
+		if ( 'action-scheduler' === $this->view && class_exists( 'ActionScheduler_AdminView' ) ) {
+			ActionScheduler_AdminView::instance()->process_admin_ui();
 		}
 
 		if ( in_array( $this->view, array( 'import', 'importer' ), true ) ) {
@@ -133,14 +143,14 @@ class WPForms_Tools {
 			}
 
 			// Load the Underscores templates for importers.
-			add_action( 'admin_print_scripts', array( $this, 'importer_templates' ) );
+			add_action( 'admin_print_scripts', [ $this, 'importer_templates' ] );
 		}
 
 		// Retrieve available forms.
-		$this->forms = wpforms()->form->get( '', array( 'orderby' => 'title' ) );
+		$this->forms = wpforms()->form->get( '', [ 'orderby' => 'title' ] );
 
-		add_action( 'wpforms_tools_init', array( $this, 'import_export_process' ) );
-		add_action( 'wpforms_admin_page', array( $this, 'output' ) );
+		add_action( 'wpforms_tools_init', [ $this, 'import_export_process' ] );
+		add_action( 'wpforms_admin_page', [ $this, 'output' ] );
 
 		// Hook for addons.
 		do_action( 'wpforms_tools_init' );
@@ -162,19 +172,19 @@ class WPForms_Tools {
 		}
 		?>
 
-		<div id="wpforms-tools" class="wrap wpforms-admin-wrap">
+		<div id="wpforms-tools" class="wrap wpforms-admin-wrap wpforms-tools-tab-<?php echo esc_attr( $this->view ); ?>">
 
 			<?php
 			if ( $show_nav ) {
 				echo '<ul class="wpforms-admin-tabs">';
 				foreach ( $this->views as $label => $view ) {
 					$view  = (array) $view;
-					$class = in_array( $this->view, $view, true ) ? ' class="active"' : '';
+					$class = in_array( $this->view, $view, true ) ? 'active' : '';
 					echo '<li>';
 						printf(
-							'<a href="%s"%s>%s</a>',
-							admin_url( 'admin.php?page=wpforms-tools&view=' . sanitize_key( $view[0] ) ),
-							$class,
+							'<a href="%1$s" class="%2$s">%3$s</a>',
+							esc_url( admin_url( 'admin.php?page=wpforms-tools&view=' . sanitize_key( $view[0] ) ) ),
+							sanitize_html_class( $class ),
 							esc_html( $label )
 						);
 					echo '</li>';
@@ -185,23 +195,18 @@ class WPForms_Tools {
 
 			<h1 class="wpforms-h1-placeholder"></h1>
 
-			<?php
+			<?php // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( isset( $_GET['wpforms_notice'] ) && 'forms-imported' === $_GET['wpforms_notice'] ) {
 				?>
 				<div class="updated notice is-dismissible">
 					<p>
 						<?php
 						printf(
-							wp_kses(
-								/* translators: %s - Forms list page URL. */
+							wp_kses( /* translators: %s - Forms list page URL. */
 								__( 'Import was successfully finished. You can go and <a href="%s">check your forms</a>.', 'wpforms-lite' ),
-								array(
-									'a' => array(
-										'href' => array(),
-									),
-								)
+								[ 'a' => [ 'href' => [] ] ]
 							),
-							admin_url( 'admin.php?page=wpforms-overview' )
+							esc_url( admin_url( 'admin.php?page=wpforms-overview' ) )
 						);
 						?>
 					</p>
@@ -224,6 +229,9 @@ class WPForms_Tools {
 						break;
 					case 'import':
 						$this->import_tab();
+						break;
+					case 'action-scheduler':
+						$this->action_scheduler_tab();
 						break;
 					default:
 						do_action( 'wpforms_tools_display_tab_' . sanitize_key( $this->view ) );
@@ -276,7 +284,7 @@ class WPForms_Tools {
 					<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
 						<span class="choicesjs-select-wrap">
 							<select class="choicesjs-select" name="provider" required>
-								<option value=""><?php esc_html_e( 'Select previous contact form plugin...', 'wpforms-lite' ); ?></option>
+								<option value="" placeholder><?php esc_html_e( 'Select previous contact form plugin...', 'wpforms-lite' ); ?></option>
 								<?php
 								foreach ( $this->importers as $importer ) {
 									$status = '';
@@ -547,11 +555,12 @@ class WPForms_Tools {
 				<?php
 				if ( ! empty( $this->forms ) ) {
 					echo '<span class="choicesjs-select-wrap">';
-					echo '<select id="wpforms-tools-form-export" class="choicesjs-select" name="forms[]" multiple data-placeholder="' . esc_attr__( 'Select form(s)', 'wpforms-lite' ) . '">';
-					foreach ( $this->forms as $form ) {
-						printf( '<option value="%d">%s</option>', absint( $form->ID ), esc_html( $form->post_title ) );
-					}
-					echo '</select>';
+						echo '<select id="wpforms-tools-form-export" class="choicesjs-select" name="forms[]" multiple>';
+							printf( '<option value="" placeholder>%s</option>', esc_html__( 'Select Form(s)', 'wpforms-lite' ) );
+							foreach ( $this->forms as $form ) {
+								printf( '<option value="%d">%s</option>', absint( $form->ID ), esc_html( $form->post_title ) );
+							}
+						echo '</select>';
 					echo '</span>';
 				} else {
 					echo '<p>' . esc_html__( 'You need to create a form before you can use form export.', 'wpforms-lite' ) . '</p>';
@@ -597,11 +606,12 @@ class WPForms_Tools {
 				<?php
 				if ( ! empty( $this->forms ) ) {
 					echo '<span class="choicesjs-select-wrap">';
-					echo '<select id="wpforms-tools-form-template" class="choicesjs-select" name="form">';
-					foreach ( $this->forms as $form ) {
-						printf( '<option value="%d">%s</option>', absint( $form->ID ), esc_html( $form->post_title ) );
-					}
-					echo '</select>';
+						echo '<select id="wpforms-tools-form-template" class="choicesjs-select" name="form">';
+						printf( '<option value="" placeholder>%s</option>', esc_html__( 'Select a Template', 'wpforms-lite' ) );
+							foreach ( $this->forms as $form ) {
+								printf( '<option value="%d">%s</option>', absint( $form->ID ), esc_html( $form->post_title ) );
+							}
+						echo '</select>';
 					echo '</span>';
 				} else {
 					echo '<p>' . esc_html__( 'You need to create a form before you can generate a template.', 'wpforms-lite' ) . '</p>';
@@ -643,6 +653,20 @@ class WPForms_Tools {
 		</div>
 
 		<?php
+	}
+
+	/**
+	 * Scheduled Actions tab contents.
+	 *
+	 * @since 1.6.1
+	 */
+	public function action_scheduler_tab() {
+
+		if ( ! class_exists( 'ActionScheduler_AdminView' ) ) {
+			return;
+		}
+
+		ActionScheduler_AdminView::instance()->render_admin_ui();
 	}
 
 	/**

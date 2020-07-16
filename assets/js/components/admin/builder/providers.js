@@ -1,4 +1,4 @@
-/* global WPForms, jQuery, Map, wpforms_builder, wpforms_builder_providers, _ */
+/* global wpforms_builder, wpforms_builder_providers, wpf */
 
 var WPForms = window.WPForms || {};
 WPForms.Admin = WPForms.Admin || {};
@@ -51,7 +51,16 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 				'wpforms-providers-builder-content-connection-fields',
 				'wpforms-providers-builder-content-connection-conditionals'
 			]
-		}
+		},
+
+		/**
+		 * Form fields for the current state.
+		 *
+		 * @since 1.6.1.2
+		 *
+		 * @type {object}
+		 */
+		fields: {},
 	};
 
 	/**
@@ -381,8 +390,12 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 		 * Should be hooked into in addons, that need to work with DOM, templates etc.
 		 *
 		 * @since 1.4.7
+		 * @since 1.6.1.2 Added initialization for `__private.fields` property.
 		 */
 		ready: function() {
+
+			// Save a current form fields state.
+			__private.fields = $.extend( {}, wpf.getFields( false, true ) );
 
 			app.panelHolder = $( '#wpforms-panel-providers' );
 
@@ -399,6 +412,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 		 * Process all generic actions/events, mostly custom that were fired by our API.
 		 *
 		 * @since 1.4.7
+		 * @since 1.6.1.2 Added a calling `app.updateMapSelects()` method.
 		 */
 		bindActions: function() {
 
@@ -456,6 +470,11 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 						isShownOnce = true;
 					}
 				} );
+
+				// On "Fields" page additional update provider's field mapped items.
+				if ( 'fields' === wpf.getQueryString( 'view' ) ) {
+					app.updateMapSelects( $connectionBlocks );
+				}
 			} );
 
 			/*
@@ -469,6 +488,93 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 					wpf.savedState = wpf.getFormState( '#wpforms-builder-form');
 				}
 			} );
+		},
+
+		/**
+		 * Update selects for mapping if any form fields was added, deleted or changed.
+		 *
+		 * @since 1.6.1.2
+		 *
+		 * @param {object} $connections jQuery selector for active conenctions.
+		 */
+		updateMapSelects: function( $connections ) {
+
+			var fields = $.extend( {}, wpf.getFields() ),
+				currentSaveFields,
+				prevSaveFields;
+
+			// We should to detect changes for labels only.
+			currentSaveFields = _.mapObject( fields, function( field, key ) {
+
+				return field.label;
+			} );
+			prevSaveFields    = _.mapObject( __private.fields, function( field, key ) {
+
+				return field.label;
+			} );
+
+			// Check if form has any fields and if they have changed labels after previous saving process.
+			if (
+				( _.isEmpty( currentSaveFields ) && _.isEmpty( prevSaveFields ) ) ||
+				( JSON.stringify( currentSaveFields ) === JSON.stringify( prevSaveFields ) )
+			) {
+				return;
+			}
+
+			// Prepare a current form field IDs.
+			var fieldIds = Object.keys( currentSaveFields )
+				.map( function( id ) {
+
+					return parseInt( id, 10 );
+				} );
+
+			// Determine deleted field IDs - it's a diff between previous and current for field IDs.
+			var deleted = Object.keys( prevSaveFields )
+				.map( function( id ) {
+
+					return parseInt( id, 10 );
+				} )
+				.filter( function( id ) {
+
+					return ! fieldIds.includes( id );
+				} );
+
+			// Remove from mapping selects "deleted" fields.
+			for ( var index = 0; index < deleted.length; index++ ) {
+				$( '.wpforms-builder-provider-connection-fields-table .wpforms-builder-provider-connection-field-value option[value="' + deleted[ index ] + '"]', $connections ).remove();
+			}
+
+			var label, $exists;
+			for ( var id in fields ) {
+
+				// Prepare a field label.
+				label = fields[ id ].label ? wpf.sanitizeString( fields[ id ].label ) : wpforms_builder.field + ' #' + id;
+
+				// Try to find all select options by value.
+				$exists = $( '.wpforms-builder-provider-connection-fields-table .wpforms-builder-provider-connection-field-value option[value="' + id + '"]', $connections );
+
+				// If no option was found - add a new one for all selects.
+				if ( ! $exists.length ) {
+					$( '.wpforms-builder-provider-connection-fields-table .wpforms-builder-provider-connection-field-value', $connections ).append( $( '<option>', { value: id, text: label } ) );
+					continue;
+				}
+
+				// Update a field label if a previous and current labels not equal.
+				if ( wpf.sanitizeString( fields[ id ].label ) !== wpf.sanitizeString( prevSaveFields[ id ].label ) ) {
+					$exists.text( label );
+				}
+			}
+
+			// If selects for mapping was changed, that all form state was changed as well.
+			// That's why we need to re-save it.
+			if ( wpf.savedState !== wpf.getFormState( '#wpforms-builder-form' ) ) {
+				wpf.savedState = wpf.getFormState( '#wpforms-builder-form' );
+			}
+
+			// Save form fields state for next saving process.
+			__private.fields = fields;
+
+			app.panelHolder.trigger( 'WPForms.Admin.Builder.Providers.updatedMapSelects', [ $connections, fields ] );
 		},
 
 		/**

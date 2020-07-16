@@ -44,17 +44,19 @@ class WPForms_License {
 	}
 
 	/**
-	 * Load the license key.
+	 * Retrieve the license key.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return string
 	 */
 	public function get() {
 
 		// Check for license key.
-		$key = wpforms_setting( 'key', false, 'wpforms_license' );
+		$key = wpforms_setting( 'key', '', 'wpforms_license' );
 
 		// Allow wp-config constant to pass key.
-		if ( ! $key && defined( 'WPFORMS_LICENSE_KEY' ) ) {
+		if ( empty( $key ) && defined( 'WPFORMS_LICENSE_KEY' ) ) {
 			$key = WPFORMS_LICENSE_KEY;
 		}
 
@@ -65,12 +67,12 @@ class WPForms_License {
 	 * Load the license key level.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return string
 	 */
 	public function type() {
 
-		$type = wpforms_setting( 'type', false, 'wpforms_license' );
-
-		return $type;
+		return wpforms_setting( 'type', '', 'wpforms_license' );
 	}
 
 	/**

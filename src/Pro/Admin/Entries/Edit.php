@@ -865,9 +865,11 @@ class Edit {
 			return;
 		}
 
+		$form_data = $this->form_data;
+
 		$action = empty( $action ) ? 'validate' : $action;
 
-		foreach ( (array) $this->form_data['fields']  as $field_properties ) {
+		foreach ( (array) $form_data['fields']  as $field_properties ) {
 
 			if ( ! $this->is_field_entries_editable( $field_properties['type'] ) ) {
 				continue;
@@ -878,8 +880,23 @@ class Edit {
 			$field_submit = isset( $entry['fields'][ $field_id ] ) ? $entry['fields'][ $field_id ] : '';
 			$field_data   = ! empty( $this->entry_fields[ $field_id ] ) ? $this->entry_fields[ $field_id ] : $this->get_empty_entry_field_data( $field_properties );
 
+			if ( $action === 'validate' ) {
+
+				// Some fields can be `required` but have an empty value because the field is hidden by CL on the frontend.
+				// For cases like this we should allow empty value even for the `required` fields.
+				if (
+					! empty( $form_data['fields'][ $field_id ]['required'] ) &&
+					(
+						! isset( $field_data['value'] ) ||
+						(string) $field_data['value'] === ''
+					)
+				) {
+					unset( $form_data['fields'][ $field_id ]['required'] );
+				}
+			}
+
 			if ( $action === 'validate' || $action === 'format' ) {
-				$this->get_entries_edit_field_object( $field_type )->$action( $field_id, $field_submit, $field_data, $this->form_data );
+				$this->get_entries_edit_field_object( $field_type )->$action( $field_id, $field_submit, $field_data, $form_data );
 			}
 		}
 	}

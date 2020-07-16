@@ -92,13 +92,20 @@ class Export {
 	public $file;
 
 	/**
-	 * Constructor.
+	 * Initialize.
 	 *
-	 * @since 1.5.5
+	 * @since 1.6.1
 	 */
-	public function __construct() {
+	public function init() {
 
 		if ( ! wpforms_current_user_can( 'view_entries' ) ) {
+			return;
+		}
+
+		if (
+			! $this->is_entries_export_ajax() &&
+			! $this->is_tools_export_page()
+		) {
 			return;
 		}
 
@@ -354,10 +361,61 @@ class Export {
 			return false;
 		}
 
-		// Check for user with correct capabilities.
-		if ( ! wpforms_current_user_can( 'view_entries' ) ) {
+		return true;
+	}
+
+	/**
+	 * Helper function to determine if it is entries export ajax request.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @return bool
+	 */
+	public function is_entries_export_ajax() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		if ( ! wp_doing_ajax() ) {
 			return false;
 		}
+
+		$ref = wp_get_referer();
+
+		if ( ! $ref ) {
+			return false;
+		}
+
+		$query = wp_parse_url( $ref, PHP_URL_QUERY );
+		wp_parse_str( $query, $query_vars );
+
+		if (
+			empty( $query_vars['page'] ) ||
+			empty( $query_vars['view'] )
+		) {
+			return false;
+		}
+
+		if (
+			$query_vars['page'] !== 'wpforms-tools' ||
+			$query_vars['view'] !== 'export'
+		) {
+			return false;
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if (
+			empty( $_REQUEST['action'] ) ||
+			empty( $_REQUEST['nonce'] ) ||
+			( empty( $_REQUEST['form'] ) && empty( $_REQUEST['request_id'] ) )
+		) {
+			return false;
+		}
+
+		if (
+			$_REQUEST['action'] !== 'wpforms_tools_entries_export_form_data' &&
+			$_REQUEST['action'] !== 'wpforms_tools_entries_export_step'
+		) {
+			return false;
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		return true;
 	}

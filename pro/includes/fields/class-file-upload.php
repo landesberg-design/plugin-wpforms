@@ -94,6 +94,8 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		// Remove file ajax route.
 		add_action( 'wp_ajax_wpforms_remove_file', array( $this, 'ajax_modern_remove' ) );
 		add_action( 'wp_ajax_nopriv_wpforms_remove_file', array( $this, 'ajax_modern_remove' ) );
+
+		add_filter( 'robots_txt', array( $this, 'disallow_upload_dir_indexing' ), -42 );
 	}
 
 	/**
@@ -875,50 +877,41 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		}
 
 		// Define data.
-		$file_name            = sanitize_file_name( $file['name'] );
-		$file_ext             = pathinfo( $file_name, PATHINFO_EXTENSION );
-		$file_base            = wp_basename( $file_name, '.' . $file_ext );
-		$file_name_new        = sprintf( '%s-%s.%s', $file_base, wp_hash( wp_rand() . microtime() . $this->form_id . $this->field_id ), strtolower( $file_ext ) );
-		$uploads              = wp_upload_dir();
-		$wpforms_uploads_root = trailingslashit( $uploads['basedir'] ) . 'wpforms';
-
-		// Add filter to allow redefine store directory.
-		$custom_uploads_root = apply_filters( 'wpforms_upload_root', $wpforms_uploads_root );
-		if ( wp_is_writable( $custom_uploads_root ) ) {
-			$wpforms_uploads_root = $custom_uploads_root;
-		}
+		$file_name     = sanitize_file_name( $file['name'] );
+		$file_ext      = pathinfo( $file_name, PATHINFO_EXTENSION );
+		$file_base     = wp_basename( $file_name, '.' . $file_ext );
+		$file_name_new = sprintf( '%s-%s.%s', $file_base, wp_hash( wp_rand() . microtime() . $this->form_id . $this->field_id ), strtolower( $file_ext ) );
+		$upload_dir    = wpforms_upload_dir();
+		$upload_path   = $upload_dir['path'];
 
 		// Old dir.
-		$form_directory       = absint( $this->form_id ) . '-' . md5( $this->form_id . $this->form_data['created'] );
-		$wpforms_uploads_form = trailingslashit( $wpforms_uploads_root ) . $form_directory;
+		$form_directory   = absint( $this->form_id ) . '-' . md5( $this->form_id . $this->form_data['created'] );
+		$upload_path_form = trailingslashit( $upload_path ) . $form_directory;
 
 		// Check for form upload directory destination.
-		if ( ! file_exists( $wpforms_uploads_form ) ) {
+		if ( ! file_exists( $upload_path_form ) ) {
 
 			// New one.
-			$form_directory       = absint( $this->form_id ) . '-' . wp_hash( $this->form_data['created'] . $this->form_id );
-			$wpforms_uploads_form = trailingslashit( $wpforms_uploads_root ) . $form_directory;
+			$form_directory   = absint( $this->form_id ) . '-' . wp_hash( $this->form_data['created'] . $this->form_id );
+			$upload_path_form = trailingslashit( $upload_path ) . $form_directory;
 
 			// Check once again and make directory if it's not exists.
-			if ( ! file_exists( $wpforms_uploads_form ) ) {
-				wp_mkdir_p( $wpforms_uploads_form );
+			if ( ! file_exists( $upload_path_form ) ) {
+				wp_mkdir_p( $upload_path_form );
 			}
 		}
-		$file_new      = trailingslashit( $wpforms_uploads_form ) . $file_name_new;
+		$file_new      = trailingslashit( $upload_path_form ) . $file_name_new;
 		$file_name_new = wp_basename( trailingslashit( dirname( $file_new ) ) . $file_name_new );
 		$file_new      = trailingslashit( dirname( $file_new ) ) . $file_name_new;
-		$file_url      = trailingslashit( $uploads['baseurl'] ) . 'wpforms/' . trailingslashit( $form_directory ) . $file_name_new;
+		$file_url      = trailingslashit( $upload_dir['url'] ) . trailingslashit( $form_directory ) . $file_name_new;
 		$attachment_id = '0';
 
-		// Check if the index.html exists in the root uploads director, if not - create it.
-		if ( ! file_exists( trailingslashit( $wpforms_uploads_root ) . 'index.html' ) ) {
-			file_put_contents( trailingslashit( $wpforms_uploads_root ) . 'index.html', '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-		}
+		// Check if the .htaccess exists in the upload directory, if not - create it.
+		wpforms_create_upload_dir_htaccess_file();
 
-		// Check if the index.html exists in the form uploads director, if not - create it.
-		if ( ! file_exists( trailingslashit( $wpforms_uploads_form ) . 'index.html' ) ) {
-			file_put_contents( trailingslashit( $wpforms_uploads_form ) . 'index.html', '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-		}
+		// Check if the index.html exists in the directories, if not - create it.
+		wpforms_create_index_html_file( $upload_path );
+		wpforms_create_index_html_file( $upload_path_form );
 
 		// Move the file to the uploads dir - similar to _wp_handle_upload().
 		$move_new_file = @move_uploaded_file( $file['tmp_name'], $file_new ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
@@ -956,10 +949,11 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			$upload    = wp_handle_sideload( $file_args, array( 'test_form' => false ) );
 
 			if ( ! empty( $upload['file'] ) ) {
-				// Create an attachment for the file.
+				// Create a Media attachment for the file.
 				$attachment_id = wp_insert_attachment(
 					array(
-						'post_title'     => $this->field_data['label'],
+						'post_title'     => $this->get_wp_media_file_title( $file ),
+						'post_content'   => $this->get_wp_media_file_desc( $file ),
 						'post_status'    => 'publish',
 						'post_mime_type' => $file['type'],
 					),
@@ -1064,6 +1058,13 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			return;
 		}
 
+		wpforms_create_upload_dir_htaccess_file();
+
+		$upload_dir = wpforms_upload_dir();
+		if ( empty( $upload_dir['error'] ) ) {
+			wpforms_create_index_html_file( $upload_dir['path'] );
+		}
+
 		$data = array();
 
 		foreach ( $files as $file ) {
@@ -1166,7 +1167,8 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		// Create a Media attachment for the file.
 		$attachment_id = wp_insert_attachment(
 			array(
-				'post_title'     => $this->field_data['label'],
+				'post_title'     => $this->get_wp_media_file_title( $file ),
+				'post_content'   => $this->get_wp_media_file_desc( $file ),
 				'post_status'    => 'publish',
 				'post_mime_type' => $file['type'],
 			),
@@ -1191,6 +1193,52 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$file['attachment_id'] = $attachment_id;
 
 		return $file;
+	}
+
+	/**
+	 * Generate an attachment title used in WP Media library for an uploaded file.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param array $file File data.
+	 *
+	 * @return string
+	 */
+	private function get_wp_media_file_title( $file ) {
+
+		$title = apply_filters(
+			'wpforms_field_' . $this->type . '_media_file_title',
+			sprintf(
+				'%s: %s',
+				$this->field_data['label'],
+				$file['name']
+			),
+			$file,
+			$this->field_data
+		);
+
+		return wpforms_sanitize_text_deeply( $title );
+	}
+
+	/**
+	 * Generate an attachment description used in WP Media library for an uploaded file.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param array $file File data.
+	 *
+	 * @return string
+	 */
+	private function get_wp_media_file_desc( $file ) {
+
+		$desc = apply_filters(
+			'wpforms_field_' . $this->type . '_media_file_desc',
+			$this->field_data['description'],
+			$file,
+			$this->field_data
+		);
+
+		return wp_kses_post_deep( $desc );
 	}
 
 	/**
@@ -1586,12 +1634,12 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 */
 	protected function get_form_files_dir() {
 
-		$uploads = wp_upload_dir();
-		$folder  = absint( $this->form_data['id'] ) . '-' . wp_hash( $this->form_data['created'] . $this->form_data['id'] );
+		$upload_dir = wpforms_upload_dir();
+		$folder     = absint( $this->form_data['id'] ) . '-' . wp_hash( $this->form_data['created'] . $this->form_data['id'] );
 
 		return array(
-			'path' => "{$uploads['basedir']}/wpforms/{$folder}",
-			'url'  => "{$uploads['baseurl']}/wpforms/{$folder}",
+			'path' => trailingslashit( $upload_dir['path'] ) . $folder,
+			'url'  => trailingslashit( $upload_dir['url'] ) . $folder,
 		);
 	}
 
@@ -1604,18 +1652,15 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 */
 	protected function get_tmp_dir() {
 
-		$uploads  = wp_upload_dir();
-		$tmp_root = untrailingslashit( $uploads['basedir'] ) . '/wpforms/tmp';
+		$upload_dir = wpforms_upload_dir();
+		$tmp_root   = $upload_dir['path'] . '/tmp';
 
 		if ( ! file_exists( $tmp_root ) || ! wp_is_writable( $tmp_root ) ) {
 			wp_mkdir_p( $tmp_root );
 		}
 
-		$index = trailingslashit( $tmp_root ) . 'index.html';
-
-		if ( ! file_exists( $index ) ) {
-			file_put_contents( $index, '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-		}
+		// Check if the index.html exists in the directory, if not - create it.
+		wpforms_create_index_html_file( $tmp_root );
 
 		return $tmp_root;
 	}
@@ -1635,11 +1680,8 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wp_mkdir_p( $path );
 		}
 
-		$index = wp_normalize_path( $path . '/index.html' );
-
-		if ( ! file_exists( $index ) ) {
-			file_put_contents( $index, '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-		}
+		// Check if the index.html exists in the path, if not - create it.
+		wpforms_create_index_html_file( $path );
 
 		return $path;
 	}
@@ -1776,6 +1818,38 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	protected function is_media_integrated() {
 
 		return ! empty( $this->field_data['media_library'] ) && '1' === $this->field_data['media_library'];
+	}
+
+	/**
+	 * Disallow WPForms upload directory indexing in robots.txt.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param string $output Robots.txt output.
+	 *
+	 * @return string
+	 */
+	public function disallow_upload_dir_indexing( $output ) {
+
+		$upload_dir = wpforms_upload_dir();
+
+		if ( ! empty( $upload_dir['error'] ) ) {
+			return $output;
+		}
+
+		$site_url = site_url();
+
+		$upload_root = str_replace( $site_url, '', $upload_dir['url'] );
+		$upload_root = trailingslashit( $upload_root );
+
+		$site_url_parts = wp_parse_url( $site_url );
+		if ( ! empty( $site_url_parts['path'] ) ) {
+			$upload_root = $site_url_parts['path'] . $upload_root;
+		}
+
+		$output .= "Disallow: $upload_root\n";
+
+		return $output;
 	}
 }
 
