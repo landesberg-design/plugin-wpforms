@@ -77,7 +77,7 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 */
 		init: function() {
 
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

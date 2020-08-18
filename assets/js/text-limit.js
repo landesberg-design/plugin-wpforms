@@ -62,6 +62,36 @@
 	}
 
 	/**
+	 * Count words in the string.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @param {string} string String value.
+	 *
+	 * @returns {number} Words count.
+	 */
+	function countWords( string ) {
+
+		if ( typeof string !== 'string' ) {
+			return 0;
+		}
+
+		if ( ! string.length ) {
+			return 0;
+		}
+
+		[
+			/([A-Z]+),([A-Z]+)/gi,
+			/([0-9]+),([A-Z]+)/gi,
+			/([A-Z]+),([0-9]+)/gi,
+		].forEach( function( pattern ) {
+			string = string.replace( pattern, '$1, $2' );
+		} );
+
+		return string.split( /\s+/ ).length;
+	}
+
+	/**
 	 * Keyup/Keydown event higher order function for words limit.
 	 *
 	 * @since 1.5.6
@@ -75,17 +105,18 @@
 
 		return function( e ) {
 
-			var words = this.value.trim().split( /\s+/ );
-
-			if ( e.keyCode === 32 && words.length >= limit ) {
-				e.preventDefault();
-			}
+			var value = this.value.trim(),
+				words = countWords( value );
 
 			hint.textContent = renderHint(
 				window.wpforms_settings.val_limit_words,
-				words.length,
+				words,
 				limit
 			);
+
+			if ( ( e.keyCode === 32 || e.keyCode === 188 ) && words >= limit ) {
+				e.preventDefault();
+			}
 		};
 	}
 
@@ -184,7 +215,7 @@
 						e.dataset.fieldId,
 						renderHint(
 							window.wpforms_settings.val_limit_words,
-							e.value.trim().split( /\s+/ ).length,
+							countWords( e.value.trim() ),
 							limit
 						)
 					);

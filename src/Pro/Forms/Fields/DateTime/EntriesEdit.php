@@ -66,11 +66,29 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 	 */
 	public function field_display( $entry_field, $field, $form_data ) {
 
+		// Properly populate subfields with the value.
 		$inputs = [ 'date', 'time' ];
 		foreach ( $inputs as $input ) {
-			if ( ! empty( $entry_field[ $input ] ) ) {
-				$field['properties'] = $this->field_object->get_field_populated_single_property_value_public( $entry_field[ $input ], $input, $field['properties'], $field );
+
+			// Skip if value is empty.
+			if ( empty( $entry_field[ $input ] ) ) {
+				continue;
 			}
+
+			// Populate date dropdowns.
+			if ( $input === 'date' && $field['date_type'] === 'dropdown' ) {
+				$field['properties']['inputs']['date']['default'] = [
+					'd' => gmdate( 'd', $entry_field['unix'] ),
+					'm' => gmdate( 'm', $entry_field['unix'] ),
+					'y' => gmdate( 'Y', $entry_field['unix'] ),
+				];
+				continue;
+			}
+
+			// Generate input value according to the datetime format.
+			$input_format        = ! empty( $field[ $input . '_format' ] ) ? $field[ $input . '_format' ] : 'm/d/Y';
+			$input_value         = ! empty( $entry_field['unix'] ) ? gmdate( $input_format, $entry_field['unix'] ) : $entry_field[ $input ];
+			$field['properties'] = $this->field_object->get_field_populated_single_property_value_public( $input_value, $input, $field['properties'], $field );
 		}
 
 		$this->field_object->field_display( $field, null, $form_data );

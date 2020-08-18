@@ -30,7 +30,7 @@
 			s = this.settings;
 
 			// Document ready.
-			$( document ).ready( WPFormsAdmin.ready );
+			$( WPFormsAdmin.ready );
 
 			// Forms Overview.
 			WPFormsAdmin.initFormOverview();

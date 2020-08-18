@@ -35,7 +35,7 @@ var WPFormsPagesAnalytics = window.WPFormsPagesAnalytics || ( function( document
 		 */
 		init: function() {
 
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

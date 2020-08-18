@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Form front-end rendering.
  *
@@ -68,7 +69,6 @@ class WPForms_Frontend {
 		add_action( 'wpforms_display_field_after', array( $this, 'field_error' ), 3, 2 );
 		add_action( 'wpforms_display_field_after', array( $this, 'field_description' ), 5, 2 );
 		add_action( 'wpforms_display_field_after', array( $this, 'field_container_close' ), 15, 2 );
-		add_action( 'wpforms_frontend_output', array( $this, 'honeypot' ), 15, 5 );
 		add_action( 'wpforms_frontend_output', array( $this, 'recaptcha' ), 20, 5 );
 		add_action( 'wpforms_frontend_output', array( $this, 'foot' ), 25, 5 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'assets_header' ) );
@@ -1187,12 +1187,28 @@ class WPForms_Frontend {
 			true
 		);
 
+		$this->assets_recaptcha();
+	}
+
+	/**
+	 * Load the assets needed for the Google's reCaptcha.
+	 *
+	 * @since 1.6.2
+	 */
+	public function assets_recaptcha() {
+
+		// Kill switch for recaptcha.
+		if ( (bool) apply_filters( 'wpforms_frontend_recaptcha_disable', false ) ) {
+			return;
+		}
+
 		// Load reCAPTCHA support if form supports it.
 		$site_key   = wpforms_setting( 'recaptcha-site-key' );
 		$secret_key = wpforms_setting( 'recaptcha-secret-key' );
 		$type       = wpforms_setting( 'recaptcha-type', 'v2' );
 		$recaptcha  = false;
 
+		// Whether at least 1 form on a page has recaptcha enabled.
 		foreach ( $this->forms as $form ) {
 			if ( ! empty( $form['settings']['recaptcha'] ) ) {
 				$recaptcha = true;
@@ -1217,16 +1233,17 @@ class WPForms_Frontend {
 				null,
 				true
 			);
+
 			if ( 'v3' === $type ) {
-				$recaptch_inline = 'var wpformsRecaptchaLoad = function(){grecaptcha.execute("' . esc_html( $site_key ) . '",{action:"wpforms"}).then(function(token){var f=document.getElementsByName("wpforms[recaptcha]");for(var i=0;i<f.length;i++){f[i].value = token;}});}; grecaptcha.ready(wpformsRecaptchaLoad);';
+				$recaptcha_inline = 'var wpformsRecaptchaLoad = function(){grecaptcha.execute("' . esc_html( $site_key ) . '",{action:"wpforms"}).then(function(token){var f=document.getElementsByName("wpforms[recaptcha]");for(var i=0;i<f.length;i++){f[i].value = token;}});}; grecaptcha.ready(wpformsRecaptchaLoad);';
 			} elseif ( 'invisible' === $type ) {
-				$recaptch_inline  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index,el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).closest("form").find("button[type=submit]").get(0).recaptchaID = recaptchaID;});};';
-				$recaptch_inline .= 'var wpformsRecaptchaCallback = function(el){var $form = jQuery(el).closest("form");if(typeof wpforms.formSubmit === "function"){wpforms.formSubmit($form);}else{$form.find("button[type=submit]").get(0).recaptchaID = false;$form.submit();}};';
+				$recaptcha_inline  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index,el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).closest("form").find("button[type=submit]").get(0).recaptchaID = recaptchaID;});};';
+				$recaptcha_inline .= 'var wpformsRecaptchaCallback = function(el){var $form = jQuery(el).closest("form");if(typeof wpforms.formSubmit === "function"){wpforms.formSubmit($form);}else{$form.find("button[type=submit]").get(0).recaptchaID = false;$form.submit();}};';
 			} else {
-				$recaptch_inline  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).attr( "data-recaptcha-id", recaptchaID);});};';
-				$recaptch_inline .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
+				$recaptcha_inline  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).attr( "data-recaptcha-id", recaptchaID);});};';
+				$recaptcha_inline .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
 			}
-			wp_add_inline_script( 'wpforms-recaptcha', $recaptch_inline );
+			wp_add_inline_script( 'wpforms-recaptcha', $recaptcha_inline );
 		}
 	}
 
@@ -1307,6 +1324,7 @@ class WPForms_Frontend {
 			'val_limit_characters'       => esc_html__( '{count} of {limit} max characters.', 'wpforms-lite' ),
 			'val_limit_words'            => esc_html__( '{count} of {limit} max words.', 'wpforms-lite' ),
 			'val_recaptcha_fail_msg'     => wpforms_setting( 'recaptcha-fail-msg', esc_html__( 'Google reCAPTCHA verification failed, please try again later.', 'wpforms-lite' ) ),
+			'val_empty_blanks'           => wpforms_setting( 'validation-input-mask-incomplete', esc_html__( 'Please fill out all blanks.', 'wpforms-lite' ) ),
 			'post_max_size'              => wpforms_size_to_bytes( ini_get( 'post_max_size' ) ),
 			'uuid_cookie'                => false,
 			'locale'                     => wpforms_get_language_code(),

@@ -509,24 +509,6 @@ function wpforms_size_to_bytes( $size ) {
 }
 
 /**
- * Convert bytes to megabytes (or in some cases KB).
- *
- * @since 1.0.0
- *
- * @param int $bytes Bytes to convert to a readable format.
- *
- * @return string
- */
-function wpforms_size_to_megabytes( $bytes ) {
-
-	if ( $bytes < 1048676 ) {
-		return number_format( $bytes / 1024, 1 ) . ' KB';
-	}
-
-	return round( number_format( $bytes / 1048576, 1 ) ) . ' MB';
-}
-
-/**
  * Convert a file size provided, such as "2M", to bytes.
  *
  * @link http://stackoverflow.com/a/22500394
@@ -544,7 +526,7 @@ function wpforms_max_upload( $bytes = false ) {
 		return $max;
 	}
 
-	return wpforms_size_to_megabytes( $max );
+	return size_format( $max );
 }
 
 /**
@@ -572,10 +554,6 @@ function wpforms_get_form_fields( $form = false, $whitelist = array() ) {
 				'content_only' => true,
 			)
 		);
-	}
-
-	if ( ! is_array( $form ) || empty( $form['fields'] ) ) {
-		return false;
 	}
 
 	// White list of field types to allow.
@@ -607,6 +585,10 @@ function wpforms_get_form_fields( $form = false, $whitelist = array() ) {
 		'net_promoter_score',
 	);
 	$allowed_form_fields = apply_filters( 'wpforms_get_form_fields_allowed', $allowed_form_fields );
+
+	if ( ! is_array( $form ) || empty( $form['fields'] ) ) {
+		return false;
+	}
 
 	$whitelist = ! empty( $whitelist ) ? $whitelist : $allowed_form_fields;
 
@@ -2172,7 +2154,7 @@ function wpforms_is_frontend_ajax() {
 		return false;
 	}
 
-	$ref = wp_get_referer();
+	$ref = wp_get_raw_referer();
 
 	if ( ! $ref ) {
 		return false;
@@ -2255,6 +2237,42 @@ function wpforms_dequeue_scripts_by_uri( $uris ) {
 function wpforms_dequeue_styles_by_uri( $uris ) {
 
 	wpforms_dequeue_by_uri( $uris, wp_styles() );
+}
+
+/**
+ * Count words in the string.
+ *
+ * @since 1.6.2
+ *
+ * @param string $string String value.
+ *
+ * @return integer Words count.
+ */
+function wpforms_count_words( $string ) {
+
+	if ( ! is_string( $string ) ) {
+		return 0;
+	}
+
+	$patterns = [
+		'/([A-Z]+),([A-Z]+)/i',
+		'/([0-9]+),([A-Z]+)/i',
+		'/([A-Z]+),([0-9]+)/i',
+	];
+
+	foreach ( $patterns as $pattern ) {
+		$string = preg_replace_callback(
+			$pattern,
+			function( $matches ) {
+				return $matches[1] . ', ' . $matches[2];
+			},
+			$string
+		);
+	}
+
+	$words = preg_split( '/[\s]+/', $string );
+
+	return is_array( $words ) ? count( $words ) : 0;
 }
 
 /**
@@ -2356,4 +2374,45 @@ function wpforms_create_upload_dir_htaccess_file() {
 </IfModule>';
 
 	return insert_with_markers( $htaccess_file, 'WPForms', $contents );
+}
+
+/**
+ * Check if Gutenberg is active.
+ *
+ * @since 1.6.2
+ *
+ * @return bool True if Gutenberg is active.
+ */
+function wpforms_is_gutenberg_active() {
+
+	$gutenberg    = false;
+	$block_editor = false;
+
+	if ( has_filter( 'replace_editor', 'gutenberg_init' ) ) {
+		// Gutenberg is installed and activated.
+		$gutenberg = true;
+	}
+
+	if ( version_compare( $GLOBALS['wp_version'], '5.0-beta', '>' ) ) {
+		// Block editor.
+		$block_editor = true;
+	}
+
+	if ( ! $gutenberg && ! $block_editor ) {
+		return false;
+	}
+
+	include_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+	if ( is_plugin_active( 'disable-gutenberg/disable-gutenberg.php' ) ) {
+
+		return ! disable_gutenberg();
+	}
+
+	if ( is_plugin_active( 'classic-editor/classic-editor.php' ) ) {
+
+		return get_option( 'classic-editor-replace' ) === 'block';
+	}
+
+	return true;
 }

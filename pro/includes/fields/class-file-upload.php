@@ -1,5 +1,7 @@
 <?php
 
+use WPForms\Pro\Forms\Fields\FileUpload\Chunk;
+
 /**
  * File upload field.
  *
@@ -14,7 +16,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 *
 	 * @var string
 	 */
-	const DROPZONE_VERSION = '5.5.0';
+	const DROPZONE_VERSION = '5.7.1';
 
 	/**
 	 * Classic (old) style of file uploader field.
@@ -50,7 +52,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 *
 	 * @var array
 	 */
-	private $blacklist = array( 'ade', 'adp', 'app', 'asp', 'bas', 'bat', 'cer', 'cgi', 'chm', 'cmd', 'com', 'cpl', 'crt', 'csh', 'csr', 'dll', 'drv', 'exe', 'fxp', 'flv', 'hlp', 'hta', 'htaccess', 'htm', 'html', 'htpasswd', 'inf', 'ins', 'isp', 'jar', 'js', 'jse', 'jsp', 'ksh', 'lnk', 'mdb', 'mde', 'mdt', 'mdw', 'msc', 'msi', 'msp', 'mst', 'ops', 'pcd', 'php', 'pif', 'pl', 'prg', 'ps1', 'ps2', 'py', 'rb', 'reg', 'scr', 'sct', 'sh', 'shb', 'shs', 'sys', 'swf', 'tmp', 'torrent', 'url', 'vb', 'vbe', 'vbs', 'vbscript', 'wsc', 'wsf', 'wsf', 'wsh', 'dfxp', 'onetmp' );
+	private $denylist = array( 'ade', 'adp', 'app', 'asp', 'bas', 'bat', 'cer', 'cgi', 'chm', 'cmd', 'com', 'cpl', 'crt', 'csh', 'csr', 'dll', 'drv', 'exe', 'fxp', 'flv', 'hlp', 'hta', 'htaccess', 'htm', 'html', 'htpasswd', 'inf', 'ins', 'isp', 'jar', 'js', 'jse', 'jsp', 'ksh', 'lnk', 'mdb', 'mde', 'mdt', 'mdw', 'msc', 'msi', 'msp', 'mst', 'ops', 'pcd', 'php', 'pif', 'pl', 'prg', 'ps1', 'ps2', 'py', 'rb', 'reg', 'scr', 'sct', 'sh', 'shb', 'shs', 'sys', 'swf', 'tmp', 'torrent', 'url', 'vb', 'vbe', 'vbs', 'vbscript', 'wsc', 'wsf', 'wsf', 'wsh', 'dfxp', 'onetmp' );
 
 	/**
 	 * Primary class constructor.
@@ -88,12 +90,32 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		add_action( 'wpforms_process_format_after', array( $this, 'format_conditional' ), 6, 1 );
 
 		// Upload file ajax route.
+		add_action( 'wp_ajax_wpforms_file_upload_speed_test', 'wp_send_json_success' );
+		add_action( 'wp_ajax_nopriv_wpforms_file_upload_speed_test', 'wp_send_json_success' );
+
+		// TODO: perhaps remove, chunks uploading replaces this.
 		add_action( 'wp_ajax_wpforms_upload_file', array( $this, 'ajax_modern_upload' ) );
 		add_action( 'wp_ajax_nopriv_wpforms_upload_file', array( $this, 'ajax_modern_upload' ) );
+
+		// Ajax handlers for newest uploads (With chunks and parallel support).
+		add_action( 'wp_ajax_wpforms_upload_chunk_init', array( $this, 'ajax_chunk_upload_init' ) );
+		add_action( 'wp_ajax_nopriv_wpforms_upload_chunk_init', array( $this, 'ajax_chunk_upload_init' ) );
+
+		add_action( 'wp_ajax_wpforms_upload_chunk', array( $this, 'ajax_chunk_upload' ) );
+		add_action( 'wp_ajax_nopriv_wpforms_upload_chunk', array( $this, 'ajax_chunk_upload' ) );
+
+		add_action( 'wp_ajax_wpforms_file_chunks_uploaded', array( $this, 'ajax_chunk_upload_finalize' ) );
+		add_action( 'wp_ajax_nopriv_wpforms_file_chunks_uploaded', array( $this, 'ajax_chunk_upload_finalize' ) );
 
 		// Remove file ajax route.
 		add_action( 'wp_ajax_wpforms_remove_file', array( $this, 'ajax_modern_remove' ) );
 		add_action( 'wp_ajax_nopriv_wpforms_remove_file', array( $this, 'ajax_modern_remove' ) );
+
+		// phpcs:ignore WordPress.Security.NonceVerification
+		if ( ! empty( $_POST['slow'] ) && 'true' === $_POST['slow'] && ! empty( $this->ajax_validate_form_field_modern() ) ) {
+			add_action( 'wpforms_file_upload_chunk_parallel', '__return_false' );
+			add_action( 'wpforms_file_upload_chunk_size', array( $this, 'get_slow_connection_chunk_size' ) );
+		}
 
 		add_filter( 'robots_txt', array( $this, 'disallow_upload_dir_indexing' ), -42 );
 	}
@@ -663,10 +685,11 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 					'field_id'        => (int) $field['id'],
 					'form_id'         => (int) $form_data['id'],
 					'url'             => admin_url( 'admin-ajax.php' ),
-					'input_name'      => 'wpforms_' . $form_data['id'] . '_' . $field['id'],
+					'input_name'      => $this->get_input_name(),
 					'required'        => $primary['required'],
 					'extensions'      => $primary['data']['rule-extension'],
 					'max_size'        => abs( $primary['data']['rule-maxsize'] ),
+					'chunk_size'      => $this->get_chunk_size(),
 					'max_file_number' => $max_file_number,
 					'preview_hint'    => str_replace( self::TEMPLATE_MAXFILENUM, $max_file_number, $strings['preview_hint'] ),
 					'post_max_size'   => wp_max_upload_size(),
@@ -681,6 +704,52 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 				$primary['required'] // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			);
 		}
+	}
+
+	/**
+	 * Input name.
+	 *
+	 * The input name is name in which the data is expected to be sent in from the client.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @return string
+	 */
+	public function get_input_name() {
+
+		return sprintf( 'wpforms_%d_%d', $this->form_id, $this->field_id );
+	}
+
+	/**
+	 * Maximum size for a chunk in file uploads.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @return int
+	 */
+	public function get_chunk_size() {
+
+		return min(
+			apply_filters( 'wpforms_file_upload_chunk_size', 2 * 1024 * 1024 ),
+			wp_max_upload_size(),
+			$this->max_file_size()
+		);
+	}
+
+	/**
+	 * Maximum chunk for slow connections.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @return int Chunk size expected for slow connections.
+	 */
+	public function get_slow_connection_chunk_size() {
+
+		return min(
+			512 * 1024,
+			wp_max_upload_size(),
+			$this->max_file_size()
+		);
 	}
 
 	/**
@@ -700,7 +769,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$this->field_id   = absint( $field_id );
 		$this->field_data = $this->form_data['fields'][ $this->field_id ];
 
-		$input_name = sprintf( 'wpforms_%d_%d', $this->form_id, $this->field_id );
+		$input_name = $this->get_input_name();
 		$style      = ! empty( $this->field_data['style'] ) ? $this->field_data['style'] : self::STYLE_CLASSIC;
 
 		// Add modern validate.
@@ -976,14 +1045,15 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		// Set final field details.
 		wpforms()->process->fields[ $this->field_id ] = array(
-			'name'          => sanitize_text_field( $field_label ),
-			'value'         => esc_url_raw( $file_url ),
-			'file'          => $file_name_new,
-			'file_original' => $file_name,
-			'ext'           => $file_ext,
-			'attachment_id' => absint( $attachment_id ),
-			'id'            => absint( $this->field_id ),
-			'type'          => $this->type,
+			'name'           => sanitize_text_field( $field_label ),
+			'value'          => esc_url_raw( $file_url ),
+			'file'           => $file_name_new,
+			'file_original'  => $file_name,
+			'file_user_name' => sanitize_text_field( $file['name'] ),
+			'ext'            => $file_ext,
+			'attachment_id'  => absint( $attachment_id ),
+			'id'             => absint( $this->field_id ),
+			'type'           => $this->type,
 		);
 
 		// Save field CL visibility state after field processing.
@@ -1048,7 +1118,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			$raw_files,
 			static function ( $file ) {
 
-				return is_array( $file ) && count( $file ) === 2 && ! empty( $file['file'] ) && ! empty( $file['name'] );
+				return is_array( $file ) && count( $file ) === 3 && ! empty( $file['file'] ) && ! empty( $file['name'] );
 			}
 		);
 
@@ -1253,14 +1323,15 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	protected function generate_file_data( $file ) {
 
 		return array(
-			'name'          => sanitize_text_field( $file['name'] ),
-			'value'         => esc_url_raw( $file['file_url'] ),
-			'file'          => $file['file_name_new'],
-			'file_original' => $file['name'],
-			'ext'           => wpforms_chain( $file['file'] )->explode( '.' )->pop()->value(),
-			'attachment_id' => isset( $file['attachment_id'] ) ? absint( $file['attachment_id'] ) : 0,
-			'id'            => $this->field_id,
-			'type'          => $file['type'],
+			'name'           => sanitize_text_field( $file['name'] ),
+			'value'          => esc_url_raw( $file['file_url'] ),
+			'file'           => $file['file_name_new'],
+			'file_original'  => $file['name'],
+			'file_user_name' => sanitize_text_field( $file['file_user_name'] ),
+			'ext'            => wpforms_chain( $file['file'] )->explode( '.' )->pop()->value(),
+			'attachment_id'  => isset( $file['attachment_id'] ) ? absint( $file['attachment_id'] ) : 0,
+			'id'             => $this->field_id,
+			'type'           => $file['type'],
 		);
 	}
 
@@ -1334,7 +1405,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		if ( ! empty( $this->field_data['max_size'] ) ) {
 
-			// Strip any suffix provided (eg M, MB etc), which leaves is wit the raw MB value.
+			// Strip any suffix provided (eg M, MB etc), which leaves us with the raw MB value.
 			$max_size = preg_replace( '/[^0-9.]/', '', $this->field_data['max_size'] );
 			$max_size = wpforms_size_to_bytes( $max_size . 'M' );
 
@@ -1361,7 +1432,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$lifespan = (int) apply_filters( 'wpforms_field_' . $this->type . '_clean_tmp_files_lifespan', DAY_IN_SECONDS );
 
 		foreach ( $files as $file ) {
-			if ( ! is_file( $file ) ) {
+			if ( 'index.html' === $file || ! is_file( $file ) ) {
 				continue;
 			}
 
@@ -1388,11 +1459,11 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		$validated_form_field = $this->ajax_validate_form_field_modern();
 		if ( empty( $validated_form_field ) ) {
-			wp_send_json_error( $default_error );
+			wp_send_json_error( $default_error, 400 );
 		}
 
 		if ( empty( $_POST['file'] ) ) {
-			wp_send_json_error( $default_error );
+			wp_send_json_error( $default_error, 403 );
 		}
 
 		$file     = sanitize_file_name( wp_unslash( $_POST['file'] ) );
@@ -1407,11 +1478,13 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wp_send_json_success( $file );
 		}
 
-		wp_send_json_error( $default_error );
+		wp_send_json_error( $default_error, 400 );
 	}
 
 	/**
 	 * Upload the file, used during AJAX requests.
+	 *
+	 * @deprecated 1.6.2
 	 *
 	 * @since 1.5.6
 	 */
@@ -1421,28 +1494,23 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		$validated_form_field = $this->ajax_validate_form_field_modern();
 		if ( empty( $validated_form_field ) ) {
-			wp_send_json_error( $default_error );
+			wp_send_json_error( $default_error, 403 );
 		}
 
 		// Make sure we have required values from $_FILES.
 		if ( empty( $_FILES['file']['name'] ) ) {
-			wp_send_json_error( $default_error );
+			wp_send_json_error( $default_error, 403 );
 		}
 		if ( empty( $_FILES['file']['tmp_name'] ) ) {
-			wp_send_json_error( $default_error );
+			wp_send_json_error( $default_error, 403 );
 		}
 
-		// Make data available everywhere in the class, so we don't need to pass it manually.
-		$this->form_data  = $validated_form_field['form_data'];
-		$this->form_id    = $this->form_data['id'];
-		$this->field_id   = $validated_form_field['field_id'];
-		$this->field_data = $this->form_data['fields'][ $this->field_id ];
-
-		$error     = empty( $_FILES['file']['error'] ) ? 0 : (int) $_FILES['file']['error'];
-		$name      = sanitize_file_name( wp_unslash( $_FILES['file']['name'] ) );
-		$path      = $_FILES['file']['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$extension = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
-		$errors    = wpforms_chain( array() )
+		$error          = empty( $_FILES['file']['error'] ) ? 0 : (int) $_FILES['file']['error'];
+		$name           = sanitize_file_name( wp_unslash( $_FILES['file']['name'] ) );
+		$file_user_name = sanitize_text_field( wp_unslash( $_FILES['file']['name'] ) );
+		$path           = $_FILES['file']['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$extension      = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
+		$errors         = wpforms_chain( array() )
 			->array_merge( (array) $this->validate_basic( $error ) )
 			->array_merge( (array) $this->validate_size() )
 			->array_merge( (array) $this->validate_extension( $extension ) )
@@ -1451,7 +1519,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			->value();
 
 		if ( count( $errors ) ) {
-			wp_send_json_error( implode( ',', $errors ) );
+			wp_send_json_error( implode( ',', $errors ), 400 );
 		}
 
 		$tmp_dir  = $this->get_tmp_dir();
@@ -1460,15 +1528,135 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$tmp      = $this->move_file( $path, $tmp_path );
 
 		if ( ! $tmp ) {
-			wp_send_json_error( $default_error );
+			wp_send_json_error( $default_error, 400 );
 		}
 
 		$this->clean_tmp_files();
 
 		wp_send_json_success(
 			array(
-				'file' => pathinfo( $tmp, PATHINFO_FILENAME ) . '.' . pathinfo( $tmp, PATHINFO_EXTENSION ),
-				'name' => $name,
+				'name'           => $name,
+				'file'           => pathinfo( $tmp, PATHINFO_FILENAME ) . '.' . pathinfo( $tmp, PATHINFO_EXTENSION ),
+				'file_user_name' => $file_user_name,
+			)
+		);
+	}
+
+	/**
+	 * Initializes the chunk upload process.
+	 *
+	 * No data is being send by the client, they expecting an authorization from this method
+	 * before sending any chunk.
+	 *
+	 * The server may return different configs to the uploader client (smaller chunks, disable
+	 * parallel uploads etc).
+	 *
+	 * This method would validate the file extension, maximum size and other things.
+	 *
+	 * @since 1.6.2
+	 */
+	public function ajax_chunk_upload_init() {
+
+		$default_error = esc_html__( 'Something went wrong, please try again.', 'wpforms' );
+
+		$validated_form_field = $this->ajax_validate_form_field_modern();
+		if ( empty( $validated_form_field ) ) {
+			wp_send_json_error( $default_error );
+		}
+
+		$handler = Chunk::from_current_request( $this );
+		if ( ! $handler || ! $handler->create_metadata() ) {
+			wp_send_json_error( $default_error, 403 );
+		}
+
+		$error     = 0;
+		$name      = sanitize_file_name( wp_unslash( $handler->get_file_name() ) );
+		$extension = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
+		$errors    = wpforms_chain( array() )
+			->array_merge( (array) $this->validate_basic( $error ) )
+			->array_merge( (array) $this->validate_size( [ $handler->get_file_size() ] ) )
+			->array_merge( (array) $this->validate_extension( $extension ) )
+			->array_filter()
+			->value();
+
+		if ( count( $errors ) > 0 ) {
+			wp_send_json_error( implode( ',', $errors ) );
+		}
+
+		wp_send_json(
+			[
+				'success' => true,
+				'data'    => [
+					'dzchunksize'          => $handler->get_chunk_size(),
+					'parallelChunkUploads' => apply_filters( 'wpforms_file_upload_chunk_parallel', true ),
+				],
+			]
+		);
+	}
+
+	/**
+	 * Upload the files using chunks.
+	 *
+	 * @since 1.6.2
+	 */
+	public function ajax_chunk_upload() {
+
+		$default_error = esc_html__( 'Something went wrong, please try again.', 'wpforms' );
+
+		$validated_form_field = $this->ajax_validate_form_field_modern();
+		if ( empty( $validated_form_field ) ) {
+			wp_send_json_error( $default_error );
+		}
+
+		$handler = Chunk::from_current_request( $this );
+
+		if ( ! $handler || ! $handler->load_metadata() ) {
+			wp_send_json_error( $default_error, 403 );
+		}
+
+		if ( ! $handler->write() ) {
+			wp_send_json_error( $default_error, 403 );
+		}
+
+		wp_send_json( [ 'success' => true ] );
+	}
+
+	/**
+	 * Ajax handler for finalizing a chunked upload.
+	 *
+	 * @since 1.6.2
+	 */
+	public function ajax_chunk_upload_finalize() {
+		$default_error = esc_html__( 'Something went wrong, please try again.', 'wpforms' );
+
+	 	$handler = Chunk::from_current_request( $this );
+		if ( ! $handler || ! $handler->load_metadata() ) {
+			wp_send_json_error( $default_error, 403 );
+		}
+
+		$file_name      = $handler->get_file_name();
+		$file_user_name = $handler->get_file_user_name();
+		$extension      = strtolower( pathinfo( $file_name, PATHINFO_EXTENSION ) );
+		$tmp_dir        = $this->get_tmp_dir();
+		$tmp_name       = $this->get_tmp_file_name( $extension );
+		$tmp_path       = wp_normalize_path( $tmp_dir . '/' . $tmp_name );
+
+		if ( ! $handler->finalize( $tmp_path ) ) {
+			wp_send_json_error( $default_error, 403 );
+		}
+
+		$is_valid_type = $this->validate_wp_filetype_and_ext( $tmp_path, $file_name );
+		if ( false !== $is_valid_type ) {
+			wp_send_json_error( $is_valid_type, 403 );
+		}
+
+		$this->clean_tmp_files();
+
+		wp_send_json_success(
+			array(
+				'name'           => $file_name,
+				'file'           => pathinfo( $tmp_path, PATHINFO_FILENAME ) . '.' . pathinfo( $tmp_path, PATHINFO_EXTENSION ),
+				'file_user_name' => $file_user_name,
 			)
 		);
 	}
@@ -1489,14 +1677,14 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			return array();
 		}
 
-		$form_data = wpforms()->form->get( (int) $_POST['form_id'], array(
-			'content_only' => true,
-		) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$form_data = wpforms()->form->get( (int) $_POST['form_id'], [ 'content_only' => true ] );
 
 		if ( empty( $form_data ) || ! is_array( $form_data ) ) {
 			return array();
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$field_id = (int) $_POST['field_id'];
 		if (
 			! isset( $form_data['fields'][ $field_id ]['style'] ) ||
@@ -1504,6 +1692,12 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		) {
 			return array();
 		}
+
+		// Make data available everywhere in the class, so we don't need to pass it manually.
+		$this->form_data  = $form_data;
+		$this->form_id    = $this->form_data['id'];
+		$this->field_id   = $field_id;
+		$this->field_data = $this->form_data['fields'][ $this->field_id ];
 
 		return array(
 			'form_data' => $form_data,
@@ -1551,20 +1745,34 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 *
 	 * @since 1.5.6
 	 *
+	 * @param array $sizes Array with all file sizes in bytes.
+	 *
 	 * @return false|string False if no errors found, error text otherwise.
 	 */
-	protected function validate_size() {
+	protected function validate_size( $sizes = null ) {
+
+		if (
+			null === $sizes &&
+			! empty( $_FILES )
+		) {
+			$sizes = [];
+			foreach ( $_FILES as $file ) {
+				$sizes[] = $file['size'];
+			}
+		}
+
+		if ( ! is_array( $sizes ) ) {
+			return false;
+		}
 
 		$max_size = min( wp_max_upload_size(), $this->max_file_size() );
 
-		if ( ! empty( $_FILES ) ) {
-			foreach ( $_FILES as $file ) {
-				if ( $file['size'] > $max_size ) {
-					return sprintf( /* translators: $s - allowed file size in Mb. */
-						esc_html__( 'File exceeds max size allowed (%s).', 'wpforms' ),
-						wpforms_size_to_megabytes( $max_size )
-					);
-				}
+		foreach ( $sizes as $size ) {
+			if ( $size > $max_size ) {
+				return sprintf( /* translators: $s - allowed file size in Mb. */
+					esc_html__( 'File exceeds max size allowed (%s).', 'wpforms' ),
+					size_format( $max_size )
+				);
 			}
 		}
 
@@ -1572,7 +1780,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	}
 
 	/**
-	 * Validate extension against blacklist and admin-provided list.
+	 * Validate extension against denylist and admin-provided list.
 	 * There are certain extensions we do not allow under any circumstances,
 	 * with no exceptions, for security purposes.
 	 *
@@ -1650,7 +1858,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 *
 	 * @return string
 	 */
-	protected function get_tmp_dir() {
+	public function get_tmp_dir() {
 
 		$upload_dir = wpforms_upload_dir();
 		$tmp_root   = $upload_dir['path'] . '/tmp';
@@ -1776,7 +1984,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 	/**
 	 * Get default extensions supported by WordPress
-	 * without those that we manually blacklist.
+	 * without those that we manually denylist.
 	 *
 	 * @since 1.5.6
 	 *
@@ -1788,7 +1996,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			->array_keys()
 			->implode( '|' )
 			->explode( '|' )
-			->array_diff( $this->blacklist )
+			->array_diff( $this->denylist )
 			->value();
 	}
 

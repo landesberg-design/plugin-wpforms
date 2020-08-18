@@ -1,13 +1,15 @@
 <?php
 /**
- * Plugin Name: WPForms
- * Plugin URI:  https://wpforms.com
- * Description: Beginner friendly WordPress contact form plugin. Use our Drag & Drop form builder to create your WordPress forms.
- * Author:      WPForms
- * Author URI:  https://wpforms.com
- * Version:     1.6.1.2
- * Text Domain: wpforms-lite
- * Domain Path: assets/languages
+ * Plugin Name:       WPForms
+ * Plugin URI:        https://wpforms.com
+ * Description:       Beginner friendly WordPress contact form plugin. Use our Drag & Drop form builder to create your WordPress forms.
+ * Requires at least: 4.9
+ * Requires PHP:      5.5
+ * Author:            WPForms
+ * Author URI:        https://wpforms.com
+ * Version:           1.6.2.2
+ * Text Domain:       wpforms-lite
+ * Domain Path:       assets/languages
  *
  * WPForms is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin version.
 if ( ! defined( 'WPFORMS_VERSION' ) ) {
-	define( 'WPFORMS_VERSION', '1.6.1.2' );
+	define( 'WPFORMS_VERSION', '1.6.2.2' );
 }
 
 // Plugin Folder Path.
@@ -50,6 +52,22 @@ if ( ! defined( 'WPFORMS_PLUGIN_FILE' ) ) {
 
 // Don't allow multiple versions to be active.
 if ( function_exists( 'wpforms' ) ) {
+
+	if ( ! function_exists( 'wpforms_pro_just_activated' ) ) {
+		/**
+		 * When we are activate a Pro version, we need to do additional operations:
+		 * 1) deactivate a Lite version
+		 * 2) register option which help to run all activation process for Pro version (custom tables creation, etc.)
+		 *
+		 * @since 1.6.2
+		 */
+		function wpforms_pro_just_activated() {
+
+			wpforms_deactivate();
+			add_option( 'wpforms_install', 1 );
+		}
+	}
+	add_action( 'activate_wpforms/wpforms.php', 'wpforms_pro_just_activated' );
 
 	if ( ! function_exists( 'wpforms_lite_just_activated' ) ) {
 		/**
@@ -123,7 +141,7 @@ if ( function_exists( 'wpforms' ) ) {
 					<p>%2$s</p>
 				</div>',
 				esc_html__( 'Heads up!', 'wpforms-lite' ),
-				esc_html__( 'Your site already has WPForms Pro activated. If you want to switch to WPForms Lite, please first go to Plugins > Installed Plugins and deactivate WPForms. Then, you can activate WPForms Lite.', 'wpforms-lite' )
+				esc_html__( 'Your site already has WPForms Pro activated. If you want to switch to WPForms Lite, please first go to Plugins → Installed Plugins and deactivate WPForms. Then, you can activate WPForms Lite.', 'wpforms-lite' )
 			);
 
 			if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended

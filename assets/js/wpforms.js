@@ -14,7 +14,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		init: function() {
 
 			// Document ready.
-			$( document ).ready( app.ready );
+			$( app.ready );
 
 			// Page load.
 			$( window ).on( 'load', app.load );
@@ -211,6 +211,14 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					}, wpforms_settings.val_phone );
 				}
 
+				// Validate Input Mask minimum length.
+				$.validator.addMethod( 'empty-blanks', function( value, element ) {
+					if ( typeof $.fn.inputmask === 'undefined' ) {
+						return true;
+					}
+					return ! ( value.indexOf( element.inputmask.opts.placeholder ) + 1 );
+				}, wpforms_settings.val_empty_blanks );
+
 				// Validate US Phone Field.
 				$.validator.addMethod( 'us-phone-field', function( value, element ) {
 					if ( value.match( /[^\d()\-+\s]/ ) ) {
@@ -296,6 +304,12 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 									$submit     = $form.find( '.wpforms-submit' ),
 									altText     = $submit.data( 'alt-text' ),
 									recaptchaID = $submit.get( 0 ).recaptchaID;
+
+								if ( $form.data( 'token' ) && 0 === $( '.wpforms-token', $form ).length ) {
+									$( '<input type="hidden" class="wpforms-token" name="wpforms[token]" />' )
+										.val( $form.data( 'token' ) )
+										.appendTo( $form );
+								}
 
 								$submit.prop( 'disabled', true );
 								$form.find( '#wpforms-field_recaptcha-error' ).remove();
@@ -763,7 +777,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			} );
 
 			// Payment radio/checkbox fields: preselect the selected payment (from dynamic/fallback population).
-			$( document ).ready( function() {
+			$( function() {
 
 				// Radios.
 				$( '.wpforms-field-radio .wpforms-image-choices-item input:checked' ).change();
@@ -798,7 +812,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			} );
 
 			// Rating field: preselect the selected rating (from dynamic/fallback population).
-			$( document ).ready( function() {
+			$( function() {
 				$( '.wpforms-field-rating-item input:checked' ).change();
 			} );
 
@@ -947,8 +961,9 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			} );
 
 			// Allow only numbers, minus and decimal point to be entered into the Numbers field.
-			$( document ).on( 'input', '.wpforms-field-number input', function( e ) {
-				this.value = this.value.replace( /[^-0-9.]/g, '' );
+			$( document ).on( 'keypress', '.wpforms-field-number input', function( e ) {
+
+				return /^[-0-9.]+$/.test( String.fromCharCode( e.keyCode || e.which ) );
 			} );
 		},
 

@@ -39,6 +39,25 @@ class Loader {
 		$this->populate_migrations();
 		$this->populate_capabilities();
 		$this->populate_tasks();
+		$this->populate_forms();
+	}
+
+	/**
+	 * Populate the Forms related classes.
+	 *
+	 * @since 1.6.2
+	 */
+	private function populate_forms() {
+
+		$this->classes[] = [
+			'name' => 'Forms\Token',
+			'id'   => 'token',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Honeypot',
+			'id'   => 'honeypot',
+		];
 	}
 
 	/**
@@ -64,6 +83,14 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\Entries\Export\Export',
+				'hook' => 'admin_init',
+			],
+			[
+				'name' => 'Admin\Challenge',
+				'id'   => 'challenge',
+			],
+			[
+				'name' => 'Admin\FormEmbedWizard',
 				'hook' => 'admin_init',
 			]
 		);

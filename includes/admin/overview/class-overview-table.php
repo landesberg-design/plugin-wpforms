@@ -323,9 +323,9 @@ class WPForms_Overview_Table extends WP_List_Table {
 	 * @since 1.0.0
 	 */
 	public function no_items() {
+
 		printf(
-			wp_kses(
-				/* translators: %s - WPForms Builder page. */
+			wp_kses( /* translators: %s - WPForms Builder page. */
 				__( 'Whoops, you haven\'t created a form yet. Want to <a href="%s">give it a go</a>?', 'wpforms-lite' ),
 				array(
 					'a' => array(

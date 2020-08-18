@@ -352,6 +352,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 	 */
 	public function field_preview_templates() {
 
+		// phpcs:disable WordPress.WP.I18n
 		// Checkbox, Radio, and Payment Multiple/Checkbox field choices.
 		?>
 		<script type="text/html" id="tmpl-wpforms-field-preview-checkbox-radio-payment-multiple">
@@ -373,7 +374,9 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 						<# } else { #>
 							<input class="wpforms-screen-reader-element" type="{{ data.type }}" disabled<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' checked' ); } #>>
 						<# } #>
-						<span class="wpforms-image-choices-label">{{{ wpf.sanitizeHTML( data.settings.choices[choiceID].label ) }}}</span>
+						<span class="wpforms-image-choices-label">
+							{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}
+						</span>
 					</label>
 				</li>
 				<# }) #>
@@ -382,13 +385,15 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 			<ul class="primary-input">
 				<# _.each( data.order, function( choiceID, key ) {  #>
 				<li>
-					<input type="{{ data.type }}" disabled<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' checked' ); } #>>{{{ wpf.sanitizeHTML( data.settings.choices[choiceID].label ) }}}
+					<input type="{{ data.type }}" disabled<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' checked' ); } #>>
+					{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}
 				</li>
 				<# }) #>
 			</ul>
 			<# } #>
 		</script>
 		<?php
+		// phpcs:enable
 	}
 
 }

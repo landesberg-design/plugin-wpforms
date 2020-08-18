@@ -55,8 +55,6 @@ div.wpforms-container {
 
 			&:last-of-type {
 				margin-bottom: 0;
-				padding-bottom: 0;
-				border-bottom: 0;
 			}
 
 			&.dz-error {
@@ -151,7 +149,7 @@ div.wpforms-container {
 			.dz-progress {
 				display: block;
 				position: absolute;
-				top: 8px;
+				bottom: 25px;
 				left: 70px;
 				width: calc(100% - 110px);
 				height: 5px;

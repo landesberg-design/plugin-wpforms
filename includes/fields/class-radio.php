@@ -17,7 +17,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 		// Define field type information.
 		$this->name     = esc_html__( 'Multiple Choice', 'wpforms-lite' );
 		$this->type     = 'radio';
-		$this->icon     = 'fa-list-ul';
+		$this->icon     = 'fa-dot-circle-o';
 		$this->order    = 110;
 		$this->defaults = array(
 			1 => array(

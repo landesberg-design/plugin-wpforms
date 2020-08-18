@@ -1,6 +1,58 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.2.2] - 2020-08-11
+### Changed
+- Disable for now auto-updates plugins feature (introduced in WordPress 5.5) for the WPForms core plugin and all of its addons.
+
+### Fixed
+- Do not allow Action Scheduler to generate errors during the plugin uninstallation procedure.
+- Front-end error gets displayed (instead of failing silently) when honeypot is triggered by an external code.
+- Form embed wizard popup should be loaded only when it can actually be used.
+- Input mask validation produces a JS error on jQuery 3.x.
+
+## [1.6.2.1] - 2020-08-07
+### Changed
+- Rephrased anti-spam protection error to provide more context.
+
+### Fixed
+- Entries export displays an error while preparing an export file.
+- "Single Line Text" and "Paragraph Text" calculate empty field word count incorrectly.
+
+## [1.6.2] - 2020-08-05
+### Added
+- Caching friendly anti-spam protection (form tokens).
+- Upload files using chunks while using the Modern File Upload field.
+- Native integration with Elementor: add to the page and create new forms right inside its builder.
+- Add a preview to the WPForms Gutenberg block.
+- "Show price after item labels" option for Payments fields.
+- File upload original file name is stored and sanitized as a string (not as a file name).
+- Display entry submission time in a Date column in Entries table.
+
+### Changed
+- Greatly improve WPForms Challenge experience.
+- Improve word counting when the Limit Length field option is used with Single Line Text/Paragraph Text fields.
+- Improve Number field input restrictions with various browsers.
+- Form field validation will now fail if input mask is enabled and user input does not complete required input mask elements.
+- Icon for the Multiple Choice field is now more representative.
+- Hide Delete button for a "Default Notification" in the Form Builder.
+- Improve Lite migrations for WordPress Multisite installations.
+- Update Constant Contact, Stripe, Mailchimp, and GetResponse logos because of their rebranding.
+- Improve descriptions of various plugin options and add more context to them.
+
+### Fixed
+- Properly map fields in various addons when the first field is added in the Form Builder.
+- Issue when editing Checkbox field entry values when dynamic choices were enabled and multiple values were saved.
+- Date Time field is not always properly populated on the Edit Entry page.
+- Entries table is not created when upgrading from Lite to Pro using zip.
+- Pro install date is not logged correctly when upgrading from Lite to Pro using zip.
+- Improve the way conditional logic templates are rendered inside the Form Builder.
+- Refresh the list of form fields that are required to properly render marketing addons.
+- "Invalid Form" error for logged out users upon submitting an AJAX form on some server configurations.
+- Multiple Choice fields had issues in the builder with image choices with empty labels.
+- Improve error handling on the back-end while processing files that were uploaded using the Modern File Upload field and failed validations.
+- Make bulk actions at the bottom of the Forms Overview work.
+
 ## [1.6.1.2] - 2020-07-08
 ### Added
 - Data encryption/decryption tools to use within the WPForms ecosystem.
@@ -52,16 +104,16 @@ All notable changes to this project will be documented in this file and formatte
 - Phone field should not allow alphabet input but allow spaces.
 - Product education URL encoding issues.
 - Large forms with numerous conditional logic rules experience significant UI slowdowns in the Form Builder.
-- The default value 0 (zero) of the Paragraph Text field does not display on the frontend.
+- The default value 0 (zero) of the Paragraph Text field does not display on the front end.
 - Securely store WPForms anonymized cookie, so it cannot be sent along with cross-site requests (samesite).
 - Entries list page on mobile devices was unusable: columns were not shown properly, links for each entry in a table were unclickable.
 - Various PHP notices that may appear during wildly complicated forms submissions.
 - Improved escaping inside Form Builder live preview, props Fortinet Fortiguard Labs.
 - Date field format defaults to YYYY-MM-DD format no matter what format is selected.
-- Page break field should always behave correctly on front-end even when its settings are broken.
+- Page break field should always behave correctly on front end even when its settings are broken.
 - Incorrect interval value was used when running a cleanup job after notifications sent.
 - Correctly display Smart phone field country selection on mobile.
-- Improved plugin custom capabilities handling inside the WordPress admin area. 
+- Improved plugin custom capabilities handling inside the WordPress admin area.
 - Do not generate errors when editing entries for forms that don't have fields anymore.
 - Delete orphaned plugin translation files when cleanup option in plugin settings is checked and the plugin is deleted from the site.
 - Prevent entry duplicates creation by improving permissions check when allowing non-admins to edit entries.
@@ -88,7 +140,7 @@ All notable changes to this project will be documented in this file and formatte
 
 ### Fixed
 - Error if there are some plugins or themes add `widget_title` filter.
-- Frontend compatibility with Rating field and jQuery 3.x.
+- Front-end compatibility with Rating field and jQuery 3.x.
 - Choice Images not displaying in form notifications if no label is set.
 - Email/Password field Advanced Options not always displaying correct options.
 - Page Break field "Disable Scroll Animation" option not working as expected.
@@ -121,7 +173,7 @@ All notable changes to this project will be documented in this file and formatte
 - Checkbox image click doesn't work well to select an option.
 - Do not allow empty connection names (spaces only) for providers.
 - File Upload field: properly handle `{field_value_id="#"}` smart tag.
-- Provide proper defaults to Date / Time field, only when Date or only Time format is selected. 
+- Provide proper defaults to Date / Time field, only when Date or only Time format is selected.
 
 ## [1.5.9] - 2020-03-03
 ### IMPORTANT
@@ -158,7 +210,7 @@ All notable changes to this project will be documented in this file and formatte
 - Validation issue with required Checkbox fields using Image Choices.
 - Form builder preview issue with a field using Dynamic Choices setting.
 - Australian mobile phone numbers not passing Smart Phone Field validation (updated intl-tel-put library).
-- Number Field values not allowing leading zeros. 
+- Number Field values not allowing leading zeros.
 - Form Builder: templates search bar shows icon over text.
 - Security hardening and improvements.
 
@@ -243,7 +295,7 @@ All notable changes to this project will be documented in this file and formatte
 - WordPress 5.3 admin area styling issues.
 - Modern File Upload hidden input styling issues.
 - Number field incorrectly processing negative numbers.
-- `page_url` Smart Tag issues. 
+- `page_url` Smart Tag issues.
 
 ## [1.5.6.2] - 2019-11-07
 ### Added
@@ -252,7 +304,7 @@ All notable changes to this project will be documented in this file and formatte
 ### Fixed
 - WordPress 5.3 compatibility.
 - Smart Phone countries squashed dropdown on screen-width <= 600px on themes with Base form styling selected.
-- Properly include Pro form templates on form creation screen in a template selection section. 
+- Properly include Pro form templates on form creation screen in a template selection section.
 - Classic file uploader: correctly handle uploaded files with the same name.
 - Field's Default value `0` disappears after saving and exiting the form builder.
 - Smart Email field did not recognize `.dev` top level domains as valid.
@@ -296,10 +348,10 @@ All notable changes to this project will be documented in this file and formatte
 ## [1.5.5.1] - 2019-09-17
 ### Added
 - New filter to display additional fields to filter entries on Entries page.
-- New filters to add additional information into entries exported CSV file. 
+- New filters to add additional information into entries exported CSV file.
 
 ### Fixed
-- Broken reCAPTCHA checkbox in Builder > Settings > General if reCAPTCHA type does not set in WPForms > Settings. 
+- Broken reCAPTCHA checkbox in Builder > Settings > General if reCAPTCHA type does not set in WPForms > Settings.
 - CSV Download adding `.html` extension to initially a CSV file in Safari on MacOS.
 - Fields default values do not show if conditional logic is enabled.
 - Smart tag `{entry_id}` should not be available for fields, because it is available only after entry saving.
@@ -308,7 +360,7 @@ All notable changes to this project will be documented in this file and formatte
 - Broken image choices selection and styling (layout) issue in IE 11.
 - Redirect to PayPal payment doesn't work when AJAX form submission is On.
 - Backward compatible filters for some fields when displaying them were missing.
- 
+
 ## [1.5.5] - 2019-08-28
 ### Added
 - New default screen for the Entries list page (WPForms > Entries).
@@ -337,7 +389,7 @@ All notable changes to this project will be documented in this file and formatte
 ### Fixed
 - About Us page behaviour when WP Mail SMTP Pro is installed.
 - Elite licenses could not install addons from inside the form builder.
-- Rating field icon color not changing on frontend with some themes.
+- Rating field icon color not changing on front end with some themes.
 - reCAPTCHA settings could be saved without providing reCAPTCHA type.
 - Entry database tables not created for some users upgrading from WPForms Lite.
 
@@ -381,10 +433,10 @@ All notable changes to this project will be documented in this file and formatte
 - Special characters aren't encoded when Smart Tags are processed in query string.
 - Fields with Image choices are not working with some Android and older desktop browsers.
 - Payment Total field value includes conditionally hidden Single item fields.
-- Frontend and notification emails incorrect payment amount for some currencies if the value is greater than 1000.
+- Front-end and notification emails incorrect payment amount for some currencies if the value is greater than 1000.
 - Conditional Logic: Payment Checkbox Items multiple selection issue.
 - Form Builder: Several alert modals are displayed in batch if multiple providers have configuration issues.
-- WP_Post object is returned from `wpforms()->form->get()` if form data is requested with a non-WPForms post ID.
+- `WP_Post` object is returned from `wpforms()->form->get()` if form data is requested with a non-WPForms post ID.
 - Inconsistent Enter key behaviour in multi-page forms.
 - Unable to get a specific entry with `wpforms()->entry->get_entries()` without giving the form id.
 
@@ -554,21 +606,21 @@ All notable changes to this project will be documented in this file and formatte
 - Gutenberg block.
 - Conditional form confirmations - forms can now have multiple confirmations with conditional logic!
 - WP Mail SMTP detection and hints in the form builder notification settings.
-- Alt and title tags to image choices images on frontend display.
+- Alt and title tags to image choices images on front-end display.
 
 ### Changed
-- Improved Website URL field frontend validation - now automatically adds protocol if omitted.
+- Improved Website URL field front-end validation - now automatically adds protocol if omitted.
 - i18n improvements.
 
 ### Fixed
 - Compatibility issue with MySQL `Strict_Trans_Tables` mode.
 - Incorrect param used with `shortcode_atts`.
 - NPS and Rating fields not having access to all conditional logic comparisons.
-- Accessing `wpforms_setting` in frontend javascript before checking if it exists.
+- Accessing `wpforms_setting` in front-end javascript before checking if it exists.
 - Escaping method in HTML field mangling code on save.
 - PHP error toggling form builder notifications in some use cases.
 - GDPR field Agreement text not updating in real time.
-- Marketing provider connections containing an escaped apostrophe. 
+- Marketing provider connections containing an escaped apostrophe.
 - Pressing "Enter" in the form builder resulting in unexpected behavior.
 - Incorrect pagination when searching entries.
 - Security enhancements and other misc. bug fixes.

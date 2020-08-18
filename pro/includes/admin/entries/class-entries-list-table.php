@@ -74,6 +74,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 				'singular' => 'entry',
 				'plural'   => 'entries',
 				'ajax'     => false,
+				'screen'   => 'entries',
 			)
 		);
 
@@ -426,7 +427,14 @@ class WPForms_Entries_Table extends WP_List_Table {
 				break;
 
 			case 'date':
-				$value = date_i18n( get_option( 'date_format' ), strtotime( $entry->date ) + ( get_option( 'gmt_offset' ) * 3600 ) );
+				$value = date_i18n(
+					sprintf(
+						'%s %s',
+						get_option( 'date_format' ),
+						get_option( 'time_format' )
+					),
+					strtotime( $entry->date ) + ( get_option( 'gmt_offset' ) * 3600 )
+				);
 				break;
 
 			case 'status':
@@ -1155,8 +1163,6 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * @since 1.5.7 Added an `Entry Notes` column support.
 	 */
 	public function prepare_items() {
-
-		$_SERVER['REQUEST_URI'] = remove_query_arg( '_wp_http_referer', $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 
 		// Retrieve count.
 		$this->get_counts();

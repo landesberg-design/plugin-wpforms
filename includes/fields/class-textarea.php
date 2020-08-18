@@ -269,35 +269,13 @@ class WPForms_Field_Textarea extends WPForms_Field {
 
 		$field = $form_data['fields'][ $field_id ];
 		if ( is_array( $field_submit ) ) {
-			$field_submit = array_filter( $field_submit );
-			$field_submit = implode( "\r\n", $field_submit );
+			$field_submit = implode( "\r\n", array_filter( $field_submit ) );
 		}
 
 		$name = ! empty( $field['label'] ) ? sanitize_text_field( $field['label'] ) : '';
 
 		// Sanitize but keep line breaks.
 		$value = wpforms_sanitize_textarea_field( $field_submit );
-
-		if ( isset( $field['limit_enabled'] ) ) {
-			$limit = absint( $field['limit_count'] );
-			$mode  = sanitize_key( $field['limit_mode'] );
-
-			if ( 'characters' === $mode ) {
-				if ( mb_strlen( str_replace( "\r\n", "\n", $value ) ) > $limit ) {
-					/* translators: %s - limit characters number. */
-					wpforms()->process->errors[ $form_data['id'] ][ $field_id ] = sprintf( _n( 'Text can\'t exceed %d character.', 'Text can\'t exceed %d characters.', $limit, 'wpforms-lite' ), $limit );
-					return;
-				}
-			} else {
-				$words = preg_split( '/[\s,]+/', $value );
-				$words = is_array( $words ) ? count( $words ) : 0;
-				if ( $words > $limit ) {
-					/* translators: %s - limit words number. */
-					wpforms()->process->errors[ $form_data['id'] ][ $field_id ] = sprintf( _n( 'Text can\'t exceed %d word.', 'Text can\'t exceed %d words.', $limit, 'wpforms-lite' ), $limit );
-					return;
-				}
-			}
-		}
 
 		wpforms()->process->fields[ $field_id ] = array(
 			'name'  => $name,
@@ -307,6 +285,46 @@ class WPForms_Field_Textarea extends WPForms_Field {
 		);
 	}
 
+	/**
+	 * Validate field on form submit.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @param int   $field_id     Field ID.
+	 * @param mixed $field_submit Field value that was submitted.
+	 * @param array $form_data    Form data and settings.
+	 */
+	public function validate( $field_id, $field_submit, $form_data ) {
+
+		parent::validate( $field_id, $field_submit, $form_data );
+
+		if ( empty( $form_data['fields'][ $field_id ] ) || empty( $form_data['fields'][ $field_id ]['limit_enabled'] ) ) {
+			return;
+		}
+
+		if ( is_array( $field_submit ) ) {
+			$field_submit = implode( "\r\n", array_filter( $field_submit ) );
+		}
+
+		$field = $form_data['fields'][ $field_id ];
+		$limit = absint( $field['limit_count'] );
+		$mode  = ! empty( $field['limit_mode'] ) ? sanitize_key( $field['limit_mode'] ) : 'characters';
+		$value = wpforms_sanitize_textarea_field( $field_submit );
+
+		if ( 'characters' === $mode ) {
+			if ( mb_strlen( str_replace( "\r\n", "\n", $value ) ) > $limit ) {
+				/* translators: %s - limit characters number. */
+				wpforms()->process->errors[ $form_data['id'] ][ $field_id ] = sprintf( _n( 'Text can\'t exceed %d character.', 'Text can\'t exceed %d characters.', $limit, 'wpforms-lite' ), $limit );
+				return;
+			}
+		} else {
+			if ( wpforms_count_words( $value ) > $limit ) {
+				/* translators: %s - limit words number. */
+				wpforms()->process->errors[ $form_data['id'] ][ $field_id ] = sprintf( _n( 'Text can\'t exceed %d word.', 'Text can\'t exceed %d words.', $limit, 'wpforms-lite' ), $limit );
+				return;
+			}
+		}
+	}
 }
 
 new WPForms_Field_Textarea();

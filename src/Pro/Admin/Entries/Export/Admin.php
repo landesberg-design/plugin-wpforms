@@ -53,7 +53,7 @@ class Admin {
 		?>
 		<div class="wpforms-setting-row tools">
 
-			<h3><?php esc_html_e( 'Export Entries', 'wpforms' ); ?></h3>
+			<h4><?php esc_html_e( 'Export Entries', 'wpforms' ); ?></h4>
 
 			<p><?php esc_html_e( 'Select a form to export entries, then select the fields you would like to include. You can also define search and date filters to further personalize the list of entries you want to retrieve. WPForms will generate a downloadable CSV of your entries.', 'wpforms' ); ?></p>
 

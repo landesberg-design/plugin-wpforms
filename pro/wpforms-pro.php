@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WPForms Pro. Load Pro specific features/functionality.
  *
@@ -85,6 +86,8 @@ class WPForms_Pro {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueues' ) );
 		add_filter( 'wpforms_helpers_templates_get_theme_template_paths', array( $this, 'add_templates' ) );
 		add_filter( 'wpforms_integrations_usagetracking_is_enabled', '__return_true' );
+
+		$this->disable_wp_auto_update_plugins();
 	}
 
 	/**
@@ -151,9 +154,6 @@ class WPForms_Pro {
 		$wpforms_install->entry_meta   = new WPForms_Entry_Meta_Handler();
 
 		$this->create_custom_tables( $wpforms_install );
-
-		// Tasks meta table.
-		wpforms()->get( 'tasks_meta' )->create_table();
 
 		$license = get_option( 'wpforms_connect', false );
 
@@ -414,13 +414,13 @@ class WPForms_Pro {
 				'gdpr-disable-uuid'    => array(
 					'id'   => 'gdpr-disable-uuid',
 					'name' => esc_html__( 'Disable User Cookies', 'wpforms' ),
-					'desc' => esc_html__( 'Check this to disable user tracking cookies (UUIDs). This will disable the Related Entries feature and the Form Abandonment/Geolocation addons.', 'wpforms' ),
+					'desc' => esc_html__( 'Check this option to disable user tracking cookies. This will disable the Related Entries feature and the Form Abandonment/Geolocation addons.', 'wpforms' ),
 					'type' => 'checkbox',
 				),
 				'gdpr-disable-details' => array(
 					'id'   => 'gdpr-disable-details',
 					'name' => esc_html__( 'Disable User Details', 'wpforms' ),
-					'desc' => esc_html__( 'Check this to disable storing the IP address and User Agent on all forms. If unchecked this can be managed on a form by form basis inside the form settings.', 'wpforms' ),
+					'desc' => esc_html__( 'Check this option to prevent the storage of IP addresses and User Agent on all forms. If unchecked, then this can be managed on a form-by-form basis inside the form builder under Settings → General', 'wpforms' ),
 					'type' => 'checkbox',
 				),
 			),
@@ -648,8 +648,12 @@ class WPForms_Pro {
 			$next_id = max( array_keys( $notifications ) ) + 1;
 		}
 
+		$default_notifications_key = min( array_keys( $notifications ) );
+
 		echo '<div class="wpforms-panel-content-section-title">';
-			esc_html_e( 'Notifications', 'wpforms' );
+			echo '<span id="wpforms-builder-settings-notifications-title">';
+				esc_html_e( 'Notifications', 'wpforms' );
+			echo '</span>';
 			echo '<button class="wpforms-notifications-add wpforms-builder-settings-block-add" data-block-type="notification" data-next-id="' . absint( $next_id ) . '">' . esc_html__( 'Add New Notification', 'wpforms' ) . '</button>';
 		echo '</div>';
 
@@ -670,19 +674,24 @@ class WPForms_Pro {
 
 		foreach ( $notifications as $id => $notification ) {
 
-			$name         = ! empty( $notification['notification_name'] ) ? $notification['notification_name'] : esc_html__( 'Default Notification', 'wpforms' );
-			$closed_state = '';
-			$toggle_state = '<i class="fa fa-chevron-up"></i>';
+			$name          = ! empty( $notification['notification_name'] ) ? $notification['notification_name'] : esc_html__( 'Default Notification', 'wpforms' );
+			$closed_state  = '';
+			$toggle_state  = '<i class="fa fa-chevron-up"></i>';
+			$block_classes = 'wpforms-notification wpforms-builder-settings-block';
 
 			if ( ! empty( $settings->form_data['id'] ) && 'closed' === wpforms_builder_settings_block_get_state( $settings->form_data['id'], $id, 'notification' ) ) {
 				$closed_state = 'style="display:none"';
 				$toggle_state = '<i class="fa fa-chevron-down"></i>';
 			}
 
+			if ( $default_notifications_key === $id ) {
+				$block_classes .= ' wpforms-builder-settings-block-default';
+			}
+
 			do_action( 'wpforms_form_settings_notifications_single_before', $settings, $id );
 			?>
 
-			<div class="wpforms-notification wpforms-builder-settings-block" data-block-type="notification" data-block-id="<?php echo absint( $id ); ?>">
+			<div class="<?php echo esc_attr( $block_classes ); ?>" data-block-type="notification" data-block-id="<?php echo absint( $id ); ?>">
 
 				<div class="wpforms-builder-settings-block-header">
 					<div class="wpforms-builder-settings-block-actions">
@@ -904,7 +913,7 @@ class WPForms_Pro {
 			$block_classes = 'wpforms-confirmation wpforms-builder-settings-block';
 
 			if ( $default_confirmation_key === $id ) {
-				$block_classes .= ' wpforms-confirmation-default';
+				$block_classes .= ' wpforms-builder-settings-block-default';
 			}
 
 			if ( ! empty( $settings->form_data['id'] ) && 'closed' === wpforms_builder_settings_block_get_state( $settings->form_data['id'], $id, 'confirmation' ) ) {
@@ -1280,10 +1289,148 @@ class WPForms_Pro {
 			return;
 		}
 
-		// Check and create custom DB tables.
-		if ( $wpforms_settings->view === 'general' && ! $this->custom_tables_exist() ) {
-			$this->create_custom_tables();
+		// Proceed on Settings plugin admin area page only.
+		if ( $wpforms_settings->view !== 'general' ) {
+			return;
 		}
+
+		// Proceed when no custom Pro tables exist.
+		if ( $this->custom_tables_exist() ) {
+			return;
+		}
+
+		// Install on a current site only.
+		$this->create_custom_tables();
+	}
+
+	/**
+	 * Disable (temporary) new WordPress 5.5 'auto-update for plugins' feature.
+	 *
+	 * @since 1.6.2.2
+	 */
+	private function disable_wp_auto_update_plugins() {
+
+		add_filter( 'plugin_auto_update_setting_html', array( $this, 'auto_update_setting_html' ), 100, 3 );
+		add_filter( 'auto_update_plugin', array( $this, 'rollback_auto_update_plugin_default_value' ), 100, 2 );
+		add_filter( 'pre_update_site_option_auto_update_plugins', array( $this, 'update_auto_update_plugins_option' ), 100, 4 );
+	}
+
+	/**
+	 * Filter the HTML of the auto-updates setting for WPForms plugins.
+	 *
+	 * @since 1.6.2.2
+	 *
+	 * @param string $html        The HTML of the plugin's auto-update column content, including
+	 *                            toggle auto-update action links and time to next update.
+	 * @param string $plugin_file Path to the plugin file relative to the plugins directory.
+	 * @param array  $plugin_data An array of plugin data.
+	 *
+	 * @return string
+	 */
+	public function auto_update_setting_html( $html, $plugin_file, $plugin_data ) {
+
+		if (
+			! empty( $plugin_data['Author'] ) &&
+			$plugin_data['Author'] === 'WPForms' &&
+			$plugin_file !== 'wpforms-lite/wpforms.php'
+		) {
+			$html = esc_html__( 'Auto-updates are not available.', 'wpforms' );
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Rollback to default value for automatically update WPForms plugins.
+	 * Some devs or tools can use `auto_update_plugin` filter and turn on auto-updates for all plugins.
+	 *
+	 * @since 1.6.2.2
+	 *
+	 * @param mixed  $auto_update    Whether to update.
+	 * @param object $filter_payload The update offer.
+	 *
+	 * @return null|bool
+	 */
+	public function rollback_auto_update_plugin_default_value( $auto_update, $filter_payload ) {
+
+		// Check whether auto-updates for plugins are supported and enabled. If not, return early.
+		if (
+			! function_exists( 'wp_is_auto_update_enabled_for_type' ) ||
+			! wp_is_auto_update_enabled_for_type( 'plugin' )
+		) {
+			return $auto_update;
+		}
+
+		if ( empty( $auto_update ) ) {
+			return $auto_update;
+		}
+
+		if ( ! is_object( $filter_payload ) || empty( $filter_payload->plugin ) ) {
+			return $auto_update;
+		}
+
+		// Determine if it's a WPForms plugin. If so, return null (default value).
+		if ( in_array( $filter_payload->plugin, $this->get_wpforms_plugins(), true ) ) {
+			return null;
+		}
+
+		return $auto_update;
+	}
+
+	/**
+	 * Filter value, which is prepared for `auto_update_plugins` option before it's saved into DB.
+	 * We need to exclude WPForms plugins.
+	 *
+	 * @since 1.6.2.2
+	 *
+	 * @param mixed  $plugins     New plugins of the network option.
+	 * @param mixed  $old_plugins Old plugins of the network option.
+	 * @param string $option      Option name.
+	 * @param int    $network_id  ID of the network.
+	 *
+	 * @return array
+	 */
+	public function update_auto_update_plugins_option( $plugins, $old_plugins, $option, $network_id ) {
+
+		// No need to filter out our plugins if none were saved.
+		if ( empty( $plugins ) ) {
+			return $plugins;
+		}
+
+		// Check whether auto-updates for plugins are supported and enabled. If so, exclude WPForms plugins.
+		if ( function_exists( 'wp_is_auto_update_enabled_for_type' ) && wp_is_auto_update_enabled_for_type( 'plugin' ) ) {
+			return array_diff( (array) $plugins, $this->get_wpforms_plugins() );
+		}
+
+		return $plugins;
+	}
+
+	/**
+	 * Retrieve collection with WPForms plugins file paths.
+	 *
+	 * @since 1.6.2.2
+	 *
+	 * @return array
+	 */
+	protected function get_wpforms_plugins() {
+
+		$plugins     = [];
+		$addons_data = wpforms()->license->addons();
+
+		if ( empty( $addons_data ) ) {
+			return $plugins;
+		}
+
+		$plugins   = array_map(
+			static function( $slug ) {
+
+				return "{$slug}/{$slug}.php";
+			},
+			wp_list_pluck( $addons_data, 'slug' )
+		);
+		$plugins[] = 'wpforms/wpforms.php';
+
+		return $plugins;
 	}
 }
 

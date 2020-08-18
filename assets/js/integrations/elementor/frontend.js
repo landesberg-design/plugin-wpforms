@@ -1,17 +1,18 @@
 /* global wpforms, wpformsElementorVars, wpformsModernFileUpload, wpformsRecaptchaLoad, grecaptcha */
+
 'use strict';
 
 /**
- * WPForms integration with Elementor.
+ * WPForms integration with Elementor on the frontend.
  *
- * @since 1.6.0
+ * @since 1.6.2 Moved from `wpforms-elementor.js`
  */
-var WPFormsElementor = window.wpforms.elementor || ( function( document, window, $ ) {
+var WPFormsElementorFrontend = window.WPFormsElementorFrontend || ( function( document, window, $ ) {
 
 	/**
 	 * Public functions and properties.
 	 *
-	 * @since 1.6.0
+	 * @since 1.6.2
 	 *
 	 * @type {object}
 	 */
@@ -20,7 +21,7 @@ var WPFormsElementor = window.wpforms.elementor || ( function( document, window,
 		/**
 		 * Start the engine.
 		 *
-		 * @since 1.6.0
+		 * @since 1.6.2
 		 */
 		init: function() {
 
@@ -30,7 +31,7 @@ var WPFormsElementor = window.wpforms.elementor || ( function( document, window,
 		/**
 		 * Register JS events.
 		 *
-		 * @since 1.6.0
+		 * @since 1.6.2
 		 */
 		events: function() {
 
@@ -50,7 +51,7 @@ var WPFormsElementor = window.wpforms.elementor || ( function( document, window,
 		/**
 		 * Init all things for WPForms.
 		 *
-		 * @since 1.6.0
+		 * @since 1.6.2
 		 *
 		 * @param {object} $form jQuery selector.
 		 */
@@ -59,7 +60,7 @@ var WPFormsElementor = window.wpforms.elementor || ( function( document, window,
 			// Init WPForms staff.
 			wpforms.ready();
 
-			// Init `Modern File Uplaod` field.
+			// Init `Modern File Upload` field.
 			if ( 'undefined' !== typeof wpformsModernFileUpload ) {
 				wpformsModernFileUpload.init();
 			}
@@ -82,4 +83,4 @@ var WPFormsElementor = window.wpforms.elementor || ( function( document, window,
 }( document, window, jQuery ) );
 
 // Initialize.
-WPFormsElementor.init();
+WPFormsElementorFrontend.init();

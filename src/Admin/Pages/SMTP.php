@@ -230,14 +230,14 @@ class SMTP {
 					<li>%5$s</li>
 					<li>%6$s</li>
 					<li>%7$s</li>
-				</ul>			
+				</ul>
 			</section>',
 			esc_url( WPFORMS_PLUGIN_URL . 'assets/images/smtp/screenshot-tnail.png' ),
 			esc_attr__( 'WP Mail SMTP screenshot', 'wpforms-lite' ),
 			esc_url( WPFORMS_PLUGIN_URL . 'assets/images/smtp/screenshot-full.png' ),
 			esc_html__( 'Over 1,000,000 websites use WP Mail SMTP.', 'wpforms-lite' ),
 			esc_html__( 'Send emails authenticated via trusted parties.', 'wpforms-lite' ),
-			esc_html__( 'Transactional Mailers: Pepipost, SendinBlue, Mailgun, SendGrid, Amazon SES.', 'wpforms-lite' ),
+			esc_html__( 'Transactional Mailers: SMTP.com, Pepipost, SendinBlue, Mailgun, SendGrid, Amazon SES.', 'wpforms-lite' ),
 			esc_html__( 'Web Mailers: Gmail, G Suite, Office 365, Outlook.com.', 'wpforms-lite' )
 		);
 	}
@@ -265,7 +265,7 @@ class SMTP {
 					<h2>%3$s</h2>
 					<p>%4$s</p>
 					<button class="button %5$s" data-plugin="%6$s" data-action="%7$s">%8$s</button>
-				</div>		
+				</div>
 			</section>',
 			esc_url( WPFORMS_PLUGIN_URL . 'assets/images/' . $step['icon'] ),
 			esc_attr__( 'Step 1', 'wpforms-lite' ),
@@ -301,7 +301,7 @@ class SMTP {
 					<h2>%4$s</h2>
 					<p>%5$s</p>
 					<button class="button %6$s" data-url="%7$s">%8$s</button>
-				</div>		
+				</div>
 			</section>',
 			esc_attr( $step['section_class'] ),
 			esc_url( WPFORMS_PLUGIN_URL . 'assets/images/' . $step['icon'] ),

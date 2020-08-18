@@ -90,7 +90,7 @@ class UsageTracking implements IntegrationInterface {
 		$settings['misc'][ self::SETTINGS_SLUG ] = array(
 			'id'   => self::SETTINGS_SLUG,
 			'name' => esc_html__( 'Allow Usage Tracking', 'wpforms-lite' ),
-			'desc' => esc_html__( 'By allowing us to track usage data we can better help you because we know with which WordPress configurations, themes and plugins we should test.', 'wpforms-lite' ),
+			'desc' => esc_html__( 'By allowing us to track usage data, we can better help you, as we will know which WordPress configurations, themes, and plugins we should test.', 'wpforms-lite' ),
 			'type' => 'checkbox',
 		);
 
@@ -172,7 +172,19 @@ class UsageTracking implements IntegrationInterface {
 	 */
 	private function get_license() {
 
-		return wpforms()->pro ? wpforms()->license->get() : '';
+		// Default to license being blank.
+		$license = '';
+
+		// If we're pro and have a license, use that.
+		if ( wpforms()->pro && ! is_null( wpforms()->license ) && wpforms()->license ) {
+			try {
+				$license = wpforms()->license->get();
+			} catch ( \Exception $e ) {
+				$license = '';
+			}
+		}
+
+		return $license;
 	}
 
 	/**
@@ -184,7 +196,7 @@ class UsageTracking implements IntegrationInterface {
 	 */
 	private function get_license_type() {
 
-		return wpforms()->pro ? wpforms()->license->type() : 'lite';
+		return wpforms()->pro && wpforms()->license ? wpforms()->license->type() : 'lite';
 	}
 
 	/**

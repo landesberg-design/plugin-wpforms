@@ -214,8 +214,10 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 			var $select = $( '<select>' );
 
 			for ( key in items ) {
-				var choiceKey = items[key];
-				var label = wpf.sanitizeString( fields[fieldSelected].choices[choiceKey].label );
+				var choiceKey = items[key],
+					label = typeof fields[ fieldSelected ].choices[ choiceKey ] !== 'undefined' && fields[ fieldSelected ].choices[ choiceKey ].label.toString().trim() !== '' ?
+						wpf.sanitizeHTML( fields[ fieldSelected ].choices[ choiceKey ].label.toString().trim() ) :
+						wpforms_builder.choice_empty_label_tpl.replace( '{number}', choiceKey );
 				$select.append( $( '<option>', {value: choiceKey, text: label, id: 'choice-' + choiceKey} ) );
 			}
 
@@ -459,7 +461,7 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 		init: function() {
 
 			// Document ready
-			$( document ).ready( WPFormsConditionals.ready );
+			$( WPFormsConditionals.ready );
 
 		},
 
@@ -630,8 +632,11 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 				$element.append( $( '<option>', { value: '', text : wpforms_builder.select_choice } ) );
 				if ( data.field.choices ) {
 					for ( var key in wpf.orders.choices[ 'field_' + data.field.id ] ) {
-						var choiceKey = wpf.orders.choices[ 'field_' + data.field.id ][ key ];
-						$element.append( $( '<option>', { value: choiceKey, text : wpf.sanitizeString( data.field.choices[choiceKey].label ) } ) );
+						var choiceKey = wpf.orders.choices[ 'field_' + data.field.id ][ key ],
+							label = typeof data.field.choices[ choiceKey ].label !== 'undefined' && data.field.choices[ choiceKey ].label.toString().trim() !== '' ?
+								wpf.sanitizeHTML( data.field.choices[ choiceKey ].label.toString().trim() ) :
+								wpforms_builder.choice_empty_label_tpl.replace( '{number}', choiceKey );
+						$element.append( $( '<option>', { value: choiceKey, text: wpf.sanitizeHTML( label ) } ) );
 					}
 				}
 				$operator.find( "option:not([value='=='],[value='!='],[value='e'],[value='!e'])" ).prop( 'disabled', true ).prop( 'selected', false ); // jshint ignore:line

@@ -355,7 +355,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 * @since 1.5.0
 		 */
 		init: function() {
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

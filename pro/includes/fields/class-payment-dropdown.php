@@ -218,6 +218,24 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 		// Choices option.
 		$this->field_option( 'choices_payments', $field );
 
+		// Show price after item labels.
+		$fld  = $this->field_element(
+			'checkbox',
+			$field,
+			array(
+				'slug'    => 'show_price_after_labels',
+				'value'   => isset( $field['show_price_after_labels'] ) ? '1' : '0',
+				'desc'    => esc_html__( 'Show price after item labels', 'wpforms' ),
+				'tooltip' => esc_html__( 'Check this option to show price of the item after the label.', 'wpforms' ),
+			),
+			false
+		);
+		$args = array(
+			'slug'    => 'show_price_after_labels',
+			'content' => $fld,
+		);
+		$this->field_element( 'row', $field, $args );
+
 		// Description.
 		$this->field_option( 'description', $field );
 
@@ -360,8 +378,9 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 
 		// Fake placeholder for Modern style.
 		if ( $is_modern && empty( $field_placeholder ) ) {
-			$first_choices     = reset( $choices );
-			$field_placeholder = $first_choices['label']['text'];
+			$first_choices      = reset( $choices );
+			$field_placeholder  = $first_choices['label']['text'];
+			$field_placeholder .= ! empty( $field['show_price_after_labels'] ) && isset( $first_choices['attr']['value'] ) ? ' - ' . wpforms_format_amount( wpforms_sanitize_amount( $first_choices['attr']['value'] ), true ) : '';
 		}
 
 		// Preselect default if no other choices were marked as default.
@@ -392,13 +411,17 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 		// Build the select options.
 		foreach ( $choices as $key => $choice ) {
 			$amount = wpforms_format_amount( wpforms_sanitize_amount( $choice['attr']['value'] ) );
+			$label  = isset( $choice['label']['text'] ) ? $choice['label']['text'] : '';
+			/* translators: %s - Choice item number. */
+			$label  = $label !== '' ? $label : sprintf( esc_html__( 'Item %s', 'wpforms' ), $key );
+			$label .= ! empty( $field['show_price_after_labels'] ) && isset( $choice['attr']['value'] ) ? ' - ' . wpforms_format_amount( wpforms_sanitize_amount( $choice['attr']['value'] ), true ) : '';
 
 			printf(
 				$option_format, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				esc_attr( $key ),
 				esc_attr( $amount ),
 				selected( true, ! empty( $choice['default'] ), false ),
-				esc_html( $choice['label']['text'] )
+				esc_html( $label )
 			);
 		}
 

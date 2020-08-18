@@ -4,7 +4,7 @@
 'use strict';
 
 const { serverSideRender: ServerSideRender = wp.components.ServerSideRender } = wp;
-const { createElement } = wp.element;
+const { createElement, Fragment } = wp.element;
 const { registerBlockType } = wp.blocks;
 const { InspectorControls } = wp.blockEditor || wp.editor;
 const { SelectControl, ToggleControl, PanelBody, Placeholder } = wp.components;
@@ -32,9 +32,17 @@ registerBlockType( 'wpforms/form-selector', {
 		displayDesc: {
 			type: 'boolean',
 		},
+		preview: {
+			type: 'boolean',
+		},
+	},
+	example: {
+		attributes: {
+			preview: true,
+		},
 	},
 	edit( props ) {
-		const { attributes: { formId = '', displayTitle = false, displayDesc = false }, setAttributes } = props;
+		const { attributes: { formId = '', displayTitle = false, displayDesc = false, preview = false }, setAttributes } = props;
 		const formOptions = wpforms_gutenberg_form_selector.forms.map( value => (
 			{ value: value.ID, label: value.post_title }
 		) );
@@ -90,6 +98,13 @@ registerBlockType( 'wpforms/form-selector', {
 					block="wpforms/form-selector"
 					attributes={ props.attributes }
 				/>
+			);
+		} else if ( preview ) {
+			jsx.push(
+				<Fragment
+					key="wpforms-gutenberg-form-selector-fragment-block-preview">
+					<img src={ wpforms_gutenberg_form_selector.block_preview_url }/>
+				</Fragment>
 			);
 		} else {
 			jsx.push(

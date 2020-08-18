@@ -67,7 +67,7 @@ class WPForms_Template_Contact extends WPForms_Template {
 						'message_scroll' => '1',
 					),
 				),
-				'honeypot'               => '1',
+				'antispam'               => '1',
 				'submit_text'            => esc_html__( 'Submit', 'wpforms-lite' ),
 				'submit_text_processing' => esc_html__( 'Sending...', 'wpforms-lite' ),
 			),

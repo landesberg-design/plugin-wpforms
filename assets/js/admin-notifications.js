@@ -43,7 +43,7 @@ var WPFormsAdminNotifications = window.WPFormsAdminNotifications || ( function( 
 		 */
 		init: function() {
 
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

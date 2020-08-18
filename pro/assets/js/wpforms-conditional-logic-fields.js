@@ -13,7 +13,7 @@
 		init: function() {
 
 			// Document ready.
-			$( document ).ready( WPFormsConditionals.ready );
+			$( WPFormsConditionals.ready );
 
 			WPFormsConditionals.bindUIActions();
 		},

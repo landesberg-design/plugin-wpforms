@@ -29,6 +29,11 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 // Load plugin file.
 require_once 'wpforms.php';
 
+// Disable Action Schedule Queue Runner.
+if ( class_exists( 'ActionScheduler_QueueRunner' ) ) {
+	ActionScheduler_QueueRunner::instance()->unhook_dispatch_async_request();
+}
+
 // Confirm user has decided to remove all data, otherwise stop.
 $settings = get_option( 'wpforms_settings', [] );
 if ( empty( $settings['uninstall-data'] ) ) {

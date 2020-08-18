@@ -1,23 +1,49 @@
-/* globals wp */
+/* globals wpforms_challenge_admin */
 /**
  * WPForms Challenge function.
  *
  * @since 1.5.0
+ * @since 1.6.2 Challenge v2
  */
 'use strict';
 
-if ( typeof WPFormsChallenge === 'undefined' ) {
-	var WPFormsChallenge = {};
-}
+var WPFormsChallenge = window.WPFormsChallenge || {};
 
 WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, window, $ ) {
+
+	/**
+	 * Public functions and properties.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @type {object}
+	 */
+	var app = {};
+
+	/**
+	 * Runtime variables.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @type {object}
+	 */
+	var vars = {};
+
+	/**
+	 * DOM elements.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @type {object}
+	 */
+	var el = {};
 
 	/**
 	 * Timer functions and properties.
 	 *
 	 * @since 1.5.0
 	 *
-	 * @type {Object}
+	 * @type {object}
 	 */
 	var timer = {
 
@@ -29,7 +55,6 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 * @type {number}
 		 */
 		initialSecondsLeft: WPFormsChallenge.admin.l10n.minutes_left * 60,
-
 
 		/**
 		 * Load timer ID.
@@ -62,7 +87,7 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 *
 		 * @param {number} secondsLeft Number of seconds left to complete the Challenge.
 		 *
-		 * @returns {string} ID from setInterval().
+		 * @returns {string|void} ID from setInterval().
 		 */
 		run: function( secondsLeft ) {
 
@@ -73,7 +98,7 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 			var timerId = setInterval( function() {
 
 				app.updateTimerUI( secondsLeft );
-				secondsLeft --;
+				secondsLeft--;
 				if ( 0 > secondsLeft ) {
 					timer.saveSecondsLeft( 0 );
 					clearInterval( timerId );
@@ -243,12 +268,8 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 
 	/**
 	 * Public functions and properties.
-	 *
-	 * @since 1.5.0
-	 *
-	 * @type {Object}
 	 */
-	var app = {
+	app = {
 
 		/**
 		 * Public timer functions and properties.
@@ -264,8 +285,8 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 */
 		init: function() {
 
-			$( document ).ready( app.ready );
-			$( window ).load( app.load );
+			$( app.ready );
+			$( window ).on( 'load', app.load );
 		},
 
 		/**
@@ -286,7 +307,9 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 */
 		load: function() {
 
-			app.timer.run( app.timer.getSecondsLeft() );
+			if ( wpforms_challenge_admin.option.status === 'started' ) {
+				app.timer.run( app.timer.getSecondsLeft() );
+			}
 		},
 
 		/**
@@ -304,11 +327,13 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 				secondsLeft = app.timer.getSecondsLeft();
 			}
 
-			if ( ! timerId && 0 === app.loadStep() ) {
+			if ( ! timerId || 0 === app.loadStep() || wpforms_challenge_admin.option.status === 'inited' ) {
 				secondsLeft = app.timer.initialSecondsLeft;
 			}
 
+			app.initElements();
 			app.refreshStep();
+			app.initListUI( null, true );
 			app.updateListUI();
 			app.updateTimerUI( secondsLeft );
 		},
@@ -320,18 +345,36 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 */
 		events: function() {
 
-			$( [ window, document ] ).blur( function() {
-				app.timer.pause();
-			} );
+			$( [ window, document ] )
+				.on( 'blur', app.pauseChallenge )
+				.on( 'focus', app.resumeChallenge )
+				.on( 'click', '.wpforms-challenge-done-btn', app.resumeChallenge );
 
-			$( [ window, document ] ).focus( function() {
-				app.timer.resume();
-			} );
+			el.$btnPause.on( 'click', app.pauseChallenge );
+			el.$btnResume.on( 'click', app.resumeChallenge );
 
-			$( '.wpforms-challenge-cancel' ).click( function() {
-				app.timer.pause();
-				app.cancelChallenge();
-			} );
+			el.$listSteps.on( 'click', '.wpforms-challenge-item-current', app.refreshPage );
+		},
+
+		/**
+		 * DOM elements.
+		 *
+		 * @since 1.6.2
+		 */
+		initElements: function() {
+
+			el = {
+				$challenge: $( '.wpforms-challenge' ),
+				$btnPause: $( '.wpforms-challenge-pause' ),
+				$btnResume: $( '.wpforms-challenge-resume' ),
+				$listSteps: $( '.wpforms-challenge-list' ),
+				$listBlock: $( '.wpforms-challenge-list-block' ),
+				$listBtnToggle: $( '.wpforms-challenge-list-block .toggle-list' ),
+				$progressBar: $( '.wpforms-challenge-bar' ),
+				$tooltipBtnDone: function() {
+					return $( '.wpforms-challenge-tooltip .wpforms-challenge-done-btn' );
+				},
+			};
 		},
 
 		/**
@@ -354,7 +397,7 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 *
 		 * @param {number|string} step Step to save.
 		 *
-		 * @returns {Object} jqXHR object from saveChallengeOption().
+		 * @returns {object} jqXHR object from saveChallengeOption().
 		 */
 		saveStep: function( step ) {
 
@@ -370,7 +413,7 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 */
 		refreshStep: function() {
 
-			var savedStep = $( '.wpforms-challenge' ).data( 'wpforms-challenge-saved-step' );
+			var savedStep = el.$challenge.data( 'wpforms-challenge-saved-step' );
 			savedStep = parseInt( savedStep, 10 ) || 0;
 
 			// Step saved on a backend has a priority.
@@ -386,7 +429,7 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 *
 		 * @param {number|string} step Step to complete.
 		 *
-		 * @returns {Object} jqXHR object from saveStep().
+		 * @returns {object} jqXHR object from saveStep().
 		 */
 		stepCompleted: function( step ) {
 
@@ -401,9 +444,9 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {number|string} step Last saved step.
-		 * @param {string} anchor Element selector to bind tooltip to.
-		 * @param {Object} args Tooltipster arguments.
+		 * @param {number|string} step   Last saved step.
+		 * @param {string}        anchor Element selector to bind tooltip to.
+		 * @param {object}        args   Tooltipster arguments.
 		 */
 		initTooltips: function( step, anchor, args ) {
 
@@ -415,8 +458,16 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 				animationDuration: 0,
 				delay            : 0,
 				theme            : [ 'tooltipster-default', 'wpforms-challenge-tooltip' ],
+				side             : [ 'top' ],
+				distance         : 3,
 				functionReady    : function( instance, helper ) {
+
 					$( helper.tooltip ).addClass( 'wpforms-challenge-tooltip-step' + step );
+
+					// Custom positioning.
+					if ( step === 4 ) {
+						instance.option( 'side', 'right' );
+					}
 
 					// Reposition is needed to render max-width CSS correctly.
 					instance.reposition();
@@ -446,30 +497,87 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 
 			$( '.wpforms-challenge-dot' ).each( function( i, el ) {
 
-				var $el = $( el );
-				var elStep = $el.data( 'wpforms-challenge-step' );
+				var $dot = $( el ),
+					elStep = $dot.data( 'wpforms-challenge-step' );
 
 				if ( elStep < nextStep ) {
-					$el.addClass( 'wpforms-challenge-dot-completed' );
+					$dot.addClass( 'wpforms-challenge-dot-completed' );
 				}
 
 				if ( elStep > nextStep ) {
-					$el.addClass( 'wpforms-challenge-dot-next' );
+					$dot.addClass( 'wpforms-challenge-dot-next' );
 				}
 
 				if ( elStep === nextStep ) {
-					$el.removeClass( 'wpforms-challenge-dot-completed wpforms-challenge-dot-next' );
+					$dot.removeClass( 'wpforms-challenge-dot-completed wpforms-challenge-dot-next' );
 				}
 
 				// Zero timeout is needed to properly detect $el visibility.
 				setTimeout( function() {
-					if ( $el.is( ':visible' ) && elStep === nextStep ) {
-						$el.tooltipster( 'open' );
+					if ( $dot.is( ':visible' ) && elStep === nextStep ) {
+						$dot.tooltipster( 'open' );
 					} else {
-						$el.tooltipster( 'close' );
+						$dot.tooltipster( 'close' );
 					}
 				}, 0 );
 			} );
+		},
+
+		/**
+		 * Init ListUI.
+		 *
+		 * @since {vERSION}
+		 *
+		 * @param {number|string} status  Challenge status.
+		 * @param {boolean}       initial Initial run, false by default.
+		 */
+		initListUI: function( status, initial ) {
+
+			status = status || wpforms_challenge_admin.option.status;
+
+			if ( [ 'started', 'paused' ].indexOf( status ) > -1 ) {
+				el.$listBlock.find( 'p' ).hide();
+				el.$listBtnToggle.show();
+				el.$progressBar.show();
+
+				// Transform skip button to cancel button.
+				var $skipBtn = el.$listBlock.find( '.list-block-button.challenge-skip' );
+
+				$skipBtn
+					.attr( 'title', $skipBtn.data( 'cancel-title' ) )
+					.removeClass( 'challenge-skip' )
+					.addClass( 'challenge-cancel' );
+			}
+
+			// Set initial window closed (collapsed) state if window is short or if it is closed manually.
+			if (
+				initial &&
+				(
+					( $( window ).height() < 900 && wpforms_challenge_admin.option.window_closed === '' ) ||
+					wpforms_challenge_admin.option.window_closed === '1'
+				)
+			) {
+				el.$listBlock.find( 'p' ).hide();
+				el.$listBtnToggle.trigger( 'click' );
+			}
+
+			if ( status === 'paused' ) {
+
+				el.$challenge.addClass( 'paused' );
+				el.$btnPause.hide();
+				el.$btnResume.show();
+
+			} else {
+
+				// Zero timeout is needed to avoid firing 'focus' and 'click' events in the same loop.
+				setTimeout( function() {
+					el.$btnPause.show();
+				}, 0 );
+
+				el.$challenge.removeClass( 'paused' );
+				el.$btnResume.hide();
+
+			}
 		},
 
 		/**
@@ -483,9 +591,9 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 
 			step = step || app.loadStep();
 
-			$( '.wpforms-challenge-list li:lt(' + step + ')' ).addClass( 'wpforms-challenge-item-completed' );
-			$( '.wpforms-challenge-list li:eq(' + step + ')' ).addClass( 'wpforms-challenge-item-current' );
-			$( '.wpforms-challenge-bar div' ).css( 'width', ( step * 20 ) + '%' );
+			el.$listSteps.find( 'li:lt(' + step + ')' ).addClass( 'wpforms-challenge-item-completed' );
+			el.$listSteps.find( 'li:eq(' + step + ')' ).addClass( 'wpforms-challenge-item-current' );
+			el.$progressBar.find( 'div' ).css( 'width', ( step * 20 ) + '%' );
 		},
 
 		/**
@@ -511,8 +619,9 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 * @since 1.5.0
 		 */
 		removeChallengeUI: function() {
+
 			$( '.wpforms-challenge-dot' ).remove();
-			$( '.wpforms-challenge' ).remove();
+			el.$challenge.remove();
 		},
 
 		/**
@@ -527,30 +636,88 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		},
 
 		/**
-		 * Cancel Challenge after stating it.
+		 * Pause Challenge.
 		 *
-		 * @since 1.5.0
+		 * @since 1.6.2
+		 *
+		 * @param {object} e Event object.
 		 */
-		cancelChallenge: function() {
+		pauseChallenge: function( e ) {
+
+			// Skip if out to the iframe.
+			if ( document.activeElement.tagName === 'IFRAME' ) {
+				return;
+			}
+
+			// Skip if is not started.
+			if ( wpforms_challenge_admin.option.status !== 'started' ) {
+				return;
+			}
+
+			vars.pauseEvent = e.type;
+
+			app.pauseResumeChallenge( 'pause' );
+		},
+
+		/**
+		 * Resume Challenge.
+		 *
+		 * @since 1.6.2
+		 *
+		 * @param {object} e Event object.
+		 */
+		resumeChallenge: function( e ) {
+
+			// Skip if is not paused.
+			if ( wpforms_challenge_admin.option.status !== 'paused' ) {
+				return;
+			}
+
+			// Resume on 'focus' only if it has been paused on 'blur'.
+			if ( e.type === 'focus' && vars.pauseEvent !== 'blur' ) {
+				delete vars.pauseEvent;
+				return;
+			}
+
+			vars.resumeEvent = e.type;
+
+			app.pauseResumeChallenge( 'resume' );
+		},
+
+		/**
+		 * Pause/Resume Challenge.
+		 *
+		 * @since 1.6.2
+		 *
+		 * @param {string} action Action to perform. `pause` or `resume`.
+		 */
+		pauseResumeChallenge: function( action ) {
+
+			action = action === 'pause' ? action : 'resume';
+
+			app.timer[ action ]();
 
 			var optionData = {
-				status       : 'canceled',
+				status       : action === 'pause' ? 'paused' : 'started',
 				seconds_spent: app.timer.getSecondsSpent(),
 				seconds_left : app.timer.getSecondsLeft(),
-				feedback_sent: false,
 			};
 
-			app.removeChallengeUI();
-			app.clearLocalStorage();
+			WPFormsChallenge.admin.saveChallengeOption( optionData );
 
-			if ( typeof WPFormsBuilder !== 'undefined' ) {
-				WPFormsChallenge.admin.saveChallengeOption( optionData )
-					.done( WPFormsBuilder.formSave ) // Save the form before reloading if we're in a WPForms Builder.
-					.done( location.reload.bind( location ) ); // Reload the page to remove WPForms Challenge JS.
-			} else {
-				WPFormsChallenge.admin.saveChallengeOption( optionData )
-					.done( app.triggerPageSave ); // Assume we're on form embed page.
-			}
+			app.initListUI( optionData.status );
+		},
+
+		/**
+		 * Refresh Page in order to re-init current step.
+		 *
+		 * @since 1.6.2
+		 *
+		 * @param {object} e Event object.
+		 */
+		refreshPage: function( e ) {
+
+			window.location.reload( true );
 		},
 
 		/**
@@ -561,7 +728,8 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 * @returns {boolean} Is Gutenberg or not.
 		 */
 		isGutenberg: function() {
-			return typeof wp !== 'undefined' && wp.hasOwnProperty( 'blocks' );
+
+			return typeof wp !== 'undefined' && Object.prototype.hasOwnProperty.call( wp, 'blocks' );
 		},
 
 		/**
@@ -574,49 +742,55 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 			if ( app.isGutenberg() ) {
 				app.gutenbergPageSave();
 
-				// TODO: Find a way to reload Gutenberg editor after save.
 			} else {
 				$( '#post #publish' ).trigger( 'click' );
 			}
 		},
 
 		/**
-		 * Save page for Gutenberg
+		 * Save page for Gutenberg.
 		 *
 		 * @since 1.5.2
 		 */
 		gutenbergPageSave: function() {
-			// use MutationObserver to wait while guttenberg create panel with Publish button
+
+			var $gb = $( '.block-editor' ),
+				$updateBtn = $gb.find( '.editor-post-publish-button.editor-post-publish-button__button' );
+
+			// Trigger click on the Update button.
+			if ( $updateBtn.length > 0 ) {
+				$updateBtn.trigger( 'click' );
+
+				return;
+			}
+
+			// Use MutationObserver to wait while Guttenberg create/display panel with Publish button.
 			var obs = {
-				targetNode  : $('.block-editor .edit-post-layout')[0],
+				targetNode  : $gb.find( '.edit-post-layout, .block-editor-editor-skeleton__publish > div' )[0],
 				config      : {
-					childList: true
+					childList: true,
+					attributes: true,
+					subtree: true,
 				},
 			};
 
-			obs.callback = function ( mutationsList, observer ) {
-				var mutation;
-				for (var i in mutationsList) {
-					mutation = mutationsList[i];
-					if ( mutation.type === 'childList' ) {
-						var $btn = $( '.block-editor .editor-post-publish-button');
-						if ($btn.length > 0) {
-							$btn.trigger( 'click' );
-							observer.disconnect();
-						}
-					}
+			obs.callback = function( mutationsList, observer ) {
+
+				var $btn = $gb.find( '.editor-post-publish-button, .editor-post-publish-panel__header-publish-button .editor-post-publish-button__button' );
+
+				if ( $btn.length > 0 ) {
+					$btn.trigger( 'click' );
+					observer.disconnect();
 				}
-			}
+			};
 
 			obs.observer = new MutationObserver( obs.callback );
 			obs.observer.observe( obs.targetNode, obs.config );
 
-			$( '.block-editor .edit-post-toggle-publish-panel__button').trigger( 'click' );
-		}
-
-
-
-
+			// Trigger click on the Publish button that opens the additional publishing panel.
+			$gb.find( '.edit-post-toggle-publish-panel__button, .editor-post-publish-panel__toggle.editor-post-publish-button__button' )
+				.trigger( 'click' );
+		},
 	};
 
 	// Provide access to public functions/properties.

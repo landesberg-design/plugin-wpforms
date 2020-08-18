@@ -35,7 +35,7 @@ var WPFormsPagesSMTP = window.WPFormsPagesSMTP || ( function( document, window, 
 		 */
 		init: function() {
 
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

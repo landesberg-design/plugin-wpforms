@@ -146,6 +146,9 @@ abstract class WPForms_Field {
 
 		// Prefill.
 		add_filter( 'wpforms_field_properties', array( $this, 'field_prefill_value_property' ), 10, 3 );
+
+		// Change the choice's value while saving entries.
+		add_filter( 'wpforms_process_before_form_data', [ $this, 'field_fill_empty_choices' ] );
 	}
 
 	/**
@@ -200,6 +203,10 @@ abstract class WPForms_Field {
 	 */
 	public function field_prefill_remove_choices_defaults( $field, &$properties ) {
 
+		// Skip this step on admin page.
+		if ( is_admin() && ! wpforms_is_admin_page( 'entries', 'edit' ) ) {
+			return;
+		}
 		if (
 			! empty( $field['dynamic_choices'] ) ||
 			! empty( $field['choices'] )
@@ -428,6 +435,40 @@ abstract class WPForms_Field {
 	}
 
 	/**
+	 * Fill choices without labels.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @param array $form_data Form data.
+	 *
+	 * @return array
+	 */
+	public function field_fill_empty_choices( $form_data ) {
+
+		if ( empty( $form_data['fields'] ) ) {
+			return $form_data;
+		}
+
+		// Set value for choices with the image only. Conditional logic doesn't work without value.
+		foreach ( $form_data['fields'] as $field_key => $field ) {
+			// Payment fields have their labels set up upfront.
+			if ( empty( $field['choices'] ) || ! in_array( $field['type'], [ 'radio', 'checkbox' ], true ) ) {
+				continue;
+			}
+
+			foreach ( $field['choices'] as $choice_id => $choice ) {
+				if ( ( isset( $choice['value'] ) && '' !== trim( $choice['value'] ) ) || empty( $choice['image'] ) ) {
+					continue;
+				}
+				/* translators: %d - choice number. */
+				$form_data['fields'][ $field_key ]['choices'][ $choice_id ]['value'] = sprintf( esc_html__( 'Choice %d', 'wpforms-lite' ), (int) $choice_id );
+			}
+		}
+
+		return $form_data;
+	}
+
+	/**
 	 * Get the value, that is used to prefill via dynamic or fallback population.
 	 * Based on field data and current properties.
 	 * Normal choices section.
@@ -448,8 +489,15 @@ abstract class WPForms_Field {
 		foreach ( $field['choices'] as $choice_key => $choice_arr ) {
 			$choice_value_key = isset( $field['show_values'] ) ? 'value' : 'label';
 			if (
-				isset( $choice_arr[ $choice_value_key ] ) &&
-				strtoupper( sanitize_text_field( $choice_arr[ $choice_value_key ] ) ) === strtoupper( $get_value )
+				(
+					isset( $choice_arr[ $choice_value_key ] ) &&
+					strtoupper( sanitize_text_field( $choice_arr[ $choice_value_key ] ) ) === strtoupper( $get_value )
+				) ||
+				(
+					empty( $choice_arr[ $choice_value_key ] ) &&
+					/* translators: %d - choice number. */
+					$get_value === sprintf( esc_html__( 'Choice %d', 'wpforms-lite' ), (int) $choice_key )
+				)
 			) {
 				$default_key = $choice_key;
 				// Stop iterating over choices.
@@ -1556,10 +1604,15 @@ abstract class WPForms_Field {
 						$default  = isset( $value['default'] ) ? (bool) $value['default'] : false;
 						$selected = ! empty( $placeholder ) && empty( $multiple ) ? '' : selected( true, $default, false );
 
+						$label = isset( $value['label'] ) ? trim( $value['label'] ) : '';
+						/* translators: %d - Choice item number. */
+						$label  = $label !== '' ? $label : sprintf( esc_html__( 'Choice %d', 'wpforms-lite' ), (int) $key );
+						$label .= ! empty( $field['show_price_after_labels'] ) && isset( $value['value'] ) ? ' - ' . wpforms_format_amount( wpforms_sanitize_amount( $value['value'] ), true ) : '';
+
 						$output .= sprintf(
 							'<option value="%2$s" %1$s>%2$s</option>',
 							$selected,
-							esc_html( $value['label'] )
+							esc_html( $label )
 						);
 					}
 
@@ -1591,6 +1644,11 @@ abstract class WPForms_Field {
 							wpforms_sanitize_classes( $item_class, true )
 						);
 
+						$label = isset( $value['label'] ) ? trim( $value['label'] ) : '';
+						/* translators: %d - Choice item number. */
+						$label  = $label !== '' ? $label : sprintf( esc_html__( 'Choice %d', 'wpforms-lite' ), (int) $key );
+						$label .= ! empty( $field['show_price_after_labels'] ) && isset( $value['value'] ) ? ' - ' . wpforms_format_amount( wpforms_sanitize_amount( $value['value'] ), true ) : '';
+
 						if ( $with_images ) {
 
 							if ( in_array( $field['choices_images_style'], array( 'modern', 'classic' ), true ) ) {
@@ -1617,7 +1675,7 @@ abstract class WPForms_Field {
 								$selected
 							);
 
-							$output .= '<span class="wpforms-image-choices-label">' . wp_kses_post( $value['label'] ) . '</span>';
+							$output .= '<span class="wpforms-image-choices-label">' . wp_kses( $label, $allowed_tags ) . '</span>';
 
 							$output .= '</label>';
 
@@ -1626,7 +1684,7 @@ abstract class WPForms_Field {
 								'<input type="%s" %s disabled>%s',
 								$type,
 								$selected,
-								wp_kses( $value['label'], $allowed_tags )
+								wp_kses( $label, $allowed_tags )
 							);
 						}
 

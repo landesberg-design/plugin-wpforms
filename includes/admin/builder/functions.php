@@ -294,22 +294,6 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 }
 
 /**
- * Get notification state, whether it's opened or closed.
- *
- * @since 1.4.1
- * @deprecated 1.4.8
- *
- * @param int $form_id
- * @param int $notification_id
- *
- * @return string
- */
-function wpforms_builder_notification_get_state( $form_id, $notification_id ) {
-	_deprecated_function( __FUNCTION__, '1.4.8 of WPForms plugin', 'wpforms_builder_settings_block_get_state()' );
-	return wpforms_builder_settings_block_get_state( $form_id, $notification_id, 'notification' );
-}
-
-/**
  * Get settings block state, whether it's opened or closed.
  *
  * @since 1.4.8

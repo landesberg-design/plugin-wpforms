@@ -636,12 +636,14 @@ class WPForms_Conditional_Logic_Fields {
 								} else {
 
 									// For rules referring to fields with choices
-									// we need to replace the choice key with the
-									// choice value.
+									// we need to replace the choice key with the choice value.
 									if ( ! empty( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['value'] ) ) {
 										$val = esc_attr( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['value'] );
-									} else {
+									} elseif ( isset( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] ) && '' !== trim( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] ) ) {
 										$val = esc_attr( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] );
+									} else {
+										/* translators: %d - choice number. */
+										$val = sprintf( esc_html__( 'Choice %d', 'wpforms-lite' ), (int) $rule_field );
 									}
 								}
 

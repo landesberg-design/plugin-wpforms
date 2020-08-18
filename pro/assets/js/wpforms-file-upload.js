@@ -1,6 +1,81 @@
 'use strict';
-
 ( function() {
+
+	/**
+	 * All connections are slow by default.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @type {boolean|null}
+	 */
+	var isSlow = null;
+
+	/**
+	 * Default settings for our speed test.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @type {{maxTime: number, payloadSize: number}}
+	 */
+	var speedTestSettings = {
+		maxTime: 3000, // Max time (ms) it should take to be considered a 'fast connection'.
+		payloadSize: 100 * 1024, // Payload size.
+	};
+
+	/**
+	 * Create a random payload for the speed test.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @returns {string} Random payload.
+	 */
+	function getPayload() {
+
+		var data = '';
+
+		for ( var i = 0; i < speedTestSettings.payloadSize; ++i ) {
+			data += String.fromCharCode( Math.round( Math.random() * 36 + 64 ) );
+		}
+
+		return data;
+	}
+
+	/**
+	 * Run speed tests and flag the clients as slow or not. If a connection
+	 * is slow it would let the backend know and the backend most likely
+	 * would disable parallel uploads and would set smaller chunk sizes.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @param {Function} next Function to call when the speed detection is done.
+	 */
+	function speedTest( next ) {
+
+		if ( null !== isSlow ) {
+			setTimeout( next );
+			return;
+		}
+
+		var data  = getPayload();
+		var start = new Date;
+
+		wp.ajax.post( {
+			action: 'wpforms_file_upload_speed_test',
+			data: data,
+		} ).then( function() {
+
+			var delta = new Date - start;
+
+			isSlow = delta >= speedTestSettings.maxTime;
+
+			next();
+		} ).fail( function() {
+
+			isSlow = true;
+
+			next();
+		} );
+	}
 
 	/**
 	 * Toggle loading message above submit button.
@@ -31,6 +106,13 @@
 
 		var $form    = jQuery( dz.element ).closest( 'form' );
 		var $btn     = $form.find( '.wpforms-submit' );
+
+		// Force dz.loading to be zero if it's below it, to make sure we
+		// don't decrement it below zero.
+		if ( dz.loading < 0 ) {
+			dz.loading = 0;
+		}
+
 		var disabled = dz.loading > 0;
 		var handler  = toggleLoadingMessage( $form );
 
@@ -107,7 +189,7 @@
 	 * @returns {*} Get XHR.
 	 */
 	function getXHR( el ) {
-		return el.xhr;
+		return el.chunkResponse || el.xhr;
 	}
 
 	/**
@@ -120,7 +202,7 @@
 	 * @returns {object} Response text.
 	 */
 	function getResponseText( el ) {
-		return el.responseText;
+		return typeof el === 'string' ? el : el.responseText;
 	}
 
 	/**
@@ -177,6 +259,10 @@
 			 * to prevent only this object from sending a request at all.
 			 * The file that generated that error should be marked as rejected,
 			 * so Dropzone will silently ignore it.
+			 *
+			 * If Chunks are enabled the file size will never exceed (by a PHP constraint) the
+			 * postMaxSize. This block shouldn't be removed nonetheless until the "modern" upload is completely
+			 * deprecated and removed.
 			 */
 			if ( file.size > this.dataTransfer.postMaxSize ) {
 				xhr.send = function() {};
@@ -190,9 +276,6 @@
 				return;
 			}
 
-			this.loading = this.loading || 0;
-			this.loading++;
-			toggleSubmit( this );
 			Object.keys( data ).forEach( function( key ) {
 				formData.append( key, data[key] );
 			} );
@@ -234,6 +317,8 @@
 	/**
 	 * Complete event higher order function.
 	 *
+	 * @deprecated 1.6.2
+	 *
 	 * @since 1.5.6
 	 *
 	 * @param {object} dz Dropzone object.
@@ -247,6 +332,121 @@
 			dz.loading--;
 			toggleSubmit( dz );
 			updateInputValue( dz );
+		};
+	}
+
+	/**
+	 * Add an error message to the current file.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @param {object} file         File object.
+	 * @param {string} errorMessage Error message
+	 */
+	function addErrorMessage( file, errorMessage ) {
+
+		if ( file.isErrorNotUploadedDisplayed ) {
+			return;
+		}
+
+		var span = document.createElement( 'span' );
+		span.innerText = errorMessage.toString();
+		span.setAttribute( 'data-dz-errormessage', '' );
+
+		file.previewElement.querySelector( '.dz-error-message' ).appendChild( span );
+	}
+
+	/**
+	 * Confirm the upload to the server.
+	 *
+	 * The confirmation is needed in order to let PHP know
+	 * that all the chunks have been uploaded.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @param {object} dz Dropzone object.
+	 *
+	 * @returns {Function} Handler function.
+	 */
+	function confirmChunksFinishUpload( dz ) {
+
+		return function confirm( file ) {
+
+			if ( ! file.retries ) {
+				file.retries = 0;
+			}
+
+			if ( 'error' === file.status ) {
+				return;
+			}
+
+			/**
+			 * Retry finalize function.
+			 *
+			 * @since 1.6.2
+			 */
+			function retry() {
+				file.retries++;
+
+				if ( file.retries === 3 ) {
+					addErrorMessage( file, window.wpforms_file_upload.errors.file_not_uploaded );
+					return;
+				}
+
+				setTimeout( function() {
+					confirm( file );
+				}, 5000 * file.retries );
+			}
+
+			/**
+			 * Fail handler for ajax request.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} response Response from the server
+			 */
+			function fail( response ) {
+
+				var hasSpecificError =	response.responseJSON &&
+										response.responseJSON.success === false &&
+										response.responseJSON.data;
+
+				if ( hasSpecificError ) {
+					addErrorMessage( file, response.responseJSON.data );
+				} else {
+					retry();
+				}
+			}
+
+			/**
+			 * Handler for ajax request.
+			 *
+			 * @since 1.6.2
+			 *
+			 * @param {object} response Response from the server
+			 */
+			function complete( response ) {
+
+				file.chunkResponse = JSON.stringify( { data: response } );
+				dz.loading = dz.loading || 0;
+				dz.loading--;
+
+				toggleSubmit( dz );
+				updateInputValue( dz );
+			}
+
+			wp.ajax.post( jQuery.extend(
+				{
+					action: 'wpforms_file_chunks_uploaded',
+					form_id: dz.dataTransfer.formId,
+					field_id: dz.dataTransfer.fieldId,
+					name: file.name,
+				},
+				dz.options.params.call( dz, null, null, {file: file, index: 0} )
+			) ).then( complete ).fail( fail );
+
+			// Move to upload the next file, if any.
+			dz.processQueue();
 		};
 	}
 
@@ -289,15 +489,59 @@
 				if ( ! file.isErrorNotUploadedDisplayed ) {
 					file.isErrorNotUploadedDisplayed = true;
 					errorMessage = window.wpforms_file_upload.errors.file_not_uploaded + ' ' + errorMessage;
+					addErrorMessage( file, errorMessage );
 				}
-
-				var span = document.createElement( 'span' );
-				span.innerText = errorMessage;
-				span.setAttribute( 'data-dz-errormessage', '' );
-
-				file.previewElement.querySelector( '.dz-error-message' ).appendChild( span );
 			}
 		}, 1 );
+	}
+
+	/**
+	 * Start File Upload.
+	 *
+	 * This would do the initial request to start a file upload. No chunk
+	 * is uploaded at this stage, instead all the information related to the
+	 * file are send to the server waiting for an authorization.
+	 *
+	 * If the server authorizes the client would start uploading the chunks.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @param {object} dz   Dropzone object.
+	 * @param {object} file Current file.
+	 */
+	function initFileUpload( dz, file ) {
+
+		wp.ajax.post( jQuery.extend(
+			{
+				action : 'wpforms_upload_chunk_init',
+				form_id: dz.dataTransfer.formId,
+				field_id: dz.dataTransfer.fieldId,
+				name: file.name,
+				slow: isSlow,
+			},
+			dz.options.params.call( dz, null, null, {file: file, index: 0} )
+		) ).then( function( response ) {
+
+			// File upload has been authorized.
+
+			for ( var key in response ) {
+				dz.options[ key ] = response[ key ];
+			}
+
+			if ( response.dzchunksize ) {
+				dz.options.chunkSize = parseInt( response.dzchunksize, 10 );
+				file.upload.totalChunkCount = Math.ceil( file.size / dz.options.chunkSize );
+			}
+
+			dz.processQueue();
+		} ).fail( function( response ) {
+
+			file.status = 'error';
+
+			addErrorMessage( file, response );
+
+			dz.processQueue();
+		} );
 	}
 
 	/**
@@ -313,7 +557,18 @@
 
 		return function( file ) {
 
-			validatePostMaxSizeError( file, dz );
+			if ( file.size >= dz.dataTransfer.postMaxSize ) {
+				validatePostMaxSizeError( file, dz );
+			} else {
+				speedTest( function() {
+					initFileUpload( dz, file );
+				} );
+			}
+
+			dz.loading = dz.loading || 0;
+			dz.loading++;
+			toggleSubmit( dz );
+
 			toggleMessage( dz );
 		};
 	}
@@ -350,15 +605,21 @@
 		return function( file ) {
 			toggleMessage( dz );
 
-			if ( file.xhr ) {
-				var json = parseJSON( file.xhr.responseText );
+			var json = file.chunkResponse || ( file.xhr || {} ).responseText;
 
-				if ( json ) {
-					removeFromServer( json.data.file, dz );
+			if ( json ) {
+				var object = parseJSON( json );
+
+				if ( object && object.data && object.data.file ) {
+					removeFromServer( object.data.file, dz );
 				}
 			}
 
 			updateInputValue( dz );
+
+			dz.loading = dz.loading || 0;
+			dz.loading--;
+			toggleSubmit( dz );
 		};
 	}
 
@@ -408,7 +669,15 @@
 		var dz = new window.Dropzone( $el, {
 			url: window.wpforms_file_upload.url,
 			addRemoveLinks: true,
-			maxFilesize: ( parseInt( $el.dataset.maxSize, 10 ) / 1000000 ).toFixed( 2 ),
+			chunking: true,
+			forceChunking: true,
+			retryChunks: true,
+			chunkSize: parseInt( $el.dataset.fileChunkSize, 10 ),
+			paramName: $el.dataset.inputName,
+			parallelChunkUploads: !! ( $el.dataset.parallelUploads || '' ).match( /^true$/i ),
+			parallelUploads: parseInt( $el.dataset.maxParallelUploads, 10 ),
+			autoProcessQueue: false,
+			maxFilesize: ( parseInt( $el.dataset.maxSize, 10 ) / ( 1024 * 1024 ) ).toFixed( 2 ),
 			maxFiles: maxFiles,
 			acceptedFiles: acceptedFiles,
 			dictMaxFilesExceeded: window.wpforms_file_upload.errors.file_limit.replace( '{fileLimit}', maxFiles ),
@@ -418,21 +687,21 @@
 
 		// Custom variables.
 		dz.dataTransfer = {
+			postMaxSize: $el.dataset.maxSize,
 			name: $el.dataset.inputName,
-			postMaxSize: parseInt( $el.dataset.postMaxSize, 10 ),
 			formId: formId,
 			fieldId: fieldId,
 		};
 
 		// Process events.
 		dz.on( 'sending', sending( dz, {
-			action: 'wpforms_upload_file',
+			action: 'wpforms_upload_chunk',
 			form_id: formId,
 			field_id: fieldId,
 		} ) );
 		dz.on( 'addedfile', addedFile( dz ) );
 		dz.on( 'removedfile', removedFile( dz ) );
-		dz.on( 'complete', complete( dz ) );
+		dz.on( 'complete', confirmChunksFinishUpload( dz ) );
 		dz.on( 'error', error( dz ) );
 
 		return dz;

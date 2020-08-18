@@ -1183,7 +1183,7 @@ class Edit {
 			return false;
 		}
 
-		$ref = wp_get_referer();
+		$ref = wp_get_raw_referer();
 
 		if ( ! $ref ) {
 			return false;

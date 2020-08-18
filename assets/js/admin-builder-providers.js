@@ -20,7 +20,7 @@
 			s = this.settings;
 
 			// Document ready.
-			$( document ).ready( WPFormsProviders.ready );
+			$( WPFormsProviders.ready );
 
 			WPFormsProviders.bindUIActions();
 		},

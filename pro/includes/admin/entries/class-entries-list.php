@@ -114,6 +114,7 @@ class WPForms_Entries_List {
 
 		// Load the classes that builds the entries table.
 		$this->load_entries_list_table();
+		$this->remove_get_parameters();
 
 		// Processing and setup.
 		add_action( 'wpforms_entries_init', array( $this, 'process_filter_dates' ), 7, 1 );
@@ -132,6 +133,16 @@ class WPForms_Entries_List {
 
 		// Enqueues.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueues' ) );
+	}
+
+	/**
+	 * Remove unnecessary $_GET parameters for shorter URL.
+	 *
+	 * @since 1.6.2
+	 */
+	private function remove_get_parameters() {
+
+		$_SERVER['REQUEST_URI'] = remove_query_arg( '_wp_http_referer', $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	}
 
 	/**

@@ -1,3 +1,5 @@
+/* global wpforms_builder */
+
 ;
 var wpf = {
 
@@ -20,7 +22,7 @@ var wpf = {
 
 		wpf.bindUIActions();
 
-		jQuery(document).ready(wpf.ready);
+		jQuery( wpf.ready );
 	},
 
 	/**
@@ -264,13 +266,13 @@ var wpf = {
 	 * @since 1.0.1
 	 * @deprecated 1.2.8
 	 *
-	 * @param string str String to sanitize.
+	 * @param {string} str String to sanitize.
 	 *
-	 * @return string
+	 * @returns {string} String after sanitization.
 	 */
 	sanitizeString: function( str ) {
 
-		if (typeof str === 'string' || str instanceof String) {
+		if ( typeof str === 'string' || str instanceof String ) {
 			return str.trim();
 		}
 		return str;
@@ -359,7 +361,8 @@ var wpf = {
 	 */
 	amountSanitize: function(amount) {
 
-		amount = amount.replace(/[^0-9.,]/g,'');
+		// Convert to string and allow only numbers, dots and commas.
+		amount = String( amount ).replace( /[^0-9.,]/g, '' );
 
 		if ( wpforms_builder.currency_decimal == ',' && ( amount.indexOf(wpforms_builder.currency_decimal) !== -1 ) ) {
 			if ( wpforms_builder.currency_thousands == '.' && amount.indexOf(wpforms_builder.currency_thousands) !== -1 ) {;
@@ -402,6 +405,30 @@ var wpf = {
 		}
 
 		return wpf.numberFormat( amount, 2, wpforms_builder.currency_decimal, wpforms_builder.currency_thousands );
+	},
+
+	/**
+	 * Format amount with currency symbol.
+	 *
+	 * @since 1.6.2
+	 *
+	 * @param {string} amount Amount to format.
+	 *
+	 * @returns {string} Formatted amount (for instance $ 128.00).
+	 */
+	amountFormatCurrency: function( amount ) {
+
+		var sanitized  = wpf.amountSanitize( amount ),
+			formatted  = wpf.amountFormat( sanitized ),
+			result;
+
+		if ( wpforms_builder.currency_symbol_pos === 'right' ) {
+			result = formatted + ' ' + wpforms_builder.currency_symbol;
+		} else {
+			result = wpforms_builder.currency_symbol + ' ' + formatted;
+		}
+
+		return result;
 	},
 
 	/**
@@ -652,7 +679,11 @@ var wpf = {
 			return string;
 		}
 
-		return purify.sanitize( string, {SAFE_FOR_JQUERY: true} );
+		if ( typeof string !== 'string' ) {
+			string = string.toString();
+		}
+
+		return purify.sanitize( string, { SAFE_FOR_JQUERY: true } );
 	},
 };
 

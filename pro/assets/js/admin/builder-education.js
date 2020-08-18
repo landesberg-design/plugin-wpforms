@@ -24,7 +24,7 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 		 * @since 1.5.1
 		 */
 		init: function() {
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

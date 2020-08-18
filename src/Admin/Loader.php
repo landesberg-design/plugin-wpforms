@@ -35,7 +35,6 @@ class Loader {
 		$core_class_names = array(
 			'Connect',
 			'DashboardWidget',
-			'Challenge',
 			'Education',
 			'FlyoutMenu',
 			'Builder\Education',

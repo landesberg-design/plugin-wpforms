@@ -24,6 +24,11 @@ class FlyoutMenu {
 			return;
 		}
 
+		// Check if WPForms Challenge can be displayed.
+		if ( wpforms()->get( 'challenge' )->challenge_can_start() ) {
+			return;
+		}
+
 		$this->hooks();
 	}
 
@@ -44,11 +49,6 @@ class FlyoutMenu {
 	 */
 	public function output() {
 
-		// Do not output if Challenge is active.
-		if ( $this->is_challenge_active() ) {
-			return;
-		}
-
 		printf(
 			'<div id="wpforms-flyout">
 				<div id="wpforms-flyout-items">
@@ -64,35 +64,6 @@ class FlyoutMenu {
 			\esc_url( \WPFORMS_PLUGIN_URL . 'assets/images/admin-flyout-menu/sullie-default.svg' ),
 			\esc_url( \WPFORMS_PLUGIN_URL . 'assets/images/admin-flyout-menu/sullie-active.svg' )
 		);
-	}
-
-
-	/**
-	 * Check if WPForms Challenge is active.
-	 *
-	 * @since 1.6.1
-	 *
-	 * @return bool
-	 */
-	private function is_challenge_active() {
-
-		$challenge    = \get_option( 'wpforms_challenge' );
-		$forms_exists = (bool) \wpforms()->form->get( '', [ 'numberposts' => 1 ] );
-
-		if (
-			! $forms_exists &&
-			(
-				empty( $challenge ) ||
-				(
-					! empty( $challenge['status'] ) &&
-					! \in_array( $challenge['status'], [ 'completed', 'canceled', 'skipped' ], true )
-				)
-			)
-		) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

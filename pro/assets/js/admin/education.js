@@ -25,7 +25,7 @@ var WPFormsAdminEducation = window.WPFormsAdminEducation || ( function( document
 		 * @since 1.5.6
 		 */
 		init: function() {
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

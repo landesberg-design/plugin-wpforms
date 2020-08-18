@@ -51,6 +51,9 @@ class WPForms_Settings {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueues' ) );
 		add_action( 'wpforms_admin_page', array( $this, 'output' ) );
 
+		// Monitor custom tables.
+		$this->monitor_custom_tables();
+
 		// Hook for addons.
 		do_action( 'wpforms_settings_init', $this );
 	}
@@ -266,8 +269,8 @@ class WPForms_Settings {
 					'id'        => 'disable-css',
 					'name'      => esc_html__( 'Include Form Styling', 'wpforms-lite' ),
 					'desc'      => sprintf(
-						wp_kses( /* translators: %s - WPForms.com documentation URL. */
-							__( 'Determines which CSS files to load for the site (<a href="%s" target="_blank" rel="noopener noreferrer">please see our tutorial for full details</a>). Unless experienced with CSS or instructed by support, "Base and Form Theme Styling" is recommended.', 'wpforms-lite' ),
+						wp_kses( /* translators: %s - WPForms.com form styling setting URL. */
+							__( 'Determines which CSS files to load and use for the site (<a href="%s" target="_blank" rel="noopener noreferrer">please see our tutorial for full details</a>). "Base and Form Theme Styling" is recommended, unless you are experienced with CSS or instructed by support to change settings. ', 'wpforms-lite' ),
 							[
 								'a' => [
 									'href'   => [],
@@ -306,7 +309,7 @@ class WPForms_Settings {
 					'desc' => sprintf(
 						wp_kses(
 						/* translators: %s - WPForms.com GDPR documentation URL. */
-							__( 'Check this to turn on GDPR related features and enhancements. <a href="%s" target="_blank" rel="noopener noreferrer">Read our GDPR documentation</a> to learn more.', 'wpforms-lite' ),
+							__( 'Check this to enable GDPR related features and enhancements. <a href="%s" target="_blank" rel="noopener noreferrer">Read our GDPR documentation</a> to learn more.', 'wpforms-lite' ),
 							[
 								'a' => [
 									'href'   => [],
@@ -399,7 +402,7 @@ class WPForms_Settings {
 				'recaptcha-fail-msg'     => [
 					'id'      => 'recaptcha-fail-msg',
 					'name'    => esc_html__( 'Fail Message', 'wpforms-lite' ),
-					'desc'    => esc_html__( 'The message displayed to users who fail the reCAPTCHA verification process.', 'wpforms-lite' ),
+					'desc'    => esc_html__( 'Displays to users who fail the reCAPTCHA verification process.', 'wpforms-lite' ),
 					'type'    => 'text',
 					'default' => esc_html__( 'Google reCAPTCHA verification failed, please try again later.', 'wpforms-lite' ),
 				],
@@ -418,56 +421,68 @@ class WPForms_Settings {
 				'recaptcha-noconflict'   => [
 					'id'   => 'recaptcha-noconflict',
 					'name' => esc_html__( 'No-Conflict Mode', 'wpforms-lite' ),
-					'desc' => esc_html__( 'When checked, other reCAPTCHA occurrences are forcefully removed, to prevent conflicts. Only check if your site is having compatibility issues or instructed to by support.', 'wpforms-lite' ),
+					'desc' => esc_html__( 'Check this option if you need to forcefully remove other reCAPTCHA occurrences in order to prevent conflicts. Only enable this option if your site is having compatibility issues or instructed by support.', 'wpforms-lite' ),
 					'type' => 'checkbox',
 				],
 			],
 			// Validation messages settings tab.
 			'validation'   => [
-				'validation-heading'          => [
+				'validation-heading'               => [
 					'id'       => 'validation-heading',
-					'content'  => '<h4>' . esc_html__( 'Validation Messages', 'wpforms-lite' ) . '</h4><p>' . esc_html__( 'These messages are displayed to the users as they fill out a form in real-time.', 'wpforms-lite' ) . '</p>',
+					'content'  => sprintf( /* translators: %s - WPForms.com smart tags documentation URL. */
+						esc_html__( '%1$s These messages are displayed to the users as they fill out a form in real-time. Messages can include plain text and/or %2$sSmart Tags%3$s.', 'wpforms-lite' ),
+						'<h4>' . esc_html__( 'Validation Messages', 'wpforms-lite' )
+						. '</h4><p>',
+						'<a href="https://wpforms.com/docs/how-to-use-smart-tags-in-wpforms/#smart-tags" target="_blank" rel="noopener noreferrer">',
+						'</>'
+					),
 					'type'     => 'content',
 					'no_label' => true,
 					'class'    => [ 'section-heading' ],
 				],
-				'validation-required'         => [
+				'validation-required'              => [
 					'id'      => 'validation-required',
 					'name'    => esc_html__( 'Required', 'wpforms-lite' ),
 					'type'    => 'text',
 					'default' => esc_html__( 'This field is required.', 'wpforms-lite' ),
 				],
-				'validation-url'              => [
+				'validation-url'                   => [
 					'id'      => 'validation-url',
 					'name'    => esc_html__( 'Website URL', 'wpforms-lite' ),
 					'type'    => 'text',
 					'default' => esc_html__( 'Please enter a valid URL.', 'wpforms-lite' ),
 				],
-				'validation-email'            => [
+				'validation-email'                 => [
 					'id'      => 'validation-email',
 					'name'    => esc_html__( 'Email', 'wpforms-lite' ),
 					'type'    => 'text',
 					'default' => esc_html__( 'Please enter a valid email address.', 'wpforms-lite' ),
 				],
-				'validation-email-suggestion' => [
+				'validation-email-suggestion'      => [
 					'id'      => 'validation-email-suggestion',
 					'name'    => esc_html__( 'Email Suggestion', 'wpforms-lite' ),
 					'type'    => 'text',
 					'default' => esc_html__( 'Did you mean {suggestion}?', 'wpforms-lite' ),
 				],
-				'validation-number'           => [
+				'validation-number'                => [
 					'id'      => 'validation-number',
 					'name'    => esc_html__( 'Number', 'wpforms-lite' ),
 					'type'    => 'text',
 					'default' => esc_html__( 'Please enter a valid number.', 'wpforms-lite' ),
 				],
-				'validation-confirm'          => [
+				'validation-confirm'               => [
 					'id'      => 'validation-confirm',
 					'name'    => esc_html__( 'Confirm Value', 'wpforms-lite' ),
 					'type'    => 'text',
 					'default' => esc_html__( 'Field values do not match.', 'wpforms-lite' ),
 				],
-				'validation-check-limit'      => [
+				'validation-input-mask-incomplete' => [
+					'id'      => 'validation-input-mask-incomplete',
+					'name'    => esc_html__( 'Input Mask Incomplete', 'wpforms-lite' ),
+					'type'    => 'text',
+					'default' => esc_html__( 'Please fill out all blanks.', 'wpforms-lite' ),
+				],
+				'validation-check-limit'           => [
 					'id'      => 'validation-check-limit',
 					'name'    => esc_html__( 'Checkbox Selection Limit', 'wpforms-lite' ),
 					'type'    => 'text',
@@ -673,6 +688,31 @@ class WPForms_Settings {
 		</div>
 
 		<?php
+	}
+
+	/**
+	 * Monitor that all custom tables exist and recreate if missing.
+	 * This logic works on Settings > General page only.
+	 *
+	 * @since 1.6.2
+	 */
+	public function monitor_custom_tables() {
+
+		// Proceed on Settings plugin admin area page only.
+		if ( $this->view !== 'general' ) {
+			return;
+		}
+
+		/*
+		 * Tasks Meta table.
+		 */
+		$meta = new \WPForms\Tasks\Meta();
+
+		if ( $meta->table_exists() ) {
+			return;
+		}
+
+		$meta->create_table();
 	}
 }
 

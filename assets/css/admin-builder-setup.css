@@ -16,7 +16,7 @@
 
 #wpforms-setup-form-name {
 	border-bottom: 1px solid #d6d6d6;
-	overflow: auto;
+	overflow: hidden;
 }
 
 #wpforms-setup-form-name span {

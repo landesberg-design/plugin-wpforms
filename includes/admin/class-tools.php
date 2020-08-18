@@ -252,7 +252,7 @@ class WPForms_Tools {
 		?>
 
 		<div class="wpforms-setting-row tools">
-			<h3><?php esc_html_e( 'WPForms Import', 'wpforms-lite' ); ?></h3>
+			<h4><?php esc_html_e( 'WPForms Import', 'wpforms-lite' ); ?></h4>
 			<p><?php esc_html_e( 'Select a WPForms export file.', 'wpforms-lite' ); ?></p>
 
 			<form method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin.php?page=wpforms-tools&view=import' ) ); ?>">
@@ -273,7 +273,7 @@ class WPForms_Tools {
 		</div>
 
 		<div class="wpforms-setting-row tools" id="wpforms-importers">
-			<h3><?php esc_html_e( 'Import from Other Form Plugins', 'wpforms-lite' ); ?></h3>
+			<h4><?php esc_html_e( 'Import from Other Form Plugins', 'wpforms-lite' ); ?></h4>
 			<p><?php esc_html_e( 'Not happy with other WordPress contact form plugins?', 'wpforms-lite' ); ?></p>
 			<p><?php esc_html_e( 'WPForms makes it easy for you to switch by allowing you import your third-party forms with a single click.', 'wpforms-lite' ); ?></p>
 
@@ -547,7 +547,7 @@ class WPForms_Tools {
 
 		<div class="wpforms-setting-row tools">
 
-			<h3 id="form-export"><?php esc_html_e( 'Form Export', 'wpforms-lite' ); ?></h3>
+			<h4 id="form-export"><?php esc_html_e( 'Form Export', 'wpforms-lite' ); ?></h4>
 
 			<p><?php esc_html_e( 'Form exports files can be used to create a backup of your forms or to import forms into another site.', 'wpforms-lite' ); ?></p>
 
@@ -575,7 +575,7 @@ class WPForms_Tools {
 
 		<div class="wpforms-setting-row tools">
 
-			<h3 id="template-export"><?php esc_html_e( 'Form Template Export', 'wpforms-lite' ); ?></h3>
+			<h4 id="template-export"><?php esc_html_e( 'Form Template Export', 'wpforms-lite' ); ?></h4>
 
 			<?php
 			if ( $this->template ) {
@@ -642,12 +642,12 @@ class WPForms_Tools {
 		?>
 
 		<div class="wpforms-setting-row tools">
-			<h3 id="form-export"><?php esc_html_e( 'System Information', 'wpforms-lite' ); ?></h3>
+			<h4 id="form-export"><?php esc_html_e( 'System Information', 'wpforms-lite' ); ?></h4>
 			<textarea readonly="readonly" class="info-area"><?php echo $this->get_system_info(); ?></textarea>
 		</div>
 
 		<div class="wpforms-setting-row tools">
-			<h3 id="ssl-verify"><?php esc_html_e( 'Test SSL Connections', 'wpforms-lite' ); ?></h3>
+			<h4 id="ssl-verify"><?php esc_html_e( 'Test SSL Connections', 'wpforms-lite' ); ?></h4>
 			<p><?php esc_html_e( 'Click the button below to verify your web server can perform SSL connections successfully.', 'wpforms-lite' ); ?></p>
 			<button type="button" id="wpforms-ssl-verify" class="wpforms-btn wpforms-btn-md wpforms-btn-orange"><?php esc_html_e( 'Test Connection', 'wpforms-lite' ); ?></button>
 		</div>

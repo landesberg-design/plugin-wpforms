@@ -93,8 +93,21 @@ abstract class FormBuilder implements FormBuilderInterface {
 	 * Used to register generic templates for all providers inside form builder.
 	 *
 	 * @since 1.4.7
+	 * @since 1.6.2 Added sub-templates for conditional logic based on provider.
 	 */
 	public function builder_templates() {
+
+		$cl_builder_block = wpforms_conditional_logic()->builder_block(
+			array(
+				'form'       => $this->form_data,
+				'type'       => 'panel',
+				'parent'     => 'providers',
+				'panel'      => esc_attr( $this->core->slug ),
+				'subsection' => '%connection_id%',
+				'reference'  => esc_html__( 'Marketing provider connection', 'wpforms-lite' ),
+			),
+			false
+		);
 		?>
 
 		<!-- Single connection block sub-template: FIELDS -->
@@ -223,20 +236,13 @@ abstract class FormBuilder implements FormBuilderInterface {
 		</script>
 
 		<!-- Single connection block sub-template: CONDITIONAL LOGIC -->
+		<script type="text/html" id="tmpl-wpforms-<?php echo esc_attr( $this->core->slug ); ?>-builder-content-connection-conditionals">
+			<?php echo $cl_builder_block; // phpcs:ignore ?>
+		</script>
+
+		<!-- DEPRECATED: Should be removed when we will make changes in our addons. -->
 		<script type="text/html" id="tmpl-wpforms-providers-builder-content-connection-conditionals">
-			<?php
-			echo wpforms_conditional_logic()->builder_block( // phpcs:ignore
-				array(
-					'form'       => $this->form_data,
-					'type'       => 'panel',
-					'parent'     => 'providers',
-					'panel'      => esc_attr( $this->core->slug ),
-					'subsection' => '%connection_id%',
-					'reference'  => esc_html__( 'Marketing provider connection', 'wpforms-lite' ),
-				),
-				false
-			);
-			?>
+			<?php echo $cl_builder_block; // phpcs:ignore ?>
 		</script>
 		<?php
 	}

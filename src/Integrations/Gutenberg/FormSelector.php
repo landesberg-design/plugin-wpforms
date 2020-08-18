@@ -95,6 +95,7 @@ class FormSelector implements IntegrationInterface {
 				\esc_html__( 'form', 'wpforms-lite' ),
 				\esc_html__( 'contact', 'wpforms-lite' ),
 				\esc_html__( 'survey', 'wpforms-lite' ),
+				'the dude',
 			),
 			'form_select'       => \esc_html__( 'Select a Form', 'wpforms-lite' ),
 			'form_settings'     => \esc_html__( 'Form Settings', 'wpforms-lite' ),
@@ -128,10 +129,11 @@ class FormSelector implements IntegrationInterface {
 			'wpforms-gutenberg-form-selector',
 			'wpforms_gutenberg_form_selector',
 			array(
-				'logo_url' => WPFORMS_PLUGIN_URL . 'assets/images/sullie-alt.png',
-				'wpnonce'  => \wp_create_nonce( 'wpforms-gutenberg-form-selector' ),
-				'forms'    => $forms,
-				'i18n'     => $i18n,
+				'logo_url'          => WPFORMS_PLUGIN_URL . 'assets/images/sullie-alt.png',
+				'block_preview_url' => WPFORMS_PLUGIN_URL . 'assets/images/integrations/gutenberg/block-preview.png',
+				'wpnonce'           => \wp_create_nonce( 'wpforms-gutenberg-form-selector' ),
+				'forms'             => $forms,
+				'i18n'              => $i18n,
 			)
 		);
 	}

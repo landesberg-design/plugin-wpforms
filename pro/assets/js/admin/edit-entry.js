@@ -46,7 +46,7 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 		 */
 		init: function() {
 
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

@@ -382,7 +382,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 		init: function() {
 
 			// Do that when DOM is ready.
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**
@@ -548,7 +548,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 			for ( var id in fields ) {
 
 				// Prepare a field label.
-				label = fields[ id ].label ? wpf.sanitizeString( fields[ id ].label ) : wpforms_builder.field + ' #' + id;
+				label = fields[ id ].label ? wpf.sanitizeHTML( fields[ id ].label ) : wpforms_builder.field + ' #' + id;
 
 				// Try to find all select options by value.
 				$exists = $( '.wpforms-builder-provider-connection-fields-table .wpforms-builder-provider-connection-field-value option[value="' + id + '"]', $connections );
@@ -560,7 +560,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 				}
 
 				// Update a field label if a previous and current labels not equal.
-				if ( wpf.sanitizeString( fields[ id ].label ) !== wpf.sanitizeString( prevSaveFields[ id ].label ) ) {
+				if ( wpf.sanitizeHTML( fields[ id ].label ) !== wpf.sanitizeHTML( prevSaveFields[ id ] ) ) {
 					$exists.text( label );
 				}
 			}
@@ -650,7 +650,22 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 
 				// CONNECTION: Rendered.
 				$( '#wpforms-panel-providers' ).on( 'connectionRendered', function( e, provider, connectionId ) {
+
 					wpf.initTooltips();
+
+					// Some our addons have another arguments for this trigger.
+					// We will fix it asap.
+					if ( typeof connectionId === 'undefined' ) {
+						if ( ! _.isObject( provider ) || ! _.has( provider, 'connection_id' ) ) {
+							return;
+						}
+						connectionId = provider.connection_id;
+					}
+
+					// If connection has mapped select fields - call `wpformsFieldUpdate` trigger.
+					if ( $( this ).find( '.wpforms-builder-provider-connection[data-connection_id="' + connectionId + '"] .wpforms-field-map-select' ).length ) {
+						wpf.fieldUpdate();
+					}
 				} );
 			},
 

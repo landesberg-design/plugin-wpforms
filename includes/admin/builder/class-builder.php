@@ -311,7 +311,7 @@ class WPForms_Builder {
 			'dom-purify',
 			WPFORMS_PLUGIN_URL . 'assets/js/purify.min.js',
 			array(),
-			'2.0.8'
+			'2.0.12'
 		);
 
 		wp_enqueue_script(
@@ -369,18 +369,17 @@ class WPForms_Builder {
 			'notification_prompt'            => esc_html__( 'Enter a notification name', 'wpforms-lite' ),
 			'notification_ph'                => esc_html__( 'Eg: User Confirmation', 'wpforms-lite' ),
 			'notification_error'             => esc_html__( 'You must provide a notification name', 'wpforms-lite' ),
-			'notification_error2'            => esc_html__( 'Form must contain one notification. To disable all notifications use the Notifications dropdown setting.', 'wpforms-lite' ),
 			'notification_def_name'          => esc_html__( 'Default Notification', 'wpforms-lite' ),
 			'confirmation_delete'            => esc_html__( 'Are you sure you want to delete this confirmation?', 'wpforms-lite' ),
 			'confirmation_prompt'            => esc_html__( 'Enter a confirmation name', 'wpforms-lite' ),
 			'confirmation_ph'                => esc_html__( 'Eg: Alternative Confirmation', 'wpforms-lite' ),
 			'confirmation_error'             => esc_html__( 'You must provide a confirmation name', 'wpforms-lite' ),
-			'confirmation_error2'            => esc_html__( 'Form must contain at least one confirmation.', 'wpforms-lite' ),
 			'confirmation_def_name'          => esc_html__( 'Default Confirmation', 'wpforms-lite' ),
 			'save'                           => esc_html__( 'Save', 'wpforms-lite' ),
 			'saving'                         => esc_html__( 'Saving ...', 'wpforms-lite' ),
 			'saved'                          => esc_html__( 'Saved!', 'wpforms-lite' ),
 			'save_exit'                      => esc_html__( 'Save and Exit', 'wpforms-lite' ),
+			'save_embed'                     => esc_html__( 'Save and Embed', 'wpforms-lite' ),
 			'saved_state'                    => '',
 			'layout_selector_show'           => esc_html__( 'Show Layouts', 'wpforms-lite' ),
 			'layout_selector_hide'           => esc_html__( 'Hide Layouts', 'wpforms-lite' ),
@@ -394,11 +393,10 @@ class WPForms_Builder {
 			'template_modal_display'         => ! empty( $this->template['modal_display'] ) ? $this->template['modal_display'] : '',
 			'template_select'                => esc_html__( 'Use Template', 'wpforms-lite' ),
 			'template_confirm'               => esc_html__( 'Changing templates on an existing form will DELETE existing form fields. Are you sure you want apply the new template?', 'wpforms-lite' ),
-			'embed_modal'                    => esc_html__( 'You are almost done. To embed this form on your site, please paste the following shortcode inside a post or page.', 'wpforms-lite' ),
-			'embed_modal_2'                  => esc_html__( 'Or you can follow the instructions in this video.', 'wpforms-lite' ),
+			'embed'                          => esc_html__( 'Embed', 'wpforms-lite' ),
 			'exit'                           => esc_html__( 'Exit', 'wpforms-lite' ),
 			'exit_url'                       => wpforms_current_user_can( 'view_forms' ) ? admin_url( 'admin.php?page=wpforms-overview' ) : admin_url(),
-			'exit_confirm'                   => esc_html__( 'If you exit without saving, your changes will be lost.', 'wpforms-lite' ),
+			'exit_confirm'                   => esc_html__( 'Your form contains unsaved changes. Would you like to save your changes first.', 'wpforms-lite' ),
 			'delete_confirm'                 => esc_html__( 'Are you sure you want to delete this field?', 'wpforms-lite' ),
 			'duplicate_confirm'              => esc_html__( 'Are you sure you want to duplicate this field?', 'wpforms-lite' ),
 			'duplicate_copy'                 => esc_html__( '(copy)', 'wpforms-lite' ),
@@ -440,6 +438,7 @@ class WPForms_Builder {
 			'cl_fields_supported'            => wpforms_get_conditional_logic_form_fields_supported(),
 			'redirect_url_field_error'       => esc_html__( 'You should enter a valid absolute address to the Confirmation Redirect URL field.', 'wpforms-lite' ),
 			'add_custom_value_label'         => esc_html__( 'Add Custom Value', 'wpforms-lite' ),
+			'choice_empty_label_tpl'         => esc_html__( 'Choice {number}', 'wpforms-lite' ),
 		);
 
 		$strings = apply_filters( 'wpforms_builder_strings', $strings, $this->form );

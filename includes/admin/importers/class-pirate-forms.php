@@ -434,7 +434,6 @@ class WPForms_Pirate_Forms extends WPForms_Importer {
 				'form_desc'              => '',
 				'submit_text'            => stripslashes( $pf_form['pirateformsopt_label_submit_btn'] ),
 				'submit_text_processing' => esc_html__( 'Sending', 'wpforms-lite' ),
-				'honeypot'               => empty( $pf_form['pirateformsopt_recaptcha_field'] ) ? '0' : '1',
 				'notification_enable'    => '1',
 				'notifications'          => array(
 					1 => array(

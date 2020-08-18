@@ -62,7 +62,7 @@ class WPForms_Template_Request_Quote extends WPForms_Template {
 				),
 			),
 			'settings' => array(
-				'honeypot'                    => '1',
+				'antispam'                    => '1',
 				'confirmation_message_scroll' => '1',
 				'submit_text_processing'      => esc_html__( 'Sending...', 'wpforms' ),
 			),

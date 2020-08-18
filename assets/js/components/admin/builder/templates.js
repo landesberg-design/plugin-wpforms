@@ -44,7 +44,7 @@ WPForms.Admin.Builder.Templates = WPForms.Admin.Builder.Templates || (function (
 		init: function () {
 
 			// Do that when DOM is ready.
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**
