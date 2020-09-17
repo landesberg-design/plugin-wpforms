@@ -694,7 +694,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 
 		if ( $current > 1 && ! empty( $prev ) ) {
 			printf(
-				'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%d">%s</button>',
+				'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%d" disabled>%s</button>',
 				(int) $current,
 				(int) $form_data['id'],
 				esc_html( $prev )
@@ -703,7 +703,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 
 		if ( $current < $total && ! empty( $next ) ) {
 			printf(
-				'<button class="wpforms-page-button wpforms-page-next" data-action="next" data-page="%d" data-formid="%d">%s</button>',
+				'<button class="wpforms-page-button wpforms-page-next" data-action="next" data-page="%d" data-formid="%d" disabled>%s</button>',
 				(int) $current,
 				(int) $form_data['id'],
 				esc_html( $next )

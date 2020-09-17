@@ -1,13 +1,36 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.2.3] - 2020-09-08
+### Changed
+- Added shortcode access to a form embed modal and enhanced modal navigation.
+- Improved empty states for All Forms, Entries list, and Builder no fields preview panel.
+- Improved Email Summaries footer text.
+- Updated bundled Dropzone.js library to 5.7.2.
+
+### Fixed
+- Properly export 0 (zero) values in field values.
+- Properly handle required Lite files translations for the Pro version of the plugin.
+- Allow unmapping all custom fields in some marketing providers' settings.
+- Properly display seconds (instead of ms) in Modern File Upload field error message when a timeout is reached.
+- Custom validation messages for the fields appear correctly with Ajax form submission enabled.
+- Base style CSS introduces no additional scrollbars now.
+- Clicking the "Next" button won't submit a multi-page form until the page is ready.
+- Correct cursor for image choices validation messages.
+- Address field "Hide subfields" checkbox got a more unique visibility toggle class.
+- Getting the license details from DB works as expected regardless of a context.
+- Getting the list of WPForms addons for user license level works as expected regardless of a context.
+- Number Slider field increment is checked to be more than zero.
+- "Show/Hide Empty Fields" toggle behavior is now consistent on both Single Entry and Print Single Entry pages.
+- Modern Dropdown validation works as expected for AJAX forms.
+
 ## [1.6.2.2] - 2020-08-11
 ### Changed
 - Disable for now auto-updates plugins feature (introduced in WordPress 5.5) for the WPForms core plugin and all of its addons.
 
 ### Fixed
 - Do not allow Action Scheduler to generate errors during the plugin uninstallation procedure.
-- Front-end error gets displayed (instead of failing silently) when honeypot is triggered by an external code.
+- Front-end error gets displayed (instead of failing silently) when honeypot is triggered by external code.
 - Form embed wizard popup should be loaded only when it can actually be used.
 - Input mask validation produces a JS error on jQuery 3.x.
 

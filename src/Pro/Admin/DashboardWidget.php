@@ -473,7 +473,9 @@ class DashboardWidget {
 				<span class="recommended"><?php \esc_html_e( 'Recommended Plugin:', 'wpforms' ); ?></span>
 				<span>
 					<b><?php \esc_html_e( 'MonsterInsights', 'wpforms' ); ?></b> <span class="sep">-</span>
-					<a href="<?php echo \esc_url( $install_mi_url ); ?>"><?php \esc_html_e( 'Install', 'wpforms' ); ?></a> <span class="sep sep-vertical">&vert;</span>
+					<?php if ( wpforms_can_install( 'plugin' ) ) { ?>
+						<a href="<?php echo \esc_url( $install_mi_url ); ?>"><?php \esc_html_e( 'Install', 'wpforms' ); ?></a> <span class="sep sep-vertical">&vert;</span>
+					<?php } ?>
 					<a href="https://www.monsterinsights.com/?utm_source=wpformsplugin&utm_medium=link&utm_campaign=wpformsdashboardwidget"><?php \esc_html_e( 'Learn More', 'wpforms' ); ?></a>
 				</span>
 			</span>

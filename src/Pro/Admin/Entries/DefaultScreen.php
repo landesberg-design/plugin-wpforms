@@ -255,4 +255,14 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	 */
 	public function recommended_plugin_block_html() {
 	}
+
+	/**
+	 * Content if a user has no forms.
+	 *
+	 * @since 1.6.2.3
+	 */
+	public function widget_content_no_forms_html() {
+
+		echo wpforms_render( 'admin/empty-states/no-forms' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
 }

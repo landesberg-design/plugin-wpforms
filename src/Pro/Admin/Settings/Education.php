@@ -82,7 +82,6 @@ class Education {
 		$strings['education_install_prompt']   = '<p>' . \esc_html__( 'The %name% is not installed. Would you like to install and activate it?', 'wpforms' ) . '</p>';
 		$strings['education_install_confirm']  = \esc_html__( 'Yes, install and activate', 'wpforms' );
 		$strings['education_installing']       = \esc_html__( 'Installing', 'wpforms' );
-		$strings['education_activated']        = \esc_html__( 'Addon activated', 'wpforms' );
 		$strings['education_save_prompt']      = \esc_html__( 'Almost done! Would you like to refresh the page?', 'wpforms' );
 		$strings['education_save_confirm']     = \esc_html__( 'Refresh page', 'wpforms' );
 		$strings['education_license_prompt']   = \esc_html__( 'To access addons please enter and activate your WPForms license key in the plugin settings.', 'wpforms' );
@@ -97,7 +96,7 @@ class Education {
 		$strings['education_upgrade']['elite']['confirm'] = \esc_html__( 'Upgrade to Elite', 'wpforms' );
 		$strings['education_upgrade']['elite']['url']     = 'https://wpforms.com/pricing/?utm_source=WordPress&utm_medium=settings-modal&utm_campaign=plugin';
 
-		$license_key = \wpforms()->license->get();
+		$license_key = \wpforms_get_license_key();
 		if ( ! empty( $license_key ) ) {
 			$strings['education_upgrade']['pro']['url'] = \add_query_arg(
 				array(
@@ -105,6 +104,12 @@ class Education {
 				),
 				$strings['education_upgrade']['pro']['url']
 			);
+		}
+
+		$can_install_addons            = wpforms_can_install( 'addon' );
+		$strings['can_install_addons'] = $can_install_addons;
+		if ( ! $can_install_addons ) {
+			$strings['education_install_prompt'] = '<p>' . esc_html__( 'The %name% is not installed. Please install and activate it to use this feature.', 'wpforms' ) . '</p>';
 		}
 
 		return $strings;

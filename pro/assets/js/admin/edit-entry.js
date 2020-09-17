@@ -228,6 +228,7 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 		 */
 		hideErrors: function() {
 
+			el.$editForm.find( '.wpforms-field.wpforms-has-error' ).removeClass( 'wpforms-has-error' );
 			el.$editForm.find( '.wpforms-error:not(label)' ).removeClass( 'wpforms-error' );
 			el.$editForm.find( 'label.wpforms-error' ).addClass( 'wpforms-hidden' );
 		},
@@ -283,6 +284,7 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 				$fieldContainer = el.$editForm.find( '#' + fieldInputID + '-container' ),
 				$errLabel = el.$editForm.find( '#' + errorLabelID );
 
+			$fieldContainer.addClass( 'wpforms-has-error' );
 			$( '#' + fieldInputID ).addClass( 'wpforms-error' );
 
 			if ( $errLabel.length > 0 ) {
@@ -322,6 +324,10 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 				var fieldInputName = 'wpforms[fields][' + fieldID + '][' + key + ']',
 					errorLabelID = 'wpforms-' + formID + '-field_' + fieldID + '-' + key + '-error',
 					$errLabel = el.$editForm.find( '#' + errorLabelID );
+
+				if ( ! $fieldContainer.hasClass( 'wpforms-has-error' ) ) {
+					$fieldContainer.addClass( 'wpforms-has-error' );
+				}
 
 				if ( $errLabel.length > 0 ) {
 					$fieldContainer.find( '[name="' + fieldInputName + '"]' ).addClass( 'wpforms-error' );

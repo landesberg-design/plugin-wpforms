@@ -18,6 +18,15 @@ class WPForms_Addons {
 	public $addons;
 
 	/**
+	 * Determine if the plugin/addon installations are allowed.
+	 *
+	 * @since 1.6.2.3
+	 *
+	 * @var bool
+	 */
+	private $can_install;
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 1.0.0
@@ -43,6 +52,8 @@ class WPForms_Addons {
 
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueues' ) );
 			add_action( 'wpforms_admin_page', array( $this, 'output' ) );
+
+			$this->can_install = wpforms_can_install( 'addon' );
 		}
 	}
 
@@ -294,10 +305,12 @@ class WPForms_Addons {
 									esc_html_e( 'Activate', 'wpforms' );
 								echo '</button>';
 							} elseif ( 'download' === $status ) {
-								echo '<button class="status-' . esc_attr( $status ) . '" data-plugin="' . esc_url( $addon['url'] ) . '" data-type="addon">';
-									echo '<i class="fa fa-cloud-download" aria-hidden="true"></i>';
-									esc_html_e( 'Install Addon', 'wpforms' );
-								echo '</button>';
+								if ( $this->can_install ) {
+									echo '<button class="status-' . esc_attr( $status ) . '" data-plugin="' . esc_url( $addon['url'] ) . '" data-type="addon">';
+										echo '<i class="fa fa-cloud-download" aria-hidden="true"></i>';
+										esc_html_e( 'Install Addon', 'wpforms' );
+									echo '</button>';
+								}
 							} else {
 								echo '<a href="https://wpforms.com/account/" target="_blank" rel="noopener noreferrer" class="wpforms-btn wpforms-btn-orange">' . esc_html__( 'Upgrade Now', 'wpforms' ) . '</a>';
 							}

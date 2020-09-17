@@ -118,7 +118,7 @@ class WPForms_Pro {
 			return;
 		}
 
-		$key = wpforms()->license->get();
+		$key = wpforms_get_license_key();
 
 		if ( ! $key ) {
 			return;
@@ -1414,20 +1414,27 @@ class WPForms_Pro {
 	 */
 	protected function get_wpforms_plugins() {
 
-		$plugins     = [];
-		$addons_data = wpforms()->license->addons();
+		$plugins = [];
+		$license = wpforms()->license;
+
+		if ( empty( $license ) ) {
+			return $plugins;
+		}
+
+		$addons_data = $license->addons();
 
 		if ( empty( $addons_data ) ) {
 			return $plugins;
 		}
 
-		$plugins   = array_map(
+		$plugins = array_map(
 			static function( $slug ) {
 
 				return "{$slug}/{$slug}.php";
 			},
 			wp_list_pluck( $addons_data, 'slug' )
 		);
+
 		$plugins[] = 'wpforms/wpforms.php';
 
 		return $plugins;

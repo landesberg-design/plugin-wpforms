@@ -166,11 +166,16 @@ var WPFormsSettingsEducation = window.WPFormsSettingsEducation || ( function( do
 		 * Ask user if they would like to save form and refresh form builder.
 		 *
 		 * @since 1.5.5
+		 * @since 1.6.2.3 Added a new `title` argument.
+		 *
+		 * @param {string} title Modal title.
 		 */
-		saveModal: function() {
+		saveModal: function( title ) {
+
+			title = title || wpforms_admin.education_activated;
 
 			$.alert( {
-				title  : wpforms_admin.education_activated,
+				title  : title.replace( /\.$/, '' ), // Remove a dot in the title end.
 				content: wpforms_admin.education_save_prompt,
 				icon   : 'fa fa-check-circle',
 				type   : 'green',
@@ -217,6 +222,7 @@ var WPFormsSettingsEducation = window.WPFormsSettingsEducation || ( function( do
 						text    : wpforms_admin.education_install_confirm,
 						btnClass: 'btn-confirm',
 						keys    : [ 'enter' ],
+						isHidden: ! wpforms_admin.can_install_addons,
 						action  : function() {
 
 							var currentModal = this,
@@ -259,11 +265,17 @@ var WPFormsSettingsEducation = window.WPFormsSettingsEducation || ( function( do
 					previousModal.close();
 
 					if ( res.success ) {
-						app.saveModal();
+						app.saveModal( res.data.msg );
 					} else {
+						var message = res.data;
+
+						if ( 'object' === typeof res.data ) {
+							message = wpforms_admin.addon_error;
+						}
+
 						$.alert( {
 							title  : false,
-							content: res.data,
+							content: message,
 							icon   : 'fa fa-exclamation-circle',
 							type   : 'orange',
 							buttons: {

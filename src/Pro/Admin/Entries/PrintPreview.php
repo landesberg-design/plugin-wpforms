@@ -130,10 +130,11 @@ class PrintPreview {
 			<meta name="robots" content="noindex,nofollow,noarchive">
 			<link rel="stylesheet" href="<?php echo \esc_url( \includes_url( 'css/buttons.min.css' ) ); ?>" type="text/css">
 			<link rel="stylesheet" href="<?php echo \WPFORMS_PLUGIN_URL; ?>assets/css/entry-print<?php echo $min; ?>.css" type="text/css">
+			<script type="text/javascript" src="<?php echo \esc_url( \includes_url( 'js/utils.js' ) ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>"></script>
 			<script type="text/javascript" src="<?php echo \esc_url( \includes_url( 'js/jquery/jquery.js' ) ); ?>"></script>
 			<script type="text/javascript">
 				jQuery( function( $ ){
-					var showEmpty   = false,
+					var showEmpty   = wpCookies.get( 'wpforms_entry_hide_empty' ) !== 'true',
 						showNotes   = false,
 						showCompact = false;
 					// Print page.
@@ -146,13 +147,20 @@ class PrintPreview {
 						event.preventDefault();
 						window.close();
 					} );
+					// Init empty fields.
+					if ( ! showEmpty ) {
+						$( '.field.empty' ).hide();
+						$( '.toggle-empty' ).text( '<?php \esc_html_e( 'Show empty fields', 'wpforms' ); ?>' );
+					}
 					// Toggle empty fields.
 					$( document ).on( 'click', '.toggle-empty', function( event ) {
 						event.preventDefault();
-						if ( ! showEmpty ) {
-							$( this ).text( '<?php \esc_html_e( 'Hide empty fields', 'wpforms' ); ?>' );
-						} else {
+						if ( showEmpty ) {
+							wpCookies.set( 'wpforms_entry_hide_empty', 'true', 2592000 );
 							$( this ).text( '<?php \esc_html_e( 'Show empty fields', 'wpforms' ); ?>' );
+						} else {
+							wpCookies.remove( 'wpforms_entry_hide_empty' );
+							$( this ).text( '<?php \esc_html_e( 'Hide empty fields', 'wpforms' ); ?>' );
 						}
 						$( '.field.empty' ).toggle();
 						showEmpty = !showEmpty;
@@ -195,7 +203,7 @@ class PrintPreview {
 					</div>
 				</h1>
 				<div class="actions">
-					<a href="#" class="toggle-empty"><?php \esc_html_e( 'Show empty fields', 'wpforms' ); ?></a> &bull;
+					<a href="#" class="toggle-empty"><?php \esc_html_e( 'Hide empty fields', 'wpforms' ); ?></a> &bull;
 					<?php echo ! empty( $this->entry->entry_notes ) ? '<a href="#" class="toggle-notes">' . \esc_html__( 'Show notes', 'wpforms' ) . '</a> &bull;' : ''; ?>
 					<a href="#" class="toggle-view"><?php \esc_html_e( 'Compact view', 'wpforms' ); ?></a>
 				</div>

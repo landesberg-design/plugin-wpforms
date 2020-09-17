@@ -608,7 +608,17 @@ class WPForms_Entries_List {
 
 			<div class="wpforms-admin-content">
 
-				<?php do_action( 'wpforms_entry_list_title', $form_data, $this ); ?>
+			<?php
+
+			if ( empty( $this->entries->items ) && ! isset( $_GET['search'] ) && ! isset( $_GET['date'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+				// Output no entries screen.
+				echo wpforms_render( 'admin/empty-states/no-entries' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+			} else {
+
+				do_action( 'wpforms_entry_list_title', $form_data, $this );
+			?>
 
 				<form id="wpforms-entries-table" method="get"
 				      action="<?php echo esc_url( admin_url( 'admin.php?page=wpforms-entries' ) ); ?>"
@@ -625,6 +635,8 @@ class WPForms_Entries_List {
 					<?php $this->entries->display(); ?>
 
 				</form>
+
+			<?php } ?>
 
 			</div>
 

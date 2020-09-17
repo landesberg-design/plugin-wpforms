@@ -51,16 +51,29 @@ class Translations implements IntegrationInterface {
 		}
 
 		/*
-		 * If WPForms Lite is already in the list, don't add it again.
-		 *
 		 * Checking this by name because the install path is not guaranteed.
 		 * The capitalized json data defines the array keys, therefore we need to check and define these as such.
 		 */
-		$plugins = json_decode( $args['body']['plugins'], true );
+		$plugins      = json_decode( $args['body']['plugins'], true );
+		$wpforms_data = [];
+
 		foreach ( $plugins['plugins'] as $slug => $data ) {
-			if ( isset( $data['Name'] ) && 'WPForms Lite' === $data['Name'] ) {
-				return $args;
+			if ( ! isset( $data['Name'] ) ) {
+				continue;
 			}
+			// If WPForms Lite is already in the list, don't add it again.
+			if ( 'WPForms Lite' === $data['Name'] ) {
+				continue;
+			}
+			// Check real data for WPForms plugin.
+			if ( 'WPForms' === $data['Name'] ) {
+				$wpforms_data = $data;
+				break;
+			}
+		}
+
+		if ( empty( $wpforms_data ) ) {
+			return $args;
 		}
 
 		/*
@@ -69,7 +82,7 @@ class Translations implements IntegrationInterface {
 		 * This entry is based on the currently present data from this plugin, to make sure the version and textdomain
 		 * settings are as expected. Take care of the capitalized array key as before.
 		 */
-		$plugins['plugins']['wpforms-lite/wpforms.php'] = $plugins['plugins']['wpforms/wpforms.php'];
+		$plugins['plugins']['wpforms-lite/wpforms.php'] = $wpforms_data;
 		// Override the name of the plugin.
 		$plugins['plugins']['wpforms-lite/wpforms.php']['Name'] = 'WPForms Lite';
 		// Override the version of the plugin to prevent increasing the update count.

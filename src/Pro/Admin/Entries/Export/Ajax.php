@@ -351,10 +351,10 @@ class Ajax {
 			$row    = array();
 			foreach ( $request_data['columns_row'] as $col_id => $col_label ) {
 				if ( is_numeric( $col_id ) ) {
-					$row[ $col_id ] = ! empty( $fields[ $col_id ]['value'] ) ? $fields[ $col_id ]['value'] : '';
+					$row[ $col_id ] = isset( $fields[ $col_id ]['value'] ) ? $fields[ $col_id ]['value'] : '';
 				} elseif ( strpos( $col_id, 'del_field_' ) !== false ) {
 					$f_id           = str_replace( 'del_field_', '', $col_id );
-					$row[ $col_id ] = ! empty( $fields[ $f_id ]['value'] ) ? $fields[ $f_id ]['value'] : '';
+					$row[ $col_id ] = isset( $fields[ $f_id ]['value'] ) ? $fields[ $f_id ]['value'] : '';
 				} else {
 					$row[ $col_id ] = $this->get_additional_info_value( $col_id, $entry, $request_data['form_data'] );
 				}

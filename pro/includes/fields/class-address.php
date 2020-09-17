@@ -382,8 +382,8 @@ class WPForms_Field_Address extends WPForms_Field {
 				printf( '<input type="text" class="default" id="wpforms-field-option-%d-address2_default" name="fields[%d][address2_default]" value="%s">', $field['id'], $field['id'], $address2_default );
 				printf( '<label for="wpforms-field-option-%d-address2_default" class="sub-label">%s</label>', $field['id'], esc_html__( 'Default Value', 'wpforms' ) );
 			echo '</div>';
-			echo '<div class="hide">';
-				printf( ' <input type="checkbox" class="hide" name="fields[%d][address2_hide]" value="1" %s>', $field['id'], checked( true, $address2_hide, false ) );
+			echo '<div class="wpforms-subfield-hide">';
+				printf( ' <input type="checkbox" class="wpforms-subfield-hide" name="fields[%d][address2_hide]" value="1" %s>', (int) $field['id'], checked( true, $address2_hide, false ) );
 			echo '</div>';
 		echo '</div>';
 
@@ -441,8 +441,8 @@ class WPForms_Field_Address extends WPForms_Field {
 				printf( '<input type="text" class="default" id="wpforms-field-option-%d-postal_default" name="fields[%d][postal_default]" value="%s">', $field['id'], $field['id'], $postal_default );
 				printf( '<label for="wpforms-field-option-%d-postal_default" class="sub-label">%s</label>', $field['id'], esc_html__( 'Default Value', 'wpforms' ) );
 			echo '</div>';
-			echo '<div class="hide">';
-				printf( ' <input type="checkbox" class="hide" name="fields[%d][postal_hide]" value="1" %s>', $field['id'], checked( true, $postal_hide, false ) );
+			echo '<div class="wpforms-subfield-hide">';
+				printf( ' <input type="checkbox" class="wpforms-subfield-hide" name="fields[%d][postal_hide]" value="1" %s>', (int) $field['id'], checked( true, $postal_hide, false ) );
 			echo '</div>';
 		echo '</div>';
 
@@ -465,8 +465,8 @@ class WPForms_Field_Address extends WPForms_Field {
 				printf( '<input type="text" class="default" id="wpforms-field-option-%d-country_default" name="fields[%d][country_default]" value="%s">', $field['id'], $field['id'], $country_default );
 				printf( '<label for="wpforms-field-option-%d-country_default" class="sub-label">%s</label>', $field['id'], esc_html__( 'Default Value', 'wpforms' ) );
 			echo '</div>';
-			echo '<div class="hide">';
-				printf( ' <input type="checkbox" class="hide" name="fields[%d][country_hide]" value="1" %s>', $field['id'], checked( '1', $country_hide, false ) );
+			echo '<div class="wpforms-subfield-hide">';
+				printf( ' <input type="checkbox" class="wpforms-subfield-hide" name="fields[%d][country_hide]" value="1" %s>', (int) $field['id'], checked( '1', $country_hide, false ) );
 			echo '</div>';
 		echo '</div>';
 

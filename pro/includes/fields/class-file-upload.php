@@ -16,7 +16,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 *
 	 * @var string
 	 */
-	const DROPZONE_VERSION = '5.7.1';
+	const DROPZONE_VERSION = '5.7.2';
 
 	/**
 	 * Classic (old) style of file uploader field.
