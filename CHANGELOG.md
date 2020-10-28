@@ -1,6 +1,47 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.3.1] - 2020-10-21
+### Fixed
+- Entry timestamps could be off by several hours for certain timezones.
+- Form title display issue inside the form builder with smaller view ports.
+- Elementor widget display issue on frontend when no form has been created.
+- Addons page activation/deactivation failing.
+
+## [1.6.3] - 2020-10-15
+### Added
+- Native integration with Divi.
+- Email field Allowlist/Denylist restrictions, see Email field Advanced Options.
+- Date/Time field restrictions, see Date/Time field Advanced Options.
+- Form builder Help - contextual help, search docs, and more.
+- Breadcrumb navigation when searching/filtering entries.
+- Logging, which can be enabled for troubleshooting from WPForms > Tools > Logs.
+- Site Health check to detect if WPForms uploads directory is writable.
+- `{entry_date format="m/d/Y"}` smart tag.
+
+### Changed
+- Nicely notify users in the Form Builder when their WordPress session has expired, and they can't save the form anymore without a page reload.
+- Better AJAX form submit field error messages handling.
+- Updated IntlTel javascript library.
+
+### Fixed
+- Custom metabox heading styling due to WordPress core changes.
+- Page title smart tag not working in some use cases when using AJAX form submissions.
+- Smart phone field assets loading when US or International formats are selected.
+- Various admin area display issues when the field label is empty.
+- Logo Translate plugin integration issues.
+- Addons page grid display issues.
+- Elementor widget edge case issues.
+- Filtering entries by the date given incorrect results due to timezones.
+- Form submit button disabled state issues when using Modern file upload format.
+- Form settings could show before the form was created.
+- Form builder styling inconsistencies with Dropdown field styles.
+- Input mask issues with some mobile browsers, notably Chrome.
+- Database migration errors in some edge cases during plugin updates.
+- Always display the WPForms admin area in the user's language regardless of the site language.
+- Do not load certain JS variables twice on the front end.
+- Conditional logic for modern dropdown and payment dropdown fields should properly process ending space in field values.
+
 ## [1.6.2.3] - 2020-09-08
 ### Changed
 - Added shortcode access to a form embed modal and enhanced modal navigation.
@@ -23,6 +64,7 @@ All notable changes to this project will be documented in this file and formatte
 - Number Slider field increment is checked to be more than zero.
 - "Show/Hide Empty Fields" toggle behavior is now consistent on both Single Entry and Print Single Entry pages.
 - Modern Dropdown validation works as expected for AJAX forms.
+- Properly support drag-n-drop on tablets in the Forms Builder.
 
 ## [1.6.2.2] - 2020-08-11
 ### Changed

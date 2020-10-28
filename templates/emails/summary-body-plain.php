@@ -19,7 +19,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 echo \esc_html__( 'Hi there!', 'wpforms-lite' ) . "\n\n";
 
 if ( \wpforms()->pro ) {
-	echo \esc_html__( 'Let’s see how your forms performed in the past week.', 'wpforms' ) . "\n\n";
+	echo \esc_html__( 'Let’s see how your forms performed in the past week.', 'wpforms-lite' ) . "\n\n";
 } else {
 	echo \esc_html__( 'Let’s see how your forms performed.', 'wpforms-lite' ) . "\n\n";
 	echo \esc_html__( 'Below is the total number of submissions for each form, however actual entries are not stored in WPForms Lite. To generate detailed reports and view future entries inside your WordPress dashboard, consider upgrading to Pro.', 'wpforms-lite' ) . "\n\n\n";

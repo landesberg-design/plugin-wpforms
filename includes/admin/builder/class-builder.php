@@ -311,8 +311,12 @@ class WPForms_Builder {
 			'dom-purify',
 			WPFORMS_PLUGIN_URL . 'assets/js/purify.min.js',
 			array(),
-			'2.0.12'
+			'2.1.1'
 		);
+
+		if ( wp_is_mobile() ) {
+			wp_enqueue_script( 'jquery-touch-punch' );
+		}
 
 		wp_enqueue_script(
 			'wpforms-utils',
@@ -439,6 +443,8 @@ class WPForms_Builder {
 			'redirect_url_field_error'       => esc_html__( 'You should enter a valid absolute address to the Confirmation Redirect URL field.', 'wpforms-lite' ),
 			'add_custom_value_label'         => esc_html__( 'Add Custom Value', 'wpforms-lite' ),
 			'choice_empty_label_tpl'         => esc_html__( 'Choice {number}', 'wpforms-lite' ),
+			'error_save_form'                => esc_html__( 'Something went wrong while saving the form. Please reload the page and try again.', 'wpforms-lite' ),
+			'error_contact_support'          => esc_html__( 'Please contact the plugin support team if this behavior persists.', 'wpforms-lite' ),
 		);
 
 		$strings = apply_filters( 'wpforms_builder_strings', $strings, $this->form );
@@ -574,6 +580,11 @@ class WPForms_Builder {
 					</div>
 
 					<div class="wpforms-right">
+
+						<a href="#" id="wpforms-help" title="<?php esc_attr_e( 'Help', 'wpforms-lite' ); ?>">
+							<i class="fa fa-question-circle"></i>
+							<span><?php esc_html_e( 'Help', 'wpforms-lite' ); ?></span>
+						</a>
 
 						<?php if ( $this->form ) : ?>
 

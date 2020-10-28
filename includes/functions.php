@@ -1588,52 +1588,76 @@ function wpforms_debug_data( $data, $echo = true ) {
  */
 function wpforms_log( $title = '', $message = '', $args = array() ) {
 
+	// Skip if logs disabled in Tools -> Logs.
+	if ( ! wpforms_setting( 'logs-enable', false ) ) {
+		return;
+	}
+
 	// Require log title.
 	if ( empty( $title ) ) {
 		return;
 	}
 
-	// Force logging everything when in debug mode.
-	if ( ! wpforms_debug() ) {
+	/**
+	 * Compare error levels to determine if we should log.
+	 * Current supported levels:
+	 * - Errors (error)
+	 * - Spam (spam)
+	 * - Entries (entry)
+	 * - Payments (payment)
+	 * - Providers (provider)
+	 * - Conditional Logic (conditional_logic)
+	 */
+	$types = ! empty( $args['type'] ) ? (array) $args['type'] : [ 'error' ];
 
-		/**
-		 * Compare error levels to determine if we should log.
-		 * Current supported levels:
-		 * - Errors (error)
-		 * - Spam (spam)
-		 * - Entries (entry)
-		 * - Payments (payment)
-		 * - Providers (provider)
-		 * - Conditional Logic (conditional_logic)
-		 */
-		$type   = ! empty( $args['type'] ) ? (array) $args['type'] : array( 'error' );
-		$levels = array_intersect( $type, get_option( 'wpforms_logging', array() ) );
-		if ( empty( $levels ) ) {
-			return;
+	// Skip invalid logs types.
+	$log_types = \WPForms\Logger\Log::get_log_types();
+	foreach ( $types as $key => $type ) {
+		if ( ! isset( $log_types[ $type ] ) ) {
+			unset( $types[ $key ] );
 		}
 	}
-
-	// Meta.
-	if ( ! empty( $args['form_id'] ) ) {
-		$meta = array(
-			'form' => absint( $args['form_id'] ),
-		);
-	} elseif ( ! empty( $args['meta'] ) ) {
-		$meta = $args['meta'];
-	} else {
-		$meta = '';
+	if ( empty( $types ) ) {
+		return;
 	}
-
-	// Parent element.
-	$parent = ! empty( $args['parent'] ) ? $args['parent'] : 0;
 
 	// Make arrays and objects look nice.
 	if ( is_array( $message ) || is_object( $message ) ) {
 		$message = '<pre>' . print_r( $message, true ) . '</pre>'; // phpcs:ignore
 	}
 
+	// Filter logs types from Tools -> Logs page.
+	$logs_types = wpforms_setting( 'logs-types', false );
+	if ( $logs_types && empty( array_intersect( $logs_types, $types ) ) ) {
+		return;
+	}
+
+	// Filter user roles from Tools -> Logs page.
+	global $current_user;
+	$logs_user_roles = wpforms_setting( 'logs-user-roles', false );
+	if ( $logs_user_roles && empty( array_intersect( $logs_user_roles, $current_user->roles ) ) ) {
+		return;
+	}
+
+	// Filter logs users from Tools -> Logs page.
+	$logs_users = wpforms_setting( 'logs-users', false );
+	if ( $logs_users && ! in_array( $current_user->ID, $logs_users, true ) ) {
+		return;
+	}
+
+	$log = wpforms()->get( 'log' );
+	if ( ! method_exists( $log, 'add' ) ) {
+		return;
+	}
 	// Create log entry.
-	wpforms()->logs->add( $title, $message, $parent, $parent, $meta );
+	$log->add(
+		$title,
+		$message,
+		$types,
+		isset( $args['form_id'] ) ? absint( $args['form_id'] ) : 0,
+		isset( $args['parent'] ) ? absint( $args['parent'] ) : 0,
+		$current_user->ID
+	);
 }
 
 /**
@@ -1773,17 +1797,67 @@ function wpforms_current_user_can( $caps = array(), $id = 0 ) {
 }
 
 /**
- * Get the certain date of a specified day in a specified format.
+ * Return date and time formatted as expected.
  *
- * @since 1.4.4
+ * @since 1.6.3
  *
- * @param string $period    Supported values: start, end.
- * @param string $timestamp Default is the current timestamp, if left empty.
- * @param string $format    Default is a MySQL format.
+ * @param string|int $date       Date to format.
+ * @param string     $format     Optional. Format for the date and time.
+ * @param bool       $gmt_offset Optional. GTM offset.
  *
  * @return string
  */
-function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d H:i:s' ) {
+function wpforms_datetime_format( $date, $format = '', $gmt_offset = false ) {
+
+	if ( '' === $format ) {
+		$format = sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) );
+	}
+
+	if ( is_string( $date ) ) {
+		$date = strtotime( $date );
+	}
+
+	if ( $gmt_offset ) {
+		$date += intval( get_option( 'gmt_offset' ) ) * 3600;
+	}
+
+	return date_i18n( $format, $date );
+}
+
+/**
+ * Return date formatted as expected.
+ *
+ * @since 1.6.3
+ *
+ * @param string|int $date       Date to format.
+ * @param string     $format     Optional. Format for the date.
+ * @param bool       $gmt_offset Optional. GTM offset.
+ *
+ * @return string
+ */
+function wpforms_date_format( $date, $format = '', $gmt_offset = false ) {
+
+	if ( '' === $format ) {
+		$format = get_option( 'date_format' );
+	}
+
+	return wpforms_datetime_format( $date, $format, $gmt_offset );
+}
+
+/**
+ * Get the certain date of a specified day in a specified format.
+ *
+ * @since 1.4.4
+ * @since 1.6.3 Added $use_gmt_offset parameter.
+ *
+ * @param string $period         Supported values: start, end.
+ * @param string $timestamp      Default is the current timestamp, if left empty.
+ * @param string $format         Default is a MySQL format.
+ * @param bool   $use_gmt_offset Use GTM offset.
+ *
+ * @return string
+ */
+function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d H:i:s', $use_gmt_offset = false ) {
 
 	$date = '';
 
@@ -1791,13 +1865,15 @@ function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d
 		$timestamp = time();
 	}
 
+	$offset_sec = $use_gmt_offset ? get_option( 'gmt_offset' ) * 3600 : 0;
+
 	switch ( $period ) {
 		case 'start_of_day':
-			$date = date( $format, strtotime( 'today', $timestamp ) );
+			$date = gmdate( $format, strtotime( 'today', $timestamp ) - $offset_sec );
 			break;
 
 		case 'end_of_day':
-			$date = date( $format, strtotime( 'tomorrow', $timestamp ) - 1 );
+			$date = gmdate( $format, strtotime( 'tomorrow', $timestamp ) - 1 - $offset_sec );
 			break;
 	}
 
@@ -1861,6 +1937,14 @@ function wpforms_get_providers_all() {
 			'plugin'      => 'wpforms-mailchimp/wpforms-mailchimp.php',
 			'plugin_slug' => 'wpforms-mailchimp',
 			'license'     => 'pro',
+		],
+		[
+			'name'        => 'Salesforce',
+			'slug'        => 'salesforce',
+			'img'         => 'addon-icon-salesforce.png',
+			'plugin'      => 'wpforms-salesforce/wpforms-salesforce.php',
+			'plugin_slug' => 'wpforms-salesforce',
+			'license'     => 'elite',
 		],
 		[
 			'name'        => 'Zapier',
@@ -2360,6 +2444,10 @@ function wpforms_create_index_html_file( $path ) {
  */
 function wpforms_create_upload_dir_htaccess_file() {
 
+	if ( ! apply_filters( 'wpforms_create_upload_dir_htaccess_file', true ) ) {
+		return false;
+	}
+
 	$upload_dir = wpforms_upload_dir();
 
 	if ( ! empty( $upload_dir['error'] ) ) {
@@ -2376,7 +2464,9 @@ function wpforms_create_upload_dir_htaccess_file() {
 		require_once ABSPATH . 'wp-admin/includes/misc.php';
 	}
 
-	$contents = '# Disable PHP and Python scripts parsing.
+	$contents = apply_filters(
+		'wpforms_create_upload_dir_htaccess_file_content',
+		'# Disable PHP and Python scripts parsing.
 <Files *>
   SetHandler none
   SetHandler default-handler
@@ -2391,7 +2481,8 @@ function wpforms_create_upload_dir_htaccess_file() {
 </IfModule>
 <IfModule headers_module>
   Header set X-Robots-Tag "noindex"
-</IfModule>';
+</IfModule>'
+	);
 
 	return insert_with_markers( $htaccess_file, 'WPForms', $contents );
 }

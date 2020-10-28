@@ -249,29 +249,43 @@ class Widget extends Widget_Base {
 	}
 
 	/**
-	 * Render widget output on the frontend.
+	 * Render widget output.
 	 *
 	 * @since 1.6.2
 	 */
 	protected function render() {
 
+		if ( Plugin::$instance->editor->is_edit_mode() ) {
+			$this->render_edit_mode();
+		} else {
+			$this->render_frontend();
+		}
+	}
+
+	/**
+	 * Render widget output in edit mode.
+	 *
+	 * @since 1.6.3.1
+	 */
+	protected function render_edit_mode() {
+
 		$form_id = $this->get_settings_for_display( 'form_id' );
 
 		// Popup markup template.
-		echo wpforms_render( 'integrations/elementor/popup' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wpforms_render( 'integrations/elementor/popup' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-		// No forms block.
 		if ( count( $this->get_forms() ) < 2 ) {
 
-			echo wpforms_render( 'integrations/elementor/no-forms' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			// No forms block.
+			echo wpforms_render( 'integrations/elementor/no-forms' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			return;
 		}
 
-		if ( empty( $form_id ) && Plugin::$instance->editor->is_edit_mode() ) {
+		if ( empty( $form_id ) ) {
 
 			// Render form selector.
-			$preview = wpforms_render(   // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				'integrations/elementor/form-selector',
 				[
 					'forms' => $this->get_form_selector_options(),
@@ -279,14 +293,22 @@ class Widget extends Widget_Base {
 				true
 			);
 
-		} else {
-
-			// Render selected form.
-			$preview = do_shortcode( $this->render_shortcode() );
-
+			return;
 		}
 
-		echo $preview; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// Finally, render selected form.
+		$this->render_frontend();
+	}
+
+	/**
+	 * Render widget output on the frontend.
+	 *
+	 * @since 1.6.3.1
+	 */
+	protected function render_frontend() {
+
+		// Render selected form.
+		echo do_shortcode( $this->render_shortcode() );
 	}
 
 	/**

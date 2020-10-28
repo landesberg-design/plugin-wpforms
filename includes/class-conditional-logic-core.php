@@ -383,8 +383,10 @@ class WPForms_Conditional_Logic_Core {
 															$selected = false;
 														}
 
+														$field_label = isset( $form_field['label'] ) && ! wpforms_is_empty_string( trim( $form_field['label'] ) ) ? $form_field['label'] : sprintf( /* translators: %d - field ID. */ __( 'Field #%d', 'wpforms-lite' ), absint( $form_field['id'] ) );
+
 														$selected = selected( $selected, $form_field['id'], false );
-														printf( '<option value="%s" %s>%s</option>', absint( $form_field['id'] ), $selected, esc_html( $form_field['label'] ) );
+														printf( '<option value="%s" %s>%s</option>', absint( $form_field['id'] ), esc_attr( $selected ), esc_html( $field_label ) );
 													}
 												}
 

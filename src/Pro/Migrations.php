@@ -92,6 +92,8 @@ class Migrations {
 	 */
 	private function migrate( $version ) {
 
+		wpforms()->get( 'pro' )->objects();
+
 		if ( version_compare( $version, '1.1.6', '<' ) ) {
 			$this->v116_upgrade();
 		}

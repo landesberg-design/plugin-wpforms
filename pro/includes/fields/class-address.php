@@ -895,6 +895,35 @@ class WPForms_Field_Address extends WPForms_Field {
 			'country'  => sanitize_text_field( $country ),
 		);
 	}
+
+	/**
+	 * Get field name for ajax error message.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @param string $name  Field name for error triggered.
+	 * @param array  $field Field settings.
+	 * @param array  $props List of properties.
+	 * @param string $error Error message.
+	 *
+	 * @return string
+	 */
+	public function ajax_error_field_name( $name, $field, $props, $error ) {
+
+		if ( ! isset( $field['type'] ) || 'address' !== $field['type'] ) {
+			return $name;
+		}
+		if ( ! isset( $field['scheme'] ) ) {
+			return $name;
+		}
+		if ( 'us' === $field['scheme'] ) {
+			$input = isset( $props['inputs']['postal'] ) ? $props['inputs']['postal'] : [];
+		} else {
+			$input = isset( $props['inputs']['country'] ) ? $props['inputs']['country'] : [];
+		}
+
+		return isset( $input['attr']['name'] ) ? $input['attr']['name'] : $name;
+	}
 }
 
 new WPForms_Field_Address();

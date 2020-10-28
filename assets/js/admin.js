@@ -45,7 +45,7 @@
 			WPFormsAdmin.initWelcome();
 
 			// Addons List.
-			WPFormsAdmin.initAddons();
+			$( document ).on( 'wpformsReady', WPFormsAdmin.initAddons );
 
 			// Settings.
 			WPFormsAdmin.initSettings();
@@ -128,7 +128,7 @@
 						confirm: {
 							text: wpforms_admin.ok,
 							btnClass: 'btn-confirm',
-							keys: [ 'enter' ]
+							keys: [ 'enter' ],
 						}
 					}
 				});
@@ -753,38 +753,33 @@
 		 */
 		initAddons: function() {
 
-			// Some actions have to be delayed to document.ready.
-			$( document ).on( 'wpformsReady', function() {
+			// Only run on the addons page.
+			if ( ! $( '#wpforms-admin-addons' ).length ) {
+				return;
+			}
 
-				// Only run on the addons page.
-				if ( ! $( '#wpforms-admin-addons' ).length ) {
-					return;
-				}
+			WPFormsAdmin.matchHeightAddonBlocks();
 
-				// Display all addon boxes as the same height.
-				$( '.addon-item .details' ).matchHeight( { byrow: false, property: 'height' } );
+			// Addons searching.
+			if ( $( '#wpforms-admin-addons-list' ).length ) {
+				var addonSearch = new List( 'wpforms-admin-addons-list', {
+					valueNames: [ 'addon-name' ] } );
 
-				// Addons searching.
-				if ( $('#wpforms-admin-addons-list').length ) {
-					var addonSearch = new List( 'wpforms-admin-addons-list', {
-						valueNames: [ 'addon-name' ]
-					} );
+				$( '#wpforms-admin-addons-search' ).on( 'keyup', function() {
+					var searchTerm = $( this ).val(),
+						$heading = $( '#addons-heading' );
 
-					$( '#wpforms-admin-addons-search' ).on( 'keyup', function () {
-						var searchTerm = $( this ).val(),
-							$heading = $( '#addons-heading' );
+					if ( searchTerm ) {
+						$heading.text( wpforms_admin.addon_search );
+					} else {
+						$heading.text( $heading.data( 'text' ) );
+					}
 
-						if ( searchTerm ) {
-							$heading.text( wpforms_admin.addon_search );
-						}
-						else {
-							$heading.text( $heading.data( 'text' ) );
-						}
+					addonSearch.search( searchTerm );
+				} );
+			}
 
-						addonSearch.search( searchTerm );
-					} );
-				}
-			});
+			$( window ).on( 'resize', WPFormsAdmin.matchHeightAddonBlocks );
 
 			// Toggle an addon state.
 			$( document ).on( 'click', '#wpforms-admin-addons .addon-item button', function( event ) {
@@ -796,7 +791,46 @@
 				}
 
 				WPFormsAdmin.addonToggle( $( this ) );
-			});
+			} );
+		},
+
+		/**
+		 * Change plugin/addon state.
+		 *
+		 * @since 1.6.3
+		 *
+		 * @param {string}   plugin     Plugin slug or URL for download.
+		 * @param {string}   state      State status activate|deactivate|install.
+		 * @param {string}   pluginType Plugin type addon or plugin.
+		 * @param {Function} callback   Callback for get result from AJAX.
+		 */
+		setAddonState: function( plugin, state, pluginType, callback ) {
+
+			var actions = {
+					'activate': 'wpforms_activate_addon',
+					'install': 'wpforms_install_addon',
+					'deactivate': 'wpforms_deactivate_addon',
+				},
+				action = actions[ state ];
+
+			if ( ! action ) {
+				return;
+			}
+
+			var data = {
+				action: action,
+				nonce: wpforms_admin.nonce,
+				plugin: plugin,
+				type: pluginType,
+			};
+
+			$.post( wpforms_admin.ajax_url, data, function( res ) {
+
+				callback( res );
+			} ).fail( function( xhr ) {
+
+				console.log( xhr.responseText );
+			} );
 		},
 
 		/**
@@ -934,6 +968,16 @@
 			}).fail( function( xhr ) {
 				console.log( xhr.responseText );
 			});
+		},
+
+		/**
+		 * Display all addon boxes as the same height.
+		 *
+		 * @since 1.6.3
+		 */
+		matchHeightAddonBlocks: function() {
+
+			$( '.addon-item .details' ).matchHeight( { byrow: false, property: 'height' } );
 		},
 
 		//--------------------------------------------------------------------//
@@ -1129,7 +1173,7 @@
 					confirm: {
 						text: wpforms_admin.ok,
 						btnClass: 'btn-confirm',
-						keys: [ 'enter' ]
+						keys: [ 'enter' ],
 					}
 				}
 			});
@@ -1222,7 +1266,7 @@
 						confirm: {
 							text: wpforms_admin.ok,
 							btnClass: 'btn-confirm',
-							keys: [ 'enter' ]
+							keys: [ 'enter' ],
 						}
 					}
 				});
@@ -1275,7 +1319,7 @@
 						confirm: {
 							text: wpforms_admin.ok,
 							btnClass: 'btn-confirm',
-							keys: [ 'enter' ]
+							keys: [ 'enter' ],
 						}
 					}
 				});
@@ -1327,7 +1371,7 @@
 						confirm: {
 							text: wpforms_admin.ok,
 							btnClass: 'btn-confirm',
-							keys: [ 'enter' ]
+							keys: [ 'enter' ],
 						}
 					}
 				});
@@ -1378,7 +1422,7 @@
 							confirm: {
 								text: wpforms_admin.ok,
 								btnClass: 'btn-confirm',
-								keys: [ 'enter' ]
+								keys: [ 'enter' ],
 							}
 						}
 					});
@@ -1498,7 +1542,7 @@
 							confirm: {
 								text: wpforms_admin.ok,
 								btnClass: 'btn-confirm',
-								keys: [ 'enter' ]
+								keys: [ 'enter' ],
 							}
 						}
 					});

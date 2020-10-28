@@ -55,6 +55,10 @@ $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpforms_entry_fields' )
 // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 $wpdb->query( 'DROP TABLE IF EXISTS ' . \WPForms\Tasks\Meta::get_table_name() );
 
+// Delete logger table.
+// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+$wpdb->query( 'DROP TABLE IF EXISTS ' . \WPForms\Logger\Repository::get_table_name() );
+
 // Delete Preview page.
 $preview_page = get_option( 'wpforms_preview_page', false );
 if ( ! empty( $preview_page ) ) {
@@ -96,6 +100,7 @@ $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\
 $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_site\_transient\_wpforms\_%'" );
 $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_timeout\_wpforms\_%'" );
 $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_site\_transient\_timeout\_wpforms\_%'" );
+$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_wpforms\_transient\_%'" );
 
 global $wp_filesystem;
 

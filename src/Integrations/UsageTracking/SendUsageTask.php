@@ -22,10 +22,15 @@ class SendUsageTask extends Task {
 	 * Server URL to send requests to.
 	 *
 	 * @since 1.6.1
-	 *
-	 * @var string
 	 */
 	const TRACK_URL = 'https://wpformsusage.com/v1/track';
+
+	/**
+	 * Option name to store the timestamp of the last run.
+	 *
+	 * @since 1.6.3
+	 */
+	const LAST_RUN = 'wpforms_send_usage_last_run';
 
 	/**
 	 * Class constructor.
@@ -73,7 +78,8 @@ class SendUsageTask extends Task {
 	 */
 	private function generate_start_date() {
 
-		$tracking            = [];
+		$tracking = [];
+
 		$tracking['days']    = wp_rand( 0, 6 ) * DAY_IN_SECONDS;
 		$tracking['hours']   = wp_rand( 0, 23 ) * HOUR_IN_SECONDS;
 		$tracking['minutes'] = wp_rand( 0, 59 ) * MINUTE_IN_SECONDS;
@@ -83,12 +89,23 @@ class SendUsageTask extends Task {
 	}
 
 	/**
-	 * Send the actual data in a non-blocking POST request.
+	 * Send the actual data in a POST request.
 	 *
 	 * @since 1.6.1
 	 */
 	public function process() {
 
+		$last_run = get_option( self::LAST_RUN );
+
+		// Make sure we do not run it more than once a day.
+		if (
+			$last_run !== false &&
+			( time() - $last_run ) < DAY_IN_SECONDS
+		) {
+			return;
+		}
+
+		// Send data to the usage tracking API.
 		$ut = new UsageTracking();
 
 		wp_remote_post(
@@ -102,5 +119,8 @@ class SendUsageTask extends Task {
 				'user-agent'  => $ut->get_user_agent(),
 			]
 		);
+
+		// Update the last run option to the current timestamp.
+		update_option( self::LAST_RUN, time() );
 	}
 }

@@ -175,8 +175,8 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 		if ( ! empty( $args['date'] ) ) {
 			// We can pass array and treat it as a range from:to.
 			if ( is_array( $args['date'] ) && count( $args['date'] ) === 2 ) {
-				$date_start = wpforms_get_day_period_date( 'start_of_day', strtotime( $args['date'][0] ) );
-				$date_end   = wpforms_get_day_period_date( 'end_of_day', strtotime( $args['date'][1] ) );
+				$date_start = wpforms_get_day_period_date( 'start_of_day', strtotime( $args['date'][0] ), 'Y-m-d H:i:s', true );
+				$date_end   = wpforms_get_day_period_date( 'end_of_day', strtotime( $args['date'][1] ), 'Y-m-d H:i:s', true );
 
 				if ( ! empty( $date_start ) && ! empty( $date_end ) ) {
 					$where['arg_date_start'] = "`date` >= '{$date_start}'";
@@ -189,8 +189,8 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 				 * So we generate start and end MySQL dates for the specified day.
 				 */
 				$timestamp  = strtotime( $args['date'] );
-				$date_start = wpforms_get_day_period_date( 'start_of_day', $timestamp );
-				$date_end   = wpforms_get_day_period_date( 'end_of_day', $timestamp );
+				$date_start = wpforms_get_day_period_date( 'start_of_day', $timestamp, 'Y-m-d H:i:s', true );
+				$date_end   = wpforms_get_day_period_date( 'end_of_day', $timestamp, 'Y-m-d H:i:s', true );
 
 				if ( ! empty( $date_start ) && ! empty( $date_end ) ) {
 					$where['arg_date_start'] = "`date` >= '{$date_start}'";

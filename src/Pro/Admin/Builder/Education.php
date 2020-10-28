@@ -293,7 +293,7 @@ class Education {
 	 */
 	public function settings( $form, $slug ) {
 
-		if ( 'settings' !== $slug ) {
+		if ( empty( $form ) || 'settings' !== $slug ) {
 			return;
 		}
 
@@ -430,6 +430,14 @@ class Education {
 				'plugin'      => 'wpforms-mailchimp/wpforms-mailchimp.php',
 				'plugin_slug' => 'wpforms-mailchimp',
 				'license'     => 'pro',
+			),
+			array(
+				'name'        => esc_html__( 'Salesforce', 'wpforms' ),
+				'slug'        => 'salesforce',
+				'img'         => 'addon-icon-salesforce.png',
+				'plugin'      => 'wpforms-salesforce/wpforms-salesforce.php',
+				'plugin_slug' => 'wpforms-salesforce',
+				'license'     => 'elite',
 			),
 			array(
 				'name'        => esc_html__( 'Zapier', 'wpforms' ),

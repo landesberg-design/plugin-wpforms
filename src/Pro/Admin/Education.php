@@ -20,6 +20,15 @@ class Education {
 	public $license;
 
 	/**
+	 * List of addons information.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @var array
+	 */
+	private $addons;
+
+	/**
 	 * WPForms admin page slug.
 	 *
 	 * @since 1.5.6
@@ -56,11 +65,15 @@ class Education {
 
 		// Load license level.
 		$this->license = \wpforms_get_license_type();
+		$this->addons  = wpforms()->license ? (array) wpforms()->license->addons() : [];
 
 		// Admin page slug.
 		$this->page = str_replace( 'wpforms-', '', filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING ) );
 
-		\add_action( 'admin_init', array( $this, 'dyk_init' ) );
+		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ] );
+		\add_action( 'admin_init', [ $this, 'dyk_init' ] );
+		\add_action( 'wpforms_entry_details_content', [ $this, 'geolocation' ], 20 );
+		\add_action( 'wp_ajax_hide_education', [ $this, 'hide_education' ] );
 	}
 
 	/**
@@ -80,9 +93,8 @@ class Education {
 			return;
 		}
 
-		\add_action( 'admin_enqueue_scripts', array( $this, 'enqueues' ) );
-		\add_action( 'wpforms_admin_' . $this->page . '_after_rows', array( $this, 'dyk_display' ) );
-		\add_action( 'wp_ajax_wpforms_dyk_dismiss', array( $this, 'dyk_ajax_dismiss' ) );
+		\add_action( 'wpforms_admin_' . $this->page . '_after_rows', [ $this, 'dyk_display' ] );
+		\add_action( 'wp_ajax_wpforms_dyk_dismiss', [ $this, 'dyk_ajax_dismiss' ] );
 	}
 
 	/**
@@ -425,4 +437,86 @@ class Education {
 			false
 		);
 	}
+
+	/**
+	 * Geolocation preview
+	 *
+	 * @since 1.6.3
+	 */
+	public function geolocation() {
+
+		$plugin_slug = 'wpforms-geolocation';
+		$plugin_file = sprintf( '%s/%s.php', $plugin_slug, $plugin_slug );
+		$dismissed   = get_user_meta( get_current_user_id(), 'wpforms_dismissed', true );
+
+		if ( is_plugin_active( $plugin_file ) ) {
+			return;
+		}
+		if ( ! empty( $dismissed['geolocation-education-metabox'] ) ) {
+			return;
+		}
+		$plugins = get_plugins();
+
+		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'education/geolocation',
+			[
+				'nonce_activate' => wp_create_nonce( 'wpforms-education-activate' ),
+				'nonce_hide'     => wp_create_nonce( 'wpforms-education-hide' ),
+				'install'        => ! empty( $plugins[ $plugin_file ] ),
+				'plugin_file'    => $plugin_file,
+				'plugin_url'     => $this->get_addon_download_url( $plugin_slug ),
+				'plugin_allow'   => in_array( $this->license, [ 'pro', 'agency', 'ultimate', 'elite' ], true ),
+			],
+			true
+		);
+	}
+
+	/**
+	 * Return a download URL for an addon.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @param string $slug Addon slug.
+	 *
+	 * @return string
+	 */
+	public function get_addon_download_url( $slug ) {
+
+		if ( empty( $this->addons ) ) {
+			return '';
+		}
+
+		foreach ( $this->addons as $addon_data ) {
+			if (
+				$addon_data->slug === $slug &&
+				! empty( $addon_data->url )
+			) {
+				return $addon_data->url;
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Hide offer activation/purchase addon.
+	 *
+	 * @since 1.6.3
+	 */
+	public function hide_education() {
+
+		check_ajax_referer( 'wpforms-education-hide', 'nonce' );
+		$plugin = filter_input( INPUT_POST, 'plugin', FILTER_SANITIZE_STRING );
+		if ( empty( $plugin ) ) {
+			wp_send_json( 0 );
+		}
+		$current_user_id                            = get_current_user_id();
+		$dismissed                                  = get_user_meta( $current_user_id, 'wpforms_dismissed', true );
+		$dismissed                                  = is_array( $dismissed ) ? $dismissed : [];
+		$dismissed['geolocation-education-metabox'] = time();
+		wp_send_json(
+			update_user_meta( $current_user_id, 'wpforms_dismissed', $dismissed )
+		);
+	}
+
 }

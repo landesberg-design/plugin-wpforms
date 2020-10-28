@@ -27,31 +27,32 @@ class WPForms_Smart_Tags {
 	public function get( $return = 'array' ) {
 
 		$tags = array(
-			'admin_email'         => esc_html__( 'Site Administrator Email', 'wpforms-lite' ),
-			'entry_id'            => esc_html__( 'Entry ID', 'wpforms-lite' ),
-			'form_id'             => esc_html__( 'Form ID', 'wpforms-lite' ),
-			'form_name'           => esc_html__( 'Form Name', 'wpforms-lite' ),
-			'page_title'          => esc_html__( 'Embedded Post/Page Title', 'wpforms-lite' ),
-			'page_url'            => esc_html__( 'Embedded Post/Page URL', 'wpforms-lite' ),
-			'page_id'             => esc_html__( 'Embedded Post/Page ID', 'wpforms-lite' ),
-			'date format="m/d/Y"' => esc_html__( 'Date', 'wpforms-lite' ),
-			'query_var key=""'    => esc_html__( 'Query String Variable', 'wpforms-lite' ),
-			'user_ip'             => esc_html__( 'User IP Address', 'wpforms-lite' ),
-			'user_id'             => esc_html__( 'User ID', 'wpforms-lite' ),
-			'user_display'        => esc_html__( 'User Display Name', 'wpforms-lite' ),
-			'user_full_name'      => esc_html__( 'User Full Name', 'wpforms-lite' ),
-			'user_first_name'     => esc_html__( 'User First Name', 'wpforms-lite' ),
-			'user_last_name'      => esc_html__( 'User Last Name', 'wpforms-lite' ),
-			'user_email'          => esc_html__( 'User Email', 'wpforms-lite' ),
-			'user_meta key=""'    => esc_html__( 'User Meta', 'wpforms-lite' ),
-			'author_id'           => esc_html__( 'Author ID', 'wpforms-lite' ),
-			'author_display'      => esc_html__( 'Author Name', 'wpforms-lite' ),
-			'author_email'        => esc_html__( 'Author Email', 'wpforms-lite' ),
-			'url_referer'         => esc_html__( 'Referrer URL', 'wpforms-lite' ),
-			'url_login'           => esc_html__( 'Login URL', 'wpforms-lite' ),
-			'url_logout'          => esc_html__( 'Logout URL', 'wpforms-lite' ),
-			'url_register'        => esc_html__( 'Register URL', 'wpforms-lite' ),
-			'url_lost_password'   => esc_html__( 'Lost Password URL', 'wpforms-lite' ),
+			'admin_email'               => esc_html__( 'Site Administrator Email', 'wpforms-lite' ),
+			'entry_id'                  => esc_html__( 'Entry ID', 'wpforms-lite' ),
+			'entry_date format="m/d/Y"' => esc_html__( 'Entry Date', 'wpforms-lite' ),
+			'form_id'                   => esc_html__( 'Form ID', 'wpforms-lite' ),
+			'form_name'                 => esc_html__( 'Form Name', 'wpforms-lite' ),
+			'page_title'                => esc_html__( 'Embedded Post/Page Title', 'wpforms-lite' ),
+			'page_url'                  => esc_html__( 'Embedded Post/Page URL', 'wpforms-lite' ),
+			'page_id'                   => esc_html__( 'Embedded Post/Page ID', 'wpforms-lite' ),
+			'date format="m/d/Y"'       => esc_html__( 'Date', 'wpforms-lite' ),
+			'query_var key=""'          => esc_html__( 'Query String Variable', 'wpforms-lite' ),
+			'user_ip'                   => esc_html__( 'User IP Address', 'wpforms-lite' ),
+			'user_id'                   => esc_html__( 'User ID', 'wpforms-lite' ),
+			'user_display'              => esc_html__( 'User Display Name', 'wpforms-lite' ),
+			'user_full_name'            => esc_html__( 'User Full Name', 'wpforms-lite' ),
+			'user_first_name'           => esc_html__( 'User First Name', 'wpforms-lite' ),
+			'user_last_name'            => esc_html__( 'User Last Name', 'wpforms-lite' ),
+			'user_email'                => esc_html__( 'User Email', 'wpforms-lite' ),
+			'user_meta key=""'          => esc_html__( 'User Meta', 'wpforms-lite' ),
+			'author_id'                 => esc_html__( 'Author ID', 'wpforms-lite' ),
+			'author_display'            => esc_html__( 'Author Name', 'wpforms-lite' ),
+			'author_email'              => esc_html__( 'Author Email', 'wpforms-lite' ),
+			'url_referer'               => esc_html__( 'Referrer URL', 'wpforms-lite' ),
+			'url_login'                 => esc_html__( 'Login URL', 'wpforms-lite' ),
+			'url_logout'                => esc_html__( 'Logout URL', 'wpforms-lite' ),
+			'url_register'              => esc_html__( 'Register URL', 'wpforms-lite' ),
+			'url_lost_password'         => esc_html__( 'Lost Password URL', 'wpforms-lite' ),
 		);
 
 		$tags = apply_filters( 'wpforms_smart_tags', $tags );
@@ -110,7 +111,11 @@ class WPForms_Smart_Tags {
 						break;
 
 					case 'form_name':
-						if ( isset( $form_data['settings']['form_title'] ) && ! empty( $form_data['settings']['form_title'] ) ) {
+						// The Form Pages addon rewrites the form_title setting for it's internal needs, so we want to first check if
+						// we have a saved title for the form, and if so, we will use that for the form title smart tag.
+						if ( isset( $form_data['settings']['form_name'] ) && ! empty( $form_data['settings']['form_name'] ) ) {
+							$name = $form_data['settings']['form_name'];
+						} elseif ( isset( $form_data['settings']['form_title'] ) && ! empty( $form_data['settings']['form_title'] ) ) {
 							$name = $form_data['settings']['form_title'];
 						} else {
 							$name = '';
@@ -256,6 +261,21 @@ class WPForms_Smart_Tags {
 			foreach ( $query_vars[1] as $key => $query_var ) {
 				$value   = ! empty( $_GET[ $query_var ] ) ? wp_unslash( sanitize_text_field( $_GET[ $query_var ] ) ) : ''; // phpcs:ignore
 				$content = $this->parse( $query_vars[0][ $key ], $value, $content );
+			}
+		}
+
+		// Entry date smart tags.
+		preg_match_all( '/{entry_date format=\"(.+?)\"}/', $content, $dates );
+
+		if ( ! empty( $dates[1] ) ) {
+
+			$entry      = wpforms()->entry->get( $entry_id );
+			$entry_date = $entry && property_exists( $entry, 'date' ) ? strtotime( $entry->date ) : 0;
+
+			foreach ( $dates[1] as $key => $date ) {
+
+				$value   = $entry_date ? date_i18n( $date, $entry_date + ( get_option( 'gmt_offset' ) * 3600 ) ) : '';
+				$content = $this->parse( $dates[0][ $key ], $value, $content );
 			}
 		}
 

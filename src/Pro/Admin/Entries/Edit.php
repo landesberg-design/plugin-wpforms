@@ -251,9 +251,9 @@ class Edit {
 			// Load jQuery input mask library - https://github.com/RobinHerbots/jquery.inputmask.
 			wp_enqueue_script(
 				'wpforms-maskedinput',
-				WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.bundle.min.js',
+				WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.min.js',
 				[ 'jquery' ],
-				'4.0.6',
+				'5.0.5',
 				true
 			);
 		}
@@ -537,13 +537,15 @@ class Edit {
 		<!-- Edit Entry Form metabox -->
 		<div id="wpforms-entry-fields" class="postbox">
 
-			<h2 class="hndle">
-				<?php echo '1' === (string) $entry->starred ? '<span class="dashicons dashicons-star-filled"></span>' : ''; ?>
-				<span><?php echo esc_html( $form_data['settings']['form_title'] ); ?></span>
-				<a href="#" class="wpforms-empty-field-toggle">
-					<?php echo $hide_empty ? esc_html__( 'Show Empty Fields', 'wpforms' ) : esc_html__( 'Hide Empty Fields', 'wpforms' ); ?>
-				</a>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<?php echo '1' === (string) $entry->starred ? '<span class="dashicons dashicons-star-filled"></span>' : ''; ?>
+					<span><?php echo esc_html( $form_data['settings']['form_title'] ); ?></span>
+					<a href="#" class="wpforms-empty-field-toggle">
+						<?php echo $hide_empty ? esc_html__( 'Show Empty Fields', 'wpforms' ) : esc_html__( 'Hide Empty Fields', 'wpforms' ); ?>
+					</a>
+				</h2>
+			</div>
 
 			<div class="inside">
 

@@ -7,7 +7,7 @@
  * Requires PHP:      5.5
  * Author:            WPForms
  * Author URI:        https://wpforms.com
- * Version:           1.6.2.3
+ * Version:           1.6.3.1
  * Text Domain:       wpforms-lite
  * Domain Path:       assets/languages
  *
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Plugin version.
 if ( ! defined( 'WPFORMS_VERSION' ) ) {
-	define( 'WPFORMS_VERSION', '1.6.2.3' );
+	define( 'WPFORMS_VERSION', '1.6.3.1' );
 }
 
 // Plugin Folder Path.
@@ -111,7 +111,12 @@ if ( function_exists( 'wpforms' ) ) {
 		 * @since 1.0.0
 		 */
 		function wpforms_deactivate() {
-			deactivate_plugins( 'wpforms-lite/wpforms.php' );
+
+			$plugin = 'wpforms-lite/wpforms.php';
+
+			deactivate_plugins( $plugin );
+
+			do_action( 'wpforms_plugin_deactivated', $plugin );
 		}
 	}
 	add_action( 'admin_init', 'wpforms_deactivate' );

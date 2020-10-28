@@ -129,7 +129,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 										<# if ( ! _.isEmpty( data.provider.fields ) ) { #>
 											<select class="wpforms-builder-provider-connection-field-name"
 												name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][{{ meta_id }}][name]">
-												<option value=""><?php \esc_attr_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
+												<option value=""><# if ( ! _.isEmpty( data.provider.placeholder ) ) { #>{{ data.provider.placeholder }}<# } else { #><?php esc_html_e( '--- Select Field ---', 'wpforms-lite' ); ?><# } #></option>
 
 												<# _.each( data.provider.fields, function( field_name, field_id ) { #>
 													<option value="{{ field_id }}"
@@ -151,16 +151,16 @@ abstract class FormBuilder implements FormBuilderInterface {
 									<td>
 										<select class="wpforms-builder-provider-connection-field-value"
 											name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][{{ meta_id }}][field_id]">
-											<option value=""><?php \esc_html_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
+											<option value=""><?php esc_html_e( '--- Select Form Field ---', 'wpforms-lite' ); ?></option>
 
 											<# _.each( data.fields, function( field, key ) { #>
 												<option value="{{ field.id }}"
 														<# if ( field.id === item.field_id ) { #>selected="selected"<# } #>
 												>
-												<# if ( ! wpf.empty( field.label ) ) { #>
-													{{ field.label }}
+												<# if ( ! _.isUndefined( field.label ) && field.label.toString().trim() !== '' ) { #>
+													{{ field.label.toString().trim() }}
 												<# } else { #>
-													{{ window.wpforms_builder.field + ' #' + field.id }}
+													{{ wpforms_builder.field + ' #' + key }}
 												<# } #>
 												</option>
 											<# } ); #>
@@ -186,7 +186,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 									<# if ( ! _.isEmpty( data.provider.fields ) ) { #>
 										<select class="wpforms-builder-provider-connection-field-name"
 											name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][0][name]">
-											<option value=""><?php \esc_attr_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
+											<option value=""><# if ( ! _.isEmpty( data.provider.placeholder ) ) { #>{{ data.provider.placeholder }}<# } else { #><?php esc_html_e( '--- Select Field ---', 'wpforms-lite' ); ?><# } #></option>
 
 											<# _.each( data.provider.fields, function( field_name, field_id ) { #>
 												<option value="{{ field_id }}">
@@ -206,14 +206,14 @@ abstract class FormBuilder implements FormBuilderInterface {
 								<td>
 									<select class="wpforms-builder-provider-connection-field-value"
 										name="providers[{{ data.provider.slug }}][{{ data.connection.id }}][fields_meta][0][field_id]">
-										<option value=""><?php \esc_html_e( '--- Select Field ---', 'wpforms-lite' ); ?></option>
+										<option value=""><?php esc_html_e( '--- Select Form Field ---', 'wpforms-lite' ); ?></option>
 
 										<# _.each( data.fields, function( field, key ) { #>
 											<option value="{{ field.id }}">
-												<# if ( ! wpf.empty( field.label ) ) { #>
-													{{ field.label }}
+												<# if ( ! _.isUndefined( field.label ) && field.label.toString().trim() !== '' ) { #>
+													{{ field.label.toString().trim() }}
 												<# } else { #>
-													{{ window.wpforms_builder.field + ' #' + field.id }}
+													{{ wpforms_builder.field + ' #' + key }}
 												<# } #>
 											</option>
 										<# } ); #>

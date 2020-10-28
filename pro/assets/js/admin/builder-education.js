@@ -157,7 +157,7 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 								confirm: {
 									text    : wpforms_builder.close,
 									btnClass: 'btn-confirm',
-									keys    : [ 'enter' ]
+									keys    : [ 'enter' ],
 								}
 							}
 						} );
@@ -300,7 +300,7 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 								confirm: {
 									text    : wpforms_builder.close,
 									btnClass: 'btn-confirm',
-									keys    : [ 'enter' ]
+									keys    : [ 'enter' ],
 								}
 							}
 						} );
@@ -376,7 +376,7 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 					confirm: {
 						text    : wpforms_builder.close,
 						btnClass: 'btn-confirm',
-						keys    : [ 'enter' ]
+						keys    : [ 'enter' ],
 					}
 				}
 			} );

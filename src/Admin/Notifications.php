@@ -426,10 +426,12 @@ class Notifications {
 
 			<a class="dismiss" title="<?php echo esc_attr__( 'Dismiss this message', 'wpforms-lite' ); ?>"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
 
+			<?php if ( count( $notifications ) > 1 ) : ?>
 			<div class="navigation">
 				<a class="prev disabled" title="<?php echo esc_attr__( 'Previous message', 'wpforms-lite' ); ?>"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
 				<a class="next disabled" title="<?php echo esc_attr__( 'Next message', 'wpforms-lite' ); ?>"><i class="fa fa-chevron-right" aria-hidden="true"></i></a>
 			</div>
+			<?php endif; ?>
 
 			<div class="messages">
 				<?php echo $notifications_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

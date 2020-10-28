@@ -79,6 +79,11 @@ class Honeypot {
 			$honeypot = esc_html__( 'WPForms honeypot field triggered.', 'wpforms-lite' );
 		}
 
+		// If we get passed an empty fields array, but we have the data in our form data, use it.
+		if ( empty( $fields ) && isset( $form_data['fields'] ) ) {
+			$fields = $form_data['fields'];
+		}
+
 		return apply_filters( 'wpforms_process_honeypot', $honeypot, $fields, $entry, $form_data );
 	}
 }

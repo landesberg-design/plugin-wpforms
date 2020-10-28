@@ -235,9 +235,8 @@ var WPFormsFormEmbedWizard = window.WPFormsFormEmbedWizard || ( function( docume
 
 			el.$videoTutorial.hide();
 			app.tutorialControl( 'Stop' );
-			el.$shortcode.val( '[wpforms id=”' + vars.formId + '” title=”false” description=”false”]' );
+			el.$shortcode.val( '[wpforms id="' + vars.formId + '" title="false" description="false"]' );
 			el.$shortcode.toggle();
-
 		},
 
 		/**

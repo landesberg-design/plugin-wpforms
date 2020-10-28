@@ -726,6 +726,13 @@ class WPForms_Process {
 			wp_send_json_error();
 		}
 
+		if ( isset( $_POST['wpforms']['post_id'] ) ) { // phpcs:ignore
+			// We don't have a global $post when processing ajax requests.
+			// Therefore, it's needed to set a global $post manually for compatibility with functions used in smart tag processing.
+			global $post;
+			$post = WP_Post::get_instance( absint( $_POST['wpforms']['post_id'] ) ); // phpcs:ignore
+		}
+
 		add_filter( 'wp_redirect', array( $this, 'ajax_process_redirect' ), 999 );
 
 		do_action( 'wpforms_ajax_submit_before_processing', $form_id );
@@ -793,17 +800,7 @@ class WPForms_Process {
 		// Transform field ids to field names for jQuery Validate plugin.
 		foreach ( $field_errors as $key => $error ) {
 
-			$field = $fields[ $key ];
-			$props = wpforms()->frontend->get_field_properties( $field, $form_data );
-			$input = isset( $props['inputs']['primary'] ) ? $props['inputs']['primary'] : end( $props['inputs'] );
-			$name  = isset( $input['attr']['name'] ) && empty( $input['hidden'] ) ? $input['attr']['name'] : '';
-			$type  = isset( $field['type'] ) ? $field['type'] : '';
-
-			// Multiple select field has a name property without [] at the end.
-			if ( $name && 'select' === $type && ! empty( $field['multiple'] ) ) {
-				$name .= '[]';
-			}
-
+			$name = $this->ajax_error_field_name( $fields[ $key ], $form_data, $error );
 			if ( $name ) {
 				$field_errors[ $name ] = $error;
 			}
@@ -826,6 +823,24 @@ class WPForms_Process {
 		do_action( 'wpforms_ajax_submit_completed', $form_id, $response );
 
 		wp_send_json_error( $response );
+	}
+
+	/**
+	 * Get field name for ajax error message.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @param array  $field     Field settings.
+	 * @param array  $form_data Form data and settings.
+	 * @param string $error     Error message.
+	 *
+	 * @return string
+	 */
+	private function ajax_error_field_name( $field, $form_data, $error ) {
+
+		$props = wpforms()->frontend->get_field_properties( $field, $form_data );
+
+		return apply_filters( 'wpforms_process_ajax_error_field_name', '', $field, $props, $error );
 	}
 
 	/**

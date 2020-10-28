@@ -44,7 +44,7 @@ class WPForms_Admin_Editor {
 			esc_attr( $editor_id ),
 			esc_attr__( 'Add Form', 'wpforms-lite' ),
 			$icon,
-			__( 'Add Form', 'wpforms-lite' )
+			esc_html__( 'Add Form', 'wpforms-lite' )
 		);
 
 		// If we have made it this far then load the JS.
@@ -66,9 +66,14 @@ class WPForms_Admin_Editor {
 			return false;
 		}
 
+		// get_current_screen() is loaded after 'admin_init' hook and may not exist yet.
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+
 		$screen = get_current_screen();
 
-		return $screen->parent_base === 'edit';
+		return $screen !== null && $screen->parent_base === 'edit';
 	}
 
 	/**
@@ -95,8 +100,7 @@ class WPForms_Admin_Editor {
 						<?php
 						echo '<p id="wpforms-modal-notice">';
 						printf(
-							wp_kses(
-								/* translators: %s - WPForms documentation link. */
+							wp_kses( /* translators: %s - WPForms documentation URL. */
 								__( 'Heads up! Don\'t forget to test your form. <a href="%s" target="_blank" rel="noopener noreferrer">Check out our complete guide</a>!', 'wpforms-lite' ),
 								array(
 									'a' => array(
@@ -362,4 +366,4 @@ class WPForms_Admin_Editor {
 
 }
 
-new WPForms_Admin_Editor;
+new WPForms_Admin_Editor();

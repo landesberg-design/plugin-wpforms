@@ -643,7 +643,7 @@ class WPForms_Conditional_Logic_Fields {
 										$val = esc_attr( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] );
 									} else {
 										/* translators: %d - choice number. */
-										$val = sprintf( esc_html__( 'Choice %d', 'wpforms-lite' ), (int) $rule_field );
+										$val = sprintf( esc_html__( 'Choice %d', 'wpforms' ), (int) $rule_field );
 									}
 								}
 

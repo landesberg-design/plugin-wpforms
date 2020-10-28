@@ -8,6 +8,13 @@
 class WPForms_Field_Phone extends WPForms_Field {
 
 	/**
+	 * International Telephone Input library CSS.
+	 *
+	 * @since 1.6.3
+	 */
+	const INTL_VERSION = '17.0.5';
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 1.0.0
@@ -72,9 +79,14 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 * Form frontend CSS enqueues.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @param array $forms Form data of forms on the current page.
 	 */
-	public function enqueue_frontend_css() {
+	public function enqueue_frontend_css( $forms ) {
 
+		if ( ! wpforms()->frontend->assets_global() && ! $this->has_smart_format( $forms ) ) {
+			return;
+		}
 		$min = \wpforms_get_min_suffix();
 
 		// International Telephone Input library CSS.
@@ -82,7 +94,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 			'wpforms-smart-phone-field',
 			WPFORMS_PLUGIN_URL . "pro/assets/css/vendor/intl-tel-input{$min}.css",
 			array(),
-			'17.0.3'
+			self::INTL_VERSION
 		);
 	}
 
@@ -90,9 +102,14 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 * Form frontend JS enqueues.
 	 *
 	 * @since 1.5.2
+	 *
+	 * @param array $forms Form data of forms on the current page.
 	 */
-	public function enqueue_frontend_js() {
+	public function enqueue_frontend_js( $forms ) {
 
+		if ( ! wpforms()->frontend->assets_global() && ! $this->has_smart_format( $forms ) ) {
+			return;
+		}
 		$min = \wpforms_get_min_suffix();
 
 		// Load International Telephone Input library - https://github.com/jackocnr/intl-tel-input.
@@ -100,9 +117,35 @@ class WPForms_Field_Phone extends WPForms_Field {
 			'wpforms-smart-phone-field',
 			WPFORMS_PLUGIN_URL . "pro/assets/js/vendor/jquery.intl-tel-input{$min}.js",
 			array( 'jquery' ),
-			'17.0.3',
+			self::INTL_VERSION,
 			true
 		);
+	}
+
+	/**
+	 * Find phone field with smart format.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @param array $forms Form data of forms on the current page.
+	 *
+	 * @return bool
+	 */
+	private function has_smart_format( $forms ) {
+
+		foreach ( $forms as $form_data ) {
+			if ( empty( $form_data['fields'] ) ) {
+				continue;
+			}
+
+			foreach ( $form_data['fields'] as $field ) {
+				if ( 'phone' === $field['type'] && isset( $field['format'] ) && 'smart' === $field['format'] ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

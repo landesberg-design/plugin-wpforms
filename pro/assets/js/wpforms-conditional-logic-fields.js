@@ -371,8 +371,8 @@
 							val = '';
 						}
 
-						left  = $.trim( val.toString().toLowerCase() );
-						right = $.trim( rule.value.toString().toLowerCase() );
+						left  = $.trim( val ).toString().toLowerCase();
+						right = $.trim( rule.value ).toString().toLowerCase();
 
 						switch ( rule.operator ) {
 							case '==' :
@@ -473,6 +473,12 @@
 		 */
 		getElementValueByRule: function( rule, $form ) {
 			var value = '';
+			var field = $form.find( '#wpforms-' + $form.data( 'formid' ) + '-field_' + rule.field );
+
+			// If we have the modern select enabled, we trim the rule value to match the trim that happens.
+			if ( field.data( 'choicesjs' ) ) {
+				rule.value = $.trim( rule.value );
+			}
 
 			if ( rule.operator === 'e' || rule.operator === '!e' ) {
 				value = WPFormsConditionals.getElementValueByEmptyTypeRules( rule, $form );

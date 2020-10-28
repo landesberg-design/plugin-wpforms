@@ -157,7 +157,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wp_enqueue_script(
 				'wpforms-file-upload',
 				WPFORMS_PLUGIN_URL . "pro/assets/js/wpforms-file-upload{$min}.js",
-				array( 'wp-util', 'wpforms-dropzone' ),
+				array( 'wpforms', 'wp-util', 'wpforms-dropzone' ),
 				WPFORMS_VERSION,
 				true
 			);

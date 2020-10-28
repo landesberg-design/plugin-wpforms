@@ -628,13 +628,15 @@ class WPForms_Entries_Single {
 		<!-- Entry Fields metabox -->
 		<div id="wpforms-entry-fields" class="postbox">
 
-			<h2 class="hndle">
-				<?php echo '1' == $entry->starred ? '<span class="dashicons dashicons-star-filled"></span>' : ''; ?>
-				<span><?php echo esc_html( $form_data['settings']['form_title'] ); ?></span>
-				<a href="#" class="wpforms-empty-field-toggle">
-					<?php echo $hide_empty ? esc_html__( 'Show Empty Fields', 'wpforms' ) : esc_html__( 'Hide Empty Fields', 'wpforms' ); ?>
-				</a>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<?php echo '1' === (string) $entry->starred ? '<span class="dashicons dashicons-star-filled"></span>' : ''; ?>
+					<span><?php echo esc_html( $form_data['settings']['form_title'] ); ?></span>
+					<a href="#" class="wpforms-empty-field-toggle">
+						<?php echo $hide_empty ? esc_html__( 'Show Empty Fields', 'wpforms' ) : esc_html__( 'Hide Empty Fields', 'wpforms' ); ?>
+					</a>
+				</h2>
+			</div>
 
 			<div class="inside">
 
@@ -708,9 +710,11 @@ class WPForms_Entries_Single {
 		<!-- Entry Notes metabox -->
 		<div id="wpforms-entry-notes" class="postbox">
 
-			<h2 class="hndle">
-				<span><?php esc_html_e( 'Notes', 'wpforms' ); ?></span>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<span><?php esc_html_e( 'Notes', 'wpforms' ); ?></span>
+				</h2>
+			</div>
 
 			<div class="inside">
 
@@ -756,9 +760,9 @@ class WPForms_Entries_Single {
 							),
 							admin_url( 'user-edit.php' )
 						);
-						$date_format = sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) );
-						$date        = date_i18n( $date_format, strtotime( $note->date ) + ( get_option( 'gmt_offset' ) * 3600 ) );
-						$class       = 0 === $count % 2 ? 'even' : 'odd';
+
+						$date  = wpforms_datetime_format( $note->date, '', true );
+						$class = 0 === $count % 2 ? 'even' : 'odd';
 
 						if ( \wpforms_current_user_can( 'edit_entries_form_single', $form_data['id'] ) ) {
 
@@ -823,9 +827,11 @@ class WPForms_Entries_Single {
 		<!-- Entry Logs metabox -->
 		<div id="wpforms-entry-logs" class="postbox">
 
-			<h2 class="hndle">
-				<span><?php esc_html_e( 'Log', 'wpforms' ); ?></span>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<span><?php esc_html_e( 'Log', 'wpforms' ); ?></span>
+				</h2>
+			</div>
 
 			<div class="inside">
 
@@ -893,9 +899,11 @@ class WPForms_Entries_Single {
 		<!-- Entry Debug metabox -->
 		<div id="wpforms-entry-debug" class="postbox">
 
-			<h2 class="hndle">
-				<span><?php esc_html_e( 'Debug Information', 'wpforms' ); ?></span>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<span><?php esc_html_e( 'Debug Information', 'wpforms' ); ?></span>
+				</h2>
+			</div>
 
 			<div class="inside">
 
@@ -925,9 +933,11 @@ class WPForms_Entries_Single {
 		<!-- Entry Details metabox -->
 		<div id="wpforms-entry-details" class="postbox">
 
-			<h2 class="hndle">
-				<span><?php esc_html_e( 'Entry Details', 'wpforms' ); ?></span>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<span><?php esc_html_e( 'Entry Details', 'wpforms' ); ?></span>
+				</h2>
+			</div>
 
 			<div class="inside">
 
@@ -1108,9 +1118,11 @@ class WPForms_Entries_Single {
 		<!-- Entry Payment details metabox -->
 		<div id="wpforms-entry-payment" class="postbox">
 
-			<h2 class="hndle">
-				<span><?php esc_html_e( 'Payment Details', 'wpforms' ); ?></span>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<span><?php esc_html_e( 'Payment Details', 'wpforms' ); ?></span>
+				</h2>
+			</div>
 
 			<div class="inside">
 
@@ -1321,9 +1333,11 @@ class WPForms_Entries_Single {
 		<!-- Entry Actions metabox -->
 		<div id="wpforms-entry-actions" class="postbox">
 
-			<h2 class="hndle">
-				<span><?php esc_html_e( 'Actions', 'wpforms' ); ?></span>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<span><?php esc_html_e( 'Actions', 'wpforms' ); ?></span>
+				</h2>
+			</div>
 
 			<div class="inside">
 
@@ -1370,9 +1384,11 @@ class WPForms_Entries_Single {
 		<!-- Entry Actions metabox -->
 		<div id="wpforms-entry-related" class="postbox">
 
-			<h2 class="hndle">
-				<span><?php esc_html_e( 'Related Entries', 'wpforms' ); ?></span>
-			</h2>
+			<div class="postbox-header">
+				<h2 class="hndle">
+					<span><?php esc_html_e( 'Related Entries', 'wpforms' ); ?></span>
+				</h2>
+			</div>
 
 			<div class="inside">
 

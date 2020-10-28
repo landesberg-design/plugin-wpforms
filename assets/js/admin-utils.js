@@ -349,30 +349,38 @@ var wpf = {
 	 * Is number?
 	 *
 	 * @since 1.2.3
+	 *
+	 * @param {number|string} n Number to check.
+	 *
+	 * @returns {boolean} Whether this is a number.
 	 */
-	isNumber: function(n) {
-		return !isNaN(parseFloat(n)) && isFinite(n);
+	isNumber: function( n ) {
+		return ! isNaN( parseFloat( n ) ) && isFinite( n );
 	},
 
 	/**
 	 * Sanitize amount and convert to standard format for calculations.
 	 *
 	 * @since 1.2.6
+	 *
+	 * @param {string} amount Price amount to sanitize.
+	 *
+	 * @returns {string} Sanitized amount.
 	 */
-	amountSanitize: function(amount) {
+	amountSanitize: function( amount ) {
 
 		// Convert to string and allow only numbers, dots and commas.
 		amount = String( amount ).replace( /[^0-9.,]/g, '' );
 
-		if ( wpforms_builder.currency_decimal == ',' && ( amount.indexOf(wpforms_builder.currency_decimal) !== -1 ) ) {
-			if ( wpforms_builder.currency_thousands == '.' && amount.indexOf(wpforms_builder.currency_thousands) !== -1 ) {;
-				amount = amount.replace(wpforms_builder.currency_thousands,'');
-			} else if( wpforms_builder.currency_thousands == '' && amount.indexOf('.') !== -1 ) {
-				amount = amount.replace('.','');
+		if ( wpforms_builder.currency_decimal === ',' && ( amount.indexOf( wpforms_builder.currency_decimal ) !== -1 ) ) {
+			if ( wpforms_builder.currency_thousands === '.' && amount.indexOf( wpforms_builder.currency_thousands ) !== -1 ) {
+				amount = amount.replace( wpforms_builder.currency_thousands, '' );
+			} else if ( wpforms_builder.currency_thousands === '' && amount.indexOf( '.' ) !== -1 ) {
+				amount = amount.replace( '.', '' );
 			}
-			amount = amount.replace(wpforms_builder.currency_decimal,'.');
-		} else if ( wpforms_builder.currency_thousands == ',' && ( amount.indexOf(wpforms_builder.currency_thousands) !== -1 ) ) {
-			amount = amount.replace(wpforms_builder.currency_thousands,'');
+			amount = amount.replace( wpforms_builder.currency_decimal, '.' );
+		} else if ( wpforms_builder.currency_thousands === ',' && ( amount.indexOf( wpforms_builder.currency_thousands ) !== -1 ) ) {
+			amount = amount.replace( wpforms_builder.currency_thousands, '' );
 		}
 
 		return wpf.numberFormat( amount, 2, '.', '' );
@@ -382,22 +390,25 @@ var wpf = {
 	 * Format amount.
 	 *
 	 * @since 1.2.6
+	 *
+	 * @param {string} amount Price amount to format.
+	 *
+	 * @returns {string} Formatted amount.
 	 */
-	amountFormat: function(amount) {
+	amountFormat: function( amount ) {
 
-		amount = String(amount);
+		amount = String( amount );
 
 		// Format the amount
-		if ( wpforms_builder.currency_decimal == ',' && ( amount.indexOf(wpforms_builder.currency_decimal) !== -1 ) ) {
-			var sepFound = amount.indexOf(wpforms_builder.currency_decimal);
-				whole    = amount.substr(0, sepFound);
-				part     = amount.substr(sepFound+1, amount.strlen-1);
-				amount   = whole + '.' + part;
+		if ( wpforms_builder.currency_decimal === ',' && ( amount.indexOf( wpforms_builder.currency_decimal ) !== -1 ) ) {
+			var sepFound = amount.indexOf( wpforms_builder.currency_decimal );
+
+			amount = amount.substr( 0, sepFound ) + '.' + amount.substr( sepFound + 1, amount.strlen - 1 );
 		}
 
 		// Strip , from the amount (if set as the thousands separator)
-		if ( wpforms_builder.currency_thousands == ',' && ( amount.indexOf(wpforms_builder.currency_thousands) !== -1 ) ) {
-			amount = amount.replace(',','');
+		if ( wpforms_builder.currency_thousands === ',' && ( amount.indexOf( wpforms_builder.currency_thousands ) !== -1 ) ) {
+			amount = amount.replace( ',', '' );
 		}
 
 		if ( wpf.empty( amount ) ) {
@@ -434,34 +445,42 @@ var wpf = {
 	/**
 	 * Format number.
 	 *
-	 * @link http://locutus.io/php/number_format/
+	 * @see http://locutus.io/php/number_format/
+	 *
 	 * @since 1.2.6
+	 *
+	 * @param {string} number       Number to format.
+	 * @param {number} decimals     How many decimals should be there.
+	 * @param {string} decimalSep   What is the decimal separator.
+	 * @param {string} thousandsSep What is the thousands separator.
+	 *
+	 * @returns {string} Formatted number.
 	 */
-	numberFormat: function (number, decimals, decimalSep, thousandsSep) {
+	numberFormat: function( number, decimals, decimalSep, thousandsSep ) {
 
-		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
-		var n = !isFinite(+number) ? 0 : +number;
-		var prec = !isFinite(+decimals) ? 0 : Math.abs(decimals);
-		var sep = (typeof thousandsSep === 'undefined') ? ',' : thousandsSep;
-		var dec = (typeof decimalSep === 'undefined') ? '.' : decimalSep;
+		number = ( number + '' ).replace( /[^0-9+\-Ee.]/g, '' );
+		var n = ! isFinite( +number ) ? 0 : +number;
+		var prec = ! isFinite( +decimals ) ? 0 : Math.abs( decimals );
+		var sep = ( typeof thousandsSep === 'undefined' ) ? ',' : thousandsSep;
+		var dec = ( typeof decimalSep === 'undefined' ) ? '.' : decimalSep;
 		var s = '';
 
-		var toFixedFix = function (n, prec) {
-			var k = Math.pow(10, prec);
-			return '' + (Math.round(n * k) / k).toFixed(prec)
+		var toFixedFix = function( n, prec ) {
+			var k = Math.pow( 10, prec );
+			return '' + ( Math.round( n * k ) / k ).toFixed( prec );
 		};
 
 		// @todo: for IE parseFloat(0.55).toFixed(0) = 0;
-		s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
-		if (s[0].length > 3) {
-			s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep)
+		s = ( prec ? toFixedFix( n, prec ) : '' + Math.round( n ) ).split( '.' );
+		if ( s[ 0 ].length > 3 ) {
+			s[ 0 ] = s[ 0 ].replace( /\B(?=(?:\d{3})+(?!\d))/g, sep );
 		}
-		if ((s[1] || '').length < prec) {
-			s[1] = s[1] || '';
-			s[1] += new Array(prec - s[1].length + 1).join('0');
+		if ( ( s[ 1 ] || '' ).length < prec ) {
+			s[ 1 ] = s[ 1 ] || '';
+			s[ 1 ] += new Array( prec - s[ 1 ].length + 1 ).join( '0' );
 		}
 
-		return s.join(dec)
+		return s.join( dec );
 	},
 
 	/**
@@ -683,7 +702,29 @@ var wpf = {
 			string = string.toString();
 		}
 
-		return purify.sanitize( string, { SAFE_FOR_JQUERY: true } );
+		return purify.sanitize( string );
+	},
+
+	/**
+	 * Encode HTML entities.
+	 * Uses: `https://stackoverflow.com/a/18750001/9745718`
+	 *
+	 * @since 1.6.3
+	 *
+	 * @param {string} string HTML to sanitize.
+	 *
+	 * @returns {string} String with encoded HTML entities.
+	 */
+	encodeHTMLEntities: function( string ) {
+
+		if ( typeof string !== 'string' ) {
+			string = string.toString();
+		}
+
+		return string.replace( /[\u00A0-\u9999<>&]/gim, function( i ) {
+
+			return '&#' + i.charCodeAt( 0 ) + ';';
+		} );
 	},
 };
 

@@ -109,6 +109,7 @@ class FormSelector implements IntegrationInterface {
 
 		\wp_enqueue_script(
 			'wpforms-gutenberg-form-selector',
+			// The unminified version is not supported by the browser.
 			WPFORMS_PLUGIN_URL . 'assets/js/components/admin/gutenberg/formselector.min.js',
 			array( 'wp-blocks', 'wp-i18n', 'wp-element' ),
 			WPFORMS_VERSION,

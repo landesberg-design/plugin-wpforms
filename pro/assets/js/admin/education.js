@@ -1,4 +1,4 @@
-/* globals ajaxurl, wpforms_admin */
+/* globals ajaxurl, wpforms_admin, wpforms_admin, WPFormsAdmin */
 
 /**
  * WPForms Admin Education module.
@@ -44,6 +44,18 @@ var WPFormsAdminEducation = window.WPFormsAdminEducation || ( function( document
 		 */
 		events: function() {
 
+			app.dyk();
+			app.hideEducation();
+			app.activateEducation();
+		},
+
+		/**
+		 * Did You Know? events.
+		 *
+		 * @since 1.6.3
+		 */
+		dyk: function() {
+
 			// "Did You Know?" Click on the dismiss button.
 			$( '.wpforms-dyk' ).on( 'click', '.dismiss', function( e ) {
 				var $t = $( this ),
@@ -55,14 +67,84 @@ var WPFormsAdminEducation = window.WPFormsAdminEducation || ( function( document
 					};
 
 				$tr.find( '.wpforms-dyk-fbox' ).addClass( 'out' );
-				setTimeout(
-					function() {
-						$tr.remove();
-					},
-					300
-				);
+				setTimeout( function() {
+					$tr.remove();
+				}, 300 );
 
 				$.get( ajaxurl, data );
+			} );
+		},
+
+		/**
+		 * Activate plugin in education popup.
+		 *
+		 * @since 1.6.3
+		 */
+		activateEducation: function() {
+
+			$( '.toggle-plugin' ).on( 'click', function( e ) {
+
+				e.preventDefault();
+				if ( $( this ).hasClass( 'inactive' ) ) {
+					return;
+				}
+				$( this ).addClass( 'inactive' );
+
+				var $button = $( this ),
+					$form = $( this ).closest( '.wpforms-geolocation-form' ),
+					buttonText = $button.text(),
+					plugin = $button.attr( 'data-plugin' ),
+					state = $button.hasClass( 'status-inactive' ) ? 'activate' : 'install',
+					pluginType = $button.attr( 'data-type' );
+
+				$button.html( WPFormsAdmin.settings.iconSpinner + buttonText );
+				WPFormsAdmin.setAddonState(
+					plugin,
+					state,
+					pluginType,
+					function( res ) {
+
+						if ( res.success ) {
+							location.reload();
+						} else {
+							$form.append( '<div class="msg error" style="display: none">' + wpforms_admin[ pluginType + '_error' ] + '</div>' );
+							$form.find( '.msg' ).slideDown();
+						}
+						$button.text( buttonText );
+						setTimeout( function() {
+
+							$button.removeClass( 'inactive' );
+							$form.find( '.msg' ).slideUp( '', function() {
+								$( this ).remove();
+							} );
+						}, 3000 );
+					} );
+			} );
+		},
+
+		/**
+		 * Hide education message.
+		 *
+		 * @since 1.6.3
+		 */
+		hideEducation: function() {
+
+			$( '.wpforms-education-hide' ).on( 'click', function( e ) {
+				e.preventDefault();
+				var container = $( this ).closest( '.postbox' );
+				var data = {
+					action: 'hide_education',
+					nonce: $( this ).attr( 'data-nonce' ),
+					plugin: $( this ).attr( 'data-plugin' ),
+				};
+				$.post(
+					wpforms_admin.ajax_url,
+					data,
+					function( data ) {
+						if ( data ) {
+							container.slideUp();
+						}
+					} );
 			} );
 		},
 

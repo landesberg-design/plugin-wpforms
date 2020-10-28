@@ -64,7 +64,7 @@ class WPForms_Pro {
 	 */
 	public function init() {
 
-		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ), 10 );
+		add_action( 'init', array( $this, 'load_textdomain' ), 10 );
 		add_filter( 'plugin_action_links_' . plugin_basename( WPFORMS_PLUGIN_DIR . 'wpforms.php' ), array( $this, 'plugin_action_links' ), 11 );
 		add_action( 'wpforms_loaded', array( $this, 'objects' ), 1 );
 		add_action( 'wpforms_loaded', array( $this, 'updater' ), 30 );
@@ -102,7 +102,7 @@ class WPForms_Pro {
 		wpforms()->entry_fields = new WPForms_Entry_Fields_Handler();
 		wpforms()->entry_meta   = new WPForms_Entry_Meta_Handler();
 
-		if ( is_admin() ) {
+		if ( is_admin() && ! wpforms()->license instanceof WPForms_License ) {
 			wpforms()->license = new WPForms_License();
 		}
 	}
@@ -214,6 +214,14 @@ class WPForms_Pro {
 	 * @since 1.5.0
 	 */
 	public function load_textdomain() {
+
+		// If the user is logged in, unset the current text-domains before loading our text domain.
+		// This feels hacky, but this way a user's set language in their profile will be used,
+		// rather than the site-specific language.
+		if ( is_user_logged_in() ) {
+			unload_textdomain( 'wpforms' );
+		}
+
 		load_plugin_textdomain( 'wpforms', false, dirname( plugin_basename( WPFORMS_PLUGIN_FILE ) ) . '/pro/assets/languages/' );
 	}
 
@@ -1218,12 +1226,9 @@ class WPForms_Pro {
 	 * @return array List of table names.
 	 */
 	public function get_existing_custom_tables() {
+		_deprecated_function( __CLASS__ . '::' . __METHOD__, '1.6.3', 'wpforms()->get_existing_custom_tables()' );
 
-		global $wpdb;
-
-		$tables = $wpdb->get_results( "SHOW TABLES LIKE '" . $wpdb->prefix . "wpforms_%'", 'ARRAY_N' ); // phpcs:ignore
-
-		return ! empty( $tables ) ? wp_list_pluck( $tables, 0 ) : array();
+		return wpforms()->get_existing_custom_tables();
 	}
 
 	/**
@@ -1243,7 +1248,7 @@ class WPForms_Pro {
 			'wpforms_entry_meta',
 		);
 
-		$tables = $this->get_existing_custom_tables();
+		$tables = wpforms()->get_existing_custom_tables();
 
 		foreach ( $custom_tables as $table ) {
 			if ( ! in_array( $wpdb->prefix . $table, $tables, true ) ) {
@@ -1332,7 +1337,8 @@ class WPForms_Pro {
 		if (
 			! empty( $plugin_data['Author'] ) &&
 			$plugin_data['Author'] === 'WPForms' &&
-			$plugin_file !== 'wpforms-lite/wpforms.php'
+			0 === strpos( $plugin_file, 'wpforms' ) &&
+			$plugin_file !== 'wpforms-lite/wpforms.php' // exclude a Lite version.
 		) {
 			$html = esc_html__( 'Auto-updates are not available.', 'wpforms' );
 		}

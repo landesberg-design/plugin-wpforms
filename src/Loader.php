@@ -40,6 +40,7 @@ class Loader {
 		$this->populate_capabilities();
 		$this->populate_tasks();
 		$this->populate_forms();
+		$this->populate_logger();
 	}
 
 	/**
@@ -92,6 +93,13 @@ class Loader {
 			[
 				'name' => 'Admin\FormEmbedWizard',
 				'hook' => 'admin_init',
+			],
+			[
+				'name' => 'Admin\SiteHealth',
+			],
+			[
+				'name' => 'Admin\Builder\Help',
+				'id'   => 'builder_help',
 			]
 		);
 	}
@@ -152,6 +160,24 @@ class Loader {
 				'id'   => 'tasks_meta',
 				'hook' => false,
 				'run'  => false,
+			]
+		);
+	}
+
+	/**
+	 * Populate logger loaded classes.
+	 *
+	 * @since 1.6.3
+	 */
+	private function populate_logger() {
+
+		array_push(
+			$this->classes,
+			[
+				'name' => 'Logger\Log',
+				'id'   => 'log',
+				'hook' => false,
+				'run'  => 'hooks',
 			]
 		);
 	}

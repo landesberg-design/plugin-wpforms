@@ -1,5 +1,7 @@
 <?php
 
+use WPForms\Helpers\Transient;
+
 /**
  * License key fun.
  *
@@ -61,6 +63,24 @@ class WPForms_License {
 		}
 
 		return $key;
+	}
+
+	/**
+	 * Check how license key is provided.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @return string
+	 */
+	public function get_key_location() {
+
+		if ( defined( 'WPFORMS_LICENSE_KEY' ) ) {
+			return 'constant';
+		}
+
+		$key = wpforms_setting( 'key', '', 'wpforms_license' );
+
+		return ! empty( $key ) ? 'option' : 'missing';
 	}
 
 	/**
@@ -128,7 +148,7 @@ class WPForms_License {
 		$option['is_invalid']  = false;
 		$this->success[]       = $success;
 		update_option( 'wpforms_license', $option );
-		delete_transient( '_wpforms_addons' );
+		Transient::delete( 'addons' );
 
 		wp_clean_plugins_cache( true );
 
@@ -180,11 +200,14 @@ class WPForms_License {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $key
-	 * @param bool $forced Force to set contextual messages (false by default).
-	 * @param bool $ajax
+	 * @param string $key           Key.
+	 * @param bool   $forced        Force to set contextual messages (false by default).
+	 * @param bool   $ajax          AJAX.
+	 * @param bool   $return_status Option to return the license status.
+	 *
+	 * @return string|bool
 	 */
-	public function validate_key( $key = '', $forced = false, $ajax = false ) {
+	public function validate_key( $key = '', $forced = false, $ajax = false, $return_status = false ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
 		$validate = $this->perform_remote_request( 'validate-key', array( 'tgm-updater-key' => $key ) );
 
@@ -200,12 +223,12 @@ class WPForms_License {
 				}
 			}
 
-			return;
+			return false;
 		}
 
+		$option = (array) get_option( 'wpforms_license' );
 		// If a key or author error is returned, the license no longer exists or the user has been deleted, so reset license.
 		if ( isset( $validate->key ) || isset( $validate->author ) ) {
-			$option                = get_option( 'wpforms_license' );
 			$option['is_expired']  = false;
 			$option['is_disabled'] = false;
 			$option['is_invalid']  = true;
@@ -214,12 +237,11 @@ class WPForms_License {
 				wp_send_json_error( esc_html__( 'Your license key for WPForms is invalid. The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates.', 'wpforms' ) );
 			}
 
-			return;
+			return $return_status ? 'invalid' : false;
 		}
 
 		// If the license has expired, set the transient and expired flag and return.
 		if ( isset( $validate->expired ) ) {
-			$option                = get_option( 'wpforms_license' );
 			$option['is_expired']  = true;
 			$option['is_disabled'] = false;
 			$option['is_invalid']  = false;
@@ -228,12 +250,11 @@ class WPForms_License {
 				wp_send_json_error( esc_html__( 'Your license key for WPForms has expired. Please renew your license key on WPForms.com to continue receiving automatic updates.', 'wpforms' ) );
 			}
 
-			return;
+			return $return_status ? 'expired' : false;
 		}
 
 		// If the license is disabled, set the transient and disabled flag and return.
 		if ( isset( $validate->disabled ) ) {
-			$option                = get_option( 'wpforms_license' );
 			$option['is_expired']  = false;
 			$option['is_disabled'] = true;
 			$option['is_invalid']  = false;
@@ -242,11 +263,10 @@ class WPForms_License {
 				wp_send_json_error( esc_html__( 'Your license key for WPForms has been disabled. Please use a different key to continue receiving automatic updates.', 'wpforms' ) );
 			}
 
-			return;
+			return $return_status ? 'disabled' : false;
 		}
 
 		// Otherwise, our check has returned successfully. Set the transient and update our license type and flags.
-		$option                = get_option( 'wpforms_license' );
 		$option['type']        = isset( $validate->type ) ? $validate->type : $option['type'];
 		$option['is_expired']  = false;
 		$option['is_disabled'] = false;
@@ -266,6 +286,8 @@ class WPForms_License {
 				);
 			}
 		}
+
+		return $return_status ? 'valid' : true;
 	}
 
 	/**
@@ -313,7 +335,7 @@ class WPForms_License {
 		$success         = isset( $deactivate->success ) ? $deactivate->success : esc_html__( 'You have deactivated the key from this site successfully.', 'wpforms' );
 		$this->success[] = $success;
 		update_option( 'wpforms_license', '' );
-		delete_transient( '_wpforms_addons' );
+		Transient::delete( 'addons' );
 
 		if ( $ajax ) {
 			wp_send_json_success( $success );
@@ -462,7 +484,7 @@ class WPForms_License {
 			return false;
 		}
 
-		$addons = get_transient( '_wpforms_addons' );
+		$addons = Transient::get( 'addons' );
 
 		if ( $force || false === $addons ) {
 			$addons = $this->get_addons();
@@ -485,20 +507,20 @@ class WPForms_License {
 
 		// If there was an API error, set transient for only 10 minutes.
 		if ( ! $addons ) {
-			set_transient( '_wpforms_addons', false, 10 * MINUTE_IN_SECONDS );
+			Transient::set( 'addons', false, 10 * MINUTE_IN_SECONDS );
 
 			return false;
 		}
 
 		// If there was an error retrieving the addons, set the error.
 		if ( isset( $addons->error ) ) {
-			set_transient( '_wpforms_addons', false, 10 * MINUTE_IN_SECONDS );
+			Transient::set( 'addons', false, 10 * MINUTE_IN_SECONDS );
 
 			return false;
 		}
 
 		// Otherwise, our request worked. Save the data and return it.
-		set_transient( '_wpforms_addons', $addons, DAY_IN_SECONDS );
+		Transient::set( 'addons', $addons, DAY_IN_SECONDS );
 
 		return $addons;
 	}

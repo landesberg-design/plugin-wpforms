@@ -1074,7 +1074,7 @@ class WPForms_About {
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Marketing Integrations', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
+						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, and Drip.', 'wpforms-lite' ),
 						'',
 						wp_kses(
 							__( '<strong>Bonus:</strong> 500+ integrations with Zapier.', 'wpforms-lite' ),
@@ -1088,7 +1088,7 @@ class WPForms_About {
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Marketing Integrations', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
+						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, and Drip.', 'wpforms-lite' ),
 						'',
 						wp_kses(
 							__( '<strong>Bonus:</strong> 500+ integrations with Zapier.', 'wpforms-lite' ),
@@ -1102,7 +1102,7 @@ class WPForms_About {
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Marketing Integrations', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, and Drip.', 'wpforms-lite' ),
+						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, and Drip.', 'wpforms-lite' ),
 						'',
 						wp_kses(
 							__( '<strong>Bonus:</strong> 500+ integrations with Zapier.', 'wpforms-lite' ),

@@ -33,7 +33,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 			'wpforms-smart-phone-field',
 			WPFORMS_PLUGIN_URL . "pro/assets/css/vendor/intl-tel-input{$min}.css",
 			[],
-			'15.0.0'
+			'17.0.5'
 		);
 
 		// Load International Telephone Input library - https://github.com/jackocnr/intl-tel-input.
@@ -41,16 +41,16 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 			'wpforms-smart-phone-field',
 			WPFORMS_PLUGIN_URL . "pro/assets/js/vendor/jquery.intl-tel-input{$min}.js",
 			[ 'jquery' ],
-			'15.0.0',
+			'17.0.5',
 			true
 		);
 
 		// Load jQuery input mask library - https://github.com/RobinHerbots/jquery.inputmask.
 		wp_enqueue_script(
 			'wpforms-maskedinput',
-			WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.bundle.min.js',
+			WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.min.js',
 			[ 'jquery' ],
-			'4.0.6',
+			'5.0.5',
 			true
 		);
 	}

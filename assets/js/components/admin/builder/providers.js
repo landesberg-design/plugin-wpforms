@@ -547,8 +547,12 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 			var label, $exists;
 			for ( var id in fields ) {
 
-				// Prepare a field label.
-				label = fields[ id ].label ? wpf.sanitizeHTML( fields[ id ].label ) : wpforms_builder.field + ' #' + id;
+				// Prepare the label.
+				if ( typeof fields[ id ].label !== 'undefined' && fields[ id ].label.toString().trim() !== '' ) {
+					label = wpf.sanitizeHTML( fields[ id ].label.toString().trim() );
+				} else {
+					label = wpforms_builder.field + ' #' + id;
+				}
 
 				// Try to find all select options by value.
 				$exists = $( '.wpforms-builder-provider-connection-fields-table .wpforms-builder-provider-connection-field-value option[value="' + id + '"]', $connections );

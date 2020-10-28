@@ -577,4 +577,24 @@ class PluginSilentUpgrader extends \Plugin_Upgrader {
 		//Bombard the calling function will all the info which we've just used.
 		return $this->result;
 	}
+
+	/**
+	 * Install a plugin package.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @param string $package The full local path or URI of the package.
+	 * @param array  $args    Optional. Other arguments for installing a plugin package. Default empty array.
+	 *
+	 * @return bool|\WP_Error True if the installation was successful, false or a WP_Error otherwise.
+	 */
+	public function install( $package, $args = array() ) {
+
+		$result = parent::install( $package, $args );
+		if ( true === $result ) {
+			do_action( 'wpforms_plugin_installed', $package );
+		}
+
+		return $result;
+	}
 }

@@ -13,16 +13,18 @@
 function wpforms_save_form() {
 
 	// Run a security check.
-	check_ajax_referer( 'wpforms-builder', 'nonce' );
+	if ( ! check_ajax_referer( 'wpforms-builder', 'nonce', false ) ) {
+		wp_send_json_error( esc_html__( 'Your session expired. Please reload the builder.', 'wpforms-lite' ) );
+	}
 
 	// Check for permissions.
 	if ( ! wpforms_current_user_can( 'edit_forms' ) ) {
-		die( esc_html__( 'You do not have permission.', 'wpforms-lite' ) );
+		wp_send_json_error( esc_html__( 'You are not allowed to perform this action.', 'wpforms-lite' ) );
 	}
 
 	// Check for form data.
 	if ( empty( $_POST['data'] ) ) {
-		die( esc_html__( 'No data provided', 'wpforms-lite' ) );
+		wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'wpforms-lite' ) );
 	}
 
 	$form_post = json_decode( stripslashes( $_POST['data'] ) ); // phpcs:ignore
@@ -62,7 +64,7 @@ function wpforms_save_form() {
 	do_action( 'wpforms_builder_save_form', $form_id, $data );
 
 	if ( ! $form_id ) {
-		die( esc_html__( 'An error occurred and the form could not be saved', 'wpforms-lite' ) );
+		wp_send_json_error( esc_html__( 'Something went wrong while saving the form.', 'wpforms-lite' ) );
 	}
 
 	wp_send_json_success(
@@ -432,7 +434,11 @@ function wpforms_deactivate_addon() {
 	}
 
 	if ( isset( $_POST['plugin'] ) ) {
-		deactivate_plugins( $_POST['plugin'] );
+		$plugin = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
+
+		deactivate_plugins( $plugin );
+
+		do_action( 'wpforms_plugin_deactivated', $plugin );
 
 		if ( 'plugin' === $type ) {
 			wp_send_json_success( esc_html__( 'Plugin deactivated.', 'wpforms-lite' ) );
@@ -468,7 +474,10 @@ function wpforms_activate_addon() {
 			$type = sanitize_key( $_POST['type'] );
 		}
 
-		$activate = activate_plugins( $_POST['plugin'] );
+		$plugin   = sanitize_text_field( wp_unslash( $_POST['plugin'] ) );
+		$activate = activate_plugins( $plugin );
+
+		do_action( 'wpforms_plugin_activated', $plugin );
 
 		if ( ! is_wp_error( $activate ) ) {
 			if ( 'plugin' === $type ) {

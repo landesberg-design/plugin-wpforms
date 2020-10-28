@@ -8,6 +8,13 @@
 class WPForms_Field_Select extends WPForms_Field {
 
 	/**
+	 * Choices JS version.
+	 *
+	 * @since 1.6.3
+	 */
+	const CHOICES_VERSION = '9.0.1';
+
+	/**
 	 * Classic (old) style.
 	 *
 	 * @since 1.6.1
@@ -574,7 +581,7 @@ class WPForms_Field_Select extends WPForms_Field {
 				'wpforms-choicesjs',
 				WPFORMS_PLUGIN_URL . "assets/css/choices{$min}.css",
 				array(),
-				'9.0.1'
+				self::CHOICES_VERSION
 			);
 		}
 	}
@@ -599,33 +606,7 @@ class WPForms_Field_Select extends WPForms_Field {
 		}
 
 		if ( $has_modern_select || wpforms()->frontend->assets_global() ) {
-			wp_enqueue_script(
-				'wpforms-choicesjs',
-				WPFORMS_PLUGIN_URL . 'assets/js/choices.min.js',
-				array(),
-				'9.0.1',
-				true
-			);
-
-			$config = array(
-				'removeItemButton'  => true,
-				'shouldSort'        => false,
-				'loadingText'       => esc_html__( 'Loading...', 'wpforms-lite' ),
-				'noResultsText'     => esc_html__( 'No results found.', 'wpforms-lite' ),
-				'noChoicesText'     => esc_html__( 'No choices to choose from.', 'wpforms-lite' ),
-				'itemSelectText'    => esc_attr__( 'Press to select.', 'wpforms-lite' ),
-				'uniqueItemText'    => esc_html__( 'Only unique values can be added.', 'wpforms-lite' ),
-				'customAddItemText' => esc_html__( 'Only values matching specific conditions can be added.', 'wpforms-lite' ),
-			);
-
-			// Allow theme/plugin developers to modify the provided or add own Choices.js settings.
-			$config = apply_filters( 'wpforms_field_select_choicesjs_config', $config, $forms, $this );
-
-			wp_localize_script(
-				'wpforms-choicesjs',
-				'wpforms_choicesjs_config',
-				$config
-			);
+			$this->enqueue_choicesjs_once( $forms );
 		}
 	}
 
@@ -662,6 +643,32 @@ class WPForms_Field_Select extends WPForms_Field {
 		}
 
 		return $is_field_style;
+	}
+
+	/**
+	 * Get field name for ajax error message.
+	 *
+	 * @since 1.6.3
+	 *
+	 * @param string $name  Field name for error triggered.
+	 * @param array  $field Field settings.
+	 * @param array  $props List of properties.
+	 * @param string $error Error message.
+	 *
+	 * @return string
+	 */
+	public function ajax_error_field_name( $name, $field, $props, $error ) {
+
+		if ( ! isset( $field['type'] ) || 'select' !== $field['type'] ) {
+			return $name;
+		}
+		if ( ! empty( $field['multiple'] ) ) {
+			$input = isset( $props['inputs'] ) ? end( $props['inputs'] ) : [];
+
+			return isset( $input['attr']['name'] ) ? $input['attr']['name'] . '[]' : '';
+		}
+
+		return $name;
 	}
 }
 

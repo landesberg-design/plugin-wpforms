@@ -1,24 +1,22 @@
 <?php
 
-namespace WPForms\Integrations\SiteHealth;
-
-use WPForms\Integrations\IntegrationInterface;
+namespace WPForms\Admin;
 
 /**
  * Site Health WPForms Info.
  *
  * @since 1.5.5
  */
-class SiteHealth implements IntegrationInterface {
+class SiteHealth {
 
 	/**
-	 * Indicate if current integration is allowed to load.
+	 * Indicate if Site Health is allowed to load.
 	 *
 	 * @since 1.5.5
 	 *
 	 * @return bool
 	 */
-	public function allow_load() {
+	private function allow_load() {
 
 		global $wp_version;
 
@@ -26,12 +24,15 @@ class SiteHealth implements IntegrationInterface {
 	}
 
 	/**
-	 * Load an integration.
+	 * Init Site Health.
 	 *
 	 * @since 1.5.5
 	 */
-	public function load() {
+	final public function init() {
 
+		if ( ! $this->allow_load() ) {
+			return;
+		}
 		$this->hooks();
 	}
 
@@ -42,7 +43,7 @@ class SiteHealth implements IntegrationInterface {
 	 */
 	protected function hooks() {
 
-		add_filter( 'debug_information', array( $this, 'add_info_section' ) );
+		add_filter( 'debug_information', [ $this, 'add_info_section' ] );
 	}
 
 	/**
@@ -56,81 +57,77 @@ class SiteHealth implements IntegrationInterface {
 	 */
 	public function add_info_section( $debug_info ) {
 
-		$wpforms = array(
+		$wpforms = [
 			'label'  => 'WPForms',
-			'fields' => array(
-				'version' => array(
+			'fields' => [
+				'version' => [
 					'label' => esc_html__( 'Version', 'wpforms-lite' ),
 					'value' => WPFORMS_VERSION,
-				),
-			),
-		);
-
-		// License key type.
-		$wpforms['fields']['license'] = array(
-			'label' => esc_html__( 'License key type', 'wpforms-lite' ),
-			'value' => wpforms_get_license_type(),
-		);
+				],
+			],
+		];
 
 		// Install date.
-		$activated = get_option( 'wpforms_activated', array() );
+		$activated = get_option( 'wpforms_activated', [] );
 		if ( ! empty( $activated['lite'] ) ) {
 			$date = $activated['lite'] + ( get_option( 'gmt_offset' ) * 3600 );
 
-			$wpforms['fields']['lite'] = array(
+			$wpforms['fields']['lite'] = [
 				'label' => esc_html__( 'Lite install date', 'wpforms-lite' ),
 				'value' => date_i18n( esc_html__( 'M j, Y @ g:ia' ), $date ),
-			);
+			];
 		}
 		if ( ! empty( $activated['pro'] ) ) {
 			$date = $activated['pro'] + ( get_option( 'gmt_offset' ) * 3600 );
 
-			$wpforms['fields']['pro'] = array(
+			$wpforms['fields']['pro'] = [
 				'label' => esc_html__( 'Pro install date', 'wpforms-lite' ),
 				'value' => date_i18n( esc_html__( 'M j, Y @ g:ia' ), $date ),
-			);
+			];
 		}
 
+		// Permissions for the upload directory.
+		$upload_dir                      = wpforms_upload_dir();
+		$wpforms['fields']['upload_dir'] = [
+			'label' => esc_html__( 'Uploads directory', 'wpforms-lite' ),
+			'value' => empty( $upload_dir['error'] ) && ! empty( $upload_dir['path'] ) && wp_is_writable( $upload_dir['path'] ) ? esc_html__( 'Writable', 'wpforms-lite' ) : esc_html__( 'Not writable', 'wpforms-lite' ),
+		];
+
 		// DB tables.
-		if ( wpforms()->pro ) {
-			$db_tables     = wpforms()->get( 'pro' )->get_existing_custom_tables();
+		$db_tables = wpforms()->get_existing_custom_tables();
+		if ( $db_tables ) {
 			$db_tables_str = empty( $db_tables ) ? esc_html__( 'Not found', 'wpforms-lite' ) : implode( ', ', $db_tables );
 
-			$wpforms['fields']['db_tables'] = array(
+			$wpforms['fields']['db_tables'] = [
 				'label' => esc_html__( 'DB tables', 'wpforms-lite' ),
 				'value' => $db_tables_str,
-			);
+			];
 		}
 
 		// Total forms.
-		$wpforms['fields']['total_forms'] = array(
+		$wpforms['fields']['total_forms'] = [
 			'label' => esc_html__( 'Total forms', 'wpforms-lite' ),
 			'value' => wp_count_posts( 'wpforms' )->publish,
-		);
+		];
 
-		// Total entries.
-		if ( wpforms()->pro ) {
-			$wpforms['fields']['total_entries'] = array(
-				'label' => esc_html__( 'Total entries', 'wpforms-lite' ),
-				'value' => wpforms()->entry->get_entries( array(), true ),
-			);
-		} else {
-			$forms = \wpforms()->form->get( '', array( 'fields' => 'ids' ) );
+		if ( ! wpforms()->pro ) {
 
-			if ( empty( $forms ) || ! \is_array( $forms ) ) {
-				$forms = array();
+			$forms = wpforms()->form->get( '', array( 'fields' => 'ids' ) );
+
+			if ( empty( $forms ) || ! is_array( $forms ) ) {
+				$forms = [];
 			}
 
 			$count = 0;
 
 			foreach ( $forms as $form_id ) {
-				$count += (int) \get_post_meta( $form_id, 'wpforms_entries_count', true );
+				$count += (int) get_post_meta( $form_id, 'wpforms_entries_count', true );
 			}
 
-			$wpforms['fields']['total_entries'] = array(
+			$wpforms['fields']['total_submissions'] = [
 				'label' => esc_html__( 'Total submissions (since v1.5.0)', 'wpforms-lite' ),
 				'value' => $count,
-			);
+			];
 		}
 
 		$debug_info['wpforms'] = $wpforms;

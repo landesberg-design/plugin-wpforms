@@ -33,9 +33,9 @@ class Loader {
 	public function __construct() {
 
 		$core_class_names = array(
+			'Divi\Divi',
 			'Elementor\Elementor',
 			'Gutenberg\FormSelector',
-			'SiteHealth\SiteHealth',
 			'WPMailSMTP\Notifications',
 			'WPorg\Translations',
 			'UsageTracking\UsageTracking',

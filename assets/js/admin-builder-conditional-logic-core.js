@@ -176,8 +176,8 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 					continue;
 				}
 
-				if ( updater.conditionalFields[ field_id ].label.length ) {
-					label = wpf.sanitizeString( updater.conditionalFields[ field_id ].label );
+				if ( typeof updater.conditionalFields[ field_id ].label !== 'undefined' && updater.conditionalFields[ field_id ].label.toString().trim() !== '' ) {
+					label = wpf.sanitizeHTML( updater.conditionalFields[ field_id ].label.toString().trim() );
 				} else {
 					label = wpforms_builder.field + ' #' + updater.conditionalFields[ field_id ].id;
 				}
@@ -579,6 +579,7 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 						confirm: {
 							text: wpforms_builder.ok,
 							btnClass: 'btn-confirm',
+							keys: [ 'enter' ],
 							action: function() {
 
 								// Prompt

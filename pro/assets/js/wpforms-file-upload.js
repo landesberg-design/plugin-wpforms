@@ -104,17 +104,17 @@
 	 */
 	function toggleSubmit( dz ) {
 
-		var $form    = jQuery( dz.element ).closest( 'form' );
-		var $btn     = $form.find( '.wpforms-submit' );
-
 		// Force dz.loading to be zero if it's below it, to make sure we
 		// don't decrement it below zero.
 		if ( dz.loading < 0 ) {
 			dz.loading = 0;
 		}
 
-		var disabled = dz.loading > 0;
-		var handler  = toggleLoadingMessage( $form );
+		var $form    = jQuery( dz.element ).closest( 'form' ),
+			$btn     = $form.find( '.wpforms-submit' ),
+			errors   = dz.getFilesWithStatus( 'error' ),
+			handler  = toggleLoadingMessage( $form ),
+			disabled = dz.loading > 0 || errors.length > 0;
 
 		if ( disabled ) {
 			$btn.prop( 'disabled', true );

@@ -1,5 +1,7 @@
 <?php
 
+use WPForms\Logger\Log;
+
 /**
  * Tools admin page class.
  *
@@ -87,29 +89,45 @@ class WPForms_Tools {
 			return;
 		}
 
-		$views = array();
+		$this->init_view();
 
-		if ( wpforms_current_user_can( 'create_forms' ) ) {
-			$views[ esc_html__( 'Import', 'wpforms-lite' ) ] = array( 'import', 'importer' );
+		if ( empty( $this->view ) ) {
+			return;
 		}
 
-		if ( wpforms_current_user_can( array( 'view_forms', 'view_entries' ) ) ) {
-			$views[ esc_html__( 'Export', 'wpforms-lite' ) ] = array( 'export' );
+		// This is required to catch all manual "Cancel" and "Run" events performed for hooks.
+		if ( 'action-scheduler' === $this->view && class_exists( 'ActionScheduler_AdminView' ) ) {
+			ActionScheduler_AdminView::instance()->process_admin_ui();
 		}
 
-		if ( wpforms_current_user_can() ) {
-			$views[ esc_html__( 'System Info', 'wpforms-lite' ) ]       = array( 'system' );
-			$views[ esc_html__( 'Scheduled Actions', 'wpforms-lite' ) ] = array( 'action-scheduler' );
+		if ( 'logs' === $this->view ) {
+			$this->logs_controller();
 		}
 
-		if ( wpforms_current_user_can() && class_exists( 'ActionScheduler_AdminView' ) ) {
-			$views[ esc_html__( 'Scheduled Actions', 'wpforms-lite' ) ] = array( 'action-scheduler' );
+		if ( in_array( $this->view, array( 'import', 'importer' ), true ) ) {
+			$this->import_controller();
 		}
 
-		// Define the core views for the tools tab.
-		$this->views = apply_filters( 'wpforms_tools_views', $views );
+		// Retrieve available forms.
+		$this->forms = wpforms()->form->get( '', [ 'orderby' => 'title' ] );
 
-		$view_ids = call_user_func_array( 'array_merge', $views );
+		add_action( 'wpforms_tools_init', [ $this, 'import_export_process' ] );
+		add_action( 'wpforms_admin_page', [ $this, 'output' ] );
+		add_action( 'admin_init', [ $this, 'register_logs_setting' ] );
+
+		// Hook for addons.
+		do_action( 'wpforms_tools_init' );
+	}
+
+	/**
+	 * Init current view.
+	 *
+	 * @since 1.6.3
+	 */
+	private function init_view() {
+
+		$this->register_views();
+		$view_ids = call_user_func_array( 'array_merge', $this->views );
 
 		// Determine the current active settings tab.
 		$this->view = ! empty( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : 'import'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -121,39 +139,60 @@ class WPForms_Tools {
 		) {
 			$this->view = reset( $view_ids );
 		}
+	}
 
-		if ( empty( $this->view ) ) {
-			return;
+	/**
+	 * Controller for Tools -> Import tab.
+	 *
+	 * @since 1.6.3
+	 */
+	private function import_controller() {
+
+		// If we're on the an import related tab, then build a list of
+		// all available importers.
+		$this->importers = apply_filters( 'wpforms_importers', $this->importers );
+
+		// Get all forms for the previous form provider.
+		if ( ! empty( $_GET['provider'] ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$provider             = sanitize_key( $_GET['provider'] ); //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$this->importer_forms = apply_filters( "wpforms_importer_forms_{$provider}", $this->importer_forms );
 		}
 
-		// This is required to catch all manual "Cancel" and "Run" events performed for hooks.
-		if ( 'action-scheduler' === $this->view && class_exists( 'ActionScheduler_AdminView' ) ) {
-			ActionScheduler_AdminView::instance()->process_admin_ui();
+		// Load the Underscores templates for importers.
+		add_action( 'admin_print_scripts', array( $this, 'importer_templates' ) );
+	}
+
+	/**
+	 * Register views for Tools menu.
+	 *
+	 * @since 1.6.3
+	 */
+	private function register_views() {
+
+		$views = array();
+
+		if ( wpforms_current_user_can( 'create_forms' ) ) {
+			$views[ esc_html__( 'Import', 'wpforms-lite' ) ] = array( 'import', 'importer' );
 		}
 
-		if ( in_array( $this->view, array( 'import', 'importer' ), true ) ) {
-			// If we're on the an import related tab, then build a list of
-			// all available importers.
-			$this->importers = apply_filters( 'wpforms_importers', $this->importers );
-
-			// Get all forms for the previous form provider.
-			if ( ! empty( $_GET['provider'] ) ) {
-				$provider             = sanitize_key( $_GET['provider'] );
-				$this->importer_forms = apply_filters( "wpforms_importer_forms_{$provider}", $this->importer_forms );
-			}
-
-			// Load the Underscores templates for importers.
-			add_action( 'admin_print_scripts', [ $this, 'importer_templates' ] );
+		if ( wpforms_current_user_can( array( 'view_forms', 'view_entries' ) ) ) {
+			$views[ esc_html__( 'Export', 'wpforms-lite' ) ] = array( 'export' );
 		}
 
-		// Retrieve available forms.
-		$this->forms = wpforms()->form->get( '', [ 'orderby' => 'title' ] );
+		if ( wpforms_current_user_can() ) {
+			$views[ esc_html__( 'System Info', 'wpforms-lite' ) ] = array( 'system' );
+		}
 
-		add_action( 'wpforms_tools_init', [ $this, 'import_export_process' ] );
-		add_action( 'wpforms_admin_page', [ $this, 'output' ] );
+		if ( wpforms_current_user_can() && class_exists( 'ActionScheduler_AdminView' ) ) {
+			$views[ esc_html__( 'Scheduled Actions', 'wpforms-lite' ) ] = array( 'action-scheduler' );
+		}
 
-		// Hook for addons.
-		do_action( 'wpforms_tools_init' );
+		if ( wpforms_current_user_can() ) {
+			$views[ esc_html__( 'Logs', 'wpforms-lite' ) ] = array( 'logs' );
+		}
+
+		// Define the core views for the tools tab.
+		$this->views = apply_filters( 'wpforms_tools_views', $views );
 	}
 
 	/**
@@ -233,6 +272,9 @@ class WPForms_Tools {
 					case 'action-scheduler':
 						$this->action_scheduler_tab();
 						break;
+					case 'logs':
+						$this->logs_tab();
+						break;
 					default:
 						do_action( 'wpforms_tools_display_tab_' . sanitize_key( $this->view ) );
 						break;
@@ -249,6 +291,7 @@ class WPForms_Tools {
 	 * @since 1.4.2
 	 */
 	public function import_tab() {
+
 		?>
 
 		<div class="wpforms-setting-row tools">
@@ -653,6 +696,160 @@ class WPForms_Tools {
 		</div>
 
 		<?php
+	}
+
+	/**
+	 * Controller for Tools -> Logs tab.
+	 *
+	 * @since 1.6.3
+	 */
+	private function logs_controller() {
+
+		$log = wpforms()->get( 'log' );
+		$log->create_table();
+		$logs_list_table = $log->get_list_table();
+		$nonce           = filter_input( INPUT_POST, '_wpforms_logs_settings_nonce', FILTER_SANITIZE_STRING );
+		if ( wp_verify_nonce( $nonce, 'wpforms-logs-settings' ) ) {
+			$settings                = get_option( 'wpforms_settings' );
+			$was_enabled             = ! empty( $settings['logs-enable'] ) ? $settings['logs-enable'] : 0;
+			$settings['logs-enable'] = filter_input( INPUT_POST, 'logs-enable', FILTER_VALIDATE_BOOLEAN );
+			$logs_types              = filter_input( INPUT_POST, 'logs-types', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
+			$logs_user_roles         = filter_input( INPUT_POST, 'logs-user-roles', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
+			$logs_users              = filter_input( INPUT_POST, 'logs-users', FILTER_SANITIZE_NUMBER_INT, FILTER_REQUIRE_ARRAY );
+			if ( $was_enabled ) {
+				$settings['logs-types']      = $logs_types ? $logs_types : [];
+				$settings['logs-user-roles'] = $logs_user_roles ? $logs_user_roles : [];
+				$settings['logs-users']      = $logs_users ? array_map( 'absint', $logs_users ) : [];
+			}
+			update_option( 'wpforms_settings', $settings );
+		}
+		$logs_list_table->process_admin_ui();
+	}
+
+	/**
+	 * Logs tab contents.
+	 *
+	 * @since 1.6.3
+	 */
+	private function logs_tab() {
+
+		$log      = wpforms()->get( 'log' );
+		$settings = get_option( 'wpforms_settings' );
+		?>
+		<form action="" method="POST">
+			<?php wp_nonce_field( 'wpforms-logs-settings', '_wpforms_logs_settings_nonce' ); ?>
+			<div class="wpforms-setting-row tools">
+				<h3><?php esc_html_e( 'Logs', 'wpforms-lite' ); ?></h3>
+				<p><?php esc_html_e( 'On this page, you can enable and configure the logging functionality while debugging behavior of various parts of the plugin, including forms and entries processing.', 'wpforms-lite' ); ?></p>
+			</div>
+			<div class="wpforms-setting-row tools wpforms-setting-row-checkbox wpforms-clear" id="wpforms-setting-row-logs-enable">
+				<div class="wpforms-setting-label">
+					<label for="wpforms-setting-logs-enable"><?php esc_html_e( 'Enable Logs', 'wpforms-lite' ); ?></label>
+				</div>
+				<div class="wpforms-setting-field">
+					<input
+						type="checkbox"
+						id="wpforms-setting-logs-enable"
+						name="logs-enable"
+						value="1"
+						<?php checked( ! empty( $settings['logs-enable'] ) ); ?>
+					>
+					<p class="desc">
+						<?php esc_html_e( 'Check this if you would like to start logging WPForms-related events. This is recommended only while debugging.', 'wpforms-lite' ); ?>
+					</p>
+				</div>
+			</div>
+			<?php if ( ! empty( $settings['logs-enable'] ) ) { ?>
+				<div class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear" id="wpforms-setting-row-log-types">
+					<div class="wpforms-setting-label">
+						<label for="wpforms-setting-logs-types"><?php esc_html_e( 'Log Types', 'wpforms-lite' ); ?></label>
+					</div>
+					<div class="wpforms-setting-field">
+						<span class="choicesjs-select-wrap">
+							<select id="wpforms-setting-logs-types" class="choicesjs-select" name="logs-types[]" multiple="multiple">
+								<?php
+								$log_types = ! empty( $settings['logs-types'] ) ? $settings['logs-types'] : [];
+								foreach ( Log::get_log_types() as $slug => $name ) {
+									?>
+									<option
+										value="<?php echo esc_attr( $slug ); ?>"
+										<?php selected( in_array( $slug, $log_types, true ) ); ?>
+									>
+										<?php echo esc_html( $name ); ?>
+									</option>
+								<?php } ?>
+							</select>
+						</span>
+						<p class="desc"><?php esc_html_e( 'Select the types of events you want to log. Everything is logged by default.', 'wpforms-lite' ); ?></p>
+					</div>
+				</div>
+				<div class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear" id="wpforms-setting-row-log-user-roles">
+					<div class="wpforms-setting-label">
+						<label for="wpforms-setting-logs-user-roles"><?php esc_html_e( 'User Roles', 'wpforms-lite' ); ?></label>
+					</div>
+					<div class="wpforms-setting-field">
+						<span class="choicesjs-select-wrap">
+							<?php
+							$logs_user_roles = ! empty( $settings['logs-user-roles'] ) ? $settings['logs-user-roles'] : [];
+							$roles           = wp_list_pluck( get_editable_roles(), 'name' );
+							?>
+							<select id="wpforms-setting-logs-user-roles" class="choicesjs-select" name="logs-user-roles[]" multiple="multiple">
+								<?php foreach ( $roles as $slug => $name ) { ?>
+									<option
+										value="<?php echo esc_attr( $slug ); ?>"
+										<?php selected( in_array( $slug, $logs_user_roles, true ) ); ?>
+									>
+										<?php echo esc_html( $name ); ?>
+									</option>
+								<?php } ?>
+							</select>
+							<span class="hidden" id="wpforms-setting-logs-user-roles-selectform-spinner"><i class="fa fa-cog fa-spin fa-lg"></i></span>
+						</span>
+						<p class="desc"><?php esc_html_e( 'Select the user roles you want to log. All roles are logged by default.', 'wpforms-lite' ); ?></p>
+					</div>
+				</div>
+				<div class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear" id="wpforms-setting-row-log-users">
+					<div class="wpforms-setting-label">
+						<label for="wpforms-setting-logs-users"><?php esc_html_e( 'Users', 'wpforms-lite' ); ?></label>
+					</div>
+					<div class="wpforms-setting-field">
+						<span class="choicesjs-select-wrap">
+							<select id="wpforms-setting-logs-users" class="choicesjs-select" name="logs-users[]" multiple="multiple">
+								<?php
+								$users      = get_users(
+									[
+										'fields' => [ 'ID', 'display_name' ],
+									]
+								);
+								$users      = wp_list_pluck( $users, 'display_name', 'ID' );
+								$logs_users = ! empty( $settings['logs-users'] ) ? $settings['logs-users'] : [];
+								foreach ( $users as $slug => $name ) {
+									?>
+									<option
+										value="<?php echo esc_attr( $slug ); ?>"
+										<?php selected( in_array( $slug, $logs_users, true ) ); ?>
+									>
+										<?php echo esc_html( $name ); ?>
+									</option>
+								<?php } ?>
+							</select>
+							<span class="hidden" id="wpforms-setting-logs-users-selectform-spinner"><i class="fa fa-cog fa-spin fa-lg"></i></span>
+						</span>
+						<p class="desc"><?php esc_html_e( 'Log events for specific users only. All users are logged by default.', 'wpforms-lite' ); ?></p>
+					</div>
+				</div>
+			<?php } ?>
+			<p class="submit">
+				<button type="submit" class="wpforms-btn wpforms-btn-md wpforms-btn-orange" name="wpforms-settings-submit">
+					<?php esc_html_e( 'Save Settings', 'wpforms-lite' ); ?>
+				</button>
+			</p>
+		</form>
+		<?php
+		$logs_list_table = $log->get_list_table();
+		if ( ! empty( $settings['logs-enable'] ) || $logs_list_table->get_total() ) {
+			$logs_list_table->display_page();
+		}
 	}
 
 	/**

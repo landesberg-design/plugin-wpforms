@@ -119,8 +119,10 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 			<div class="wpforms-preview">
 
 				<div class="wpforms-title-desc">
-					<h2 class="wpforms-form-name"><?php echo esc_html( $this->form->post_title ); ?></h2>
-					<span class="wpforms-form-desc"><?php echo wp_kses( $this->form->post_excerpt, wpforms_builder_preview_get_allowed_tags() ); ?></span>
+					<div class="wpforms-title-desc-inner">
+						<h2 class="wpforms-form-name"><?php echo esc_html( $this->form->post_title ); ?></h2>
+						<span class="wpforms-form-desc"><?php echo wp_kses( $this->form->post_excerpt, wpforms_builder_preview_get_allowed_tags() ); ?></span>
+					</div>
 				</div>
 
 				<div class="wpforms-no-fields-holder wpforms-hidden">
@@ -249,7 +251,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 			$class = apply_filters( 'wpforms_builder_field_option_class', '', $field );
 
-			printf( '<div class="wpforms-field-option wpforms-field-option-%s %s" id="wpforms-field-option-%d" data-field-id="%d">', sanitize_html_class( $field['type'] ), sanitize_html_class( $class ), (int) $field['id'], (int) $field['id'] );
+			printf( '<div class="wpforms-field-option wpforms-field-option-%s %s" id="wpforms-field-option-%d" data-field-id="%d">', sanitize_html_class( $field['type'] ), wpforms_sanitize_classes( $class ), (int) $field['id'], (int) $field['id'] );
 
 			printf( '<input type="hidden" name="fields[%d][id]" value="%d" class="wpforms-field-option-hidden-id">', $field['id'], $field['id'] );
 

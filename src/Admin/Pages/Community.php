@@ -58,7 +58,8 @@ class Community {
 	 */
 	public function get_blocks_data() {
 
-		$data = array();
+		$type = wpforms()->pro ? 'plugin' : 'liteplugin';
+		$data = [];
 
 		$data['vip_circle'] = array(
 			'title'          => esc_html__( 'WPForms VIP Circle Facebook Group', 'wpforms-lite' ),
@@ -74,7 +75,7 @@ class Community {
 			'title'          => esc_html__( 'WPForms Developer Documentation', 'wpforms-lite' ),
 			'description'    => esc_html__( 'Customize and extend WPForms with code. Our comprehensive developer resources include tutorials, snippets, and documentation on core actions, filters, functions, and more.', 'wpforms-lite' ),
 			'button_text'    => esc_html__( 'View WPForms Dev Docs', 'wpforms-lite' ),
-			'button_link'    => 'https://wpforms.com/developers/?utm_source=WordPress&amp;utm_medium=Community&amp;utm_campaign=liteplugin&amp;utm_content=Developers',
+			'button_link'    => 'https://wpforms.com/developers/?utm_source=WordPress&amp;utm_medium=Community&amp;utm_campaign=' . esc_attr( $type ) . '&amp;utm_content=Developers',
 			'cover_bg_color' => '#EBEBEB',
 			'cover_img'      => 'dev-docs.png',
 			'cover_img2x'    => 'dev-docs@2x.png',
@@ -94,7 +95,7 @@ class Community {
 			'title'          => esc_html__( 'WPForms Translators Community', 'wpforms-lite' ),
 			'description'    => esc_html__( 'We\'re building a community of translators and i18n experts to translate WPForms. Sign up to our translator community newsletter to learn more and get information on how you can contribute!', 'wpforms-lite' ),
 			'button_text'    => esc_html__( 'Join Translators Community', 'wpforms-lite' ),
-			'button_link'    => 'https://wpforms.com/translator-community-signup/?utm_source=WordPress&amp;utm_medium=Community&amp;utm_campaign=liteplugin&amp;utm_content=Translators',
+			'button_link'    => 'https://wpforms.com/translator-community-signup/?utm_source=WordPress&amp;utm_medium=Community&amp;utm_campaign=' . esc_attr( $type ) . '&amp;utm_content=Translators',
 			'cover_bg_color' => '#F2FAED',
 			'cover_img'      => 'translators.png',
 			'cover_img2x'    => 'translators@2x.png',
@@ -104,7 +105,7 @@ class Community {
 			'title'          => esc_html__( 'Suggest a Feature', 'wpforms-lite' ),
 			'description'    => esc_html__( 'Do you have an idea or suggestion for WPForms? If you have thoughts on features, integrations, addons, or improvements - we want to hear it! We appreciate all feedback and insight from our users.', 'wpforms-lite' ),
 			'button_text'    => esc_html__( 'Suggest a Feature', 'wpforms-lite' ),
-			'button_link'    => 'https://wpforms.com/features/suggest/?utm_source=WordPress&amp;utm_medium=Community&amp;utm_campaign=liteplugin&amp;utm_content=Feature',
+			'button_link'    => 'https://wpforms.com/features/suggest/?utm_source=WordPress&amp;utm_medium=Community&amp;utm_campaign=' . esc_attr( $type ) . '&amp;utm_content=Feature',
 			'cover_bg_color' => '#FFF9EF',
 			'cover_img'      => 'suggest.png',
 			'cover_img2x'    => 'suggest@2x.png',

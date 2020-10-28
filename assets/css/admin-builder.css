@@ -103,6 +103,11 @@ body {
 	display: none;
 }
 
+/* In some cases we need to override inline style display value */
+#wpforms-builder #wpforms-builder-form .wpforms-hidden-strict {
+	display: none !important;
+}
+
 #wpforms-builder .wpforms-one-half {
 	float: left;
 	width: 48%;

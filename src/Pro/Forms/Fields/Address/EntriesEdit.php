@@ -29,9 +29,9 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 		// Load jQuery input mask library - https://github.com/RobinHerbots/jquery.inputmask.
 		wp_enqueue_script(
 			'wpforms-maskedinput',
-			WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.bundle.min.js',
+			WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.min.js',
 			[ 'jquery' ],
-			'4.0.6',
+			'5.0.5',
 			true
 		);
 	}

@@ -260,17 +260,16 @@ class PrintPreview {
 
 					foreach ( $this->entry->entry_notes as $note ) {
 
-						$user        = \get_userdata( $note->user_id );
-						$user_name   = ! empty( $user->display_name ) ? $user->display_name : $user->user_login;
-						$date_format = sprintf( '%s %s', \get_option( 'date_format' ), \get_option( 'time_format' ) );
-						$date        = \date_i18n( $date_format, strtotime( $note->date ) + ( \get_option( 'gmt_offset' ) * 3600 ) );
+						$user      = \get_userdata( $note->user_id );
+						$user_name = ! empty( $user->display_name ) ? $user->display_name : $user->user_login;
+						$date      = wpforms_datetime_format( $note->date, '', true );
 
 						echo '<div class="note">';
 							echo '<div class="note-byline">';
-								printf( /* translators: %1$s - user name; %2$s - date. */
-									\esc_html__( 'Added by %1$s on %2$s', 'wpforms' ),
-									\esc_html( $user_name ),
-									\esc_html( $date )
+								printf( /* translators: %1$s - user name; %2$s - date */
+									esc_html__( 'Added by %1$s on %2$s', 'wpforms' ),
+									esc_html( $user_name ),
+									esc_html( $date )
 								);
 							echo '</div>';
 							echo '<div class="note-text">' . \wp_kses_post( $note->data ) . '</div>';
