@@ -11,8 +11,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 
 ?>
-<div class="wpforms-challenge-tooltips wpforms-challenge-tooltip-step5">
-	<div id="tooltip-content5">
+<div class="wpforms-admin-form-embed-wizard-tooltip">
+	<div id="wpforms-admin-form-embed-wizard-tooltip-content">
 		<?php if ( wpforms_is_gutenberg_active() ) : // Gutenberg content. ?>
 			<h3><?php esc_html_e( 'Add a Block', 'wpforms-lite' ); ?></h3>
 			<p>
@@ -33,11 +33,11 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				);
 				?>
 			</p>
-			<i class="wpforms-challenge-tooltips-red-arrow"></i>
+			<i class="wpforms-admin-form-embed-wizard-tooltips-red-arrow"></i>
 		<?php else : ?>
 			<h3><?php esc_html_e( 'Embed in a Page', 'wpforms-lite' ); ?></h3>
 			<p><?php esc_html_e( 'Click the “Add Form” button, select your form, then add the embed code.', 'wpforms-lite' ); ?></p>
 		<?php endif; ?>
-		<button type="button" class="wpforms-challenge-step5-done wpforms-challenge-done-btn"><?php esc_html_e( 'Done', 'wpforms-lite' ); ?></button>
+		<button type="button" class="wpforms-admin-form-embed-wizard-done-btn"><?php esc_html_e( 'Done', 'wpforms-lite' ); ?></button>
 	</div>
 </div>

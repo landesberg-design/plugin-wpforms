@@ -351,6 +351,48 @@ abstract class WPForms_DB {
 	}
 
 	/**
+	 * Delete record(s) from the database using WHERE IN syntax.
+	 *
+	 * @since 1.6.4
+	 *
+	 * @param string $column        Column name.
+	 * @param mixed  $column_values Column values.
+	 *
+	 * @return int|bool Number of deleted records, false otherwise.
+	 */
+	public function delete_where_in( $column, $column_values ) {
+
+		global $wpdb;
+
+		if ( empty( $column ) || empty( $column_values ) ) {
+			return false;
+		}
+
+		if ( ! array_key_exists( $column, $this->get_columns() ) ) {
+			return false;
+		}
+
+		$values = is_array( $column_values ) ? $column_values : [ $column_values ];
+
+		foreach ( $values as $key => $value ) {
+			// Check if a string contains an integer and sanitize accordingly.
+			if ( (string) (int) $value === $value ) {
+				$values[ $key ]       = (int) $value;
+				$placeholders[ $key ] = '%d';
+			} else {
+				$values[ $key ]       = sanitize_text_field( $value );
+				$placeholders[ $key ] = '%s';
+			}
+		}
+
+		$placeholders = isset( $placeholders ) ? implode( ',', $placeholders ) : '';
+		$sql          = "DELETE FROM {$this->table_name} WHERE {$column} IN ( {$placeholders} )";
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->query( $wpdb->prepare( $sql, $values ) );
+	}
+
+	/**
 	 * Check if the given table exists.
 	 *
 	 * @since 1.1.6

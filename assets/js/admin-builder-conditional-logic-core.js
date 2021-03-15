@@ -1,4 +1,4 @@
-/* globals wpf, wpforms_builder */
+/* global wpf, wpforms_builder */
 
 'use strict';
 

@@ -19,6 +19,15 @@ class Help {
 	private $settings;
 
 	/**
+	 * Docs data.
+	 *
+	 * @since 1.6.4
+	 *
+	 * @var array
+	 */
+	private $docs;
+
+	/**
 	 * Initialize class.
 	 *
 	 * @since 1.6.3
@@ -52,11 +61,8 @@ class Help {
 			// Remote source URL.
 			'docs_remote_source' => 'https://cdn.wpforms.com/wp-content/docs.json',
 
-			// Docs cache directory (full path).
-			'cache_dir'          => $upload_path,
-
 			// Docs cache file (full path).
-			'cache_file'         => $upload_path . 'docs.json',
+			'cache_file'         => $upload_path . 'cache/docs.json',
 
 			// Docs cache time to live in seconds.
 			'cache_ttl'          => (int) apply_filters( 'wpforms_admin_builder_help_cache_ttl', WEEK_IN_SECONDS ),
@@ -136,16 +142,21 @@ class Help {
 			$docs = json_decode( file_get_contents( $this->settings['cache_file'] ), true );
 		}
 
+		clearstatcache();
+
 		if (
-			! empty( $docs ) &&
+			empty( $docs ) ||
 			(int) filemtime( $this->settings['cache_file'] ) + $this->settings['cache_ttl'] > time()
 		) {
-			return $docs;
+			// This code should execute once when the method called the first time,
+			// Next update_docs() should be executed by schedule.
+			$docs = $this->update_docs();
 		}
 
-		// This code should execute once, when the method called first time,
-		// Next update_docs() should be executed by schedule.
-		return $this->update_docs();
+		// Store in class private variable for further use.
+		$this->docs = ! empty( $docs ) ? $docs : [];
+
+		return $this->docs;
 	}
 
 	/**
@@ -160,27 +171,43 @@ class Help {
 		// Unfortunately, we need to call setup() here for properly scheduled execution.
 		$this->setup();
 
-		$request = wp_remote_get( $this->settings['docs_remote_source'] );
+		$request = wp_remote_get(
+			$this->settings['docs_remote_source'],
+			[
+				// Limit the processing time to half of the default PHP max execution time,
+				// so we will have a chance to see the Form Builder even without the docs data.
+				'timeout' => 15,
+			]
+		);
 
 		if ( is_wp_error( $request ) ) {
 			return false;
 		}
 
-		$docs = wp_remote_retrieve_body( $request );
+		$content   = wp_remote_retrieve_body( $request );
+		$cache_dir = dirname( $this->settings['cache_file'] );
 
 		// Check cache directory and create it if needed.
-		if ( ! file_exists( $this->settings['cache_dir'] ) || ! wp_is_writable( $this->settings['cache_dir'] ) ) {
-			wp_mkdir_p( $this->settings['cache_dir'] );
+		if ( ! file_exists( $cache_dir ) || ! wp_is_writable( $cache_dir ) ) {
+			wp_mkdir_p( $cache_dir );
 			wpforms_create_upload_dir_htaccess_file();
-			wpforms_create_index_html_file( $this->settings['cache_dir'] );
+			wpforms_create_index_html_file( $cache_dir );
 		}
 
-		file_put_contents( $this->settings['cache_file'], $docs ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
+		// Attempt to decode the json data.
+		$docs = json_decode( $content, true );
+
+		// If the data successfully decoded to array we caching the content.
+		if ( is_array( $docs ) ) {
+			file_put_contents( $this->settings['cache_file'], $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
+		} else {
+			$docs = [];
+		}
 
 		// Schedule recurring updates.
 		$this->schedule_update_docs();
 
-		return json_decode( $docs, true );
+		return $docs;
 	}
 
 	/**
@@ -283,6 +310,8 @@ class Help {
 			'providers/constant_contact'                         => 'constant contact',
 			'providers/drip'                                     => 'drip',
 			'providers/getresponse'                              => 'getresponse',
+			'providers/getresponse_v3'                           => 'getresponse',
+			'providers/mailchimp'                                => 'mailchimp',
 			'providers/mailchimpv3'                              => 'mailchimp',
 			'providers/zapier'                                   => 'zapier',
 			'providers/salesforce'                               => 'salesforce',
@@ -1112,6 +1141,10 @@ class Help {
 	 */
 	public function get_context_docs() {
 
+		if ( empty( $this->docs ) ) {
+			return [];
+		}
+
 		$docs_links = $this->get_context_docs_links();
 		$docs       = [];
 
@@ -1129,27 +1162,23 @@ class Help {
 	 *
 	 * @param string $link Absolute link to the doc without the domain part.
 	 *
-	 * @return array Docs recommended by search terms.
+	 * @return array Array with doc id as element.
 	 */
 	public function get_doc_id( $link ) {
 
-		static $docs = [];
-
-		if ( empty( $docs ) ) {
-			$docs = $this->get_docs();
+		if ( empty( $this->docs ) ) {
+			return [];
 		}
 
 		$result = array_filter(
-			$docs,
+			$this->docs,
 			function( $doc ) use ( $link ) {
 
 				return ! empty( $doc['url'] ) && $doc['url'] === 'https://wpforms.com' . $link;
 			}
 		);
 
-		$keys = array_keys( $result );
-
-		return ! empty( $keys[0] ) ? $keys[0] : [];
+		return ! empty( $result ) && is_array( $result ) ? array_keys( $result ) : [];
 	}
 
 	/**
@@ -1163,10 +1192,14 @@ class Help {
 	 */
 	public function get_doc_ids( $links ) {
 
+		if ( empty( $this->docs ) ) {
+			return [];
+		}
+
 		$ids = [];
 
 		foreach ( $links as $link ) {
-			array_push( $ids, $this->get_doc_id( $link ) );
+			$ids = array_merge( $ids, $this->get_doc_id( $link ) );
 		}
 
 		return $ids;

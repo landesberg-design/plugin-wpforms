@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Admin\Settings;
 
+use WPForms\Admin\Settings\Geolocation;
+
 /**
  * Settings enhancements to educate users on what is
  * available in addons and high level licenses.
@@ -61,6 +63,11 @@ class Education {
 			\add_filter( 'wpforms_admin_strings', array( $this, 'js_strings' ) );
 			\add_action( 'admin_enqueue_scripts', array( $this, 'enqueues' ) );
 			\add_action( 'wpforms_settings_providers', array( $this, 'providers' ), 10000, 1 );
+		}
+
+		// Geolocation API related hooks.
+		if ( \wpforms_is_admin_page( 'settings', 'geolocation' ) ) {
+			\add_action( 'wpforms_settings_init', [ $this, 'geolocation_settings' ] );
 		}
 	}
 
@@ -315,5 +322,23 @@ class Education {
 		_deprecated_function( __FUNCTION__, '1.5.9.3 of the WPForms plugin', 'wpforms_get_license_type()' );
 
 		return wpforms_get_license_type();
+	}
+
+	/**
+	 * Add Geolocation settings section.
+	 *
+	 * @since 1.6.5
+	 */
+	public function geolocation_settings() {
+
+		if (
+			in_array( wpforms_get_license_type(), [ 'pro', 'elite', 'agency', 'ultimate' ], true ) &&
+			defined( 'WPFORMS_GEOLOCATION_VERSION' ) &&
+			version_compare( WPFORMS_GEOLOCATION_VERSION, '2.0.0', '>=' )
+		) {
+			return;
+		}
+
+		( new Geolocation() )->hooks();
 	}
 }

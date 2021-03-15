@@ -2,7 +2,6 @@
 /**
  * View for geolocation product education.
  *
- * @var string $nonce_activate Nonce for activate plugin.
  * @var string $nonce_hide     Nonce for hide education.
  * @var bool   $install        Is plugin installed?
  * @var string $plugin_file    Plugin file.

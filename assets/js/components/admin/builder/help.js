@@ -434,7 +434,7 @@ WPForms.Admin.Builder.Help = WPForms.Admin.Builder.Help || ( function( document,
 				$category.removeClass( 'opened' );
 			}
 
-			$categoryDocs.slideToggle( ui.config.speed );
+			$categoryDocs.stop().slideToggle( ui.config.speed );
 		},
 
 		/**
@@ -448,7 +448,7 @@ WPForms.Admin.Builder.Help = WPForms.Admin.Builder.Help || ( function( document,
 
 			var $btn = $( this );
 
-			$btn.prev( 'div' ).slideToggle( ui.config.speed, function() {
+			$btn.prev( 'div' ).stop().slideToggle( ui.config.speed, function() {
 				$btn.closest( '.wpforms-builder-help-category' ).addClass( 'viewall' );
 			} );
 			ui.fadeOut( $btn );

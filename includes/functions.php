@@ -790,6 +790,7 @@ function wpforms_countries() {
 		'BM' => esc_html__( 'Bermuda', 'wpforms-lite' ),
 		'BT' => esc_html__( 'Bhutan', 'wpforms-lite' ),
 		'BO' => esc_html__( 'Bolivia (Plurinational State of)', 'wpforms-lite' ),
+		'BQ' => esc_html__( 'Bonaire, Saint Eustatius and Saba', 'wpforms-lite' ),
 		'BA' => esc_html__( 'Bosnia and Herzegovina', 'wpforms-lite' ),
 		'BW' => esc_html__( 'Botswana', 'wpforms-lite' ),
 		'BV' => esc_html__( 'Bouvet Island', 'wpforms-lite' ),
@@ -880,6 +881,7 @@ function wpforms_countries() {
 		'KI' => esc_html__( 'Kiribati', 'wpforms-lite' ),
 		'KP' => esc_html__( 'Korea (Democratic People\'s Republic of)', 'wpforms-lite' ),
 		'KR' => esc_html__( 'Korea (Republic of)', 'wpforms-lite' ),
+		'XK' => esc_html__( 'Kosovo', 'wpforms-lite' ),
 		'KW' => esc_html__( 'Kuwait', 'wpforms-lite' ),
 		'KG' => esc_html__( 'Kyrgyzstan', 'wpforms-lite' ),
 		'LA' => esc_html__( 'Lao People\'s Democratic Republic', 'wpforms-lite' ),
@@ -974,7 +976,7 @@ function wpforms_countries() {
 		'SD' => esc_html__( 'Sudan', 'wpforms-lite' ),
 		'SR' => esc_html__( 'Suriname', 'wpforms-lite' ),
 		'SJ' => esc_html__( 'Svalbard and Jan Mayen', 'wpforms-lite' ),
-		'SZ' => esc_html__( 'Swaziland', 'wpforms-lite' ),
+		'SZ' => esc_html__( 'Eswatini (Kingdom of)', 'wpforms-lite' ),
 		'SE' => esc_html__( 'Sweden', 'wpforms-lite' ),
 		'CH' => esc_html__( 'Switzerland', 'wpforms-lite' ),
 		'SY' => esc_html__( 'Syrian Arab Republic', 'wpforms-lite' ),
@@ -1003,7 +1005,7 @@ function wpforms_countries() {
 		'VU' => esc_html__( 'Vanuatu', 'wpforms-lite' ),
 		'VA' => esc_html__( 'Vatican City State', 'wpforms-lite' ),
 		'VE' => esc_html__( 'Venezuela (Bolivarian Republic of)', 'wpforms-lite' ),
-		'VN' => esc_html__( 'Viet Nam', 'wpforms-lite' ),
+		'VN' => esc_html__( 'Vietnam', 'wpforms-lite' ),
 		'VG' => esc_html__( 'Virgin Islands (British)', 'wpforms-lite' ),
 		'VI' => esc_html__( 'Virgin Islands (U.S.)', 'wpforms-lite' ),
 		'WF' => esc_html__( 'Wallis and Futuna', 'wpforms-lite' ),
@@ -1253,24 +1255,24 @@ function wpforms_light_or_dark( $color, $dark = '#000000', $light = '#FFFFFF' ) 
  *
  * @return array
  */
-function wpforms_get_hierarchical_object( $args = array(), $flat = false ) {
+function wpforms_get_hierarchical_object( $args = [], $flat = false ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
 	if ( empty( $args['taxonomy'] ) && empty( $args['post_type'] ) ) {
-		return array();
+		return [];
 	}
 
-	$children   = array();
-	$parents    = array();
+	$children   = [];
+	$parents    = [];
 	$ref_parent = '';
 	$ref_name   = '';
 
 	if ( ! empty( $args['post_type'] ) ) {
 
-		$defaults   = array(
+		$defaults   = [
 			'posts_per_page' => - 1,
 			'orderby'        => 'title',
 			'order'          => 'ASC',
-		);
+		];
 		$args       = wp_parse_args( $args, $defaults );
 		$items      = get_posts( $args );
 		$ref_parent = 'post_parent';
@@ -1279,9 +1281,11 @@ function wpforms_get_hierarchical_object( $args = array(), $flat = false ) {
 
 	} elseif ( ! empty( $args['taxonomy'] ) ) {
 
-		$defaults   = array(
+		$defaults   = [
 			'hide_empty' => false,
-		);
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		];
 		$args       = wp_parse_args( $args, $defaults );
 		$items      = get_terms( $args );
 		$ref_parent = 'parent';
@@ -1290,7 +1294,7 @@ function wpforms_get_hierarchical_object( $args = array(), $flat = false ) {
 	}
 
 	if ( empty( $items ) || is_wp_error( $items ) ) {
-		return array();
+		return [];
 	}
 
 	foreach ( $items as $item ) {
@@ -1304,22 +1308,74 @@ function wpforms_get_hierarchical_object( $args = array(), $flat = false ) {
 	}
 
 	$children_count = count( $children );
+
 	while ( $children_count >= 1 ) {
 		foreach ( $children as $child ) {
 			_wpforms_get_hierarchical_object_search( $child, $parents, $children, $ref_parent );
+
 			// $children is modified by reference, so we need to recount to make sure we met the limits.
 			$children_count = count( $children );
 		}
 	}
 
+	// Sort nested child objects alphabetically using natural order, applies only
+	// to ordering by entry title or term name.
+	if ( in_array( $args['orderby'], [ 'title', 'name' ], true ) ) {
+		_wpforms_sort_hierarchical_object( $parents, $args['orderby'], $args['order'] );
+	}
+
 	if ( $flat ) {
-		$parents_flat = array();
+		$parents_flat = [];
+
 		_wpforms_get_hierarchical_object_flatten( $parents, $parents_flat, $ref_name );
 
 		return $parents_flat;
 	}
 
 	return $parents;
+}
+
+/**
+ * Sort a nested array of objects.
+ *
+ * @since 1.6.5
+ *
+ * @param array  $objects An array of objects to sort.
+ * @param string $orderby The object field to order by.
+ * @param string $order   Order direction.
+ */
+function _wpforms_sort_hierarchical_object( &$objects, $orderby, $order ) {
+
+	// Map WP_Query/WP_Term_Query orderby to WP_Post/WP_Term property.
+	$map = [
+		'title' => 'post_title',
+		'name'  => 'name',
+	];
+
+	foreach ( $objects as $object ) {
+		if ( ! isset( $object->children ) ) {
+			continue;
+		}
+
+		uasort(
+			$object->children,
+			static function ( $a, $b ) use ( $map, $orderby, $order ) {
+
+				/**
+				 * This covers most cases and works for most languages. For some – e.g. European languages
+				 * that use extended latin charset (Polish, German etc) it will sort the objects into 2
+				 * groups – base and extended, properly sorted within each group. Making it even more
+				 * robust requires either additional PHP extensions to be installed on the server
+				 * or using heavy (and slow) conversions and computations.
+				 */
+				return $order === 'ASC' ?
+					strnatcasecmp( $a->{$map[ $orderby ]}, $b->{$map[ $orderby ]} ) :
+					strnatcasecmp( $b->{$map[ $orderby ]}, $a->{$map[ $orderby ]} );
+			}
+		);
+
+		_wpforms_sort_hierarchical_object( $object->children, $orderby, $order );
+	}
 }
 
 /**
@@ -1529,15 +1585,6 @@ function wpforms_debug() {
 
 	if ( ( defined( 'WPFORMS_DEBUG' ) && true === WPFORMS_DEBUG ) && is_super_admin() ) {
 		$debug = true;
-	}
-
-	$debug_option = get_option( 'wpforms_debug' );
-
-	if ( $debug_option ) {
-		$current_user = wp_get_current_user();
-		if ( $current_user->user_login === $debug_option ) {
-			$debug = true;
-		}
 	}
 
 	return apply_filters( 'wpforms_debug', $debug );
@@ -1789,9 +1836,15 @@ function wpforms_get_capability_manage_options() {
  *
  * @return bool
  */
-function wpforms_current_user_can( $caps = array(), $id = 0 ) {
+function wpforms_current_user_can( $caps = [], $id = 0 ) {
 
-	$user_can = wpforms()->get( 'access' )->current_user_can( $caps , $id );
+	$access = wpforms()->get( 'access' );
+
+	if ( ! method_exists( $access, 'current_user_can' ) ) {
+		return false;
+	}
+
+	$user_can = $access->current_user_can( $caps , $id );
 
 	return apply_filters( 'wpforms_current_user_can', $user_can, $caps, $id );
 }
@@ -1818,7 +1871,7 @@ function wpforms_datetime_format( $date, $format = '', $gmt_offset = false ) {
 	}
 
 	if ( $gmt_offset ) {
-		$date += intval( get_option( 'gmt_offset' ) ) * 3600;
+		$date += (int) ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
 	}
 
 	return date_i18n( $format, $date );
@@ -1945,6 +1998,14 @@ function wpforms_get_providers_all() {
 			'plugin'      => 'wpforms-salesforce/wpforms-salesforce.php',
 			'plugin_slug' => 'wpforms-salesforce',
 			'license'     => 'elite',
+		],
+		[
+			'name'        => 'Sendinblue',
+			'slug'        => 'sendinblue',
+			'img'         => 'addon-icon-sendinblue.png',
+			'plugin'      => 'wpforms-sendinblue/wpforms-sendinblue.php',
+			'plugin_slug' => 'wpforms-sendinblue',
+			'license'     => 'pro',
 		],
 		[
 			'name'        => 'Zapier',
@@ -2243,6 +2304,7 @@ function wpforms_get_activated_timestamp( $type = '' ) {
  * Detect if AJAX frontend form submit is being processed.
  *
  * @since 1.5.8.2
+ * @since 1.6.5 Added filterable frontend ajax actions list as a fallback to missing referer cases.
  *
  * @return bool
  */
@@ -2254,14 +2316,35 @@ function wpforms_is_frontend_ajax() {
 	}
 
 	// It targets admin-ajax.php.
-	if ( isset( $_SERVER['SCRIPT_FILENAME'] ) && basename( sanitize_text_field( wp_unslash( $_SERVER['SCRIPT_FILENAME'] ) ) ) !== 'admin-ajax.php' ) {
+	if (
+		isset( $_SERVER['SCRIPT_FILENAME'] ) &&
+		basename( sanitize_text_field( wp_unslash( $_SERVER['SCRIPT_FILENAME'] ) ) ) !== 'admin-ajax.php'
+	) {
 		return false;
 	}
 
-	$ref = wp_get_raw_referer();
+	$ref    = wp_get_raw_referer();
+	$action = isset( $_POST['action'] ) ? sanitize_key( $_POST['action'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
+	// It has a frontend AJAX action name if there's no referer.
 	if ( ! $ref ) {
-		return false;
+
+		$frontend_actions = [
+			'wpforms_submit',
+			'wpforms_file_upload_speed_test',
+			'wpforms_upload_chunk_init',
+			'wpforms_upload_chunk',
+			'wpforms_file_chunks_uploaded',
+			'wpforms_remove_file',
+			'wpforms_restricted_email',
+			'wpforms_form_locker_unique_answer',
+			'wpforms_form_abandonment',
+		];
+
+		// This hook is running on "plugins_loaded", mind the hooks order when using it.
+		$frontend_actions = (array) apply_filters( 'wpforms_is_frontend_ajax_frontend_actions', $frontend_actions );
+
+		return in_array( $action, $frontend_actions, true );
 	}
 
 	$path       = wp_parse_url( $ref, PHP_URL_PATH );
@@ -2271,8 +2354,6 @@ function wpforms_is_frontend_ajax() {
 	if ( strpos( $path, $admin_path ) !== false ) {
 		return false;
 	}
-
-	$action = isset( $_POST['action'] ) ? sanitize_key( $_POST['action'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 	// It's a WPForms request.
 	if ( strpos( $action, 'wpforms' ) !== 0 ) {
@@ -2562,4 +2643,44 @@ function wpforms_can_install( $type ) {
 
 	// Allow addons installation if license is not expired, enabled and valid.
 	return empty( $license['is_expired'] ) && empty( $license['is_disabled'] ) && empty( $license['is_invalid'] );
+}
+
+/**
+ * Retrieve the full config for CAPTCHA.
+ *
+ * @since 1.6.4
+ *
+ * @return array
+ */
+function wpforms_get_captcha_settings() {
+
+	$allowed_captcha_list = [ 'hcaptcha', 'recaptcha' ];
+	$captcha_provider     = wpforms_setting( 'captcha-provider', 'recaptcha' );
+
+	if ( ! in_array( $captcha_provider, $allowed_captcha_list, true ) ) {
+		return [
+			'provider' => 'none',
+		];
+	}
+
+	return [
+		'provider'       => $captcha_provider,
+		'site_key'       => sanitize_text_field( wpforms_setting( "{$captcha_provider}-site-key", '' ) ),
+		'secret_key'     => sanitize_text_field( wpforms_setting( "{$captcha_provider}-secret-key", '' ) ),
+		'recaptcha_type' => wpforms_setting( 'recaptcha-type', 'v2' ),
+	];
+}
+
+/**
+ * Wrapper for set_time_limit to see if it is enabled.
+ *
+ * @since 1.6.4
+ *
+ * @param int $limit Time limit.
+ */
+function wpforms_set_time_limit( $limit = 0 ) {
+
+	if ( function_exists( 'set_time_limit' ) && false === strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) { // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.safe_modeDeprecatedRemoved
+		@set_time_limit( $limit ); // @codingStandardsIgnoreLine
+	}
 }

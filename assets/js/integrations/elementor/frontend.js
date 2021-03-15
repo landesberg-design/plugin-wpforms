@@ -57,7 +57,7 @@ var WPFormsElementorFrontend = window.WPFormsElementorFrontend || ( function( do
 		 */
 		initFields: function( $form ) {
 
-			// Init WPForms staff.
+			// Init WPForms things.
 			wpforms.ready();
 
 			// Init `Modern File Upload` field.
@@ -65,12 +65,15 @@ var WPFormsElementorFrontend = window.WPFormsElementorFrontend || ( function( do
 				wpformsModernFileUpload.init();
 			}
 
-			// Init reCAPTCHA.
-			if (
-				'undefined' !== typeof wpformsRecaptchaLoad &&
-				'undefined' !== typeof grecaptcha
-			) {
-				'v3' === wpformsElementorVars.recaptcha_type ? grecaptcha.ready( wpformsRecaptchaLoad ) : wpformsRecaptchaLoad();
+			// Init CAPTCHA.
+			if ( 'undefined' !== typeof wpformsRecaptchaLoad ) {
+				if ( 'recaptcha' === wpformsElementorVars.captcha_provider && 'v3' === wpformsElementorVars.recaptcha_type ) {
+					if ( 'undefined' !== typeof grecaptcha ) {
+						grecaptcha.ready( wpformsRecaptchaLoad );
+					}
+				} else {
+					wpformsRecaptchaLoad();
+				}
 			}
 
 			// Register a custom event.

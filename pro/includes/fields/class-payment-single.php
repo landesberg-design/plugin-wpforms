@@ -43,15 +43,16 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 		$field_id = absint( $field['id'] );
 
 		// Set options container (<select>) properties.
-		$properties['input_container'] = array(
-			'class' => array( 'wpforms-payment-price' ),
-			'data'  => array(),
+		$properties['input_container'] = [
+			'class' => [ 'wpforms-payment-price' ],
+			'data'  => [],
 			'id'    => "wpforms-{$form_id}-field_{$field_id}",
-		);
+		];
 
 		// User format data and class.
 		$field_format = ! empty( $field['format'] ) ? $field['format'] : 'single';
-		if ( 'user' === $field_format ) {
+
+		if ( $field_format === 'user' ) {
 			$properties['inputs']['primary']['data']['rule-currency'] = '["$",false]';
 
 			$properties['inputs']['primary']['class'][] = 'wpforms-payment-user-input';
@@ -64,12 +65,25 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 			$properties['inputs']['primary']['class'][] = 'wpforms-field-' . esc_attr( $field['size'] );
 		}
 
+		$required = ! empty( $form_data['fields'][ $field_id ]['required'] );
+
+		if ( $required ) {
+			$properties['inputs']['primary']['data']['rule-required-positive-number'] = true;
+		}
+
 		// Price.
-		$field_value                                      = ! empty( $field['price'] ) ? wpforms_sanitize_amount( $field['price'] ) : '';
-		$properties['inputs']['primary']['attr']['value'] = ! empty( $field_value ) ? wpforms_format_amount( $field_value, true ) : '';
+		if ( ! empty( $field['price'] ) ) {
+			$field_value = wpforms_sanitize_amount( $field['price'] );
+		} elseif ( $required && $field_format === 'single' ) {
+			$field_value = wpforms_format_amount( 0 );
+		} else {
+			$field_value = '';
+		}
+
+		$properties['inputs']['primary']['attr']['value'] = ! empty( $field_value ) ? wpforms_format_amount( $field_value, true ) : $field_value;
 
 		// Single item and hidden format should hide the input field.
-		if ( ! empty( $field['format'] ) && 'hidden' === $field['format'] ) {
+		if ( ! empty( $field['format'] ) && $field['format'] === 'hidden' ) {
 			$properties['container']['class'][] = 'wpforms-field-hidden';
 		}
 
@@ -279,6 +293,7 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 			! empty( $field_submit ) &&
 			'user' !== $form_data['fields'][ $field_id ]['format']
 		) {
+
 			$price  = wpforms_sanitize_amount( $form_data['fields'][ $field_id ]['price'] );
 			$submit = wpforms_sanitize_amount( $field_submit );
 			if ( $price !== $submit ) {

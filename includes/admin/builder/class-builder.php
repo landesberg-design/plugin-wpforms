@@ -310,8 +310,8 @@ class WPForms_Builder {
 		wp_enqueue_script(
 			'dom-purify',
 			WPFORMS_PLUGIN_URL . 'assets/js/purify.min.js',
-			array(),
-			'2.1.1'
+			[],
+			'2.2.6'
 		);
 
 		if ( wp_is_mobile() ) {
@@ -445,6 +445,20 @@ class WPForms_Builder {
 			'choice_empty_label_tpl'         => esc_html__( 'Choice {number}', 'wpforms-lite' ),
 			'error_save_form'                => esc_html__( 'Something went wrong while saving the form. Please reload the page and try again.', 'wpforms-lite' ),
 			'error_contact_support'          => esc_html__( 'Please contact the plugin support team if this behavior persists.', 'wpforms-lite' ),
+		);
+
+		$strings['disable_entries'] = sprintf(
+			wp_kses( /* translators: %s - Link to the WPForms.com doc article. */
+				__( 'Disabling entry storage for this form will completely prevent any new submissions from getting saved to your site. If you still intend to keep a record of entries through notification emails, then please <a href="%s" target="_blank" rel="noopener noreferrer">test your form</a> to ensure emails send reliably.', 'wpforms-lite' ),
+				[
+					'a' => [
+						'href'   => [],
+						'rel'    => [],
+						'target' => [],
+					],
+				]
+			),
+			'https://wpforms.com/docs/how-to-properly-test-your-wordpress-forms-before-launching-checklist/'
 		);
 
 		$strings = apply_filters( 'wpforms_builder_strings', $strings, $this->form );

@@ -6,6 +6,7 @@
 	 * Predefine hint text to display.
 	 *
 	 * @since 1.5.6
+	 * @since 1.6.4 Added a new macros - {remaining}.
 	 *
 	 * @param {string} hintText Hint text.
 	 * @param {number} count Current count.
@@ -15,7 +16,7 @@
 	 */
 	function renderHint( hintText, count, limit ) {
 
-		return hintText.replace( '{count}', count ).replace( '{limit}', limit );
+		return hintText.replace( '{count}', count ).replace( '{limit}', limit ).replace( '{remaining}', limit - count );
 	}
 
 	/**

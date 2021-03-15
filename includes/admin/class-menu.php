@@ -32,6 +32,10 @@ class WPForms_Admin_Menu {
 		$manage_cap = wpforms_get_capability_manage_options();
 		$access     = wpforms()->get( 'access' );
 
+		if ( ! method_exists( $access, 'get_menu_cap' ) ) {
+			return;
+		}
+
 		// Default Forms top level menu item.
 		add_menu_page(
 			esc_html__( 'WPForms', 'wpforms-lite' ),

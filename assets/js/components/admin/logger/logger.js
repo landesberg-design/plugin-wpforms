@@ -19,7 +19,12 @@ var WPFormsLogger = window.WPFormsLogger || ( function( document, window, $ ) {
 		 */
 		init: function() {
 
-			app.bindPopup();
+			$( app.ready );
+		},
+
+		ready: function() {
+
+			$( app.bindPopup() );
 		},
 
 		/**
@@ -29,18 +34,11 @@ var WPFormsLogger = window.WPFormsLogger || ( function( document, window, $ ) {
 		 */
 		bindPopup: function() {
 
-			$( '.wp-list-table.logs' ).on( 'click', '.js-single-log-target', function( e ) {
+			$( '.wpforms-list-table--logs .wp-list-table' ).on( 'click', '.js-single-log-target', function( e ) {
 
 				e.preventDefault();
-				$.get(
-					wpforms_admin.ajax_url,
-					{
-						action: 'wpforms_get_log_record',
-						nonce: wpforms_admin.nonce,
-						recordId: $( this ).attr( 'data-log-id' ),
-					},
-					app.showPopup
-				);
+
+				app.showPopup( $( this ).attr( 'data-log-id' ) );
 			} );
 		},
 
@@ -49,24 +47,70 @@ var WPFormsLogger = window.WPFormsLogger || ( function( document, window, $ ) {
 		 *
 		 * @since 1.6.3
 		 *
-		 * @param {object} res Ajax response.
+		 * @param {numeric} recordId Record Id.
 		 */
-		showPopup: function( res ) {
+		showPopup: function( recordId ) {
 
-			if ( ! res.success || ! res.data ) {
+			if ( ! recordId ) {
 				return;
 			}
+
 			var popupTemplate = wp.template( 'wpforms-log-record' );
+
 			$.dialog( {
 				title: false,
 				boxWidth: Math.min( 550, $( window ).width() ),
-				content: popupTemplate( res.data ),
+				content: function() {
+
+					var self = this;
+
+					return $.get(
+						wpforms_admin.ajax_url,
+						{
+							action: 'wpforms_get_log_record',
+							nonce: wpforms_admin.nonce,
+							recordId: recordId,
+						}
+					).done( function( res ) {
+
+						if ( ! res.success || ! res.data ) {
+							app.error( res.data );
+							self.close();
+
+							return;
+						}
+						self.setContent( popupTemplate( res.data ) );
+
+					} ).fail( function( xhr, textStatus, e ) {
+
+						app.error( textStatus + ' ' + xhr.responseText );
+						self.close();
+					} );
+				},
 				animation: 'scale',
 				columnClass: 'medium',
 				closeAnimation: 'scale',
 				backgroundDismiss: true,
 			} );
 		},
+
+		/**
+		 * Output error to the console if debug mode is on.
+		 *
+		 * @since 1.6.4
+		 *
+		 * @param {string} msg Error text.
+		 */
+		error: function( msg ) {
+
+			if ( ! wpforms_admin.debug ) {
+				return;
+			}
+
+			msg = _.isEmpty( msg ) ? '' : ': ' + msg;
+			console.log( 'WPForms Debug: Error receiving log record data' + msg );
+		},
+
 	};
 
 	return app;

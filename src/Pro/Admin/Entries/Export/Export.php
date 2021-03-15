@@ -10,23 +10,30 @@ namespace WPForms\Pro\Admin\Entries\Export;
 class Export {
 
 	/**
+	 * ActionScheduler task name for cleaning up orphaned export files.
+	 *
+	 * @since 1.6.5
+	 */
+	const TASK_CLEANUP = 'wpforms_pro_admin_entries_export_remove_old_export_files';
+
+	/**
 	 * Configuration.
 	 *
 	 * @since 1.5.5
 	 *
 	 * @var array
 	 */
-	public $configuration = array(
+	public $configuration = [
 		'request_data_ttl'     => DAY_IN_SECONDS, // Export request and a temp file TTL value.
-		'entries_per_step'     => 1000,           // Number of entries in a chunk that are retrieved and saved into a temp file per one step.
+		'entries_per_step'     => 5000,           // Number of entries in a chunk that are retrieved and saved into a temp file per one iteration.
 		'csv_export_separator' => ',',            // Columns separator.
-		'disallowed_fields'    => array(          // Disallowed fields array.
+		'disallowed_fields'    => [               // Disallowed fields array.
 			'divider',
 			'html',
 			'pagebreak',
 			'captcha',
-		),
-	);
+		],
+	];
 
 	/**
 	 * Translatable strings for JS responses.
@@ -54,6 +61,15 @@ class Export {
 	 * @var array
 	 */
 	public $additional_info_fields = array();
+
+	/**
+	 * Type checkboxes.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @var array
+	 */
+	public $export_options_fields = [];
 
 	/**
 	 * Array for store/read some data.
@@ -98,13 +114,14 @@ class Export {
 	 */
 	public function init() {
 
-		if ( ! wpforms_current_user_can( 'view_entries' ) ) {
+		if ( ! wpforms_current_user_can( 'view_entries' ) && ! wp_doing_cron() ) {
 			return;
 		}
 
 		if (
 			! $this->is_entries_export_ajax() &&
-			! $this->is_tools_export_page()
+			! $this->is_tools_export_page() &&
+			! wp_doing_cron()
 		) {
 			return;
 		}
@@ -144,6 +161,17 @@ class Export {
 			)
 		);
 
+		// This option should be available only if zip PHP extension is loaded.
+		if ( class_exists( 'ZipArchive' ) ) {
+			$this->export_options_fields['xlsx'] = esc_html__( 'Export in Microsoft Excel (.xlsx)', 'wpforms' );
+		}
+
+		// Export options fields.
+		$this->export_options_fields = apply_filters(
+			'wpforms_pro_admin_entries_export_options_fields',
+			$this->export_options_fields
+		);
+
 		// Error strings.
 		$this->errors = array(
 			'common'            => esc_html__( 'There were problems while preparing your export file. Please recheck export settings and try again.', 'wpforms' ),
@@ -159,16 +187,14 @@ class Export {
 
 		// Strings to localize.
 		$this->i18n = array(
-			'error_prefix'        => $this->errors['common'],
-			'error_form_empty'    => $this->errors['form_empty'],
-			'prc_1_filtering'     => esc_html__( 'Generating a list of entries according to your filters.', 'wpforms' ),
-			'prc_1_please_wait'   => esc_html__( 'This can take a while. Please wait.', 'wpforms' ),
-			'prc_2_no_entries'    => esc_html__( 'No entries found after applying your filters.', 'wpforms' ),
-			'prc_2_total_entries' => esc_html__( 'Number of entries found: {total_entries}.', 'wpforms' ),
-			'prc_2_progress'      => esc_html__( 'Generating a CSV file: {progress}% completed. Please wait for generation to complete, file download will start automatically.', 'wpforms' ),
-			'prc_3_done'          => esc_html__( 'The file was generated successfully.', 'wpforms' ),
-			'prc_3_download'      => esc_html__( 'If the download does not start automatically', 'wpforms' ),
-			'prc_3_click_here'    => esc_html__( 'click here', 'wpforms' ),
+			'error_prefix'      => $this->errors['common'],
+			'error_form_empty'  => $this->errors['form_empty'],
+			'prc_1_filtering'   => esc_html__( 'Generating a list of entries according to your filters.', 'wpforms' ),
+			'prc_1_please_wait' => esc_html__( 'This can take a while. Please wait.', 'wpforms' ),
+			'prc_2_no_entries'  => esc_html__( 'No entries found after applying your filters.', 'wpforms' ),
+			'prc_3_done'        => esc_html__( 'The file was generated successfully.', 'wpforms' ),
+			'prc_3_download'    => esc_html__( 'If the download does not start automatically', 'wpforms' ),
+			'prc_3_click_here'  => esc_html__( 'click here', 'wpforms' ),
 		);
 
 		// Keeping default configuration data.
@@ -286,6 +312,13 @@ class Export {
 		$args['additional_info'] = array();
 		if ( ! empty( $req['additional_info'] ) ) {
 			$args['additional_info'] = array_map( 'sanitize_text_field', wp_unslash( $req['additional_info'] ) );
+		}
+
+		// Export Options Information.
+		$args['export_options'] = [];
+
+		if ( ! empty( $req['export_options'] ) ) {
+			$args['export_options'] = array_map( 'sanitize_text_field', wp_unslash( $req['export_options'] ) );
 		}
 
 		// Date range.

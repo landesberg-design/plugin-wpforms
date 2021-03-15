@@ -1,4 +1,4 @@
-/* globals ajaxurl, wpforms_admin, wpforms_admin, WPFormsAdmin */
+/* global ajaxurl, wpforms_admin, wpforms_admin, WPFormsAdmin */
 
 /**
  * WPForms Admin Education module.
@@ -91,7 +91,7 @@ var WPFormsAdminEducation = window.WPFormsAdminEducation || ( function( document
 				$( this ).addClass( 'inactive' );
 
 				var $button = $( this ),
-					$form = $( this ).closest( '.wpforms-geolocation-form' ),
+					$form = $( this ).closest( '.wpforms-geolocation-form, .wpforms-setting-row-education' ),
 					buttonText = $button.text(),
 					plugin = $button.attr( 'data-plugin' ),
 					state = $button.hasClass( 'status-inactive' ) ? 'activate' : 'install',
@@ -107,7 +107,9 @@ var WPFormsAdminEducation = window.WPFormsAdminEducation || ( function( document
 						if ( res.success ) {
 							location.reload();
 						} else {
-							$form.append( '<div class="msg error" style="display: none">' + wpforms_admin[ pluginType + '_error' ] + '</div>' );
+							var message = typeof res.data === 'string' ? res.data : wpforms_admin[ pluginType + '_error' ];
+
+							$form.append( '<div class="msg error" style="display: none">' + message + '</div>' );
 							$form.find( '.msg' ).slideDown();
 						}
 						$button.text( buttonText );

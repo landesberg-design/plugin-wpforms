@@ -519,7 +519,7 @@ class WPForms_About {
 						printf(
 							wp_kses(
 							/* translators: %s - stars. */
-								__( 'We know that you will truly love WPForms. It has over <strong>5000+ five star ratings</strong> (%s) and is active on over 1 million websites.', 'wpforms-lite' ),
+								__( 'We know that you will truly love WPForms. It has over <strong>7000+ five star ratings</strong> (%s) and is active on over 4 million websites.', 'wpforms-lite' ),
 								array(
 									'strong' => array(),
 								)
@@ -882,14 +882,14 @@ class WPForms_About {
 			'wp-mail-smtp/wp_mail_smtp.php' => array(
 				'icon'  => $images_url . 'plugin-smtp.png',
 				'name'  => esc_html__( 'WP Mail SMTP', 'wpforms-lite' ),
-				'desc'  => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 1 million websites.', 'wpforms-lite' ),
+				'desc'  => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 2 million websites.', 'wpforms-lite' ),
 				'wporg' => 'https://wordpress.org/plugins/wp-mail-smtp/',
 				'url'   => 'https://downloads.wordpress.org/plugin/wp-mail-smtp.zip',
 				'pro'   => array(
 					'plug' => 'wp-mail-smtp-pro/wp_mail_smtp.php',
 					'icon' => $images_url . 'plugin-smtp.png',
 					'name' => esc_html__( 'WP Mail SMTP Pro', 'wpforms-lite' ),
-					'desc' => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 1 million websites.', 'wpforms-lite' ),
+					'desc' => esc_html__( 'Make sure your website\'s emails reach the inbox. Our goal is to make email deliverability easy and reliable. Trusted by over 2 million websites.', 'wpforms-lite' ),
 					'url'  => 'https://wpmailsmtp.com/pricing/',
 					'act'  => 'go-to-url',
 				),
@@ -1239,28 +1239,28 @@ class WPForms_About {
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Pro Addons Included', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (21 total)', 'wpforms-lite' ),
+						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, and more (22 total)', 'wpforms-lite' ),
 					],
 				],
 				'elite'    => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (24 total)', 'wpforms-lite' ),
+						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, and more (27 total)', 'wpforms-lite' ),
 					],
 				],
 				'ultimate' => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (24 total)', 'wpforms-lite' ),
+						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, and more (27 total)', 'wpforms-lite' ),
 					],
 				],
 				'agency'   => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Form Abandonment, Front-end Post Submission, User Registration, Geo-location, and more (24 total)', 'wpforms-lite' ),
+						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, and more (27 total)', 'wpforms-lite' ),
 					],
 				],
 			],

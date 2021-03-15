@@ -1,4 +1,4 @@
-/* globals wpforms_builder, WPFormsBuilder */
+/* global wpforms_builder, WPFormsBuilder */
 /**
  * WPForms Form Builder Education function.
  *
@@ -54,7 +54,7 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 
 			$( document ).on(
 				'click',
-				'.wpforms-add-fields-button, .wpforms-panel-sidebar-section, .wpforms-builder-settings-block-add',
+				'.wpforms-add-fields-button, .wpforms-panel-sidebar-section, .wpforms-builder-settings-block-add, .wpforms-field-option-row',
 				function( event ) {
 
 					var $this = $( this );
@@ -66,13 +66,27 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 
 						switch ( $this.data( 'action' ) ) {
 							case 'activate':
-								app.activateModal( $this.data( 'name' ), $this.data( 'path' ), $this.data( 'nonce' )  );
+								app.activateModal( {
+									feature: $this.data( 'name' ),
+									path: $this.data( 'path' ),
+									nonce: $this.data( 'nonce' ),
+								} );
 								break;
 							case 'install':
-								app.installModal( $this.data( 'name' ), $this.data( 'url' ), $this.data( 'nonce' ), $this.data( 'license' ) );
+								app.installModal( {
+									feature: $this.data( 'name' ),
+									url: $this.data( 'url' ),
+									nonce: $this.data( 'nonce' ),
+									license: $this.data( 'license' ),
+								} );
 								break;
 							case 'upgrade':
-								app.upgradeModal( $this.data( 'name' ), $this.data( 'field-name' ), $this.data( 'license' ) );
+								app.upgradeModal( {
+									feature: $this.data( 'name' ),
+									message: $this.data( 'message' ),
+									fieldName: $this.data( 'field-name' ),
+									license: $this.data( 'license' ),
+								} );
 								break;
 							case 'license':
 								app.licenseModal();
@@ -88,38 +102,36 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 		 *
 		 * @since 1.5.1
 		 *
-		 * @param {string} feature Feature name.
-		 * @param {string} path    Addon path.
-		 * @param {string} nonce   Action nonce.
+		 * @param {object} args Arguments.
 		 */
-		activateModal: function( feature, path, nonce ) {
+		activateModal: function( args ) {
 
 			$.alert( {
-				title  : false,
-				content: wpforms_builder.education_activate_prompt.replace( /%name%/g, feature ),
-				icon   : 'fa fa-info-circle',
-				type   : 'blue',
+				title: false,
+				content: wpforms_builder.education_activate_prompt.replace( /%name%/g, args.feature ),
+				icon: 'fa fa-info-circle',
+				type: 'blue',
 				buttons: {
 					confirm: {
-						text    : wpforms_builder.education_activate_confirm,
+						text: wpforms_builder.education_activate_confirm,
 						btnClass: 'btn-confirm',
-						keys    : [ 'enter' ],
-						action  : function() {
+						keys: [ 'enter' ],
+						action: function() {
 
 							var currentModal = this,
-								$confirm     = currentModal.$body.find( '.btn-confirm' );
+								$confirm = currentModal.$body.find( '.btn-confirm' );
 
 							$confirm.prop( 'disabled', true ).html( '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i> ' + wpforms_builder.education_activating );
 
-							app.activateAddon( path, nonce, currentModal );
+							app.activateAddon( args.path, args.nonce, currentModal );
 
 							return false;
-						}
+						},
 					},
-					cancel : {
-						text: wpforms_builder.cancel
-					}
-				}
+					cancel: {
+						text: wpforms_builder.cancel,
+					},
+				},
 			} );
 		},
 
@@ -217,46 +229,46 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 		 *
 		 * @since 1.5.1
 		 *
-		 * @param {string} feature Feature name.
-		 * @param {string} url     Install URL.
-		 * @param {string} nonce   Action nonce.
-		 * @param {string} type    License level.
+		 * @param {object} args Arguments.
 		 */
-		installModal: function( feature, url, nonce, type ) {
+		installModal: function( args ) {
 
-			if ( ! url || '' === url ) {
-				app.upgradeModal( feature, '', type );
+			if ( ! args.url || '' === args.url ) {
+				app.upgradeModal( {
+					feature: args.feature,
+					license: args.license,
+				} );
 				return;
 			}
 
 			$.alert( {
-				title   : false,
-				content : wpforms_builder.education_install_prompt.replace( /%name%/g, feature ),
-				icon    : 'fa fa-info-circle',
-				type    : 'blue',
+				title: false,
+				content: wpforms_builder.education_install_prompt.replace( /%name%/g, args.feature ),
+				icon: 'fa fa-info-circle',
+				type: 'blue',
 				boxWidth: '425px',
-				buttons : {
+				buttons: {
 					confirm: {
-						text    : wpforms_builder.education_install_confirm,
+						text: wpforms_builder.education_install_confirm,
 						btnClass: 'btn-confirm',
-						keys    : [ 'enter' ],
+						keys: [ 'enter' ],
 						isHidden: ! wpforms_builder.can_install_addons,
-						action  : function() {
+						action: function() {
 
 							var currentModal = this,
-								$confirm     = currentModal.$body.find( '.btn-confirm' );
+								$confirm = currentModal.$body.find( '.btn-confirm' );
 
 							$confirm.prop( 'disabled', true ).html( '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i> ' + wpforms_builder.education_installing );
 
-							app.installAddon( url, nonce, currentModal );
+							app.installAddon( args.url, args.nonce, currentModal );
 
 							return false;
-						}
+						},
 					},
-					cancel : {
-						text: wpforms_builder.cancel
-					}
-				}
+					cancel: {
+						text: wpforms_builder.cancel,
+					},
+				},
 			} );
 		},
 
@@ -314,50 +326,58 @@ var WPFormsBuilderEducation = window.WPFormsBuilderEducation || ( function( docu
 		 *
 		 * @since 1.5.1
 		 *
-		 * @param {string} feature   Feature name.
-		 * @param {string} fieldName Field name.
-		 * @param {string} type 	 License type.
+		 * @param {object} args Arguments.
 		 */
-		upgradeModal: function( feature, fieldName, type ) {
+		upgradeModal: function( args ) {
 
 			// Provide a default value.
-			if ( typeof type === 'undefined' || type.length === 0 ) {
-				type = 'pro';
+			if ( typeof args.license === 'undefined' || args.license.length === 0 ) {
+				args.license = 'pro';
 			}
 
 			// Make sure we received only supported type.
-			if ( $.inArray( type, [ 'pro', 'elite' ] ) < 0 ) {
+			if ( $.inArray( args.license, [ 'pro', 'elite' ] ) < 0 ) {
 				return;
 			}
 
-			var modalTitle = feature + ' ' + wpforms_builder.education_upgrade[type].title;
-
-			if ( typeof fieldName !== 'undefined' && fieldName.length > 0 ) {
-				modalTitle = fieldName + ' ' + wpforms_builder.education_upgrade[type].title;
-			}
-
 			$.alert( {
-				title       : modalTitle,
-				icon        : 'fa fa-lock',
-				content     : wpforms_builder.education_upgrade[type].message.replace( /%name%/g, feature ),
-				boxWidth    : '550px',
+				title: app.getModalTitle( args ),
+				icon: 'fa fa-lock',
+				content: args.message && args.message.length ? args.message : wpforms_builder.education_upgrade[ args.license ].message.replace( /%name%/g, args.feature ),
+				boxWidth: '550px',
 				onOpenBefore: function() {
 					this.$body.find( '.jconfirm-content' ).addClass( 'lite-upgrade' );
 				},
-				buttons     : {
+				buttons: {
 					confirm: {
-						text    : wpforms_builder.education_upgrade[type].confirm,
+						text: wpforms_builder.education_upgrade[ args.license ].confirm,
 						btnClass: 'btn-confirm',
-						keys    : [ 'enter' ],
-						action  : function() {
+						keys: [ 'enter' ],
+						action: function() {
 							window.open(
-								wpforms_builder.education_upgrade[type].url + '&utm_content=' + encodeURIComponent( feature.trim() ),
+								wpforms_builder.education_upgrade[ args.license ].url + '&utm_content=' + encodeURIComponent( args.feature.trim() ),
 								'_blank'
 							);
-						}
-					}
-				}
+						},
+					},
+				},
 			} );
+		},
+
+		/**
+		 * Get title for popup.
+		 *
+		 * @since 1.6.5
+		 *
+		 * @param {object} args Arguments for modal.
+		 *
+		 * @returns {string} Modal title.
+		 */
+		getModalTitle: function( args ) {
+
+			return typeof args.fieldName !== 'undefined' && args.fieldName.length > 0 ?
+				args.fieldName + ' ' + wpforms_builder.education_upgrade[ args.license ].title :
+				args.feature + ' ' + wpforms_builder.education_upgrade[ args.license ].title;
 		},
 
 		/**

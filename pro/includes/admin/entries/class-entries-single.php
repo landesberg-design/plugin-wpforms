@@ -16,20 +16,31 @@ class WPForms_Entries_Single {
 	 *
 	 * @var array
 	 */
-	public $alerts = array();
+	public $alerts = [];
 
 	/**
 	 * Abort. Bail on proceeding to process the page.
 	 *
 	 * @since 1.1.6
+	 *
 	 * @var bool
 	 */
 	public $abort = false;
 
 	/**
+	 * The human readable error message.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @var string
+	 */
+	private $abort_message;
+
+	/**
 	 * Form object.
 	 *
 	 * @since 1.1.6
+	 *
 	 * @var object
 	 */
 	public $form;
@@ -38,6 +49,7 @@ class WPForms_Entries_Single {
 	 * Entry object.
 	 *
 	 * @since 1.1.6
+	 *
 	 * @var object
 	 */
 	public $entry;
@@ -50,7 +62,7 @@ class WPForms_Entries_Single {
 	public function __construct() {
 
 		// Maybe load entries page.
-		add_action( 'admin_init', array( $this, 'init' ) );
+		add_action( 'admin_init', [ $this, 'init' ] );
 	}
 
 	/**
@@ -60,45 +72,45 @@ class WPForms_Entries_Single {
 	 */
 	public function init() {
 
-		$entry_id = isset( $_GET['entry_id'] ) ? absint( wp_unslash( $_GET['entry_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification
+		$page = ! empty( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		$view = ! empty( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 
-		if ( ! \wpforms_current_user_can( 'view_entry_single', $entry_id ) ) {
-			return;
+		if ( $page !== 'wpforms-entries' || $view !== 'details' ) {
+		    return;
 		}
 
-		// Check page and view.
-		$page = ! empty( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : '';
-		$view = ! empty( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : '';
+		$entry_id = isset( $_GET['entry_id'] ) ? absint( $_GET['entry_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification
 
-		if ( 'wpforms-entries' === $page && 'details' === $view ) {
-
-			// Entry processing and setup.
-			add_action( 'wpforms_entries_init', array( $this, 'process_star' ), 8, 1 );
-			add_action( 'wpforms_entries_init', array( $this, 'process_unread' ), 8, 1 );
-			add_action( 'wpforms_entries_init', array( $this, 'process_note_delete' ), 8, 1 );
-			add_action( 'wpforms_entries_init', array( $this, 'process_note_add' ), 8, 1 );
-			add_action( 'wpforms_entries_init', array( $this, 'process_notifications' ), 15, 1 );
-			add_action( 'wpforms_entries_init', array( $this, 'setup' ), 10, 1 );
-
-			do_action( 'wpforms_entries_init', 'details' );
-
-			// Output. Entry content and metaboxes.
-			add_action( 'wpforms_admin_page', array( $this, 'details' ) );
-			add_action( 'wpforms_entry_details_content', array( $this, 'details_fields' ), 10, 2 );
-			add_action( 'wpforms_entry_details_content', array( $this, 'details_notes' ), 10, 2 );
-			add_action( 'wpforms_entry_details_content', array( $this, 'details_log' ), 40, 2 );
-			add_action( 'wpforms_entry_details_content', array( $this, 'details_debug' ), 50, 2 );
-			add_action( 'wpforms_entry_details_sidebar', array( $this, 'details_meta' ), 10, 2 );
-			add_action( 'wpforms_entry_details_sidebar', array( $this, 'details_payment' ), 15, 2 );
-			add_action( 'wpforms_entry_details_sidebar', array( $this, 'details_actions' ), 20, 2 );
-			add_action( 'wpforms_entry_details_sidebar', array( $this, 'details_related' ), 20, 2 );
-
-			// Remove Screen Options tab from admin area header.
-			add_filter( 'screen_options_show_screen', '__return_false' );
-
-			// Enqueues.
-			add_action( 'admin_enqueue_scripts', array( $this, 'enqueues' ) );
+		if ( ! wpforms_current_user_can( 'view_entry_single', $entry_id ) ) {
+			wp_die( esc_html__( 'Sorry, you are not allowed to view this entry.', 'wpforms' ), 403 );
 		}
+
+		// Entry processing and setup.
+		add_action( 'wpforms_entries_init', [ $this, 'process_star' ], 8, 1 );
+		add_action( 'wpforms_entries_init', [ $this, 'process_unread' ], 8, 1 );
+		add_action( 'wpforms_entries_init', [ $this, 'process_note_delete' ], 8, 1 );
+		add_action( 'wpforms_entries_init', [ $this, 'process_note_add' ], 8, 1 );
+		add_action( 'wpforms_entries_init', [ $this, 'process_notifications' ], 15, 1 );
+		add_action( 'wpforms_entries_init', [ $this, 'setup' ], 10, 1 );
+
+		do_action( 'wpforms_entries_init', 'details' );
+
+		// Output. Entry content and metaboxes.
+		add_action( 'wpforms_admin_page', [ $this, 'details' ] );
+		add_action( 'wpforms_entry_details_content', [ $this, 'details_fields' ], 10, 2 );
+		add_action( 'wpforms_entry_details_content', [ $this, 'details_notes' ], 10, 2 );
+		add_action( 'wpforms_entry_details_content', [ $this, 'details_log' ], 40, 2 );
+		add_action( 'wpforms_entry_details_content', [ $this, 'details_debug' ], 50, 2 );
+		add_action( 'wpforms_entry_details_sidebar', [ $this, 'details_meta' ], 10, 2 );
+		add_action( 'wpforms_entry_details_sidebar', [ $this, 'details_payment' ], 15, 2 );
+		add_action( 'wpforms_entry_details_sidebar', [ $this, 'details_actions' ], 20, 2 );
+		add_action( 'wpforms_entry_details_sidebar', [ $this, 'details_related' ], 20, 2 );
+
+		// Remove Screen Options tab from admin area header.
+		add_filter( 'screen_options_show_screen', '__return_false' );
+
+		// Enqueues.
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ] );
 	}
 
 	/**
@@ -410,41 +422,27 @@ class WPForms_Entries_Single {
 	 */
 	public function setup() {
 
-		// No entry ID was provided, error.
-		if ( empty( $_GET['entry_id'] ) ) {
-			$this->alerts[] = array(
-				'type'    => 'error',
-				'message' => esc_html__( 'Invalid entry ID.', 'wpforms' ),
-				'abort'   => true,
-			);
+		// No entry ID was provided, abort.
+		if ( empty( $_GET['entry_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$this->abort_message = esc_html__( 'It looks like the provided entry ID isn\'t valid.', 'wpforms' );
+			$this->abort         = true;
+
 			return;
 		}
 
 		// Find the entry.
-		$entry = wpforms()->entry->get( absint( $_GET['entry_id'] ) );
+		$entry = wpforms()->entry->get( absint( $_GET['entry_id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		// No entry was found, error.
+		// No entry was found, abort.
 		if ( ! $entry || empty( $entry ) ) {
-			$this->alerts[] = array(
-				'type'    => 'error',
-				'message' => esc_html__( 'Entry not found.', 'wpforms' ),
-				'abort'   => true,
-			);
+			$this->abort_message = esc_html__( 'It looks like the entry you are trying to access is no longer available.', 'wpforms' );
+			$this->abort         = true;
+
 			return;
 		}
 
 		// Find the form information.
-		$form = wpforms()->form->get( $entry->form_id, array( 'cap' => 'view_entries_form_single' ) );
-
-		// No form was found, error.
-		if ( ! $form || empty( $form ) ) {
-			$this->alerts[] = array(
-				'type'    => 'error',
-				'message' => esc_html__( 'Form not found.', 'wpforms' ),
-				'abort'   => true,
-			);
-			return;
-		}
+		$form = wpforms()->form->get( $entry->form_id, [ 'cap' => 'view_entries_form_single' ] );
 
 		// Form details.
 		$form_data      = wpforms_decode( $form->post_content );
@@ -541,22 +539,31 @@ class WPForms_Entries_Single {
 	 */
 	public function details() {
 
-		// Check for blocking errors to display.
-		$this->display_alerts( 'error', true );
-
-		if ( $this->abort ) {
-			return;
-		}
-
-		$entry     = $this->entry;
-		$form_data = wpforms_decode( $this->form->post_content );
-		 ?>
-
+		?>
 		<div id="wpforms-entries-single" class="wrap wpforms-admin-wrap">
 
 			<h1 class="page-title">
 
 				<?php esc_html_e( 'View Entry', 'wpforms' ); ?>
+
+				<?php
+				if ( $this->abort ) {
+					echo '</h1>'; // close heading.
+					echo '</div>'; // close wrap.
+
+					echo '<div class="wpforms-admin-content">';
+
+						// Output no entries screen.
+						echo wpforms_render( 'admin/empty-states/no-entry', [ 'message' => $this->abort_message ], true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+					echo '</div>';
+
+					return;
+				}
+
+				$entry     = $this->entry;
+				$form_data = wpforms_decode( $this->form->post_content );
+				?>
 
 				<a href="<?php echo esc_url( $this->form->form_url ); ?>" class="add-new-h2 wpforms-btn-orange"><?php esc_html_e( 'Back to All Entries', 'wpforms' ); ?></a>
 
@@ -1243,22 +1250,6 @@ class WPForms_Entries_Single {
 			admin_url( 'admin.php' )
 		);
 
-		// Export Entry URL.
-		$export_url = wp_nonce_url(
-			add_query_arg(
-				array(
-					'page'     => 'wpforms-tools',
-					'view'     => 'export',
-					'action'   => 'wpforms_tools_single_entry_export_download',
-					'form'     => (int) $form_data['id'],
-					'entry_id' => $entry->entry_id,
-				),
-				admin_url( 'admin.php' )
-			),
-			'wpforms-tools-single-entry-export-nonce',
-			'nonce'
-		);
-
 		// Resend Entry Notifications URL.
 		$notifications_url = wp_nonce_url(
 			add_query_arg(
@@ -1304,11 +1295,16 @@ class WPForms_Entries_Single {
 			'icon'   => 'dashicons-media-text',
 			'label'  => esc_html__( 'Print', 'wpforms' ),
 		);
-		$action_links['export']        = array(
-			'url'   => $export_url,
+		$action_links['export']        = [
+			'url'   => $this->get_export_url( (int) $form_data['id'], $entry->entry_id, 'csv' ),
 			'icon'  => 'dashicons-migrate',
 			'label' => esc_html__( 'Export (CSV)', 'wpforms' ),
-		);
+		];
+		$action_links['export_xlsx']   = [
+			'url'   => $this->get_export_url( (int) $form_data['id'], $entry->entry_id, 'xlsx' ),
+			'icon'  => 'dashicons-media-spreadsheet',
+			'label' => esc_html__( 'Export (XLSX)', 'wpforms' ),
+		];
 		$action_links['notifications'] = array(
 			'url'   => $notifications_url,
 			'icon'  => 'dashicons-email-alt',
@@ -1363,6 +1359,36 @@ class WPForms_Entries_Single {
 
 		</div>
 		<?php
+	}
+
+	/**
+	 * Get Export URL.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @param int    $form_id  Form ID.
+	 * @param int    $entry_id Entry ID.
+	 * @param string $type     Export type.
+	 *
+	 * @return string
+	 */
+	private function get_export_url( $form_id, $entry_id, $type ) {
+
+		return wp_nonce_url(
+			add_query_arg(
+				[
+					'page'     => 'wpforms-tools',
+					'view'     => 'export',
+					'action'   => 'wpforms_tools_single_entry_export_download',
+					'form'     => $form_id,
+					'entry_id' => $entry_id,
+					'export_options' => [ $type ],
+				],
+				admin_url( 'admin.php' )
+			),
+			'wpforms-tools-single-entry-export-nonce',
+			'nonce'
+		);
 	}
 
 	/**
@@ -1427,41 +1453,42 @@ class WPForms_Entries_Single {
 	 *
 	 * @todo Refactor or eliminate this
 	 *
-	 * @param string $display
-	 * @param bool $wrap
+	 * @param mixed $display Type(s) of the notice.
+	 * @param bool  $wrap    Whether to output the wrapper.
 	 */
-	function display_alerts( $display = '', $wrap = false ) {
+	public function display_alerts( $display = '', $wrap = false ) {
 
 		if ( empty( $this->alerts ) ) {
 			return;
+		}
 
-		} else {
+		$display = empty( $display ) ?
+			[ 'error', 'info', 'warning', 'success' ] :
+			(array) $display;
 
-			if ( empty( $display ) ) {
-				$display = array( 'error', 'info', 'warning', 'success' );
-			} else {
-				$display = (array) $display;
+		foreach ( $this->alerts as $alert ) {
+
+			$type = ! empty( $alert['type'] ) ? $alert['type'] : 'info';
+
+			if ( ! in_array( $type, $display, true ) ) {
+				continue;
 			}
 
-			foreach ( $this->alerts as $alert ) {
+			$classes = [ 'notice', 'notice-' . $type ];
 
-				$type = ! empty( $alert['type'] ) ? $alert['type'] : 'info';
-
-				if ( in_array( $type, $display, true ) ) {
-					$class  = 'notice-' . $type;
-					$class .= ! empty( $alert['dismiss'] ) ? ' is-dismissible' : '';
-					$output = '<div class="notice ' . $class . '"><p>' . $alert['message'] . '</p></div>';
-					if ( $wrap ) {
-						echo '<div class="wrap">' . $output . '</div>';
-					} else {
-						echo $output;
-					}
-					if ( ! empty( $alert['abort'] ) ) {
-						$this->abort = true;
-						break;
-					}
-				}
+			if ( ! empty( $alert['dismiss'] ) ) {
+				$classes[] = 'is-dismissible';
 			}
+
+			$output = $wrap ?
+				'<div class="wrap"><div class="%1$s"><p>%2$s</p></div></div>' :
+				'<div class="%1$s"><p>%2$s</p></div>';
+
+			printf(
+				$output, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				esc_attr( implode( ' ', $classes ) ),
+				$alert['message'] // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
 		}
 	}
 }

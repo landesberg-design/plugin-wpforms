@@ -211,7 +211,7 @@ class Token {
 	 */
 	private function get_missing_token_message() {
 
-		return esc_html__( "This page isn't loading JavaScript properly, and the form will not be able to submit.", 'wpforms-lite' ) . $this->maybe_get_support_text();
+		return $this->get_error_message( esc_html__( 'This page isn\'t loading JavaScript properly, and the form will not be able to submit.', 'wpforms-lite' ) );
 	}
 
 	/**
@@ -223,7 +223,33 @@ class Token {
 	 */
 	private function get_invalid_token_message() {
 
-		return esc_html__( 'Form token is invalid. Please refresh the page.', 'wpforms-lite' ) . $this->maybe_get_support_text();
+		return $this->get_error_message( esc_html__( 'Form token is invalid. Please refresh the page.', 'wpforms-lite' ) );
+	}
+
+	/**
+	 * Get error message depends on user.
+	 *
+	 * @since 1.6.4.1
+	 *
+	 * @param string $text Message text.
+	 *
+	 * @return string
+	 */
+	private function get_error_message( $text ) {
+
+		return wpforms_current_user_can() ? $text . $this->maybe_get_support_text() : $this->get_non_logged_user_error_message();
+	}
+
+	/**
+	 * Non logged user error message.
+	 *
+	 * @since 1.6.4.1
+	 *
+	 * @return string
+	 */
+	private function get_non_logged_user_error_message() {
+
+		return esc_html__( 'The form was unable to submit. Please contact the site administrator.', 'wpforms-lite' );
 	}
 
 	/**

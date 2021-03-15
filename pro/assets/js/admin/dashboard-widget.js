@@ -1,4 +1,4 @@
-/* globals wpforms_dashboard_widget, ajaxurl, moment, Chart */
+/* global wpforms_dashboard_widget, ajaxurl, moment, Chart */
 /**
  * WPForms Dashboard Widget function.
  *

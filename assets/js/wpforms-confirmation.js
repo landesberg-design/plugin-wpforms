@@ -1,5 +1,3 @@
-/* globals jQuery */
-
 // Clear URL - remove wpforms_form_id
 ( function() {
 	var loc = window.location,

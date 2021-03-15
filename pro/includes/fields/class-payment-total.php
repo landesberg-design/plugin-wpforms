@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Single line text field.
+ * Total payment field.
  *
  * @since 1.0.0
  */

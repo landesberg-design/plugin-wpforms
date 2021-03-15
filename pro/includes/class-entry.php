@@ -346,7 +346,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		$defaults = array(
 			'select'        => 'all',
-			'number'        => 30,
+			'number'        => $this->get_count_per_page(),
 			'offset'        => 0,
 			'form_id'       => 0,
 			'entry_id'      => 0,
@@ -614,5 +614,17 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		) {$charset_collate};";
 
 		dbDelta( $sql );
+	}
+
+	/**
+	 * Get entries count per page.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @return int
+	 */
+	public function get_count_per_page() {
+
+		return (int) apply_filters( 'wpforms_entries_per_page', 30 );
 	}
 }

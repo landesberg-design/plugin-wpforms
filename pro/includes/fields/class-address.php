@@ -862,7 +862,13 @@ class WPForms_Field_Address extends WPForms_Field {
 		$city     = ! empty( $field_submit['city'] ) ? $field_submit['city'] : '';
 		$state    = ! empty( $field_submit['state'] ) ? $field_submit['state'] : '';
 		$postal   = ! empty( $field_submit['postal'] ) ? $field_submit['postal'] : '';
-		$country  = ! empty( $field_submit['country'] ) ? $field_submit['country'] : '';
+
+		// If scheme type is 'us', define US as a country field value.
+		if ( ! empty( $form_data['fields'][ $field_id ]['scheme'] ) && $form_data['fields'][ $field_id ]['scheme'] === 'us' ) {
+			$country = 'US';
+		} else {
+			$country = ! empty( $field_submit['country'] ) ? $field_submit['country'] : '';
+		}
 
 		$value  = '';
 		$value .= ! empty( $address1 ) ? "$address1\n" : '';

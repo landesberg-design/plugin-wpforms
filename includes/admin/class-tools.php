@@ -705,10 +705,8 @@ class WPForms_Tools {
 	 */
 	private function logs_controller() {
 
-		$log = wpforms()->get( 'log' );
-		$log->create_table();
-		$logs_list_table = $log->get_list_table();
-		$nonce           = filter_input( INPUT_POST, '_wpforms_logs_settings_nonce', FILTER_SANITIZE_STRING );
+		$log   = wpforms()->get( 'log' );
+		$nonce = filter_input( INPUT_POST, '_wpforms_logs_settings_nonce', FILTER_SANITIZE_STRING );
 		if ( wp_verify_nonce( $nonce, 'wpforms-logs-settings' ) ) {
 			$settings                = get_option( 'wpforms_settings' );
 			$was_enabled             = ! empty( $settings['logs-enable'] ) ? $settings['logs-enable'] : 0;
@@ -722,7 +720,11 @@ class WPForms_Tools {
 				$settings['logs-users']      = $logs_users ? array_map( 'absint', $logs_users ) : [];
 			}
 			update_option( 'wpforms_settings', $settings );
+			if ( ! empty( $settings['logs-enable'] ) ) {
+				$log->create_table();
+			}
 		}
+		$logs_list_table = $log->get_list_table();
 		$logs_list_table->process_admin_ui();
 	}
 
@@ -847,6 +849,11 @@ class WPForms_Tools {
 		</form>
 		<?php
 		$logs_list_table = $log->get_list_table();
+
+		if ( ! $logs_list_table->table_exists() ) {
+			return;
+		}
+
 		if ( ! empty( $settings['logs-enable'] ) || $logs_list_table->get_total() ) {
 			$logs_list_table->display_page();
 		}
@@ -930,7 +937,7 @@ class WPForms_Tools {
 		}
 
 		$tmp_name = isset( $_FILES['file']['tmp_name'] ) ? sanitize_text_field( $_FILES['file']['tmp_name'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- wp_unslash() breaks upload on Windows.
-		$forms    = json_decode( file_get_contents( $tmp_name ), true );
+		$forms    = json_decode( \WPForms\Helpers\File::remove_utf8_bom( file_get_contents( $tmp_name ) ), true );
 
 		if ( empty( $forms ) || ! is_array( $forms ) ) {
 			wp_die(
@@ -995,9 +1002,7 @@ class WPForms_Tools {
 
 		ignore_user_abort( true );
 
-		if ( ! in_array( 'set_time_limit', explode( ',', ini_get( 'disable_functions' ) ), true ) ) {
-			set_time_limit( 0 );
-		}
+		wpforms_set_time_limit();
 
 		nocache_headers();
 		header( 'Content-Type: application/json; charset=utf-8' );
@@ -1041,7 +1046,7 @@ class WPForms_Tools {
 		// Format template field and settings data.
 		$data                     = $form_data;
 		$data['meta']['template'] = $slug;
-		$data['fields']           = wpforms_array_remove_empty_strings( $data['fields'] );
+		$data['fields']           = isset( $data['fields'] ) ? wpforms_array_remove_empty_strings( $data['fields'] ) : [];
 		$data['settings']         = wpforms_array_remove_empty_strings( $data['settings'] );
 
 		unset( $data['id'] );

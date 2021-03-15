@@ -142,8 +142,12 @@ class WPForms_Updater {
 		// Run update check by pinging the external API. If it fails, return the default update object.
 		if ( ! $this->update ) {
 			$this->update = $this->perform_remote_request( 'get-plugin-update', array( 'tgm-updater-plugin' => $this->plugin_slug ) );
+
+			// No update is available.
 			if ( ! $this->update || ! empty( $this->update->error ) ) {
 				$this->update = false;
+
+				$value->no_update[ $this->plugin_path ] = $this->get_no_update();
 
 				return $value;
 			}
@@ -155,6 +159,8 @@ class WPForms_Updater {
 			$this->update->old_version             = $this->version;
 			$this->update->plugin                  = $this->plugin_path;
 			$value->response[ $this->plugin_path ] = $this->update;
+		} else {
+			$value->no_update[ $this->plugin_path ] = $this->get_no_update();
 		}
 
 		// Return the update object.
@@ -306,5 +312,31 @@ class WPForms_Updater {
 
 		// Return the json decoded content.
 		return $response_body;
+	}
+
+	/**
+	 * Prepare the "mock" item to the `no_update` property.
+	 * Is required for the enable/disable auto-updates links to correctly appear in UI.
+	 *
+	 * @since 1.6.4
+	 *
+	 * @return object
+	 */
+	protected function get_no_update() {
+
+		return (object) [
+			'id'            => $this->plugin_path,
+			'slug'          => $this->plugin_slug,
+			'plugin'        => $this->plugin_path,
+			'new_version'   => $this->version,
+			'url'           => '',
+			'package'       => '',
+			'icons'         => [],
+			'banners'       => [],
+			'banners_rtl'   => [],
+			'tested'        => '',
+			'requires_php'  => '',
+			'compatibility' => new stdClass(),
+		];
 	}
 }

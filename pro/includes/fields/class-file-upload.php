@@ -452,9 +452,10 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			'label',
 			$field,
 			array(
-				'slug'    => 'extensions',
-				'value'   => esc_html__( 'Allowed File Extensions', 'wpforms' ),
-				'tooltip' => esc_html__( 'Enter the extensions you would like to allow, comma separated.', 'wpforms' ),
+				'slug'          => 'extensions',
+				'value'         => esc_html__( 'Allowed File Extensions', 'wpforms' ),
+				'tooltip'       => esc_html__( 'Enter the extensions you would like to allow, comma separated.', 'wpforms' ),
+				'after_tooltip' => '<a href="https://wpforms.com/docs/a-complete-guide-to-the-file-upload-field/#file-types" class="after-label-description" target="_blank" rel="noopener noreferrer">' . esc_html__( 'See More Details', 'wpforms' ) . '</a>',
 			),
 			false
 		);
@@ -867,18 +868,41 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 */
 	protected function validate_modern( $input_name ) {
 
-		if ( ! $this->is_required() ) {
-			return;
-		}
-
 		$value = '';
+
 		if ( ! empty( $_POST[ $input_name ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$value = json_decode( wp_unslash( $_POST[ $input_name ] ), true ); // phpcs:ignore WordPress.Security
 		}
 
-		if ( empty( $value ) ) {
+		if ( ! empty( $value ) && ! $this->has_missing_tmp_file( $value ) ) {
+			wpforms()->process->errors[ $this->form_id ][ $this->field_id ] = $this->validate_basic( 7 );
+
+			return;
+		}
+
+		if ( $this->is_required() && empty( $value ) ) {
 			wpforms()->process->errors[ $this->form_id ][ $this->field_id ] = wpforms_get_required_label();
 		}
+	}
+
+	/**
+	 * Check if file(s) exists in temp directory.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @param array $files List of files.
+	 *
+	 * @return bool
+	 */
+	private function has_missing_tmp_file( $files ) {
+
+		foreach ( $files as $file ) {
+			if ( empty( $file['file'] ) || ! is_file( trailingslashit( $this->get_tmp_dir() ) . $file['file'] ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -948,7 +972,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		// Define data.
 		$file_name     = sanitize_file_name( $file['name'] );
 		$file_ext      = pathinfo( $file_name, PATHINFO_EXTENSION );
-		$file_base     = wp_basename( $file_name, '.' . $file_ext );
+		$file_base     = $this->get_file_basename( $file_name, $file_ext );
 		$file_name_new = sprintf( '%s-%s.%s', $file_base, wp_hash( wp_rand() . microtime() . $this->form_id . $this->field_id ), strtolower( $file_ext ) );
 		$upload_dir    = wpforms_upload_dir();
 		$upload_path   = $upload_dir['path'];
@@ -1190,6 +1214,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		$file['tmp_path'] = trailingslashit( $this->get_tmp_dir() ) . $file['file'];
 		$file['type']     = 'application/octet-stream';
+
 		if ( is_file( $file['tmp_path'] ) ) {
 			$filetype     = wp_check_filetype( $file['tmp_path'] );
 			$file['type'] = $filetype['type'];
@@ -1197,13 +1222,31 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		// Data for no media case.
 		$file_ext              = pathinfo( $file['name'], PATHINFO_EXTENSION );
-		$file_base             = wp_basename( $file['name'], '.' . $file_ext );
+		$file_base             = $this->get_file_basename( $file['name'], $file_ext );
 		$file['file_name_new'] = sanitize_file_name( sprintf( '%s-%s.%s', $file_base, wp_hash( wp_rand() . microtime() . $this->form_data['id'] . $this->field_id ), strtolower( $file_ext ) ) );
 		$file['file_url']      = trailingslashit( $dir['url'] ) . $file['file_name_new'];
 		$file['path']          = trailingslashit( $dir['path'] ) . $file['file_name_new'];
 		$file['attachment_id'] = 0;
 
 		return $file;
+	}
+
+	/**
+	 * Get file basename.
+	 *
+	 * Ensure the file name length does not exceed 64 characters to prevent `make_clickable()`
+	 * function from generating an incorrect URL.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @param string $file_name File name.
+	 * @param string $file_ext  File extension.
+	 *
+	 * @return string
+	 */
+	private function get_file_basename( $file_name, $file_ext ) {
+
+		return mb_substr( wp_basename( $file_name, '.' . $file_ext ), 0, 64, 'UTF-8' );
 	}
 
 	/**

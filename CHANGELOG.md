@@ -1,6 +1,95 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.5.1] - 2021-02-23
+### Fixed
+- Incorrect validation in the Single Item field with 'user defined' type and 'required' status when paying in thousands.
+- PHP notice while exporting a form template with no form fields.
+- On certain WordPress/server configurations there could be an error while trying to automatically download the translations.
+
+## [1.6.5] - 2021-02-16
+### Added
+- Automatically download translation files for the core plugin and its addons.
+- Export all entries in the Microsoft Excel (.xslx) format, which should fix CSV-related compatibility issues.
+- Clone Notifications in the Form Builder to quickly recreate a lot of them.
+
+### Changed
+- Updated DOMPurify lib to 2.2.6.
+- Convert "Viewed" and "Starred" export entry values to "Yes"/"No".
+- Reload the Form Builder after Save and Embed option usage, and going back using the browser Back button.
+- Improved empty states for Single Entry view.
+- Disable From Name and From Email fields in Form Builder > Notifications when the WP Mail SMTP plugin forces those values.
+
+### Fixed
+- RTL support for the Smart Phone field.
+- Properly display entry time when the site has a timezone with fractional offset.
+- The Gutenberg block JavaScript issue in WordPress 5.0-5.1.1 versions.
+- The Gutenberg block CSS issues in Twenty Twenty-One theme.
+- AMP incompatible script for Lite version.
+- Address field should have US country pre-defined when US mode is active.
+- Multiple choice selected choice resets to default while editing the entry.
+- Logs records on WPForms > Tools > Logs may not be clickable under certain circumstances, preventing previewing the logged information.
+- Email Summaries ignoring timezone offset while generating reports.
+- CSS issue in WordPress 5.5+: the form title centered on single entry view if starred.
+- Email Suggestion feature when using two or more forms on a page.
+- Shorten the names of uploaded files to avoid broken links on a single Entry page and in emails.
+- Missing on-hover tooltips' after cloning/duplicating elements in the Form Builder (Notifications, fields, etc).
+- Minor styling issues on the WPForms > Tools > Logs page.
+- Issues while importing forms saved in UTF-8 with BOM.
+- Improve performance of the WPForms Challenge.
+- WPForms module icon compatibility with the latest Elementor version.
+- Incorrect CPT and taxonomy terms alphabetical sorting of the Dynamic Choice option values for fields that support this Advanced Option.
+- Properly clean up all orphaned CSV files after the export has been completed.
+- Compatibility with WordPress 4.9 on the WPForms > Analytics/SMTP pages.
+- Incorrect required File Upload field post-processing when upload failed.
+- AJAX form submissions and file uploading on some server configuration.
+- Improve Admin Menu Bar support since WordPress 5.2.
+- Do not allow submitting the form with required but empty (or equal to 0) user-defined Single Item payment field value.
+
+## [1.6.4.1] - 2020-12-28
+### Added
+- Frontend form warning indicating missing WPForms JS (visible to admin only).
+
+### Changed
+- Help hCaptcha process all requests in a more efficient way, so bot detection will work better. 
+
+### Fixed
+- Improve pagination on Tools > Logs page inside the plugin admin area.
+- Various JavaScript issues on create post/page/form pages in WordPress 5.6.
+- Edge cases when custom fields mapping for providers was broken.
+
+## [1.6.4] - 2020-12-16
+### Added
+- hCaptcha support, see WPForms > CAPTCHA settings.
+- Show confirmation modal when deleting entries using bulk actions method.
+- Character/word limit validation message control inside Settings > Validation page.
+
+### Changed
+- Display a notification to a user in the Form Builder that outlines all the consequences of disabling entry storage.
+- Dropdown and Dropdown Items fields using the Modern format will only show the search option if at least 8 choices are provided.
+- Updated jQuery inputmask library to v5.0.6-beta20
+- Improved Form Builder Help documentation caching.
+- Only create our Logs database table when specifically enabled in the Tools settings.
+- Updated WPForms install count and rating information.
+- Allowed WPForms plugin and addons auto-update control in WP 5.5+.
+- Added "Copy to Clipboard" button inside Form Embed modal.
+- Entries page: "Delete All" button deletes filtered entries only if any filtering is applied.
+
+### Fixed
+- PHP Warning caused by Email field changes.
+- Editing multiline text in Paragraph field breaks new lines in submitted text.
+- Javascript conflicts with IE11.
+- Possible errors if web host had `set_time_limit()` disabled.
+- Form builder Date/Time field date format resetting after refresh.
+- Email validation issue if form is in a page multiple times.
+- Conditional form confirmation processing issue if one of the confirmations was not correctly configured.
+- Footer links in the Summary email are now working properly.
+- Double-click issue for "Add New Account" buttons on the Settings > Integrations page.
+- Advanced Options for Date / Time field are not logically ordered for conditional logic.
+- Required Date dropdown field shows three validation messages instead of one.
+- Search/Filter displays incorrect number of results on Entries screen.
+- Gutenberg block ignores "Include Form Styling" setting and forces full CSS stylesheet.
+
 ## [1.6.3.1] - 2020-10-21
 ### Fixed
 - Entry timestamps could be off by several hours for certain timezones.
@@ -34,7 +123,7 @@ All notable changes to this project will be documented in this file and formatte
 - Elementor widget edge case issues.
 - Filtering entries by the date given incorrect results due to timezones.
 - Form submit button disabled state issues when using Modern file upload format.
-- Form settings could show before the form was created.
+- Form settings could be visible before the form was created.
 - Form builder styling inconsistencies with Dropdown field styles.
 - Input mask issues with some mobile browsers, notably Chrome.
 - Database migration errors in some edge cases during plugin updates.

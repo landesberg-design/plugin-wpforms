@@ -1,4 +1,4 @@
-/* globals wpforms_challenge_admin, ajaxurl, WPFormsBuilder */
+/* global wpforms_challenge_admin, ajaxurl, WPFormsBuilder */
 /**
  * WPForms Challenge Admin function.
  *

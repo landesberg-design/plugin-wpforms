@@ -79,7 +79,7 @@ class Elementor implements IntegrationInterface {
 		// Load WPForms assets globally on Elementor Preview panel only.
 		add_filter( 'wpforms_global_assets', '__return_true' );
 
-		// Hide reCAPTCHA badge on Elementor Preview panel.
+		// Hide CAPTCHA badge on Elementor Preview panel.
 		add_filter( 'wpforms_frontend_recaptcha_disable', '__return_true' );
 	}
 
@@ -150,7 +150,8 @@ class Elementor implements IntegrationInterface {
 			'wpforms-elementor',
 			'wpformsElementorVars',
 			[
-				'recaptcha_type' => wpforms_setting( 'recaptcha-type', 'v2' ),
+				'captcha_provider' => wpforms_setting( 'captcha-provider', 'recaptcha' ),
+				'recaptcha_type'   => wpforms_setting( 'recaptcha-type', 'v2' ),
 			]
 		);
 	}

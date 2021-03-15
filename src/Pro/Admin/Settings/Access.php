@@ -198,7 +198,7 @@ class Access {
 			),
 		);
 
-		return \wpforms_list_insert_after( $tabs, 'integrations', $tab );
+		return \wpforms_list_insert_after( $tabs, 'geolocation', $tab );
 	}
 
 	/**

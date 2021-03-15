@@ -51,11 +51,11 @@ class FormEmbedWizard {
 
 		$min = wpforms_get_min_suffix();
 
-		if ( $this->is_form_embed_page() ) {
+		if ( $this->is_form_embed_page() && ! $this->is_challenge_active() ) {
 
 			wp_enqueue_style(
-				'wpforms-challenge',
-				WPFORMS_PLUGIN_URL . "assets/css/challenge{$min}.css",
+				'wpforms-admin-form-embed-wizard',
+				WPFORMS_PLUGIN_URL . "assets/css/form-embed-wizard{$min}.css",
 				[],
 				WPFORMS_VERSION
 			);
@@ -100,6 +100,13 @@ class FormEmbedWizard {
 	 */
 	public function output() {
 
+		// We do not need to output tooltip if Challenge is active.
+		if ( $this->is_form_embed_page() && $this->is_challenge_active() ) {
+			$this->delete_meta();
+
+			return;
+		}
+
 		$template = $this->is_form_embed_page() ? 'admin/form-embed-wizard/tooltip' : 'admin/form-embed-wizard/popup';
 
 		echo wpforms_render( $template ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -108,7 +115,26 @@ class FormEmbedWizard {
 	}
 
 	/**
-	 * Check if the current page is a form embed page edit related to Challenge.
+	 * Check if Challenge is active.
+	 *
+	 * @since 1.6.4
+	 *
+	 * @return boolean
+	 */
+	public function is_challenge_active() {
+
+		static $challenge_active = null;
+
+		if ( is_null( $challenge_active ) ) {
+			$challenge        = wpforms()->get( 'challenge' );
+			$challenge_active = method_exists( $challenge, 'challenge_active' ) ? $challenge->challenge_active() : false;
+		}
+
+		return $challenge_active;
+	}
+
+	/**
+	 * Check if the current page is a form embed page.
 	 *
 	 * @since 1.6.2
 	 *
@@ -225,9 +251,11 @@ class FormEmbedWizard {
 		$this->set_meta( $meta );
 
 		// Update challenge option to properly continue challenge on the embed page.
-		$challenge = wpforms()->get( 'challenge' );
-		if ( $challenge->challenge_active() ) {
-			$challenge->set_challenge_option( [ 'embed_page' => $meta['embed_page'] ] );
+		if ( $this->is_challenge_active() ) {
+			$challenge = wpforms()->get( 'challenge' );
+			if ( method_exists( $challenge, 'set_challenge_option' ) ) {
+				$challenge->set_challenge_option( [ 'embed_page' => $meta['embed_page'] ] );
+			}
 		}
 
 		wp_send_json_success( $url );

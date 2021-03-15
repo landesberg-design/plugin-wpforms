@@ -1,4 +1,4 @@
-/* globals wpforms_tools_entries_export, ajaxurl */
+/* global wpforms_tools_entries_export, ajaxurl */
 /**
  * WPForms Entries Export function.
  *
@@ -191,19 +191,11 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 						app.displaySubmitSpinner( false );
 						return;
 					}
-					if ( 'stop' === res.data.step ) {
-						msg = i18n.prc_3_done;
-						msg += '<br>' + i18n.prc_3_download + ', <a href="#" class="wpforms-download-link">' + i18n.prc_3_click_here + '</a>.';
-						app.displaySubmitMsg( msg, 'info' );
-						app.displaySubmitSpinner( false );
-						app.triggerDownload( res.data.request_id );
-						vars.processing = true;
-						return;
-					}
-					msg = i18n.prc_2_total_entries.replace( '{total_entries}', res.data.count );
-					msg += '<br>' + i18n.prc_2_progress.replace( '{progress}', Math.ceil( ( ( res.data.step - 1 ) * 100 ) / res.data.total_steps ) );
+					msg = i18n.prc_3_done;
+					msg += '<br>' + i18n.prc_3_download + ', <a href="#" class="wpforms-download-link">' + i18n.prc_3_click_here + '</a>.';
 					app.displaySubmitMsg( msg, 'info' );
-					app.exportAjaxStep( res.data.request_id );
+					app.displaySubmitSpinner( false );
+					app.triggerDownload( res.data.request_id );
 				} )
 				.fail( function( jqXHR, textStatus, errorThrown ) {
 					clearTimeout( vars.timerId );

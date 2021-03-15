@@ -476,10 +476,8 @@ Admin Form Builder - Fields panel
 
 #wpforms-panel-fields .wpforms-field-option-date-time .type,
 #wpforms-panel-fields .wpforms-field-option-date-time .interval {
-	float: left;
 	width: 44%;
 	margin-right: 2%;
-	clear: both;
 }
 
 #wpforms-panel-fields .wpforms-field-option-address .default select,
@@ -1483,10 +1481,12 @@ Admin Form Builder - Fields panel
 	flex-grow: 1;
 }
 
+#wpforms-panel-fields .wpforms-field-hcaptcha-icon,
 #wpforms-panel-fields .wpforms-field-recaptcha-icon {
 	width: 28px;
 }
 
+#wpforms-panel-fields .wpforms-field-hcaptcha-title,
 #wpforms-panel-fields .wpforms-field-recaptcha-title {
 	margin: 0;
 	font-weight: 600;
@@ -1508,11 +1508,30 @@ Admin Form Builder - Fields panel
 
 #wpforms-panel-fields .wpforms-field-recaptcha-desc-icon {
 	width: 14px;
-	color: #4285f4;
+	color: #00c6bf;
 }
 
 #wpforms-panel-fields .wpforms-field-recaptcha-desc-icon path {
 	fill: currentColor;
+}
+
+#wpforms-panel-fields .wpforms-field-recaptcha-icon,
+#wpforms-panel-fields .wpforms-field-recaptcha-title {
+	display: none;
+}
+
+#wpforms-panel-fields .wpforms-field-recaptcha.is-recaptcha .wpforms-field-hcaptcha-icon,
+#wpforms-panel-fields .wpforms-field-recaptcha.is-recaptcha .wpforms-field-hcaptcha-title {
+	display: none;
+}
+
+#wpforms-panel-fields .wpforms-field-recaptcha.is-recaptcha .wpforms-field-recaptcha-icon,
+#wpforms-panel-fields .wpforms-field-recaptcha.is-recaptcha .wpforms-field-recaptcha-title {
+	display: block;
+}
+
+#wpforms-panel-fields .wpforms-field-recaptcha.is-recaptcha .wpforms-field-recaptcha-desc-icon {
+	color: #4285f4;
 }
 
 /* Submit. */

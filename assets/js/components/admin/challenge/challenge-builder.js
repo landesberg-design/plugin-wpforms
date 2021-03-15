@@ -1,4 +1,4 @@
-/* globals WPFormsBuilder, wpforms_challenge_admin, WPFormsFormEmbedWizard */
+/* global WPFormsBuilder, wpforms_challenge_admin, WPFormsFormEmbedWizard */
 /**
  * WPForms Challenge function.
  *

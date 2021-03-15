@@ -18,7 +18,7 @@ class AdminBarMenu extends \WPForms\Admin\AdminBarMenu {
 
 		parent::hooks();
 
-		add_action( 'wpforms_admin_adminbarmenu_forms_menu_after', [ $this, 'view_entries_menu' ], 10, 2 );
+		add_filter( 'wpforms_admin_adminbarmenu_get_form_data', [ $this, 'add_entry_links_to_form_menu' ] );
 
 		add_action( 'wpforms_admin_adminbarmenu_register_all_forms_menu_after', [ $this, 'entries_menu' ] );
 	}
@@ -28,15 +28,19 @@ class AdminBarMenu extends \WPForms\Admin\AdminBarMenu {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param array $form Form data array.
+	 * @param int $form_id Form ID.
 	 *
 	 * @return bool
 	 */
-	public function has_survey( $form ) {
+	public function has_survey( $form_id ) {
 
 		if ( ! function_exists( 'wpforms_surveys_polls' ) ) {
 			return false;
 		}
+
+		// Get our form data to check if surveys are enabled.
+		$form = wpforms()->form->get( $form_id );
+		$form = apply_filters( 'wpforms_frontend_form_data', wpforms_decode( $form->post_content ) );
 
 		if ( ! empty( $form['settings']['survey_enable'] ) ) {
 			return true;
@@ -54,37 +58,26 @@ class AdminBarMenu extends \WPForms\Admin\AdminBarMenu {
 	}
 
 	/**
-	 * Render View Entries admin menu bar sub-item.
-	 * Maybe include Survey results admin menu bar sub-item.
+	 * Add entry and survey links to form data array for admin menu bar output.
+	 * This gets called multiple times per page load, one for each form on the page.
 	 *
-	 * @since 1.6.0
+	 * @since 1.6.5
 	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
-	 * @param array         $form         Form data.
+	 * @param array $form_data Current form data.
+	 *
+	 * @return array Form data with added links.
 	 */
-	public function view_entries_menu( \WP_Admin_Bar $wp_admin_bar, $form ) {
+	public function add_entry_links_to_form_menu( $form_data ) {
 
-		$form_id = absint( $form['id'] );
+		$form_id = ! empty( $form_data['form_id'] ) ? absint( $form_data['form_id'] ) : 0;
 
-		$wp_admin_bar->add_menu(
-			[
-				'parent' => 'wpforms-form-id-' . $form_id,
-				'id'     => 'wpforms-view-form-id-' . $form_id,
-				'title'  => __( 'View Entries', 'wpforms' ),
-				'href'   => admin_url( 'admin.php?page=wpforms-entries&view=list&form_id=' . $form_id ),
-			]
-		);
+		$form_data['entries_url'] = admin_url( 'admin.php?page=wpforms-entries&view=list&form_id=' . $form_id );
 
-		if ( $this->has_survey( $form ) ) {
-			$wp_admin_bar->add_menu(
-				[
-					'parent' => 'wpforms-form-id-' . $form_id,
-					'id'     => 'wpforms-view-survey-results-id-' . $form_id,
-					'title'  => __( 'Survey Results', 'wpforms' ),
-					'href'   => admin_url( 'admin.php?page=wpforms-entries&view=survey&form_id=' . $form_id ),
-				]
-			);
+		if ( $this->has_survey( $form_id ) ) {
+			$form_data['survey_url'] = admin_url( 'admin.php?page=wpforms-entries&view=survey&form_id=' . $form_id );
 		}
+
+		return $form_data;
 	}
 
 	/**
@@ -100,7 +93,7 @@ class AdminBarMenu extends \WPForms\Admin\AdminBarMenu {
 			[
 				'parent' => 'wpforms-menu',
 				'id'     => 'wpforms-entries',
-				'title'  => __( 'Entries', 'wpforms' ),
+				'title'  => esc_html__( 'Entries', 'wpforms' ),
 				'href'   => admin_url( 'admin.php?page=wpforms-entries' ),
 			]
 		);

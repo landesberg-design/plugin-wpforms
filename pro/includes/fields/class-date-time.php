@@ -395,6 +395,29 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 					'tooltip' => esc_html__( 'Advanced date options.', 'wpforms' ),
 				)
 			);
+			echo '<div class="type">';
+				printf(
+					'<select id="wpforms-field-option-%d-date_type" name="fields[%d][date_type]">',
+					esc_attr( $field['id'] ),
+					esc_attr( $field['id'] )
+				);
+					printf(
+						'<option value="datepicker" %s>%s</option>',
+						selected( $date_type, 'datepicker', false ),
+						esc_html__( 'Date Picker', 'wpforms' )
+					);
+					printf(
+						'<option value="dropdown" %s>%s</option>',
+						selected( $date_type, 'dropdown', false ),
+						esc_html__( 'Date Dropdown', 'wpforms' )
+					);
+				echo '</select>';
+				printf(
+					'<label for="wpforms-field-option-%d-date_type" class="sub-label">%s</label>',
+					esc_attr( $field['id'] ),
+					esc_html__( 'Type', 'wpforms' )
+				);
+			echo '</div>';
 			echo '<div class="placeholder">';
 				printf(
 					'<input type="text" class="placeholder" id="wpforms-field-option-%d-date_placeholder" name="fields[%d][date_placeholder]" value="%s">',
@@ -439,29 +462,6 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 					esc_html__( 'Format', 'wpforms' )
 				);
 			echo '</div>';
-			echo '<div class="type">';
-				printf(
-					'<select id="wpforms-field-option-%d-date_type" name="fields[%d][date_type]">',
-					esc_attr( $field['id'] ),
-					esc_attr( $field['id'] )
-				);
-					printf(
-						'<option value="datepicker" %s>%s</option>',
-						selected( $date_type, 'datepicker', false ),
-						esc_html__( 'Date Picker', 'wpforms' )
-					);
-					printf(
-						'<option value="dropdown" %s>%s</option>',
-						selected( $date_type, 'dropdown', false ),
-						esc_html__( 'Date Dropdown', 'wpforms' )
-					);
-				echo '</select>';
-				printf(
-					'<label for="wpforms-field-option-%d-date_type" class="sub-label">%s</label>',
-					esc_attr( $field['id'] ),
-					esc_html__( 'Type', 'wpforms' )
-				);
-			echo '</div>';
 
 			// Limit Days options.
 			$this->field_options_limit_days( $field );
@@ -502,6 +502,28 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 					'tooltip' => esc_html__( 'Advanced time options.', 'wpforms' ),
 				)
 			);
+
+			echo '<div class="interval">';
+				printf(
+					'<select id="wpforms-field-option-%d-time_interval" name="fields[%d][time_interval]">',
+					esc_attr( $field['id'] ),
+					esc_attr( $field['id'] )
+				);
+					foreach ( $time_intervals as $key => $value ) {
+						printf(
+							'<option value="%s" %s>%s</option>',
+							esc_attr( $key ),
+							selected( $time_interval, $key, false ),
+							$value // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						);
+					}
+				echo '</select>';
+				printf(
+					'<label for="wpforms-field-option-%d-time_interval" class="sub-label">%s</label>',
+					esc_attr( $field['id'] ),
+					esc_html__( 'Interval', 'wpforms' )
+				);
+			echo '</div>';
 			echo '<div class="placeholder">';
 				printf(
 					'<input type="text"" class="placeholder" id="wpforms-field-option-%d-time_placeholder" name="fields[%d][time_placeholder]" value="%s">',
@@ -534,27 +556,6 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 					'<label for="wpforms-field-option-%d-time_format" class="sub-label">%s</label>',
 					esc_attr( $field['id'] ),
 					esc_html__( 'Format', 'wpforms' )
-				);
-			echo '</div>';
-			echo '<div class="interval">';
-				printf(
-					'<select id="wpforms-field-option-%d-time_interval" name="fields[%d][time_interval]">',
-					esc_attr( $field['id'] ),
-					esc_attr( $field['id'] )
-				);
-				foreach ( $time_intervals as $key => $value ) {
-					printf(
-						'<option value="%s" %s>%s</option>',
-						esc_attr( $key ),
-						selected( $time_interval, $key, false ),
-						$value
-					);
-				}
-				echo '</select>';
-				printf(
-					'<label for="wpforms-field-option-%d-time_interval" class="sub-label">%s</label>',
-					esc_attr( $field['id'] ),
-					esc_html__( 'Interval', 'wpforms' )
 				);
 			echo '</div>';
 

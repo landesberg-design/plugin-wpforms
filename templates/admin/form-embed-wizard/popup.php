@@ -48,7 +48,7 @@ $pages_exists = (int) wp_count_posts( 'page' )->publish > 0;
 				<p class="secondary">
 					<?php
 					printf(
-						wp_kses( /* translators: %s - Video tutorial toggle class. */
+						wp_kses( /* translators: %1$s - Video tutorial toggle CSS classes, %2$s - shortcode toggle CSS classes. */
 							__( 'You can also <a href="#" class="%1$s">embed your form manually</a> or <a href="#" class="%2$s">use a shortcode</a>', 'wpforms-lite' ),
 							[
 								'a' => [
@@ -64,7 +64,12 @@ $pages_exists = (int) wp_count_posts( 'page' )->publish > 0;
 				</p>
 				<?php $video_id = wpforms_is_gutenberg_active() ? '_29nTiDvmLw' : 'IxGVz3AjEe0'; ?>
 				<iframe style="display: none;" src="https://youtube.com/embed/<?php echo esc_attr( $video_id ); ?>?rel=0&showinfo=0" frameborder="0" id="wpforms-admin-form-embed-wizard-tutorial" allowfullscreen width="450" height="256"></iframe>
-				<input type="text" id="wpforms-admin-form-embed-wizard-shortcode" class="wpforms-admin-popup-shortcode" disabled style="display: none;"/>
+				<div id="wpforms-admin-form-embed-wizard-shortcode-wrap" style="display: none;">
+					<input type="text" id="wpforms-admin-form-embed-wizard-shortcode" class="wpforms-admin-popup-shortcode" disabled />
+					<span id="wpforms-admin-form-embed-wizard-shortcode-copy" title="<?php esc_attr_e( 'Copy embed code to clipboard', 'wpforms-lite' ); ?>">
+						<i class="fa fa-files-o" aria-hidden="true"></i>
+					</span>
+				</div>
 			</div>
 			<div id="wpforms-admin-form-embed-wizard-section-goback" class="wpforms-admin-popup-bottom" style="display: none;">
 				<p class="secondary">

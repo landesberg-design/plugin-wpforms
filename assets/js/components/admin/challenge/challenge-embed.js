@@ -1,4 +1,4 @@
-/* globals ajaxurl */
+/* global ajaxurl */
 /**
  * WPForms Challenge function.
  *

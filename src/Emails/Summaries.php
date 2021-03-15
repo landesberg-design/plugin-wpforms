@@ -52,11 +52,13 @@ class Summaries {
 	public function hooks() {
 
 		\add_filter( 'wpforms_settings_defaults', array( $this, 'disable_summaries_setting' ) );
+		\add_action( 'wpforms_settings_updated', array( $this, 'deregister_fetch_info_blocks_task' ) );
 
 		if ( ! $this->is_disabled() ) {
 			\add_action( 'init', array( $this, 'preview' ) );
 			\add_filter( 'cron_schedules', array( $this, 'add_weekly_cron_schedule' ) );
 			\add_action( 'wpforms_email_summaries_cron', array( $this, 'cron' ) );
+			\add_filter( 'wpforms_tasks_get_tasks', array( $this, 'register_fetch_info_blocks_task' ) );
 		}
 	}
 
@@ -250,5 +252,45 @@ class Summaries {
 		}
 
 		return $results;
+	}
+
+	/**
+	 * Register Action Scheduler task to fetch and cache Info Blocks.
+	 *
+	 * @since 1.6.4
+	 *
+	 * @param \WPForms\Tasks\Task[] $tasks List of task classes.
+	 *
+	 * @return array
+	 */
+	public static function register_fetch_info_blocks_task( $tasks ) {
+
+		$tasks[] = FetchInfoBlocksTask::class;
+
+		return $tasks;
+	}
+
+	/**
+	 * Deregister Action Scheduler task to fetch and cache Info Blocks.
+	 *
+	 * @since 1.6.4
+	 */
+	public function deregister_fetch_info_blocks_task() {
+
+		if ( ! $this->is_disabled() ) {
+			return;
+		}
+
+		// Deregister the task.
+		( new FetchInfoBlocksTask() )->cancel();
+
+		// Delete last run time record.
+		delete_option( FetchInfoBlocksTask::LAST_RUN );
+
+		// Remove the cache file if it exists.
+		$file_name = ( new InfoBlocks() )->get_cache_file_path();
+		if ( file_exists( $file_name ) ) {
+			@unlink( $file_name ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
 	}
 }

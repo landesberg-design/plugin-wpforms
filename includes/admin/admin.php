@@ -127,6 +127,7 @@ function wpforms_admin_scripts() {
 		'close'                           => esc_html__( 'Close', 'wpforms-lite' ),
 		'entry_delete_confirm'            => esc_html__( 'Are you sure you want to delete this entry?', 'wpforms-lite' ),
 		'entry_delete_all_confirm'        => esc_html__( 'Are you sure you want to delete ALL entries?', 'wpforms-lite' ),
+		'entry_delete_n_confirm'          => esc_html__( 'Are you sure you want to delete {entry_count} entry(s)?', 'wpforms-lite' ),
 		'entry_empty_fields_hide'         => esc_html__( 'Hide Empty Fields', 'wpforms-lite' ),
 		'entry_empty_fields_show'         => esc_html__( 'Show Empty Fields', 'wpforms-lite' ),
 		'entry_field_columns'             => esc_html__( 'Entries Field Columns', 'wpforms-lite' ),
@@ -149,9 +150,10 @@ function wpforms_admin_scripts() {
 		'plugin_activate_btn'             => esc_html__( 'Activate', 'wpforms-lite' ),
 		'plugin_activate_confirm'         => esc_html__( 'needs to be activated to import its forms. Would you like us to activate it for you?', 'wpforms-lite' ),
 		'provider_delete_confirm'         => esc_html__( 'Are you sure you want to disconnect this account?', 'wpforms-lite' ),
+		'provider_delete_error'           => esc_html__( 'Could not disconnect this account.', 'wpforms-lite' ),
 		'provider_auth_error'             => esc_html__( 'Could not authenticate with the provider.', 'wpforms-lite' ),
 		'save_refresh'                    => esc_html__( 'Save and Refresh', 'wpforms-lite' ),
-		'server_error'                    => esc_html__( 'Unfortunately, there was an server connection error.', 'wpforms-lite' ),
+		'server_error'                    => esc_html__( 'Unfortunately there was a server connection error.', 'wpforms-lite' ),
 		'settings_form_style_base'        => sprintf(
 			wp_kses(
 				/* translators: %s - WPForms.com docs page URL. */
@@ -191,6 +193,8 @@ function wpforms_admin_scripts() {
 		'choicesjs_no_results'            => esc_html__( 'No results found', 'wpforms-lite' ),
 		'choicesjs_no_choices'            => esc_html__( 'No choices to choose from', 'wpforms-lite' ),
 		'choicesjs_item_select'           => esc_html__( 'Press to select', 'wpforms-lite' ),
+		'debug'                           => wpforms_debug(),
+		'edit_license'                    => esc_html__( 'To edit the License Key, please first click the Deactivate Key button. Please note that deactivating this key will remove access to updates, addons, and support.', 'wpforms-lite' ),
 	);
 	$strings = apply_filters( 'wpforms_admin_strings', $strings );
 

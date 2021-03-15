@@ -51,7 +51,7 @@ class SiteHealth extends \WPForms\Admin\SiteHealth {
 		$license = wpforms()->license;
 
 		if ( empty( $license ) ) {
-			$status = false;
+			$status = 'undefined';
 		} else {
 			$status = $license->validate_key( $license->get(), false, false, true );
 		}

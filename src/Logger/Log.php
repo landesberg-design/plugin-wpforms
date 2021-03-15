@@ -170,11 +170,7 @@ class Log {
 			! check_ajax_referer( 'wpforms-admin', 'nonce', false ) ||
 			! wpforms_current_user_can()
 		) {
-			wp_send_json_error(
-				array(
-					'error' => esc_html__( 'You do not have permission.', 'wpforms-lite' ),
-				)
-			);
+			wp_send_json_error( esc_html__( 'You do not have permission.', 'wpforms-lite' ) );
 		}
 
 		$id = filter_input( INPUT_GET, 'recordId', FILTER_VALIDATE_INT );

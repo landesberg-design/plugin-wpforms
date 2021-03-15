@@ -627,7 +627,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 
 						var $table = $( this ).parents( '.wpforms-builder-provider-connection-fields-table' ),
 							$clone = $table.find( 'tr' ).last().clone( true ),
-							nextID = parseInt( /\[(\d+)\]/g.exec( $clone.find( '.wpforms-builder-provider-connection-field-name' ).attr( 'name' ) )[ 1 ], 10 ) + 1;
+							nextID = parseInt( /\[.+]\[.+]\[.+]\[(\d+)]/.exec( $clone.find( '.wpforms-builder-provider-connection-field-name' ).attr( 'name' ) )[ 1 ], 10 ) + 1;
 
 						// Clear the row and increment the counter.
 						$clone.find( '.wpforms-builder-provider-connection-field-name' )
@@ -651,6 +651,12 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 
 						$row.remove();
 					} );
+
+				// CONNECTION: Generated.
+				$( '#wpforms-panel-providers' ).on( 'connectionGenerated', function() {
+
+					wpf.initTooltips();
+				} );
 
 				// CONNECTION: Rendered.
 				$( '#wpforms-panel-providers' ).on( 'connectionRendered', function( e, provider, connectionId ) {

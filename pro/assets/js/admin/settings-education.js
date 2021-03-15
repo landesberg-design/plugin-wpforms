@@ -1,4 +1,4 @@
-/* globals wpforms_admin */
+/* global wpforms_admin */
 /**
  * WPForms Settings Education function.
  *

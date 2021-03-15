@@ -39,6 +39,7 @@ class Loader {
 			'WPMailSMTP\Notifications',
 			'WPorg\Translations',
 			'UsageTracking\UsageTracking',
+			'TranslationsPress\Translations',
 		);
 
 		$class_names = \apply_filters( 'wpforms_integrations_available', $core_class_names );

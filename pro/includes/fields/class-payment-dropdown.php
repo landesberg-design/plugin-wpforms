@@ -350,6 +350,7 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 		$container         = $field['properties']['input_container'];
 		$field_placeholder = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
 		$is_modern         = ! empty( $field['style'] ) && self::STYLE_MODERN === $field['style'];
+		$choices           = $field['properties']['inputs'];
 
 		if ( ! empty( $field['required'] ) ) {
 			$container['attr']['required'] = 'required';
@@ -363,9 +364,10 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 			if ( ! empty( $field['size'] ) ) {
 				$container['data']['size-class'] = 'wpforms-field-row wpforms-field-' . sanitize_html_class( $field['size'] );
 			}
+
+			$container['data']['search-enabled'] = $this->is_choicesjs_search_enabled( count( $choices ) );
 		}
 
-		$choices     = $field['properties']['inputs'];
 		$has_default = false;
 
 		// Check to see if any of the options were selected by default.

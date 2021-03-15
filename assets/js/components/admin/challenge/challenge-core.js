@@ -1,4 +1,4 @@
-/* globals wpforms_challenge_admin */
+/* global wpforms_challenge_admin */
 /**
  * WPForms Challenge function.
  *

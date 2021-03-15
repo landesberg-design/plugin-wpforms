@@ -84,6 +84,7 @@ class WPForms_Frontend {
 		add_action( 'wpforms_frontend_output', array( $this, 'foot' ), 25, 5 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'assets_header' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'recaptcha_noconflict' ), 9999 );
+		add_action( 'wp_head', array( $this, 'missing_assets_error_js' ) );
 		add_action( 'wp_footer', array( $this, 'assets_footer' ), 15 );
 		add_action( 'wp_footer', array( $this, 'recaptcha_noconflict' ), 19 );
 		add_action( 'wp_footer', array( $this, 'footer_end' ), 99 );
@@ -815,9 +816,10 @@ class WPForms_Frontend {
 	}
 
 	/**
-	 * Google reCAPTCHA output if configured.
+	 * CAPTCHA output if configured.
 	 *
 	 * @since 1.0.0
+	 * @since 1.6.4 Added hCaptcha support.
 	 *
 	 * @param array $form_data   Form data and settings.
 	 * @param null  $deprecated  Deprecated in v1.3.7, previously was $form object.
@@ -827,35 +829,41 @@ class WPForms_Frontend {
 	 */
 	public function recaptcha( $form_data, $deprecated, $title, $description, $errors ) {
 
-		// Check that recaptcha is configured in the settings.
-		$site_key   = wpforms_setting( 'recaptcha-site-key' );
-		$secret_key = wpforms_setting( 'recaptcha-secret-key' );
-		$type       = wpforms_setting( 'recaptcha-type', 'v2' );
-		if ( ! $site_key || ! $secret_key ) {
-			return;
-		}
-
-		// Check that the recaptcha is configured for the specific form.
+		// Check that CAPTCHA is configured in the settings.
+		$captcha_settings = wpforms_get_captcha_settings();
 		if (
-			! isset( $form_data['settings']['recaptcha'] ) ||
-			'1' != $form_data['settings']['recaptcha']
+			empty( $captcha_settings['provider'] ) ||
+			'none' === $captcha_settings['provider'] ||
+			empty( $captcha_settings['site_key'] ) ||
+			empty( $captcha_settings['secret_key'] )
 		) {
 			return;
 		}
 
+		// Check that the CAPTCHA is configured for the specific form.
+		if (
+			! isset( $form_data['settings']['recaptcha'] ) ||
+			'1' !== $form_data['settings']['recaptcha']
+		) {
+			return;
+		}
+
+		$is_recaptcha_v3 = 'recaptcha' === $captcha_settings['provider'] && 'v3' === $captcha_settings['recaptcha_type'];
+
 		if ( wpforms_is_amp() ) {
-			if ( 'v3' === $type ) {
+			if ( $is_recaptcha_v3 ) {
 				printf(
 					'<amp-recaptcha-input name="wpforms[recaptcha]" data-sitekey="%s" data-action="%s" layout="nodisplay"></amp-recaptcha-input>',
-					esc_attr( $site_key ),
+					esc_attr( $captcha_settings['site_key'] ),
 					esc_attr( 'wpforms_' . $form_data['id'] )
 				);
 			} elseif ( is_super_admin() ) {
+				$captcha_provider = 'hcaptcha' === $captcha_settings['provider'] ? esc_html__( 'hCaptcha', 'wpforms-lite' ) : esc_html__( 'Google reCAPTCHA v2', 'wpforms-lite' );
 				echo '<div class="wpforms-notice wpforms-warning" style="margin: 20px 0;">';
 				printf(
 					wp_kses(
-						/* translators: %s - URL to reCAPTCHA documentation. */
-						__( 'Google reCAPTCHA v2 is not supported by AMP and is currently disabled.<br><a href="%s" rel="noopener noreferrer" target="_blank">Upgrade to reCAPTCHA v3</a> for full AMP support. <br><em>Please note: this message is only displayed to site administrators.</em>', 'wpforms-lite' ),
+						/* translators: %1$s - CAPTCHA provider name; %2$s - URL to reCAPTCHA documentation. */
+						__( '%1$s is not supported by AMP and is currently disabled.<br><a href="%2$s" rel="noopener noreferrer" target="_blank">Upgrade to reCAPTCHA v3</a> for full AMP support. <br><em>Please note: this message is only displayed to site administrators.</em>', 'wpforms-lite' ),
 						array(
 							'a'  => array(
 								'href'   => array(),
@@ -866,6 +874,7 @@ class WPForms_Frontend {
 							'em' => array(),
 						)
 					),
+					$captcha_provider, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					'https://wpforms.com/docs/setup-captcha-wpforms/'
 				);
 				echo '</div>';
@@ -873,26 +882,26 @@ class WPForms_Frontend {
 			return; // Only v3 is supported in AMP.
 		}
 
-		if ( 'v3' === $type ) {
+		if ( $is_recaptcha_v3 ) {
 			echo '<input type="hidden" name="wpforms[recaptcha]" value="">';
 			return;
 		}
 
 		$visible = $this->pages ? 'style="display:none;"' : '';
 		$data    = array(
-			'sitekey' => trim( sanitize_text_field( $site_key ) ),
+			'sitekey' => $captcha_settings['site_key'],
 		);
 		$data    = apply_filters( 'wpforms_frontend_recaptcha', $data, $form_data );
 
-		if ( 'invisible' === $type ) {
+		if ( 'recaptcha' === $captcha_settings['provider'] && 'invisible' === $captcha_settings['recaptcha_type'] ) {
 			$data['size'] = 'invisible';
 		}
 
-		echo '<div class="wpforms-recaptcha-container" ' . $visible . '>';
+		echo '<div class="wpforms-recaptcha-container wpforms-is-' . $captcha_settings['provider'] . '" ' . $visible . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		echo '<div ' . wpforms_html_attributes( '', array( 'g-recaptcha' ), $data ) . '></div>';
 
-		if ( 'invisible' !== $type ) {
+		if ( 'invisible' !== $captcha_settings['recaptcha_type'] ) {
 			echo '<input type="text" name="g-recaptcha-hidden" class="wpforms-recaptcha-hidden" style="position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;" required>';
 		}
 
@@ -1110,6 +1119,7 @@ class WPForms_Frontend {
 	 * @since 1.0.0
 	 */
 	public function assets_js() {
+
 		if ( wpforms_is_amp() ) {
 			return;
 		}
@@ -1126,6 +1136,7 @@ class WPForms_Frontend {
 		);
 
 		// Load jQuery date/time libraries.
+		// TODO: should be moved out of here.
 		if (
 			$this->assets_global() ||
 			true === wpforms_has_field_type( 'date-time', $this->forms, true )
@@ -1156,7 +1167,7 @@ class WPForms_Frontend {
 				'wpforms-maskedinput',
 				WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.min.js',
 				array( 'jquery' ),
-				'5.0.5',
+				'5.0.6',
 				true
 			);
 		}
@@ -1176,6 +1187,7 @@ class WPForms_Frontend {
 		}
 
 		// Load CC payment library - https://github.com/stripe/jquery.payment/.
+		// TODO: should be moved out of here.
 		if (
 			$this->assets_global() ||
 			true === wpforms_has_field_type( 'credit-card', $this->forms, true )
@@ -1202,60 +1214,108 @@ class WPForms_Frontend {
 	}
 
 	/**
-	 * Load the assets needed for the Google's reCaptcha.
+	 * Load the assets needed for the CAPTCHA.
 	 *
 	 * @since 1.6.2
+	 * @since 1.6.4 Added hCaptcha support.
 	 */
 	public function assets_recaptcha() {
 
-		// Kill switch for recaptcha.
+		// Kill switch for CAPTCHA.
 		if ( (bool) apply_filters( 'wpforms_frontend_recaptcha_disable', false ) ) {
 			return;
 		}
 
-		// Load reCAPTCHA support if form supports it.
-		$site_key   = wpforms_setting( 'recaptcha-site-key' );
-		$secret_key = wpforms_setting( 'recaptcha-secret-key' );
-		$type       = wpforms_setting( 'recaptcha-type', 'v2' );
-		$recaptcha  = false;
+		// Load CAPTCHA support if form supports it.
+		$captcha_settings = wpforms_get_captcha_settings();
 
-		// Whether at least 1 form on a page has recaptcha enabled.
+		if (
+			empty( $captcha_settings['provider'] ) ||
+			'none' === $captcha_settings['provider'] ||
+			empty( $captcha_settings['site_key'] ) ||
+			empty( $captcha_settings['secret_key'] )
+		) {
+			return;
+		}
+
+		// Whether at least 1 form on a page has CAPTCHA enabled.
+		$captcha = false;
 		foreach ( $this->forms as $form ) {
 			if ( ! empty( $form['settings']['recaptcha'] ) ) {
-				$recaptcha = true;
+				$captcha = true;
 				break;
 			}
 		}
 
-		if (
-			( $recaptcha || $this->assets_global() ) &&
-			( $secret_key && $site_key )
-		) {
-			if ( $type === 'v3' ) {
-				$recaptcha_api = 'https://www.google.com/recaptcha/api.js?render=' . $site_key;
-			} else {
-				$recaptcha_api = apply_filters( 'wpforms_frontend_recaptcha_url', 'https://www.google.com/recaptcha/api.js?onload=wpformsRecaptchaLoad&render=explicit' );
-			}
-
-			wp_enqueue_script(
-				'wpforms-recaptcha',
-				$recaptcha_api,
-				$type === 'v3' ? array() : array( 'jquery' ),
-				null,
-				true
-			);
-
-			if ( 'v3' === $type ) {
-				$recaptcha_inline = 'var wpformsRecaptchaLoad = function(){grecaptcha.execute("' . esc_html( $site_key ) . '",{action:"wpforms"}).then(function(token){var f=document.getElementsByName("wpforms[recaptcha]");for(var i=0;i<f.length;i++){f[i].value = token;}});jQuery(document).trigger("wpformsRecaptchaLoaded");}; grecaptcha.ready(wpformsRecaptchaLoad);';
-			} elseif ( 'invisible' === $type ) {
-				$recaptcha_inline  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index,el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).closest("form").find("button[type=submit]").get(0).recaptchaID = recaptchaID;});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
-				$recaptcha_inline .= 'var wpformsRecaptchaCallback = function(el){var $form = jQuery(el).closest("form");if(typeof wpforms.formSubmit === "function"){wpforms.formSubmit($form);}else{$form.find("button[type=submit]").get(0).recaptchaID = false;$form.submit();}};';
-			} else {
-				$recaptcha_inline  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).attr( "data-recaptcha-id", recaptchaID);});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
-				$recaptcha_inline .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
-			}
-			wp_add_inline_script( 'wpforms-recaptcha', $recaptcha_inline );
+		// Return early.
+		if ( ! $captcha && ! $this->assets_global() ) {
+			return;
 		}
+
+		$is_recaptcha_v3 = 'recaptcha' === $captcha_settings['provider'] && 'v3' === $captcha_settings['recaptcha_type'];
+		$captcha_api     = 'hcaptcha' === $captcha_settings['provider'] ? 'https://hcaptcha.com/1/api.js?onload=wpformsRecaptchaLoad&render=explicit' : apply_filters( 'wpforms_frontend_recaptcha_url', 'https://www.google.com/recaptcha/api.js?onload=wpformsRecaptchaLoad&render=explicit' ); // BC: reCAPTCHA v3 don't filtered.
+		$captcha_api     = $is_recaptcha_v3 ? 'https://www.google.com/recaptcha/api.js?render=' . $captcha_settings['site_key'] : $captcha_api;
+
+		/**
+		 * Filter the CAPTCHA API URL.
+		 *
+		 * @since 1.6.4
+		 *
+		 * @param string $captcha_api The CAPTCHA API URL.
+		 */
+		$captcha_api = apply_filters( 'wpforms_frontend_captcha_api', $captcha_api );
+
+		wp_enqueue_script(
+			'wpforms-recaptcha',
+			$captcha_api,
+			$is_recaptcha_v3 ? array() : array( 'jquery' ),
+			null,
+			true
+		);
+
+		/**
+		 * Filter the string containing the CAPTCHA javascript to be added.
+		 *
+		 * @since 1.6.4
+		 *
+		 * @param string $captcha_inline The CAPTCHA javascript.
+		 */
+		$captcha_inline = apply_filters( 'wpforms_frontend_captcha_inline_script', $this->get_captcha_inline_script( $captcha_settings ) );
+
+		wp_add_inline_script( 'wpforms-recaptcha', $captcha_inline );
+	}
+
+	/**
+	 * Retrieve the string containing the CAPTCHA inline javascript.
+	 *
+	 * @since 1.6.4
+	 *
+	 * @param array $captcha_settings The CAPTCHA settings.
+	 *
+	 * @return string
+	 */
+	protected function get_captcha_inline_script( $captcha_settings ) {
+
+		$data = '';
+
+		if ( 'hcaptcha' === $captcha_settings['provider'] ) {
+			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){var captchaID = hcaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}});jQuery(el).attr( "data-recaptcha-id", captchaID);});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
+			$data .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
+
+			return $data;
+		}
+
+		if ( 'v3' === $captcha_settings['recaptcha_type'] ) {
+			$data = 'var wpformsRecaptchaLoad = function(){grecaptcha.execute("' . $captcha_settings['site_key'] . '",{action:"wpforms"}).then(function(token){var f=document.getElementsByName("wpforms[recaptcha]");for(var i=0;i<f.length;i++){f[i].value = token;}});jQuery(document).trigger("wpformsRecaptchaLoaded");}; grecaptcha.ready(wpformsRecaptchaLoad);';
+		} elseif ( 'invisible' === $captcha_settings['recaptcha_type'] ) {
+			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index,el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).closest("form").find("button[type=submit]").get(0).recaptchaID = recaptchaID;});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
+			$data .= 'var wpformsRecaptchaCallback = function(el){var $form = jQuery(el).closest("form");if(typeof wpforms.formSubmit === "function"){wpforms.formSubmit($form);}else{$form.find("button[type=submit]").get(0).recaptchaID = false;$form.submit();}};';
+		} else {
+			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}});jQuery(el).attr( "data-recaptcha-id", recaptchaID);});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
+			$data .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
+		}
+
+		return $data;
 	}
 
 	/**
@@ -1317,6 +1377,8 @@ class WPForms_Frontend {
 	 */
 	public function get_strings() {
 
+		$captcha_settings = wpforms_get_captcha_settings();
+
 		// Define base strings.
 		$strings = array(
 			'val_required'               => wpforms_setting( 'validation-required', esc_html__( 'This field is required.', 'wpforms-lite' ) ),
@@ -1326,6 +1388,7 @@ class WPForms_Frontend {
 			'val_email_suggestion_title' => esc_attr__( 'Click to accept this suggestion.', 'wpforms-lite' ),
 			'val_email_restricted'       => wpforms_setting( 'validation-email-restricted', esc_html__( 'This email address is not allowed.', 'wpforms-lite' ) ),
 			'val_number'                 => wpforms_setting( 'validation-number', esc_html__( 'Please enter a valid number.', 'wpforms-lite' ) ),
+			'val_number_positive'        => wpforms_setting( 'validation-number-positive', esc_html__( 'Please enter a valid positive number.', 'wpforms-lite' ) ),
 			'val_confirm'                => wpforms_setting( 'validation-confirm', esc_html__( 'Field values do not match.', 'wpforms-lite' ) ),
 			'val_fileextension'          => wpforms_setting( 'validation-fileextension', esc_html__( 'File type is not allowed.', 'wpforms-lite' ) ),
 			'val_filesize'               => wpforms_setting( 'validation-filesize', esc_html__( 'File exceeds max size allowed. File was not uploaded.', 'wpforms-lite' ) ),
@@ -1335,8 +1398,8 @@ class WPForms_Frontend {
 			'val_creditcard'             => wpforms_setting( 'validation-creditcard', esc_html__( 'Please enter a valid credit card number.', 'wpforms-lite' ) ),
 			'val_post_max_size'          => wpforms_setting( 'validation-post_max_size', esc_html__( 'The total size of the selected files {totalSize} Mb exceeds the allowed limit {maxSize} Mb.', 'wpforms-lite' ) ),
 			'val_checklimit'             => wpforms_setting( 'validation-check-limit', esc_html__( 'You have exceeded the number of allowed selections: {#}.', 'wpforms-lite' ) ),
-			'val_limit_characters'       => esc_html__( '{count} of {limit} max characters.', 'wpforms-lite' ),
-			'val_limit_words'            => esc_html__( '{count} of {limit} max words.', 'wpforms-lite' ),
+			'val_limit_characters'       => wpforms_setting( 'validation-character-limit', esc_html__( '{count} of {limit} max characters.', 'wpforms-lite' ) ),
+			'val_limit_words'            => wpforms_setting( 'validation-word-limit', esc_html__( '{count} of {limit} max words.', 'wpforms-lite' ) ),
 			'val_recaptcha_fail_msg'     => wpforms_setting( 'recaptcha-fail-msg', esc_html__( 'Google reCAPTCHA verification failed, please try again later.', 'wpforms-lite' ) ),
 			'val_empty_blanks'           => wpforms_setting( 'validation-input-mask-incomplete', esc_html__( 'Please fill out all blanks.', 'wpforms-lite' ) ),
 			'post_max_size'              => wpforms_size_to_bytes( ini_get( 'post_max_size' ) ),
@@ -1348,7 +1411,9 @@ class WPForms_Frontend {
 			'mailcheck_enabled'          => (bool) apply_filters( 'wpforms_mailcheck_enabled', true ),
 			'mailcheck_domains'          => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_domains', array() ) ),
 			'mailcheck_toplevel_domains' => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_toplevel_domains', array( 'dev' ) ) ),
+			'is_ssl'                     => is_ssl(),
 		);
+
 		// Include payment related strings if needed.
 		if ( function_exists( 'wpforms_get_currencies' ) ) {
 			$currency                       = wpforms_setting( 'currency', 'USD' );
@@ -1378,7 +1443,10 @@ class WPForms_Frontend {
 	 */
 	public function footer_end() {
 
-		if ( ( empty( $this->forms ) && ! $this->assets_global() ) || wpforms_is_amp() ) {
+		if (
+			( empty( $this->forms ) && ! $this->assets_global() ) ||
+			wpforms_is_amp()
+		) {
 			return;
 		}
 
@@ -1406,31 +1474,36 @@ class WPForms_Frontend {
 	 * specific pages, etc.
 	 *
 	 * @since 1.4.5
+	 * @since 1.6.4 Added hCaptcha support.
 	 */
 	public function recaptcha_noconflict() {
 
-		$noconflict = wpforms_setting( 'recaptcha-noconflict' );
+		$captcha_settings = wpforms_get_captcha_settings();
 
-		if ( empty( $noconflict ) ) {
+		if (
+			empty( wpforms_setting( 'recaptcha-noconflict' ) ) ||
+			empty( $captcha_settings['provider'] ) ||
+			'none' === $captcha_settings['provider'] ||
+			! apply_filters( 'wpforms_frontend_recaptcha_noconflict', true )
+		) {
 			return;
 		}
 
-		if ( ! apply_filters( 'wpforms_frontend_recaptcha_noconflict', true ) ) {
-			return;
-		}
+		$scripts = wp_scripts();
+		$urls    = [ 'google.com/recaptcha', 'gstatic.com/recaptcha', 'hcaptcha.com/1' ];
 
-		global $wp_scripts;
+		foreach ( $scripts->queue as $handle ) {
 
-		$urls = array( 'google.com/recaptcha', 'gstatic.com/recaptcha' );
-
-		foreach ( $wp_scripts->queue as $handle ) {
-
-			if ( false !== strpos( $wp_scripts->registered[ $handle ]->handle, 'wpforms' ) ) {
+			// Skip the WPForms javascript-assets.
+			if (
+				! isset( $scripts->registered[ $handle ] ) ||
+				false !== strpos( $scripts->registered[ $handle ]->handle, 'wpforms' )
+			) {
 				return;
 			}
 
 			foreach ( $urls as $url ) {
-				if ( false !== strpos( $wp_scripts->registered[ $handle ]->src, $url ) ) {
+				if ( false !== strpos( $scripts->registered[ $handle ]->src, $url ) ) {
 					wp_dequeue_script( $handle );
 					wp_deregister_script( $handle );
 					break;
@@ -1463,5 +1536,94 @@ class WPForms_Frontend {
 		$this->output( $atts['id'], $atts['title'], $atts['description'] );
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Inline a script to check if our main js is loaded and display a warning message otherwise.
+	 *
+	 * @since 1.6.4.1
+	 */
+	public function missing_assets_error_js() {
+
+		if ( ! wpforms_current_user_can() || wpforms_is_amp() ) {
+			return;
+		}
+
+		printf( $this->get_missing_assets_error_script(), $this->get_missing_assets_error_message() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/**
+	 * Get missing assets error script.
+	 *
+	 * @since 1.6.4.1
+	 *
+	 * @return string
+	 */
+	private function get_missing_assets_error_script() {
+
+		return "<script>
+				( function() {
+					function wpforms_js_error_loading() {
+						
+						if ( typeof window.wpforms !== 'undefined' ) {
+							return;
+						}
+						
+						var forms = document.querySelectorAll( '.wpforms-form' );
+						
+						if ( ! forms.length ) {
+							return;
+						}
+						
+						var error = document.createElement( 'div' );
+
+						error.classList.add( 'wpforms-error-container' );
+						error.innerHTML = '%s';
+
+						forms.forEach( function( form ) {
+						
+							if ( ! form.querySelector( '.wpforms-error-container' ) ) {
+								form.insertBefore( error.cloneNode( true ), form.firstChild );
+							}
+						} );
+					};
+				
+					if ( document.readyState === 'loading' ) {
+						document.addEventListener( 'DOMContentLoaded', wpforms_js_error_loading );
+					} else {
+						wpforms_js_error_loading();
+					}
+				}() );
+			</script>";
+	}
+
+	/**
+	 * Get missing assets error message.
+	 *
+	 * @since 1.6.4.1
+	 *
+	 * @return string
+	 */
+	private function get_missing_assets_error_message() {
+
+		$message = wp_kses(
+			sprintf( /* translators: %s - URL to the troubleshooting guide. */
+				__( 'Heads up! WPForms has detected an issue with JavaScript on this page. JavaScript is required for this form to work properly, so this form may not work as expected. See our <a href="%s" target="_blank" rel="noopener noreferrer">troubleshooting guide</a> to learn more or contact support.', 'wpforms-lite' ),
+				'https://wpforms.com/docs/getting-support-wpforms/'
+			),
+			[
+				'a' => [
+					'href'   => [],
+					'target' => [],
+					'rel'    => [],
+				],
+			]
+		);
+
+		$message .= '<p>';
+		$message .= esc_html__( 'This message is only displayed to site administrators.', 'wpforms-lite' );
+		$message .= '</p>';
+
+		return $message;
 	}
 }

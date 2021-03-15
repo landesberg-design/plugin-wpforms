@@ -751,7 +751,8 @@ body {
 	border-bottom: 1px solid #d3d3d3;
 }
 
-#wpforms-builder .wpforms-panel-content-section-title button {
+#wpforms-builder .wpforms-panel-content-section-title button,
+#wpforms-builder .wpforms-panel-content-section-title .button {
 	background-color: #0e6cad;
 	color: #fff;
 	border: none;

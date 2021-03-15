@@ -253,7 +253,7 @@ class Edit {
 				'wpforms-maskedinput',
 				WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.min.js',
 				[ 'jquery' ],
-				'5.0.5',
+				'5.0.6',
 				true
 			);
 		}

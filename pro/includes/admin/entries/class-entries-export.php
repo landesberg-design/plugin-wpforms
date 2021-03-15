@@ -149,9 +149,7 @@ class WPForms_Entries_Export {
 
 		ignore_user_abort( true );
 
-		if ( ! in_array( 'set_time_limit', explode( ',', ini_get( 'disable_functions' ) ), true ) ) {
-			set_time_limit( 0 );
-		}
+		wpforms_set_time_limit();
 
 		if ( ! $this->is_single_entry() ) {
 			$file_name = 'wpforms-' . sanitize_file_name( get_the_title( $this->form_id ) ) . '-' . date( 'm-d-Y' ) . '.csv';

@@ -79,7 +79,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		);
 
 		// Default number of forms to show per page.
-		$this->per_page = apply_filters( 'wpforms_entries_per_page', 30 );
+		$this->per_page = wpforms()->entry->get_count_per_page();
 	}
 
 	/**
@@ -979,13 +979,15 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	protected function display_bulk_action_message() {
 
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$bulk_counts = array(
 			'read'      => isset( $_REQUEST['read'] ) ? absint( $_REQUEST['read'] ) : 0,
 			'unread'    => isset( $_REQUEST['unread'] ) ? absint( $_REQUEST['unread'] ) : 0,
 			'starred'   => isset( $_REQUEST['starred'] ) ? absint( $_REQUEST['starred'] ) : 0,
 			'unstarred' => isset( $_REQUEST['unstarred'] ) ? absint( $_REQUEST['unstarred'] ) : 0,
-			'deleted'   => isset( $_REQUEST['deleted'] ) ? absint( $_REQUEST['deleted'] ) : 0,
+			'deleted'   => isset( $_REQUEST['deleted'] ) ? (int) $_REQUEST['deleted'] : 0,
 		);
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		$bulk_messages = array(
 			/* translators: %d - number of processed entries. */
@@ -999,6 +1001,10 @@ class WPForms_Entries_Table extends WP_List_Table {
 			/* translators: %d - number of processed entries. */
 			'deleted'   => _n( '%d entry was successfully deleted.', '%d entries were successfully deleted.', $bulk_counts['deleted'] ),
 		);
+
+		if ( -1 === $bulk_counts['deleted'] ) {
+			$bulk_messages['deleted'] = esc_html__( 'All entries for the currently selected form were successfully deleted.', 'wpforms' );
+		}
 
 		// Leave only non-zero counts, so only those that were processed are left.
 		$bulk_counts = array_filter( $bulk_counts );
@@ -1112,12 +1118,12 @@ class WPForms_Entries_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Fetch and setup the final data for the table
+	 * Fetch and setup the final data for the table.
 	 *
 	 * @since 1.0.0
 	 * @since 1.5.7 Added an `Entry Notes` column support.
 	 */
-	public function prepare_items() {
+	public function prepare_items() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		// Retrieve count.
 		$this->get_counts();
@@ -1126,7 +1132,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$columns = $this->get_columns();
 
 		// Hidden columns (none).
-		$hidden = array();
+		$hidden = [];
 
 		// Define which columns can be sorted.
 		$sortable = $this->get_sortable_columns();
@@ -1135,32 +1141,32 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$primary = key( array_slice( $columns, 2, 1 ) );
 
 		// Set column headers.
-		$this->_column_headers = array( $columns, $hidden, $sortable, $primary );
+		$this->_column_headers = [ $columns, $hidden, $sortable, $primary ];
 
 		// Get entries.
 		$total_items = $this->counts['total'];
 		$page        = $this->get_pagenum();
-		$order       = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'DESC';
-		$orderby     = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'entry_id';
+		$order       = isset( $_GET['order'] ) ? sanitize_key( $_GET['order'] ) : 'DESC';
+		$orderby     = isset( $_GET['orderby'] ) ? sanitize_key( $_GET['orderby'] ) : 'entry_id';
 		$per_page    = $this->get_items_per_page( 'wpforms_entries_per_page', $this->per_page );
-		$data_args   = array(
+		$data_args   = [
 			'form_id' => $this->form_id,
 			'number'  => $per_page,
 			'offset'  => $per_page * ( $page - 1 ),
 			'order'   => $order,
 			'orderby' => $orderby,
-		);
+		];
 
-		if ( ! empty( $_GET['type'] ) && 'starred' === $_GET['type'] ) {
+		if ( ! empty( $_GET['type'] ) && $_GET['type'] === 'starred' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$data_args['starred'] = '1';
 			$total_items          = $this->counts['starred'];
 		}
-		if ( ! empty( $_GET['type'] ) && 'unread' === $_GET['type'] ) {
+		if ( ! empty( $_GET['type'] ) && $_GET['type'] === 'unread' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$data_args['viewed'] = '0';
 			$total_items         = $this->counts['unread'];
 		}
 		if ( ! empty( $_GET['status'] ) ) {
-			$data_args['status'] = sanitize_text_field( $_GET['status'] );
+			$data_args['status'] = sanitize_text_field( $_GET['status'] ); // phpcs:ignore WordPress.Security
 			$total_items         = $this->counts['abandoned'];
 		}
 
@@ -1172,9 +1178,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$data      = wpforms()->entry->get_entries( $data_args );
 
 		// Maybe sort by payment total.
-		if ( 'payment_total' === $orderby ) {
-			usort( $data, array( $this, 'payment_total_sort' ) );
-			if ( 'DESC' === strtoupper( $order ) ) {
+		if ( $orderby === 'payment_total' ) {
+			usort( $data, [ $this, 'payment_total_sort' ] );
+			if ( strtoupper( $order ) === 'DESC' ) {
 				$data = array_reverse( $data );
 			}
 		}
@@ -1184,11 +1190,11 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		// Finalize pagination.
 		$this->set_pagination_args(
-			array(
+			[
 				'total_items' => $total_items,
-				'per_page'    => $per_page,
 				'total_pages' => ceil( $total_items / $per_page ),
-			)
+				'per_page'    => $per_page,
+			]
 		);
 	}
 

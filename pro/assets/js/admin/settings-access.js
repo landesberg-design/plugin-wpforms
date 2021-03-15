@@ -1,4 +1,4 @@
-/* globals wpforms_admin, wpforms_settings_access */
+/* global wpforms_admin, wpforms_settings_access */
 /**
  * WPForms Settings Access function.
  *

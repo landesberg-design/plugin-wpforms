@@ -540,7 +540,7 @@ class WPForms_Field_Email extends WPForms_Field {
 			wpforms()->process->errors[ $form_id ][ $field_id ]['primary'] = esc_html__( 'The provided email is not valid.', 'wpforms-lite' );
 		} elseif ( isset( $field_submit['primary'] ) && isset( $field_submit['secondary'] ) && $field_submit['secondary'] !== $field_submit['primary'] ) {
 			wpforms()->process->errors[ $form_id ][ $field_id ]['secondary'] = esc_html__( 'The provided emails do not match.', 'wpforms-lite' );
-		} elseif ( ! empty( $field_submit['primary'] && ! empty( $form_data['fields'][ $field_id ] ) && ! $this->is_restricted_email( $field_submit['primary'], $form_data['fields'][ $field_id ] ) ) ) {
+		} elseif ( ! empty( $field_submit['primary'] ) && ! empty( $form_data['fields'][ $field_id ] ) && ! $this->is_restricted_email( $field_submit['primary'], $form_data['fields'][ $field_id ] ) ) {
 			wpforms()->process->errors[ $form_id ][ $field_id ]['primary'] = wpforms_setting( 'validation-email-restricted', esc_html__( 'This email address is not allowed.', 'wpforms-lite' ) );
 		}
 	}
@@ -664,5 +664,3 @@ class WPForms_Field_Email extends WPForms_Field {
 		return '^' . str_replace( [ '.', '*' ], [ '\.', '.*' ], $pattern ) . '$';
 	}
 }
-
-new WPForms_Field_Email();

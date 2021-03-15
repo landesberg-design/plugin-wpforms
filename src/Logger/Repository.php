@@ -35,6 +35,15 @@ class Repository {
 	private $records;
 
 	/**
+	 * Get not-limited total query.
+	 *
+	 * @since {VESRION}
+	 *
+	 * @var int
+	 */
+	private $full_total;
+
+	/**
 	 * Log constructor.
 	 *
 	 * @since 1.6.3
@@ -44,6 +53,7 @@ class Repository {
 	public function __construct( $records_query ) {
 
 		$this->records_query = $records_query;
+		$this->full_total    = false;
 		$this->records       = new Records();
 	}
 
@@ -124,8 +134,9 @@ class Repository {
 	 */
 	public function records( $limit, $offset = 0, $search = '', $type = '' ) {
 
-		$data    = $this->records_query->get( $limit, $offset, $search, $type );
-		$records = new Records();
+		$data             = $this->records_query->get( $limit, $offset, $search, $type );
+		$this->full_total = true;
+		$records          = new Records();
 		// As we got raw data we need to convert to Record.
 		foreach ( $data as $row ) {
 			$records->push(
@@ -221,6 +232,22 @@ class Repository {
 	}
 
 	/**
+	 * Check if the database table exist.
+	 *
+	 * @since 1.6.4
+	 *
+	 * @return bool
+	 */
+	public function table_exists() {
+
+		global $wpdb;
+
+		$table = self::get_table_name();
+
+		return $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+	}
+
+	/**
 	 * Get total count of logs.
 	 *
 	 * @since 1.6.3
@@ -234,7 +261,7 @@ class Repository {
 		$total = wp_cache_get( self::CACHE_TOTAL_KEY );
 		if ( ! $total ) {
 			//phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
-			$total = $wpdb->get_var( 'SELECT COUNT(ID) FROM ' . self::get_table_name() );
+			$total = $this->full_total ? $wpdb->get_var( 'SELECT FOUND_ROWS()' ) : $wpdb->get_var( 'SELECT COUNT(ID) FROM ' . self::get_table_name() );
 			//phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
 			wp_cache_set( self::CACHE_TOTAL_KEY, $total, 'wpforms', DAY_IN_SECONDS );
 		}

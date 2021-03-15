@@ -152,12 +152,15 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 				esc_html__( 'Enable anti-spam protection', 'wpforms-lite' )
 			);
 
-			$recaptcha_key    = wpforms_setting( 'recaptcha-site-key' );
-			$recaptcha_secret = wpforms_setting( 'recaptcha-secret-key' );
-			$recaptcha_type   = wpforms_setting( 'recaptcha-type', 'v2' );
-
-			if ( ! empty( $recaptcha_key ) && ! empty( $recaptcha_secret ) ) {
-				switch ( $recaptcha_type ) {
+			$captcha_settings = wpforms_get_captcha_settings();
+			if (
+				! empty( $captcha_settings['provider'] ) &&
+				'none' !== $captcha_settings['provider'] &&
+				! empty( $captcha_settings['site_key'] ) &&
+				! empty( $captcha_settings['secret_key'] )
+			) {
+				$lbl = '';
+				switch ( $captcha_settings['recaptcha_type'] ) {
 					case 'v2':
 						$lbl = esc_html__( 'Enable Google Checkbox v2 reCAPTCHA', 'wpforms-lite' );
 						break;
@@ -168,12 +171,19 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 						$lbl = esc_html__( 'Enable Google v3 reCAPTCHA', 'wpforms-lite' );
 						break;
 				}
+
+				$lbl = 'hcaptcha' === $captcha_settings['provider'] ? esc_html__( 'Enable hCaptcha', 'wpforms-lite' ) : $lbl;
 				wpforms_panel_field(
 					'checkbox',
 					'settings',
 					'recaptcha',
 					$this->form_data,
-					$lbl
+					$lbl,
+					[
+						'data' => [
+							'provider' => $captcha_settings['provider'],
+						],
+					]
 				);
 			}
 			wpforms_panel_field(
@@ -183,7 +193,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 				$this->form_data,
 				esc_html__( 'Enable dynamic fields population', 'wpforms-lite' ),
 				array(
-					'tooltip' => '<a href="https://developers.wpforms.com/docs/enable-dynamic-field-population/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to use Dynamic Field Population', 'wpforms-lite' ) . '</a>',
+					'tooltip' => '<a href="https://wpforms.com/developers/how-to-enable-dynamic-field-population/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to use Dynamic Field Population', 'wpforms-lite' ) . '</a>',
 				)
 			);
 			wpforms_panel_field(

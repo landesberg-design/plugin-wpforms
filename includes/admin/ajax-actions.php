@@ -28,7 +28,9 @@ function wpforms_save_form() {
 	}
 
 	$form_post = json_decode( stripslashes( $_POST['data'] ) ); // phpcs:ignore
-	$data      = array();
+	$data      = [
+		'fields' => [],
+	];
 
 	if ( ! is_null( $form_post ) && $form_post ) {
 		foreach ( $form_post as $post_input_data ) {
@@ -42,7 +44,7 @@ function wpforms_save_form() {
 				$array_bits = array_merge( $array_bits, explode( '][', $matches[3] ) );
 			}
 
-			$new_post_data = array();
+			$new_post_data = [];
 
 			// Build the new array value from leaf to trunk.
 			for ( $i = count( $array_bits ) - 1; $i >= 0; $i -- ) {

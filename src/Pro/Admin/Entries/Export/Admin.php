@@ -79,6 +79,8 @@ class Admin {
 						<?php $this->display_additional_info_block(); ?>
 					</section>
 
+					<?php $this->display_export_options_block(); ?>
+
 					<section class="wp-clearfix" id="wpforms-tools-entries-export-options-date">
 						<h5><?php esc_html_e( 'Custom Date Range', 'wpforms' ); ?></h5>
 						<input type="text" name="date" class="wpforms-date-selector"
@@ -196,7 +198,7 @@ class Admin {
 
 		$i = 0;
 		foreach ( $additional_info_fields as $slug => $label ) {
-			if ( 'geodata' === $slug && ! class_exists( 'WPForms_Geolocation' ) ) {
+			if ( $slug === 'geodata' && ! function_exists( 'wpforms_geolocation' ) ) {
 				continue;
 			}
 			if ( 'pginfo' === $slug && ! ( class_exists( 'WPForms_Paypal_Standard' ) || function_exists( 'wpforms_stripe' ) ) ) {
@@ -211,6 +213,39 @@ class Admin {
 			);
 			$i ++;
 		}
+	}
+
+	/**
+	 * Export options block.
+	 *
+	 * @since 1.6.5
+	 */
+	private function display_export_options_block() {
+
+		$export_option  = $this->export->data['get_args']['export_options'];
+		$export_options = $this->export->export_options_fields;
+
+		if ( empty( $export_options ) ) {
+			return;
+		}
+
+		echo '<section class="wp-clearfix" id="wpforms-tools-entries-export-options-type-info">';
+		echo '<h5>' . esc_html__( 'Export Options', 'wpforms' ) . '</h5>';
+
+		$i = 0;
+
+		foreach ( $export_options as $slug => $label ) {
+			printf(
+				'<label><input type="checkbox" name="export_options[%d]" value="%s"%s> %s</label>',
+				(int) $i,
+				esc_attr( $slug ),
+				esc_attr( $this->get_checked_property( $slug, $export_option, '' ) ),
+				esc_html( $label )
+			);
+			$i ++;
+		}
+
+		echo '</section>';
 	}
 
 	/**

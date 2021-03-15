@@ -1,4 +1,4 @@
-/* globals wpforms_admin, wpforms_admin_edit_entry, wpf, wpforms */
+/* global wpforms_admin, wpforms_admin_edit_entry, wpf, wpforms */
 /**
  * WPForms Edit Entry function.
  *

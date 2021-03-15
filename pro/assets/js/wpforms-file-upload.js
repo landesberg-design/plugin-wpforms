@@ -538,7 +538,16 @@
 
 			file.status = 'error';
 
-			addErrorMessage( file, response );
+			if ( ! file.xhr ) {
+				var errorMessage = window.wpforms_file_upload.errors.file_not_uploaded;
+
+				if ( response.statusText ) {
+					errorMessage += ' ' + response.statusText + '.';
+				}
+
+				file.previewElement.classList.add( 'dz-processing', 'dz-error', 'dz-complete' );
+				addErrorMessage( file, errorMessage );
+			}
 
 			dz.processQueue();
 		} );
@@ -640,6 +649,12 @@
 			if ( file.isErrorNotUploadedDisplayed ) {
 				return;
 			}
+
+			if ( typeof errorMessage === 'object' ) {
+				errorMessage = Object.prototype.hasOwnProperty.call( errorMessage, 'data' ) && typeof errorMessage.data === 'string' ? errorMessage.data : '';
+			}
+
+			errorMessage = errorMessage !== '0' ? errorMessage : '';
 
 			file.isErrorNotUploadedDisplayed = true;
 			file.previewElement.querySelectorAll( '[data-dz-errormessage]' )[0].textContent = window.wpforms_file_upload.errors.file_not_uploaded + ' ' + errorMessage;

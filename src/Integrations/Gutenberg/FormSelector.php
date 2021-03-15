@@ -49,35 +49,56 @@ class FormSelector implements IntegrationInterface {
 	 */
 	public function register_block() {
 
-		\wp_register_style(
-			'wpforms-gutenberg-form-selector',
-			WPFORMS_PLUGIN_URL . 'assets/css/wpforms-full.css',
-			array( 'wp-edit-blocks' ),
-			WPFORMS_VERSION
-		);
+		$css_file            = false;
+		$disable_css_setting = wpforms_setting( 'disable-css', '1' );
+		$min                 = wpforms_get_min_suffix();
 
-		$attributes = array(
-			'formId'       => array(
+		if ( is_admin() ) {
+			\wp_enqueue_style(
+				'wpforms-integrations',
+				WPFORMS_PLUGIN_URL . "assets/css/admin-integrations{$min}.css",
+				[],
+				WPFORMS_VERSION
+			);
+		}
+
+		if ( '1' === $disable_css_setting ) {
+			$css_file = 'full';
+		} elseif ( '2' === $disable_css_setting ) {
+			$css_file = 'base';
+		}
+
+		if ( $css_file ) {
+			\wp_register_style(
+				'wpforms-gutenberg-form-selector',
+				WPFORMS_PLUGIN_URL . "assets/css/wpforms-{$css_file}{$min}.css",
+				[ 'wp-edit-blocks' ],
+				WPFORMS_VERSION
+			);
+		}
+
+		$attributes = [
+			'formId'       => [
 				'type' => 'string',
-			),
-			'displayTitle' => array(
+			],
+			'displayTitle' => [
 				'type' => 'boolean',
-			),
-			'displayDesc'  => array(
+			],
+			'displayDesc'  => [
 				'type' => 'boolean',
-			),
-			'className'    => array(
+			],
+			'className'    => [
 				'type' => 'string',
-			),
-		);
+			],
+		];
 
 		\register_block_type(
 			'wpforms/form-selector',
-			array(
+			[
 				'attributes'      => \apply_filters( 'wpforms_gutenberg_form_selector_attributes', $attributes ),
-				'editor_style'    => 'wpforms-gutenberg-form-selector',
-				'render_callback' => array( $this, 'get_form_html' ),
-			)
+				'editor_style'    => $css_file ? 'wpforms-gutenberg-form-selector' : '',
+				'render_callback' => [ $this, 'get_form_html' ],
+			]
 		);
 	}
 
@@ -106,6 +127,10 @@ class FormSelector implements IntegrationInterface {
 			'panel_notice_text' => \esc_html__( 'Do not forget to test your form.', 'wpforms-lite' ),
 			'panel_notice_link' => \esc_html__( 'Check out our complete guide!', 'wpforms-lite' ),
 		);
+
+		if ( version_compare( $GLOBALS['wp_version'], '5.1.1', '<=' ) ) {
+			array_pop( $i18n['form_keywords'] );
+		}
 
 		\wp_enqueue_script(
 			'wpforms-gutenberg-form-selector',

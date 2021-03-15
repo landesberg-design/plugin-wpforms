@@ -187,11 +187,6 @@ class WPForms_Settings {
 				'form'   => true,
 				'submit' => esc_html__( 'Save Settings', 'wpforms-lite' ),
 			],
-			'recaptcha'    => [
-				'name'   => esc_html__( 'reCAPTCHA', 'wpforms-lite' ),
-				'form'   => true,
-				'submit' => esc_html__( 'Save Settings', 'wpforms-lite' ),
-			],
 			'validation'   => [
 				'name'   => esc_html__( 'Validation', 'wpforms-lite' ),
 				'form'   => true,
@@ -199,6 +194,11 @@ class WPForms_Settings {
 			],
 			'integrations' => [
 				'name'   => esc_html__( 'Integrations', 'wpforms-lite' ),
+				'form'   => false,
+				'submit' => false,
+			],
+			'geolocation'  => [
+				'name'   => esc_html__( 'Geolocation', 'wpforms-lite' ),
 				'form'   => false,
 				'submit' => false,
 			],
@@ -369,62 +369,6 @@ class WPForms_Settings {
 					'type' => 'checkbox',
 				],
 			],
-			// Recaptcha settings tab.
-			'recaptcha'    => [
-				'recaptcha-heading'      => [
-					'id'       => 'recaptcha-heading',
-					'content'  => '<h4>' . esc_html__( 'reCAPTCHA', 'wpforms-lite' ) . '</h4>' . $this->get_recaptcha_field_desc(),
-					'type'     => 'content',
-					'no_label' => true,
-					'class'    => [ 'section-heading' ],
-				],
-				'recaptcha-type'         => [
-					'id'      => 'recaptcha-type',
-					'name'    => esc_html__( 'Type', 'wpforms-lite' ),
-					'type'    => 'radio',
-					'default' => 'v2',
-					'options' => [
-						'v2'        => esc_html__( 'Checkbox reCAPTCHA v2', 'wpforms-lite' ),
-						'invisible' => esc_html__( 'Invisible reCAPTCHA v2', 'wpforms-lite' ),
-						'v3'        => esc_html__( 'reCAPTCHA v3', 'wpforms-lite' ),
-					],
-				],
-				'recaptcha-site-key'     => [
-					'id'   => 'recaptcha-site-key',
-					'name' => esc_html__( 'Site Key', 'wpforms-lite' ),
-					'type' => 'text',
-				],
-				'recaptcha-secret-key'   => [
-					'id'   => 'recaptcha-secret-key',
-					'name' => esc_html__( 'Secret Key', 'wpforms-lite' ),
-					'type' => 'text',
-				],
-				'recaptcha-fail-msg'     => [
-					'id'      => 'recaptcha-fail-msg',
-					'name'    => esc_html__( 'Fail Message', 'wpforms-lite' ),
-					'desc'    => esc_html__( 'Displays to users who fail the reCAPTCHA verification process.', 'wpforms-lite' ),
-					'type'    => 'text',
-					'default' => esc_html__( 'Google reCAPTCHA verification failed, please try again later.', 'wpforms-lite' ),
-				],
-				'recaptcha-v3-threshold' => [
-					'id'      => 'recaptcha-v3-threshold',
-					'name'    => esc_html__( 'Score Threshold', 'wpforms-lite' ),
-					'desc'    => esc_html__( 'reCAPTCHA v3 returns a score (1.0 is very likely a good interaction, 0.0 is very likely a bot). If the score less than or equal to this threshold, the form submission will be blocked and the message above will be displayed.', 'wpforms-lite' ),
-					'type'    => 'number',
-					'attr'    => [
-						'step' => '0.1',
-						'min'  => '0.0',
-						'max'  => '1.0',
-					],
-					'default' => esc_html__( '0.4', 'wpforms-lite' ),
-				],
-				'recaptcha-noconflict'   => [
-					'id'   => 'recaptcha-noconflict',
-					'name' => esc_html__( 'No-Conflict Mode', 'wpforms-lite' ),
-					'desc' => esc_html__( 'Check this option if you need to forcefully remove other reCAPTCHA occurrences in order to prevent conflicts. Only enable this option if your site is having compatibility issues or instructed by support.', 'wpforms-lite' ),
-					'type' => 'checkbox',
-				],
-			],
 			// Validation messages settings tab.
 			'validation'   => [
 				'validation-heading'               => [
@@ -476,6 +420,12 @@ class WPForms_Settings {
 					'type'    => 'text',
 					'default' => esc_html__( 'Please enter a valid number.', 'wpforms-lite' ),
 				],
+				'validation-number-positive'       => [
+					'id'      => 'validation-number-positive',
+					'name'    => esc_html__( 'Number Positive', 'wpforms-lite' ),
+					'type'    => 'text',
+					'default' => esc_html__( 'Please enter a valid positive number.', 'wpforms-lite' ),
+				],
 				'validation-confirm'               => [
 					'id'      => 'validation-confirm',
 					'name'    => esc_html__( 'Confirm Value', 'wpforms-lite' ),
@@ -493,6 +443,18 @@ class WPForms_Settings {
 					'name'    => esc_html__( 'Checkbox Selection Limit', 'wpforms-lite' ),
 					'type'    => 'text',
 					'default' => esc_html__( 'You have exceeded the number of allowed selections: {#}.', 'wpforms-lite' ),
+				],
+				'validation-character-limit'       => [
+					'id'      => 'validation-character-limit',
+					'name'    => esc_html__( 'Character Limit', 'wpforms-lite' ),
+					'type'    => 'text',
+					'default' => esc_html__( 'Limit is {limit} characters. Characters remaining: {remaining}.', 'wpforms-lite' ),
+				],
+				'validation-word-limit'            => [
+					'id'      => 'validation-word-limit',
+					'name'    => esc_html__( 'Word Limit', 'wpforms-lite' ),
+					'type'    => 'text',
+					'default' => esc_html__( 'Limit is {limit} words. Words remaining: {remaining}.', 'wpforms-lite' ),
 				],
 			],
 			// Provider integrations settings tab.
@@ -556,55 +518,6 @@ class WPForms_Settings {
 		}
 
 		return empty( $view ) ? $defaults : $defaults[ $view ];
-	}
-
-	/**
-	 * Some heading descriptions, like for reCAPTCHA, are long so we define them separately.
-	 *
-	 * @since 1.6.0
-	 *
-	 * @return string
-	 */
-	private function get_recaptcha_field_desc() {
-
-		return '<p>' . esc_html__( 'reCAPTCHA is a free anti-spam service from Google which helps to protect your website from spam and abuse while letting real people pass through with ease.', 'wpforms-lite' ) . '</p>' .
-			'<p>' . esc_html__( 'Google offers 3 versions of reCAPTCHA (all supported within WPForms):', 'wpforms-lite' ) . '</p>' .
-			'<ul style="list-style: disc;margin-left: 20px;">' .
-				'<li>' .
-					wp_kses(
-						__( '<strong>v2 Checkbox reCAPTCHA</strong>: Prompts users to check a box to prove they\'re human.', 'wpforms-lite' ),
-						[ 'strong' => [] ]
-					) .
-				'</li>' .
-				'<li>' .
-					wp_kses(
-						__( '<strong>v2 Invisible reCAPTCHA</strong>: Uses advanced technology to detect real users without requiring any input.', 'wpforms-lite' ),
-						[ 'strong' => [] ]
-					) .
-				'</li>' .
-				'<li>' .
-					wp_kses(
-						__( '<strong>v3 reCAPTCHA</strong>: Uses a behind-the-scenes scoring system to detect abusive traffic, and lets you decide the minimum passing score. Recommended for advanced use only (or if using Google AMP).', 'wpforms-lite' ),
-						[ 'strong' => [] ]
-					) .
-				'</li>' .
-			'</ul>' .
-			'<p>' . esc_html__( 'Sites already using one type of reCAPTCHA will need to create new site keys before switching to a different option.', 'wpforms-lite' ) . '</p>' .
-			'<p>' .
-				sprintf(
-					wp_kses( /* translators: %s - WPForms.com Setup Captcha URL. */
-						__( '<a href="%s" target="_blank" rel="noopener noreferrer">Read our walk through</a> to learn more and for step-by-step directions.', 'wpforms-lite' ),
-						[
-							'a' => [
-								'href'   => [],
-								'target' => [],
-								'rel'    => [],
-							],
-						]
-					),
-					'https://wpforms.com/docs/setup-captcha-wpforms/'
-				) .
-			'</p></ul>';
 	}
 
 	/**

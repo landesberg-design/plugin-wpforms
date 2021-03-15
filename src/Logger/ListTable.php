@@ -506,12 +506,24 @@ class ListTable extends WP_List_Table {
 
 		$this->prepare_column_headers();
 		$this->prepare_items();
-		echo '<div class="wpforms-list-table">';
+		echo '<div class="wpforms-list-table wpforms-list-table--logs">';
 		echo '<form id="' . esc_attr( $this->_args['plural'] ) . '-filter" method="get">';
 		$this->header();
 		parent::display();
 		echo '</form>';
 		echo '</div>';
+	}
+
+	/**
+	 * Check if the database table exist.
+	 *
+	 * @since 1.6.4
+	 *
+	 * @return bool
+	 */
+	public function table_exists() {
+
+		return $this->repository->table_exists();
 	}
 
 	/**

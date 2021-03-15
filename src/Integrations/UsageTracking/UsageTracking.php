@@ -202,6 +202,9 @@ class UsageTracking implements IntegrationInterface {
 					'recaptcha-site-key',
 					'recaptcha-secret-key',
 					'recaptcha-fail-msg',
+					'hcaptcha-site-key',
+					'hcaptcha-secret-key',
+					'hcaptcha-fail-msg',
 				]
 			)
 		);

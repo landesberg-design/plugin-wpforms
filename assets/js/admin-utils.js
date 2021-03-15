@@ -634,7 +634,29 @@ var wpf = {
 			position: 'right',
 			maxWidth: 300,
 			multiple: true,
-			interactive: true
+			interactive: true,
+			debug: false,
+			IEmin: 11,
+		} );
+	},
+
+	/**
+	 * Restore WPForms admin area tooltip's title.
+	 *
+	 * @since 1.6.5
+	 *
+	 * @param {mixed} $scope Searching scope.
+	 */
+	restoreTooltips: function( $scope ) {
+
+		$scope = typeof $scope !== 'undefined' && $scope && $scope.length > 0 ? $scope.find( '.wpforms-help-tooltip' ) : jQuery( '.wpforms-help-tooltip' );
+		$scope.each( function() {
+			var $this = jQuery( this );
+			if ( jQuery.tooltipster.instances( this ).length !== 0 ) {
+
+				// Restoring title.
+				$this.attr( 'title', $this.tooltipster( 'content' ) );
+			}
 		} );
 	},
 

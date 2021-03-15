@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro;
 
+use WPForms\Pro\Integrations\TranslationsPress\Translations;
+
 /**
  * Class Migrations handles Pro plugin upgrade routines.
  *
@@ -112,6 +114,10 @@ class Migrations {
 
 		if ( version_compare( $version, '1.5.9', '<' ) ) {
 			$this->v159_upgrade();
+		}
+
+		if ( version_compare( $version, '1.6.5', '<' ) ) {
+			$this->v165_upgrade();
 		}
 	}
 
@@ -439,5 +445,23 @@ class Migrations {
 		}
 
 		echo '<p>' . esc_html__( 'No updates are currently needed.', 'wpforms' ) . '</p>';
+	}
+
+	/**
+	 * Do all the required migrations for WPForms v1.6.5.
+	 *
+	 * @since 1.6.5
+	 */
+	private function v165_upgrade() {
+
+		if ( ! class_exists( Translations::class ) ) {
+			return;
+		}
+
+		$t15s = new Translations();
+
+		if ( $t15s->allow_load() ) {
+			$t15s->download_plugins_translations();
+		}
 	}
 }

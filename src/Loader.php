@@ -72,6 +72,7 @@ class Loader {
 			$this->classes,
 			[
 				'name' => 'Admin\AdminBarMenu',
+				'hook' => 'init',
 			],
 			[
 				'name' => 'Admin\Notifications',
@@ -84,7 +85,6 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\Entries\Export\Export',
-				'hook' => 'admin_init',
 			],
 			[
 				'name' => 'Admin\Challenge',
@@ -100,6 +100,10 @@ class Loader {
 			[
 				'name' => 'Admin\Builder\Help',
 				'id'   => 'builder_help',
+			],
+			[
+				'name' => 'Admin\Settings\Captcha',
+				'hook' => 'admin_init',
 			]
 		);
 	}

@@ -49,7 +49,7 @@ class RecordQuery {
 
 		global $wpdb;
 
-		$sql   = 'SELECT * FROM ' . Repository::get_table_name();
+		$sql   = 'SELECT SQL_CALC_FOUND_ROWS * FROM ' . Repository::get_table_name();
 		$where = [];
 		if ( ! empty( $search ) ) {
 			$where[] = $wpdb->prepare(

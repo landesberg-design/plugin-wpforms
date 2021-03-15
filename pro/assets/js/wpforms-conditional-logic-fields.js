@@ -1,4 +1,4 @@
-/* globals wpforms_conditional_logic */
+/* global wpforms_conditional_logic */
 ( function( $ ) {
 
 	'use strict';
