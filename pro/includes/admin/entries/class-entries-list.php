@@ -320,7 +320,7 @@ class WPForms_Entries_List {
 	public function process_columns() {
 
 		// Check for run switch and data.
-		if ( empty( $_POST['action'] ) || empty( $_POST['form_id'] ) || 'list-columns' !== $_POST['action'] ) {
+		if ( empty( $_POST['action'] ) || empty( $_POST['form_id'] ) || $_POST['action'] !== 'list-columns' ) {
 			return;
 		}
 
@@ -331,16 +331,26 @@ class WPForms_Entries_List {
 
 		$post_id = absint( $_POST['form_id'] );
 
+		// Remove KSES filters before updating meta for forms and their fields which contain HTML.
+		// If we don't do this, forms for users who don't have 'unfiltered_html' capabilities can get corrupt due to conflicts with wp_kses().
+		kses_remove_filters();
+
 		// Update or delete.
 		if ( empty( $_POST['fields'] ) ) {
 
-			wpforms()->form->delete_meta( $post_id, 'entry_columns', array( 'cap' => 'view_entries_form_single' ) );
+			wpforms()->form->delete_meta( $post_id, 'entry_columns', [ 'cap' => 'view_entries_form_single' ] );
 
 		} else {
 
 			$fields = array_map( 'intval', $_POST['fields'] );
 
-			wpforms()->form->update_meta( $post_id, 'entry_columns', $fields, array( 'cap' => 'view_entries_form_single' ) );
+			wpforms()->form->update_meta( $post_id, 'entry_columns', $fields, [ 'cap' => 'view_entries_form_single' ] );
+
+		}
+
+		// Re-initialize KSES filters for users who don't have 'unfiltered_html' capabilities.
+		if ( ! current_user_can( 'unfiltered_html' ) ) {
+			kses_init_filters();
 		}
 	}
 
@@ -376,15 +386,24 @@ class WPForms_Entries_List {
 
 		// Check if entries filtered.
 		if ( ! empty( $this->filter['entry_id'] ) ) {
+			array_map( [ WPForms_Field_File_Upload::class, 'delete_uploaded_files_from_entry' ], $this->filter['entry_id'] );
 			$deleted = wpforms()->entry->delete_where_in( 'entry_id', $this->filter['entry_id'] );
 			wpforms()->entry_meta->delete_where_in( 'entry_id', $this->filter['entry_id'] );
 			wpforms()->entry_fields->delete_where_in( 'entry_id', $this->filter['entry_id'] );
 
 		} else {
+			$entries = wpforms()->entry->get_entries(
+				[
+					'select'  => 'entry_ids',
+					'form_id' => $form_id,
+				]
+			);
+
+			array_map( [ WPForms_Field_File_Upload::class, 'delete_uploaded_files_from_entry' ], array_column( $entries, 'entry_id' ) );
 			$deleted = wpforms()->entry->delete_by( 'form_id', $form_id );
 			wpforms()->entry_meta->delete_by( 'form_id', $form_id );
 			wpforms()->entry_fields->delete_by( 'form_id', $form_id );
-			$deleted = $deleted ? -1 : 0;
+			$deleted = $deleted ? - 1 : 0;
 		}
 
 		$redirect_url = ! empty( $_GET['url'] ) ? add_query_arg( 'deleted', $deleted, esc_url_raw( wp_unslash( $_GET['url'] ) ) ) : '';

@@ -160,6 +160,8 @@ class WPForms_Process {
 
 		// CAPTCHA check.
 		$captcha_settings = wpforms_get_captcha_settings();
+		$bypass_captcha   = apply_filters( 'wpforms_process_bypass_captcha', false, $entry, $this->form_data );
+
 		if (
 			! empty( $captcha_settings['provider'] ) &&
 			'none' !== $captcha_settings['provider'] &&
@@ -167,6 +169,7 @@ class WPForms_Process {
 			! empty( $captcha_settings['secret_key'] ) &&
 			isset( $this->form_data['settings']['recaptcha'] ) &&
 			'1' == $this->form_data['settings']['recaptcha'] &&
+			empty( $bypass_captcha ) &&
 			! isset( $_POST['__amp_form_verify'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- No need to check CAPTCHA until form is submitted.
 			&&
 			( ( 'recaptcha' === $captcha_settings['provider'] && 'v3' === $captcha_settings['recaptcha_type'] ) || ! wpforms_is_amp() ) // AMP requires Google reCAPTCHA v3.
@@ -200,17 +203,9 @@ class WPForms_Process {
 			/*
 			 * hCaptcha uses user IP to better detect bots and their attacks on a form.
 			 * Majority of our users have GDPR disabled.
-			 * So we remove this data from the request only when it's not needed:
-			 * 1) when GDPR is enabled AND globally disabled user details storage;
-			 * 2) when GDPR is enabled AND IP address processing is disabled on per form basis.
+			 * So we remove this data from the request only when it's not needed, depending on wpforms_is_collecting_ip_allowed($this->form_data) check.
 			 */
-			if (
-				wpforms_setting( 'gdpr', false ) &&
-				(
-					wpforms_setting( 'gdpr-disable-details', false ) ||
-					! empty( $this->form_data['settings']['disable_ip'] )
-				)
-			) {
+			if ( ! wpforms_is_collecting_ip_allowed( $this->form_data ) ) {
 				unset( $verify_query_arg['remoteip'] );
 			}
 

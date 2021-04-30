@@ -1,6 +1,49 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.6] - 2021-03-30
+### Added
+- Ability to delete uploaded files when editing a form entry.
+- Delete all uploaded files to clean up space when the associated entry is deleted.
+- Support currencies with no decimals.
+- WordPress 5.7 new color scheme compatibility.
+
+### Changed
+- Hide the "Add New Notification" button, when the Notifications were turned off.
+- Allow using 0/false values in choices label for Checkboxes, Multiple Choice, Dropdown fields.
+- Better AJAX form submit error messages handling for the Email field.
+- Refactored Tools page with all of its subpages for easier long-term support.
+- Exclude Page Break, Custom Captcha, HTML, and Section Divider fields from a single entry export file.
+- Updated the WPForms > About Us page.
+- Updated Dropzone lib to 5.8.1 (fixes IE11 issue).
+- Updated DOMPurify lib to 2.2.7.
+- Replaced jQuery.ready() function usage with a recommended way since jQuery 3.0.
+
+### Fixed
+- Front-end slow loading of a form with Conditional Logic, when applied to fields with image choices.
+- Incorrect Edit Entry page layout where fields are rendered, when fields have custom CSS classes that modify the form structure (i.e. by adding columns).
+- HTML layout is broken on the Analytics page for some site languages.
+- Incorrect permission checks for different places in the dashboard and the Form Builder.
+- RTL support for Name, Email, Password, Address, and Date/Time fields.
+- Incorrect total form count value for different user's roles on the Forms Overview page (All Forms).
+- Speed up the Form Builder rendering by loading certain scripts only when the Embed functionality is triggered.
+- Validation for Rating Field is still required even though the selection is still showing.
+- The `iframe` HTML element was not rendered incorrectly in the Twenty Twenty theme.
+- The Checkboxes and Multiple Choice fields CSS issues in Twenty Twenty-One theme.
+- On WordPress 4.9.0-4.9.4 and certain FTP configurations there could be an error while trying to automatically download the translations.
+- Omit Dynamic Choices fields from conditional logic settings.
+- Allowlist/Denylist validation was broken for the Email field in a multi-page form.
+- Error message text was missing or incorrect when an addon installation failed on certain WordPress/server configurations.
+- Correctly format big amounts in the Single Item payment field.
+- Single Item payment field shows an "Amount mismatch" error on the form submit on PHP 8.0.
+- PHP notice generated while exporting a form with the Divider field, which has Conditional Logic.
+- PHP fatal error generated when using `{entry_date format="m/d/Y"}` smart tag in a Notification message of the plugin Lite version.
+- Display the Payment Gateway Information option on the Entries Export page only if any of the payment addons is active.
+- Incorrect WPForms custom capabilities display in the Members plugin.
+- Columns sorting on the Forms Overview page made by non-administrators (using the Access Control functionality) could break forms in certain cases.
+- WPForms Challenge was drunk in the Firefox browser.
+- reCAPTCHA doesn't render in a popup when the same form exists in another place.
+
 ## [1.6.5.1] - 2021-02-23
 ### Fixed
 - Incorrect validation in the Single Item field with 'user defined' type and 'required' status when paying in thousands.
@@ -824,10 +867,10 @@ All notable changes to this project will be documented in this file and formatte
 - GDPR Enhancement: Disable User Details (IP and User Agent) plugin setting.
 - GDPR Enhancement: Disable Storing User Details form setting.
 - GDPR Enhancement: User Agreement form field.
-- Page break, section divider, and HTML fields can now be enabled in email notifications with a filter [doc](https://developers.wpforms.com/docs/filter-reference-wpforms_email_display_other_fields).
+- Page break, section divider, and HTML fields can now be enabled in email notifications with a filter [doc](https://wpforms.com/developers/wpforms_email_display_other_fields/).
 
 ### Changed
-- Hide credit card field unless enabled by a payment addon or with a filter [doc](https://developers.wpforms.com/docs/enable-credit-card-field-without-stripe-addon/).
+- Hide credit card field unless enabled by a payment addon or with a filter [doc](https://wpforms.com/developers/how-to-enable-credit-card-field-without-stripe-addon/).
 - PHP warning that alerts users support for PHP 5.4 and below will be dropped this summer.
 - Spam logging, to improve performance.
 

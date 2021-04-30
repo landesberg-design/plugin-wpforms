@@ -129,6 +129,43 @@ function wpforms_setting( $key, $default = false, $option = 'wpforms_settings' )
 }
 
 /**
+ * Update plugin settings option and allow it to be filterable.
+ *
+ * @since 1.6.6
+ *
+ * @param array $settings A plugin settings array that is saved into options table.
+ *
+ * @return bool
+ */
+function wpforms_update_settings( $settings ) {
+
+	/**
+	 * Allows plugin settings to be modified before persisting in the database.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param array $settings An array of plugin settings to modify.
+	 */
+	$settings = (array) apply_filters( 'wpforms_update_settings', $settings );
+
+	$updated = update_option( 'wpforms_settings', $settings );
+
+	/**
+	 * Fires after the plugin settings were persisted in the database.
+	 *
+	 * The `$updated` parameter allows to check whether the update was actually successful.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param array  $settings An array of plugin settings.
+	 * @param bool   $updated  Whether an option was updated or not.
+	 */
+	do_action( 'wpforms_settings_updated', $settings, $updated );
+
+	return $updated;
+}
+
+/**
  * Sanitize key, primarily used for looking up options.
  *
  * @since 1.3.9
@@ -2521,7 +2558,7 @@ function wpforms_create_index_html_file( $path ) {
  *
  * @since 1.6.1
  *
- * @return bool True on write success, false on failure.
+ * @return bool True when the .htaccess file exists, false on failure.
  */
 function wpforms_create_upload_dir_htaccess_file() {
 
@@ -2536,8 +2573,23 @@ function wpforms_create_upload_dir_htaccess_file() {
 	}
 
 	$htaccess_file = wp_normalize_path( trailingslashit( $upload_dir['path'] ) . '.htaccess' );
+	$cache_key     = 'wpforms_htaccess_file';
 
-	if ( file_exists( $htaccess_file ) ) {
+	if ( is_file( $htaccess_file ) ) {
+		$cached_stat = get_transient( $cache_key );
+		$stat        = array_intersect_key(
+			stat( $htaccess_file ),
+			[
+				'size'  => 0,
+				'mtime' => 0,
+				'ctime' => 0,
+			]
+		);
+
+		if ( $cached_stat === $stat ) {
+			return true;
+		}
+
 		@unlink( $htaccess_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 	}
 
@@ -2560,12 +2612,31 @@ function wpforms_create_upload_dir_htaccess_file() {
 <IfModule mod_php7.c>
   php_flag engine off
 </IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
 <IfModule headers_module>
   Header set X-Robots-Tag "noindex"
 </IfModule>'
 	);
 
-	return insert_with_markers( $htaccess_file, 'WPForms', $contents );
+	$created = insert_with_markers( $htaccess_file, 'WPForms', $contents );
+
+	if ( $created ) {
+		clearstatcache( true, $htaccess_file );
+		$stat = array_intersect_key(
+			stat( $htaccess_file ),
+			[
+				'size'  => 0,
+				'mtime' => 0,
+				'ctime' => 0,
+			]
+		);
+
+		set_transient( $cache_key, $stat );
+	}
+
+	return $created;
 }
 
 /**
@@ -2683,4 +2754,65 @@ function wpforms_set_time_limit( $limit = 0 ) {
 	if ( function_exists( 'set_time_limit' ) && false === strpos( ini_get( 'disable_functions' ), 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) { // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.safe_modeDeprecatedRemoved
 		@set_time_limit( $limit ); // @codingStandardsIgnoreLine
 	}
+}
+
+/**
+ * Determine if collecting user's IP is allowed by GDPR setting (globally or per form).
+ * Majority of our users have GDPR disabled.
+ * So we remove this data from the request only when it's not needed:
+ * 1) when GDPR is enabled AND globally disabled user details storage;
+ * 2) when GDPR is enabled AND IP address processing is disabled on per form basis.
+ *
+ * @since 1.6.6
+ *
+ * @param array $form_data Form settings.
+ *
+ * @return bool
+ */
+function wpforms_is_collecting_ip_allowed( $form_data = [] ) {
+
+	if (
+		wpforms_setting( 'gdpr', false ) &&
+		(
+			wpforms_setting( 'gdpr-disable-details', false ) ||
+			( ! empty( $form_data ) && ! empty( $form_data['settings']['disable_ip'] ) )
+		)
+	) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Retrieve a timezone from the site settings as a `DateTimeZone` object.
+ *
+ * Timezone can be based on a PHP timezone string or a ±HH:MM offset.
+ *
+ * @since 1.6.6
+ *
+ * @return DateTimeZone Timezone object.
+ */
+function wpforms_get_timezone() {
+
+	if ( function_exists( 'wp_timezone' ) ) {
+		return wp_timezone();
+	}
+
+	// Fallback for WordPress version < 5.3.
+	$timezone_string = get_option( 'timezone_string' );
+
+	if ( ! $timezone_string ) {
+		$offset  = (float) get_option( 'gmt_offset' );
+		$hours   = (int) $offset;
+		$minutes = ( $offset - $hours );
+
+		$sign     = ( $offset < 0 ) ? '-' : '+';
+		$abs_hour = abs( $hours );
+		$abs_mins = abs( $minutes * 60 );
+
+		$timezone_string = sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
+	}
+
+	return timezone_open( $timezone_string );
 }

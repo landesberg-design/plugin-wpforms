@@ -84,11 +84,22 @@ class Challenge {
 		$current_form_id = isset( $_GET['form_id'] ) ? (int) $_GET['form_id'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$is_new_form     = isset( $_GET['newform'] ) ? (int) $_GET['newform'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		if ( $is_new_form && 2 !== $step ) {
+		if ( $is_new_form && $step !== 2 ) {
 			return false;
 		}
 
 		if ( ! $is_new_form && $form_id !== $current_form_id && $step >= 2 ) {
+
+			// In case if user skipped the Challenge by closing the browser window or exiting the builder,
+			// we need to set the previous Challenge as `canceled`.
+			// Otherwise, the Form Embed Wizard will think that the Challenge is active.
+			$this->set_challenge_option(
+				[
+					'status'            => 'skipped',
+					'finished_date_gmt' => current_time( 'mysql', true ),
+				]
+			);
+
 			return false;
 		}
 
@@ -431,6 +442,9 @@ class Challenge {
 
 		if ( $this->challenge_force_start() ) {
 			$can_start = true;
+
+			// No need to check something else in this case.
+			return $can_start;
 		}
 
 		if ( $this->challenge_finished() ) {

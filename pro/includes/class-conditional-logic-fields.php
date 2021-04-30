@@ -239,7 +239,7 @@ class WPForms_Conditional_Logic_Fields {
 		$form_data['conditional_fields'] = array();
 
 		foreach ( $form_data['fields'] as $id => $field ) {
-			if ( $this->field_is_conditional( $field ) && ! in_array( $field['type'], array( 'html' ), true ) ) {
+			if ( $this->field_is_conditional( $field ) && ! in_array( $field['type'], [ 'html', 'divider' ], true ) ) {
 				$form_data['conditional_fields'][] = $id;
 			}
 		}

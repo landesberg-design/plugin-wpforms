@@ -58,7 +58,7 @@ WPForms.Admin.Builder.Help = WPForms.Admin.Builder.Help || ( function( document,
 		 */
 		init: function() {
 
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

@@ -128,6 +128,8 @@ class Edit {
 	 */
 	private function hooks() {
 
+		add_action( 'delete_attachment', [ $this, 'maybe_remove_attachment_data_from_entries' ] );
+
 		if ( $this->is_admin_entry_editing_ajax() ) {
 
 			remove_action( 'wp_ajax_wpforms_submit', [ wpforms()->process, 'ajax_submit' ] );
@@ -308,20 +310,22 @@ class Edit {
 	private function get_localized_data() {
 
 		$data['strings'] = [
-			'update'           => esc_html__( 'Update', 'wpforms' ),
-			'success'          => esc_html__( 'Success', 'wpforms' ),
-			'continue_editing' => esc_html__( 'Continue Editing', 'wpforms' ),
-			'view_entry'       => esc_html__( 'View Entry', 'wpforms' ),
-			'msg_saved'        => esc_html__( 'The entry was successfully saved.', 'wpforms' ),
+			'update'            => esc_html__( 'Update', 'wpforms' ),
+			'success'           => esc_html__( 'Success', 'wpforms' ),
+			'continue_editing'  => esc_html__( 'Continue Editing', 'wpforms' ),
+			'view_entry'        => esc_html__( 'View Entry', 'wpforms' ),
+			'msg_saved'         => esc_html__( 'The entry was successfully saved.', 'wpforms' ),
+			'entry_delete_file' => esc_html__( 'Are you sure you want to permanently delete the file "{file_name}"?', 'wpforms' ),
+			'entry_empty_file'  => esc_html__( 'Empty', 'wpforms' ),
 		];
 
 		// View Entry URL.
 		$data['strings']['view_entry_url'] = add_query_arg(
-			array(
+			[
 				'page'     => 'wpforms-entries',
 				'view'     => 'details',
 				'entry_id' => $this->entry_id,
-			),
+			],
 			admin_url( 'admin.php' )
 		);
 
@@ -380,6 +384,7 @@ class Edit {
 		$this->entry_fields = apply_filters( 'wpforms_entry_single_data', wpforms_decode( $entry->fields ), $entry, $form_data );
 		$this->form         = $form;
 		$this->form_data    = $form_data;
+		$this->form_id      = $form->ID;
 
 		// Lastly, mark entry as read if needed.
 		if ( '1' !== $entry->viewed && empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
@@ -392,16 +397,8 @@ class Edit {
 		}
 
 		if ( ! empty( $is_success ) ) {
-			wpforms()->entry_meta->add(
-				[
-					'entry_id' => $entry->entry_id,
-					'form_id'  => $form_data['id'],
-					'user_id'  => get_current_user_id(),
-					'type'     => 'log',
-					'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry read.', 'wpforms' ) ) ),
-				],
-				'entry_meta'
-			);
+
+			$this->add_entry_meta( esc_html__( 'Entry read.', 'wpforms' ) );
 
 			$this->entry->viewed     = '1';
 			$this->entry->entry_logs = wpforms()->entry_meta->get_meta(
@@ -638,6 +635,13 @@ class Edit {
 			/* translators: %d - field ID. */
 			! empty( $field['label'] ) ? esc_html( wp_strip_all_tags( $field['label'] ) ) : sprintf( esc_html__( 'Field ID #%d', 'wpforms' ), (int) $field_id )
 		);
+
+		/*
+		 * Clean extra user-defined CSS classes to avoid styling issues.
+		 * This makes Edit screen look similar to View screen in terms of visual structure:
+		 * each field one by one on a single row, no columns, etc.
+		 */
+		$field['css'] = '';
 
 		// Add properties to the field.
 		$field['properties'] = wpforms()->frontend->get_field_properties( $field, $form_data );
@@ -926,16 +930,11 @@ class Edit {
 		wpforms()->entry->update( $this->entry_id, $entry_data, '', 'edit_entry', [ 'cap' => 'edit_entry_single' ] );
 
 		// Add record to entry meta.
-		wpforms()->entry_meta->add(
-			[
-				'entry_id' => (int) $this->entry_id,
-				'form_id'  => (int) $this->form_data['id'],
-				'user_id'  => get_current_user_id(),
-				'type'     => 'log',
-				'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry edited.', 'wpforms' ) ) ),
-			],
-			'entry_meta'
-		);
+		$this->add_entry_meta( esc_html__( 'Entry edited.', 'wpforms' ) );
+
+		$removed_files = \WPForms_Field_File_Upload::delete_uploaded_files_from_entry( $this->entry_id, $updated_fields, $this->entry_fields );
+
+		array_map( [ $this, 'add_removed_file_meta' ], $removed_files );
 
 		$response = [
 			'modified' => esc_html( date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), strtotime( $this->date_modified ) + ( get_option( 'gmt_offset' ) * 3600 ) ) ),
@@ -1139,6 +1138,7 @@ class Edit {
 			'phone',
 			'rating',
 			'url',
+			'file-upload',
 		];
 
 		$editable = in_array( $type, $editable_types, true );
@@ -1225,4 +1225,205 @@ class Edit {
 
 		return true;
 	}
+
+	/**
+	 * Add entry log record to the entry_meta table.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param string $message Message to log.
+	 */
+	private function add_entry_meta( $message ) {
+
+		// Add record to entry meta.
+		wpforms()->entry_meta->add(
+			[
+				'entry_id' => (int) $this->entry_id,
+				'form_id'  => (int) $this->form_id,
+				'user_id'  => get_current_user_id(),
+				'type'     => 'log',
+				'data'     => wpautop( sprintf( '<em>%s</em>', esc_html( $message ) ) ),
+			],
+			'entry_meta'
+		);
+	}
+
+	/**
+	 * Add removed file to entry meta.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param string $filename File name.
+	 */
+	private function add_removed_file_meta( $filename ) {
+
+		/* translators: %s - Name of the file that has been deleted. */
+		$this->add_entry_meta( sprintf( esc_html__( 'The uploaded file "%s" has been deleted.', 'wpforms' ), esc_html( $filename ) ) );
+	}
+
+	/**
+	 * Maybe remove attachment data from entry field.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 */
+	public function maybe_remove_attachment_data_from_entries( $attachment_id ) {
+
+		global $wpdb;
+
+		$table_name = wpforms()->entry->table_name;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entries = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT `entry_id` FROM {$table_name} WHERE `fields` LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				'%"attachment_id":' . $wpdb->esc_like( $attachment_id ) . ',%'
+			),
+			ARRAY_N
+		);
+
+		if ( ! $entries ) {
+			return;
+		}
+
+		foreach ( $entries as $entry_id ) {
+
+			$this->date_modified = current_time( 'Y-m-d H:i:s' );
+
+			$entry = wpforms()->entry->get( $entry_id );
+
+			if ( empty( $entry ) ) {
+				continue;
+			}
+
+			$entry_fields = wpforms_decode( $entry->fields );
+
+			if ( empty( $entry_fields ) ) {
+				continue;
+			}
+
+			$this->entry_id = $entry_id;
+			$this->form_id  = $entry->form_id;
+
+			$entry_fields = wpforms_chain( $entry_fields )
+				->map(
+					function ( $entry_field ) use ( $entry_id, $attachment_id ) {
+
+						if ( $entry_field['type'] !== 'file-upload' ) {
+							return $entry_field;
+						}
+
+						return $this->maybe_remove_attachment_data_from_entry_fields( $entry_field, (int) $entry_id, $attachment_id );
+					}
+				)
+				->value();
+
+			$entry_data = [
+				'fields'        => wp_json_encode( $entry_fields ),
+				'date_modified' => $this->date_modified,
+			];
+
+			wpforms()->entry->update(
+				$entry_id,
+				$entry_data,
+				'',
+				'edit_entry',
+				[
+					'cap' => 'edit_entry_single',
+				]
+			);
+		}
+	}
+
+	/**
+	 * Maybe remove attachment from entry fields.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param array $entry_field   Entry Field.
+	 * @param int   $entry_id      Entry ID.
+	 * @param int   $attachment_id Attachment ID.
+	 *
+	 * @return string|array
+	 */
+	private function maybe_remove_attachment_data_from_entry_fields( $entry_field, $entry_id, $attachment_id ) {
+
+		if ( ! \WPForms_Field_File_Upload::is_modern_upload( $entry_field ) ) {
+			if ( $this->maybe_remove_attachment_from_entry_field( $attachment_id, $entry_field, $entry_id, $entry_field['id'] ) ) {
+				$entry_field['value'] = '';
+			}
+
+			return $entry_field;
+		}
+
+		if ( empty( $entry_field['value_raw'] ) ) {
+			return $entry_field;
+		}
+
+		foreach ( $entry_field['value_raw'] as $raw_key => $field_value ) {
+
+			if ( $this->maybe_remove_attachment_from_entry_field( $attachment_id, $field_value, $entry_id, $entry_field['id'] ) ) {
+				unset( $entry_field['value_raw'][ $raw_key ] );
+			}
+		}
+
+		$entry_field['value'] = implode( "\n", array_column( $entry_field['value_raw'], 'value' ) );
+
+		return $entry_field;
+	}
+
+	/**
+	 * Maybe remove attachment from entry field.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param int   $attachment_id Attachment ID.
+	 * @param array $field_data    Field data.
+	 * @param int   $entry_id      Entry ID.
+	 * @param int   $field_id      Field ID.
+	 *
+	 * @return bool
+	 */
+	private function maybe_remove_attachment_from_entry_field( $attachment_id, $field_data, $entry_id, $field_id ) {
+
+		if ( ! isset( $field_data['attachment_id'] ) || (int) $attachment_id !== $field_data['attachment_id'] ) {
+			return false;
+		}
+
+		$this->add_removed_file_meta( $field_data['file_user_name'] );
+
+		$entry_fields = wpforms()->entry_fields->get_fields(
+			[
+				'entry_id' => $entry_id,
+				'field_id' => $field_id,
+			]
+		);
+
+		if ( empty( $entry_fields ) ) {
+			return false;
+		}
+
+		$dbdata_field_id = array_map(
+			'get_object_vars',
+			$entry_fields
+		);
+
+		if ( ! isset( $dbdata_field_id[0]['id'] ) ) {
+			return false;
+		}
+
+		wpforms()->entry_fields->update(
+			(int) $dbdata_field_id[0]['id'],
+			[
+				'value' => '',
+				'date'  => $this->date_modified,
+			],
+			'id',
+			'edit_entry'
+		);
+
+		return true;
+	}
+
 }

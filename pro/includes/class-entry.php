@@ -144,6 +144,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return false;
 		}
 
+		\WPForms_Field_File_Upload::delete_uploaded_files_from_entry( $row_id );
+
 		$entry  = parent::delete( $row_id );
 		$meta   = wpforms()->entry_meta->delete_by( 'entry_id', $row_id );
 		$fields = wpforms()->entry_fields->delete_by( 'entry_id', $row_id );

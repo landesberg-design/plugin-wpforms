@@ -66,15 +66,15 @@ class WPForms_Template_Order extends WPForms_Template {
 					'choices'  => array(
 						'1' => array(
 							'label' => esc_html__( 'First Item', 'wpforms' ),
-							'value' => '10.00',
+							'value' => wpforms_format_amount( '10.00' ),
 						),
 						'2' => array(
 							'label' => esc_html__( 'Second Item', 'wpforms' ),
-							'value' => '20.00',
+							'value' => wpforms_format_amount( '20.00' ),
 						),
 						'3' => array(
 							'label' => esc_html__( 'Third Item', 'wpforms' ),
-							'value' => '30.00',
+							'value' => wpforms_format_amount( '30.00' ),
 						),
 					),
 				),

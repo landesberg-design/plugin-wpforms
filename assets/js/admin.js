@@ -213,7 +213,7 @@
 		},
 
 		/**
-		 * Initilize checkbox mulit-select columns.
+		 * Initialize checkbox multi-select columns.
 		 *
 		 * @since 1.4.2
 		 */

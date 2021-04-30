@@ -89,6 +89,12 @@ class FormEmbedWizard {
 			[
 				'nonce'        => wp_create_nonce( 'wpforms_admin_form_embed_wizard_nonce' ),
 				'is_edit_page' => (int) $this->is_form_embed_page( 'edit' ),
+				'video_url'    => esc_url(
+					sprintf(
+						'https://youtube.com/embed/%s?rel=0&showinfo=0',
+						wpforms_is_gutenberg_active() ? '_29nTiDvmLw' : 'IxGVz3AjEe0'
+					)
+				),
 			]
 		);
 	}
@@ -108,8 +114,15 @@ class FormEmbedWizard {
 		}
 
 		$template = $this->is_form_embed_page() ? 'admin/form-embed-wizard/tooltip' : 'admin/form-embed-wizard/popup';
+		$args     = [];
 
-		echo wpforms_render( $template ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( ! $this->is_form_embed_page() ) {
+			$args['user_can_edit_pages'] = current_user_can( 'edit_pages' );
+			$args['dropdown_pages']      = $this->get_dropdown_pages();
+		}
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wpforms_render( $template, $args );
 
 		$this->delete_meta();
 	}
@@ -308,5 +321,55 @@ class FormEmbedWizard {
 		}
 
 		return sprintf( $pattern, absint( $form_id ) );
+	}
+
+	/**
+	 * Generate select with pages which are available to edit for current user.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @return string HTML dropdown list of pages.
+	 */
+	private function get_dropdown_pages() {
+
+		add_filter( 'get_pages', [ $this, 'remove_inaccessible_pages' ], 20 );
+
+		$dropdown = wp_dropdown_pages(
+			[
+				'show_option_none' => esc_html__( 'Select a Page', 'wpforms-lite' ),
+				'id'               => 'wpforms-admin-form-embed-wizard-select-page',
+				'name'             => '',
+				'post_status'      => [ 'publish', 'pending' ],
+				'echo'             => false,
+			]
+		);
+
+		remove_filter( 'get_pages', [ $this, 'remove_inaccessible_pages' ], 20 );
+
+		return $dropdown;
+	}
+
+	/**
+	 * Excludes pages from dropdown which user can't edit.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param \WP_Post[] $pages Array of page objects.
+	 *
+	 * @return \WP_Post[]|false Array of filtered pages or false.
+	 */
+	public function remove_inaccessible_pages( $pages ) {
+
+		if ( ! $pages ) {
+			return $pages;
+		}
+
+		foreach ( $pages as $key => $page ) {
+			if ( ! current_user_can( 'edit_page', $page->ID ) ) {
+				unset( $pages[ $key ] );
+			}
+		}
+
+		return $pages;
 	}
 }

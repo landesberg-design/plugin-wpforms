@@ -286,7 +286,15 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		init: function() {
 
 			$( app.ready );
-			$( window ).on( 'load', app.load );
+			$( window ).on( 'load', function() {
+
+				// in case of jQuery 3.+ we need to wait for an `ready` event first.
+				if ( $.isFunction( $.ready.then ) ) {
+					$.ready.then( app.load );
+				} else {
+					app.load();
+				}
+			} );
 		},
 
 		/**
@@ -449,6 +457,10 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		 * @param {object}        args   Tooltipster arguments.
 		 */
 		initTooltips: function( step, anchor, args ) {
+
+			if ( typeof $.fn.tooltipster === 'undefined' ) {
+				return;
+			}
 
 			var $dot = $( '<span class="wpforms-challenge-dot wpforms-challenge-dot-step' + step + '" data-wpforms-challenge-step="' + step + '">&nbsp;</span>' );
 			var tooltipsterArgs = {

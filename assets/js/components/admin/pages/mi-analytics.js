@@ -152,7 +152,7 @@ var WPFormsPagesAnalytics = window.WPFormsPagesAnalytics || ( function( document
 
 			if ( success ) {
 				el.$stepInstallNum.attr( 'src', el.$stepInstallNum.attr( 'src' ).replace( 'step-1.', 'step-complete.' ) );
-				$btn.addClass( 'grey' ).text( wpforms_pluginlanding.activated );
+				$btn.addClass( 'grey' ).removeClass( 'button-primary' ).text( wpforms_pluginlanding.activated );
 				app.stepInstallPluginStatus();
 			} else {
 				var activationFail = ( 'install' === action && res.success && ! res.data.is_activated ) || 'activate' === action,
@@ -198,14 +198,14 @@ var WPFormsPagesAnalytics = window.WPFormsPagesAnalytics || ( function( document
 			if ( res.data.setup_status > 0 ) {
 				el.$stepSetupNum.attr( 'src', el.$stepSetupNum.attr( 'src' ).replace( 'step-2.svg', 'step-complete.svg' ) );
 				el.$stepAddon.removeClass( 'grey' );
-				el.$stepAddon.find( 'button' ).attr( 'data-url', res.data.step3_button_url ).removeClass( 'grey' ).removeClass( 'disabled' );
+				el.$stepAddon.find( 'button' ).attr( 'data-url', res.data.step3_button_url ).removeClass( 'grey disabled' ).addClass( 'button-primary' );
 
 				if ( res.data.license_level === 'pro' ) {
 					var buttonText = res.data.addon_installed > 0 ? wpforms_pluginlanding.activate_now : wpforms_pluginlanding.install_now;
 					el.$stepAddon.find( 'button' ).text( buttonText );
 				}
 			} else {
-				el.$stepSetupBtn.removeClass( 'grey' ).removeClass( 'disabled' );
+				el.$stepSetupBtn.removeClass( 'grey disabled' ).addClass( 'button-primary' );
 			}
 		},
 

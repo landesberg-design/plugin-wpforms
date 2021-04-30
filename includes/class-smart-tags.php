@@ -267,7 +267,7 @@ class WPForms_Smart_Tags {
 		// Entry date smart tags.
 		preg_match_all( '/{entry_date format=\"(.+?)\"}/', $content, $dates );
 
-		if ( ! empty( $dates[1] ) ) {
+		if ( ! empty( wpforms()->entry ) && ! empty( $dates[1] ) ) {
 
 			$entry      = wpforms()->entry->get( $entry_id );
 			$entry_date = $entry && property_exists( $entry, 'date' ) ? strtotime( $entry->date ) : 0;

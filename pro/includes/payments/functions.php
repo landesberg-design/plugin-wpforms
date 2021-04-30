@@ -209,32 +209,30 @@ function wpforms_get_currencies() {
 		),
 	);
 
-	return apply_filters( 'wpforms_currencies', $currencies );
+	return array_change_key_case( apply_filters( 'wpforms_currencies', $currencies ), CASE_UPPER );
 }
 
 /**
- * Sanitize Amount.
+ * Sanitize amount by stripping out thousands separators.
  *
- * Return a sanitized amount by stripping out thousands separators.
- *
- * @since 1.2.6
  * @link https://github.com/easydigitaldownloads/easy-digital-downloads/blob/master/includes/formatting.php#L24
  *
- * @param string $amount
- * @param string $currency
+ * @since 1.2.6
+ *
+ * @param string $amount   Price amount.
+ * @param string $currency Currency ISO code (USD, EUR, etc).
  *
  * @return string $amount
  */
 function wpforms_sanitize_amount( $amount, $currency = '' ) {
 
 	if ( empty( $currency ) ) {
-		$currency = wpforms_setting( 'currency', 'USD' );
+		$currency = wpforms_get_currency();
 	}
 	$currency      = strtoupper( $currency );
 	$currencies    = wpforms_get_currencies();
-	$thousands_sep = $currencies[ $currency ]['thousands_separator'];
-	$decimal_sep   = $currencies[ $currency ]['decimal_separator'];
-	$is_negative   = false;
+	$thousands_sep = isset( $currencies[ $currency ]['thousands_separator'] ) ? $currencies[ $currency ]['thousands_separator'] : ',';
+	$decimal_sep   = isset( $currencies[ $currency ]['decimal_separator'] ) ? $currencies[ $currency ]['decimal_separator'] : '.';
 
 	// Sanitize the amount.
 	if ( $decimal_sep === ',' && false !== ( $found = strpos( $amount, $decimal_sep ) ) ) {
@@ -248,17 +246,23 @@ function wpforms_sanitize_amount( $amount, $currency = '' ) {
 		$amount = str_replace( $thousands_sep, '', $amount );
 	}
 
-	if ( $amount < 0 ) {
-		$is_negative = true;
-	}
+	$amount = preg_replace( '/[^0-9\.-]/', '', $amount );
 
-	$amount   = preg_replace( '/[^0-9\.]/', '', $amount );
-	$decimals = apply_filters( 'wpforms_sanitize_amount_decimals', 2, $amount );
-	$amount   = number_format( (double) $amount, $decimals, '.', '' );
+	/**
+	 * Set correct currency decimals.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param int     $decimals Default number of decimals.
+	 * @param string  $amount   Price amount.
+	 */
+	$decimals = (int) apply_filters(
+		'wpforms_sanitize_amount_decimals',
+		wpforms_get_currency_decimals( $currency ),
+		$amount
+	);
 
-	if ( $is_negative ) {
-		$amount *= - 1;
-	}
+	$amount = number_format( (float) $amount, $decimals, '.', '' );
 
 	return $amount;
 }
@@ -268,51 +272,126 @@ function wpforms_sanitize_amount( $amount, $currency = '' ) {
  *
  * @since 1.2.6
  *
- * @param string $amount
- * @param bool   $symbol
- * @param string $currency
+ * @param string $amount   Price amount.
+ * @param bool   $symbol   Currency symbol ($, €).
+ * @param string $currency Currency ISO code (USD, EUR, etc).
  *
  * @return string $amount Newly formatted amount or Price Not Available
  */
 function wpforms_format_amount( $amount, $symbol = false, $currency = '' ) {
 
 	if ( empty( $currency ) ) {
-		$currency = wpforms_setting( 'currency', 'USD' );
+		$currency = wpforms_get_currency();
 	}
 	$currency      = strtoupper( $currency );
 	$currencies    = wpforms_get_currencies();
-	$thousands_sep = $currencies[ $currency ]['thousands_separator'];
-	$decimal_sep   = $currencies[ $currency ]['decimal_separator'];
+	$thousands_sep = isset( $currencies[ $currency ]['thousands_separator'] ) ? $currencies[ $currency ]['thousands_separator'] : ',';
+	$decimal_sep   = isset( $currencies[ $currency ]['decimal_separator'] ) ? $currencies[ $currency ]['decimal_separator'] : '.';
+	$sep_found     = ! empty( $decimal_sep ) ? strpos( $amount, $decimal_sep ) : false;
 
 	// Format the amount.
-	if ( $decimal_sep === ',' && false !== ( $sep_found = strpos( $amount, $decimal_sep ) ) ) {
+	if (
+		$decimal_sep === ',' &&
+		$sep_found !== false
+	) {
 		$whole  = substr( $amount, 0, $sep_found );
 		$part   = substr( $amount, $sep_found + 1, ( strlen( $amount ) - 1 ) );
 		$amount = $whole . '.' . $part;
 	}
 
-	// Strip , from the amount (if set as the thousands separator).
-	if ( $thousands_sep === ',' && false !== ( $found = strpos( $amount, $thousands_sep ) ) ) {
-		$amount = floatval( str_replace( ',', '', $amount ) );
+	// Strip "," (comma) from the amount (if set as the thousands separator).
+	if (
+		$thousands_sep === ',' &&
+		strpos( $amount, $thousands_sep ) !== false
+	) {
+		$amount = (float) str_replace( ',', '', $amount );
 	}
 
 	if ( empty( $amount ) ) {
 		$amount = 0;
 	}
 
-	$decimals = apply_filters( 'wpforms_sanitize_amount_decimals', 2, $amount );
-	$number   = number_format( (float) $amount, $decimals, $decimal_sep, $thousands_sep );
+	/** This filter is documented in wpforms_sanitize_amount function above. */
+	$decimals = (int) apply_filters(
+		'wpforms_sanitize_amount_decimals',
+		wpforms_get_currency_decimals( $currency ),
+		$amount
+	);
 
-	if ( $symbol ) {
+	$number = number_format( (float) $amount, $decimals, $decimal_sep, $thousands_sep );
+
+	// Display a symbol, if any.
+	if ( $symbol && isset( $currencies[ $currency ]['symbol_pos'] ) ) {
 		$symbol_padding = apply_filters( 'wpforms_currency_symbol_padding', ' ' );
-		if ( 'right' === $currencies[ $currency ]['symbol_pos'] ) {
-			$number = $number . $symbol_padding . $currencies[ $currency ]['symbol'];
+		if ( $currencies[ $currency ]['symbol_pos'] === 'right' ) {
+			$number .= $symbol_padding . $currencies[ $currency ]['symbol'];
 		} else {
 			$number = $currencies[ $currency ]['symbol'] . $symbol_padding . $number;
 		}
 	}
 
 	return $number;
+}
+
+/**
+ * Get default number of decimals for a given currency.
+ * If not provided inside the currency, default value is used, which is 2.
+ *
+ * @since 1.6.6
+ *
+ * @param array|string $currency Currency data we are getting decimals for.
+ *
+ * @return int
+ */
+function wpforms_get_currency_decimals( $currency ) {
+
+	if ( is_string( $currency ) ) {
+		$currencies    = wpforms_get_currencies();
+		$currency_code = strtoupper( $currency );
+		$currency      = isset( $currencies[ $currency_code ] ) ? $currencies[ $currency_code ] : [];
+	}
+
+	/**
+	 * Get currency decimals.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param int          $decimals Default number of decimals.
+	 * @param array|string $currency Currency data we are getting decimals for.
+	 */
+	return (int) apply_filters(
+		'wpforms_get_currency_decimals',
+		isset( $currency['decimals'] ) ? $currency['decimals'] : 2,
+		$currency
+	);
+}
+
+/**
+ * Get payments currency.
+ * If the currency not available anymore 'USD' used as default.
+ *
+ * @since 1.6.6
+ *
+ * @return string
+ */
+function wpforms_get_currency() {
+
+	$currency   = wpforms_setting( 'currency' );
+	$currencies = wpforms_get_currencies();
+
+	/**
+	 * Get payments currency.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param string $currency   Payments currency.
+	 * @param array  $currencies Available currencies.
+	 */
+	return apply_filters(
+		'wpforms_get_currency',
+		isset( $currencies[ $currency ] ) ? $currency : 'USD',
+		$currencies
+	);
 }
 
 /**
@@ -324,9 +403,10 @@ function wpforms_format_amount( $amount, $symbol = false, $currency = '' ) {
  */
 function wpforms_payment_fields() {
 
-	$fields = array( 'payment-single', 'payment-multiple', 'payment-checkbox', 'payment-select' );
-
-	return apply_filters( 'wpforms_payment_fields', $fields );
+	return (array) apply_filters(
+		'wpforms_payment_fields',
+		[ 'payment-single', 'payment-multiple', 'payment-checkbox', 'payment-select' ]
+	);
 }
 
 /**

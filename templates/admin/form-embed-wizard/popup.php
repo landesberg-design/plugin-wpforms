@@ -9,41 +9,38 @@
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-$pages_exists = (int) wp_count_posts( 'page' )->publish > 0;
-
+$pages_exists = ! empty( $args['dropdown_pages'] ) ? 1 : 0;
 ?>
+
 <div id="wpforms-admin-form-embed-wizard-container" class="wpforms-admin-popup-container">
 	<div id="wpforms-admin-form-embed-wizard" class="wpforms-admin-popup" data-pages-exists="<?php echo esc_attr( $pages_exists ); ?>">
 		<div class="wpforms-admin-popup-content">
 			<h3><?php esc_html_e( 'Embed in a Page', 'wpforms-lite' ); ?></h3>
 			<div id="wpforms-admin-form-embed-wizard-content-initial">
 				<p class="no-gap"><b><?php esc_html_e( 'We can help embed your form with just a few clicks!', 'wpforms-lite' ); ?></b></p>
-				<p><?php esc_html_e( 'Would you like to embed your form in an existing page, or create a new one?', 'wpforms-lite' ); ?></p>
+
+				<?php if ( ! empty( $args['user_can_edit_pages'] ) ) : ?>
+					<p><?php esc_html_e( 'Would you like to embed your form in an existing page, or create a new one?', 'wpforms-lite' ); ?></p>
+				<?php endif; ?>
 			</div>
-			<div id="wpforms-admin-form-embed-wizard-content-select-page" style="display: none;">
-				<p><?php esc_html_e( 'Select the page you would like to embed your form in.', 'wpforms-lite' ); ?></p>
-			</div>
-			<div id="wpforms-admin-form-embed-wizard-content-create-page" style="display: none;">
-				<p><?php esc_html_e( 'What would you like to call the new page?', 'wpforms-lite' ); ?></p>
-			</div>
-			<div id="wpforms-admin-form-embed-wizard-section-btns" class="wpforms-admin-popup-bottom">
-				<button type="button" data-action="select-page" class="wpforms-admin-popup-btn"><?php esc_html_e( 'Select Existing Page', 'wpforms-lite' ); ?></button>
-				<button type="button" data-action="create-page" class="wpforms-admin-popup-btn"><?php esc_html_e( 'Create New Page', 'wpforms-lite' ); ?></button>
-			</div>
-			<div id="wpforms-admin-form-embed-wizard-section-go" class="wpforms-admin-popup-bottom wpforms-admin-popup-flex" style="display: none;">
-				<?php
-				wp_dropdown_pages(
-					[
-						'show_option_none' => esc_html__( 'Select a Page', 'wpforms-lite' ),
-						'id'               => 'wpforms-admin-form-embed-wizard-select-page',
-						'name'             => '',
-					]
-				);
-				?>
-				<input type="text" id="wpforms-admin-form-embed-wizard-new-page-title" value="" placeholder="<?php esc_attr_e( 'Name Your Page', 'wpforms-lite' ); ?>">
-				<button type="button" data-action="go" class="wpforms-admin-popup-btn"><?php esc_html_e( 'Let’s Go!', 'wpforms-lite' ); ?></button>
-			</div>
+
+			<?php if ( ! empty( $args['user_can_edit_pages'] ) ) : ?>
+				<div id="wpforms-admin-form-embed-wizard-content-select-page" style="display: none;">
+					<p><?php esc_html_e( 'Select the page you would like to embed your form in.', 'wpforms-lite' ); ?></p>
+				</div>
+				<div id="wpforms-admin-form-embed-wizard-content-create-page" style="display: none;">
+					<p><?php esc_html_e( 'What would you like to call the new page?', 'wpforms-lite' ); ?></p>
+				</div>
+				<div id="wpforms-admin-form-embed-wizard-section-btns" class="wpforms-admin-popup-bottom">
+					<button type="button" data-action="select-page" class="wpforms-admin-popup-btn"><?php esc_html_e( 'Select Existing Page', 'wpforms-lite' ); ?></button>
+					<button type="button" data-action="create-page" class="wpforms-admin-popup-btn"><?php esc_html_e( 'Create New Page', 'wpforms-lite' ); ?></button>
+				</div>
+				<div id="wpforms-admin-form-embed-wizard-section-go" class="wpforms-admin-popup-bottom wpforms-admin-popup-flex" style="display: none;">
+					<?php echo $args['dropdown_pages']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<input type="text" id="wpforms-admin-form-embed-wizard-new-page-title" value="" placeholder="<?php esc_attr_e( 'Name Your Page', 'wpforms-lite' ); ?>">
+					<button type="button" data-action="go" class="wpforms-admin-popup-btn"><?php esc_html_e( 'Let’s Go!', 'wpforms-lite' ); ?></button>
+				</div>
+			<?php endif; ?>
 			<div id="wpforms-admin-form-embed-wizard-section-toggles" class="wpforms-admin-popup-bottom">
 				<p class="secondary">
 					<?php
@@ -62,8 +59,7 @@ $pages_exists = (int) wp_count_posts( 'page' )->publish > 0;
 					);
 					?>
 				</p>
-				<?php $video_id = wpforms_is_gutenberg_active() ? '_29nTiDvmLw' : 'IxGVz3AjEe0'; ?>
-				<iframe style="display: none;" src="https://youtube.com/embed/<?php echo esc_attr( $video_id ); ?>?rel=0&showinfo=0" frameborder="0" id="wpforms-admin-form-embed-wizard-tutorial" allowfullscreen width="450" height="256"></iframe>
+				<iframe style="display: none;" src="about:blank" frameborder="0" id="wpforms-admin-form-embed-wizard-tutorial" allowfullscreen width="450" height="256"></iframe>
 				<div id="wpforms-admin-form-embed-wizard-shortcode-wrap" style="display: none;">
 					<input type="text" id="wpforms-admin-form-embed-wizard-shortcode" class="wpforms-admin-popup-shortcode" disabled />
 					<span id="wpforms-admin-form-embed-wizard-shortcode-copy" title="<?php esc_attr_e( 'Copy embed code to clipboard', 'wpforms-lite' ); ?>">

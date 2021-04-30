@@ -225,7 +225,7 @@ class Captcha {
 			'recaptcha-noconflict'   => [
 				'id'   => 'recaptcha-noconflict',
 				'name' => esc_html__( 'No-Conflict Mode', 'wpforms-lite' ),
-				'desc' => esc_html__( 'Check this option if you need to forcefully remove other CAPTCHA occurrences in order to prevent conflicts. Only enable this option if your site is having compatibility issues or instructed by support.', 'wpforms-lite' ),
+				'desc' => esc_html__( 'Check this option to forcefully remove other CAPTCHA occurrences in order to prevent conflicts. Only enable this option if your site is having compatibility issues or instructed by support.', 'wpforms-lite' ),
 				'type' => 'checkbox',
 			],
 			self::VIEW . '-preview'  => [
@@ -243,7 +243,7 @@ class Captcha {
 		) {
 			$data = apply_filters( 'wpforms_admin_pages_settings_captcha_data', [ 'sitekey' => $this->settings['site_key'] ] );
 
-			// Prepare HTML for CATCHA preview.
+			// Prepare HTML for CAPTCHA preview.
 			$placeholder_descr = $settings[ self::VIEW ][ self::VIEW . '-preview' ]['content'];
 			$captcha_descr     = esc_html__( 'This CAPTCHA is generated using your site and secret keys. If an error is displayed, please double-check your keys.', 'wpforms-lite' );
 			$captcha_preview   = sprintf( '<div class="wpforms-captcha-container" style="pointer-events:none!important;cursor:default!important;"><div %s></div><input type="text" name="wpforms-captcha-hidden" class="wpforms-recaptcha-hidden" style="position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;"></div>', wpforms_html_attributes( '', [ 'wpforms-captcha' ], $data ) );
@@ -389,7 +389,7 @@ class Captcha {
 	}
 
 	/**
-	 * Retrieve query arguments for the CATCHA API URL.
+	 * Retrieve query arguments for the CAPTCHA API URL.
 	 *
 	 * @since 1.6.4
 	 *

@@ -23,19 +23,19 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 		$this->defaults = array(
 			1 => array(
 				'label'   => esc_html__( 'First Item', 'wpforms' ),
-				'value'   => '10.00',
+				'value'   => wpforms_format_amount( '10.00' ),
 				'image'   => '',
 				'default' => '',
 			),
 			2 => array(
 				'label'   => esc_html__( 'Second Item', 'wpforms' ),
-				'value'   => '25.00',
+				'value'   => wpforms_format_amount( '25.00' ),
 				'image'   => '',
 				'default' => '',
 			),
 			3 => array(
 				'label'   => esc_html__( 'Third Item', 'wpforms' ),
-				'value'   => '50.00',
+				'value'   => wpforms_format_amount( '50.00' ),
 				'image'   => '',
 				'default' => '',
 			),
@@ -486,7 +486,7 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 			'value_raw'    => sanitize_text_field( $field_submit ),
 			'amount'       => wpforms_format_amount( $amount ),
 			'amount_raw'   => $amount,
-			'currency'     => wpforms_setting( 'currency', 'USD' ),
+			'currency'     => wpforms_get_currency(),
 			'image'        => $image,
 			'id'           => absint( $field_id ),
 			'type'         => $this->type,

@@ -328,7 +328,7 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 			'value'      => wpforms_format_amount( $amount, true ),
 			'amount'     => wpforms_format_amount( $amount ),
 			'amount_raw' => $amount,
-			'currency'   => wpforms_setting( 'currency', 'USD' ),
+			'currency'   => wpforms_get_currency(),
 			'id'         => absint( $field_id ),
 			'type'       => $this->type,
 		);

@@ -524,24 +524,41 @@ class WPForms_Field_Email extends WPForms_Field {
 	 * @param mixed $field_submit Field value that was submitted.
 	 * @param array $form_data    Form data and settings.
 	 */
-	public function validate( $field_id, $field_submit, $form_data ) {
+	public function validate( $field_id, $field_submit, $form_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		$form_id = (int) $form_data['id'];
 
 		parent::validate( $field_id, $field_submit, $form_data );
 
 		if ( ! is_array( $field_submit ) && ! empty( $field_submit ) ) {
-			$field_submit = array(
+			$field_submit = [
 				'primary' => $field_submit,
-			);
+			];
 		}
 
-		if ( ! empty( $field_submit['primary'] ) && ! is_email( $field_submit['primary'] ) ) {
-			wpforms()->process->errors[ $form_id ][ $field_id ]['primary'] = esc_html__( 'The provided email is not valid.', 'wpforms-lite' );
-		} elseif ( isset( $field_submit['primary'] ) && isset( $field_submit['secondary'] ) && $field_submit['secondary'] !== $field_submit['primary'] ) {
-			wpforms()->process->errors[ $form_id ][ $field_id ]['secondary'] = esc_html__( 'The provided emails do not match.', 'wpforms-lite' );
-		} elseif ( ! empty( $field_submit['primary'] ) && ! empty( $form_data['fields'][ $field_id ] ) && ! $this->is_restricted_email( $field_submit['primary'], $form_data['fields'][ $field_id ] ) ) {
-			wpforms()->process->errors[ $form_id ][ $field_id ]['primary'] = wpforms_setting( 'validation-email-restricted', esc_html__( 'This email address is not allowed.', 'wpforms-lite' ) );
+		// Validate email field with confirmation.
+		if ( isset( $form_data['fields'][ $field_id ]['confirmation'] ) && ! empty( $field_submit['primary'] ) && ! empty( $field_submit['secondary'] ) ) {
+
+			if ( ! is_email( $field_submit['primary'] ) ) {
+				wpforms()->process->errors[ $form_id ][ $field_id ] = esc_html__( 'The provided email is not valid.', 'wpforms-lite' );
+
+			} elseif ( $field_submit['primary'] !== $field_submit['secondary'] ) {
+				wpforms()->process->errors[ $form_id ][ $field_id ] = esc_html__( 'The provided emails do not match.', 'wpforms-lite' );
+
+			} elseif ( ! $this->is_restricted_email( $field_submit['primary'], $form_data['fields'][ $field_id ] ) ) {
+				wpforms()->process->errors[ $form_id ][ $field_id ] = wpforms_setting( 'validation-email-restricted', esc_html__( 'This email address is not allowed.', 'wpforms-lite' ) );
+			}
+		}
+
+		// Validate regular email field, without confirmation.
+		if ( ! isset( $form_data['fields'][ $field_id ]['confirmation'] ) && ! empty( $field_submit['primary'] ) ) {
+
+			if ( ! is_email( $field_submit['primary'] ) ) {
+				wpforms()->process->errors[ $form_id ][ $field_id ] = esc_html__( 'The provided email is not valid.', 'wpforms-lite' );
+
+			} elseif ( ! $this->is_restricted_email( $field_submit['primary'], $form_data['fields'][ $field_id ] ) ) {
+				wpforms()->process->errors[ $form_id ][ $field_id ] = wpforms_setting( 'validation-email-restricted', esc_html__( 'This email address is not allowed.', 'wpforms-lite' ) );
+			}
 		}
 	}
 

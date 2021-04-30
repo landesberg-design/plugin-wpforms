@@ -203,7 +203,6 @@ Admin Form Builder - Fields panel
 	overflow: hidden;
 }
 
-#wpforms-panel-fields .wpforms-add-fields-button.upgrade-modal,
 #wpforms-panel-fields .wpforms-add-fields-button.education-modal,
 #wpforms-panel-fields .wpforms-add-fields-button:disabled {
 	opacity: 0.6;
@@ -346,7 +345,7 @@ Admin Form Builder - Fields panel
 	outline: 0;
 }
 
-#wpforms-panel-fields .wpforms-field-option-group-toggle.upgrade-modal {
+#wpforms-panel-fields .wpforms-field-option-group-toggle.education-modal {
 	opacity: 0.6;
 }
 

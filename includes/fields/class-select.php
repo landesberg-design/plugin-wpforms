@@ -230,7 +230,7 @@ class WPForms_Field_Select extends WPForms_Field {
 					'slug'    => 'show_values',
 					'value'   => isset( $field['show_values'] ) ? $field['show_values'] : '0',
 					'desc'    => esc_html__( 'Show Values', 'wpforms-lite' ),
-					'tooltip' => esc_html__( 'Check this to manually set form field values.', 'wpforms-lite' ),
+					'tooltip' => esc_html__( 'Check this option to manually set form field values.', 'wpforms-lite' ),
 				),
 				false
 			);

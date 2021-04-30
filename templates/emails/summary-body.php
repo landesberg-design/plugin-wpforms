@@ -12,7 +12,7 @@
  * @var array  $info_block
  */
 
-if ( ! \defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -22,35 +22,45 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<tbody>
 	<tr>
 		<td>
-			<h6 class="greeting"><?php \esc_html_e( 'Hi there!', 'wpforms-lite' ); ?></h6>
-			<?php if ( \wpforms()->pro ) : ?>
-				<p class="large"><?php \esc_html_e( 'Let’s see how your forms performed in the past week.', 'wpforms-lite' ); ?></p>
+			<h6 class="greeting"><?php esc_html_e( 'Hi there!', 'wpforms-lite' ); ?></h6>
+			<?php if ( wpforms()->pro ) : ?>
+				<p class="large"><?php esc_html_e( 'Let’s see how your forms performed in the past week.', 'wpforms-lite' ); ?></p>
 			<?php else : ?>
-				<p class="large"><?php \esc_html_e( 'Let’s see how your forms performed.', 'wpforms-lite' ); ?></p>
+				<p class="large"><?php esc_html_e( 'Let’s see how your forms performed.', 'wpforms-lite' ); ?></p>
 				<p class="lite-disclaimer">
-					<?php \esc_html_e( 'Below is the total number of submissions for each form, however actual entries are not stored in WPForms Lite. To generate detailed reports and view future entries inside your WordPress dashboard, consider upgrading to Pro.', 'wpforms-lite' ); ?>
+					<?php
+					echo wp_kses(
+						__( 'Below is the total number of submissions for each form, <strong>however actual entries are not stored by WPForms Lite</strong>.', 'wpforms-lite' ),
+						[
+							'strong' => [],
+						]
+					);
+					?>
+				</p>
+				<p class="lite-disclaimer">
+					<?php esc_html_e( 'To generate detailed reports and view future entries inside your WordPress dashboard, consider upgrading to Pro.', 'wpforms-lite' ); ?>
 				</p>
 			<?php endif; ?>
 			<table class="email-summaries">
 				<thead>
 				<tr>
-					<th><?php \esc_html_e( 'Form', 'wpforms-lite' ); ?></th>
-					<th class="entries-column text-center"><?php \esc_html_e( 'Entries', 'wpforms-lite' ); ?></th>
+					<th><?php esc_html_e( 'Form', 'wpforms-lite' ); ?></th>
+					<th class="entries-column text-center"><?php esc_html_e( 'Entries', 'wpforms-lite' ); ?></th>
 				</tr>
 				</thead>
 				<tbody>
 
 				<?php foreach ( $entries as $row ) : ?>
 					<tr>
-						<td class="text-large"><?php echo isset( $row['title'] ) ? \esc_html( $row['title'] ) : ''; ?></td>
+						<td class="text-large"><?php echo isset( $row['title'] ) ? esc_html( $row['title'] ) : ''; ?></td>
 						<td class="entry-count text-large">
 							<?php if ( empty( $row['edit_url'] ) ) : ?>
 								<span>
-									<?php echo isset( $row['count'] ) ? \absint( $row['count'] ) : ''; ?>
+									<?php echo isset( $row['count'] ) ? absint( $row['count'] ) : ''; ?>
 								</span>
 							<?php else : ?>
-								<a href="<?php echo \esc_url( $row['edit_url'] ); ?>">
-									<?php echo isset( $row['count'] ) ? \absint( $row['count'] ) : ''; ?>
+								<a href="<?php echo esc_url( $row['edit_url'] ); ?>">
+									<?php echo isset( $row['count'] ) ? absint( $row['count'] ) : ''; ?>
 								</a>
 							<?php endif; ?>
 						</td>
@@ -59,7 +69,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 				<?php if ( empty( $entries ) ) : ?>
 					<tr>
-						<td class="text-center" colspan="2"><?php \esc_html_e( 'It appears you do not have any form entries yet.', 'wpforms-lite' ); ?></td>
+						<td class="text-center" colspan="2"><?php esc_html_e( 'It appears you do not have any form entries yet.', 'wpforms-lite' ); ?></td>
 					</tr>
 				<?php endif; ?>
 
@@ -76,13 +86,13 @@ if ( ! \defined( 'ABSPATH' ) ) {
 									<?php if ( ! empty( $info_block['title'] ) ) : ?>
 										<tr>
 											<td class="text-center">
-												<h6><?php echo \esc_html( $info_block['title'] ); ?></h6>
+												<h6><?php echo esc_html( $info_block['title'] ); ?></h6>
 											</td>
 										</tr>
 									<?php endif; ?>
 									<?php if ( ! empty( $info_block['content'] ) ) : ?>
 										<tr>
-											<td class="text-center"><?php echo \wp_kses_post( $info_block['content'] ); ?></td>
+											<td class="text-center"><?php echo wp_kses_post( $info_block['content'] ); ?></td>
 										</tr>
 									<?php endif; ?>
 								</table>
@@ -100,8 +110,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 												<table>
 													<tr>
 														<td>
-															<a href="<?php echo \esc_url( $info_block['url'] ); ?>" rel="noopener noreferrer" target="_blank">
-																<?php echo \esc_html( $info_block['button'] ); ?>
+															<a href="<?php echo esc_url( $info_block['url'] ); ?>" rel="noopener noreferrer" target="_blank">
+																<?php echo esc_html( $info_block['button'] ); ?>
 															</a>
 														</td>
 													</tr>

@@ -229,6 +229,10 @@ class PrintPreview {
 					// Display the fields and their values.
 					foreach ( $fields as $key => $field ) {
 
+						if ( ! isset( $field['id'] ) ) {
+							continue;
+						}
+
 						$field_value  = \apply_filters( 'wpforms_html_field_value', \wp_strip_all_tags( $field['value'] ), $field, $this->form_data, 'entry-single' );
 						$field_class  = \sanitize_html_class( 'wpforms-field-' . $field['type'] );
 						$field_class .= empty( $field_value ) ? ' empty' : '';

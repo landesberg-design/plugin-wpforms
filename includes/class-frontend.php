@@ -893,7 +893,7 @@ class WPForms_Frontend {
 		);
 		$data    = apply_filters( 'wpforms_frontend_recaptcha', $data, $form_data );
 
-		if ( 'recaptcha' === $captcha_settings['provider'] && 'invisible' === $captcha_settings['recaptcha_type'] ) {
+		if ( $captcha_settings['provider'] === 'recaptcha' && $captcha_settings['recaptcha_type'] === 'invisible' ) {
 			$data['size'] = 'invisible';
 		}
 
@@ -1296,22 +1296,20 @@ class WPForms_Frontend {
 	 */
 	protected function get_captcha_inline_script( $captcha_settings ) {
 
-		$data = '';
-
-		if ( 'hcaptcha' === $captcha_settings['provider'] ) {
+		if ( $captcha_settings['provider'] === 'hcaptcha' ) {
 			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){var captchaID = hcaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}});jQuery(el).attr( "data-recaptcha-id", captchaID);});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
 			$data .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
 
 			return $data;
 		}
 
-		if ( 'v3' === $captcha_settings['recaptcha_type'] ) {
+		if ( $captcha_settings['recaptcha_type'] === 'v3' ) {
 			$data = 'var wpformsRecaptchaLoad = function(){grecaptcha.execute("' . $captcha_settings['site_key'] . '",{action:"wpforms"}).then(function(token){var f=document.getElementsByName("wpforms[recaptcha]");for(var i=0;i<f.length;i++){f[i].value = token;}});jQuery(document).trigger("wpformsRecaptchaLoaded");}; grecaptcha.ready(wpformsRecaptchaLoad);';
-		} elseif ( 'invisible' === $captcha_settings['recaptcha_type'] ) {
-			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index,el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).closest("form").find("button[type=submit]").get(0).recaptchaID = recaptchaID;});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
+		} elseif ( $captcha_settings['recaptcha_type'] === 'invisible' ) {
+			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index,el){try{var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).closest("form").find("button[type=submit]").get(0).recaptchaID = recaptchaID;}catch(error){}});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
 			$data .= 'var wpformsRecaptchaCallback = function(el){var $form = jQuery(el).closest("form");if(typeof wpforms.formSubmit === "function"){wpforms.formSubmit($form);}else{$form.find("button[type=submit]").get(0).recaptchaID = false;$form.submit();}};';
 		} else {
-			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}});jQuery(el).attr( "data-recaptcha-id", recaptchaID);});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
+			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){try{var recaptchaID = grecaptcha.render( el, {callback:function(){wpformsRecaptchaCallback(el);}});}catch(error){}jQuery(el).attr( "data-recaptcha-id", recaptchaID);});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
 			$data .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
 		}
 
@@ -1377,12 +1375,9 @@ class WPForms_Frontend {
 	 */
 	public function get_strings() {
 
-		$captcha_settings = wpforms_get_captcha_settings();
-
 		// Define base strings.
-		$strings = array(
+		$strings = [
 			'val_required'               => wpforms_setting( 'validation-required', esc_html__( 'This field is required.', 'wpforms-lite' ) ),
-			'val_url'                    => wpforms_setting( 'validation-url', esc_html__( 'Please enter a valid URL.', 'wpforms-lite' ) ),
 			'val_email'                  => wpforms_setting( 'validation-email', esc_html__( 'Please enter a valid email address.', 'wpforms-lite' ) ),
 			'val_email_suggestion'       => wpforms_setting( 'validation-email-suggestion', esc_html__( 'Did you mean {suggestion}?', 'wpforms-lite' ) ),
 			'val_email_suggestion_title' => esc_attr__( 'Click to accept this suggestion.', 'wpforms-lite' ),
@@ -1390,19 +1385,11 @@ class WPForms_Frontend {
 			'val_number'                 => wpforms_setting( 'validation-number', esc_html__( 'Please enter a valid number.', 'wpforms-lite' ) ),
 			'val_number_positive'        => wpforms_setting( 'validation-number-positive', esc_html__( 'Please enter a valid positive number.', 'wpforms-lite' ) ),
 			'val_confirm'                => wpforms_setting( 'validation-confirm', esc_html__( 'Field values do not match.', 'wpforms-lite' ) ),
-			'val_fileextension'          => wpforms_setting( 'validation-fileextension', esc_html__( 'File type is not allowed.', 'wpforms-lite' ) ),
-			'val_filesize'               => wpforms_setting( 'validation-filesize', esc_html__( 'File exceeds max size allowed. File was not uploaded.', 'wpforms-lite' ) ),
-			'val_time12h'                => wpforms_setting( 'validation-time12h', esc_html__( 'Please enter time in 12-hour AM/PM format (eg 8:45 AM).', 'wpforms-lite' ) ),
-			'val_time24h'                => wpforms_setting( 'validation-time24h', esc_html__( 'Please enter time in 24-hour format (eg 22:45).', 'wpforms-lite' ) ),
-			'val_requiredpayment'        => wpforms_setting( 'validation-requiredpayment', esc_html__( 'Payment is required.', 'wpforms-lite' ) ),
-			'val_creditcard'             => wpforms_setting( 'validation-creditcard', esc_html__( 'Please enter a valid credit card number.', 'wpforms-lite' ) ),
-			'val_post_max_size'          => wpforms_setting( 'validation-post_max_size', esc_html__( 'The total size of the selected files {totalSize} Mb exceeds the allowed limit {maxSize} Mb.', 'wpforms-lite' ) ),
 			'val_checklimit'             => wpforms_setting( 'validation-check-limit', esc_html__( 'You have exceeded the number of allowed selections: {#}.', 'wpforms-lite' ) ),
 			'val_limit_characters'       => wpforms_setting( 'validation-character-limit', esc_html__( '{count} of {limit} max characters.', 'wpforms-lite' ) ),
 			'val_limit_words'            => wpforms_setting( 'validation-word-limit', esc_html__( '{count} of {limit} max words.', 'wpforms-lite' ) ),
 			'val_recaptcha_fail_msg'     => wpforms_setting( 'recaptcha-fail-msg', esc_html__( 'Google reCAPTCHA verification failed, please try again later.', 'wpforms-lite' ) ),
 			'val_empty_blanks'           => wpforms_setting( 'validation-input-mask-incomplete', esc_html__( 'Please fill out all blanks.', 'wpforms-lite' ) ),
-			'post_max_size'              => wpforms_size_to_bytes( ini_get( 'post_max_size' ) ),
 			'uuid_cookie'                => false,
 			'locale'                     => wpforms_get_language_code(),
 			'wpforms_plugin_url'         => WPFORMS_PLUGIN_URL,
@@ -1412,18 +1399,20 @@ class WPForms_Frontend {
 			'mailcheck_domains'          => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_domains', array() ) ),
 			'mailcheck_toplevel_domains' => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_toplevel_domains', array( 'dev' ) ) ),
 			'is_ssl'                     => is_ssl(),
-		);
+		];
 
 		// Include payment related strings if needed.
 		if ( function_exists( 'wpforms_get_currencies' ) ) {
-			$currency                       = wpforms_setting( 'currency', 'USD' );
+			$currency                       = wpforms_get_currency();
 			$currencies                     = wpforms_get_currencies();
 			$strings['currency_code']       = $currency;
-			$strings['currency_thousands']  = $currencies[ $currency ]['thousands_separator'];
-			$strings['currency_decimal']    = $currencies[ $currency ]['decimal_separator'];
-			$strings['currency_symbol']     = $currencies[ $currency ]['symbol'];
-			$strings['currency_symbol_pos'] = $currencies[ $currency ]['symbol_pos'];
+			$strings['currency_thousands']  = isset( $currencies[ $currency ]['thousands_separator'] ) ? $currencies[ $currency ]['thousands_separator'] : ',';
+			$strings['currency_decimals']   = wpforms_get_currency_decimals( $currencies[ $currency ] );
+			$strings['currency_decimal']    = isset( $currencies[ $currency ]['decimal_separator'] ) ? $currencies[ $currency ]['decimal_separator'] : '.';
+			$strings['currency_symbol']     = isset( $currencies[ $currency ]['symbol'] ) ? $currencies[ $currency ]['symbol'] : '$';
+			$strings['currency_symbol_pos'] = isset( $currencies[ $currency ]['symbol_pos'] ) ? $currencies[ $currency ]['symbol_pos'] : 'left';
 		}
+
 		$strings = apply_filters( 'wpforms_frontend_strings', $strings );
 
 		foreach ( (array) $strings as $key => $value ) {
@@ -1545,7 +1534,16 @@ class WPForms_Frontend {
 	 */
 	public function missing_assets_error_js() {
 
-		if ( ! wpforms_current_user_can() || wpforms_is_amp() ) {
+		/**
+		 * Disable missing assets error js checking.
+		 *
+		 * @since 1.6.6
+		 *
+		 * @param bool False by default, set to True to disable checking.
+		 */
+		$skip = (bool) apply_filters( 'wpforms_frontend_missing_assets_error_js_disable', false );
+
+		if ( ! wpforms_current_user_can() || wpforms_is_amp() || $skip ) {
 			return;
 		}
 

@@ -59,7 +59,7 @@ class Help {
 		$this->settings = [
 
 			// Remote source URL.
-			'docs_remote_source' => 'https://cdn.wpforms.com/wp-content/docs.json',
+			'docs_remote_source' => 'https://wpforms.com/wp-content/docs.json',
 
 			// Docs cache file (full path).
 			'cache_file'         => $upload_path . 'cache/docs.json',

@@ -21,7 +21,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 	<br>
 
-	<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpforms-builder' ) ); ?>" class="wpforms-btn add-new-h2 wpforms-btn-orange"><?php esc_html_e( 'Create Your Form', 'wpforms-lite' ); ?></a>
+	<?php if ( wpforms_current_user_can( 'create_forms' ) ) : ?>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpforms-builder' ) ); ?>" class="wpforms-btn add-new-h2 wpforms-btn-orange"><?php esc_html_e( 'Create Your Form', 'wpforms-lite' ); ?></a>
+	<?php endif; ?>
 
 	<p class="wpforms-admin-no-forms-footer">
 		<?php

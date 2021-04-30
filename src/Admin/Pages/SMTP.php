@@ -367,7 +367,7 @@ class SMTP {
 		if ( ! $this->output_data['plugin_installed'] && ! $this->output_data['pro_plugin_installed'] ) {
 			$step['icon']          = 'step-1.svg';
 			$step['button_text']   = esc_html__( 'Install WP Mail SMTP', 'wpforms-lite' );
-			$step['button_class']  = '';
+			$step['button_class']  = 'button-primary';
 			$step['button_action'] = 'install';
 			$step['plugin']        = $this->config['lite_download_url'];
 
@@ -382,7 +382,7 @@ class SMTP {
 			$this->output_data['plugin_setup']     = $this->is_smtp_configured();
 			$step['icon']                          = $this->output_data['plugin_activated'] ? 'step-complete.svg' : 'step-1.svg';
 			$step['button_text']                   = $this->output_data['plugin_activated'] ? esc_html__( 'WP Mail SMTP Installed & Activated', 'wpforms-lite' ) : esc_html__( 'Activate WP Mail SMTP', 'wpforms-lite' );
-			$step['button_class']                  = $this->output_data['plugin_activated'] ? 'grey disabled' : '';
+			$step['button_class']                  = $this->output_data['plugin_activated'] ? 'grey disabled' : 'button-primary';
 			$step['button_action']                 = $this->output_data['plugin_activated'] ? '' : 'activate';
 			$step['plugin']                        = $this->output_data['pro_plugin_installed'] ? $this->config['pro_plugin'] : $this->config['lite_plugin'];
 		}
@@ -411,7 +411,7 @@ class SMTP {
 			$step['section_class'] = '';
 			$step['button_text']   = esc_html__( 'Open Setup Wizard', 'wpforms-lite' );
 		} else {
-			$step['button_class'] = $this->output_data['plugin_activated'] ? '' : 'grey disabled';
+			$step['button_class'] = $this->output_data['plugin_activated'] ? 'button-primary' : 'grey disabled';
 		}
 
 		return $step;

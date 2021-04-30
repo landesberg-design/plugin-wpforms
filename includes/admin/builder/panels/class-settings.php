@@ -213,7 +213,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 		/*
 		 * Notifications.
 		 */
-		echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-notifications">';
+		echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-notifications" data-panel="notifications">';
 
 			do_action( 'wpforms_form_settings_notifications', $this );
 
@@ -222,7 +222,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 		/*
 		 * Confirmations.
 		 */
-		echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-confirmation">';
+		echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-confirmation" data-panel="confirmations">';
 
 			do_action( 'wpforms_form_settings_confirmations', $this );
 

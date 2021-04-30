@@ -535,7 +535,7 @@ class WPForms_License {
 	 * @param array  $headers       The headers to send to the remote URL.
 	 * @param string $return_format The format for returning content from the remote URL.
 	 *
-	 * @return string|bool Json decoded response on success, false on failure.
+	 * @return mixed Json decoded response on success, false on failure.
 	 */
 	public function perform_remote_request( $action, $body = array(), $headers = array(), $return_format = 'json' ) {
 

@@ -378,7 +378,7 @@ class ListTable extends WP_List_Table {
 	 */
 	public function no_items() {
 
-		esc_html_e( 'No logs found', 'wpforms-lite' );
+		esc_html_e( 'No logs found.', 'wpforms-lite' );
 	}
 
 

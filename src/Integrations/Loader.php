@@ -39,6 +39,7 @@ class Loader {
 			'WPMailSMTP\Notifications',
 			'WPorg\Translations',
 			'UsageTracking\UsageTracking',
+			'DefaultThemes\DefaultThemes',
 			'TranslationsPress\Translations',
 		);
 

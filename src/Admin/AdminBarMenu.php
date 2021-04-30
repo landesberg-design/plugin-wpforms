@@ -87,6 +87,14 @@ class AdminBarMenu {
 			[],
 			WPFORMS_VERSION
 		);
+
+		// WordPress 5.7 color set.
+		if ( version_compare( get_bloginfo( 'version' ), '5.7', '>=' ) ) {
+			$inline_styles  = '#wpadminbar .wpforms-menu-notification-indicator { background-color: #d63638 !important; }';
+			$inline_styles .= '#wpadminbar .wpforms-menu-notification-counter { background-color: #d63638 !important; }';
+
+			wp_add_inline_style( 'wpforms-admin-bar', $inline_styles );
+		}
 	}
 
 	/**

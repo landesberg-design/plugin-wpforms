@@ -79,11 +79,13 @@ class Translations implements IntegrationInterface {
 			return false;
 		}
 
+		// Important for `current_user_can` function in WordPress 4.9.0 - 4.9.4.
+		require_once ABSPATH . 'wp-admin/includes/template.php';
+
 		if ( ! current_user_can( 'install_languages' ) ) {
 			return false;
 		}
 
-		require_once ABSPATH . 'wp-admin/includes/template.php';
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 

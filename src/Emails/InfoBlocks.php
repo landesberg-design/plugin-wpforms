@@ -13,7 +13,7 @@ class InfoBlocks {
 	 *
 	 * @since 1.5.4
 	 */
-	const SOURCE_URL = 'https://cdn.wpforms.com/wp-content/email-summaries.json';
+	const SOURCE_URL = 'https://wpforms.com/wp-content/email-summaries.json';
 
 	/**
 	 * Get info blocks info from the cache file or remote.

@@ -360,30 +360,44 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		if ( ! empty( $field['value_raw'] ) ) {
 			return wpforms_chain( $field['value_raw'] )
 				->map(
-					static function ( $file ) {
+					function ( $file ) use ( $context ) {
 
 						if ( empty( $file['value'] ) || empty( $file['file_original'] ) ) {
 							return '';
 						}
 
-						return sprintf(
-							'<a href="%s" rel="noopener noreferrer" target="_blank">%s</a>',
-							esc_url( $file['value'] ),
-							esc_html( $file['file_original'] )
-						);
+						return $this->get_file_link_html( $file, $context ) . '<br>';
 					}
 				)
 				->array_filter()
-				->implode( '<br>' )
+				->implode()
 				->value();
 		}
 
-		// Process classic uploader.
-		return sprintf(
-			'<a href="%s" rel="noopener" target="_blank">%s</a>',
-			esc_url( $field['value'] ),
-			esc_html( $field['file_original'] )
+		return $this->get_file_link_html( $field, $context );
+	}
+
+	/**
+	 * Get file link HTML.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param array  $file    File data.
+	 * @param string $context Value display context.
+	 *
+	 * @return string
+	 */
+	private function get_file_link_html( $file, $context ) {
+
+		$html  = in_array( $context, [ 'email-html', 'entry-single' ], true ) ? $this->file_icon_html( $file ) : '';
+		$html .= sprintf(
+			'<a href="%s" rel="noopener noreferrer" target="_blank" style="%s">%s</a>',
+			esc_url( $file['value'] ),
+			$context === 'email-html' ? 'padding-left:10px;' : '',
+			esc_html( $file['file_original'] )
 		);
+
+		return $html;
 	}
 
 	/**
@@ -395,14 +409,14 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 */
 	public function get_strings() {
 
-		return array(
+		return [
 			'preview_title_single' => esc_html__( 'Click or drag a file to this area to upload.', 'wpforms' ),
 			'preview_title_plural' => esc_html__( 'Click or drag files to this area to upload.', 'wpforms' ),
 			'preview_hint'         => sprintf( /* translators: % - max number of files as a template string (not a number), replaced by a number later. */
 				esc_html__( 'You can upload up to %s files.', 'wpforms' ),
 				self::TEMPLATE_MAXFILENUM
 			),
-		);
+		];
 	}
 
 	/**
@@ -2101,6 +2115,166 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$output .= "Disallow: $upload_root\n";
 
 		return $output;
+	}
+
+	/**
+	 * Get file icon html.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param array $file_data File data.
+	 *
+	 * @return string
+	 */
+	public function file_icon_html( $file_data ) {
+
+		$src       = esc_url( $file_data['value'] );
+		$ext_types = wp_get_ext_types();
+
+		if ( ! in_array( $file_data['ext'], $ext_types['image'], true ) ) {
+
+			$src = wp_mime_type_icon( wp_ext2type( $file_data['ext'] ) );
+		} elseif ( $file_data['attachment_id'] ) {
+
+			$image = wp_get_attachment_image_src( $file_data['attachment_id'], [ 16, 16 ], true );
+			$src   = $image ? $image[0] : $src;
+		}
+
+		return sprintf( '<span class="file-icon"><img width="16" height="16" src="%s" alt="" /></span>', esc_url( $src ) );
+	}
+
+	/**
+	 * Get Form files path.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param string $form_id Form ID.
+	 *
+	 * @return string
+	 */
+	private static function get_form_files_path( $form_id ) {
+
+		$form_data = wpforms()->form->get( $form_id );
+
+		$upload_dir = wpforms_upload_dir();
+		$folder     = absint( $form_data->ID ) . '-' . wp_hash( $form_data->post_date . $form_data->ID );
+
+		return trailingslashit( $upload_dir['path'] ) . $folder;
+	}
+
+	/**
+	 * Maybe delete uploaded files from entry.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param string $entry_id       Entry ID.
+	 * @param array  $delete_fields  Fields to delete.
+	 * @param array  $exclude_fields Exclude fields.
+	 *
+	 * @return array Removed files names.
+	 */
+	public static function delete_uploaded_files_from_entry( $entry_id, $delete_fields = [], $exclude_fields = [] ) {
+
+		$removed_files = [];
+		$entry         = wpforms()->entry->get( $entry_id );
+
+		if ( empty( $entry ) ) {
+			return $removed_files;
+		}
+
+		$files_path       = self::get_form_files_path( $entry->form_id );
+		$fields_to_delete = $delete_fields ? $delete_fields : (array) wpforms_decode( $entry->fields );
+
+		foreach ( $fields_to_delete as $field ) {
+
+
+			if ( ! isset( $field['type'] ) || $field['type'] !== 'file-upload' || ( $exclude_fields && ! isset( $exclude_fields[ $field['id'] ] ) ) ) {
+				continue;
+			}
+
+			$removed_files = self::delete_uploaded_file_from_entry( $removed_files, $field, $exclude_fields, $files_path );
+		}
+
+		return $removed_files;
+	}
+
+	/**
+	 * Maybe delete uploaded file from entry.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param array  $removed_files  Removed files array.
+	 * @param array  $field          Field to delete.
+	 * @param array  $exclude_fields Exclude fields.
+	 * @param string $files_path     Form files path.
+	 *
+	 * @return array
+	 */
+	private static function delete_uploaded_file_from_entry( $removed_files, $field, $exclude_fields, $files_path ) {
+
+		if ( ! self::is_modern_upload( $field ) ) {
+
+			$removed_files[] = self::delete_uploaded_file( $files_path, $field );
+
+			return $removed_files;
+		}
+
+		$values = $field['value_raw'];
+
+		if ( $exclude_fields ) {
+			$values = ! empty( $field['value_raw'] ) ? array_diff_key( $exclude_fields[ $field['id'] ]['value_raw'], $field['value_raw'] ) : $exclude_fields[ $field['id'] ]['value_raw'];
+		}
+
+		if ( empty( $values ) ) {
+			return $removed_files;
+		}
+
+		foreach ( $values as $value_raw ) {
+			$removed_files[] = self::delete_uploaded_file( $files_path, $value_raw );
+		}
+
+		return $removed_files;
+	}
+
+	/**
+	 * Delete uploaded file.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @param string $files_path Path to files.
+	 * @param array  $file_data  File data.
+	 *
+	 * @return string
+	 */
+	private static function delete_uploaded_file( $files_path, $file_data ) {
+
+		if ( empty( $file_data['file'] ) ) {
+			return '';
+		}
+
+		$file = trailingslashit( $files_path ) . $file_data['file'];
+
+		if ( ! is_file( $file ) ) {
+			return '';
+		}
+
+		unlink( $file );
+
+		return $file_data['file_user_name'];
+	}
+
+	/**
+	 * Check if modern upload was used.
+	 *
+	 * @param array $field_data Field data.
+	 *
+	 * @since 1.6.6
+	 *
+	 * @return bool
+	 */
+	public static function is_modern_upload( $field_data ) {
+
+		return isset( $field_data['style'] ) && $field_data['style'] === self::STYLE_MODERN;
 	}
 }
 

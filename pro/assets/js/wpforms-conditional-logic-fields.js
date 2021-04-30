@@ -105,7 +105,7 @@
 			}
 
 			var $form = $( el ),
-				$field, type, tagName;
+				$field, type, tagName, $ratingBlock;
 
 			$form.find( '.wpforms-conditional-hide :input' ).each( function() {
 
@@ -124,6 +124,13 @@
 					case 'checkbox':
 					case 'radio':
 						$field.closest( 'ul' ).find( 'li' ).removeClass( 'wpforms-selected' );
+
+						// Reset Rating field labels.
+						$ratingBlock = $field.closest( 'div.wpforms-field-rating-items' );
+						if ( $ratingBlock.length ) {
+							$ratingBlock.find( 'label' ).removeClass( 'selected' );
+						}
+
 						if ( $field.is( ':checked' ) ) {
 							$field.prop( 'checked', false ).trigger( 'change' );
 						}

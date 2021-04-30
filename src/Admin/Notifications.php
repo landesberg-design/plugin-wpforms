@@ -16,7 +16,7 @@ class Notifications {
 	 *
 	 * @var string
 	 */
-	const SOURCE_URL = 'https://plugin-cdn.wpforms.com/wp-content/notifications.json';
+	const SOURCE_URL = 'https://plugin.wpforms.com/wp-content/notifications.json';
 
 	/**
 	 * Option value.

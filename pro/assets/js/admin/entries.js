@@ -19,7 +19,7 @@ var WPFormsPagesEntries = window.WPFormsPagesEntries || ( function( document, wi
 		 */
 		init: function() {
 
-			$( document ).ready( app.ready );
+			$( app.ready );
 		},
 
 		/**

@@ -143,22 +143,34 @@ class Export {
 	protected function init_settings() {
 
 		// Additional information fields.
+		$this->additional_info_fields = [
+			'entry_id'   => esc_html__( 'Entry ID', 'wpforms' ),
+			'date'       => esc_html__( 'Entry Date', 'wpforms' ),
+			'notes'      => esc_html__( 'Entry Notes', 'wpforms' ),
+			'viewed'     => esc_html__( 'Viewed', 'wpforms' ),
+			'starred'    => esc_html__( 'Starred', 'wpforms' ),
+			'user_agent' => esc_html__( 'User Agent', 'wpforms' ),
+			'ip_address' => esc_html__( 'User IP', 'wpforms' ),
+			'user_uuid'  => esc_html__( 'Unique Generated User ID', 'wpforms' ),
+			'pstatus'    => esc_html__( 'Payment Status', 'wpforms' ),
+			'pginfo'     => esc_html__( 'Payment Gateway Information', 'wpforms' ),
+			'del_fields' => esc_html__( 'Include data of previously deleted fields', 'wpforms' ),
+		];
+
+		if ( function_exists( 'wpforms_geolocation' ) ) {
+			$this->additional_info_fields['geodata'] = esc_html__( 'Geolocation Details', 'wpforms' );
+		}
+
+		/**
+		 * Additional information fields for entries export.
+		 *
+		 * @since 1.5.5.1
+		 *
+		 * @param array $fields Additional info fields.
+		 */
 		$this->additional_info_fields = apply_filters(
 			'wpforms_pro_admin_entries_export_additional_info_fields',
-			array(
-				'entry_id'   => esc_html__( 'Entry ID', 'wpforms' ),
-				'date'       => esc_html__( 'Entry Date', 'wpforms' ),
-				'notes'      => esc_html__( 'Entry Notes', 'wpforms' ),
-				'viewed'     => esc_html__( 'Viewed', 'wpforms' ),
-				'starred'    => esc_html__( 'Starred', 'wpforms' ),
-				'user_agent' => esc_html__( 'User Agent', 'wpforms' ),
-				'ip_address' => esc_html__( 'User IP', 'wpforms' ),
-				'user_uuid'  => esc_html__( 'Unique Generated User ID', 'wpforms' ),
-				'geodata'    => esc_html__( 'Geolocation Details', 'wpforms' ),
-				'pstatus'    => esc_html__( 'Payment Status', 'wpforms' ),
-				'pginfo'     => esc_html__( 'Payment Gateway Information', 'wpforms' ),
-				'del_fields' => esc_html__( 'Include data of previously deleted fields', 'wpforms' ),
-			)
+			$this->additional_info_fields
 		);
 
 		// This option should be available only if zip PHP extension is loaded.

@@ -245,10 +245,8 @@ namespace WPForms {
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/builder/functions.php';
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-settings.php';
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-welcome.php';
-				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-tools.php';
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-editor.php';
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-review.php';
-				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-importers.php';
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/class-about.php';
 				require_once WPFORMS_PLUGIN_DIR . 'includes/admin/ajax-actions.php';
 			}

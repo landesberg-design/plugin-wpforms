@@ -311,7 +311,7 @@ class WPForms_Builder {
 			'dom-purify',
 			WPFORMS_PLUGIN_URL . 'assets/js/purify.min.js',
 			[],
-			'2.2.6'
+			'2.2.7'
 		);
 
 		if ( wp_is_mobile() ) {
@@ -539,8 +539,9 @@ class WPForms_Builder {
 			return;
 		}
 
-		$form_id  = $this->form ? absint( $this->form->ID ) : '';
-		$field_id = ! empty( $this->form_data['field_id'] ) ? $this->form_data['field_id'] : '';
+		$form_id      = $this->form ? absint( $this->form->ID ) : '';
+		$field_id     = ! empty( $this->form_data['field_id'] ) ? $this->form_data['field_id'] : '';
+		$allowed_caps = [ 'edit_posts', 'edit_other_posts', 'edit_private_posts', 'edit_published_posts', 'edit_pages', 'edit_other_pages', 'edit_published_pages', 'edit_private_pages' ];
 		?>
 
 		<div id="wpforms-builder" class="wpforms-admin-page">
@@ -602,10 +603,12 @@ class WPForms_Builder {
 
 						<?php if ( $this->form ) : ?>
 
-							<a href="#" id="wpforms-embed" title="<?php esc_attr_e( 'Embed Form', 'wpforms-lite' ); ?>">
-								<i class="fa fa-code"></i>
-								<span class="text"><?php esc_html_e( 'Embed', 'wpforms-lite' ); ?></span>
-							</a>
+							<?php if ( array_filter( (array) $allowed_caps, 'current_user_can' ) ) : ?>
+								<a href="#" id="wpforms-embed" title="<?php esc_attr_e( 'Embed Form', 'wpforms-lite' ); ?>">
+									<i class="fa fa-code"></i>
+									<span class="text"><?php esc_html_e( 'Embed', 'wpforms-lite' ); ?></span>
+								</a>
+							<?php endif; ?>
 
 							<a href="#" id="wpforms-save" title="<?php esc_attr_e( 'Save Form', 'wpforms-lite' ); ?>">
 								<i class="fa fa-check"></i>

@@ -360,7 +360,12 @@ class WPForms_Overview_Table extends WP_List_Table {
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		// Get forms.
-		$total    = wp_count_posts( 'wpforms' )->publish;
+		if ( wpforms_current_user_can( 'wpforms_view_others_forms' ) ) {
+			$total = wp_count_posts( 'wpforms' )->publish;
+		} else {
+			$total = count_user_posts( get_current_user_id(), 'wpforms', true );
+		}
+
 		$page     = $this->get_pagenum();
 		$order    = isset( $_GET['order'] ) ? $_GET['order'] : 'DESC';
 		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'ID';

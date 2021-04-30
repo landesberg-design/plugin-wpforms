@@ -471,16 +471,7 @@ class WPForms_Pro {
 
 		// If GDPR enhancements are enabled and user details are disabled
 		// globally or in the form settings, discard the IP and UA.
-		if (
-			(
-				wpforms_setting( 'gdpr', false ) &&
-				(
-					wpforms_setting( 'gdpr-disable-details', false ) ||
-					! empty( $form_data['settings']['disable_ip'] )
-				)
-			) ||
-			! apply_filters( 'wpforms_disable_entry_user_ip', '__return_false', $fields, $form_data )
-		) {
+		if ( ! wpforms_is_collecting_ip_allowed( $form_data ) || ! apply_filters( 'wpforms_disable_entry_user_ip', '__return_false', $fields, $form_data ) ) {
 			$user_agent = '';
 			$user_ip    = '';
 		}
@@ -667,11 +658,13 @@ class WPForms_Pro {
 
 		$default_notifications_key = min( array_keys( $notifications ) );
 
+		$hidden = empty( $settings->form_data['settings']['notification_enable'] ) ? 'hidden' : '';
+
 		echo '<div class="wpforms-panel-content-section-title">';
 			echo '<span id="wpforms-builder-settings-notifications-title">';
 				esc_html_e( 'Notifications', 'wpforms' );
 			echo '</span>';
-			echo '<button class="wpforms-notifications-add wpforms-builder-settings-block-add" data-block-type="notification" data-next-id="' . absint( $next_id ) . '">' . esc_html__( 'Add New Notification', 'wpforms' ) . '</button>';
+			echo '<button class="wpforms-notifications-add wpforms-builder-settings-block-add ' . esc_attr( $hidden ) . '" data-block-type="notification" data-next-id="' . absint( $next_id ) . '">' . esc_html__( 'Add New Notification', 'wpforms' ) . '</button>';// phpcs:ignore
 		echo '</div>';
 
 		wpforms_panel_field(
@@ -1097,22 +1090,51 @@ class WPForms_Pro {
 	 * @since 1.2.6
 	 *
 	 * @param array  $strings List of strings.
-	 * @param object $form
+	 * @param object $form    CPT of the form.
 	 *
 	 * @return array
 	 */
 	public function form_builder_strings( $strings, $form ) {
 
-		$currency   = wpforms_setting( 'currency', 'USD' );
+		$currency   = wpforms_get_currency();
 		$currencies = wpforms_get_currencies();
 
 		$strings['currency']            = sanitize_text_field( $currency );
-		$strings['currency_name']       = sanitize_text_field( $currencies[ $currency ]['name'] );
-		$strings['currency_decimal']    = sanitize_text_field( $currencies[ $currency ]['decimal_separator'] );
-		$strings['currency_thousands']  = sanitize_text_field( $currencies[ $currency ]['thousands_separator'] );
-		$strings['currency_symbol']     = sanitize_text_field( $currencies[ $currency ]['symbol'] );
-		$strings['currency_symbol_pos'] = sanitize_text_field( $currencies[ $currency ]['symbol_pos'] );
+		$strings['currency_name']       = isset( $currencies[ $currency ]['name'] ) ? sanitize_text_field( $currencies[ $currency ]['name'] ) : '';
+		$strings['currency_decimals']   = wpforms_get_currency_decimals( $currencies[ $currency ] );
+		$strings['currency_decimal']    = isset( $currencies[ $currency ]['decimal_separator'] ) ? sanitize_text_field( $currencies[ $currency ]['decimal_separator'] ) : '.';
+		$strings['currency_thousands']  = isset( $currencies[ $currency ]['thousands_separator'] ) ? sanitize_text_field( $currencies[ $currency ]['thousands_separator'] ) : ',';
+		$strings['currency_symbol']     = isset( $currencies[ $currency ]['symbol'] ) ? sanitize_text_field( $currencies[ $currency ]['symbol'] ) : '$';
+		$strings['currency_symbol_pos'] = isset( $currencies[ $currency ]['symbol_pos'] ) ? sanitize_text_field( $currencies[ $currency ]['symbol_pos'] ) : 'left';
 		$strings['notification_clone']  = esc_html__( ' - clone', 'wpforms' );
+
+		$strings['notification_by_status_enable_alert'] = wp_kses(
+		// translators: %s: Payment provider completed payments. Example: `PayPal Standard completed payments`.
+			__( '<p>You have just enabled this notification for <strong>%s</strong>. Please note that this email notification will only send for <strong>%s</strong>.</p><p>If you\'d like to set up additional notifications for this form, please see our <a href="https://wpforms.com/docs/setup-form-notification-wpforms/" rel="nofollow noopener" target="_blank">tutorial</a>.</p>', 'wpforms' ), // phpcs:ignore WordPress.WP.I18n.UnorderedPlaceholdersText
+			[
+				'p'      => [],
+				'strong' => [],
+				'a'      => [
+					'href'   => [],
+					'rel'    => [],
+					'target' => [],
+				],
+			]
+		);
+
+		$strings['notification_by_status_switch_alert'] = wp_kses(
+		// translators: %1$s: Payment provider completed payments. Example: `PayPal Standard completed payments`, %2$s - Disabled Payment provider completed payments.
+			__( '<p>You have just <strong>disabled</strong> the notification for <strong>%2$s</strong> and <strong>enabled</strong> the notification for <strong>%1$s</strong>. Please note that this email notification will only send for <strong>%1$s</strong>.</p><p>If you\'d like to set up additional notifications for this form, please see our <a href="https://wpforms.com/docs/setup-form-notification-wpforms/" rel="nofollow noopener" target="_blank">tutorial</a>.</p>', 'wpforms' ), // phpcs:ignore WordPress.WP.I18n.UnorderedPlaceholdersText
+			[
+				'p'      => [],
+				'strong' => [],
+				'a'      => [
+					'href'   => [],
+					'rel'    => [],
+					'target' => [],
+				],
+			]
+		);
 
 		return $strings;
 	}
@@ -1129,8 +1151,24 @@ class WPForms_Pro {
 	public function frontend_strings( $strings ) {
 
 		// If the user has GDPR enhancements enabled and has disabled UUID,
-		// disable the the setting, otherwise enable it.
+		// disable the setting, otherwise enable it.
 		$strings['uuid_cookie'] = ! wpforms_setting( 'gdpr-disable-uuid', false );
+
+		$strings['val_requiredpayment'] = wpforms_setting( 'validation-requiredpayment', esc_html__( 'Payment is required.', 'wpforms' ) );
+		$strings['val_creditcard']      = wpforms_setting( 'validation-creditcard', esc_html__( 'Please enter a valid credit card number.', 'wpforms' ) );
+		$strings['val_post_max_size']   = wpforms_setting( 'validation-post_max_size', esc_html__( 'The total size of the selected files {totalSize} Mb exceeds the allowed limit {maxSize} Mb.', 'wpforms' ) );
+
+		// Date/time.
+		$strings['val_time12h'] = wpforms_setting( 'validation-time12h', esc_html__( 'Please enter time in 12-hour AM/PM format (eg 8:45 AM).', 'wpforms' ) );
+		$strings['val_time24h'] = wpforms_setting( 'validation-time24h', esc_html__( 'Please enter time in 24-hour format (eg 22:45).', 'wpforms' ) );
+
+		// URL.
+		$strings['val_url'] = wpforms_setting( 'validation-url', esc_html__( 'Please enter a valid URL.', 'wpforms' ) );
+
+		// File upload.
+		$strings['val_fileextension'] = wpforms_setting( 'validation-fileextension', esc_html__( 'File type is not allowed.', 'wpforms' ) );
+		$strings['val_filesize']      = wpforms_setting( 'validation-filesize', esc_html__( 'File exceeds max size allowed. File was not uploaded.', 'wpforms' ) );
+		$strings['post_max_size']     = wpforms_size_to_bytes( ini_get( 'post_max_size' ) );
 
 		return $strings;
 	}

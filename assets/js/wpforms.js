@@ -175,7 +175,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					var validator = this,
 						$el = $( element ),
 						$field = $el.closest( '.wpforms-field' ),
-						$form = $el.closest( '.wpforms-form' );
+						$form = $el.closest( '.wpforms-form' ),
+						isValid = 'pending';
 
 					if ( ! $el.val().length ) {
 						return true;
@@ -196,8 +197,9 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 						dataType: 'json',
 						success: function( response ) {
 
-							var isValid =  response.success && response.data,
-								errors = {};
+							var errors = {};
+
+							isValid = response.success && response.data;
 
 							if ( isValid ) {
 								validator.resetInternals();
@@ -210,7 +212,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 							validator.stopRequest( element, isValid );
 						},
 					} );
-					return 'pending';
+					return isValid;
 				}, wpforms_settings.val_email_restricted );
 
 				// Validate confirmations.
@@ -965,18 +967,6 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				app.amountTotal( el, true );
 			} );
 
-			// Payment radio/checkbox fields: preselect the selected payment (from dynamic/fallback population).
-			$( function() {
-
-				// Radios.
-				$( '.wpforms-field-radio .wpforms-image-choices-item input:checked' ).change();
-				$( '.wpforms-field-payment-multiple .wpforms-image-choices-item input:checked' ).change();
-
-				// Checkboxes.
-				$( '.wpforms-field-checkbox .wpforms-image-choices-item input' ).change();
-				$( '.wpforms-field-payment-checkbox .wpforms-image-choices-item input' ).change();
-			} );
-
 			// Rating field: hover effect.
 			$( '.wpforms-field-rating-item' ).hover(
 				function() {
@@ -1449,18 +1439,17 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 			amount = amount.toString().replace( /[^0-9.,]/g, '' );
 
-			if ( ',' === currency.decimal_sep && ( amount.indexOf( currency.decimal_sep ) !== -1 ) ) {
-				if ( '.' === currency.thousands_sep && amount.indexOf( currency.thousands_sep ) !== -1 ) {
-					amount = amount.replace( currency.thousands_sep, '' );
-				} else if ( '' === currency.thousands_sep && amount.indexOf( '.' ) !== -1 ) {
-					amount = amount.replace( '.', '' );
+			if ( currency.decimal_sep === ',' ) {
+				if ( currency.thousands_sep === '.' && amount.indexOf( currency.thousands_sep ) !== -1 ) {
+					amount = amount.replace( new RegExp( '\\' + currency.thousands_sep, 'g' ), '' );
+				} else if ( currency.thousands_sep === '' && amount.indexOf( '.' ) !== -1 ) {
+					amount = amount.replace( /\./g, '' );
 				}
 				amount = amount.replace( currency.decimal_sep, '.' );
-			} else if ( ',' === currency.thousands_sep && ( amount.indexOf( currency.thousands_sep ) !== -1 ) ) {
-				amount = amount.replace( currency.thousands_sep, '' );
+			} else if ( currency.thousands_sep === ',' && ( amount.indexOf( currency.thousands_sep ) !== -1 ) ) {
+				amount = amount.replace( new RegExp( '\\' + currency.thousands_sep, 'g' ), '' );
 			}
-
-			return app.numberFormat( amount, 2, '.', '' );
+			return app.numberFormat( amount, currency.decimals, '.', '' );
 		},
 
 		/**
@@ -1482,20 +1471,20 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			if ( ',' === currency.decimal_sep && ( amount.indexOf( currency.decimal_sep ) !== -1 ) ) {
 				var sepFound = amount.indexOf( currency.decimal_sep ),
 					whole    = amount.substr( 0, sepFound ),
-					part     = amount.substr( sepFound + 1, amount.strlen - 1 );
+					part     = amount.substr( sepFound + 1, amount.length - 1 );
 				amount = whole + '.' + part;
 			}
 
 			// Strip , from the amount (if set as the thousands separator)
 			if ( ',' === currency.thousands_sep && ( amount.indexOf( currency.thousands_sep ) !== -1 ) ) {
-				amount = amount.replace( ',', '' );
+				amount = amount.replace( /,/g, '' );
 			}
 
 			if ( app.empty( amount ) ) {
 				amount = 0;
 			}
 
-			return app.numberFormat( amount, 2, currency.decimal_sep, currency.thousands_sep );
+			return app.numberFormat( amount, currency.decimals, currency.decimal_sep, currency.thousands_sep );
 		},
 
 		/**
@@ -1503,13 +1492,14 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		 *
 		 * @since 1.2.6
 		 *
-		 * @returns {object} Currency settings.
+		 * @returns {object} Currency data object.
 		 */
 		getCurrency: function() {
 
 			var currency = {
 				code: 'USD',
 				thousands_sep: ',',
+				decimals: 2,
 				decimal_sep: '.',
 				symbol: '$',
 				symbol_pos: 'left',
@@ -1521,6 +1511,9 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			}
 			if ( typeof wpforms_settings.currency_thousands !== 'undefined' ) {
 				currency.thousands_sep = wpforms_settings.currency_thousands;
+			}
+			if ( typeof wpforms_settings.currency_decimals !== 'undefined' ) {
+				currency.decimals = wpforms_settings.currency_decimals;
 			}
 			if ( typeof wpforms_settings.currency_decimal !== 'undefined' ) {
 				currency.decimal_sep = wpforms_settings.currency_decimal;
@@ -1542,10 +1535,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		 *
 		 * @since 1.2.6
 		 *
-		 * @param {string} number Number to format.
-		 * @param {number} decimals How many decimals?
-		 * @param {string} decimalSep Decimals separator.
-		 * @param {string} thousandsSep Thousands separator.
+		 * @param {string} number       Number to format.
+		 * @param {number} decimals     How many decimals should be there.
+		 * @param {string} decimalSep   What is the decimal separator.
+		 * @param {string} thousandsSep What is the thousands separator.
 		 *
 		 * @returns {string} Formatted number.
 		 */

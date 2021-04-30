@@ -63,23 +63,23 @@ class Capabilities {
 	 */
 	public function get_caps() {
 
-		$capabilities = array(
+		$capabilities = [
 			// Forms capabilities.
-			'wpforms_create_forms'                => \esc_html__( 'Create Forms', 'wpforms' ),
-			'wpforms_view_own_forms'              => \esc_html__( 'View Own Forms', 'wpforms' ),
-			'wpforms_view_others_forms'           => \esc_html__( 'View Others\' Forms', 'wpforms' ),
-			'wpforms_edit_own_forms'              => \esc_html__( 'Edit Own Forms', 'wpforms' ),
-			'wpforms_edit_others_forms'           => \esc_html__( 'Edit Others\' Forms', 'wpforms' ),
-			'wpforms_delete_own_forms'            => \esc_html__( 'Delete Own Forms', 'wpforms' ),
-			'wpforms_delete_others_forms'         => \esc_html__( 'Delete Others\' Forms', 'wpforms' ),
+			'wpforms_create_forms'                => __( 'Create Forms', 'wpforms' ),
+			'wpforms_view_own_forms'              => __( 'View Own Forms', 'wpforms' ),
+			'wpforms_view_others_forms'           => __( 'View Others\' Forms', 'wpforms' ),
+			'wpforms_edit_own_forms'              => __( 'Edit Own Forms', 'wpforms' ),
+			'wpforms_edit_others_forms'           => __( 'Edit Others\' Forms', 'wpforms' ),
+			'wpforms_delete_own_forms'            => __( 'Delete Own Forms', 'wpforms' ),
+			'wpforms_delete_others_forms'         => __( 'Delete Others\' Forms', 'wpforms' ),
 			// Entries capabilities.
-			'wpforms_view_entries_own_forms'      => \esc_html__( 'View Own Forms Entries', 'wpforms' ),
-			'wpforms_view_entries_others_forms'   => \esc_html__( 'View Others\' Forms Entries', 'wpforms' ),
-			'wpforms_edit_entries_own_forms'      => \esc_html__( 'Edit Own Forms Entries', 'wpforms' ),
-			'wpforms_edit_entries_others_forms'   => \esc_html__( 'Edit Others\' Forms Entries', 'wpforms' ),
-			'wpforms_delete_entries_own_forms'    => \esc_html__( 'Delete Own Forms Entries', 'wpforms' ),
-			'wpforms_delete_entries_others_forms' => \esc_html__( 'Delete Others\' Forms Entries', 'wpforms' ),
-		);
+			'wpforms_view_entries_own_forms'      => __( 'View Own Forms Entries', 'wpforms' ),
+			'wpforms_view_entries_others_forms'   => __( 'View Others\' Forms Entries', 'wpforms' ),
+			'wpforms_edit_entries_own_forms'      => __( 'Edit Own Forms Entries', 'wpforms' ),
+			'wpforms_edit_entries_others_forms'   => __( 'Edit Others\' Forms Entries', 'wpforms' ),
+			'wpforms_delete_entries_own_forms'    => __( 'Delete Own Forms Entries', 'wpforms' ),
+			'wpforms_delete_entries_others_forms' => __( 'Delete Others\' Forms Entries', 'wpforms' ),
+		];
 
 		return \apply_filters( 'wpforms_access_capabilities_get_caps', $capabilities );
 	}

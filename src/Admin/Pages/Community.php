@@ -134,7 +134,7 @@ class Community {
 							<h3 class="item-title">%s</h3>
 							<p class="item-description">%s</p>
 							<div class="item-footer">
-								<a class="button" href="%s" target="_blank" rel="noopener noreferrer">%s</a>
+								<a class="button-primary" href="%s" target="_blank" rel="noopener noreferrer">%s</a>
 							</div>
 						</div>',
 						esc_attr( $item['cover_bg_color'] ),

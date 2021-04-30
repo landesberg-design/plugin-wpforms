@@ -28,7 +28,15 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 		init: function() {
 
 			$( app.ready );
-			$( window ).on( 'load', app.load );
+			$( window ).on( 'load', function() {
+
+				// in case of jQuery 3.+ we need to wait for an `ready` event first.
+				if ( $.isFunction( $.ready.then ) ) {
+					$.ready.then( app.load );
+				} else {
+					app.load();
+				}
+			} );
 		},
 
 		/**
@@ -68,6 +76,8 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 				WPFormsChallenge.core.clearLocalStorage();
 				app.showWelcomePopup();
 			}
+
+			$( '#wpforms-embed' ).addClass( 'wpforms-disabled' );
 
 			var tooltipAnchors = [
 				'#wpforms-setup-name',

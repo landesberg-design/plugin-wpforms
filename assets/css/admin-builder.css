@@ -69,6 +69,12 @@ body {
 	outline: none;
 }
 
+#wpforms-builder .wpforms-disabled {
+	cursor: default;
+	pointer-events: none;
+	opacity: 0.5;
+}
+
 #wpforms-builder .wp-editor-wrap .wp-editor-container textarea {
 	margin: 1px 0 0 0;
 }
@@ -694,7 +700,6 @@ body {
 	position: relative;
 }
 
-#wpforms-builder .wpforms-panel-sidebar-section.upgrade-modal,
 #wpforms-builder .wpforms-panel-sidebar-section.education-modal {
 	opacity: 0.5;
 }

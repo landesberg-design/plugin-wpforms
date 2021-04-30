@@ -197,20 +197,21 @@ class Admin {
 		$additional_info_fields = $this->export->additional_info_fields;
 
 		$i = 0;
+
 		foreach ( $additional_info_fields as $slug => $label ) {
-			if ( $slug === 'geodata' && ! function_exists( 'wpforms_geolocation' ) ) {
+
+			if ( $slug === 'pginfo' && ! ( class_exists( 'WPForms_Paypal_Standard' ) || class_exists( '\WPFormsStripe\Loader' ) || class_exists( '\WPFormsAuthorizeNet\Loader' ) ) ) {
 				continue;
 			}
-			if ( 'pginfo' === $slug && ! ( class_exists( 'WPForms_Paypal_Standard' ) || function_exists( 'wpforms_stripe' ) ) ) {
-				continue;
-			}
+
 			printf(
 				'<label><input type="checkbox" name="additional_info[%d]" value="%s"%s> %s</label>',
-				$i,
+				(int) $i,
 				esc_attr( $slug ),
 				esc_attr( $this->get_checked_property( $slug, $additional_info, '' ) ),
 				esc_html( $label )
 			);
+
 			$i ++;
 		}
 	}
