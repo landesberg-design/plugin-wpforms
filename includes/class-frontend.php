@@ -456,7 +456,19 @@ class WPForms_Frontend {
 
 			// Loop through all the fields we have.
 			foreach ( $form_data['fields'] as $field ) :
+				if ( ! has_action( "wpforms_display_field_{$field['type']}" ) ) {
+					continue;
+				}
 
+				/**
+				 *
+				 * Modify Field before render.
+				 *
+				 * @since 1.4.0
+				 *
+				 * @param array $field Current field.
+				 * @param array $form_data Form data and settings.
+				 */
 				$field = apply_filters( 'wpforms_field_data', $field, $form_data );
 
 				if ( empty( $field ) ) {
@@ -901,7 +913,7 @@ class WPForms_Frontend {
 
 		echo '<div ' . wpforms_html_attributes( '', array( 'g-recaptcha' ), $data ) . '></div>';
 
-		if ( 'invisible' !== $captcha_settings['recaptcha_type'] ) {
+		if ( $captcha_settings['provider'] === 'hcaptcha' || $captcha_settings['recaptcha_type'] !== 'invisible' ) {
 			echo '<input type="text" name="g-recaptcha-hidden" class="wpforms-recaptcha-hidden" style="position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;" required>';
 		}
 
@@ -1296,22 +1308,138 @@ class WPForms_Frontend {
 	 */
 	protected function get_captcha_inline_script( $captcha_settings ) {
 
+		// phpcs:disable Generic.Commenting.DocComment.MissingShort
+
+		// IE11 polyfills for native `matches()` and `closest()` methods.
+		$polyfills = /** @lang JavaScript */ '
+			if (!Element.prototype.matches) {
+			    Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+			}
+			if (!Element.prototype.closest) {
+			    Element.prototype.closest = function (s) {
+			        var el = this;
+			        do {
+			            if (Element.prototype.matches.call(el, s)) { return el; }
+			            el = el.parentElement || el.parentNode;
+			        } while (el !== null && el.nodeType === 1);
+			        return null;
+			    };
+			}
+		';
+
+		// Native equivalent for jQuery's `trigger()` method.
+		$dispatch = /** @lang JavaScript */ '
+			var wpformsDispatchEvent = function (el, ev, custom) {
+			    var e = document.createEvent(custom ? "CustomEvent" : "HTMLEvents");
+			    custom ? e.initCustomEvent(ev, true, true, false) : e.initEvent(ev, true, true);
+			    el.dispatchEvent(e);
+			};
+		';
+
+		// Captcha callback, used by hCaptcha and checkbox reCaptcha v2.
+		$callback = /** @lang JavaScript */ '
+			var wpformsRecaptchaCallback = function (el) {
+			    var hdn = el.parentNode.querySelector(".wpforms-recaptcha-hidden");
+			    var err = el.parentNode.querySelector("#g-recaptcha-hidden-error");
+			    hdn.value = "1";
+			    wpformsDispatchEvent(hdn, "change", false);
+			    hdn.classList.remove("wpforms-error");
+			    err && hdn.parentNode.removeChild(err);
+			};
+		';
+
 		if ( $captcha_settings['provider'] === 'hcaptcha' ) {
-			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){var captchaID = hcaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}});jQuery(el).attr( "data-recaptcha-id", captchaID);});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
-			$data .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
+
+			$data  = $dispatch;
+			$data .= $callback;
+
+			$data .= /** @lang JavaScript */ '
+				var wpformsRecaptchaLoad = function () {
+				    Array.prototype.forEach.call(document.querySelectorAll(".g-recaptcha"), function (el) {
+				        var captchaID = hcaptcha.render(el, {
+				            callback: function () {
+				                wpformsRecaptchaCallback(el);
+				            }
+				        });
+				        el.setAttribute("data-recaptcha-id", captchaID);
+				    });
+				    wpformsDispatchEvent(document, "wpformsRecaptchaLoaded", true);
+				};
+			';
 
 			return $data;
 		}
 
 		if ( $captcha_settings['recaptcha_type'] === 'v3' ) {
-			$data = 'var wpformsRecaptchaLoad = function(){grecaptcha.execute("' . $captcha_settings['site_key'] . '",{action:"wpforms"}).then(function(token){var f=document.getElementsByName("wpforms[recaptcha]");for(var i=0;i<f.length;i++){f[i].value = token;}});jQuery(document).trigger("wpformsRecaptchaLoaded");}; grecaptcha.ready(wpformsRecaptchaLoad);';
+
+			$data = $dispatch;
+
+			$data .= /** @lang JavaScript */ '
+				var wpformsRecaptchaLoad = function () {
+				    grecaptcha.execute("' . $captcha_settings['site_key'] . '", {action: "wpforms"}).then(function (token) {
+				        Array.prototype.forEach.call(document.getElementsByName("wpforms[recaptcha]"), function (el) {
+				            el.value = token;
+				        });
+				    });
+				    wpformsDispatchEvent(document, "wpformsRecaptchaLoaded", true);
+				};
+				grecaptcha.ready(wpformsRecaptchaLoad);
+    		';
+
 		} elseif ( $captcha_settings['recaptcha_type'] === 'invisible' ) {
-			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index,el){try{var recaptchaID = grecaptcha.render(el,{callback:function(){wpformsRecaptchaCallback(el);}},true);jQuery(el).closest("form").find("button[type=submit]").get(0).recaptchaID = recaptchaID;}catch(error){}});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
-			$data .= 'var wpformsRecaptchaCallback = function(el){var $form = jQuery(el).closest("form");if(typeof wpforms.formSubmit === "function"){wpforms.formSubmit($form);}else{$form.find("button[type=submit]").get(0).recaptchaID = false;$form.submit();}};';
+
+			$data  = $polyfills;
+			$data .= $dispatch;
+
+			$data .= /** @lang JavaScript */ '
+				var wpformsRecaptchaLoad = function () {
+				    Array.prototype.forEach.call(document.querySelectorAll(".g-recaptcha"), function (el) {
+				        try {
+				            var recaptchaID = grecaptcha.render(el, {
+				                callback: function () {
+				                    wpformsRecaptchaCallback(el);
+				                }
+				            }, true);
+				            el.closest("form").querySelector("button[type=submit]").recaptchaID = recaptchaID;
+				        } catch (error) {}
+				    });
+				    wpformsDispatchEvent(document, "wpformsRecaptchaLoaded", true);
+				};
+				var wpformsRecaptchaCallback = function (el) {
+				    var $form = el.closest("form");
+				    if (typeof wpforms.formSubmit === "function") {
+				        wpforms.formSubmit($form);
+				    } else {
+				        $form.querySelector("button[type=submit]").recaptchaID = false;
+				        $form.submit();
+				    }
+				};
+			';
+
 		} else {
-			$data  = 'var wpformsRecaptchaLoad = function(){jQuery(".g-recaptcha").each(function(index, el){try{var recaptchaID = grecaptcha.render( el, {callback:function(){wpformsRecaptchaCallback(el);}});}catch(error){}jQuery(el).attr( "data-recaptcha-id", recaptchaID);});jQuery(document).trigger("wpformsRecaptchaLoaded");};';
-			$data .= 'var wpformsRecaptchaCallback = function(el){jQuery(el).parent().find(".wpforms-recaptcha-hidden").val("1").trigger("change").valid();};';
+
+			$data  = $dispatch;
+			$data .= $callback;
+
+			$data .= /** @lang JavaScript */ '
+				var wpformsRecaptchaLoad = function () {
+				    Array.prototype.forEach.call(document.querySelectorAll(".g-recaptcha"), function (el) {
+				        try {
+				            var recaptchaID = grecaptcha.render(el, {
+				                callback: function () {
+				                    wpformsRecaptchaCallback(el);
+				                }
+				            });
+				            el.setAttribute("data-recaptcha-id", recaptchaID);
+				        } catch (error) {}
+				    });
+				    wpformsDispatchEvent(document, "wpformsRecaptchaLoaded", true);
+				};
+			';
+
 		}
+
+		// phpcs:enable Generic.Commenting.DocComment.MissingShort
 
 		return $data;
 	}

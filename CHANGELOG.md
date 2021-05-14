@@ -1,6 +1,28 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.7] - 2021-05-11
+### Added
+- Additional Print Entry screen controls for adding HTML fields and Section dividers into the printed page.
+- Minimum password strength validation for a Password field.
+
+### Changed
+- Rephrased an error message for the Modern Upload field when the file wasn't uploaded.
+- Email Summaries can now be tweaked via the hook to have multiple "To" recipients.
+- Rewrote inline captcha scripts in vanilla JS to improve its compatibility with a third-party code.
+- Replaced jQuery.isFunction() (deprecated as of jQuery 3.3) usages with a recommended counterpart.
+- Email Summaries subject line is changed to reduce the chance of going into the spam folder.
+- Refine smart tags system to improve extensibility.
+- Warn users about deleting the field in a Form Builder containing conditional logic that affects other fields.
+- Updated DOMPurify lib to 2.2.8.
+- Each addon title is linked to related documentation on the Addons page.
+- Externally disabled fields are displayed inside the Form Builder as dismissible notices.
+
+### Fixed
+- Inconsistency in "Add new group" conditional logic button naming in field settings.
+- Inconsistent Form Builder JS events loading order in jQuery 3+ across different browsers.
+- Form title issue on a single entry screen when using a specific combination of Access Control settings.
+
 ## [1.6.6] - 2021-03-30
 ### Added
 - Ability to delete uploaded files when editing a form entry.
@@ -28,7 +50,7 @@ All notable changes to this project will be documented in this file and formatte
 - Incorrect total form count value for different user's roles on the Forms Overview page (All Forms).
 - Speed up the Form Builder rendering by loading certain scripts only when the Embed functionality is triggered.
 - Validation for Rating Field is still required even though the selection is still showing.
-- The `iframe` HTML element was not rendered incorrectly in the Twenty Twenty theme.
+- The `iframe` HTML element was rendered incorrectly in the Twenty Twenty theme.
 - The Checkboxes and Multiple Choice fields CSS issues in Twenty Twenty-One theme.
 - On WordPress 4.9.0-4.9.4 and certain FTP configurations there could be an error while trying to automatically download the translations.
 - Omit Dynamic Choices fields from conditional logic settings.

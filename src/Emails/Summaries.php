@@ -120,7 +120,7 @@ class Summaries {
 	 */
 	public function preview() {
 
-		if ( ! \wpforms_current_user_can() ) {
+		if ( ! wpforms_current_user_can() ) {
 			return;
 		}
 
@@ -128,24 +128,32 @@ class Summaries {
 			return;
 		}
 
-		if ( 'summary' !== $_GET['wpforms_email_template'] ) { // phpcs:ignore
+		if ( $_GET['wpforms_email_template'] !== 'summary' ) { // phpcs:ignore
 			return;
 		}
 
-		$args = array(
-			'body' => array(
+		$args = [
+			'body' => [
 				'entries'    => $this->get_entries(),
 				'info_block' => ( new InfoBlocks() )->get_next(),
-			),
-		);
+			],
+		];
 
 		$template = ( new Templates\Summary() )->set_args( $args );
-		$template = \apply_filters( 'wpforms_emails_summaries_template', $template );
+
+		/**
+		 * Filters the summaries email template.
+		 *
+		 * @since 1.5.4
+		 *
+		 * @param Templates\Summary $template Default summaries email template.
+		 */
+		$template = apply_filters( 'wpforms_emails_summaries_template', $template );
 
 		$content = $template->get();
 
-		if ( 'default' !== \wpforms_setting( 'email-template', 'default' ) ) {
-			$content = \wpautop( $content );
+		if ( wpforms_setting( 'email-template', 'default' ) !== 'default' ) {
+			$content = wpautop( $content );
 		}
 
 		echo $content; // phpcs:ignore
@@ -204,15 +212,17 @@ class Summaries {
 
 		$next_block = $info_blocks->get_next();
 
-		$args = array(
-			'body' => array(
+		$args = [
+			'body' => [
 				'entries'    => $entries,
 				'info_block' => $next_block,
-			),
-		);
+			],
+		];
 
 		$template = ( new Templates\Summary() )->set_args( $args );
-		$template = \apply_filters( 'wpforms_emails_summaries_template', $template );
+
+		/** This filter is documented in preview() method above. */
+		$template = apply_filters( 'wpforms_emails_summaries_template', $template );
 
 		$content = $template->get();
 
@@ -220,8 +230,36 @@ class Summaries {
 			return;
 		}
 
-		$to_email = \apply_filters( 'wpforms_emails_summaries_cron_to_email', \get_option( 'admin_email' ) );
-		$subject  = \apply_filters( 'wpforms_emails_summaries_cron_subject', \esc_html__( 'WPForms Summary', 'wpforms-lite' ) );
+		$parsed_home_url = wp_parse_url( home_url() );
+		$site_domain     = $parsed_home_url['host'];
+
+		if ( is_multisite() && isset( $parsed_home_url['path'] ) ) {
+			$site_domain .= $parsed_home_url['path'];
+		}
+
+		$subject = sprintf(
+			/* translators: %s - site domain. */
+			esc_html__( 'Your Weekly WPForms Summary for %s', 'wpforms-lite' ),
+			$site_domain
+		);
+
+		/**
+		 * Filters the summaries email subject.
+		 *
+		 * @since 1.5.4
+		 *
+		 * @param string $subject Default summaries email subject.
+		 */
+		$subject = apply_filters( 'wpforms_emails_summaries_cron_subject', $subject );
+
+		/**
+		 * Filters the summaries recipient email address.
+		 *
+		 * @since 1.5.4
+		 *
+		 * @param string Default summaries recipient email address.
+		 */
+		$to_email = apply_filters( 'wpforms_emails_summaries_cron_to_email', get_option( 'admin_email' ) );
 
 		$sent = ( new Mailer() )
 			->template( $template )
@@ -229,7 +267,7 @@ class Summaries {
 			->to_email( $to_email )
 			->send();
 
-		if ( true === $sent ) {
+		if ( $sent === true ) {
 			$info_blocks->register_sent( $next_block );
 		}
 	}

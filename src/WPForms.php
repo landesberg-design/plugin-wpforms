@@ -83,15 +83,6 @@ namespace WPForms {
 		public $process;
 
 		/**
-		 * The smart tags instance.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @var \WPForms_Smart_Tags
-		 */
-		public $smart_tags;
-
-		/**
 		 * The License class instance (Pro).
 		 *
 		 * @since 1.0.0
@@ -129,6 +120,16 @@ namespace WPForms {
 		 * @return mixed|null
 		 */
 		public function __get( $name ) {
+
+			if ( 'smart_tags' === $name ) {
+				trigger_error( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
+					esc_html__(
+						"Property smart_tags was deprecated use wpforms()->get( 'smart_tags' ) instead of wpforms()->smart_tags",
+						'wpforms-lite'
+					),
+					E_USER_DEPRECATED
+				);
+			}
 
 			return $this->get( $name );
 		}
@@ -228,7 +229,6 @@ namespace WPForms {
 			// TODO: class-providers.php should be loaded in admin area only.
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-providers.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-process.php';
-			require_once WPFORMS_PLUGIN_DIR . 'includes/class-smart-tags.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-widget.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-conditional-logic-core.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/emails/class-emails.php';
@@ -311,10 +311,9 @@ namespace WPForms {
 		public function objects() {
 
 			// Global objects.
-			$this->form       = new \WPForms_Form_Handler();
-			$this->frontend   = new \WPForms_Frontend();
-			$this->process    = new \WPForms_Process();
-			$this->smart_tags = new \WPForms_Smart_Tags();
+			$this->form     = new \WPForms_Form_Handler();
+			$this->frontend = new \WPForms_Frontend();
+			$this->process  = new \WPForms_Process();
 
 			// Hook now that all of the WPForms stuff is loaded.
 			do_action( 'wpforms_loaded' );

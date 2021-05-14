@@ -31,21 +31,22 @@ class AttributeMatchingExtension extends AbstractExtension
      */
     public function getAttributeMatchingTranslators()
     {
-        return [
-            'exists' => [$this, 'translateExists'],
-            '=' => [$this, 'translateEquals'],
-            '~=' => [$this, 'translateIncludes'],
-            '|=' => [$this, 'translateDashMatch'],
-            '^=' => [$this, 'translatePrefixMatch'],
-            '$=' => [$this, 'translateSuffixMatch'],
-            '*=' => [$this, 'translateSubstringMatch'],
-            '!=' => [$this, 'translateDifferent'],
-        ];
+        return array(
+            'exists' => array($this, 'translateExists'),
+            '=' => array($this, 'translateEquals'),
+            '~=' => array($this, 'translateIncludes'),
+            '|=' => array($this, 'translateDashMatch'),
+            '^=' => array($this, 'translatePrefixMatch'),
+            '$=' => array($this, 'translateSuffixMatch'),
+            '*=' => array($this, 'translateSubstringMatch'),
+            '!=' => array($this, 'translateDifferent'),
+        );
     }
 
     /**
-     * @param string $attribute
-     * @param string $value
+     * @param XPathExpr $xpath
+     * @param string    $attribute
+     * @param string    $value
      *
      * @return XPathExpr
      */
@@ -55,8 +56,9 @@ class AttributeMatchingExtension extends AbstractExtension
     }
 
     /**
-     * @param string $attribute
-     * @param string $value
+     * @param XPathExpr $xpath
+     * @param string    $attribute
+     * @param string    $value
      *
      * @return XPathExpr
      */
@@ -66,8 +68,9 @@ class AttributeMatchingExtension extends AbstractExtension
     }
 
     /**
-     * @param string $attribute
-     * @param string $value
+     * @param XPathExpr $xpath
+     * @param string    $attribute
+     * @param string    $value
      *
      * @return XPathExpr
      */
@@ -81,8 +84,9 @@ class AttributeMatchingExtension extends AbstractExtension
     }
 
     /**
-     * @param string $attribute
-     * @param string $value
+     * @param XPathExpr $xpath
+     * @param string    $attribute
+     * @param string    $value
      *
      * @return XPathExpr
      */
@@ -97,8 +101,9 @@ class AttributeMatchingExtension extends AbstractExtension
     }
 
     /**
-     * @param string $attribute
-     * @param string $value
+     * @param XPathExpr $xpath
+     * @param string    $attribute
+     * @param string    $value
      *
      * @return XPathExpr
      */
@@ -112,8 +117,9 @@ class AttributeMatchingExtension extends AbstractExtension
     }
 
     /**
-     * @param string $attribute
-     * @param string $value
+     * @param XPathExpr $xpath
+     * @param string    $attribute
+     * @param string    $value
      *
      * @return XPathExpr
      */
@@ -128,8 +134,9 @@ class AttributeMatchingExtension extends AbstractExtension
     }
 
     /**
-     * @param string $attribute
-     * @param string $value
+     * @param XPathExpr $xpath
+     * @param string    $attribute
+     * @param string    $value
      *
      * @return XPathExpr
      */
@@ -143,8 +150,9 @@ class AttributeMatchingExtension extends AbstractExtension
     }
 
     /**
-     * @param string $attribute
-     * @param string $value
+     * @param XPathExpr $xpath
+     * @param string    $attribute
+     * @param string    $value
      *
      * @return XPathExpr
      */

@@ -515,7 +515,7 @@ class WPForms_Conditional_Logic_Core {
 
 					endforeach; // End foreach() for conditional logic groups.
 
-					echo '<button class="wpforms-conditional-groups-add">' . esc_html__( 'Add rule group', 'wpforms-lite' ) . '</button>';
+					echo '<button class="wpforms-conditional-groups-add">' . esc_html__( 'Add new group', 'wpforms-lite' ) . '</button>';
 
 				echo '</div>'; // Close Groups wrap markup.
 

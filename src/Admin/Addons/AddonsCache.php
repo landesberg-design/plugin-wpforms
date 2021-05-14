@@ -55,13 +55,13 @@ class AddonsCache {
 		$this->settings = [
 
 			// Remote source URL.
-			'remote_source' => 'https://wpforms.com/wp-content/addons.json',
+			'remote_source' => 'https://cdn.wpforms.com/wp-content/addons.json',
 
 			// Docs cache file (full path).
 			'cache_file'    => $upload_path . 'cache/addons.json',
 
 			// Docs cache time to live in seconds.
-			'cache_ttl'     => (int) apply_filters( 'wpforms_admin_education_addons_cache_ttl', WEEK_IN_SECONDS ),
+			'cache_ttl'     => (int) apply_filters( 'wpforms_admin_addons_cache_ttl', WEEK_IN_SECONDS ),
 		];
 	}
 

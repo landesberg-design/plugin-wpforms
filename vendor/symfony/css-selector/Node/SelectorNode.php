@@ -27,7 +27,8 @@ class SelectorNode extends AbstractNode
     private $pseudoElement;
 
     /**
-     * @param string|null $pseudoElement
+     * @param NodeInterface $tree
+     * @param string|null   $pseudoElement
      */
     public function __construct(NodeInterface $tree, $pseudoElement = null)
     {

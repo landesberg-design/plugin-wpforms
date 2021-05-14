@@ -52,7 +52,7 @@ var WPFormsFormEmbedWizard = window.WPFormsFormEmbedWizard || ( function( docume
 			$( window ).on( 'load', function() {
 
 				// in case of jQuery 3.+ we need to wait for an `ready` event first.
-				if ( $.isFunction( $.ready.then ) ) {
+				if ( typeof $.ready.then === 'function' ) {
 					$.ready.then( app.load );
 				} else {
 					app.load();

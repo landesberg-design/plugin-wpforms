@@ -931,12 +931,19 @@ class WPForms_Entries_Single {
 	 * @param object $entry     Entry data.
 	 * @param array  $form_data Form data.
 	 */
-	public function details_meta( $entry, $form_data ) {
+	public function details_meta( $entry, $form_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$datetime_format = get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' );
-		$datetime_offset = get_option( 'gmt_offset' ) * 3600;
+		$datetime = static function( $date ) {
+			$datetime_offset = get_option( 'gmt_offset' ) * 3600;
 
+			return sprintf( /* translators: %1$s - date for the entry; %2$s - time for the entry. */
+				esc_html__( '%1$s at %2$s', 'wpforms' ),
+				date_i18n( 'M j, Y', strtotime( $date ) + $datetime_offset ),
+				date_i18n( get_option( 'time_format' ), strtotime( $date ) + $datetime_offset )
+			);
+		};
 		?>
+
 		<!-- Entry Details metabox -->
 		<div id="wpforms-entry-details" class="postbox">
 
@@ -985,14 +992,18 @@ class WPForms_Entries_Single {
 					<p class="wpforms-entry-date">
 						<span class="dashicons dashicons-calendar"></span>
 						<?php esc_html_e( 'Submitted:', 'wpforms' ); ?>
-						<strong class="date-time"><?php echo esc_html( date_i18n( $datetime_format, strtotime( $entry->date ) + $datetime_offset ) ); ?></strong>
+						<strong class="date-time">
+							<?php echo esc_html( $datetime( $entry->date ) ); ?>
+						</strong>
 					</p>
 
-					<?php if ( '0000-00-00 00:00:00' !== $entry->date_modified ) : ?>
+					<?php if ( $entry->date_modified !== '0000-00-00 00:00:00' ) : ?>
 						<p class="wpforms-entry-modified">
 							<span class="dashicons dashicons-calendar-alt"></span>
 							<?php esc_html_e( 'Modified:', 'wpforms' ); ?>
-							<strong class="date-time"><?php echo esc_html( date_i18n( $datetime_format, strtotime( $entry->date_modified ) + $datetime_offset ) ); ?></strong>
+							<strong class="date-time">
+								<?php echo esc_html( $datetime( $entry->date_modified ) ); ?>
+							</strong>
 						</p>
 					<?php endif; ?>
 
@@ -1004,9 +1015,9 @@ class WPForms_Entries_Single {
 							$user      = get_userdata( $entry->user_id );
 							$user_name = esc_html( ! empty( $user->display_name ) ? $user->display_name : $user->user_login );
 							$user_url  = add_query_arg(
-								array(
+								[
 									'user_id' => absint( $user->ID ),
-								),
+								],
 								admin_url( 'user-edit.php' )
 							);
 							?>
@@ -1045,12 +1056,12 @@ class WPForms_Entries_Single {
 							<?php
 							$delete_link = wp_nonce_url(
 								add_query_arg(
-									array(
+									[
 										'view'     => 'list',
 										'action'   => 'delete',
 										'form_id'  => $form_data['id'],
 										'entry_id' => $entry->entry_id,
-									)
+									]
 								),
 								'bulk-entries'
 							);

@@ -12,11 +12,11 @@ use WPForms\Emails\Templates\General;
 class Mailer {
 
 	/**
-	 * Email address to send to.
+	 * Array or comma-separated list of email addresses to send message.
 	 *
 	 * @since 1.5.4
 	 *
-	 * @var string
+	 * @var string|string[]
 	 */
 	private $to_email;
 
@@ -351,11 +351,15 @@ class Mailer {
 	 *
 	 * @since 1.5.4
 	 *
-	 * @param string $email Email address.
+	 * @param string|string[] $email Array or comma-separated list of email addresses to send message.
 	 *
 	 * @return Mailer
 	 */
 	public function to_email( $email ) {
+
+		if ( is_string( $email ) ) {
+			$email = explode( ',', $email );
+		}
 
 		$this->to_email = \apply_filters( 'wpforms_emails_mailer_to_email', $email, $this );
 
@@ -421,10 +425,12 @@ class Mailer {
 	 */
 	protected function get_errors() {
 
-		$errors = array();
+		$errors = [];
 
-		if ( ! \is_email( $this->to_email ) ) {
-			$errors[] = \esc_html__( '[WPForms\Emails\Mailer] Invalid email address.', 'wpforms-lite' );
+		foreach ( (array) $this->to_email as $email ) {
+			if ( ! \is_email( $email ) ) {
+				$errors[] = sprintf( /* translators: %s - invalid email. */ esc_html__( '[WPForms\Emails\Mailer] Invalid email address %s.', 'wpforms-lite' ), $email );
+			}
 		}
 
 		if ( empty( $this->subject ) ) {

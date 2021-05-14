@@ -931,7 +931,7 @@
 
 				// Deactivate.
 				state = 'deactivate';
-				cssClass = 'status-inactive';
+				cssClass = 'status-installed';
 				if ( pluginType === 'plugin' ) {
 					cssClass += ' button button-secondary';
 				}
@@ -943,7 +943,7 @@
 					errorText  = s.iconDeactivate + errorText;
 				}
 
-			} else if ( $btn.hasClass( 'status-inactive' ) ) {
+			} else if ( $btn.hasClass( 'status-installed' ) ) {
 
 				// Activate.
 				state = 'activate';
@@ -961,7 +961,7 @@
 					errorText  = wpforms_admin.addon_activate;
 				}
 
-			} else if ( $btn.hasClass( 'status-download' ) ) {
+			} else if ( $btn.hasClass( 'status-missing' ) ) {
 
 				// Install & Activate.
 				state = 'install';
@@ -990,19 +990,19 @@
 						if ( ! res.data.is_activated ) {
 							stateText  = wpforms_admin.addon_inactive;
 							buttonText = 'plugin' === pluginType ? wpforms_admin.addon_activate : s.iconActivate + wpforms_admin.addon_activate;
-							cssClass   = 'plugin' === pluginType ? 'status-inactive button button-secondary' : 'status-inactive';
+							cssClass   = 'plugin' === pluginType ? 'status-installed button button-secondary' : 'status-installed';
 						}
 					} else {
 						successText = res.data;
 					}
 					$addon.find( '.actions' ).append( '<div class="msg success">' + successText + '</div>' );
 					$addon.find( 'span.status-label' )
-						.removeClass( 'status-active status-inactive status-download' )
+						.removeClass( 'status-active status-installed status-missing' )
 						.addClass( cssClass )
 						.removeClass( 'button button-primary button-secondary disabled' )
 						.text( stateText );
 					$btn
-						.removeClass( 'status-active status-inactive status-download' )
+						.removeClass( 'status-active status-installed status-missing' )
 						.removeClass( 'button button-primary button-secondary disabled' )
 						.addClass( cssClass ).html( buttonText );
 				} else {
@@ -1016,7 +1016,7 @@
 						$addon.find( '.actions' ).append( '<div class="msg error">' + res.data + '</div>' );
 					}
 					if ( 'install' === state && 'plugin' === pluginType ) {
-						$btn.addClass( 'status-go-to-url' ).removeClass( 'status-download' );
+						$btn.addClass( 'status-go-to-url' ).removeClass( 'status-missing' );
 					}
 					$btn.html( errorText );
 				}

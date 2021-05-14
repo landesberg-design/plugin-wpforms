@@ -42,7 +42,15 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			$( app.ready );
 
 			// Page load.
-			$( window ).on( 'load', app.load );
+			$( window ).on( 'load', function() {
+
+				// In the case of jQuery 3.+, we need to wait for a ready event first.
+				if ( typeof $.ready.then === 'function' ) {
+					$.ready.then( app.load );
+				} else {
+					app.load();
+				}
+			} );
 
 			$( window ).on( 'beforeunload', function() {
 				if ( ! that.formIsSaved() && closeConfirmation ) {
@@ -216,6 +224,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			app.dropdownField.init();
 
 			app.initSomeFieldOptions();
+
+			app.dismissNotice();
 		},
 
 		/**
@@ -1229,6 +1239,25 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		},
 
 		/**
+		 * Update Password Strength controls by changing checkbox.
+		 *
+		 * @since 1.6.7
+		 *
+		 * @param {number} id      Field id.
+		 * @param {bool}   checked Whether an option is checked or not.
+		 */
+		updatePasswordStrengthControls: function( id, checked ) {
+
+			var $strengthControls = $( '#wpforms-field-option-row-' + id + '-password-strength-level' );
+
+			if ( checked ) {
+				$strengthControls.removeClass( 'wpforms-hidden' );
+			} else {
+				$strengthControls.addClass( 'wpforms-hidden' );
+			}
+		},
+
+		/**
 		 * Element bindings.
 		 *
 		 * @since 1.0.0
@@ -2236,6 +2265,14 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				}
 			);
 
+			$builder.on(
+				'change',
+				'.wpforms-field-option-row-password-strength input',
+				function( event ) {
+					app.updatePasswordStrengthControls( $( event.target ).parents( '.wpforms-field-option-row-password-strength' ).data().fieldId, event.target.checked );
+				}
+			);
+
 			// File uploader - change style.
 			$builder
 				.on(
@@ -2329,38 +2366,46 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					}
 				});
 			} else {
-				$.confirm({
-					title: false,
-					content: wpforms_builder.delete_confirm,
-					backgroundDismiss: false,
-					closeIcon: false,
-					icon: 'fa fa-exclamation-circle',
-					type: 'orange',
+
+				var fieldData = {
+					'id'      : id,
+					'message' : wpforms_builder.delete_confirm,
+				};
+
+				$builder.trigger( 'wpformsBeforeFieldDeleteAlert', [ fieldData ] );
+
+				$.confirm( {
+					title             : false,
+					content           : fieldData.message,
+					backgroundDismiss : false,
+					closeIcon         : false,
+					icon              : 'fa fa-exclamation-circle',
+					type              : 'orange',
 					buttons: {
 						confirm: {
-							text: wpforms_builder.ok,
-							btnClass: 'btn-confirm',
-							keys: [ 'enter' ],
-							action: function(){
-								$('#wpforms-field-'+id).fadeOut(400, function(){
-									$(this).remove();
-									$('#wpforms-field-option-'+id).remove();
-									$('.wpforms-field, .wpforms-title-desc').removeClass('active');
-									app.fieldTabToggle('add-fields');
-									if ( $('.wpforms-field').length < 1 ) {
+							text     : wpforms_builder.ok,
+							btnClass : 'btn-confirm',
+							keys     : [ 'enter' ],
+							action: function() {
+								$( '#wpforms-field-' + id ).fadeOut( 400, function() {
+									$( this ).remove();
+									$( '#wpforms-field-option-' + id ).remove();
+									$( '.wpforms-field, .wpforms-title-desc' ).removeClass( 'active' );
+									app.fieldTabToggle( 'add-fields' );
+									if ( $( '.wpforms-field' ).length < 1 ) {
 										elements.$fieldOptions.append( elements.$noFieldsOptions.clone() );
 										elements.$sortableFieldsWrap.append( elements.$noFieldsPreview.clone() );
 										$builder.find( '.wpforms-field-submit' ).hide();
 									}
-									$builder.trigger('wpformsFieldDelete', [id, type ]);
-								});
-							}
+									$builder.trigger( 'wpformsFieldDelete', [ id, type ] );
+								} );
+							},
 						},
 						cancel: {
-							text: wpforms_builder.cancel
-						}
-					}
-				});
+							text: wpforms_builder.cancel,
+						},
+					},
+				} );
 			}
 		},
 
@@ -2840,33 +2885,81 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 *
 		 * @since 1.0.0
 		 */
-		fieldChoiceDelete: function(e, el) {
+		fieldChoiceDelete: function( e, el ) {
 
 			e.preventDefault();
 
-			var $this = $(el),
-				$list = $this.parent().parent(),
-				total = $list.find('li').length;
+			var $this     = $( el ),
+				$list     = $this.parent().parent(),
+				total     = $list.find( 'li' ).length,
+				fieldData = {
+					'id'       : $list.data( 'field-id' ),
+					'choiceId' : $this.closest( 'li' ).data( 'key' ),
+					'message'  : '<strong>' + wpforms_builder.delete_choice_confirm + '</strong>',
+					'trigger'  : false,
+				};
 
-			if (total == '1') {
-				$.alert({
+			$builder.trigger( 'wpformsBeforeFieldDeleteAlert', [ fieldData ] );
+
+			if ( total === 1 ) {
+				app.fieldChoiceDeleteAlert();
+			} else {
+				var deleteChoice = function() {
+					$this.parent().remove();
+					app.fieldChoiceUpdate( $list.data( 'field-type' ), $list.data( 'field-id' ) );
+					$builder.trigger( 'wpformsFieldChoiceDelete' );
+				};
+
+				if ( ! fieldData.trigger ) {
+					deleteChoice();
+
+					return;
+				}
+
+				$.confirm( {
 					title: false,
-					content: wpforms_builder.error_choice,
-					icon: 'fa fa-info-circle',
-					type: 'blue',
+					content: fieldData.message,
+					backgroundDismiss: false,
+					closeIcon: false,
+					icon: 'fa fa-exclamation-circle',
+					type: 'orange',
 					buttons: {
 						confirm: {
 							text: wpforms_builder.ok,
 							btnClass: 'btn-confirm',
 							keys: [ 'enter' ],
-						}
-					}
-				});
-			} else {
-				$this.parent().remove();
-				app.fieldChoiceUpdate($list.data('field-type'), $list.data('field-id'));
-				$builder.trigger('wpformsFieldChoiceDelete');
+							action: function() {
+								deleteChoice();
+							},
+						},
+						cancel: {
+							text: wpforms_builder.cancel,
+						},
+					},
+				} );
 			}
+		},
+
+		/**
+		 * Field choice delete error alert.
+		 *
+		 * @since 1.6.7
+		 */
+		fieldChoiceDeleteAlert: function() {
+
+			$.alert( {
+				title: false,
+				content: wpforms_builder.error_choice,
+				icon: 'fa fa-info-circle',
+				type: 'blue',
+				buttons: {
+					confirm: {
+						text: wpforms_builder.ok,
+						btnClass: 'btn-confirm',
+						keys: [ 'enter' ],
+					},
+				},
+			} );
 		},
 
 		/**
@@ -5386,7 +5479,24 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		},
 
 		//--------------------------------------------------------------------//
-		// Other functions
+		// Notice.
+		//--------------------------------------------------------------------//
+		/**
+		 * Click on the Dismiss notice button.
+		 *
+		 * @since 1.6.7
+		 */
+		dismissNotice: function() {
+
+			$builder.on( 'click', '.wpforms-notice-dismiss', function( e ) {
+				e.preventDefault();
+				$( this ).closest( '.wpforms-notice' ).remove();
+				$( '#wpforms-field-option-' + $( this ).data( 'field-id' ) ).remove();
+			} );
+		},
+
+		//--------------------------------------------------------------------//
+		// Other functions.
 		//--------------------------------------------------------------------//
 
 		/**

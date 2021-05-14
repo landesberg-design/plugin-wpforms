@@ -41,16 +41,16 @@ class HtmlExtension extends AbstractExtension
      */
     public function getPseudoClassTranslators()
     {
-        return [
-            'checked' => [$this, 'translateChecked'],
-            'link' => [$this, 'translateLink'],
-            'disabled' => [$this, 'translateDisabled'],
-            'enabled' => [$this, 'translateEnabled'],
-            'selected' => [$this, 'translateSelected'],
-            'invalid' => [$this, 'translateInvalid'],
-            'hover' => [$this, 'translateHover'],
-            'visited' => [$this, 'translateVisited'],
-        ];
+        return array(
+            'checked' => array($this, 'translateChecked'),
+            'link' => array($this, 'translateLink'),
+            'disabled' => array($this, 'translateDisabled'),
+            'enabled' => array($this, 'translateEnabled'),
+            'selected' => array($this, 'translateSelected'),
+            'invalid' => array($this, 'translateInvalid'),
+            'hover' => array($this, 'translateHover'),
+            'visited' => array($this, 'translateVisited'),
+        );
     }
 
     /**
@@ -58,9 +58,9 @@ class HtmlExtension extends AbstractExtension
      */
     public function getFunctionTranslators()
     {
-        return [
-            'lang' => [$this, 'translateLang'],
-        ];
+        return array(
+            'lang' => array($this, 'translateLang'),
+        );
     }
 
     /**

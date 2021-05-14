@@ -88,7 +88,7 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 
 		/**
 		 * Activate addon by clicking the toggle button.
-		 * Used in the Geolocation education.
+		 * Used in the Geolocation education box on the single entry view page.
 		 *
 		 * @since 1.6.6
 		 */

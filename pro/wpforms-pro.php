@@ -51,7 +51,6 @@ class WPForms_Pro {
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/ajax-actions.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/entries/class-entries-single.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/entries/class-entries-list.php';
-			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/class-addons.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/class-updater.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/class-license.php';
 		}
@@ -340,7 +339,7 @@ class WPForms_Pro {
 	public function register_settings_fields( $settings ) {
 
 		$currencies      = wpforms_get_currencies();
-		$currency_option = array();
+		$currency_option = [];
 
 		// Format currencies for select element.
 		foreach ( $currencies as $code => $currency ) {
@@ -348,64 +347,70 @@ class WPForms_Pro {
 		}
 
 		// Validation settings for fields only available in Pro.
-		$settings['validation']['validation-phone']           = array(
+		$settings['validation']['validation-phone']            = [
 			'id'      => 'validation-phone',
 			'name'    => esc_html__( 'Phone', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'Please enter a valid phone number.', 'wpforms' ),
-		);
-		$settings['validation']['validation-fileextension']   = array(
+		];
+		$settings['validation']['validation-fileextension']    = [
 			'id'      => 'validation-fileextension',
 			'name'    => esc_html__( 'File Extension', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'File type is not allowed.', 'wpforms' ),
-		);
-		$settings['validation']['validation-filesize']        = array(
+		];
+		$settings['validation']['validation-filesize']         = [
 			'id'      => 'validation-filesize',
 			'name'    => esc_html__( 'File Size', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'File exceeds max size allowed. File was not uploaded.', 'wpforms' ),
-		);
-		$settings['validation']['validation-time12h']         = array(
+		];
+		$settings['validation']['validation-time12h']          = [
 			'id'      => 'validation-time12h',
 			'name'    => esc_html__( 'Time (12 hour)', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'Please enter time in 12-hour AM/PM format (eg 8:45 AM).', 'wpforms' ),
-		);
-		$settings['validation']['validation-time24h']         = array(
+		];
+		$settings['validation']['validation-time24h']          = [
 			'id'      => 'validation-time24h',
 			'name'    => esc_html__( 'Time (24 hour)', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'Please enter time in 24-hour format (eg 22:45).', 'wpforms' ),
-		);
-		$settings['validation']['validation-requiredpayment'] = array(
+		];
+		$settings['validation']['validation-requiredpayment']  = [
 			'id'      => 'validation-requiredpayment',
 			'name'    => esc_html__( 'Payment Required', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'Payment is required.', 'wpforms' ),
-		);
-		$settings['validation']['validation-creditcard']      = array(
+		];
+		$settings['validation']['validation-creditcard']       = [
 			'id'      => 'validation-creditcard',
 			'name'    => esc_html__( 'Credit Card', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'Please enter a valid credit card number.', 'wpforms' ),
-		);
-		$settings['validation']['validation-post_max_size']   = array(
+		];
+		$settings['validation']['validation-post_max_size']    = [
 			'id'      => 'validation-post_max_size',
 			'name'    => esc_html__( 'File Upload Total Size', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'The total size of the selected files {totalSize} Mb exceeds the allowed limit {maxSize} Mb.', 'wpforms' ),
-		);
+		];
+		$settings['validation']['validation-passwordstrength'] = [
+			'id'      => 'validation-passwordstrength',
+			'name'    => esc_html__( 'Password Strength', 'wpforms' ),
+			'type'    => 'text',
+			'default' => esc_html__( 'A stronger password is required. Consider using upper and lower case letters, numbers, and symbols.', 'wpforms' ),
+		];
 
 		// Payment settings.
-		$settings['payments']['payments-heading'] = array(
+		$settings['payments']['payments-heading'] = [
 			'id'       => 'payments-heading',
 			'content'  => '<h4>' . esc_html__( 'Payments', 'wpforms' ) . '</h4>',
 			'type'     => 'content',
 			'no_label' => true,
-			'class'    => array( 'section-heading', 'no-desc' ),
-		);
-		$settings['payments']['currency']         = array(
+			'class'    => [ 'section-heading', 'no-desc' ],
+		];
+		$settings['payments']['currency']         = [
 			'id'        => 'currency',
 			'name'      => esc_html__( 'Currency', 'wpforms' ),
 			'type'      => 'select',
@@ -413,25 +418,25 @@ class WPForms_Pro {
 			'search'    => true,
 			'default'   => 'USD',
 			'options'   => $currency_option,
-		);
+		];
 
 		// Additional GDPR related options.
 		$settings['general'] = wpforms_array_insert(
 			$settings['general'],
-			array(
-				'gdpr-disable-uuid'    => array(
+			[
+				'gdpr-disable-uuid'    => [
 					'id'   => 'gdpr-disable-uuid',
 					'name' => esc_html__( 'Disable User Cookies', 'wpforms' ),
 					'desc' => esc_html__( 'Check this option to disable user tracking cookies. This will disable the Related Entries feature and the Form Abandonment/Geolocation addons.', 'wpforms' ),
 					'type' => 'checkbox',
-				),
-				'gdpr-disable-details' => array(
+				],
+				'gdpr-disable-details' => [
 					'id'   => 'gdpr-disable-details',
 					'name' => esc_html__( 'Disable User Details', 'wpforms' ),
 					'desc' => esc_html__( 'Check this option to prevent the storage of IP addresses and User Agent on all forms. If unchecked, then this can be managed on a form-by-form basis inside the form builder under Settings → General', 'wpforms' ),
 					'type' => 'checkbox',
-				),
-			),
+				],
+			],
 			'gdpr'
 		);
 

@@ -16,11 +16,18 @@ function wpforms_display( $form_id = false, $title = false, $desc = false ) {
 /**
  * Perform json_decode and unslash.
  *
+ * IMPORTANT: This function decodes the result of wpforms_encode() properly only if
+ * wp_insert_post() or wp_update_post() were used after the data is encoded.
+ * Both wp_insert_post() and wp_update_post() remove excessive slashes added by wpforms_encode().
+ *
+ * Using wpforms_decode() on wpforms_encode() result directly
+ * (without using wp_insert_post() or wp_update_post() first) always returns null or false.
+ *
  * @since 1.0.0
  *
  * @param string $data Data to decode.
  *
- * @return array|bool
+ * @return array|false|null
  */
 function wpforms_decode( $data ) {
 
@@ -34,11 +41,17 @@ function wpforms_decode( $data ) {
 /**
  * Perform json_encode and wp_slash.
  *
+ * IMPORTANT: This function adds excessive slashes to prevent data damage
+ * by wp_insert_post() or wp_update_post() that use wp_unslash() on all the incoming data.
+ *
+ * Decoding the result of this function by wpforms_decode() directly
+ * (without using wp_insert_post() or wp_update_post() first) always returns null or false.
+ *
  * @since 1.3.1.3
  *
  * @param mixed $data Data to encode.
  *
- * @return string
+ * @return string|false
  */
 function wpforms_encode( $data = false ) {
 

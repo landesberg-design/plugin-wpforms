@@ -1002,6 +1002,10 @@ Admin Form Builder - Fields panel
 	padding-top:6px;
 }
 
+#wpforms-panel-fields .wpforms-field-divider:first-of-type:not(.active):not(:hover) {
+	border-top-color: transparent;
+}
+
 /* Name field */
 #wpforms-panel-fields .wpforms-field-name {
 }

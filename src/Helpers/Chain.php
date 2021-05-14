@@ -6,6 +6,109 @@ namespace WPForms\Helpers;
  * Chain monad, useful for chaining certain array or string related functions.
  *
  * @since 1.5.6
+ *
+ * @method Chain array_change_key_case()
+ * @method Chain array_chunk()
+ * @method Chain array_column()
+ * @method Chain array_combine()
+ * @method Chain array_count_values()
+ * @method Chain array_diff_assoc()
+ * @method Chain array_diff_key()
+ * @method Chain array_diff_uassoc()
+ * @method Chain array_diff_ukey()
+ * @method Chain array_diff(array $var)
+ * @method Chain array_fill_keys()
+ * @method Chain array_fill()
+ * @method Chain array_filter()
+ * @method Chain array_flip()
+ * @method Chain array_intersect_assoc()
+ * @method Chain array_intersect_key()
+ * @method Chain array_intersect_uassoc()
+ * @method Chain array_intersect_ukey()
+ * @method Chain array_intersect(array $var)
+ * @method Chain array_key_first()
+ * @method Chain array_key_last()
+ * @method Chain array_keys()
+ * @method Chain array_map()
+ * @method Chain array_merge_recursive()
+ * @method Chain array_merge(array $var)
+ * @method Chain array_pad()
+ * @method Chain array_pop()
+ * @method Chain array_product()
+ * @method Chain array_rand()
+ * @method Chain array_reduce()
+ * @method Chain array_replace_recursive()
+ * @method Chain array_replace()
+ * @method Chain array_reverse()
+ * @method Chain array_shift()
+ * @method Chain array_slice()
+ * @method Chain array_splice()
+ * @method Chain array_sum()
+ * @method Chain array_udiff_assoc()
+ * @method Chain array_udiff_uassoc()
+ * @method Chain array_udiff()
+ * @method Chain array_uintersect_assoc()
+ * @method Chain array_uintersect_uassoc()
+ * @method Chain array_uintersect()
+ * @method Chain array_unique()
+ * @method Chain array_values()
+ * @method Chain count()
+ * @method Chain current()
+ * @method Chain end()
+ * @method Chain key()
+ * @method Chain next()
+ * @method Chain prev()
+ * @method Chain range()
+ * @method Chain reset()
+ * @method Chain ltrim()
+ * @method Chain rtrim()
+ * @method Chain md5()
+ * @method Chain str_getcsv()
+ * @method Chain str_ireplace()
+ * @method Chain str_pad()
+ * @method Chain str_repeat()
+ * @method Chain str_rot13()
+ * @method Chain str_shuffle()
+ * @method Chain str_split()
+ * @method Chain str_word_count()
+ * @method Chain strcasecmp()
+ * @method Chain strchr()
+ * @method Chain strcmp()
+ * @method Chain strcoll()
+ * @method Chain strcspn()
+ * @method Chain strip_tags()
+ * @method Chain stripcslashes()
+ * @method Chain stripos()
+ * @method Chain stripslashes()
+ * @method Chain stristr()
+ * @method Chain strlen()
+ * @method Chain strnatcasecmp()
+ * @method Chain strnatcmp()
+ * @method Chain strncasecmp()
+ * @method Chain strncmp()
+ * @method Chain strpbrk()
+ * @method Chain strpos()
+ * @method Chain strrchr()
+ * @method Chain strrev()
+ * @method Chain strripos()
+ * @method Chain strrpos()
+ * @method Chain strspn()
+ * @method Chain strstr()
+ * @method Chain strtok()
+ * @method Chain strtolower()
+ * @method Chain strtoupper()
+ * @method Chain strtr()
+ * @method Chain substr_compare()
+ * @method Chain substr_count()
+ * @method Chain substr_replace()
+ * @method Chain substr()
+ * @method Chain trim()
+ * @method Chain ucfirst()
+ * @method Chain ucwords()
+ * @method Chain vfprintf()
+ * @method Chain vprintf()
+ * @method Chain vsprintf()
+ * @method Chain wordwrap()
  */
 class Chain {
 
@@ -186,7 +289,7 @@ class Chain {
 	 */
 	public function allowed_methods() {
 
-		return array(
+		return [
 			'array_change_key_case',
 			'array_chunk',
 			'array_column',
@@ -290,7 +393,7 @@ class Chain {
 			'vprintf',
 			'vsprintf',
 			'wordwrap',
-		);
+		];
 	}
 
 	/**

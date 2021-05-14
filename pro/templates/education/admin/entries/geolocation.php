@@ -68,7 +68,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php if ( $plugin_allow ) { ?>
 					<p><?php esc_html_e( 'You can install the Geolocation addon with just a few clicks!', 'wpforms' ); ?></p>
 					<a
-						class="<?php echo esc_attr( $action === 'activate' ? 'status-inactive' : 'status-download' ); ?> wpforms-btn wpforms-btn-lg wpforms-btn-blue wpforms-education-toggle-plugin-btn"
+						class="<?php echo esc_attr( $action === 'activate' ? 'status-installed' : 'status-missing' ); ?> wpforms-btn wpforms-btn-lg wpforms-btn-blue wpforms-education-toggle-plugin-btn"
 						data-plugin="<?php echo $action === 'activate' ? esc_attr( $path ) : esc_url( $url ); ?>"
 						data-action="<?php echo esc_attr( $action ); ?>"
 						data-type="addon"

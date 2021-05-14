@@ -539,11 +539,7 @@
 			file.status = 'error';
 
 			if ( ! file.xhr ) {
-				var errorMessage = window.wpforms_file_upload.errors.file_not_uploaded;
-
-				if ( response.statusText ) {
-					errorMessage += ' ' + response.statusText + '.';
-				}
+				var errorMessage = window.wpforms_file_upload.errors.file_not_uploaded + ' ' + window.wpforms_file_upload.errors.default_error;
 
 				file.previewElement.classList.add( 'dz-processing', 'dz-error', 'dz-complete' );
 				addErrorMessage( file, errorMessage );

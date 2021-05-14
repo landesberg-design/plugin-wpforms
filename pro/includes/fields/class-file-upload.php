@@ -149,7 +149,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wp_enqueue_script(
 				'wpforms-dropzone',
 				WPFORMS_PLUGIN_URL . "pro/assets/js/vendor/dropzone{$min}.js",
-				array( 'jquery' ),
+				[ 'jquery' ],
 				self::DROPZONE_VERSION,
 				true
 			);
@@ -157,7 +157,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wp_enqueue_script(
 				'wpforms-file-upload',
 				WPFORMS_PLUGIN_URL . "pro/assets/js/wpforms-file-upload{$min}.js",
-				array( 'wpforms', 'wp-util', 'wpforms-dropzone' ),
+				[ 'wpforms', 'wp-util', 'wpforms-dropzone' ],
 				WPFORMS_VERSION,
 				true
 			);
@@ -165,9 +165,10 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wp_localize_script(
 				'wpforms-dropzone',
 				'wpforms_file_upload',
-				array(
+				[
 					'url'             => admin_url( 'admin-ajax.php' ),
-					'errors'          => array(
+					'errors'          => [
+						'default_error'     => esc_html__( 'Something went wrong, please try again.', 'wpforms' ),
 						'file_not_uploaded' => esc_html__( 'This file was not uploaded.', 'wpforms' ),
 						'file_limit'        => esc_html__( 'File limit has been reached ({fileLimit}).', 'wpforms' ),
 						'file_extension'    => wpforms_setting( 'validation-fileextension', esc_html__( 'File type is not allowed.', 'wpforms' ) ),
@@ -176,9 +177,9 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 							esc_html__( 'File exceeds the upload limit allowed (%s).', 'wpforms' ),
 							wpforms_max_upload()
 						),
-					),
+					],
 					'loading_message' => esc_html__( 'File upload is in progress. Please submit the form once uploading is completed.', 'wpforms' ),
-				)
+				]
 			);
 		}
 	}

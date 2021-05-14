@@ -61,13 +61,6 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 		conditionalFields: {},
 
 		/**
-		 * Form fields changed in the process of updating the conditional logic.
-		 *
-		 * @since 1.6.0.2
-		 */
-		changedConditionalFields: [],
-
-		/**
 		 * HTML template containing a list of <option> elements representing available conditional fields.
 		 *
 		 * @since 1.6.0.2
@@ -232,9 +225,6 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 		 */
 		updateConditionalRuleRows: function() {
 
-			// Clear changed conditional fields cache before processing.
-			updater.changedConditionalFields = [];
-
 			var rowsToProcess  = updater.$ruleRows.length;
 
 			/**
@@ -254,9 +244,6 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 						--rowsToProcess;
 					}
 
-					if ( 0 === rowsToProcess ) {
-						updater.finalizeConditionalRuleRowsUpdate();
-					}
 				}, 0 );
 			} );
 		},
@@ -304,47 +291,41 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 		},
 
 		/**
-		 * Finalize the updates.
+		 * Update delete confirmation alert message.
 		 *
-		 * @since 1.6.0.2
+		 * @since 1.6.7
+		 *
+		 * @param {object} fieldData Field Data object.
 		 */
-		finalizeConditionalRuleRowsUpdate: function() {
+		fieldDeleteConfirmAlert: function( fieldData ) {
 
-			// If conditional rules have been altered due to form updates then
-			// we alert the user.
-			if ( ! updater.changedConditionalFields.length ) {
-				return;
+			var alert = wpforms_builder.conditionals_change + '<br>',
+				updateAlert;
+
+			if ( wpf.empty( updater.allFields ) ) {
+
+				updater.cacheAllFields( wpf.getFields() );
 			}
 
-			// Remove dupes
-			var changedUnique = updater.changedConditionalFields.reduce( function( a, b ) {
-				if ( a.indexOf( b ) < 0 ) {
-					a.push( b );
+			$( '.wpforms-conditional-field' ).each( function() {
+
+				if ( fieldData.id === Number( $( this ).val() ) ) {
+
+					if ( fieldData.choiceId && fieldData.choiceId !== Number( $( this ).closest( '.wpforms-conditional-row' ).find( '.wpforms-conditional-value' ).val() ) ) {
+						return;
+					}
+
+					alert += updater.getChangedFieldNameForAlert( $( this ).closest( '.wpforms-conditional-group' ).data( 'reference' ) );
+
+					updateAlert = true;
+					fieldData.trigger = true;
 				}
-				return a;
-			}, [] );
-
-			// Build and trigger alert
-			var alert = wpforms_builder.conditionals_change,
-				key;
-
-			for ( key in changedUnique ) {
-				alert += updater.getChangedFieldNameForAlert( changedUnique[key], updater.allFields );
-			}
-
-			$.alert( {
-				title: wpforms_builder.heads_up,
-				content: alert,
-				icon: 'fa fa-exclamation-circle',
-				type: 'orange',
-				buttons: {
-					confirm: {
-						text: wpforms_builder.ok,
-						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
-					},
-				},
 			} );
+
+			if ( updateAlert ) {
+
+				fieldData.message = '<strong>' + fieldData.message + '</strong>' + '<br><br>' + alert;
+			}
 		},
 
 		/**
@@ -382,15 +363,6 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 
 				$value.find( '#choice-' + valueSelected ).prop( 'selected', true );
 
-			} else {
-
-				// Old value does not exist in the new options, likely
-				// deleted. Add the field ID to the charged variable,
-				// which will let the user know the fields conditional
-				// logic has been altered.
-				if ( valueSelected.length > 0 ) {
-					updater.changedConditionalFields.push( $row.closest( '.wpforms-conditional-group' ).data( 'reference' ) );
-				}
 			}
 		},
 
@@ -402,11 +374,6 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 		 * @param {object} $row Row container.
 		 */
 		removeRuleRow: function( $row ) {
-
-			// Old field does not exist in the new options, likely deleted.
-			// Add the field ID to the charged variable, which will let
-			// the user know the fields conditional logic has been altered.
-			updater.changedConditionalFields.push( $row.closest( '.wpforms-conditional-group' ).data( 'reference' ) );
 
 			// Since previously selected field no longer exists, this
 			// means this rule is now invalid. So the rule gets
@@ -517,6 +484,10 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 
 			// Conditional logic update/refresh.
 			$( document ).on( 'wpformsFieldUpdate', WPFormsConditionals.conditionalUpdateOptions );
+
+			$builder.on( 'wpformsBeforeFieldDeleteAlert', function( e, fieldData ) {
+				updater.fieldDeleteConfirmAlert( fieldData );
+			} );
 		},
 
 		/**

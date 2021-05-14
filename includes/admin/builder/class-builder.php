@@ -311,7 +311,7 @@ class WPForms_Builder {
 			'dom-purify',
 			WPFORMS_PLUGIN_URL . 'assets/js/purify.min.js',
 			[],
-			'2.2.7'
+			'2.2.8'
 		);
 
 		if ( wp_is_mobile() ) {
@@ -358,7 +358,7 @@ class WPForms_Builder {
 			'cancel'                         => esc_html__( 'Cancel', 'wpforms-lite' ),
 			'ok'                             => esc_html__( 'OK', 'wpforms-lite' ),
 			'close'                          => esc_html__( 'Close', 'wpforms-lite' ),
-			'conditionals_change'            => esc_html__( 'Due to form changes, conditional logic rules have been removed or updated:', 'wpforms-lite' ),
+			'conditionals_change'            => esc_html__( 'Due to form changes, conditional logic rules will be removed or updated:', 'wpforms-lite' ),
 			'conditionals_disable'           => esc_html__( 'Are you sure you want to disable conditional logic? This will remove the rules for this field or setting.', 'wpforms-lite' ),
 			'field'                          => esc_html__( 'Field', 'wpforms-lite' ),
 			'field_locked'                   => esc_html__( 'Field Locked', 'wpforms-lite' ),
@@ -402,6 +402,7 @@ class WPForms_Builder {
 			'exit_url'                       => wpforms_current_user_can( 'view_forms' ) ? admin_url( 'admin.php?page=wpforms-overview' ) : admin_url(),
 			'exit_confirm'                   => esc_html__( 'Your form contains unsaved changes. Would you like to save your changes first.', 'wpforms-lite' ),
 			'delete_confirm'                 => esc_html__( 'Are you sure you want to delete this field?', 'wpforms-lite' ),
+			'delete_choice_confirm'          => esc_html__( 'Are you sure you want to delete this choice?', 'wpforms-lite' ),
 			'duplicate_confirm'              => esc_html__( 'Are you sure you want to duplicate this field?', 'wpforms-lite' ),
 			'duplicate_copy'                 => esc_html__( '(copy)', 'wpforms-lite' ),
 			'error_title'                    => esc_html__( 'Please enter a form name.', 'wpforms-lite' ),
@@ -427,7 +428,7 @@ class WPForms_Builder {
 			'rule_create'                    => esc_html__( 'Create new rule', 'wpforms-lite' ),
 			'rule_create_group'              => esc_html__( 'Add new group', 'wpforms-lite' ),
 			'rule_delete'                    => esc_html__( 'Delete rule', 'wpforms-lite' ),
-			'smart_tags'                     => wpforms()->smart_tags->get(),
+			'smart_tags'                     => apply_filters( 'wpforms_builder_enqueues_smart_tags', wpforms()->get( 'smart_tags' )->get_smart_tags() ),
 			'smart_tags_disabled_for_fields' => array( 'entry_id' ),
 			'smart_tags_show'                => esc_html__( 'Show Smart Tags', 'wpforms-lite' ),
 			'smart_tags_hide'                => esc_html__( 'Hide Smart Tags', 'wpforms-lite' ),

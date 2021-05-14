@@ -195,7 +195,7 @@ var WPFormsElementor = window.WPFormsElementor || ( function( document, window, 
 				}
 
 				// Disconnect previous widget observer.
-				if ( typeof vars.observer !== 'undefined' && $.isFunction( vars.observer.disconnect ) ) {
+				if ( typeof vars.observer !== 'undefined' && typeof vars.observer.disconnect === 'function' ) {
 					vars.observer.disconnect();
 				}
 

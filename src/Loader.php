@@ -42,6 +42,7 @@ class Loader {
 		$this->populate_capabilities();
 		$this->populate_tasks();
 		$this->populate_forms();
+		$this->populate_smart_tags();
 		$this->populate_logger();
 		$this->populate_education();
 	}
@@ -115,6 +116,10 @@ class Loader {
 			[
 				'name' => 'Admin\Tools\Tools',
 				'hook' => 'admin_init',
+			],
+			[
+				'name' => 'Admin\Pages\Addons',
+				'id'   => 'addons_page',
 			]
 		);
 	}
@@ -175,6 +180,23 @@ class Loader {
 				'id'   => 'tasks_meta',
 				'hook' => false,
 				'run'  => false,
+			]
+		);
+	}
+
+	/**
+	 * Populate smart tags loaded classes.
+	 *
+	 * @since 1.6.7
+	 */
+	private function populate_smart_tags() {
+
+		array_push(
+			$this->classes,
+			[
+				'name' => 'SmartTags\SmartTags',
+				'id'   => 'smart_tags',
+				'run'  => 'hooks',
 			]
 		);
 	}

@@ -22,10 +22,19 @@ class WPForms_Field_Password extends WPForms_Field {
 		$this->group = 'fancy';
 
 		// Define additional field properties.
-		add_filter( 'wpforms_field_properties_password', array( $this, 'field_properties' ), 5, 3 );
+		add_filter( 'wpforms_field_properties_password', [ $this, 'field_properties' ], 5, 3 );
 
 		// Set confirmation status to option wrapper class.
-		add_filter( 'wpforms_builder_field_option_class', array( $this, 'field_option_class' ), 10, 2 );
+		add_filter( 'wpforms_builder_field_option_class', [ $this, 'field_option_class' ], 10, 2 );
+
+		// Form frontend CSS enqueues.
+		add_action( 'wpforms_frontend_css', [ $this, 'enqueue_frontend_css' ] );
+
+		// Form frontend JS enqueues.
+		add_action( 'wpforms_frontend_js', [ $this, 'enqueue_frontend_js' ] );
+
+		// Add frontend strings.
+		add_action( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
 	}
 
 	/**
@@ -41,6 +50,11 @@ class WPForms_Field_Password extends WPForms_Field {
 	 */
 	public function field_properties( $properties, $field, $form_data ) {
 
+		if ( ! empty( $field['password-strength'] ) ) {
+			$properties['inputs']['primary']['data']['rule-password-strength']  = true;
+			$properties['inputs']['primary']['data']['password-strength-level'] = $field['password-strength-level'];
+		}
+
 		if ( empty( $field['confirmation'] ) ) {
 			return $properties;
 		}
@@ -49,48 +63,48 @@ class WPForms_Field_Password extends WPForms_Field {
 		$field_id = absint( $field['id'] );
 
 		// Password confirmation setting enabled.
-		$props      = array(
-			'inputs' => array(
-				'primary'   => array(
-					'block'    => array(
+		$props      = [
+			'inputs' => [
+				'primary'   => [
+					'block'    => [
 						'wpforms-field-row-block',
 						'wpforms-one-half',
 						'wpforms-first',
-					),
-					'class'    => array(
+					],
+					'class'    => [
 						'wpforms-field-password-primary',
-					),
-					'sublabel' => array(
+					],
+					'sublabel' => [
 						'hidden' => ! empty( $field['sublabel_hide'] ),
 						'value'  => esc_html__( 'Password', 'wpforms' ),
-					),
-				),
-				'secondary' => array(
-					'attr'     => array(
+					],
+				],
+				'secondary' => [
+					'attr'     => [
 						'name'        => "wpforms[fields][{$field_id}][secondary]",
 						'value'       => '',
 						'placeholder' => ! empty( $field['confirmation_placeholder'] ) ? $field['confirmation_placeholder'] : '',
-					),
-					'block'    => array(
+					],
+					'block'    => [
 						'wpforms-field-row-block',
 						'wpforms-one-half',
-					),
-					'class'    => array(
+					],
+					'class'    => [
 						'wpforms-field-password-secondary',
-					),
-					'data'     => array(
+					],
+					'data'     => [
 						'rule-confirm' => '#' . $properties['inputs']['primary']['id'],
-					),
+					],
 					'id'       => "wpforms-{$form_id}-field_{$field_id}-secondary",
 					'required' => ! empty( $field['required'] ) ? 'required' : '',
-					'sublabel' => array(
+					'sublabel' => [
 						'hidden' => ! empty( $field['sublabel_hide'] ),
 						'value'  => esc_html__( 'Confirm Password', 'wpforms' ),
-					),
+					],
 					'value'    => '',
-				),
-			),
-		);
+				],
+			],
+		];
 		$properties = array_merge_recursive( $properties, $props );
 
 		// Input Primary: adjust name.
@@ -99,10 +113,10 @@ class WPForms_Field_Password extends WPForms_Field {
 		// Input Primary: remove size and error classes.
 		$properties['inputs']['primary']['class'] = array_diff(
 			$properties['inputs']['primary']['class'],
-			array(
+			[
 				'wpforms-field-' . sanitize_html_class( $field['size'] ),
 				'wpforms-error',
-			)
+			]
 		);
 
 		// Input Primary: add error class if needed.
@@ -175,9 +189,10 @@ class WPForms_Field_Password extends WPForms_Field {
 		 */
 
 		// Options open markup.
-		$args = array(
+		$args = [
 			'markup' => 'open',
-		);
+		];
+
 		$this->field_option( 'basic-options', $field, $args );
 
 		// Label.
@@ -193,24 +208,78 @@ class WPForms_Field_Password extends WPForms_Field {
 		$fld  = $this->field_element(
 			'checkbox',
 			$field,
-			array(
+			[
 				'slug'    => 'confirmation',
 				'value'   => isset( $field['confirmation'] ) ? '1' : '0',
 				'desc'    => esc_html__( 'Enable Password Confirmation', 'wpforms' ),
 				'tooltip' => esc_html__( 'Check this option to ask users to provide their password twice.', 'wpforms' ),
-			),
+			],
 			false
 		);
-		$args = array(
+		$args = [
 			'slug'    => 'confirmation',
 			'content' => $fld,
+		];
+
+		$this->field_element( 'row', $field, $args );
+
+		// Password strength.
+		$meter = $this->field_element(
+			'checkbox',
+			$field,
+			[
+				'slug'    => 'password-strength',
+				'value'   => isset( $field['password-strength'] ) ? '1' : '0',
+				'desc'    => esc_html__( 'Enable Password Strength', 'wpforms' ),
+				'tooltip' => esc_html__( 'Check this option to set minimum password strength.', 'wpforms' ),
+			],
+			false
 		);
+		$args  = [
+			'slug'    => 'password-strength',
+			'content' => $meter,
+		];
+
+		$this->field_element( 'row', $field, $args );
+
+		$strength_label = $this->field_element(
+			'label',
+			$field,
+			[
+				'value'   => esc_html__( 'Minimum Strength', 'wpforms' ),
+				'tooltip' => esc_html__( 'Select minimum password strength level.', 'wpforms' ),
+			],
+			false
+		);
+
+		$strength = $this->field_element(
+			'select',
+			$field,
+			[
+				'slug'    => 'password-strength-level',
+				'options' => [
+					'2' => esc_html__( 'Weak', 'wpforms' ),
+					'3' => esc_html__( 'Good', 'wpforms' ),
+					'4' => esc_html__( 'Strong', 'wpforms' ),
+				],
+				'value'   => isset( $field['password-strength-level'] ) ? $field['password-strength-level'] : '3',
+
+			],
+			false
+		);
+		$args = [
+			'slug'    => 'password-strength-level',
+			'class'   => ! isset( $field['password-strength'] ) ? 'wpforms-hidden' : '',
+			'content' => $strength_label . $strength,
+		];
+
 		$this->field_element( 'row', $field, $args );
 
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'basic-options', $field, $args );
 
 		/*
@@ -218,9 +287,10 @@ class WPForms_Field_Password extends WPForms_Field {
 		 */
 
 		// Options open markup.
-		$args = array(
+		$args = [
 			'markup' => 'open',
-		);
+		];
+
 		$this->field_option( 'advanced-options', $field, $args );
 
 		// Size.
@@ -233,26 +303,27 @@ class WPForms_Field_Password extends WPForms_Field {
 		$lbl  = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'    => 'confirmation_placeholder',
 				'value'   => esc_html__( 'Confirmation Placeholder Text', 'wpforms' ),
 				'tooltip' => esc_html__( 'Enter text for the confirmation field placeholder.', 'wpforms' ),
-			),
+			],
 			false
 		);
 		$fld  = $this->field_element(
 			'text',
 			$field,
-			array(
+			[
 				'slug'  => 'confirmation_placeholder',
 				'value' => ! empty( $field['confirmation_placeholder'] ) ? esc_attr( $field['confirmation_placeholder'] ) : '',
-			),
+			],
 			false
 		);
-		$args = array(
+		$args = [
 			'slug'    => 'confirmation_placeholder',
 			'content' => $lbl . $fld,
-		);
+		];
+
 		$this->field_element( 'row', $field, $args );
 
 		// Hide Label.
@@ -268,9 +339,10 @@ class WPForms_Field_Password extends WPForms_Field {
 		$this->field_option( 'css', $field );
 
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'advanced-options', $field, $args );
 	}
 
@@ -409,6 +481,22 @@ class WPForms_Field_Password extends WPForms_Field {
 				wpforms()->process->errors[ $form_id ][ $field_id ]['secondary'] = esc_html__( 'Field values do not match.', 'wpforms' );
 			}
 		}
+
+		if (
+			! empty( $fields[ $field_id ]['password-strength'] ) &&
+			! empty( $fields[ $field_id ]['password-strength-level'] ) &&
+			version_compare( PHP_VERSION, '7.2.0', '>=' )
+		) {
+
+			require_once WPFORMS_PLUGIN_DIR . 'libs/bjeavons/zxcvbn-php/autoload.php';
+
+			$password_value = empty( $fields[ $field_id ]['confirmation'] ) ? $field_submit : $field_submit['primary'];
+			$strength       = ( new \ZxcvbnPhp\Zxcvbn() )->passwordStrength( $password_value );
+
+			if ( isset( $strength['score'] ) && $strength['score'] < (int) $fields[ $field_id ]['password-strength-level'] ) {
+				wpforms()->process->errors[ $form_id ][ $field_id ] = $this->strength_error_message();
+			}
+		}
 	}
 
 	/**
@@ -438,6 +526,108 @@ class WPForms_Field_Password extends WPForms_Field {
 			'id'    => absint( $field_id ),
 			'type'  => $this->type,
 		);
+	}
+
+	/**
+	 * Form frontend CSS enqueues.
+	 *
+	 * @since 1.6.7
+	 *
+	 * @param array $forms Form data of forms on the current page.
+	 */
+	public function enqueue_frontend_css( $forms ) {
+
+		if ( ! $this->strength_enabled( $forms ) && ! wpforms()->frontend->assets_global() ) {
+			return;
+		}
+
+		$min = wpforms_get_min_suffix();
+
+		wp_enqueue_style(
+			'wpforms-password-field',
+			WPFORMS_PLUGIN_URL . "pro/assets/css/fields/password{$min}.css",
+			[],
+			WPFORMS_VERSION
+		);
+	}
+
+	/**
+	 * Form frontend JS enqueues.
+	 *
+	 * @since 1.6.7
+	 *
+	 * @param array $forms Form data of forms on the current page.
+	 */
+	public function enqueue_frontend_js( $forms ) {
+
+		if ( ! $this->strength_enabled( $forms ) && ! wpforms()->frontend->assets_global() ) {
+			return;
+		}
+
+		$min = \wpforms_get_min_suffix();
+
+		wp_enqueue_script(
+			'wpforms-password-field',
+			WPFORMS_PLUGIN_URL . "pro/assets/js/fields/password{$min}.js",
+			[ 'jquery', 'password-strength-meter' ],
+			WPFORMS_VERSION,
+			true
+		);
+
+	}
+
+	/**
+	 * Check if password strength enabled.
+	 *
+	 * @since 1.6.7
+	 *
+	 * @param array $forms Form data of forms on the current page.
+	 *
+	 * @return bool
+	 */
+	private function strength_enabled( $forms ) {
+
+		foreach ( $forms as $form_data ) {
+			if ( empty( $form_data['fields'] ) ) {
+				continue;
+			}
+
+			foreach ( $form_data['fields'] as $field ) {
+				if ( $field['type'] === 'password' && isset( $field['password-strength'] ) ) {
+					return (bool) $field['password-strength'];
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Add password strength validation error to frontend strings.
+	 *
+	 * @since 1.6.7
+	 *
+	 * @param array $strings Frontend strings.
+	 *
+	 * @return array Frontend strings.
+	 */
+	public function add_frontend_strings( $strings ) {
+
+		$strings['val_password_strength'] = $this->strength_error_message();
+
+		return $strings;
+	}
+
+	/**
+	 * Get strength error message.
+	 *
+	 * @since 1.6.7
+	 *
+	 * @return string
+	 */
+	private function strength_error_message() {
+
+		return wpforms_setting( 'validation-passwordstrength', esc_html__( 'A stronger password is required. Consider using upper and lower case letters, numbers, and symbols.', 'wpforms' ) );
 	}
 }
 

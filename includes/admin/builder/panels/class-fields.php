@@ -299,7 +299,18 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 			$css = apply_filters( 'wpforms_field_preview_class', $css, $field );
 
-			printf( '<div class="wpforms-field wpforms-field-%s %s" id="wpforms-field-%d" data-field-id="%d" data-field-type="%s">', $field['type'], $css, $field['id'], $field['id'], $field['type'] );
+			if ( ! has_action( "wpforms_display_field_{$field['type']}" ) ) {
+				$this->unavailable_fields_preview( $field );
+
+				continue;
+			}
+
+			printf(
+				'<div class="wpforms-field wpforms-field-%1$s %2$s" id="wpforms-field-%3$d" data-field-id="%3$d" data-field-type="%1$s">',
+				esc_attr( $field['type'] ),
+				esc_attr( $css ),
+				esc_attr( $field['id'] )
+			);
 
 			if ( apply_filters( 'wpforms_field_preview_display_duplicate_button', true, $field, $this->form_data ) ) {
 				printf( '<a href="#" class="wpforms-field-duplicate" title="%s"><i class="fa fa-files-o" aria-hidden="true"></i></a>', esc_html__( 'Duplicate Field', 'wpforms-lite' ) );
@@ -313,6 +324,91 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 			echo '</div>';
 		}
+	}
+
+	/**
+	 * Generate HTML for hidden inputs from given data.
+	 *
+	 * @since 1.6.7
+	 *
+	 * @param array  $data Field array data.
+	 * @param string $name Input name prefix.
+	 */
+	private function generate_hidden_inputs( $data = [], $name = '' ) {
+
+		if ( ! is_array( $data ) || empty( $data ) ) {
+			return;
+		}
+
+		foreach ( $data as $key => $value ) {
+			if ( $key === 'id' ) {
+				continue;
+			}
+
+			$key = ! empty( $data['id'] ) ? sprintf( '[%s][%s]', $data['id'], $key ) : sprintf( '[%s]', $key );
+
+			if ( ! empty( $name ) ) {
+				$key = trim( $name ) . $key;
+			}
+
+			if ( is_array( $value ) ) {
+				$this->generate_hidden_inputs( $value, $key );
+			} else {
+				printf( "<input type='hidden' name='%s' value='%s' />",  esc_attr( $key ), esc_attr( $value ) );
+			}
+		}
+	}
+
+	/**
+	 * Unavailable builder field display.
+	 *
+	 * @since 1.6.7
+	 *
+	 * @param array $field Field array data.
+	 */
+	public function unavailable_fields_preview( $field ) {
+
+		// Using ucwords() for certain fields may generate incorrect words.
+		switch ( $field['type'] ) {
+			case 'url':
+				$field_type = 'URL';
+
+				break;
+			case 'html':
+				$field_type = 'HTML';
+
+				break;
+			case 'gdpr-checkbox':
+				$field_type = 'GDPR Checkbox';
+
+				break;
+			default:
+				$field_type = ucwords( preg_replace( '/[_-]/', ' ', $field['type'] ) );
+		}
+
+		$warning_message = sprintf( /* translators: %s - unavailable field name. */
+			esc_html__( 'Unfortunately, the %s field is not available and will be ignored on the front end.', 'wpforms-lite' ),
+			$field_type
+		);
+
+		echo '<div class="wpforms-notice wpforms-warning">';
+
+		printf(
+			'<div class="wpforms-notice-message">%1$s</div>
+			<div class="wpforms-notice-buttons">
+				<a href="%2$s" target="_blank" rel="noopener noreferrer" class="wpforms-btn wpforms-btn-md wpforms-btn-light-grey">%3$s</a>
+				<button type="button" class="wpforms-notice-dismiss" title="" data-field-id="%4$s"/>
+			</div>',
+			$warning_message, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'https://wpforms.com/docs/how-to-import-and-export-wpforms/#field-missing',
+			esc_html__( 'Learn more', 'wpforms-lite' ),
+			esc_attr( $field['id'] )
+		);
+
+		// Save unavailable fields data in hidden inputs.
+		$this->generate_hidden_inputs( $field, 'fields' );
+
+		echo '</div>';
 	}
 
 	/**

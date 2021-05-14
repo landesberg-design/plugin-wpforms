@@ -82,7 +82,7 @@ class Token
     /**
      * @return bool
      */
-    public function isDelimiter(array $values = [])
+    public function isDelimiter(array $values = array())
     {
         if (self::TYPE_DELIMITER !== $this->type) {
             return false;

@@ -58,7 +58,7 @@ abstract class WPForms_DB {
 	 */
 	public function get_columns() {
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -71,7 +71,7 @@ abstract class WPForms_DB {
 	 */
 	public function get_column_defaults() {
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -90,8 +90,8 @@ abstract class WPForms_DB {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->table_name} WHERE {$this->primary_key} = %s LIMIT 1;",
-				$row_id
+				"SELECT * FROM $this->table_name WHERE $this->primary_key = %d LIMIT 1;", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				(int) $row_id
 			)
 		);
 	}
@@ -102,23 +102,26 @@ abstract class WPForms_DB {
 	 * @since 1.1.6
 	 *
 	 * @param string     $column Column name.
-	 * @param int|string $row_id Row ID.
+	 * @param int|string $value  Column value.
 	 *
-	 * @return object|null|bool Database query result, object or null on failure.
+	 * @return object|null Database query result, object or null on failure.
 	 */
-	public function get_by( $column, $row_id ) {
+	public function get_by( $column, $value ) {
 
 		global $wpdb;
 
-		if ( empty( $row_id ) || ! array_key_exists( $column, $this->get_columns() ) ) {
-			return false;
+		if (
+			empty( $value ) ||
+		    ! array_key_exists( $column, $this->get_columns() )
+		) {
+			return null;
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM $this->table_name WHERE $column = '%s' LIMIT 1;",
-				$row_id
+				"SELECT * FROM $this->table_name WHERE $column = %s LIMIT 1;", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$value
 			)
 		);
 	}
@@ -138,14 +141,14 @@ abstract class WPForms_DB {
 		global $wpdb;
 
 		if ( empty( $row_id ) || ! array_key_exists( $column, $this->get_columns() ) ) {
-			return false;
+			return null;
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT $column FROM $this->table_name WHERE $this->primary_key = '%s' LIMIT 1;",
-				$row_id
+				"SELECT $column FROM $this->table_name WHERE $this->primary_key = %d LIMIT 1;", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				(int) $row_id
 			)
 		);
 	}
@@ -165,14 +168,20 @@ abstract class WPForms_DB {
 
 		global $wpdb;
 
-		if ( empty( $column ) || empty( $column_where ) || empty( $column_value ) || ! array_key_exists( $column, $this->get_columns() ) ) {
-			return false;
+		if (
+			empty( $column ) ||
+			empty( $column_where ) ||
+			empty( $column_value ) ||
+			! array_key_exists( $column_where, $this->get_columns() ) ||
+			! array_key_exists( $column, $this->get_columns() )
+		) {
+			return null;
 		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;",
+				"SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$column_value
 			)
 		);
@@ -193,7 +202,7 @@ abstract class WPForms_DB {
 		global $wpdb;
 
 		// Set default values.
-		$data = wp_parse_args( $data, $this->get_column_defaults() );
+		$data = (array) wp_parse_args( $data, $this->get_column_defaults() );
 
 		do_action( 'wpforms_pre_insert_' . $type, $data );
 
@@ -218,7 +227,9 @@ abstract class WPForms_DB {
 	}
 
 	/**
-	 * Insert a new record into the database. This runs the add method.
+	 * Insert a new record into the database. This runs the add() method.
+	 *
+	 * @see add()
 	 *
 	 * @since 1.1.6
 	 *
@@ -244,7 +255,7 @@ abstract class WPForms_DB {
 	 *
 	 * @return bool False if the record could not be updated, true otherwise.
 	 */
-	public function update( $row_id, $data = array(), $where = '', $type = '' ) {
+	public function update( $row_id, $data = [], $where = '', $type = '' ) {
 
 		global $wpdb;
 
@@ -275,7 +286,7 @@ abstract class WPForms_DB {
 		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
-		if ( false === $wpdb->update( $this->table_name, $data, array( $where => $row_id ), $column_formats ) ) {
+		if ( $wpdb->update( $this->table_name, $data, [ $where => $row_id ], $column_formats ) === false ) {
 			return false;
 		}
 
@@ -307,8 +318,8 @@ abstract class WPForms_DB {
 		do_action( 'wpforms_pre_delete', $row_id );
 		do_action( 'wpforms_pre_delete_' . $this->type, $row_id );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
-		if ( false === $wpdb->query( $wpdb->prepare( "DELETE FROM {$this->table_name} WHERE {$this->primary_key} = %d", $row_id ) ) ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $this->primary_key = %d", $row_id ) ) === false ) {
 			return false;
 		}
 
@@ -332,15 +343,19 @@ abstract class WPForms_DB {
 
 		global $wpdb;
 
-		if ( empty( $column ) || empty( $column_value ) || ! array_key_exists( $column, $this->get_columns() ) ) {
+		if (
+			empty( $column ) ||
+			empty( $column_value ) ||
+			! array_key_exists( $column, $this->get_columns() )
+		) {
 			return false;
 		}
 
 		do_action( 'wpforms_pre_delete', $column_value );
 		do_action( 'wpforms_pre_delete_' . $this->type, $column_value );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
-		if ( false === $wpdb->query( $wpdb->prepare( "DELETE FROM {$this->table_name} WHERE $column = %s", $column_value ) ) ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $column = %s", $column_value ) ) === false ) {
 			return false;
 		}
 
@@ -386,7 +401,7 @@ abstract class WPForms_DB {
 		}
 
 		$placeholders = isset( $placeholders ) ? implode( ',', $placeholders ) : '';
-		$sql          = "DELETE FROM {$this->table_name} WHERE {$column} IN ( {$placeholders} )";
+		$sql          = "DELETE FROM $this->table_name WHERE $column IN ( $placeholders )";
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
 		return $wpdb->query( $wpdb->prepare( $sql, $values ) );
@@ -400,7 +415,7 @@ abstract class WPForms_DB {
 	 *
 	 * @param string $table The table name. Defaults to the child class table name.
 	 *
-	 * @return string|null If the table name exists.
+	 * @return bool If the table name exists.
 	 */
 	public function table_exists( $table = '' ) {
 

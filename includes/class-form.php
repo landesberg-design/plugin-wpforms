@@ -247,8 +247,8 @@ class WPForms_Form_Handler {
 		// Prevent $args['post_content'] from overwriting predefined $form_content.
 		// Typically it happens if the form was created with a form template and a user was not redirected to a form editing screen afterwards.
 		// This is only possible if a user has 'wpforms_create_forms' and no 'wpforms_edit_own_forms' capability.
-		if ( isset( $args['post_content'] ) && is_array( wpforms_decode( $args['post_content'] ) ) ) {
-			$args['post_content'] = wpforms_encode( array_replace_recursive( $form_content, wpforms_decode( $args['post_content'] ) ) );
+		if ( isset( $args['post_content'] ) && is_array( json_decode( wp_unslash( $args['post_content'] ), true ) ) ) {
+			$args['post_content'] = wpforms_encode( array_replace_recursive( $form_content, json_decode( wp_unslash( $args['post_content'] ), true ) ) );
 		}
 
 		// Merge args and create the form.

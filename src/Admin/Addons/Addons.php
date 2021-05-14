@@ -74,6 +74,8 @@ class Addons {
 	protected function hooks() {
 
 		add_action( 'admin_init', [ $this, 'get_available' ] );
+
+		do_action( 'wpforms_admin_addons_init' );
 	}
 
 	/**
@@ -81,11 +83,13 @@ class Addons {
 	 *
 	 * @since 1.6.6
 	 *
+	 * @param bool $force_cache_update Determine if we need to update cache. Default is `false`.
+	 *
 	 * @return array
 	 */
-	public function get_all() {
+	public function get_all( $force_cache_update = false ) {
 
-		return $this->addons;
+		return (bool) $force_cache_update ? $this->cache->update_cache() : $this->addons;
 	}
 
 	/**
@@ -117,7 +121,7 @@ class Addons {
 
 		$filtered_addons = [];
 
-		foreach ( $addons as $key => $addon ) {
+		foreach ( $addons as $addon ) {
 			foreach ( [ 'category', 'license' ] as $arg_key ) {
 				if (
 					! empty( $args[ $arg_key ] ) &&
@@ -125,7 +129,7 @@ class Addons {
 					is_array( $addon[ $arg_key ] ) &&
 					in_array( strtolower( $args[ $arg_key ] ), $addon[ $arg_key ], true )
 				) {
-					array_push( $filtered_addons, $addon );
+					$filtered_addons[] = $addon;
 				}
 			}
 		}
@@ -295,6 +299,8 @@ class Addons {
 		$addon['plugin_allow']  = $this->has_access( $addon );
 		$addon['status']        = 'missing';
 		$addon['action']        = 'upgrade';
+		$addon['page_url']      = empty( $addon['url'] ) ? '' : $addon['url'];
+		$addon['doc_url']       = empty( $addon['doc'] ) ? '' : $addon['doc'];
 		$addon['url']           = '';
 
 		static $nonce   = '';
