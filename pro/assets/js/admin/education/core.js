@@ -12,6 +12,15 @@ var WPFormsEducation = window.WPFormsEducation || {};
 WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( document, window, $ ) {
 
 	/**
+	 * Runtime variables.
+	 *
+	 * @since 1.6.8
+	 *
+	 * @type {object}
+	 */
+	var vars = {};
+
+	/**
 	 * Public functions and properties.
 	 *
 	 * @since 1.6.6
@@ -26,6 +35,8 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 		 * @since 1.6.6
 		 */
 		init: function() {
+
+			vars.spinner = '<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
 
 			$( app.ready );
 		},
@@ -163,7 +174,10 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 
 							this.$$confirm
 								.prop( 'disabled', true )
-								.html( '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i> ' + wpforms_education.activating );
+								.html( vars.spinner + wpforms_education.activating );
+
+							this.$$cancel
+								.prop( 'disabled', true );
 
 							app.activateAddon( path, nonce, this );
 
@@ -251,7 +265,10 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 
 							this.$$confirm
 								.prop( 'disabled', true )
-								.html( '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i> ' + wpforms_education.saving );
+								.html( vars.spinner + wpforms_education.saving );
+
+							this.$$cancel
+								.prop( 'disabled', true );
 
 							if ( WPFormsBuilder.formIsSaved() ) {
 								location.reload();
@@ -303,7 +320,10 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 						action  : function() {
 
 							this.$$confirm.prop( 'disabled', true )
-								.html( '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i> ' + wpforms_education.installing );
+								.html( vars.spinner + wpforms_education.installing );
+
+							this.$$cancel
+								.prop( 'disabled', true );
 
 							app.installAddon( url, nonce, this );
 
@@ -414,10 +434,11 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 						btnClass: 'btn-confirm',
 						keys    : [ 'enter' ],
 						action  : function() {
-							window.open(
-								wpforms_education.upgrade[type].url + '&utm_content=' + encodeURIComponent( feature.trim() ),
-								'_blank'
-							);
+
+							var appendChar = /(\?)/.test( wpforms_education.upgrade[ type ].url ) ? '&' : '?',
+								upgradeURL = wpforms_education.upgrade[ type ].url + appendChar + 'utm_content=' + encodeURIComponent( feature.trim() );
+
+							window.open( upgradeURL, '_blank' );
 						},
 					},
 				},

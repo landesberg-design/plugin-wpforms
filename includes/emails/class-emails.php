@@ -539,17 +539,23 @@ class WPForms_WP_Emails {
 						continue;
 					}
 
-					if ( 'divider' === $field['type'] ) {
+					if ( $field['type'] === 'divider' ) {
 						$field_name = ! empty( $field['label'] ) ? str_repeat( '&mdash;', 3 ) . ' ' . $field['label'] . ' ' . str_repeat( '&mdash;', 3 ) : null;
 						$field_val  = ! empty( $field['description'] ) ? $field['description'] : '';
-					} elseif ( 'pagebreak' === $field['type'] ) {
-						if ( ! empty( $field['position'] ) && 'bottom' === $field['position'] ) {
+					} elseif ( $field['type'] === 'pagebreak' ) {
+						if ( ! empty( $field['position'] ) && $field['position'] === 'bottom' ) {
 							continue;
 						}
 						$title      = ! empty( $field['title'] ) ? $field['title'] : esc_html__( 'Page Break', 'wpforms-lite' );
 						$field_name = str_repeat( '&mdash;', 6 ) . ' ' . $title . ' ' . str_repeat( '&mdash;', 6 );
-					} elseif ( 'html' === $field['type'] ) {
-						$field_name = null;
+					} elseif ( $field['type'] === 'html' ) {
+
+						// If CL is enabled and the field is conditionally hidden, hide it from message.
+						if ( ! empty( $this->form_data['fields'][ $field['id'] ]['conditionals'] ) && ! wpforms_conditional_logic_fields()->field_is_visible( $this->form_data, $field['id'] ) ) {
+							continue;
+						}
+
+						$field_name = ! empty( $field['name'] ) ? $field['name'] : esc_html__( 'HTML / Code Block', 'wpforms-lite' );
 						$field_val  = $field['code'];
 					}
 				} else {

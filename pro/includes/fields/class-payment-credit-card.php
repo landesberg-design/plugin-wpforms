@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Name text field.
+ * Credit card field (legacy).
  *
  * @since 1.0.0
  */
@@ -301,19 +301,20 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 			echo '</div>';
 		echo '</div>';
 
+		// Custom CSS classes.
+		$this->field_option( 'css', $field );
+
 		// Hide Label.
 		$this->field_option( 'label_hide', $field );
 
 		// Hide sub-labels.
 		$this->field_option( 'sublabel_hide', $field );
 
-		// Custom CSS classes.
-		$this->field_option( 'css', $field );
-
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'advanced-options', $field, $args );
 	}
 
@@ -340,31 +341,31 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 			<div class="wpforms-field-row">
 				<div class="wpforms-credit-card-cardnumber">
 					<label class="wpforms-sub-label"><?php esc_html_e( 'Card Number', 'wpforms' ); ?></label>
-					<input type="text" placeholder="<?php echo esc_attr( $number_placeholder ); ?>" disabled>
+					<input type="text" placeholder="<?php echo esc_attr( $number_placeholder ); ?>" readonly>
 				</div>
 
 				<div class="wpforms-credit-card-cardcvc">
 					<label class="wpforms-sub-label"><?php esc_html_e( 'Security Code', 'wpforms' ); ?></label>
-					<input type="text" placeholder="<?php echo esc_attr( $cvc_placeholder ); ?>" disabled>
+					<input type="text" placeholder="<?php echo esc_attr( $cvc_placeholder ); ?>" readonly>
 				</div>
 			</div>
 
 			<div class="wpforms-field-row">
 				<div class="wpforms-credit-card-cardname">
 					<label class="wpforms-sub-label"><?php esc_html_e( 'Name on Card', 'wpforms' ); ?></label>
-					<input type="text" placeholder="<?php echo esc_attr( $name_placeholder ); ?>" disabled>
+					<input type="text" placeholder="<?php echo esc_attr( $name_placeholder ); ?>" readonly>
 				</div>
 
 				<div class="wpforms-credit-card-expiration">
 					<label class="wpforms-sub-label"><?php esc_html_e( 'Expiration', 'wpforms' ); ?></label>
 					<div class="wpforms-credit-card-cardmonth">
-						<select disabled>
+						<select readonly>
 							<option>MM</option>
 						</select>
 					</div>
 					<span>/</span>
 					<div class="wpforms-credit-card-cardyear">
-						<select disabled>
+						<select readonly>
 							<option>YY</option>
 						</select>
 					</div>

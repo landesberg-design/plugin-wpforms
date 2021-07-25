@@ -145,9 +145,7 @@ abstract class WPForms_Builder_Panel {
 		$active = $view === $this->slug ? 'active' : '';
 		$wrap   = $this->sidebar ? 'wpforms-panel-sidebar-content' : 'wpforms-panel-full-content';
 
-		printf( '<div class="wpforms-panel %s" id="wpforms-panel-%s">', $active, esc_attr( $this->slug ) );
-
-		printf( '<div class="wpforms-panel-name">%s</div>', $this->name );
+		printf( '<div class="wpforms-panel %s" id="wpforms-panel-%s">', esc_attr( $active ), esc_attr( $this->slug ) );
 
 		printf( '<div class="%s">', $wrap );
 

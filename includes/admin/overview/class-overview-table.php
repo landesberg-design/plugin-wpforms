@@ -60,7 +60,7 @@ class WPForms_Overview_Table extends WP_List_Table {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_Post $form
+	 * @param WP_Post $form Form.
 	 *
 	 * @return string
 	 */
@@ -74,8 +74,8 @@ class WPForms_Overview_Table extends WP_List_Table {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_Post $form
-	 * @param string  $column_name
+	 * @param WP_Post $form        Form.
+	 * @param string  $column_name Column Name.
 	 *
 	 * @return string
 	 */
@@ -119,7 +119,7 @@ class WPForms_Overview_Table extends WP_List_Table {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_Post $form
+	 * @param WP_Post $form Form.
 	 *
 	 * @return string
 	 */

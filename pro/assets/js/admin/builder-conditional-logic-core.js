@@ -520,10 +520,10 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 			e.preventDefault();
 
 			var $this      = $( el ),
-				$block     = $this.parent().parent(),
+				$block     = $this.closest( '.wpforms-conditional-block' ),
 				logicBlock = wp.template( 'wpforms-conditional-block' ),
 				data       = {
-					fieldID    : $this.parent().data( 'field-id' ),
+					fieldID    : $this.closest( '.wpforms-field-option-row' ).data( 'field-id' ),
 					fieldName  : $this.data( 'name' ),
 					actions    : $this.data( 'actions' ),
 					actionDesc : $this.data( 'action-desc' ),
@@ -706,7 +706,9 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 				if ( $groups.find( '.wpforms-conditional-group' ).length > 1 ) {
 					$group.remove();
 				} else {
-					return;
+					$rows.find( '.wpforms-conditional-operator' ).val( '==' ).trigger( 'change' );
+					$rows.find( '.wpforms-conditional-value' ).val( '' ).trigger( 'change' );
+					$rows.find( '.wpforms-conditional-field' ).val( '' ).trigger( 'change' );
 				}
 			} else {
 				$this.parent().parent().remove();

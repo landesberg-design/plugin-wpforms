@@ -152,7 +152,7 @@ class WPForms_Settings {
 		// Save settings.
 		wpforms_update_settings( $settings );
 
-		WPForms_Admin_Notice::success( esc_html__( 'Settings were successfully saved.', 'wpforms-lite' ) );
+		\WPForms\Admin\Notice::success( esc_html__( 'Settings were successfully saved.', 'wpforms-lite' ) );
 	}
 
 	/**

@@ -86,7 +86,7 @@ function wpforms_save_form() {
 add_action( 'wp_ajax_wpforms_save_form', 'wpforms_save_form' );
 
 /**
- * Create a new form
+ * Create a new form.
  *
  * @since 1.0.0
  */
@@ -97,54 +97,59 @@ function wpforms_new_form() {
 
 	// Check for form name.
 	if ( empty( $_POST['title'] ) ) {
-		die( esc_html__( 'No form name provided', 'wpforms-lite' ) );
+		die( esc_html__( 'No form name provided.', 'wpforms-lite' ) );
+	}
+
+	if ( ! isset( $_POST['template'] ) ) {
+		$_POST['template'] = '';
 	}
 
 	// Create form.
-	$form_title    = sanitize_text_field( $_POST['title'] );
-	$form_template = sanitize_text_field( $_POST['template'] );
+	$form_title    = sanitize_text_field( wp_unslash( $_POST['title'] ) );
+	$form_template = empty( $_POST['template'] ) ? 'blank' : sanitize_text_field( wp_unslash( $_POST['template'] ) );
 	$title_exists  = get_page_by_title( $form_title, 'OBJECT', 'wpforms' );
 	$form_id       = wpforms()->form->add(
 		$form_title,
-		array(),
-		array(
+		[],
+		[
 			'template' => $form_template,
-		)
+		]
 	);
-	if ( null !== $title_exists ) {
+
+	if ( $title_exists !== null ) {
 		wp_update_post(
-			array(
+			[
 				'ID'         => $form_id,
 				'post_title' => $form_title . ' (ID #' . $form_id . ')',
-			)
+			]
 		);
 	}
 
 	if ( ! $form_id ) {
-		die( esc_html__( 'Error creating form', 'wpforms-lite' ) );
+		die( esc_html__( 'Error creating form.', 'wpforms-lite' ) );
 	}
 
 	if ( wpforms_current_user_can( 'edit_form_single', $form_id ) ) {
 		wp_send_json_success(
-			array(
+			[
 				'id'       => $form_id,
 				'redirect' => add_query_arg(
-					array(
+					[
 						'view'    => 'fields',
 						'form_id' => $form_id,
 						'newform' => '1',
-					),
+					],
 					admin_url( 'admin.php?page=wpforms-builder' )
 				),
-			)
+			]
 		);
 	}
 
 	if ( wpforms_current_user_can( 'view_forms' ) ) {
-		wp_send_json_success( array( 'redirect' => admin_url( 'admin.php?page=wpforms-overview' ) ) );
+		wp_send_json_success( [ 'redirect' => admin_url( 'admin.php?page=wpforms-overview' ) ] );
 	}
 
-	wp_send_json_success( array( 'redirect' => admin_url() ) );
+	wp_send_json_success( [ 'redirect' => admin_url() ] );
 }
 
 add_action( 'wp_ajax_wpforms_new_form', 'wpforms_new_form' );
@@ -161,37 +166,40 @@ function wpforms_update_form_template() {
 
 	// Check for form name.
 	if ( empty( $_POST['form_id'] ) ) {
-		die( esc_html__( 'No form ID provided', 'wpforms-lite' ) );
+		wp_send_json_error( esc_html__( 'No form ID provided.', 'wpforms-lite' ) );
 	}
+
+	$form_template = empty( $_POST['template'] ) ? 'blank' : sanitize_text_field( $_POST['template'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 
 	$data    = wpforms()->form->get(
 		(int) $_POST['form_id'],
-		array(
+		[
 			'content_only' => true,
-		)
+		]
 	);
 	$form_id = wpforms()->form->update(
 		(int) $_POST['form_id'],
 		$data,
-		array(
-			'template' => $_POST['template'],
-		)
+		[
+			'template' => $form_template,
+		]
 	);
 
 	if ( $form_id ) {
-		$data = array(
-			'id'       => $form_id,
-			'redirect' => add_query_arg(
-				array(
-					'view'    => 'fields',
-					'form_id' => $form_id,
+		wp_send_json_success(
+			[
+				'id'       => $form_id,
+				'redirect' => add_query_arg(
+					[
+						'view'    => 'fields',
+						'form_id' => $form_id,
+					],
+					admin_url( 'admin.php?page=wpforms-builder' )
 				),
-				admin_url( 'admin.php?page=wpforms-builder' )
-			),
+			]
 		);
-		wp_send_json_success( $data );
 	} else {
-		die( esc_html__( 'Error updating form template', 'wpforms-lite' ) );
+		wp_send_json_error( esc_html__( 'Error updating form template.', 'wpforms-lite' ) );
 	}
 }
 
@@ -472,6 +480,7 @@ function wpforms_activate_addon() {
 	if ( isset( $_POST['plugin'] ) ) {
 
 		$type = 'addon';
+
 		if ( ! empty( $_POST['type'] ) ) {
 			$type = sanitize_key( $_POST['type'] );
 		}
@@ -482,7 +491,7 @@ function wpforms_activate_addon() {
 		do_action( 'wpforms_plugin_activated', $plugin );
 
 		if ( ! is_wp_error( $activate ) ) {
-			if ( 'plugin' === $type ) {
+			if ( $type === 'plugin' ) {
 				wp_send_json_success( esc_html__( 'Plugin activated.', 'wpforms-lite' ) );
 			} else {
 				wp_send_json_success( esc_html__( 'Addon activated.', 'wpforms-lite' ) );

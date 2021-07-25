@@ -122,11 +122,12 @@ class UsageTracking implements IntegrationInterface {
 
 		$theme_data      = wp_get_theme();
 		$activated_dates = get_option( 'wpforms_activated', [] );
+		$first_form_date = get_option( 'wpforms_forms_first_created' );
 		$forms           = $this->get_all_forms();
 		$forms_total     = count( $forms );
 		$entries_total   = $this->get_entries_total();
 
-		return [
+		$data = [
 			// Generic data (environment).
 			'url'                            => home_url(),
 			'php_version'                    => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
@@ -154,6 +155,7 @@ class UsageTracking implements IntegrationInterface {
 			'wpforms_challenge_stats'        => get_option( 'wpforms_challenge', [] ),
 			'wpforms_lite_installed_date'    => $this->get_installed( $activated_dates, 'lite' ),
 			'wpforms_pro_installed_date'     => $this->get_installed( $activated_dates, 'pro' ),
+			'wpforms_builder_opened_date'    => (int) get_option( 'wpforms_builder_opened_date', 0 ),
 			'wpforms_settings'               => $this->get_settings(),
 			'wpforms_integration_active'     => $this->get_forms_integrations( $forms ),
 			'wpforms_payments_active'        => $this->get_payments_active( $forms ),
@@ -161,6 +163,12 @@ class UsageTracking implements IntegrationInterface {
 			'wpforms_multiple_notifications' => count( $this->get_forms_with_multiple_notifications( $forms ) ),
 			'wpforms_ajax_form_submissions'  => count( $this->get_ajax_form_submissions( $forms ) ),
 		];
+
+		if ( ! empty( $first_form_date ) ) {
+			$data['wpforms_forms_first_created'] = $first_form_date;
+		}
+
+		return $data;
 	}
 
 	/**
@@ -227,6 +235,8 @@ class UsageTracking implements IntegrationInterface {
 	 * Get timezone offset.
 	 * We use `wp_timezone_string()` when it's available (WP 5.3+),
 	 * otherwise fallback to the same code, copy-pasted.
+	 *
+	 * @see wp_timezone_string()
 	 *
 	 * @since 1.6.1
 	 *

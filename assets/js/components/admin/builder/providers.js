@@ -97,7 +97,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 		 *
 		 * @type {object}
 		 */
-		spinner: '<i class="fa fa-circle-o-notch fa-spin wpforms-button-icon" />',
+		spinner: '<i class="wpforms-loading-spinner wpforms-loading-inline"></i>',
 
 		/**
 		 * All ajax requests are grouped together with own properties.
@@ -653,9 +653,16 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 					} );
 
 				// CONNECTION: Generated.
-				$( '#wpforms-panel-providers' ).on( 'connectionGenerated', function() {
+				$( '#wpforms-panel-providers' ).on( 'connectionGenerated', function( e, data ) {
 
 					wpf.initTooltips();
+
+					// Hide provider default settings screen.
+					$( this )
+						.find( '.wpforms-builder-provider-connection[data-connection_id="' + data.connection.id + '"]' )
+						.closest( '.wpforms-panel-content-section' )
+						.find( '.wpforms-builder-provider-connections-default' )
+						.addClass( 'wpforms-hidden' );
 				} );
 
 				// CONNECTION: Rendered.
@@ -692,9 +699,9 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 
 				$.confirm( {
 					title: false,
-					content: wpforms_builder_providers.prompt_connection.replace( /%type%/g, 'connection' )
-					+ '<input autofocus="" type="text" id="wpforms-builder-provider-connection-name" placeholder="' + wpforms_builder_providers.prompt_placeholder + '">'
-					+ '<p class="error">' + wpforms_builder_providers.error_name + '</p>',
+					content: wpforms_builder_providers.prompt_connection.replace( /%type%/g, 'connection' ) +
+						'<input autofocus="" type="text" id="wpforms-builder-provider-connection-name" placeholder="' + wpforms_builder_providers.prompt_placeholder + '">' +
+						'<p class="error">' + wpforms_builder_providers.error_name + '</p>',
 					backgroundDismiss: false,
 					closeIcon: false,
 					icon: 'fa fa-info-circle',
@@ -716,7 +723,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 								} else {
 									app.getProviderHolder( provider ).trigger( 'connectionCreate', [ name ] );
 								}
-							}
+							},
 						},
 						cancel: {
 							text: wpforms_builder.cancel,
@@ -732,8 +739,8 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 			 * @since 1.4.7
 			 * @since 1.5.9 Added a new parameter - provider.
 			 *
-			 * @param {string} provider Current provider slug.
-			 * @param {Object} $connection jQuery DOM element for a connection.
+			 * @param {string} provider    Current provider slug.
+			 * @param {object} $connection jQuery DOM element for a connection.
 			 */
 			connectionDelete: function( provider, $connection ) {
 
@@ -752,17 +759,24 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 								// We need this BEFORE removing, as some handlers might need DOM element.
 								app.getProviderHolder( provider ).trigger( 'connectionDelete', [ $connection ] );
 
+								var $section = $connection.closest( '.wpforms-panel-content-section' );
+
 								$connection.fadeOut( 'fast', function() {
+
 									$( this ).remove();
 
 									app.getProviderHolder( provider ).trigger( 'connectionDeleted', [ $connection ] );
+
+									if ( ! $section.find( '.wpforms-builder-provider-connection' ).length ) {
+										$section.find( '.wpforms-builder-provider-connections-default' ).removeClass( 'wpforms-hidden' );
+									}
 								} );
-							}
+							},
 						},
 						cancel: {
-							text: wpforms_builder.cancel
-						}
-					}
+							text: wpforms_builder.cancel,
+						},
+					},
 				} );
 			},
 
@@ -779,7 +793,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 				 *
 				 * @since 1.4.8
 				 *
-				 * @param {String}
+				 * @param {string}
 				 */
 				provider: '',
 
@@ -798,7 +812,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 				 *
 				 * @since 1.4.8
 				 *
-				 * @param {String} provider
+				 * @param {string} provider Provider slug.
 				 */
 				setProvider: function( provider ) {
 					this.provider = provider;
@@ -944,11 +958,11 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 		 *
 		 * @since 1.4.7
 		 *
-		 * @returns {Object} jQuery DOM element.
+		 * @returns {object} jQuery DOM element.
 		 */
 		getProviderHolder: function( provider ) {
 			return $( '#' + provider + '-provider' );
-		}
+		},
 	};
 
 	// Provide access to public functions/properties.

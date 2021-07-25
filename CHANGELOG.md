@@ -1,6 +1,82 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.8.1] - 2021-07-21
+### Changed
+- Allow using right click to open a form preview in new tab or window.
+
+### Fixed
+- Notifications disabled on the previous version were enabled after the 1.6.8 update.
+- Single Item field set to Hidden type now does not have unnecessary padding.
+- Block preview in new WordPress 5.8 Widgets Block Editor now aligned properly.
+- Omit a redundant number of files option from the Classic File Upload field.
+- Some fields had no padding on the Edit Entry screen if the value was empty.
+- Word wrapping issues in various places for non-English languages.
+- Remove excessive whitespaces after in the Notification name after cloning.
+- HTML field in notification emails is now displayed honoring the field's conditional logic.
+
+## [1.6.8] - 2021-07-13
+### Added
+- Form Builder visual modernization and improved user experience.
+- Form Builder is now more optimized, loading and performing faster.
+- More tooltips in various areas of the Form Builder to provide context for different options.
+- A lot more Templates that you can use for one-click forms creation.
+- Categorize Form Templates into different sections and improve search, allowing faster access and better user experience.
+- New Preview button for all Templates, so you can check how your form will look like before applying the Template.
+
+### Changed
+- Dropped support for IE11 in the Form Builder (same as WordPress 5.8).
+- Introducing tabs instead of accordion for Field Options in the Form Builder: General, Advanced, Smart Logic.
+- Allow underscore symbol usage in Allowlist/Denylist in Email field.
+- Updated DOMPurify lib to 2.3.0.
+
+### Fixed
+- A lot of visual inconsistencies inside the Form Builder.
+- TinyMCE editor in the default Confirmation has 2 tabs (Visual, Text), which previously had incorrect height.
+- Firefox-specific issue that prevents fields from being drag-n-dropped inside the Preview area of the Form Builder.
+- Smart phone field flag appeared over modern dropdown field's choices.
+- Heartbeat notification on the Entries page about new entry displayed incorrectly.
+- Correctly change the HTML field label when the field is copied.
+- Form Builder performance issue with large number of choices added to option fields.
+- Missing down arrow in Dropdown field in Twenty Twenty-One theme.
+- Checkboxes and Multiple Choice input fields rendered incorrectly in Twenty Twenty-One theme.  
+- Breaking words when wrapping in Modern Dropdown field.
+- After upgrading the license, "Upgrade to Pro" popup is still displayed.
+- Download all relevant translations when initiating an upgrade from Lite to Pro on the plugin Settings page.
+- When deleting the last Conditional Logic rule, the fields are now reset.
+- Preserve line breaks when pasting blocks of text into Paragraph field with word limit option enabled.
+
+## [1.6.7.3] - 2021-07-02
+### Changed
+- Renamed a misspelled `wpforms_display_sumbit_spinner_src` filter to `wpforms_display_submit_spinner_src`, old name is now deprecated.
+
+### Fixed
+- Expired transients are not deleted automatically.
+- Entries count race condition under high load in the plugin Lite version.
+- Form Builder product education links.
+
+## [1.6.7.2] - 2021-06-25
+### Fixed
+- Admin notice option flag reference.
+
+## [1.6.7.1] - 2021-06-15
+### Changed
+- Password strength text in the Form Builder matches the text on a frontend now.
+- Improved logic of pasting a text in the fields with word and character limits.
+- Updated DOMPurify lib to 2.2.9.
+- Some admin notices can be dismissed on a per-user basis.
+
+### Fixed
+- Smart Tags don't parse dot and comma symbols well.
+- Occasional PHP Notices on getting addons' download URLs and printing the entry.
+- In rare cases, WPForms functions calls are not handled correctly inside the third-party frontend AJAX calls.
+- Tooltipster JS error on Edit Entry page.
+- Incorrect `wpforms_smart_tag_process` filter deprecation notice.
+- Compatibility with the Elementor 3.1.x, 3.2.x and 3.3.x.
+- Broken XLSX of exported entries in rare cases when server temporary directory is not writable.
+- Cleanup database from obsolete data after preparing an entries export file for download.
+- Properly handle errors reporting when entries exporting failed for some reason.
+
 ## [1.6.7] - 2021-05-11
 ### Added
 - Additional Print Entry screen controls for adding HTML fields and Section dividers into the printed page.
@@ -116,7 +192,7 @@ All notable changes to this project will be documented in this file and formatte
 - Frontend form warning indicating missing WPForms JS (visible to admin only).
 
 ### Changed
-- Help hCaptcha process all requests in a more efficient way, so bot detection will work better. 
+- Help hCaptcha process all requests in a more efficient way, so bot detection will work better.
 
 ### Fixed
 - Improve pagination on Tools > Logs page inside the plugin admin area.
@@ -842,7 +918,7 @@ All notable changes to this project will be documented in this file and formatte
 - Marketing provider connections containing an escaped apostrophe.
 - Pressing "Enter" in the form builder resulting in unexpected behavior.
 - Incorrect pagination when searching entries.
-- Security enhancements and other misc. bug fixes.
+- Security enhancements and other misc bug fixes.
 
 ## [1.4.7.2] - 2018-06-21
 ### Changed
@@ -1506,7 +1582,7 @@ All notable changes to this project will be documented in this file and formatte
 ## [1.1.9] - 2016-05-06
 ### Added
 - Form preview.
-- Other small misc. updates.
+- Other small misc updates.
 
 ### Changed
 - reCAPTCHA settings description to include link to how-to article.

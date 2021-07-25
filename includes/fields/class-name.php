@@ -269,13 +269,15 @@ class WPForms_Field_Name extends WPForms_Field {
 			$simple_default     = ! empty( $field['simple_default'] ) ? esc_attr( $field['simple_default'] ) : '';
 			printf( '<div class="wpforms-clear wpforms-field-option-row wpforms-field-option-row-simple" id="wpforms-field-option-row-%d-simple" data-subfield="simple" data-field-id="%d">', $field['id'], $field['id'] );
 				$this->field_element( 'label', $field, array( 'slug' => 'simple_placeholder', 'value' => esc_html__( 'Name', 'wpforms-lite' ), 'tooltip' => esc_html__( 'Name field advanced options.', 'wpforms-lite' ) ) );
-				echo '<div class="placeholder">';
-					printf( '<input type="text" class="placeholder" id="wpforms-field-option-%d-simple_placeholder" name="fields[%d][simple_placeholder]" value="%s">', $field['id'], $field['id'], $simple_placeholder );
-					printf( '<label for="wpforms-field-option-%d-simple_placeholder" class="sub-label">%s</label>', $field['id'], esc_html__( 'Placeholder', 'wpforms-lite' ) );
-				echo '</div>';
-				echo '<div class="default">';
-					printf( '<input type="text" class="default" id="wpforms-field-option-%d-simple_default" name="fields[%d][simple_default]" value="%s">', $field['id'], $field['id'], $simple_default );
-					printf( '<label for="wpforms-field-option-%d-simple_default" class="sub-label">%s</label>', $field['id'], esc_html__( 'Default Value', 'wpforms-lite' ) );
+				echo '<div class="wpforms-field-options-columns-2 wpforms-field-options-columns">';
+					echo '<div class="placeholder wpforms-field-options-column">';
+						printf( '<input type="text" class="placeholder" id="wpforms-field-option-%d-simple_placeholder" name="fields[%d][simple_placeholder]" value="%s">', (int) $field['id'], (int) $field['id'], esc_attr( $simple_placeholder ) );
+						printf( '<label for="wpforms-field-option-%d-simple_placeholder" class="sub-label">%s</label>', (int) $field['id'], esc_html__( 'Placeholder', 'wpforms-lite' ) );
+					echo '</div>';
+					echo '<div class="default wpforms-field-options-column">';
+						printf( '<input type="text" class="default" id="wpforms-field-option-%d-simple_default" name="fields[%d][simple_default]" value="%s">', (int) $field['id'], (int) $field['id'], esc_attr( $simple_default ) );
+						printf( '<label for="wpforms-field-option-%d-simple_default" class="sub-label">%s</label>', (int) $field['id'], esc_html__( 'Default Value', 'wpforms-lite' ) );
+					echo '</div>';
 				echo '</div>';
 			echo '</div>';
 
@@ -284,13 +286,15 @@ class WPForms_Field_Name extends WPForms_Field {
 			$first_default     = ! empty( $field['first_default'] ) ? esc_attr( $field['first_default'] ) : '';
 			printf( '<div class="wpforms-clear wpforms-field-option-row wpforms-field-option-row-first" id="wpforms-field-option-row-%d-first" data-subfield="first-name" data-field-id="%d">', $field['id'], $field['id'] );
 				$this->field_element( 'label', $field, array( 'slug' => 'first_placeholder', 'value' => esc_html__( 'First Name', 'wpforms-lite' ), 'tooltip' => esc_html__( 'First name field advanced options.', 'wpforms-lite' ) ) );
-				echo '<div class="placeholder">';
-					printf( '<input type="text" class="placeholder" id="wpforms-field-option-%d-first_placeholder" name="fields[%d][first_placeholder]" value="%s">', $field['id'], $field['id'], $first_placeholder );
-					printf( '<label for="wpforms-field-option-%d-first_placeholder" class="sub-label">%s</label>', $field['id'], esc_html__( 'Placeholder', 'wpforms-lite' ) );
-				echo '</div>';
-				echo '<div class="default">';
-					printf( '<input type="text" class="default" id="wpforms-field-option-%d-first_default" name="fields[%d][first_default]" value="%s">', $field['id'], $field['id'], $first_default );
-					printf( '<label for="wpforms-field-option-%d-first_default" class="sub-label">%s</label>', $field['id'], esc_html__( 'Default Value', 'wpforms-lite' ) );
+				echo '<div class="wpforms-field-options-columns-2 wpforms-field-options-columns">';
+					echo '<div class="placeholder wpforms-field-options-column">';
+						printf( '<input type="text" class="placeholder" id="wpforms-field-option-%1$d-first_placeholder" name="fields[%1$d][first_placeholder]" value="%2$s">', (int) $field['id'], esc_attr( $first_placeholder ) );
+						printf( '<label for="wpforms-field-option-%d-first_placeholder" class="sub-label">%s</label>', (int) $field['id'], esc_html__( 'Placeholder', 'wpforms-lite' ) );
+					echo '</div>';
+					echo '<div class="default wpforms-field-options-column">';
+						printf( '<input type="text" class="default" id="wpforms-field-option-%1$d-first_default" name="fields[%1$d][first_default]" value="%2$s">', (int) $field['id'], esc_attr( $first_default ) );
+						printf( '<label for="wpforms-field-option-%d-first_default" class="sub-label">%s</label>', (int) $field['id'], esc_html__( 'Default Value', 'wpforms-lite' ) );
+					echo '</div>';
 				echo '</div>';
 			echo '</div>';
 
@@ -299,13 +303,15 @@ class WPForms_Field_Name extends WPForms_Field {
 			$middle_default     = ! empty( $field['middle_default'] ) ? esc_attr( $field['middle_default'] ) : '';
 			printf( '<div class="wpforms-clear wpforms-field-option-row wpforms-field-option-row-middle" id="wpforms-field-option-row-%d-middle" data-subfield="middle-name" data-field-id="%d">', $field['id'], $field['id'] );
 				$this->field_element( 'label', $field, array( 'slug' => 'middle_placeholder', 'value' => esc_html__( 'Middle Name', 'wpforms-lite' ), 'tooltip' => esc_html__( 'Middle name field advanced options.', 'wpforms-lite' ) ) );
-				echo '<div class="placeholder">';
-					printf( '<input type="text" class="placeholder" id="wpforms-field-option-%d-middle_placeholder" name="fields[%d][middle_placeholder]" value="%s">', $field['id'], $field['id'], $middle_placeholder );
-					printf( '<label for="wpforms-field-option-%d-middle_placeholder" class="sub-label">%s</label>', $field['id'], esc_html__( 'Placeholder', 'wpforms-lite' ) );
-				echo '</div>';
-				echo '<div class="default">';
-					printf( '<input type="text" class="default" id="wpforms-field-option-%d-middle_default" name="fields[%d][middle_default]" value="%s">', $field['id'], $field['id'], $middle_default );
-					printf( '<label for="wpforms-field-option-%d-middle_default" class="sub-label">%s</label>', $field['id'], esc_html__( 'Default Value', 'wpforms-lite' ) );
+				echo '<div class="wpforms-field-options-columns-2 wpforms-field-options-columns">';
+					echo '<div class="placeholder wpforms-field-options-column">';
+						printf( '<input type="text" class="placeholder" id="wpforms-field-option-%1$d-middle_placeholder" name="fields[%1$d][middle_placeholder]" value="%2$s">', (int) $field['id'], esc_attr( $middle_placeholder ) );
+						printf( '<label for="wpforms-field-option-%d-middle_placeholder" class="sub-label">%s</label>', (int) $field['id'], esc_html__( 'Placeholder', 'wpforms-lite' ) );
+					echo '</div>';
+					echo '<div class="default wpforms-field-options-column">';
+						printf( '<input type="text" class="default" id="wpforms-field-option-%1$d-middle_default" name="fields[%1$d][middle_default]" value="%2$s">', (int) $field['id'], esc_attr( $middle_default ) );
+						printf( '<label for="wpforms-field-option-%d-middle_default" class="sub-label">%s</label>', (int) $field['id'], esc_html__( 'Default Value', 'wpforms-lite' ) );
+					echo '</div>';
 				echo '</div>';
 			echo '</div>';
 
@@ -314,17 +320,22 @@ class WPForms_Field_Name extends WPForms_Field {
 			$last_default     = ! empty( $field['last_default'] ) ? esc_attr( $field['last_default'] ) : '';
 			printf( '<div class="wpforms-clear wpforms-field-option-row wpforms-field-option-row-last" id="wpforms-field-option-row-%d-last" data-subfield="last-name" data-field-id="%d">', $field['id'], $field['id'] );
 				$this->field_element( 'label', $field, array( 'slug' => 'last_placeholder', 'value' => esc_html__( 'Last Name', 'wpforms-lite' ), 'tooltip' => esc_html__( 'Last name field advanced options.', 'wpforms-lite' ) ) );
-				echo '<div class="placeholder">';
-					printf( '<input type="text" class="placeholder" id="wpforms-field-option-%d-last_placeholder" name="fields[%d][last_placeholder]" value="%s">', $field['id'], $field['id'], $last_placeholder );
-					printf( '<label for="wpforms-field-option-%d-last_placeholder" class="sub-label">%s</label>', $field['id'], esc_html__( 'Placeholder', 'wpforms-lite' ) );
-				echo '</div>';
-				echo '<div class="default">';
-					printf( '<input type="text" class="default" id="wpforms-field-option-%d-last_default" name="fields[%d][last_default]" value="%s">', $field['id'], $field['id'], $last_default );
-					printf( '<label for="wpforms-field-option-%d-last_default" class="sub-label">%s</label>', $field['id'], esc_html__( 'Default Value', 'wpforms-lite' ) );
+				echo '<div class="wpforms-field-options-columns-2 wpforms-field-options-columns">';
+					echo '<div class="placeholder wpforms-field-options-column">';
+						printf( '<input type="text" class="placeholder" id="wpforms-field-option-%1$d-last_placeholder" name="fields[%1$d][last_placeholder]" value="%2$s">', (int) $field['id'], esc_attr( $last_placeholder ) );
+						printf( '<label for="wpforms-field-option-%d-last_placeholder" class="sub-label">%s</label>', (int) $field['id'], esc_html__( 'Placeholder', 'wpforms-lite' ) );
+					echo '</div>';
+					echo '<div class="default wpforms-field-options-column">';
+						printf( '<input type="text" class="default" id="wpforms-field-option-%1$d-last_default" name="fields[%1$d][last_default]" value="%2$s">', (int) $field['id'], esc_attr( $last_default ) );
+						printf( '<label for="wpforms-field-option-%d-last_default" class="sub-label">%s</label>', (int) $field['id'], esc_html__( 'Default Value', 'wpforms-lite' ) );
+					echo '</div>';
 				echo '</div>';
 			echo '</div>';
 
 		echo '</div>';
+
+		// Custom CSS classes.
+		$this->field_option( 'css', $field );
 
 		// Hide Label.
 		$this->field_option( 'label_hide', $field );
@@ -332,13 +343,11 @@ class WPForms_Field_Name extends WPForms_Field {
 		// Hide sub-labels.
 		$this->field_option( 'sublabel_hide', $field );
 
-		// Custom CSS classes.
-		$this->field_option( 'css', $field );
-
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'advanced-options', $field, $args );
 	}
 
@@ -362,24 +371,24 @@ class WPForms_Field_Name extends WPForms_Field {
 		$this->field_preview_option( 'label', $field );
 		?>
 
-		<div class="format-selected-<?php echo $format; ?> format-selected">
+		<div class="format-selected-<?php echo sanitize_html_class( $format ); ?> format-selected wpforms-clear">
 
 			<div class="wpforms-simple">
-				<input type="text" placeholder="<?php echo $simple_placeholder; ?>" class="primary-input" disabled>
+				<input type="text" placeholder="<?php echo esc_attr( $simple_placeholder ); ?>" class="primary-input" readonly>
 			</div>
 
 			<div class="wpforms-first-name">
-				<input type="text" placeholder="<?php echo $first_placeholder; ?>" class="primary-input" disabled>
+				<input type="text" placeholder="<?php echo esc_attr( $first_placeholder ); ?>" class="primary-input" readonly>
 				<label class="wpforms-sub-label"><?php esc_html_e( 'First', 'wpforms-lite' ); ?></label>
 			</div>
 
 			<div class="wpforms-middle-name">
-				<input type="text" placeholder="<?php echo $middle_placeholder; ?>" class="primary-input" disabled>
+				<input type="text" placeholder="<?php echo esc_attr( $middle_placeholder ); ?>" class="primary-input" readonly>
 				<label class="wpforms-sub-label"><?php esc_html_e( 'Middle', 'wpforms-lite' ); ?></label>
 			</div>
 
 			<div class="wpforms-last-name">
-				<input type="text" placeholder="<?php echo $last_placeholder; ?>" class="primary-input" disabled>
+				<input type="text" placeholder="<?php echo esc_attr( $last_placeholder ); ?>" class="primary-input" readonly>
 				<label class="wpforms-sub-label"><?php esc_html_e( 'Last', 'wpforms-lite' ); ?></label>
 			</div>
 

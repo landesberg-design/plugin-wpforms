@@ -224,7 +224,7 @@ class WPForms_Field_Select extends WPForms_Field {
 		// or if manually enabled by a filter.
 		if ( ! empty( $field['show_values'] ) || wpforms_show_fields_options_setting() ) {
 			$show_values = $this->field_element(
-				'checkbox',
+				'toggle',
 				$field,
 				array(
 					'slug'    => 'show_values',
@@ -246,7 +246,7 @@ class WPForms_Field_Select extends WPForms_Field {
 
 		// Multiple options selection.
 		$fld = $this->field_element(
-			'checkbox',
+			'toggle',
 			$field,
 			array(
 				'slug'    => 'multiple',
@@ -320,25 +320,25 @@ class WPForms_Field_Select extends WPForms_Field {
 		// Placeholder.
 		$this->field_option( 'placeholder', $field );
 
-		// Hide label.
-		$this->field_option( 'label_hide', $field );
-
-		// Custom CSS classes.
-		$this->field_option( 'css', $field );
-
 		// Dynamic choice auto-populating toggle.
 		$this->field_option( 'dynamic_choices', $field );
 
 		// Dynamic choice source.
 		$this->field_option( 'dynamic_choices_source', $field );
 
+		// Custom CSS classes.
+		$this->field_option( 'css', $field );
+
+		// Hide label.
+		$this->field_option( 'label_hide', $field );
+
 		// Options close markup.
 		$this->field_option(
 			'advanced-options',
 			$field,
-			array(
+			[
 				'markup' => 'close',
-			)
+			]
 		);
 	}
 

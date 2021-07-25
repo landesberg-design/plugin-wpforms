@@ -175,8 +175,8 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 		$this->field_option( 'advanced-options', $field, array( 'markup' => 'open' ) );
 		$this->field_option( 'size', $field );
 		$this->field_option( 'placeholder', $field );
-		$this->field_option( 'label_hide', $field );
 		$this->field_option( 'css', $field );
+		$this->field_option( 'label_hide', $field );
 		$this->field_option( 'advanced-options', $field, array( 'markup' => 'close' ) );
 	}
 
@@ -207,7 +207,7 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 			echo '</p>';
 
 			printf(
-				'<input type="text" placeholder="%s" class="primary-input" value="%s" disabled>',
+				'<input type="text" placeholder="%s" class="primary-input" value="%s" readonly>',
 				esc_attr( $placeholder ),
 				esc_attr( $value )
 			);

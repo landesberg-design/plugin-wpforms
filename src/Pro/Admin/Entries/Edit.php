@@ -343,7 +343,7 @@ class Edit {
 
 		// No entry ID was provided, error.
 		if ( empty( $_GET['entry_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-			\WPForms_Admin_Notice::error( esc_html__( 'Invalid entry ID.', 'wpforms' ) );
+			\WPForms\Admin\Notice::error( esc_html__( 'Invalid entry ID.', 'wpforms' ) );
 			$this->abort = true;
 			return;
 		}
@@ -353,7 +353,7 @@ class Edit {
 
 		// No entry was found, error.
 		if ( ! $entry || empty( $entry ) ) {
-			\WPForms_Admin_Notice::error( esc_html__( 'Entry not found.', 'wpforms' ) );
+			\WPForms\Admin\Notice::error( esc_html__( 'Entry not found.', 'wpforms' ) );
 			$this->abort = true;
 			return;
 		}
@@ -363,7 +363,7 @@ class Edit {
 
 		// No form was found, error.
 		if ( ! $form || empty( $form ) ) {
-			\WPForms_Admin_Notice::error( esc_html__( 'Form not found.', 'wpforms' ) );
+			\WPForms\Admin\Notice::error( esc_html__( 'Form not found.', 'wpforms' ) );
 			return;
 		}
 
@@ -646,8 +646,29 @@ class Edit {
 		// Add properties to the field.
 		$field['properties'] = wpforms()->frontend->get_field_properties( $field, $form_data );
 
+		/**
+		 * Is the field editable?
+		 *
+		 * @since 1.5.9.5
+		 * @since 1.6.8.1 Added $entry_fields and $form_data arguments.
+		 *
+		 * @param bool  $is_editable  Is the field editable?
+		 * @param array $field        Field data.
+		 * @param array $entry_fields Entry fields data.
+		 * @param array $form_data    Form data and settings.
+		 *
+		 * @return bool
+		 */
+		$is_editable = (bool) apply_filters(
+			'wpforms_pro_admin_entries_edit_field_output_editable',
+			$this->is_field_entries_editable( $field['type'] ),
+			$field,
+			$entry_fields,
+			$form_data
+		);
+
 		// Field output.
-		if ( apply_filters( 'wpforms_pro_admin_entries_edit_field_output_editable', $this->is_field_entries_editable( $field['type'] ), $field ) ) {
+		if ( $is_editable ) {
 			$this->display_edit_form_field_editable( $entry_field, $field, $form_data );
 		} else {
 			$this->display_edit_form_field_non_editable( $field_value );
@@ -1138,7 +1159,6 @@ class Edit {
 			'phone',
 			'rating',
 			'url',
-			'file-upload',
 		];
 
 		$editable = in_array( $type, $editable_types, true );

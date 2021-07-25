@@ -110,7 +110,7 @@ class Addons {
 	public function hooks() {
 
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ] );
-		add_action( 'admin_init', [ $this, 'notices' ] );
+		add_action( 'admin_notices', [ $this, 'notices' ] );
 		add_action( 'wpforms_admin_page', [ $this, 'output' ] );
 	}
 
@@ -226,23 +226,23 @@ class Addons {
 		$errors = wpforms()->license->get_errors();
 
 		if ( empty( $this->addons ) ) {
-			\WPForms_Admin_Notice::error( esc_html__( 'There was an issue retrieving Addons for this site. Please click on the button above to refresh.', 'wpforms' ) );
+			\WPForms\Admin\Notice::error( esc_html__( 'There was an issue retrieving Addons for this site. Please click on the button above to refresh.', 'wpforms' ) );
 
 			return;
 		}
 
 		if ( ! empty( $errors ) ) {
-			\WPForms_Admin_Notice::error( esc_html__( 'In order to get access to Addons, you need to resolve your license key errors.', 'wpforms' ) );
+			\WPForms\Admin\Notice::error( esc_html__( 'In order to get access to Addons, you need to resolve your license key errors.', 'wpforms' ) );
 
 			return;
 		}
 
 		if ( $this->refresh ) {
-			\WPForms_Admin_Notice::success( esc_html__( 'Addons have successfully been refreshed.', 'wpforms' ) );
+			\WPForms\Admin\Notice::success( esc_html__( 'Addons have successfully been refreshed.', 'wpforms' ) );
 		}
 
 		if ( empty( $this->license_type ) ) {
-			\WPForms_Admin_Notice::error(
+			\WPForms\Admin\Notice::error(
 				sprintf(
 					wp_kses( /* translators: %s - WPForms plugin settings URL. */
 						__( 'To access addons please enter and activate your WPForms license key in the plugin <a href="%s">settings</a>.', 'wpforms' ),

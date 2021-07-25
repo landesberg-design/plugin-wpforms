@@ -2,6 +2,7 @@
 
 namespace WPForms\Tasks;
 
+use WPForms\Helpers\Transient;
 use WPForms\Tasks\Actions\EntryEmailsTask;
 
 /**
@@ -34,6 +35,8 @@ class Tasks {
 
 			new $task();
 		}
+
+		add_action( 'delete_expired_transients', [ Transient::class, 'delete_all_expired' ], 11 );
 
 		add_action( 'admin_menu', [ $this, 'admin_hide_as_menu' ], PHP_INT_MAX );
 

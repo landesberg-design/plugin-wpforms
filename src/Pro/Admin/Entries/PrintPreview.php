@@ -370,6 +370,11 @@ class PrintPreview {
 		}
 
 		foreach ( $settings as $key => $setting ) {
+
+			if ( ! isset( $fields[ $key ] ) ) {
+				continue;
+			}
+
 			if ( ! in_array( $setting['type'], [ 'divider', 'html' ], true ) ) {
 				$settings[ $key ] = $fields[ $key ];
 			}

@@ -73,6 +73,6 @@ $pages_exists = ! empty( $args['dropdown_pages'] ) ? 1 : 0;
 				</p>
 			</div>
 		</div>
-		<div class="wpforms-admin-popup-close">×</div>
+		<i class="fa fa-times wpforms-admin-popup-close"></i>
 	</div>
 </div>

@@ -119,6 +119,10 @@ class Migrations {
 		if ( version_compare( $version, '1.6.5', '<' ) ) {
 			$this->v165_upgrade();
 		}
+
+		if ( version_compare( $version, '1.6.8', '<' ) ) {
+			$this->v168_upgrade();
+		}
 	}
 
 	/**
@@ -369,7 +373,7 @@ class Migrations {
 		}
 
 		// Don't show upgrade notices on the upgrades screen.
-		if ( ! empty( $_GET['page'] ) && 'wpforms-tools' === $_GET['page'] && ! empty( $_GET['view'] ) && 'upgrade' === $_GET['view'] ) {
+		if ( ! empty( $_GET['page'] ) && $_GET['page'] === 'wpforms-tools' && ! empty( $_GET['view'] ) && $_GET['view'] === 'upgrade' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}
 
@@ -377,7 +381,7 @@ class Migrations {
 		$upgrade_v143 = get_option( 'wpforms_fields_update', false );
 
 		if ( $upgrade_v143 ) {
-			if ( 'incomplete' === $upgrade_v143 ) {
+			if ( $upgrade_v143 === 'incomplete' ) {
 				/* translators: %s - resume page URL. */
 				$msg = __( 'WPForms database upgrade is incomplete, click <a href="%s">here</a> to resume.', 'wpforms' );
 			} else {
@@ -385,19 +389,19 @@ class Migrations {
 				$msg = __( 'WPForms needs to upgrade the database, click <a href="%s">here</a> to start the upgrade.', 'wpforms' );
 			}
 
-			echo '<div class="notice notice-info"><p>';
-				printf(
+			\WPForms\Admin\Notice::info(
+				sprintf(
 					wp_kses(
 						$msg,
-						array(
-							'a' => array(
-								'href' => array(),
-							),
-						)
+						[
+							'a' => [
+								'href' => [],
+							],
+						]
 					),
 					esc_url( admin_url( 'admin.php?page=wpforms-tools&view=upgrade' ) )
-				);
-			echo '</p></div>';
+				)
+			);
 		}
 	}
 
@@ -463,5 +467,24 @@ class Migrations {
 		if ( $t15s->allow_load() ) {
 			$t15s->download_plugins_translations();
 		}
+	}
+
+	/**
+	 * Do all the required migrations for WPForms v1.6.8.
+	 *
+	 * @since 1.6.8
+	 */
+	private function v168_upgrade() {
+
+		if ( ! function_exists( 'wpforms_form_templates_pack' ) ) {
+			return;
+		}
+
+		add_action(
+			'admin_init',
+			static function() {
+				deactivate_plugins( 'wpforms-form-templates-pack/wpforms-form-templates-pack.php' );
+			}
+		);
 	}
 }

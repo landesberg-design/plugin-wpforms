@@ -1018,7 +1018,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 
 		if ( $messages ) {
-			WPForms_Admin_Notice::success( implode( '<br>', array_map( 'esc_html', $messages ) ) );
+			\WPForms\Admin\Notice::success( implode( '<br>', array_map( 'esc_html', $messages ) ) );
 		}
 	}
 

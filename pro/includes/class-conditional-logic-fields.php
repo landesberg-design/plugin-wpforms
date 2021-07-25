@@ -76,32 +76,32 @@ class WPForms_Conditional_Logic_Fields {
 	 *
 	 * @since 1.3.8
 	 *
-	 * @param array $field
-	 * @param object $instance
+	 * @param array          $field    Field data.
+	 * @param \WPForms_Field $instance Field object instance.
 	 */
 	public function builder_field_conditionals( $field, $instance ) {
 
 		// Certain fields don't support conditional logic.
-		if ( in_array( $field['type'], array( 'pagebreak', 'hidden' ), true ) ) {
+		if ( in_array( $field['type'], [ 'pagebreak', 'hidden' ], true ) ) {
 			return;
 		}
 		?>
 
 		<div class="wpforms-conditional-fields wpforms-field-option-group wpforms-field-option-group-conditionals wpforms-hide"
-			id="wpforms-field-option-conditionals-<?php echo $field['id']; ?>">
+			id="wpforms-field-option-conditionals-<?php echo (int) $field['id']; ?>">
 
 			<a href="#" class="wpforms-field-option-group-toggle">
-				<?php esc_html_e( 'Conditionals', 'wpforms' ); ?> <i class="fa fa-angle-right"></i>
+				<?php esc_html_e( 'Smart Logic', 'wpforms' ); ?>
 			</a>
 
 			<div class="wpforms-field-option-group-inner">
 				<?php
 				wpforms_conditional_logic()->builder_block(
-					array(
+					[
 						'form'     => $instance->form_id,
 						'field'    => $field,
 						'instance' => $instance,
-					)
+					]
 				);
 				?>
 			</div>
@@ -453,7 +453,9 @@ class WPForms_Conditional_Logic_Fields {
 	 * Helper methods.        *
 	 * - field_is_conditional *
 	 * - field_is_trigger     *
+     * - field_is_visible     *
 	 * - generate_rules       *
+     * - clear_empty_rules    *
 	 **************************/
 
 	/**
@@ -537,6 +539,34 @@ class WPForms_Conditional_Logic_Fields {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check if the field is visible under conditions of submitted entry.
+	 *
+	 * @since 1.6.8.1
+	 *
+	 * @param array $form_data Form data and settings.
+	 * @param int   $field_id  Field id.
+	 *
+	 * @return bool
+	 */
+	public function field_is_visible( $form_data, $field_id ) {
+
+		if ( ! array_key_exists( $field_id, $form_data['fields'] ) ) {
+			return false;
+		}
+
+		$conditionals = $this->clear_empty_rules( $form_data['fields'][ $field_id ]['conditionals'] );
+
+		// Determine the field visibility.
+		$visible = wpforms_conditional_logic()->process( wpforms()->process->fields, $form_data, $conditionals );
+
+		if ( $form_data['fields'][ $field_id ]['conditional_type'] === 'hide' ) {
+			$visible = ! $visible;
+		}
+
+		return $visible;
 	}
 
 	/**

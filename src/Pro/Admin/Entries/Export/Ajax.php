@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Admin\Entries\Export;
 
+use WPForms\Helpers\Transient;
+
 /**
  * Ajax endpoints and data processing.
  *
@@ -130,7 +132,7 @@ class Ajax {
 	 *
 	 * @throws \Exception Try-catch.
 	 */
-	public function ajax_export_step() {
+	public function ajax_export_step() {// phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		try {
 
@@ -174,13 +176,14 @@ class Ajax {
 			$response = $this->get_response_data();
 
 			// Store request data.
-			set_transient( 'wpforms-tools-entries-export-request-' . $this->request_data['request_id'], $this->request_data, $this->export->configuration['request_data_ttl'] );
+			Transient::set( 'wpforms-tools-entries-export-request-' . $this->request_data['request_id'], $this->request_data, $this->export->configuration['request_data_ttl'] );
 
 			wp_send_json_success( $response );
 
 		} catch ( \Exception $e ) {
 
 			$error = $this->export->errors['common'] . '<br>' . $e->getMessage();
+
 			if ( wpforms_debug() ) {
 				$error .= '<br><b>WPFORMS DEBUG</b>: ' . $e->__toString();
 			}

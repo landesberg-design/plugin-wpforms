@@ -118,6 +118,8 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		}
 
 		add_filter( 'robots_txt', array( $this, 'disallow_upload_dir_indexing' ), -42 );
+
+		add_filter( 'wpforms_pro_admin_entries_edit_field_output_editable', [ $this, 'is_editable' ], 10, 4 );
 	}
 
 	/**
@@ -556,11 +558,15 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			),
 			false
 		);
-		$this->field_element( 'row', $field, array(
-			'slug'    => 'max_file_number',
-			'content' => $lbl . $fld,
-			'class'   => self::STYLE_CLASSIC === $style ? 'wpforms-row-hide' : '',
-		) );
+		$this->field_element(
+			'row',
+			$field,
+			[
+				'slug'    => 'max_file_number',
+				'content' => $lbl . $fld,
+				'class'   => $style === self::STYLE_CLASSIC ? 'wpforms-hidden' : '',
+			]
+		);
 
 		// Required toggle.
 		$this->field_option( 'required', $field );
@@ -599,38 +605,52 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			),
 			false
 		);
-		$this->field_element( 'row', $field, array(
-			'slug'    => 'style',
-			'content' => $lbl . $fld,
-		) );
 
-		// Hide Label.
-		$this->field_option( 'label_hide', $field );
+		$this->field_element(
+			'row',
+			$field,
+			[
+				'slug'    => 'style',
+				'content' => $lbl . $fld,
+			]
+		);
 
 		// Media Library toggle.
-		$fld  = $this->field_element(
-			'checkbox',
+		$fld = $this->field_element(
+			'toggle',
 			$field,
-			array(
+			[
 				'slug'    => 'media_library',
 				'value'   => ! empty( $field['media_library'] ) ? 1 : '',
 				'desc'    => esc_html__( 'Store file in WordPress Media Library', 'wpforms' ),
 				'tooltip' => esc_html__( 'Check this option to store the final uploaded file in the WordPress Media Library', 'wpforms' ),
-			),
+			],
 			false
 		);
-		$this->field_element( 'row', $field, array(
-			'slug'    => 'media_library',
-			'content' => $fld,
-		) );
+
+		$this->field_element(
+			'row',
+			$field,
+			[
+				'slug'    => 'media_library',
+				'content' => $fld,
+			]
+		);
 
 		// Custom CSS classes.
 		$this->field_option( 'css', $field );
 
+		// Hide Label.
+		$this->field_option( 'label_hide', $field );
+
 		// Options close markup.
-		$this->field_option( 'advanced-options', $field, array(
-			'markup' => 'close',
-		) );
+		$this->field_option(
+			'advanced-options',
+			$field,
+			[
+				'markup' => 'close',
+			]
+		);
 	}
 
 	/**
@@ -671,6 +691,27 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		// Description.
 		$this->field_preview_option( 'description', $field );
+	}
+
+	/**
+	 * Only a non-empty field is editable.
+	 *
+	 * @since 1.6.8.1
+	 *
+	 * @param bool  $is_editable  Default value.
+	 * @param array $field        Field data.
+	 * @param array $entry_fields Entry fields data.
+	 * @param array $form_data    Form data and settings.
+	 *
+	 * @return bool
+	 */
+	public function is_editable( $is_editable, $field, $entry_fields, $form_data ) {
+
+		if ( $field['type'] !== $this->type ) {
+			return $is_editable;
+		}
+
+		return ! empty( $entry_fields[ $field['id'] ]['value'] );
 	}
 
 	/**
@@ -831,7 +872,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		 */
 		if (
 			( empty( $_FILES[ $input_name ]['tmp_name'] ) || 4 === $_FILES[ $input_name ]['error'] ) &&
-		     $this->is_required()
+			$this->is_required()
 		) {
 			wpforms()->process->errors[ $this->form_id ][ $this->field_id ] = wpforms_get_required_label();
 
@@ -1280,12 +1321,12 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$file_args = array(
+		$file_args = [
 			'error'    => '',
 			'tmp_name' => $file['path'],
 			'name'     => $file['file_name_new'],
 			'type'     => $file['type'],
-		);
+		];
 		$upload    = wp_handle_sideload( $file_args, array( 'test_form' => false ) );
 
 		if ( empty( $upload['file'] ) ) {

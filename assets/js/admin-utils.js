@@ -212,22 +212,26 @@ var wpf = {
 	 * Toggle the loading state/indicator of a field option.
 	 *
 	 * @since 1.2.8
+	 *
+	 * @param {mixed}   option jQuery object, or DOM element selector.
+	 * @param {boolean} unload True if you need to unload spinner, and vice versa.
 	 */
-	fieldOptionLoading: function(option, unload) {
+	fieldOptionLoading: function( option, unload ) {
 
-		var $option = jQuery(option),
-			$label  = $option.find('label'),
-			unload  = (typeof unload === 'undefined') ? false : true,
-			spinner = '<i class="fa fa-spinner fa-spin wpforms-loading-inline"></i>';
+		var $option = jQuery( option ),
+			$label  = $option.find( 'label' ),
+			spinner = '<i class="wpforms-loading-spinner wpforms-loading-inline"></i>';
 
-		if (unload) {
-			$label.find('.wpforms-loading-inline').remove();
-			$label.find('.wpforms-help-tooltip').show();
-			$option.find('input,select,textarea').prop('disabled', false);
+		unload  = typeof unload !== 'undefined';
+
+		if ( unload ) {
+			$label.find( '.wpforms-loading-spinner' ).remove();
+			$label.find( '.wpforms-help-tooltip' ).show();
+			$option.find( 'input,select,textarea' ).prop( 'disabled', false );
 		} else {
-			$label.append(spinner);
-			$label.find('.wpforms-help-tooltip').hide();
-			$option.find('input,select,textarea').prop('disabled', true);
+			$label.append( spinner );
+			$label.find( '.wpforms-help-tooltip' ).hide();
+			$option.find( 'input,select,textarea' ).prop( 'disabled', true );
 		}
 	},
 
@@ -633,6 +637,10 @@ var wpf = {
 	 */
 	initTooltips: function() {
 
+		if ( typeof jQuery.fn.tooltipster === 'undefined' ) {
+			return;
+		}
+
 		jQuery( '.wpforms-help-tooltip' ).tooltipster( {
 			contentAsHTML: true,
 			position: 'right',
@@ -782,6 +790,30 @@ var wpf = {
 					$item.prop( 'checked', false );
 				}
 			} );
+		} );
+	},
+
+	/**
+	 * Pluck a certain field out of each object in a list.
+	 *
+	 * JS implementation of the `wp_list_pluck()`.
+	 *
+	 * @since 1.6.8
+	 *
+	 * @param {Array}  arr    Array of objects.
+	 * @param {string} column Column.
+	 *
+	 * @returns {Array} Array with extracted column values.
+	 */
+	listPluck: function( arr, column ) {
+
+		return arr.map( function( x ) {
+
+			if ( typeof x !== 'undefined' ) {
+				return x[ column ];
+			}
+
+			return x;
 		} );
 	},
 };

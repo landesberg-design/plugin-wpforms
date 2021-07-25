@@ -33,6 +33,8 @@ class WPForms_Field_Email extends WPForms_Field {
 		add_action( 'wp_ajax_nopriv_wpforms_restricted_email', [ $this, 'ajax_check_restricted_email' ] );
 
 		add_action( 'wp_ajax_wpforms_sanitize_restricted_rules', [ $this, 'ajax_sanitize_restricted_rules' ] );
+
+		add_filter( 'wpforms_save_form_args', [ $this, 'save_form_args' ], 11, 3 );
 	}
 
 	/**
@@ -239,7 +241,7 @@ class WPForms_Field_Email extends WPForms_Field {
 
 		// Confirmation toggle.
 		$fld = $this->field_element(
-			'checkbox',
+			'toggle',
 			$field,
 			array(
 				'slug'    => 'confirmation',
@@ -303,17 +305,8 @@ class WPForms_Field_Email extends WPForms_Field {
 		);
 		$this->field_element( 'row', $field, $args );
 
-		// Hide Label.
-		$this->field_option( 'label_hide', $field );
-
-		// Hide sub-labels.
-		$this->field_option( 'sublabel_hide', $field );
-
 		// Default value.
 		$this->field_option( 'default_value', $field );
-
-		// Custom CSS classes.
-		$this->field_option( 'css', $field );
 
 		$filter_type_label = $this->field_element(
 			'label',
@@ -325,6 +318,7 @@ class WPForms_Field_Email extends WPForms_Field {
 			],
 			false
 		);
+
 		$filter_type_field = $this->field_element(
 			'select',
 			$field,
@@ -339,6 +333,7 @@ class WPForms_Field_Email extends WPForms_Field {
 			],
 			false
 		);
+
 		$this->field_element(
 			'row',
 			$field,
@@ -382,10 +377,20 @@ class WPForms_Field_Email extends WPForms_Field {
 			]
 		);
 
+		// Custom CSS classes.
+		$this->field_option( 'css', $field );
+
+		// Hide Label.
+		$this->field_option( 'label_hide', $field );
+
+		// Hide sub-labels.
+		$this->field_option( 'sublabel_hide', $field );
+
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'advanced-options', $field, $args );
 	}
 
@@ -406,15 +411,15 @@ class WPForms_Field_Email extends WPForms_Field {
 		$this->field_preview_option( 'label', $field );
 		?>
 
-		<div class="wpforms-confirm wpforms-confirm-<?php echo $confirm; ?>">
+		<div class="wpforms-confirm wpforms-confirm-<?php echo sanitize_html_class( $confirm ); ?>">
 
 			<div class="wpforms-confirm-primary">
-				<input type="email" placeholder="<?php echo $placeholder; ?>" class="primary-input" disabled>
+				<input type="email" placeholder="<?php echo esc_attr( $placeholder ); ?>" class="primary-input" readonly>
 				<label class="wpforms-sub-label"><?php esc_html_e( 'Email', 'wpforms-lite' ); ?></label>
 			</div>
 
 			<div class="wpforms-confirm-confirmation">
-				<input type="email" placeholder="<?php echo $confirm_placeholder; ?>" class="secondary-input" disabled>
+				<input type="email" placeholder="<?php echo esc_attr( $confirm_placeholder ); ?>" class="secondary-input" readonly>
 				<label class="wpforms-sub-label"><?php esc_html_e( 'Confirm Email', 'wpforms-lite' ); ?></label>
 			</div>
 
@@ -570,22 +575,28 @@ class WPForms_Field_Email extends WPForms_Field {
 	public function ajax_check_restricted_email() {
 
 		$token = wpforms()->get( 'token' );
+
 		if ( ! $token || ! $token->verify( filter_input( INPUT_POST, 'token', FILTER_SANITIZE_STRING ) ) ) {
 			wp_send_json_error();
 		}
+
 		$form_id  = filter_input( INPUT_POST, 'form_id', FILTER_SANITIZE_NUMBER_INT );
 		$field_id = filter_input( INPUT_POST, 'field_id', FILTER_SANITIZE_NUMBER_INT );
 		$email    = filter_input( INPUT_POST, 'email', FILTER_SANITIZE_EMAIL );
+
 		if ( ! $form_id || ! $field_id || ! $email ) {
 			wp_send_json_error();
 		}
+
 		$form_data = wpforms()->form->get(
 			$form_id,
-			array( 'content_only' => true )
+			[ 'content_only' => true ]
 		);
+
 		if ( empty( $form_data['fields'][ $field_id ] ) ) {
 			wp_send_json_error();
 		}
+
 		wp_send_json_success(
 			$this->is_restricted_email( $email, $form_data['fields'][ $field_id ] )
 		);
@@ -600,10 +611,13 @@ class WPForms_Field_Email extends WPForms_Field {
 
 		// Run a security check.
 		check_ajax_referer( 'wpforms-builder', 'nonce' );
+
 		$content = filter_input( INPUT_GET, 'content', FILTER_SANITIZE_STRING );
+
 		if ( ! $content ) {
 			wp_send_json_error();
 		}
+
 		$rules = $this->sanitize_restricted_rules( $content );
 
 		wp_send_json_success(
@@ -626,13 +640,54 @@ class WPForms_Field_Email extends WPForms_Field {
 
 		foreach ( $patterns as $key => $pattern ) {
 			$pattern = trim( $pattern );
+
 			if ( ! $pattern ) {
 				unset( $patterns[ $key ] );
 			}
-			// Strip all deny symbols for prevent double convert.
-			$pattern = strtolower( $pattern );
-			// Symbol '*' allow using in field settings. Symbol '-' need to email with domain in punycode.
-			$patterns[ $key ] = preg_replace( '/[^a-z0-9@.*-]/', '', $pattern );
+
+			$pattern     = strtolower( $pattern );
+			$email_parts = explode( '@', $pattern );
+
+			$local_part = preg_replace(
+				/**
+				 * Allowed characters in the "name" part of the email:
+				 *
+				 * - latin letters, lowercase
+				 * - numbers
+				 * - underscore
+				 * - period <.>
+				 * - asterisk <*> (used for wildcards)
+				 * - hyphen
+				 *
+				 * @todo Synchronize regex with WordPress' `is_email()` function.
+				 */
+				'/[^a-z0-9_.*-]/',
+				'',
+				array_shift( $email_parts )
+			);
+
+			if ( empty( $email_parts ) ) {
+				$patterns[ $key ] = $local_part;
+
+				continue;
+			}
+
+			$domain_part = preg_replace(
+				/**
+				 * Allowed characters in the "domain" part of the email:
+				 *
+				 * - latin letters, lowercase
+				 * - numbers
+				 * - period <.>
+				 * - asterisk <*> (used for wildcards)
+				 * - hyphen
+				 */
+				'/[^a-z0-9.*-]/',
+				'',
+				$email_parts[0]
+			);
+
+			$patterns[ $key ] = $local_part . '@' . $domain_part;
 		}
 
 		return ! empty( $patterns ) ? array_filter( $patterns ) : [];
@@ -653,16 +708,19 @@ class WPForms_Field_Email extends WPForms_Field {
 		if ( empty( $field['filter_type'] ) || empty( $field[ $field['filter_type'] ] ) ) {
 			return true;
 		}
+
 		$email    = strtolower( $email );
 		$patterns = $this->sanitize_restricted_rules( $field[ $field['filter_type'] ] );
 		$patterns = array_unique( array_map( [ $this, 'sanitize_email_pattern' ], $patterns ) );
 
-		$check = 'allowlist' === $field['filter_type'];
+		$check = $field['filter_type'] === 'allowlist';
+
 		foreach ( $patterns as $pattern ) {
 			if ( true === (bool) preg_match( '/' . $pattern . '/', $email ) ) {
 				return $check;
 			}
 		}
+
 		return ! $check;
 	}
 
@@ -679,5 +737,35 @@ class WPForms_Field_Email extends WPForms_Field {
 
 		// Create regex pattern from a string.
 		return '^' . str_replace( [ '.', '*' ], [ '\.', '.*' ], $pattern ) . '$';
+	}
+
+	/**
+	 * Sanitize allow/deny list before saving.
+	 *
+	 * @since 1.6.8
+	 *
+	 * @param array $form Form array which is usable with `wp_update_post()`.
+	 * @param array $data Data retrieved from $_POST and processed.
+	 * @param array $args Empty by default, may contain custom data not intended to be saved, but used for processing.
+	 *
+	 * @return array
+	 */
+	public function save_form_args( $form, $data, $args ) {
+
+		// Get a filtered form content.
+		$form_data = json_decode( stripslashes( $form['post_content'] ), true );
+
+		foreach ( $form_data['fields'] as $key => $field ) {
+			if ( $field['type'] !== 'email' ) {
+				continue;
+			}
+
+			$form_data['fields'][ $key ]['allowlist'] = implode( PHP_EOL, $this->sanitize_restricted_rules( $field['allowlist'] ) );
+			$form_data['fields'][ $key ]['denylist']  = implode( PHP_EOL, $this->sanitize_restricted_rules( $field['denylist'] ) );
+		}
+
+		$form['post_content'] = wpforms_encode( $form_data );
+
+		return $form;
 	}
 }

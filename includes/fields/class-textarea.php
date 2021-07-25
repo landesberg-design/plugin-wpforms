@@ -106,14 +106,11 @@ class WPForms_Field_Textarea extends WPForms_Field {
 		// Placeholder.
 		$this->field_option( 'placeholder', $field );
 
-		// Hide label.
-		$this->field_option( 'label_hide', $field );
-
 		// Limit length.
 		$args = array(
 			'slug'    => 'limit_enabled',
 			'content' => $this->field_element(
-				'checkbox',
+				'toggle',
 				$field,
 				array(
 					'slug'    => 'limit_enabled',
@@ -168,13 +165,16 @@ class WPForms_Field_Textarea extends WPForms_Field {
 		// Custom CSS classes.
 		$this->field_option( 'css', $field );
 
+		// Hide label.
+		$this->field_option( 'label_hide', $field );
+
 		// Options close markup.
 		$this->field_option(
 			'advanced-options',
 			$field,
-			array(
+			[
 				'markup' => 'close',
-			)
+			]
 		);
 	}
 
@@ -193,7 +193,7 @@ class WPForms_Field_Textarea extends WPForms_Field {
 		// Primary input.
 		$placeholder = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
 
-		echo '<textarea placeholder="' . esc_attr( $placeholder ) . '" class="primary-input" disabled></textarea>';
+		echo '<textarea placeholder="' . esc_attr( $placeholder ) . '" class="primary-input" readonly></textarea>';
 
 		// Description.
 		$this->field_preview_option( 'description', $field );

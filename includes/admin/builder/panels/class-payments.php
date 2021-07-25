@@ -72,22 +72,22 @@ class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 		if ( ! wpforms()->pro ) {
 
 			// WPForms Lite users.
-			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-info">';
-			echo '<p>Payment integrations are not available on your plan.</p>';
-			echo '<p>Please upgrade to PRO to unlock all the payment integrations and more awesome features.</p>';
-			echo '<a href="' . esc_url( wpforms_admin_upgrade_link( 'builder-payments' ) ) . '" class="wpforms-btn wpforms-btn-orange wpforms-btn-lg" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Upgrade to PRO', 'wpforms-lite' ) . '</a>';
-			echo '</div>';
+			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-info">
+				<div class="illustration illustration-payments"></div>
+				<h5>' . esc_html__( 'Payment integrations are not available on your plan.', 'wpforms-lite' ) . '</h5>
+				<p>' . esc_html__( 'Please upgrade to PRO to unlock all the payment integrations and more awesome features.', 'wpforms-lite' ) . '</p>
+				<a href="' . esc_url( wpforms_admin_upgrade_link( 'builder-payments' ) ) . '" class="wpforms-btn wpforms-btn-orange wpforms-btn-md" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Upgrade to PRO', 'wpforms-lite' ) . '</a>
+			</div>';
 
 		} elseif ( empty( $payments_active ) ) {
 
 			// Check for active payment addons. When no payment addons are
 			// activated let the user know they need to install/activate an
 			// addon to setup a payment.
-			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-info">';
-			echo '<h5>' . esc_html__( 'Install Your Payment Integration', 'wpforms-lite' ) . '</h5>';
-			echo
-				'<p>' .
-				sprintf(
+			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-default">
+				<div class="illustration illustration-payments"></div>
+				<h5>' . esc_html__( 'Install Your Payment Integration', 'wpforms-lite' ) . '</h5>
+				<p>' . sprintf(
 					wp_kses(
 						/* translators: %s - Addons page URL. */
 						__( 'It seems you do not have any payment addons activated. You can head over to the <a href="%s">Addons page</a> to install and activate the addon for your payment service.', 'wpforms-lite' ),
@@ -99,15 +99,17 @@ class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 					),
 					esc_url( admin_url( 'admin.php?page=wpforms-addons' ) )
 				) .
-				'</p>';
-			echo '</div>';
+				'</p>
+			</div>';
+
 		} else {
 
 			// Everything is good - display default instructions.
-			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-default">';
-			echo '<h5>' . esc_html__( 'Install Your Payment Integration', 'wpforms-lite' ) . '</h5>';
-			echo '<p>' . esc_html__( 'It seems you don\'t have any payment addons activated. Click one of the available addons and start accepting payments today!', 'wpforms-lite' ) . '</p>';
-			echo '</div>';
+			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-default">
+				<div class="illustration illustration-payments"></div>
+				<h5>' . esc_html__( 'Install Your Payment Integration', 'wpforms-lite' ) . '</h5>
+				<p>' . esc_html__( 'It seems you don\'t have any payment addons activated. Click one of the available addons and start accepting payments today!', 'wpforms-lite' ) . '</p>
+			</div>';
 		}
 
 		do_action( 'wpforms_payments_panel_content', $this->form );

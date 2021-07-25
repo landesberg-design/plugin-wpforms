@@ -43,6 +43,7 @@ class WPForms_Pro {
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/class-entry.php';
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/class-entry-fields.php';
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/class-entry-meta.php';
+		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/class-conditional-logic-core.php';
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/class-conditional-logic-fields.php';
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/payments/class-payment.php';
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/payments/functions.php';
@@ -539,7 +540,7 @@ class WPForms_Pro {
 			)
 		) {
 			wpforms_panel_field(
-				'checkbox',
+				'toggle',
 				'settings',
 				'disable_entries',
 				$instance->form_data,
@@ -551,7 +552,7 @@ class WPForms_Pro {
 		// details are not disabled globally.
 		if ( wpforms_setting( 'gdpr', false ) && ! wpforms_setting( 'gdpr-disable-details', false ) ) {
 			wpforms_panel_field(
-				'checkbox',
+				'toggle',
 				'settings',
 				'disable_ip',
 				$instance->form_data,
@@ -663,7 +664,7 @@ class WPForms_Pro {
 
 		$default_notifications_key = min( array_keys( $notifications ) );
 
-		$hidden = empty( $settings->form_data['settings']['notification_enable'] ) ? 'hidden' : '';
+		$hidden = empty( $settings->form_data['settings']['notification_enable'] ) ? 'wpforms-hidden' : '';
 
 		echo '<div class="wpforms-panel-content-section-title">';
 			echo '<span id="wpforms-builder-settings-notifications-title">';
@@ -672,18 +673,54 @@ class WPForms_Pro {
 			echo '<button class="wpforms-notifications-add wpforms-builder-settings-block-add ' . esc_attr( $hidden ) . '" data-block-type="notification" data-next-id="' . absint( $next_id ) . '">' . esc_html__( 'Add New Notification', 'wpforms' ) . '</button>';// phpcs:ignore
 		echo '</div>';
 
+		$dismissed = get_user_meta( get_current_user_id(), 'wpforms_dismissed', true );
+
+		if ( empty( $dismissed['edu-builder-notifications-description'] ) ) {
+			echo '<div class="wpforms-panel-content-section-description wpforms-dismiss-container wpforms-dismiss-out">';
+			echo '<button type="button" class="wpforms-dismiss-button" title="' . esc_attr__( 'Dismiss this message.', 'wpforms' ) . '" data-section="builder-notifications-description"></button>';
+			echo '<p>';
+			printf(
+				wp_kses( /* translators: %s - Link to the WPForms.com doc article. */
+					__( 'Notifications are emails sent when a form is submitted. By default, these emails include entry details. For setup and customization options, including a video overview, please <a href="%s" target="_blank" rel="noopener noreferrer">see our tutorial</a>.', 'wpforms' ),
+					[
+						'a' => [
+							'href'   => [],
+							'rel'    => [],
+							'target' => [],
+						],
+					]
+				),
+				'https://wpforms.com/docs/setup-form-notification-wpforms/'
+			);
+			echo '</p>';
+			echo '<p>';
+			printf(
+				wp_kses( /* translators: 1$s, %2$s - Links to the WPForms.com doc articles. */
+					__( 'After saving these settings, be sure to <a href="%1$s" target="_blank" rel="noopener noreferrer">test a form submission</a>. This lets you see how emails will look, and to ensure that<br>they <a href="%2$s" target="_blank" rel="noopener noreferrer">are delivered successfully</a>.', 'wpforms' ),
+					[
+						'a'  => [
+							'href'   => [],
+							'rel'    => [],
+							'target' => [],
+						],
+						'br' => [],
+					]
+				),
+				'https://wpforms.com/docs/how-to-properly-test-your-wordpress-forms-before-launching-checklist/',
+				'https://wpforms.com/docs/troubleshooting-email-notifications/'
+			);
+			echo '</p>';
+			echo '</div>';
+		}
+
 		wpforms_panel_field(
-			'select',
+			'toggle',
 			'settings',
 			'notification_enable',
 			$settings->form_data,
-			esc_html__( 'Notifications', 'wpforms' ),
+			esc_html__( 'Enable Notifications', 'wpforms' ),
 			[
-				'default' => '1',
-				'options' => [
-					'1' => esc_html__( 'On', 'wpforms' ),
-					'0' => esc_html__( 'Off', 'wpforms' ),
-				],
+				'value' => empty( $form_settings['notification_enable'] ) ? 0 : 1,
 			]
 		);
 
@@ -691,12 +728,12 @@ class WPForms_Pro {
 
 			$name          = ! empty( $notification['notification_name'] ) ? $notification['notification_name'] : esc_html__( 'Default Notification', 'wpforms' );
 			$closed_state  = '';
-			$toggle_state  = '<i class="fa fa-chevron-up"></i>';
+			$toggle_state  = '<i class="fa fa-chevron-circle-up"></i>';
 			$block_classes = 'wpforms-notification wpforms-builder-settings-block';
 
 			if ( ! empty( $settings->form_data['id'] ) && 'closed' === wpforms_builder_settings_block_get_state( $settings->form_data['id'], $id, 'notification' ) ) {
 				$closed_state = 'style="display:none"';
-				$toggle_state = '<i class="fa fa-chevron-down"></i>';
+				$toggle_state = '<i class="fa fa-chevron-circle-down"></i>';
 			}
 
 			if ( $default_notifications_key === $id ) {
@@ -712,20 +749,21 @@ class WPForms_Pro {
 					<div class="wpforms-builder-settings-block-actions">
 						<?php do_action( 'wpforms_form_settings_notifications_single_action', $id, $notification, $settings ); ?>
 
-						<button class="wpforms-builder-settings-block-edit" title="<?php esc_attr_e( 'Edit', 'wpforms' ); ?>"><i class="fa fa-pencil"></i></button><!--
-						--><button class="wpforms-builder-settings-block-clone" title="<?php esc_attr_e( 'Clone', 'wpforms' ); ?>"><i class="fa fa-clone"></i></button><!--
+						<button class="wpforms-builder-settings-block-clone" title="<?php esc_attr_e( 'Clone', 'wpforms' ); ?>"><i class="fa fa-copy"></i></button><!--
+						--><button class="wpforms-builder-settings-block-delete" title="<?php esc_attr_e( 'Delete', 'wpforms' ); ?>"><i class="fa fa-trash-o"></i></button><!--
 						--><button class="wpforms-builder-settings-block-toggle" title="<?php esc_attr_e( 'Open / Close', 'wpforms' ); ?>">
 							<?php echo $toggle_state; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						</button><!--
-						--><button class="wpforms-builder-settings-block-delete" title="<?php esc_attr_e( 'Delete', 'wpforms' ); ?>"><i class="fa fa-times-circle"></i></button>
+						</button>
 					</div>
 
 					<div class="wpforms-builder-settings-block-name-holder">
-						<span class="wpforms-builder-settings-block-name"><?php echo esc_html( $name ); ?></span>
-
+						<span class="wpforms-builder-settings-block-name">
+							<?php echo esc_html( $name ); ?>
+						</span>
 						<div class="wpforms-builder-settings-block-name-edit">
 							<input type="text" name="settings[notifications][<?php echo absint( $id ); ?>][notification_name]" value="<?php echo esc_attr( $name ); ?>">
 						</div>
+						<button class="wpforms-builder-settings-block-edit" title="<?php esc_attr_e( 'Edit', 'wpforms' ); ?>"><i class="fa fa-pencil"></i></button>
 					</div>
 
 				</div>
@@ -775,7 +813,7 @@ class WPForms_Pro {
 						'notifications',
 						'subject',
 						$settings->form_data,
-						esc_html__( 'Email Subject', 'wpforms' ),
+						esc_html__( 'Email Subject Line', 'wpforms' ),
 						[
 							/* translators: %s - form name. */
 							'default'    => sprintf( esc_html__( 'New Entry: %s', 'wpforms' ), $settings->form->post_title ),
@@ -832,7 +870,7 @@ class WPForms_Pro {
 						'notifications',
 						'replyto',
 						$settings->form_data,
-						esc_html__( 'Reply-To', 'wpforms' ),
+						esc_html__( 'Reply-To Email Address', 'wpforms' ),
 						[
 							'smarttags'  => [
 								'type'   => 'fields',
@@ -848,7 +886,7 @@ class WPForms_Pro {
 						'notifications',
 						'message',
 						$settings->form_data,
-						esc_html__( 'Message', 'wpforms' ),
+						esc_html__( 'Email Message', 'wpforms' ),
 						[
 							'rows'       => 6,
 							'default'    => '{all_fields}',
@@ -931,7 +969,7 @@ class WPForms_Pro {
 
 			$name          = ! empty( $confirmation['name'] ) ? $confirmation['name'] : esc_html__( 'Default Confirmation', 'wpforms' );
 			$closed_state  = '';
-			$toggle_state  = '<i class="fa fa-chevron-up"></i>';
+			$toggle_state  = '<i class="fa fa-chevron-circle-up"></i>';
 			$block_classes = 'wpforms-confirmation wpforms-builder-settings-block';
 
 			if ( $default_confirmation_key === $id ) {
@@ -940,7 +978,7 @@ class WPForms_Pro {
 
 			if ( ! empty( $settings->form_data['id'] ) && 'closed' === wpforms_builder_settings_block_get_state( $settings->form_data['id'], $id, 'confirmation' ) ) {
 				$closed_state = 'style="display:none"';
-				$toggle_state = '<i class="fa fa-chevron-down"></i>';
+				$toggle_state = '<i class="fa fa-chevron-circle-down"></i>';
 			}
 
 			do_action( 'wpforms_form_settings_confirmations_single_before', $settings, $id );
@@ -952,11 +990,10 @@ class WPForms_Pro {
 					<div class="wpforms-builder-settings-block-actions">
 						<?php do_action( 'wpforms_form_settings_confirmations_single_action', $id, $confirmation, $settings ); ?>
 
-						<button class="wpforms-builder-settings-block-edit" title="<?php esc_attr_e( 'Edit', 'wpforms' ); ?>"><i class="fa fa-pencil"></i></button><!--
+						<button class="wpforms-builder-settings-block-delete" title="<?php esc_attr_e( 'Delete', 'wpforms' ); ?>"><i class="fa fa-trash-o"></i></button><!--
 						--><button class="wpforms-builder-settings-block-toggle" title="<?php esc_attr_e( 'Open / Close', 'wpforms' ); ?>">
 							<?php echo $toggle_state; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						</button><!--
-						--><button class="wpforms-builder-settings-block-delete" title="<?php esc_attr_e( 'Delete', 'wpforms' ); ?>"><i class="fa fa-times-circle"></i></button>
+						</button>
 					</div>
 
 					<div class="wpforms-builder-settings-block-name-holder">
@@ -965,6 +1002,7 @@ class WPForms_Pro {
 						<div class="wpforms-builder-settings-block-name-edit">
 							<input type="text" name="settings[confirmations][<?php echo absint( $id ); ?>][name]" value="<?php echo esc_attr( $name ); ?>">
 						</div>
+						<button class="wpforms-builder-settings-block-edit" title="<?php esc_attr_e( 'Edit', 'wpforms' ); ?>"><i class="fa fa-pencil"></i></button>
 					</div>
 
 				</div>
@@ -998,32 +1036,35 @@ class WPForms_Pro {
 						'message',
 						$settings->form_data,
 						esc_html__( 'Confirmation Message', 'wpforms' ),
-						array(
+						[
 							'default'     => esc_html__( 'Thanks for contacting us! We will be in touch with you shortly.', 'wpforms' ),
-							'tinymce'     => array(
+							'tinymce'     => [
 								'editor_height' => '200',
-							),
+							],
 							'input_id'    => 'wpforms-panel-field-confirmations-message-' . $id,
 							'input_class' => 'wpforms-panel-field-confirmations-message',
 							'parent'      => 'settings',
 							'subsection'  => $id,
-						)
+							'class'       => 'wpforms-panel-field-tinymce',
+						]
 					);
 					wpforms_panel_field(
-						'checkbox',
+						'toggle',
 						'confirmations',
 						'message_scroll',
 						$settings->form_data,
 						esc_html__( 'Automatically scroll to the confirmation message', 'wpforms' ),
-						array(
+						[
 							'input_id'    => 'wpforms-panel-field-confirmations-message_scroll-' . $id,
 							'input_class' => 'wpforms-panel-field-confirmations-message_scroll',
 							'parent'      => 'settings',
 							'subsection'  => $id,
-						)
+						]
 					);
-					$p     = array();
+
+					$p     = [];
 					$pages = get_pages();
+
 					foreach ( $pages as $page ) {
 						$depth          = count( $page->ancestors );
 						$p[ $page->ID ] = str_repeat( '-', $depth ) . ' ' . $page->post_title;
@@ -1187,22 +1228,21 @@ class WPForms_Pro {
 	public function conditional_logic_addon_notice() {
 
 		if ( file_exists( WP_PLUGIN_DIR . '/wpforms-conditional-logic/wpforms-conditional-logic.php' ) && ! defined( 'WPFORMS_DEBUG' ) ) {
-			echo '<div class="notice notice-info"><p>';
-			printf(
-				wp_kses(
-					/* translators: %s - WPForms.com announcement page URL. */
+			$notice = sprintf(
+				wp_kses( /* translators: %s - WPForms.com announcement page URL. */
 					__( 'Conditional logic functionality is now included in the core WPForms plugin! The WPForms Conditional Logic addon can be removed without affecting your forms. For more details <a href="%s" target="_blank" rel="noopener noreferrer">read our announcement</a>.', 'wpforms' ),
-					array(
-						'a' => array(
-							'href'   => array(),
-							'target' => array(),
-							'rel'    => array(),
-						),
-					)
+					[
+						'a' => [
+							'href'   => [],
+							'target' => [],
+							'rel'    => [],
+						],
+					]
 				),
 				'https://wpforms.com/announcing-wpforms-1-3-8/'
 			);
-			echo '</p></div>';
+
+			\WPForms\Admin\Notice::info( $notice );
 		}
 	}
 
@@ -1218,7 +1258,7 @@ class WPForms_Pro {
 
 		<!-- Confirmation block 'message' field template -->
 		<script type="text/html" id="tmpl-wpforms-builder-confirmations-message-field">
-			<div id="wpforms-panel-field-confirmations-message-{{ data.id }}-wrap" class="wpforms-panel-field  wpforms-panel-field-textarea" style="display: block;">
+			<div id="wpforms-panel-field-confirmations-message-{{ data.id }}-wrap" class="wpforms-panel-field wpforms-panel-field-tinymce" style="display: block;">
 				<label for="wpforms-panel-field-confirmations-message-{{ data.id }}"><?php esc_html_e( 'Confirmation Message', 'wpforms' ); ?></label>
 				<textarea id="wpforms-panel-field-confirmations-message-{{ data.id }}" name="settings[confirmations][{{ data.id }}][message]" rows="3" placeholder="" class="wpforms-panel-field-confirmations-message"></textarea>
 			</div>
@@ -1227,14 +1267,17 @@ class WPForms_Pro {
 		<!-- Conditional logic toggle field template -->
 		<script  type="text/html" id="tmpl-wpforms-builder-conditional-logic-toggle-field">
 			<div id="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-wrap" class="wpforms-panel-field wpforms-conditionals-enable-toggle wpforms-panel-field-checkbox">
-				<input type="checkbox" id="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-checkbox" name="settings[{{ data.type }}s][{{ data.id }}][conditional_logic]" value="1"
-				       class="wpforms-panel-field-conditional_logic-checkbox"
-				       data-name="settings[{{ data.type }}s][{{ data.id }}]"
-				       data-actions="{{ data.actions }}"
-				       data-action-desc="{{ data.actionDesc }}"><label for="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-checkbox" class="inline">
-					<?php esc_html_e( 'Enable conditional logic', 'wpforms' ); ?>
-					<i class="fa fa-question-circle wpforms-help-tooltip" title="<?php echo esc_attr( $conditional_logic_tooltip ); ?>"></i>
-				</label>
+				<span class="wpforms-toggle-control">
+					<input type="checkbox" id="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-checkbox" name="settings[{{ data.type }}s][{{ data.id }}][conditional_logic]" value="1"
+						class="wpforms-panel-field-conditional_logic-checkbox"
+						data-name="settings[{{ data.type }}s][{{ data.id }}]"
+						data-actions="{{ data.actions }}"
+						data-action-desc="{{ data.actionDesc }}">
+					<label class="wpforms-toggle-control-icon" for="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-checkbox"></label>
+					<label for="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-checkbox" class="wpforms-toggle-control-label">
+						<?php esc_html_e( 'Enable Conditional Logic', 'wpforms' ); ?>
+					</label><i class="fa fa-question-circle-o wpforms-help-tooltip tooltipstered" title="<?php echo esc_attr( $conditional_logic_tooltip ); ?>"></i>
+				</span>
 			</div>
 		</script>
 

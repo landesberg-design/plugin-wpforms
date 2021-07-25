@@ -53,15 +53,6 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 	 */
 	public function field_display( $entry_field, $field, $form_data ) {
 
-		if ( empty( $entry_field['value'] ) ) {
-			printf(
-				'<span class="wpforms-entry-field-value">%s</span>',
-				esc_html__( 'Empty', 'wpforms' )
-			);
-
-			return;
-		}
-
 		$html = '';
 
 		$is_media_file = isset( $field['media_library'] );

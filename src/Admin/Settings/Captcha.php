@@ -280,7 +280,7 @@ class Captcha {
 			return;
 		}
 
-		\WPForms_Admin_Notice::info( esc_html__( 'A preview of your CAPTCHA is displayed below. Please view to verify the CAPTCHA settings are correct.', 'wpforms-lite' ) );
+		\WPForms\Admin\Notice::info( esc_html__( 'A preview of your CAPTCHA is displayed below. Please view to verify the CAPTCHA settings are correct.', 'wpforms-lite' ) );
 	}
 
 	/**

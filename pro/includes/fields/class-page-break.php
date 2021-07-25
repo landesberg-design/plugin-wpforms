@@ -442,29 +442,26 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		if ( 'top' !== $position ) {
 
 			// Previous button toggle.
-			$lbl = $this->field_element(
-				'label',
-				$field,
-				array(
-					'slug'    => 'prev_toggle',
-					'value'   => esc_html__( 'Display Previous', 'wpforms' ),
-					'tooltip' => esc_html__( 'Toggle displaying the Previous page navigation button.', 'wpforms' ),
-				),
-				false
-			);
 			$fld = $this->field_element(
 				'toggle',
 				$field,
-				array(
-					'slug'  => 'prev_toggle',
-					'value' => ! empty( $field['prev_toggle'] ) || ! empty( $field['prev'] ) ? true : false,
-				),
+				[
+					'slug'    => 'prev_toggle',
+					'value'   => ! empty( $field['prev_toggle'] ) || ! empty( $field['prev'] ) ? true : false,
+					'desc'    => esc_html__( 'Display Previous', 'wpforms' ),
+					'tooltip' => esc_html__( 'Toggle displaying the Previous page navigation button.', 'wpforms' ),
+				],
 				false
 			);
-			$this->field_element( 'row', $field, array(
-				'slug'    => 'prev_toggle',
-				'content' => $lbl . $fld,
-			) );
+
+			$this->field_element(
+				'row',
+				$field,
+				[
+					'slug'    => 'prev_toggle',
+					'content' => $fld,
+				]
+			);
 
 			// Previous button label.
 			$lbl = $this->field_element(
@@ -543,32 +540,25 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 				) );
 
 				// Scroll animation toggle.
-				$lbl = $this->field_element(
-					'label',
-					$field,
-					array(
-						'slug'    => 'scroll_disabled',
-						'value'   => esc_html__( 'Disable Scroll Animation', 'wpforms' ),
-						'tooltip' => esc_html__( 'By default, a user\'s view is pulled to the top of each form page. Set to ON to disable this animation.', 'wpforms' ),
-					),
-					false
-				);
 				$fld = $this->field_element(
 					'toggle',
 					$field,
-					array(
-						'slug'  => 'scroll_disabled',
-						'value' => ! empty( $field['scroll_disabled'] ) ? true : false,
-					),
+					[
+						'slug'    => 'scroll_disabled',
+						'value'   => ! empty( $field['scroll_disabled'] ),
+						'desc'    => esc_html__( 'Disable Scroll Animation', 'wpforms' ),
+						'tooltip' => esc_html__( 'By default, a user\'s view is pulled to the top of each form page. Set to ON to disable this animation.', 'wpforms' ),
+					],
 					false
 				);
+
 				$this->field_element(
 					'row',
 					$field,
-					array(
+					[
 						'slug'    => 'scroll_disabled',
-						'content' => $lbl . $fld,
-					)
+						'content' => $fld,
+					]
 				);
 			}
 

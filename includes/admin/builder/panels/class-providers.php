@@ -26,20 +26,16 @@ class WPForms_Builder_Panel_Providers extends WPForms_Builder_Panel {
 	 * Enqueue assets for the Providers panel.
 	 *
 	 * @since 1.0.0
+	 * @since 1.6.8  All the builder stylesheets enqueues moved to the `\WPForms_Builder::enqueues()`.
 	 */
 	public function enqueues() {
 
-		wp_enqueue_style(
-			'wpforms-builder-providers',
-			WPFORMS_PLUGIN_URL . 'assets/css/admin-builder-providers.css',
-			null,
-			WPFORMS_VERSION
-		);
+		$min = wpforms_get_min_suffix();
 
 		wp_enqueue_script(
 			'wpforms-builder-providers',
-			WPFORMS_PLUGIN_URL . 'assets/js/admin-builder-providers.js',
-			array( 'jquery' ),
+			WPFORMS_PLUGIN_URL . "assets/js/admin-builder-providers{$min}.js",
+			[ 'jquery' ],
 			WPFORMS_VERSION,
 			false
 		);
@@ -47,15 +43,15 @@ class WPForms_Builder_Panel_Providers extends WPForms_Builder_Panel {
 		wp_localize_script(
 			'wpforms-builder-providers',
 			'wpforms_builder_providers',
-			array(
-				'url'                => esc_url( add_query_arg( array( 'view' => 'providers' ) ) ),
+			[
+				'url'                => esc_url( add_query_arg( [ 'view' => 'providers' ] ) ),
 				'confirm_save'       => esc_html__( 'We need to save your progress to continue to the Marketing panel. Is that OK?', 'wpforms-lite' ),
 				'confirm_connection' => esc_html__( 'Are you sure you want to delete this connection?', 'wpforms-lite' ),
 				'prompt_connection'  => esc_html__( 'Enter a %type% nickname', 'wpforms-lite' ),
 				'prompt_placeholder' => esc_html__( 'Eg: Newsletter Optin', 'wpforms-lite' ),
 				'error_name'         => esc_html__( 'You must provide a connection nickname.', 'wpforms-lite' ),
 				'required_field'     => esc_html__( 'Field required', 'wpforms-lite' ),
-			)
+			]
 		);
 	}
 
@@ -131,10 +127,11 @@ class WPForms_Builder_Panel_Providers extends WPForms_Builder_Panel {
 		} else {
 
 			// Everything is good - display default instructions.
-			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-default">';
-			echo '<h5>' . esc_html__( 'Select Your Marketing Integration', 'wpforms-lite' ) . '</h5>';
-			echo '<p>' . esc_html__( 'Select your email marketing service provider or CRM from the options on the left. If you don\'t see your email marketing service listed, then let us know and we\'ll do our best to get it added as fast as possible.', 'wpforms-lite' ) . '</p>';
-			echo '</div>';
+			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-default">
+				<div class="illustration illustration-marketing"></div>
+				<h5>' . esc_html__( 'Select Your Marketing Integration', 'wpforms-lite' ) . '</h5>
+				<p>' . esc_html__( 'Select your email marketing service provider or CRM from the options on the left. If you don\'t see your email marketing service listed, then let us know and we\'ll do our best to get it added as fast as possible.', 'wpforms-lite' ) . '</p>
+			</div>';
 		}
 
 		do_action( 'wpforms_providers_panel_content', $this->form );

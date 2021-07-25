@@ -60,14 +60,21 @@ abstract class SmartTag {
 	 *
 	 * @return array
 	 */
-	final protected function get_attributes() {
+	public function get_attributes() {
 
 		if ( ! empty( $this->attributes ) ) {
-			$this->attributes;
+			return $this->attributes;
 		}
 
-		preg_match_all( '/(\w+)=["\'](.+?)["\']/', $this->smart_tag, $attributes );
-		$this->attributes = array_combine( $attributes[1], $attributes[2] );
+		/**
+		 * (\w+) an attribute name and also the first capturing group. Lowercase or uppercase letters, digits, underscore.
+		 * = the equal sign.
+		 * (["\']) single or double quote, the second capturing group.
+		 * (.+?) an attribute value within the quotes, and also the third capturing group. Any number of any characters except new line. Lazy mode - match as few characters as possible to allow multiple attributes on one line.
+		 * \2 - repeat the second capturing group.
+		 */
+		preg_match_all( '/(\w+)=(["\'])(.+?)\2/', $this->smart_tag, $attributes );
+		$this->attributes = array_combine( $attributes[1], $attributes[3] );
 
 		return $this->attributes;
 	}

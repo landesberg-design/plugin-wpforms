@@ -188,7 +188,13 @@ class Addons extends \WPForms\Admin\Addons\Addons {
 			return false;
 		}
 
-		$urls = wp_list_pluck( (array) $addons, 'url', 'slug' );
+		$urls = [];
+
+		foreach ( (array) $addons as $addon ) {
+			if ( ! empty( $addon->slug ) ) {
+				$urls[ $addon->slug ] = ! empty( $addon->url ) ? $addon->url : '';
+			}
+		}
 
 		// Otherwise, our request worked. Save the data and return it.
 		Transient::set( 'addons_urls', $urls, DAY_IN_SECONDS );

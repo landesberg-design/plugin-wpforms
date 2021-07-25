@@ -92,6 +92,7 @@ class WPForms_Entries_Single {
 		add_action( 'wpforms_entries_init', [ $this, 'process_note_add' ], 8, 1 );
 		add_action( 'wpforms_entries_init', [ $this, 'process_notifications' ], 15, 1 );
 		add_action( 'wpforms_entries_init', [ $this, 'setup' ], 10, 1 );
+		add_action( 'wpforms_entries_init', [ $this, 'register_alerts' ], 20, 1 );
 
 		do_action( 'wpforms_entries_init', 'details' );
 
@@ -592,8 +593,6 @@ class WPForms_Entries_Single {
 				</div>
 
 			</h1>
-
-			<?php $this->display_alerts(); ?>
 
 			<div class="wpforms-admin-content">
 
@@ -1458,16 +1457,41 @@ class WPForms_Entries_Single {
 	}
 
 	/**
+	 * Add notices and errors.
+	 *
+	 * @since 1.6.7.1
+	 */
+	public function register_alerts() {
+
+		if ( empty( $this->alerts ) ) {
+			return;
+		}
+
+		foreach ( $this->alerts as $alert ) {
+			$type = ! empty( $alert['type'] ) ? $alert['type'] : 'info';
+
+			\WPForms\Admin\Notice::add( $alert['message'], $type );
+
+			if ( ! empty( $alert['abort'] ) ) {
+				$this->abort = true;
+
+				break;
+			}
+		}
+	}
+
+	/**
 	 * Display admin notices and errors.
 	 *
 	 * @since 1.1.6
-	 *
-	 * @todo Refactor or eliminate this
+	 * @deprecated 1.6.7.1
 	 *
 	 * @param mixed $display Type(s) of the notice.
 	 * @param bool  $wrap    Whether to output the wrapper.
 	 */
 	public function display_alerts( $display = '', $wrap = false ) {
+
+		_deprecated_function( __CLASS__ . '::' . __METHOD__, '1.6.7.1 of WPForms plugin' );
 
 		if ( empty( $this->alerts ) ) {
 			return;
@@ -1504,4 +1528,4 @@ class WPForms_Entries_Single {
 	}
 }
 
-new WPForms_Entries_Single;
+new WPForms_Entries_Single();

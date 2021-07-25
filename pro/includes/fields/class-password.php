@@ -206,7 +206,7 @@ class WPForms_Field_Password extends WPForms_Field {
 
 		// Confirmation toggle.
 		$fld  = $this->field_element(
-			'checkbox',
+			'toggle',
 			$field,
 			[
 				'slug'    => 'confirmation',
@@ -225,7 +225,7 @@ class WPForms_Field_Password extends WPForms_Field {
 
 		// Password strength.
 		$meter = $this->field_element(
-			'checkbox',
+			'toggle',
 			$field,
 			[
 				'slug'    => 'password-strength',
@@ -259,7 +259,7 @@ class WPForms_Field_Password extends WPForms_Field {
 				'slug'    => 'password-strength-level',
 				'options' => [
 					'2' => esc_html__( 'Weak', 'wpforms' ),
-					'3' => esc_html__( 'Good', 'wpforms' ),
+					'3' => esc_html__( 'Medium', 'wpforms' ),
 					'4' => esc_html__( 'Strong', 'wpforms' ),
 				],
 				'value'   => isset( $field['password-strength-level'] ) ? $field['password-strength-level'] : '3',
@@ -326,17 +326,17 @@ class WPForms_Field_Password extends WPForms_Field {
 
 		$this->field_element( 'row', $field, $args );
 
-		// Hide Label.
-		$this->field_option( 'label_hide', $field );
-
-		// Hide sub-labels.
-		$this->field_option( 'sublabel_hide', $field );
-
 		// Default value.
 		$this->field_option( 'default_value', $field );
 
 		// Custom CSS classes.
 		$this->field_option( 'css', $field );
+
+		// Hide Label.
+		$this->field_option( 'label_hide', $field );
+
+		// Hide sub-labels.
+		$this->field_option( 'sublabel_hide', $field );
 
 		// Options close markup.
 		$args = [
@@ -366,12 +366,12 @@ class WPForms_Field_Password extends WPForms_Field {
 		<div class="wpforms-confirm wpforms-confirm-<?php echo esc_attr( $confirm ); ?>">
 
 			<div class="wpforms-confirm-primary">
-				<input type="password" placeholder="<?php echo esc_attr( $placeholder ); ?>" class="primary-input" disabled>
+				<input type="password" placeholder="<?php echo esc_attr( $placeholder ); ?>" class="primary-input" readonly>
 				<label class="wpforms-sub-label"><?php esc_html_e( 'Password', 'wpforms' ); ?></label>
 			</div>
 
 			<div class="wpforms-confirm-confirmation">
-				<input type="password" placeholder="<?php echo esc_attr( $confirm_placeholder ); ?>" class="secondary-input" disabled>
+				<input type="password" placeholder="<?php echo esc_attr( $confirm_placeholder ); ?>" class="secondary-input" readonly>
 				<label class="wpforms-sub-label"><?php esc_html_e( 'Confirm Password', 'wpforms' ); ?></label>
 			</div>
 

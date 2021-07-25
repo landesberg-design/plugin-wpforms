@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\SmartTags;
 
+use WPForms\SmartTags\SmartTag\Generic;
+
 /**
  * Class SmartTags.
  *
@@ -40,17 +42,16 @@ class SmartTags extends \WPForms\SmartTags\SmartTags {
 	protected function get_smart_tag_class_name( $smart_tag_name ) {
 
 		if ( ! $this->has_smart_tag( $smart_tag_name ) ) {
-			return '';
+			return Generic::class;
 		}
 
 		$parent_class = parent::get_smart_tag_class_name( $smart_tag_name );
 
-		if ( $parent_class ) {
+		if ( $parent_class !== Generic::class ) {
 			return $parent_class;
 		}
 
-		$class_name = str_replace( ' ', '', ucwords( str_replace( '_', ' ', $smart_tag_name ) ) );
-
+		$class_name      = str_replace( ' ', '', ucwords( str_replace( '_', ' ', $smart_tag_name ) ) );
 		$full_class_name = '\\WPForms\\Pro\\SmartTags\\SmartTag\\' . $class_name;
 
 		if ( class_exists( $full_class_name ) ) {
@@ -62,12 +63,12 @@ class SmartTags extends \WPForms\SmartTags\SmartTags {
 		 *
 		 * @since 1.6.7
 		 *
-		 * @param string The value.
-		 * @param string Smart tag name.
+		 * @param string $class_name     The value.
+		 * @param string $smart_tag_name Smart tag name.
 		 */
 		$full_class_name = apply_filters( 'wpforms_pro_smarttags_get_smart_tag_class_name', '', $smart_tag_name );
 
-		return class_exists( $full_class_name ) ? $full_class_name : '';
+		return class_exists( $full_class_name ) ? $full_class_name : Generic::class;
 	}
 
 	/**

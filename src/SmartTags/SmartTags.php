@@ -2,6 +2,9 @@
 
 namespace WPForms\SmartTags;
 
+use WPForms\SmartTags\SmartTag\Generic;
+use WPForms\SmartTags\SmartTag\SmartTag;
+
 /**
  * Class SmartTags.
  *
@@ -142,7 +145,14 @@ class SmartTags {
 	 */
 	private function get_all_smart_tags( $content ) {
 
-		preg_match_all( '~{([a-z0-9_]+)(|[\s=][\w\s="\'\\\/:|-]+)}~', $content, $smart_tags );
+		/**
+		 * A smart tag should start and end with a curly brace.
+		 * ([a-z0-9_]+) a smart tag name and also the first capturing group. Lowercase letters, digits, and an  underscore.
+		 * (|[ =][^\n}]*) - second capturing group:
+		 * | no characters at all or the following:
+		 * [ =][^\n}]* space or equal sign and any number of any characters except new line and closing curly brace.
+		 */
+		preg_match_all( '~{([a-z0-9_]+)(|[ =][^\n}]*)}~', $content, $smart_tags );
 
 		return array_combine( $smart_tags[0], $smart_tags[1] );
 	}
@@ -168,48 +178,78 @@ class SmartTags {
 		}
 
 		foreach ( $smart_tags as $smart_tag => $tag_name ) {
+			$class_name       = $this->get_smart_tag_class_name( $tag_name );
+			$smart_tag_object = new $class_name( $smart_tag );
 
-			$class = $this->get_smart_tag_class_name( $tag_name );
-
-			if ( ! $class ) {
-				/**
-				 * Modify content for unregistered smart tags.
-				 *
-				 * @since      1.4.0
-				 * @deprecated 1.6.7
-				 *
-				 * @param string Content of the Smart Tag.
-				 * @param string Tag name of the Smart Tag.
-				 */
-				$content = (string) apply_filters_deprecated(
-					'wpforms_smart_tag_process',
-					[ $content, $tag_name ],
-					'1.6.7',
-					'wpforms_smarttags_process_{$tag_name}_value'
-				);
-
-				continue;
-			}
+			/**
+			 * Modify the smart tag value.
+			 *
+			 * @since 1.6.7
+			 * @since 1.6.7.1 Added the 5th argument.
+			 *
+			 * @param null|string $value            Smart Tag value.
+			 * @param array       $form_data        Form data.
+			 * @param string      $fields           List of fields.
+			 * @param int         $entry_id         Entry ID.
+			 * @param SmartTag    $smart_tag_object The smart tag object or the Generic object for those cases when class unregistered.
+			 */
+			$value = apply_filters(
+				"wpforms_smarttags_process_{$tag_name}_value",
+				$smart_tag_object->get_value( $form_data, $fields, $entry_id ),
+				$form_data,
+				$fields,
+				$entry_id,
+				$smart_tag_object
+			);
 
 			/**
 			 * Modify a smart tag value.
 			 *
-			 * @since 1.6.7
+			 * @since 1.6.7.1
 			 *
-			 * @param string Smart Tag value.
-			 * @param array  Form data.
-			 * @param string List of fields.
-			 * @param int    Entry ID.
+			 * @param null|string $value            Smart Tag value.
+			 * @param string      $tag_name         Smart tag name.
+			 * @param array       $form_data        Form data.
+			 * @param string      $fields           List of fields.
+			 * @param int         $entry_id         Entry ID.
+			 * @param SmartTag    $smart_tag_object The smart tag object or the Generic object for those cases when class unregistered.
 			 */
-			$value = (string) apply_filters(
-				"wpforms_smarttags_process_{$tag_name}_value",
-				( new $class( $smart_tag ) )->get_value( $form_data, $fields, $entry_id ),
+			$value = apply_filters(
+				'wpforms_smarttags_process_value',
+				$value,
+				$tag_name,
 				$form_data,
 				$fields,
-				$entry_id
+				$entry_id,
+				$smart_tag_object
 			);
 
-			$content = $this->replace( $smart_tag, $value, $content );
+			if ( ! is_null( $value ) ) {
+				$content = $this->replace( $smart_tag, $value, $content );
+			}
+
+			/**
+			 * Modify content with smart tags.
+			 *
+			 * @since      1.4.0
+			 * @since      1.6.7.1 Added 3rd, 4th, 5th, 6th arguments.
+			 *
+			 * @param string   $content          Content of the Smart Tag.
+			 * @param string   $tag_name         Tag name of the Smart Tag.
+			 * @param array    $form_data        Form data.
+			 * @param string   $fields           List of fields.
+			 * @param int      $entry_id         Entry ID.
+			 * @param SmartTag $smart_tag_object The smart tag object or the Generic object for those cases when class unregistered.
+			 */
+			$content = (string) apply_filters(
+				'wpforms_smart_tag_process',
+				$content,
+				$tag_name,
+				$form_data,
+				$fields,
+				$entry_id,
+				$smart_tag_object
+			);
 		}
 
 		return $content;
@@ -241,7 +281,7 @@ class SmartTags {
 	protected function get_smart_tag_class_name( $smart_tag_name ) {
 
 		if ( ! $this->has_smart_tag( $smart_tag_name ) ) {
-			return '';
+			return Generic::class;
 		}
 
 		$class_name = str_replace( ' ', '', ucwords( str_replace( '_', ' ', $smart_tag_name ) ) );
@@ -257,12 +297,12 @@ class SmartTags {
 		 *
 		 * @since 1.6.7
 		 *
-		 * @param string The value.
-		 * @param string Smart tag name.
+		 * @param string $class_name     The value.
+		 * @param string $smart_tag_name Smart tag name.
 		 */
 		$full_class_name = apply_filters( 'wpforms_smarttags_get_smart_tag_class_name', '', $smart_tag_name );
 
-		return class_exists( $full_class_name ) ? $full_class_name : '';
+		return class_exists( $full_class_name ) ? $full_class_name : Generic::class;
 	}
 
 	/**

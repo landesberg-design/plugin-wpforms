@@ -35,20 +35,22 @@ class WPForms_Field_Hidden extends WPForms_Field {
 		 */
 
 		// Options open markup.
-		$args = array(
+		$args = [
 			'markup' => 'open',
-		);
+		];
+
 		$this->field_option( 'basic-options', $field, $args );
 
 		// Label.
 		$this->field_option( 'label', $field );
 
 		// Set label to disabled.
-		$args = array(
+		$args = [
 			'type'  => 'hidden',
 			'slug'  => 'label_disable',
 			'value' => '1',
-		);
+		];
+
 		$this->field_element( 'text', $field, $args );
 
 		// Default value.
@@ -58,9 +60,10 @@ class WPForms_Field_Hidden extends WPForms_Field {
 		$this->field_option( 'css', $field );
 
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'basic-options', $field, $args );
 	}
 
@@ -77,7 +80,7 @@ class WPForms_Field_Hidden extends WPForms_Field {
 		$this->field_preview_option( 'label', $field );
 
 		// Primary input.
-		echo '<input type="text" class="primary-input" disabled>';
+		echo '<input type="text" class="primary-input" readonly>';
 	}
 
 	/**

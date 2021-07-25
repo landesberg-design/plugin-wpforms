@@ -103,7 +103,14 @@ class DefaultThemes implements IntegrationInterface {
 	 */
 	private function tt1_hooks() {
 
-		add_action( 'wp_enqueue_scripts', [ $this, 'tt1_multiple_fields_fix' ], 11 );
+		if ( wpforms_setting( 'disable-css' ) === '1' ) {
+			add_action( 'wp_enqueue_scripts', [ $this, 'tt1_multiple_fields_fix' ], 11 );
+			add_action( 'wp_enqueue_scripts', [ $this, 'tt1_dropdown_fix' ], 11 );
+		}
+
+		if ( wpforms_setting( 'disable-css' ) === '2' ) {
+			add_action( 'wp_enqueue_scripts', [ $this, 'tt1_base_style_fix' ], 11 );
+		}
 	}
 
 
@@ -116,6 +123,7 @@ class DefaultThemes implements IntegrationInterface {
 
 		wp_add_inline_style(
 			'twenty-twenty-one-style',
+			/** @lang CSS */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 			'@supports (-webkit-appearance: none) or (-moz-appearance: none) {
 				div.wpforms-container-full .wpforms-form input[type=checkbox] {
 					-webkit-appearance: checkbox;
@@ -134,6 +142,46 @@ class DefaultThemes implements IntegrationInterface {
 	}
 
 	/**
+	 * Apply fix for dropdown field arrow, when it disappeared from select in the Twenty Twenty-One theme.
+	 *
+	 * @since 1.6.8
+	 */
+	public function tt1_dropdown_fix() {
+
+		wp_add_inline_style(
+			'twenty-twenty-one-style',
+			/** @lang CSS */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			'div.wpforms-container-full .wpforms-form select {
+				background-image: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'10\' fill=\'%2328303d\'><polygon points=\'0,0 10,0 5,5\'/></svg>");
+				background-repeat: no-repeat;
+				background-position: right var(--form--spacing-unit) top 60%;
+			}'
+		);
+	}
+
+	/**
+	 * Apply fix for checkboxes and radio fields width in the Twenty Twenty-One theme, when the user uses only base styles.
+	 *
+	 * @since 1.6.8
+	 */
+	public function tt1_base_style_fix() {
+
+		wp_add_inline_style(
+			'twenty-twenty-one-style',
+			/** @lang CSS */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			'.wpforms-container .wpforms-field input[type=checkbox],
+			.wpforms-container .wpforms-field input[type=radio] {
+				width: 25px;
+				height: 25px;
+			}
+			.wpforms-container .wpforms-field input[type=checkbox] + label,
+			.wpforms-container .wpforms-field input[type=radio] + label {
+				vertical-align: top;
+			}'
+		);
+	}
+
+	/**
 	 * Apply resize-fix for iframe HTML element, when the next page was clicked in the Twenty Twenty theme.
 	 *
 	 * @since 1.6.6
@@ -142,6 +190,7 @@ class DefaultThemes implements IntegrationInterface {
 
 		wp_add_inline_script(
 			'twentytwenty-js',
+			/** @lang JavaScript */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 			'window.addEventListener( "load", function() {
 
 				if ( typeof jQuery === "undefined" ) {

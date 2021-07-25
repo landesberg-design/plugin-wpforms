@@ -340,7 +340,7 @@ class System extends View {
 		$data  = "\n" . '-- Webserver Configuration' . "\n\n";
 		$data .= 'PHP Version:              ' . PHP_VERSION . "\n";
 		$data .= 'MySQL Version:            ' . $wpdb->db_version() . "\n";
-		$data .= 'Webserver Info:           ' . isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '' . "\n";
+		$data .= 'Webserver Info:           ' . ( isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '' ) . "\n";
 
 		// PHP configs... now we're getting to the important stuff.
 		$data .= "\n" . '-- PHP Configuration' . "\n\n";

@@ -39,8 +39,8 @@ class Admin {
 	 */
 	public function hooks() {
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'scripts' ) );
-		add_action( 'wpforms_admin_tools_export_top', array( $this, 'display_entries_export_form' ) );
+		add_action( 'admin_enqueue_scripts', [ $this, 'scripts' ] );
+		add_action( 'wpforms_admin_tools_export_top', [ $this, 'display_entries_export_form' ] );
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Admin {
 
 			<h4><?php esc_html_e( 'Export Entries', 'wpforms' ); ?></h4>
 
-			<p><?php esc_html_e( 'Select a form to export entries, then select the fields you would like to include. You can also define search and date filters to further personalize the list of entries you want to retrieve. WPForms will generate a downloadable CSV of your entries.', 'wpforms' ); ?></p>
+			<p><?php esc_html_e( 'Select a form to export entries, then select the fields you would like to include. You can also define search and date filters to further personalize the list of entries you want to retrieve. WPForms will generate a downloadable CSV/XLSX file of your entries.', 'wpforms' ); ?></p>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin.php?page=wpforms-tools&view=export' ) ); ?>" id="wpforms-tools-entries-export">
 				<input type="hidden" name="action" value="wpforms_tools_entries_export_step">
@@ -119,10 +119,10 @@ class Admin {
 		// Retrieve available forms.
 		$forms = wpforms()->form->get(
 			'',
-			array(
+			[
 				'orderby' => 'title',
 				'cap'     => 'view_entries_form_single',
-			)
+			]
 		);
 
 		$form_id = $this->export->data['get_args']['form_id'];
@@ -169,12 +169,14 @@ class Admin {
 		}
 
 		$i = 0;
+
 		foreach ( $form_data['fields'] as $id => $field ) {
 			if ( in_array( $field['type'], $this->export->configuration['disallowed_fields'], true ) ) {
 				continue;
 			}
 			/* translators: %d - Field ID. */
 			$name = ! empty( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $id );
+
 			printf(
 				'<label><input type="checkbox" name="fields[%d]" value="%d"%s> %s</label>',
 				$i,
@@ -270,6 +272,7 @@ class Admin {
 					}
 					/* translators: %d - Field ID. */
 					$name = ! empty( $field['label'] ) ? wp_strip_all_tags( $field['label'] ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $id );
+
 					printf(
 						'<option value="%d" %s>%s</option>',
 						(int) $id,
@@ -311,7 +314,7 @@ class Admin {
 		wp_enqueue_style(
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
-			array(),
+			[],
 			'4.6.3'
 		);
 
@@ -322,7 +325,7 @@ class Admin {
 		wp_enqueue_script(
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
-			array( 'jquery' ),
+			[ 'jquery' ],
 			'4.6.3',
 			true
 		);
@@ -330,7 +333,7 @@ class Admin {
 		wp_enqueue_script(
 			'wpforms-tools-entries-export',
 			WPFORMS_PLUGIN_URL . "pro/assets/js/admin/tools-entries-export{$min}.js",
-			array( 'jquery', 'wpforms-flatpickr' ),
+			[ 'jquery', 'wpforms-flatpickr' ],
 			WPFORMS_VERSION,
 			true
 		);
@@ -350,17 +353,20 @@ class Admin {
 	 *
 	 * @param string $val     Value.
 	 * @param array  $arr     Array of values.
-	 * @param string $default ' checked' OR ''.
+	 * @param string $default Either ' checked' OR ''.
 	 *
 	 * @return string
 	 */
 	public function get_checked_property( $val, $arr, $default = ' checked' ) {
 
-		$checked = ' checked' !== $default ? '' : $default;
+		$checked = $default !== ' checked' ? '' : $default;
+
 		if ( empty( $arr ) || ! is_array( $arr ) ) {
 			return $checked;
 		}
+
 		$checked = ' checked';
+
 		if ( ! in_array( $val, $arr, true ) ) {
 			$checked = '';
 		}

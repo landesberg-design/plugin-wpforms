@@ -198,7 +198,7 @@ class WPForms_Overview {
 		}
 
 		if ( ! empty( $notice ) ) {
-			WPForms_Admin_Notice::add( $notice['msg'], $notice['type'] );
+			\WPForms\Admin\Notice::add( $notice['msg'], $notice['type'] );
 		}
 	}
 

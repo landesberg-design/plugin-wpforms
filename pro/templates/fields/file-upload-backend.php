@@ -15,5 +15,5 @@
 	</span>
 </div>
 <div class="<?php echo esc_attr( $classic_classes ); ?>">
-	<input type="file" class="primary-input" disabled>
+	<input type="file" class="primary-input" readonly>
 </div>

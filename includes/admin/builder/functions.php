@@ -141,9 +141,17 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 				$label
 			);
 			if ( ! empty( $args['tooltip'] ) ) {
-				$output .= sprintf( ' <i class="fa fa-question-circle wpforms-help-tooltip" title="%s"></i>', esc_attr( $args['tooltip'] ) );
+				$output .= sprintf( '<i class="fa fa-question-circle-o wpforms-help-tooltip" title="%s"></i>', esc_attr( $args['tooltip'] ) );
 			}
 			$output .= '</label>';
+			break;
+
+		// Toggle.
+		case 'toggle':
+			$toggle_args                = $args;
+			$toggle_args['input-class'] = $input_class;
+			$output                     = wpforms_panel_field_toggle_control( $toggle_args, $input_id, $field_name, $label, $value, $data_attr );
+
 			break;
 
 		// Radio.
@@ -188,7 +196,7 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 				}
 
 				if ( ! empty( $item['tooltip'] ) ) {
-					$output .= sprintf( ' <i class="fa fa-question-circle wpforms-help-tooltip" title="%s"></i>', esc_attr( $item['tooltip'] ) );
+					$output .= sprintf( '<i class="fa fa-question-circle-o wpforms-help-tooltip" title="%s"></i>', esc_attr( $item['tooltip'] ) );
 				}
 				$output .= '</label></span>';
 				$radio_counter ++;
@@ -255,14 +263,16 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 		'wpforms-panel-field-' . sanitize_html_class( $option )
 	);
 	$field_open .= ! empty( $args['before'] ) ? $args['before'] : '';
-	if ( 'checkbox' !== $option && ! empty( $label ) ) {
+
+	if ( $option !== 'toggle' && $option !== 'checkbox' && ! empty( $label ) ) {
 		$field_label = sprintf(
 			'<label for="%s">%s',
 			$input_id,
 			$label
 		);
+
 		if ( ! empty( $args['tooltip'] ) ) {
-			$field_label .= sprintf( ' <i class="fa fa-question-circle wpforms-help-tooltip" title="%s"></i>', esc_attr( $args['tooltip'] ) );
+			$field_label .= sprintf( '<i class="fa fa-question-circle-o wpforms-help-tooltip" title="%s"></i>', esc_attr( $args['tooltip'] ) );
 		}
 		if ( ! empty( $args['after_tooltip'] ) ) {
 			$field_label .= $args['after_tooltip'];
@@ -272,15 +282,17 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 			$type   = ! empty( $args['smarttags']['type'] ) ? esc_attr( $args['smarttags']['type'] ) : 'fields';
 			$fields = ! empty( $args['smarttags']['fields'] ) ? esc_attr( $args['smarttags']['fields'] ) : '';
 
-			$field_label .= '<a href="#" class="toggle-smart-tag-display" data-type="' . $type . '" data-fields="' . $fields . '"><i class="fa fa-tags"></i> <span>' . esc_html__( 'Show Smart Tags', 'wpforms-lite' ) . '</span></a>';
+			$field_label .= '<a href="#" class="toggle-smart-tag-display toggle-unfoldable-cont" data-type="' . $type . '" data-fields="' . $fields . '"><i class="fa fa-tags"></i><span>' . esc_html__( 'Show Smart Tags', 'wpforms-lite' ) . '</span></a>';
 		}
 		$field_label .= '</label>';
+
 		if ( ! empty( $args['after_label'] ) ) {
 			$field_label .= $args['after_label'];
 		}
 	} else {
 		$field_label = '';
 	}
+
 	$field_close  = ! empty( $args['after'] ) ? $args['after'] : '';
 	$field_close .= '</div>';
 	$output       = $field_open . $field_label . $output . $field_close;
@@ -291,6 +303,91 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 	} else {
 		return $output;
 	}
+}
+
+/**
+ * Create toggle control.
+ *
+ * It's like a regular checkbox but with a modern visual appearance.
+ *
+ * @since 1.6.8
+ *
+ * @param array  $args       Arguments array.
+ *
+ *    @type bool   $status        If `true`, control will display the current status next to the toggle.
+ *    @type string $status-on     Status `On` text. By default `On`.
+ *    @type string $status-off    Status `Off` text. By default `Off`.
+ *    @type bool   $label-hide    If `true` then label will not display.
+ *    @type string $tooltip       Tooltip text.
+ *    @type string $input-class   CSS class for the hidden `<input type=checkbox>`.
+ *    @type string $control-class CSS class for the wrapper `<span>`.
+ *
+ * @param string $input_id   Input ID.
+ * @param string $field_name Field name.
+ * @param string $label      Label text. Can contain HTML in order to display additional badges.
+ * @param mixed  $value      Value.
+ * @param string $data_attr  Attributes.
+ *
+ * @return string
+ */
+function wpforms_panel_field_toggle_control( $args, $input_id, $field_name, $label, $value, $data_attr ) {
+
+	$checked = checked( true, (bool) $value, false );
+	$status  = '';
+
+	if ( ! empty( $args['status'] ) ) {
+		$status_on  = ! empty( $args['status-on'] ) ? $args['status-on'] : esc_html__( 'On', 'wpforms-lite' );
+		$status_off = ! empty( $args['status-off'] ) ? $args['status-off'] : esc_html__( 'Off', 'wpforms-lite' );
+		$status     = sprintf(
+			'<label
+				for="%s"
+				class="wpforms-toggle-control-status"
+				data-on="%s"
+				data-off="%s">
+				%s
+			</label>',
+			esc_attr( $input_id ),
+			esc_attr( $status_on ),
+			esc_attr( $status_off ),
+			esc_html( ! empty( $args['value'] ) ? $status_on : $status_off )
+		);
+	}
+
+	$label_html  = empty( $args['label-hide'] ) && ! empty( $label ) ?
+		sprintf(
+			'<label for="%s" class="wpforms-toggle-control-label">%s</label>',
+			esc_attr( $input_id ),
+			$label
+		) : '';
+	$label_html .= isset( $args['tooltip'] ) ?
+		sprintf(
+			'<i class="fa fa-question-circle-o wpforms-help-tooltip" title="%s"></i>',
+			esc_attr( $args['tooltip'] )
+		) : '';
+
+	$label_left    = ! empty( $args['label-left'] ) ? $label_html . $status : '';
+	$label_right   = empty( $args['label-left'] ) ? $status . $label_html : '';
+	$title         = isset( $args['title'] ) ? ' title="' . esc_attr( $args['title'] ) . '"' : '';
+	$control_class = ! empty( $args['control-class'] ) ? $args['control-class'] : '';
+	$input_class   = ! empty( $args['input-class'] ) ? $args['input-class'] : '';
+
+	return sprintf(
+		'<span class="wpforms-toggle-control %8$s" %9$s>
+			%1$s
+			<input type="checkbox" id="%2$s" name="%3$s" class="%7$s" value="1" %4$s %5$s>
+			<label class="wpforms-toggle-control-icon" for="%2$s"></label>
+			%6$s
+		</span>',
+		$label_left,
+		esc_attr( $input_id ),
+		esc_attr( $field_name ),
+		$checked,
+		$data_attr,
+		$label_right,
+		wpforms_sanitize_classes( $input_class ),
+		wpforms_sanitize_classes( $control_class ),
+		$title
+	);
 }
 
 /**
@@ -383,21 +480,33 @@ function wpforms_builder_preview_get_allowed_tags() {
  */
 function wpforms_panel_fields_group( $inner, $args = [], $echo = true ) {
 
-	$output = '<div class="wpforms-panel-fields-group">';
+	$group      = ! empty( $args['group'] ) ? $args['group'] : '';
+	$unfoldable = ! empty( $args['unfoldable'] );
+	$opened     = ! empty( $_COOKIE[ 'wpforms_fields_group_' . $group ] ) && $_COOKIE[ 'wpforms_fields_group_' . $group ] === 'true' ? ' opened' : '';
+
+	$output = sprintf(
+		'<div class="wpforms-panel-fields-group%1$s"%2$s>',
+		$unfoldable ? ' unfoldable' . $opened : '',
+		$unfoldable ? ' data-group="' . $group . '"' : ''
+	);
 
 	if ( ! empty( $args['borders'] ) && in_array( 'top', $args['borders'], true ) ) {
 		$output .= '<div class="wpforms-panel-fields-group-border-top"></div>';
 	}
 
 	if ( ! empty( $args['title'] ) ) {
-		$output .= '<div class="wpforms-panel-fields-group-title">' . esc_html( $args['title'] ) . '</div>';
+		$chevron = $unfoldable ? '<i class="fa fa-chevron-circle-right"></i>' : '';
+		$output .= '<div class="wpforms-panel-fields-group-title">' . esc_html( $args['title'] ) . $chevron . '</div>';
 	}
 
 	if ( ! empty( $args['description'] ) ) {
 		$output .= '<div class="wpforms-panel-fields-group-description">' . wp_kses_post( $args['description'] ) . '</div>';
 	}
 
-	$output .= '<div class="wpforms-panel-fields-group-inner">' . $inner . '</div>';
+	$output .= sprintf(
+		'<div class="wpforms-panel-fields-group-inner"%s>' . $inner . '</div>',
+		empty( $opened ) && $unfoldable ? ' style="display: none;"' : ''
+	);
 
 	if ( ! empty( $args['borders'] ) && in_array( 'bottom', $args['borders'], true ) ) {
 		$output .= '<div class="wpforms-panel-fields-group-border-bottom"></div>';

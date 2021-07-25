@@ -207,9 +207,6 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 		// Size.
 		$this->field_option( 'size', $field );
 
-		// Hide label.
-		$this->field_option( 'label_hide', $field );
-
 		// Default value.
 		$lbl = $this->field_element(
 			'label',
@@ -311,19 +308,23 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 		$this->field_element(
 			'row',
 			$field,
-			array(
+			[
 				'slug'    => 'step',
 				'content' => $lbl . $fld,
-			)
+			]
 		);
 
 		// Custom CSS classes.
 		$this->field_option( 'css', $field );
 
+		// Hide label.
+		$this->field_option( 'label_hide', $field );
+
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'advanced-options', $field, $args );
 	}
 

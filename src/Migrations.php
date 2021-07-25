@@ -42,8 +42,8 @@ class Migrations {
 	 */
 	private function hooks() {
 
-		add_action( 'wpforms_loaded', array( $this, 'maybe_migrate' ), -9999 );
-		add_action( 'wpforms_loaded', array( $this, 'update_version' ), -9998 );
+		add_action( 'wpforms_loaded', [ $this, 'maybe_migrate' ], -9999 );
+		add_action( 'wpforms_loaded', [ $this, 'update_version' ], -9998 );
 	}
 
 	/**
@@ -78,6 +78,14 @@ class Migrations {
 
 		if ( version_compare( $version, '1.5.9', '<' ) ) {
 			$this->v159_upgrade();
+		}
+
+		if ( version_compare( $version, '1.6.7.2', '<' ) ) {
+			$this->v1672_upgrade();
+		}
+
+		if ( version_compare( $version, '1.6.8', '<' ) ) {
+			$this->v168_upgrade();
 		}
 	}
 
@@ -114,5 +122,61 @@ class Migrations {
 		}
 
 		$this->is_migrated = true;
+	}
+
+	/**
+	 * Do all the required migrations for WPForms v1.6.7.2.
+	 *
+	 * @since 1.6.7.2
+	 */
+	private function v1672_upgrade() {
+
+		$review = get_option( 'wpforms_review' );
+
+		if ( empty( $review ) ) {
+			return;
+		}
+
+		$notices = get_option( 'wpforms_admin_notices', [] );
+
+		if ( isset( $notices['review_request'] ) ) {
+			return;
+		}
+
+		$notices['review_request'] = $review;
+
+		update_option( 'wpforms_admin_notices', $notices, true );
+		delete_option( 'wpforms_review' );
+	}
+
+	/**
+	 * Do all the required migrations for WPForms v1.6.8.
+	 *
+	 * @since 1.6.8
+	 */
+	private function v168_upgrade() {
+
+		$current_opened_date = get_option( 'wpforms_builder_opened_date', null );
+
+		// Do not run migration twice as 0 is a default value for all old users.
+		if ( $current_opened_date === '0' ) {
+			return;
+		}
+
+		// We don't want users to report to us if they already previously used the builder by creating a form.
+		$forms = wpforms()->form->get(
+			'',
+			[
+				'posts_per_page'         => 1,
+				'nopaging'               => false,
+				'fields'                 => 'ids',
+				'update_post_meta_cache' => false,
+			]
+		);
+
+		// At least 1 form exists - set the detault value.
+		if ( ! empty( $forms ) ) {
+			add_option( 'wpforms_builder_opened_date', 0, '', 'no' );
+		}
 	}
 }

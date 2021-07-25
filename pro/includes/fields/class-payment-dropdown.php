@@ -220,20 +220,21 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 
 		// Show price after item labels.
 		$fld  = $this->field_element(
-			'checkbox',
+			'toggle',
 			$field,
-			array(
+			[
 				'slug'    => 'show_price_after_labels',
 				'value'   => isset( $field['show_price_after_labels'] ) ? '1' : '0',
 				'desc'    => esc_html__( 'Show price after item labels', 'wpforms' ),
 				'tooltip' => esc_html__( 'Check this option to show price of the item after the label.', 'wpforms' ),
-			),
+			],
 			false
 		);
-		$args = array(
+		$args = [
 			'slug'    => 'show_price_after_labels',
 			'content' => $fld,
-		);
+		];
+
 		$this->field_element( 'row', $field, $args );
 
 		// Description.
@@ -293,14 +294,14 @@ class WPForms_Field_Payment_Select extends WPForms_Field {
 		// Placeholder.
 		$this->field_option( 'placeholder', $field );
 
-		// Hide label.
-		$this->field_option( 'label_hide', $field );
-
 		// Custom CSS classes.
 		$this->field_option( 'css', $field );
 
+		// Hide label.
+		$this->field_option( 'label_hide', $field );
+
 		// Options close markup.
-		$this->field_option( 'advanced-options', $field, array( 'markup' => 'close' ) );
+		$this->field_option( 'advanced-options', $field, [ 'markup' => 'close' ] );
 	}
 
 	/**

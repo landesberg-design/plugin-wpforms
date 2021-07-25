@@ -316,6 +316,10 @@ class AdminBarMenu {
 		foreach ( $forms as $form ) {
 			$form_id = absint( $form['id'] );
 
+			if ( empty( $form_id ) ) {
+				continue;
+			}
+
 			/* translators: %d - Form ID */
 			$form_title = sprintf( esc_html__( 'Form ID: %d', 'wpforms-lite' ), $form_id );
 

@@ -3,6 +3,7 @@
 namespace WPForms\Pro\Admin\Entries\Export;
 
 use Goodby\CSV\Export\Standard\CsvFileObject;
+use WPForms\Helpers\Transient;
 
 /**
  * File-related routines.
@@ -96,7 +97,10 @@ class File {
 			return;
 		}
 
-		$writer     = new \XLSXWriter();
+		$writer = new \XLSXWriter();
+
+		$writer->setTempDir( $this->get_tmpdir() );
+
 		$sheet_name = 'WPForms';
 
 		$widths = [];
@@ -211,6 +215,9 @@ class File {
 
 		clearstatcache( true, $export_file );
 
+		// Remove the transient.
+		Transient::delete( 'wpforms-tools-entries-export-request-' . $request_data['request_id'] );
+
 		if ( ! is_readable( $export_file ) || is_dir( $export_file ) ) {
 			throw new \Exception( $this->export->errors['file_not_readable'] );
 		}
@@ -225,7 +232,7 @@ class File {
 
 		$this->http_headers( $file_name );
 
-		readfile( $export_file ); // phpcs:ignore
+		readfile( $export_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile
 
 		// Schedule clean up.
 		$this->schedule_remove_old_export_files();
@@ -244,7 +251,7 @@ class File {
 
 		$args = $this->export->data['get_args'];
 
-		if ( 'wpforms_tools_entries_export_download' !== $args['action'] ) {
+		if ( $args['action'] !== 'wpforms_tools_entries_export_download' ) {
 			return;
 		}
 
@@ -264,7 +271,7 @@ class File {
 			}
 
 			// Get stored request data.
-			$request_data = get_transient( 'wpforms-tools-entries-export-request-' . $args['request_id'] );
+			$request_data = Transient::get( 'wpforms-tools-entries-export-request-' . $args['request_id'] );
 
 			$this->output_file( $request_data );
 
@@ -275,17 +282,18 @@ class File {
 				$error .= '<br><b>WPFORMS DEBUG</b>: ' . $e->__toString();
 			}
 			$error = str_replace( "'", '&#039;', $error );
+			$js_error = str_replace( "\n", '', $error );
 
 			echo "
 			<script>
 				( function() {
 					var w = window;
-					if ( w.frameElement != null &&
-						 w.frameElement.nodeName === 'IFRAME' &&
-						 w.parent.jQuery )
-					{
-						w.parent.jQuery( w.parent.document ).trigger( 'csv_file_error', [ '" . str_replace( "\n", '', $error ) . "' ] );
-						w.parent.WPFormsEntriesExport.displaySubmitSpinner( false );
+					if (
+						w.frameElement != null &&
+						w.frameElement.nodeName === 'IFRAME' &&
+						w.parent.jQuery
+					) {
+						w.parent.jQuery( w.parent.document ).trigger( 'csv_file_error', [ '" . wp_slash( $js_error ) . "' ] );
 					}
 				} )();
 			</script>
@@ -350,7 +358,7 @@ class File {
 				$error .= '<br><b>WPFORMS DEBUG</b>: ' . $e->__toString();
 			}
 
-			\WPForms_Admin_Notice::error( $error );
+			\WPForms\Admin\Notice::error( $error );
 		}
 	}
 
@@ -374,8 +382,7 @@ class File {
 	}
 
 	/**
-	 * Garbage clearing.
-	 * We need to clear only temporary files because transients are cleared automagically.
+	 * Clear temporary files.
 	 *
 	 * @since 1.5.5
 	 * @since 1.6.5 Stop using transients. Now we use ActionScheduler for this task.
