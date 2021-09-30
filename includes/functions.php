@@ -468,8 +468,8 @@ function wpforms_html_attributes( $id = '', $class = array(), $datas = array(), 
 
 	if ( ! empty( $atts ) ) {
 		foreach ( $atts as $att => $val ) {
-			if ( '0' == $val || ! empty( $val ) ) {
-				if ( '[' === $att[0] ) {
+			if ( '0' === (string) $val || ! empty( $val ) ) {
+				if ( $att[0] === '[' ) {
 					// Handle special case for bound attributes in AMP.
 					$escaped_att = '[' . sanitize_html_class( trim( $att, '[]' ) ) . ']';
 				} else {
@@ -2828,4 +2828,24 @@ function wpforms_get_timezone() {
 	}
 
 	return timezone_open( $timezone_string );
+}
+
+/**
+ * Alias for default readonly function.
+ *
+ * @since 1.6.9
+ *
+ * @param mixed $readonly One of the values to compare.
+ * @param mixed $current  The other value to compare if not just true.
+ * @param bool  $echo     Whether to echo or just return the string.
+ *
+ * @return string HTML attribute or empty string.
+ */
+function wpforms_readonly( $readonly, $current = true, $echo = true ) {
+
+	if ( function_exists( 'wp_readonly' ) ) {
+		return wp_readonly( $readonly, $current, $echo );
+	}
+
+	return __checked_selected_helper( $readonly, $current, $echo, 'readonly' );
 }

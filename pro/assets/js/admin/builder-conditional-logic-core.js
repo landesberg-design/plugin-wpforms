@@ -543,7 +543,6 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 					title: false,
 					content: wpforms_builder.conditionals_disable,
 					backgroundDismiss: false,
-					closeIcon: false,
 					icon: 'fa fa-exclamation-circle',
 					type: 'orange',
 					buttons: {

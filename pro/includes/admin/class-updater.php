@@ -134,14 +134,14 @@ class WPForms_Updater {
 	 */
 	public function update_plugins_filter( $value ) {
 
-		// If no update object exists, return early.
-		if ( empty( $value ) ) {
+		// If no update object exists or given value is not an object type, return early.
+		if ( empty( $value ) || ! is_object( $value ) ) {
 			return $value;
 		}
 
 		// Run update check by pinging the external API. If it fails, return the default update object.
 		if ( ! $this->update ) {
-			$this->update = $this->perform_remote_request( 'get-plugin-update', array( 'tgm-updater-plugin' => $this->plugin_slug ) );
+			$this->update = $this->perform_remote_request( 'get-plugin-update', [ 'tgm-updater-plugin' => $this->plugin_slug ] );
 
 			// No update is available.
 			if ( ! $this->update || ! empty( $this->update->error ) ) {

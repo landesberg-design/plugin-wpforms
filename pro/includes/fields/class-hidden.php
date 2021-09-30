@@ -18,7 +18,7 @@ class WPForms_Field_Hidden extends WPForms_Field {
 		$this->name  = esc_html__( 'Hidden Field', 'wpforms' );
 		$this->type  = 'hidden';
 		$this->icon  = 'fa-eye-slash';
-		$this->order = 150;
+		$this->order = 170;
 		$this->group = 'fancy';
 	}
 

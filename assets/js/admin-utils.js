@@ -159,9 +159,7 @@ var wpf = {
 			// Normal processing, get fields from builder and prime cache.
 			var formData       = wpf.formObject( '#wpforms-field-options' ),
 				fields         = formData.fields,
-				fieldOrder     = [],
-				fieldsOrdered  = [],
-				fieldBlacklist = [ 'html', 'pagebreak' ];
+				fieldBlacklist = [ 'entry-preview', 'html', 'pagebreak' ];
 
 			if (!fields) {
 				return false;

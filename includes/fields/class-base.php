@@ -1583,12 +1583,14 @@ abstract class WPForms_Field {
 			case 'label':
 				$label  = isset( $field['label'] ) && ! empty( $field['label'] ) ? esc_html( $field['label'] ) : '';
 				$output = sprintf( '<label class="label-title %s"><span class="text">%s</span><span class="required">*</span></label>', $class, $label );
+
 				break;
 
 			case 'description':
 				$description = isset( $field['description'] ) && ! empty( $field['description'] ) ? wp_kses( $field['description'], $allowed_tags ) : '';
 				$description = strpos( $class, 'nl2br' ) !== false ? nl2br( $description ) : $description;
 				$output      = sprintf( '<div class="description %s">%s</div>', $class, $description );
+
 				break;
 
 			case 'choices':
@@ -1596,7 +1598,8 @@ abstract class WPForms_Field {
 
 				$values  = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
 				$dynamic = ! empty( $field['dynamic_choices'] ) ? $field['dynamic_choices'] : false;
-				$total   = 0;
+				$total   = count( $values );
+				$values  = array_slice( $values, 0, 20 );
 
 				/*
 				 * Check to see if this field is configured for Dynamic Choices,
@@ -1614,7 +1617,7 @@ abstract class WPForms_Field {
 									'wpforms_dynamic_choice_post_type_args',
 									[
 										'post_type'      => $field['dynamic_post_type'],
-										'posts_per_page' => -1,
+										'posts_per_page' => 20,
 										'orderby'        => 'title',
 										'order'          => 'ASC',
 									],
@@ -1641,6 +1644,7 @@ abstract class WPForms_Field {
 									[
 										'taxonomy'   => $field['dynamic_taxonomy'],
 										'hide_empty' => false,
+										'number'     => 20,
 									],
 									$field,
 									$this->form_id
@@ -1676,15 +1680,18 @@ abstract class WPForms_Field {
 					case 'gdpr-checkbox':
 					case 'payment-checkbox':
 						$type = 'checkbox';
+
 						break;
 
 					case 'select':
 					case 'payment-select':
 						$type = 'select';
+
 						break;
 
 					default:
 						$type = 'radio';
+
 						break;
 				}
 
@@ -1815,25 +1822,25 @@ abstract class WPForms_Field {
 					}
 
 					$output .= '</ul>';
+
+					/*
+					 * Contains more than 20 items, include a note about a limited subset of results displayed.
+					*/
+					if ( $total > 20 ) {
+						$output .= '<div class="wpforms-alert-dynamic wpforms-alert wpforms-alert-warning">';
+						$output .= sprintf(
+							wp_kses( /* translators: %s - total amount of choices. */
+								__( 'Showing the first 20 choices.<br> All %s choices will be displayed when viewing the form.', 'wpforms-lite' ),
+								[
+									'br' => [],
+								]
+							),
+							$total
+						);
+						$output .= '</div>';
+					}
 				}
 
-				/*
-				 * Dynamic population is enabled and contains more than 20 items,
-				 * include a note about results displayed.
-				 */
-				if ( $total > 20 ) {
-					$output .= '<div class="wpforms-alert-dynamic wpforms-alert wpforms-alert-warning">';
-					$output .= sprintf(
-						wp_kses( /* translators: %d - total amount of choices. */
-							__( 'Showing the first 20 choices.<br> All %d choices will be displayed when viewing the form.', 'wpforms-lite' ),
-							[
-								'br' => [],
-							]
-						),
-						$total
-					);
-					$output .= '</div>';
-				}
 				break;
 		}
 
@@ -1908,7 +1915,15 @@ abstract class WPForms_Field {
 		}
 
 		$preview .= sprintf( '<a href="#" class="wpforms-field-delete" title="%s"><i class="fa fa-trash-o"></i></a>', esc_attr__( 'Delete Field', 'wpforms-lite' ) );
-		$preview .= sprintf( '<span class="wpforms-field-helper">%s</span>', esc_html__( 'Click to edit. Drag to reorder.', 'wpforms-lite' ) );
+		$preview .= sprintf(
+			// language=HTML PhpStorm.
+			'<div class="wpforms-field-helper">
+				<span class="wpforms-field-helper-edit">%s</span>
+				<span class="wpforms-field-helper-drag">%s</span>
+			</div>',
+			esc_html__( 'Click to edit.', 'wpforms-lite' ),
+			esc_html__( 'Drag to reorder.', 'wpforms-lite' )
+		);
 		$preview .= $prev;
 		$preview .= '</div>';
 

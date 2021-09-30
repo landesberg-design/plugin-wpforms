@@ -25,7 +25,7 @@ abstract class Process {
 	 *
 	 * @var array
 	 */
-	protected $fields = array();
+	protected $fields = [];
 
 	/**
 	 * Submitted form content.
@@ -34,7 +34,8 @@ abstract class Process {
 	 *
 	 * @var array
 	 */
-	protected $entry = array();
+	protected $entry = [];
+
 	/**
 	 * Form data and settings.
 	 *
@@ -42,7 +43,8 @@ abstract class Process {
 	 *
 	 * @var array
 	 */
-	protected $form_data = array();
+	protected $form_data = [];
+
 	/**
 	 * ID of a saved entry.
 	 *
@@ -60,6 +62,7 @@ abstract class Process {
 	 * @param Core $core Provider core class.
 	 */
 	public function __construct( Core $core ) {
+
 		$this->core = $core;
 	}
 
@@ -90,7 +93,8 @@ abstract class Process {
 
 		if (
 			empty( $connection['conditional_logic'] ) ||
-			empty( $connection['conditionals'] )
+			empty( $connection['conditionals'] ) ||
+			! function_exists( 'wpforms_conditional_logic' )
 		) {
 			return true;
 		}
@@ -99,7 +103,7 @@ abstract class Process {
 
 		if (
 			! empty( $connection['conditional_type'] ) &&
-			'stop' === $connection['conditional_type']
+			$connection['conditional_type'] === 'stop'
 		) {
 			$process = ! $process;
 		}
@@ -115,6 +119,7 @@ abstract class Process {
 	 * @return array
 	 */
 	protected function get_options() {
-		return \wpforms_get_providers_options( $this->core->slug );
+
+		return wpforms_get_providers_options( $this->core->slug );
 	}
 }

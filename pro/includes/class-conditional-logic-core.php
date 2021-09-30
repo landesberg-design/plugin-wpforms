@@ -60,10 +60,6 @@ class WPForms_Conditional_Logic_Core {
 	 */
 	public function builder_assets() {
 
-		if ( ! wpforms()->pro ) {
-			return;
-		}
-
 		$min = wpforms_get_min_suffix();
 
 		// CSS.
@@ -605,7 +601,11 @@ class WPForms_Conditional_Logic_Core {
 
 				foreach ( $group as $rule_id => $rule ) {
 
-					if ( ! isset( $rule['field'] ) || $rule['field'] == '' || ! isset( $rule['operator'] ) ) {
+					if (
+						! isset( $rule['field'] ) ||
+						$rule['field'] === '' ||
+						! isset( $rule['operator'] )
+					) {
 						continue;
 					}
 
@@ -625,12 +625,12 @@ class WPForms_Conditional_Logic_Core {
 
 						switch ( $rule_operator ) {
 							case '==':
-								$pass_rule = ( $left == $right );
+								$pass_rule = $left === $right;
 
 								break;
 
 							case '!=':
-								$pass_rule = ( $left != $right );
+								$pass_rule = $left !== $right;
 
 								break;
 
@@ -655,12 +655,12 @@ class WPForms_Conditional_Logic_Core {
 								break;
 
 							case 'e':
-								$pass_rule = ( $left == '' );
+								$pass_rule = $left === '';
 
 								break;
 
 							case '!e':
-								$pass_rule = ( $left != '' );
+								$pass_rule = $left !== '';
 
 								break;
 
@@ -699,14 +699,14 @@ class WPForms_Conditional_Logic_Core {
 						if (
 							in_array( $fields[ $rule_field ]['type'], [ 'payment-multiple', 'payment-checkbox', 'payment-select' ], true ) &&
 							isset( $fields[ $rule_field ]['value_raw'] ) &&
-							$fields[ $rule_field ]['value_raw'] != ''
+							(string) $fields[ $rule_field ]['value_raw'] !== ''
 						) {
 
 							// Payment Multiple/Checkbox fields store the option key,
 							// so we can reference that easily.
 							$provided_id = explode( ',', (string) $fields[ $rule_field ]['value_raw'] );
 
-						} elseif ( isset( $fields[ $rule_field ]['value'] ) && $fields[ $rule_field ]['value'] != '' ) {
+						} elseif ( isset( $fields[ $rule_field ]['value'] ) && (string) $fields[ $rule_field ]['value'] !== '' ) {
 
 							// Other select type fields we don't store the
 							// option key so we have to do the logic to locate

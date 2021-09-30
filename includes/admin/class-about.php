@@ -138,7 +138,7 @@ class WPForms_About {
 
 		// If the user tries to load an invalid view - fallback to About Us.
 		if (
-			! in_array( $this->view, call_user_func_array( 'array_merge', $this->views ), true ) &&
+			! in_array( $this->view, call_user_func_array( 'array_merge', array_values( $this->views ) ), true ) &&
 			! has_action( 'wpforms_admin_about_display_tab_' . sanitize_key( $this->view ) )
 		) {
 			$this->view = self::DEFAULT_TAB;
@@ -444,7 +444,18 @@ class WPForms_About {
 	 */
 	protected function output_getting_started() {
 
-		$license = $this->get_license_type();
+		$license      = $this->get_license_type();
+		$utm_campaign = $license === 'lite' ? 'liteplugin' : 'plugin';
+
+		$links = [
+			'add-new'                 => "https://wpforms.com/docs/creating-first-form/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign={$utm_campaign}&utm_content=How to Add a New Form#add-new",
+			'customize-fields'        => "https://wpforms.com/docs/creating-first-form/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign={$utm_campaign}&utm_content=How to Customize Form Fields#customize-fields",
+			'display-form'            => "https://wpforms.com/docs/creating-first-form/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign={$utm_campaign}&utm_content=How to Display Forms on Your Site#display-form",
+			'right-form-field'        => "https://wpforms.com/docs/how-to-choose-the-right-form-field-for-your-forms/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign={$utm_campaign}&utm_content=How to Choose the Right Form Field",
+			'complete-guide'          => "https://wpforms.com/docs/a-complete-guide-to-wpforms-settings/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign={$utm_campaign}&utm_content=A Complete Guide to WPForms Settings",
+			'gdpr-compliant'          => "https://wpforms.com/docs/how-to-create-gdpr-compliant-forms/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign={$utm_campaign}&utm_content=How to Create GDPR Complaint Forms",
+			'install-activate-addons' => "https://wpforms.com/docs/install-activate-wpforms-addons/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign={$utm_campaign}&utm_content=How to Install and Activate WPForms Addons",
+		];
 		?>
 
 		<div class="wpforms-admin-about-section wpforms-admin-about-section-first-form" style="display:flex;">
@@ -469,17 +480,17 @@ class WPForms_About {
 
 				<ul class="list-plain">
 					<li>
-						<a href="https://wpforms.com/docs/creating-first-form/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted#add-new" target="_blank" rel="noopener noreferrer">
+						<a href="<?php echo esc_url( $links['add-new'] ); ?>" target="_blank" rel="noopener noreferrer">
 							<?php esc_html_e( 'How to Add a New Form', 'wpforms-lite' ); ?>
 						</a>
 					</li>
 					<li>
-						<a href="https://wpforms.com/docs/creating-first-form/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted#customize-fields" target="_blank" rel="noopener noreferrer">
+						<a href="<?php echo esc_url( $links['customize-fields'] ); ?>" target="_blank" rel="noopener noreferrer">
 							<?php esc_html_e( 'How to Customize Form Fields', 'wpforms-lite' ); ?>
 						</a>
 					</li>
 					<li>
-						<a href="https://wpforms.com/docs/creating-first-form/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted#display-form" target="_blank" rel="noopener noreferrer">
+						<a href="<?php echo esc_url( $links['display-form'] ); ?>" target="_blank" rel="noopener noreferrer">
 							<?php esc_html_e( 'How to Display Forms on Your Site', 'wpforms-lite' ); ?>
 						</a>
 					</li>
@@ -505,10 +516,10 @@ class WPForms_About {
 						<?php
 						echo wp_kses(
 							__( 'Thanks for being a loyal WPForms Lite user. <strong>Upgrade to WPForms Pro</strong> to unlock all the awesome features and experience<br>why WPForms is consistently rated the best WordPress form builder.', 'wpforms-lite' ),
-							array(
-								'br'     => array(),
-								'strong' => array(),
-							)
+							[
+								'br'     => [],
+								'strong' => [],
+							]
 						);
 						?>
 					</p>
@@ -516,12 +527,11 @@ class WPForms_About {
 					<p>
 						<?php
 						printf(
-							wp_kses(
-							/* translators: %s - stars. */
-								__( 'We know that you will truly love WPForms. It has over <strong>7000+ five star ratings</strong> (%s) and is active on over 4 million websites.', 'wpforms-lite' ),
-								array(
-									'strong' => array(),
-								)
+							wp_kses( /* translators: %s - stars. */
+								__( 'We know that you will truly love WPForms. It has over <strong>9000+ five star ratings</strong> (%s) and is active on over 4 million websites.', 'wpforms-lite' ),
+								[
+									'strong' => [],
+								]
 							),
 							'<i class="fa fa-star" aria-hidden="true"></i>' .
 							'<i class="fa fa-star" aria-hidden="true"></i>' .
@@ -589,26 +599,26 @@ class WPForms_About {
 
 					<h3 class="call-to-action">
 						<?php
-						if ( 'lite' === $license ) {
-							echo '<a href="' . wpforms_admin_upgrade_link( 'wpforms-about-page' ) . '" target="_blank" rel="noopener noreferrer">';
-						} else {
-							echo '<a href="https://wpforms.com/pricing?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer">';
-						}
+						printf(
+							'<a href="%s" target="_blank" rel="noopener noreferrer">',
+							esc_url( wpforms_admin_upgrade_link( 'wpforms-about-page', 'Get WPForms Pro Today' ) )
+						);
+
 						esc_html_e( 'Get WPForms Pro Today and Unlock all the Powerful Features', 'wpforms-lite' );
 						?>
 						</a>
 					</h3>
 
-					<?php if ( 'lite' === $license ) { ?>
+					<?php if ( $license === 'lite' ) { ?>
 						<p>
 							<?php
 							echo wp_kses(
 								__( 'Bonus: WPForms Lite users get <span class="price-20-off">50% off regular price</span>, automatically applied at checkout.', 'wpforms-lite' ),
-								array(
-									'span' => array(
-										'class' => array(),
-									),
-								)
+								[
+									'span' => [
+										'class' => [],
+									],
+								]
 							);
 							?>
 						</p>
@@ -620,7 +630,7 @@ class WPForms_About {
 
 		<div class="wpforms-admin-about-section wpforms-admin-about-section-squashed wpforms-admin-about-section-post wpforms-admin-columns">
 			<div class="wpforms-admin-column-20">
-				<img src="<?php echo WPFORMS_PLUGIN_URL; ?>assets/images/about/how-choose-right-form-field.png" alt="">
+				<img src="<?php echo esc_url( WPFORMS_PLUGIN_URL . 'assets/images/about/how-choose-right-form-field.png' ); ?>" alt="">
 			</div>
 			<div class="wpforms-admin-column-80">
 				<h2>
@@ -631,7 +641,7 @@ class WPForms_About {
 					<?php esc_html_e( 'Are you wondering which form fields you have access to in WPForms and what each field does? WPForms has lots of field types to make creating and filling out forms easy. In this tutorial, we’ll cover all of the fields available in WPForms.', 'wpforms-lite' ); ?>
 				</p>
 
-				<a href="https://wpforms.com/docs/how-to-choose-the-right-form-field-for-your-forms/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer" class="wpforms-admin-about-section-post-link">
+				<a href="<?php echo esc_url( $links['right-form-field'] ); ?>" target="_blank" rel="noopener noreferrer" class="wpforms-admin-about-section-post-link">
 					<?php esc_html_e( 'Read Documentation', 'wpforms-lite' ); ?><i class="fa fa-external-link" aria-hidden="true"></i>
 				</a>
 			</div>
@@ -639,7 +649,7 @@ class WPForms_About {
 
 		<div class="wpforms-admin-about-section wpforms-admin-about-section-squashed wpforms-admin-about-section-post wpforms-admin-columns">
 			<div class="wpforms-admin-column-20">
-				<img src="<?php echo WPFORMS_PLUGIN_URL; ?>assets/images/about/complete-guide-to-wpforms-settings.png" alt="">
+				<img src="<?php echo esc_url( WPFORMS_PLUGIN_URL . 'assets/images/about/complete-guide-to-wpforms-settings.png' ); ?>" alt="">
 			</div>
 			<div class="wpforms-admin-column-80">
 				<h2>
@@ -650,7 +660,7 @@ class WPForms_About {
 					<?php esc_html_e( 'Would you like to learn more about all of the settings available in WPForms? In addition to tons of customization options within the form builder, WPForms has an extensive list of plugin-wide options available. This includes choosing your currency, adding GDPR enhancements, setting up integrations.', 'wpforms-lite' ); ?>
 				</p>
 
-				<a href="https://wpforms.com/docs/a-complete-guide-to-wpforms-settings/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer" class="wpforms-admin-about-section-post-link">
+				<a href="<?php echo esc_url( $links['complete-guide'] ); ?>" target="_blank" rel="noopener noreferrer" class="wpforms-admin-about-section-post-link">
 					<?php esc_html_e( 'Read Documentation', 'wpforms-lite' ); ?><i class="fa fa-external-link" aria-hidden="true"></i>
 				</a>
 			</div>
@@ -669,7 +679,7 @@ class WPForms_About {
 					<?php esc_html_e( 'Do you need to check that your forms are compliant with the European Union’s General Data Protection Regulation? The best way to ensure GDPR compliance for your specific site is always to consult legal counsel. In this guide, we’ll discuss general considerations for GDPR compliance in your WordPress forms.', 'wpforms-lite' ); ?>
 				</p>
 
-				<a href="https://wpforms.com/docs/how-to-create-gdpr-compliant-forms/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer" class="wpforms-admin-about-section-post-link">
+				<a href="<?php echo esc_url( $links['gdpr-compliant'] ); ?>" target="_blank" rel="noopener noreferrer" class="wpforms-admin-about-section-post-link">
 					<?php esc_html_e( 'Read Documentation', 'wpforms-lite' ); ?><i class="fa fa-external-link" aria-hidden="true"></i>
 				</a>
 			</div>
@@ -677,7 +687,7 @@ class WPForms_About {
 
 		<div class="wpforms-admin-about-section wpforms-admin-about-section-squashed wpforms-admin-about-section-post wpforms-admin-columns">
 			<div class="wpforms-admin-column-20">
-				<img src="<?php echo WPFORMS_PLUGIN_URL; ?>assets/images/about/how-install-activate-wpforms-addons.png" alt="">
+				<img src="<?php echo esc_url( WPFORMS_PLUGIN_URL . 'assets/images/about/how-install-activate-wpforms-addons.png' ); ?>" alt="">
 			</div>
 			<div class="wpforms-admin-column-80">
 				<h2>
@@ -688,7 +698,7 @@ class WPForms_About {
 					<?php esc_html_e( 'Would you like to access WPForms addons to extend the functionality of your forms? The first thing you need to do is install WPForms. Once that’s done, let’s go ahead and look at the process of activating addons.', 'wpforms-lite' ); ?>
 				</p>
 
-				<a href="https://wpforms.com/docs/install-activate-wpforms-addons/?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer" class="wpforms-admin-about-section-post-link">
+				<a href="<?php echo esc_url( $links['install-activate-addons'] ); ?>" target="_blank" rel="noopener noreferrer" class="wpforms-admin-about-section-post-link">
 					<?php esc_html_e( 'Read Documentation', 'wpforms-lite' ); ?><i class="fa fa-external-link" aria-hidden="true"></i>
 				</a>
 			</div>
@@ -772,6 +782,7 @@ class WPForms_About {
 						}
 
 						$current_status = $current['status'];
+
 						if ( $current['text'] !== $next['text'] && $current_status === 'full' ) {
 							$current_status = 'partial';
 						}
@@ -808,11 +819,10 @@ class WPForms_About {
 			<div class="wpforms-admin-about-section-hero-main no-border">
 				<h3 class="call-to-action centered">
 					<?php
-					if ( 'lite' === $license ) {
-						echo '<a href="' . esc_url( wpforms_admin_upgrade_link( 'wpforms-about-page' ) ) . '" target="_blank" rel="noopener noreferrer">';
-					} else {
-						echo '<a href="https://wpforms.com/pricing?utm_source=WordPress&utm_medium=wpforms-about-page&utm_campaign=gettingstarted" target="_blank" rel="noopener noreferrer">';
-					}
+					printf(
+						'<a href="%s" target="_blank" rel="noopener noreferrer">',
+						esc_url( wpforms_admin_upgrade_link( 'wpforms-about-page', 'Get WPForms Pro Today' ) )
+					);
 					printf( /* translators: %s - next license level. */
 						esc_html__( 'Get WPForms %s Today and Unlock all the Powerful Features', 'wpforms-lite' ),
 						esc_html( $next_license )
@@ -821,16 +831,16 @@ class WPForms_About {
 					</a>
 				</h3>
 
-				<?php if ( 'lite' === $license ) { ?>
+				<?php if ( $license === 'lite' ) { ?>
 					<p class="centered">
 						<?php
 						echo wp_kses(
 							__( 'Bonus: WPForms Lite users get <span class="price-20-off">50% off regular price</span>, automatically applied at checkout.', 'wpforms-lite' ),
-							array(
-								'span' => array(
-									'class' => array(),
-								),
-							)
+							[
+								'span' => [
+									'class' => [],
+								],
+							]
 						);
 						?>
 					</p>

@@ -345,13 +345,17 @@ abstract class WPForms_Provider {
 	 */
 	public function process_conditionals( $fields, $entry, $form_data, $connection ) {
 
-		if ( empty( $connection['conditional_logic'] ) || empty( $connection['conditionals'] ) ) {
+		if (
+			empty( $connection['conditional_logic'] ) ||
+			empty( $connection['conditionals'] ) ||
+			! function_exists( 'wpforms_conditional_logic' )
+		) {
 			return true;
 		}
 
 		$process = wpforms_conditional_logic()->process( $fields, $form_data, $connection['conditionals'] );
 
-		if ( ! empty( $connection['conditional_type'] ) && 'stop' === $connection['conditional_type'] ) {
+		if ( ! empty( $connection['conditional_type'] ) && $connection['conditional_type'] === 'stop' ) {
 			$process = ! $process;
 		}
 
@@ -901,7 +905,7 @@ abstract class WPForms_Provider {
 			$output .= esc_html( $provider_field['name'] );
 			if (
 				! empty( $provider_field['req'] ) &&
-				$provider_field['req'] == '1'
+				(int) $provider_field['req'] === 1
 			) {
 				$output .= '<span class="required">*</span>';
 			}
@@ -938,31 +942,31 @@ abstract class WPForms_Provider {
 	}
 
 	/**
-	 * Provider connection conditional options HTML
+	 * Provider connection conditional options HTML.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $connection_id
-	 * @param array $connection
-	 * @param string|array $form
+	 * @param string       $connection_id Unique connection ID.
+	 * @param array        $connection    Configured connection properties.
+	 * @param string|array $form          Form properties.
 	 *
 	 * @return string
 	 */
-	public function output_conditionals( $connection_id = '', $connection = array(), $form = '' ) {
+	public function output_conditionals( $connection_id = '', $connection = [], $form = '' ) {
 
-		if ( empty( $connection['account_id'] ) ) {
+		if ( empty( $connection['account_id'] ) || ! function_exists( 'wpforms_conditional_logic' ) ) {
 			return '';
 		}
 
 		return wpforms_conditional_logic()->builder_block(
-			array(
+			[
 				'form'       => $this->form_data,
 				'type'       => 'panel',
 				'panel'      => $this->slug,
 				'parent'     => 'providers',
 				'subsection' => $connection_id,
 				'reference'  => esc_html__( 'Marketing provider connection', 'wpforms-lite' ),
-			),
+			],
 			false
 		);
 	}

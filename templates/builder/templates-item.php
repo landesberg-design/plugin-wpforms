@@ -9,6 +9,7 @@
  * @var string $license_class        License class (in the case of higher license needed).
  * @var string $categories           Categories, coma separated.
  * @var string $badge_text           Badge text.
+ * @var string $demo_url             Template demo URL.
  * @var string $template_id          Template ID (Slug or ID if available).
  * @var string $education_class      Education class (in the case of higher license needed).
  * @var string $education_attributes Education attributes.
@@ -40,6 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<a href="#" class="wpforms-template-select wpforms-btn wpforms-btn-md wpforms-btn-orange<?php echo esc_attr( $education_class ); ?>"
 			data-template-name-raw="<?php echo esc_attr( $template['name'] ); ?>"
 			data-template="<?php echo esc_attr( $template_id ); ?>"
+			data-slug="<?php echo esc_attr( $template['slug'] ); ?>"
 			<?php echo $education_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?php echo $addons_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?php
@@ -50,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</a>
 		<?php if ( $template['url'] !== '' ) : ?>
 			<a class="wpforms-template-demo wpforms-btn wpforms-btn-md wpforms-btn-light-grey"
-				href="<?php echo esc_url( $template['url'] ); ?>"
+				href="<?php echo esc_url( $demo_url ); ?>"
 				target="_blank" rel="noopener noreferrer">
 				<?php esc_html_e( 'View Demo', 'wpforms-lite' ); ?>
 			</a>

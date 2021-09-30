@@ -81,13 +81,28 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 
 					switch ( $this.data( 'action' ) ) {
 						case 'activate':
-							app.activateModal( $this.data( 'name' ), $this.data( 'path' ), $this.data( 'nonce' ) );
+							app.activateModal(
+								$this.data( 'name' ),
+								$this.data( 'path' ),
+								$this.data( 'nonce' )
+							);
 							break;
 						case 'install':
-							app.installModal( $this.data( 'name' ), $this.data( 'url' ), $this.data( 'nonce' ), $this.data( 'license' ) );
+							app.installModal(
+								$this.data( 'name' ),
+								$this.data( 'url' ),
+								$this.data( 'nonce' ),
+								$this.data( 'license' )
+							);
 							break;
 						case 'upgrade':
-							app.upgradeModal( $this.data( 'name' ), $this.data( 'field-name' ), $this.data( 'license' ), $this.data( 'video' ) );
+							app.upgradeModal(
+								$this.data( 'name' ),
+								$this.data( 'field-name' ),
+								WPFormsEducation.core.getUTMContentValue( $this ),
+								$this.data( 'license' ),
+								$this.data( 'video' )
+							);
 							break;
 						case 'license':
 							app.licenseModal();
@@ -301,7 +316,7 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 		installModal: function( feature, url, nonce, type ) {
 
 			if ( ! url || '' === url ) {
-				app.upgradeModal( feature, '', type, '' );
+				app.upgradeModal( feature, '', 'Empty install URL', type, '' );
 				return;
 			}
 
@@ -391,12 +406,13 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 		 *
 		 * @since 1.6.6
 		 *
-		 * @param {string} feature   Feature name.
-		 * @param {string} fieldName Field name.
-		 * @param {string} type      License type.
-		 * @param {string} video     Feature video URL.
+		 * @param {string} feature    Feature name.
+		 * @param {string} fieldName  Field name.
+		 * @param {string} utmContent UTM content.
+		 * @param {string} type       License type.
+		 * @param {string} video      Feature video URL.
 		 */
-		upgradeModal: function( feature, fieldName, type, video ) {
+		upgradeModal: function( feature, fieldName, utmContent, type, video ) {
 
 			// Provide a default value.
 			if ( typeof type === 'undefined' || type.length === 0 ) {
@@ -420,6 +436,7 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 				content     : wpforms_education.upgrade[type].message.replace( /%name%/g, feature ),
 				boxWidth    : '550px',
 				theme       : 'modern,wpforms-education',
+				closeIcon   : true,
 				onOpenBefore: function() {
 
 					if ( ! _.isEmpty( video ) ) {
@@ -435,10 +452,7 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 						keys    : [ 'enter' ],
 						action  : function() {
 
-							var appendChar = /(\?)/.test( wpforms_education.upgrade[ type ].url ) ? '&' : '?',
-								upgradeURL = wpforms_education.upgrade[ type ].url + appendChar + 'utm_content=' + encodeURIComponent( feature.trim() );
-
-							window.open( upgradeURL, '_blank' );
+							window.open( WPFormsEducation.core.getUpgradeURL( utmContent, type ), '_blank' );
 						},
 					},
 				},

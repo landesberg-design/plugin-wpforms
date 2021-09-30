@@ -1,9 +1,52 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
 
+## [1.6.9] - 2021-08-24
+### Added
+- New field - Entry Preview.
+- Keyboard Shortcuts informational popup in the Form Builder, triggered with `Ctrl + /` shortcut.
+- Separate category for templates added by addons.
+- Smart Tags support in Confirmation Messages.
+- Advanced Entry search by Entry ID, Entry notes, user IP, and user agent.
+- Punycode support for the Email field to allow using international domain names.
+- Compatibility with PHP 8.
+
+### Changed
+- Display only WPForms related actions on the Tools > Scheduled Actions page.
+- Enable AJAX form submission by default for new forms created using Blank template and addon templates.
+- Default state on the CAPTCHA Settings screen on new installs is now set to None.
+- Improved consistency of various modal popups in the Form Builder.
+- Do not allow Entry editing when there are no fields with editable values.
+- Speed up form preview in the Form Builder by limiting the number of choices displayed.
+- Updated ActionScheduler library to 3.2.1.
+- Updated Flatpickr JS library to v4.6.9.
+
+### Fixed
+- Tooltip is not working for the Form Locker Message box options.
+- Avoid error by allowing objects implementing the `__invoke()` method as a hook callback.
+- Missing down arrow in the Dropdown field in the Twenty Twenty-One theme on a fresh install.
+- Clicking on the Field Options tab in the Form Builder always opens options for the first field in the form.
+- Form Setting panels can be broken by horizontally resizing textarea fields.
+- Unable to remove or duplicate the Section Divider field with an empty label.
+- Insert/edit link button not working in the Confirmation Message editor.
+- Prevent editor styles from loading on various settings pages.
+- Missing Conditional Logic class in the Lite version causing errors when using custom integration that extends the `WPForms_Provider` class.
+- Console error in Chrome when re-ordering choices in the Dropdown, Checkboxes and Multiple Choice field settings.
+- Unrelated admin notices are no longer displayed on the WPForms admin pages.
+- Modern Dropdown and Custom Captcha fields not initialized properly in the Divi Builder.
+- Dropdown preview in the Form Builder not updated if the first option's value is empty.
+- Password strength meter generating JavaScript error in WordPress <5.5.
+- Preserve reply-to in the Notifications settings when creating a form from a template.
+- CSS improvements of View and Edit Entry pages when there are no fields.
+- The Address field in the International format now renders correctly when subfields are turned off.
+- Translations are not fully loaded when changing the site language.
+- Minor button styling issue in WordPress 4.9.
+- Various Dropdown field CSS issues in the Form Builder.
+- Misaligned icon in the Dashboard widget.
+
 ## [1.6.8.1] - 2021-07-21
 ### Changed
-- Allow using right click to open a form preview in new tab or window.
+- Allow using right-click to open a form preview in a new tab or window.
 
 ### Fixed
 - Notifications disabled on the previous version were enabled after the 1.6.8 update.

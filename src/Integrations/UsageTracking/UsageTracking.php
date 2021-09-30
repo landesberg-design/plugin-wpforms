@@ -344,7 +344,7 @@ class UsageTracking implements IntegrationInterface {
 		$integrations = array_filter( $integrations );
 
 		if ( count( $integrations ) > 0 ) {
-			$integrations = call_user_func_array( 'array_merge', $integrations );
+			$integrations = call_user_func_array( 'array_merge', array_values( $integrations ) );
 		}
 
 		return array_count_values( $integrations );
@@ -384,7 +384,7 @@ class UsageTracking implements IntegrationInterface {
 		$payments = array_filter( $payments );
 
 		if ( count( $payments ) > 0 ) {
-			$payments = call_user_func_array( 'array_merge', $payments );
+			$payments = call_user_func_array( 'array_merge', array_values( $payments ) );
 		}
 
 		return array_count_values( $payments );

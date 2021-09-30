@@ -350,15 +350,13 @@ var WPFormsFormEmbedWizard = window.WPFormsFormEmbedWizard || ( function( docume
 				content: wpforms_builder.exit_confirm,
 				icon: 'fa fa-exclamation-circle',
 				type: 'orange',
-				backgroundDismiss: false,
-				closeIcon: false,
+				closeIcon: true,
 				buttons: {
 					confirm: {
 						text: wpforms_builder.save_embed,
 						btnClass: 'btn-confirm',
 						keys: [ 'enter' ],
 						action: function() {
-
 							WPFormsBuilder.formSave().done( app.embedPageRedirect );
 						},
 					},
@@ -369,6 +367,9 @@ var WPFormsFormEmbedWizard = window.WPFormsFormEmbedWizard || ( function( docume
 							app.embedPageRedirect();
 						},
 					},
+				},
+				onClose: function() {
+					el.$sectionGo.find( 'button' ).prop( 'disabled', false );
 				},
 			} );
 		},

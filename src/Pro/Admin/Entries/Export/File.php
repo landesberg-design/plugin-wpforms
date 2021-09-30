@@ -69,7 +69,7 @@ class File {
 
 		for ( $i = 1; $i <= $request_data['total_steps']; $i ++ ) {
 
-			$entries = wpforms()->entry->get_entries( $request_data['db_args'] );
+			$entries = wpforms()->get( 'entry' )->get_entries( $request_data['db_args'] );
 
 			foreach ( $this->export->ajax->get_entry_data( $entries ) as $entry ) {
 
@@ -113,7 +113,7 @@ class File {
 
 		for ( $i = 1; $i <= $request_data['total_steps']; $i ++ ) {
 
-			$entries = wpforms()->entry->get_entries( $request_data['db_args'] );
+			$entries = wpforms()->get( 'entry' )->get_entries( $request_data['db_args'] );
 
 			foreach ( $this->export->ajax->get_entry_data( $entries ) as $entry ) {
 
@@ -289,7 +289,7 @@ class File {
 				( function() {
 					var w = window;
 					if (
-						w.frameElement != null &&
+						w.frameElement !== null &&
 						w.frameElement.nodeName === 'IFRAME' &&
 						w.parent.jQuery
 					) {

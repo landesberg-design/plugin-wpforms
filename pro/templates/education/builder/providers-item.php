@@ -23,6 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <a href="#" class="wpforms-panel-sidebar-section icon wpforms-panel-sidebar-section-<?php echo esc_attr( $clear_slug ); ?> education-modal"
 	data-name="<?php echo esc_attr( $modal_name ); ?>"
+	data-slug="<?php echo esc_attr( $clear_slug ); ?>"
 	data-action="<?php echo esc_attr( $action ); ?>"
 	data-path="<?php echo esc_attr( $path ); ?>"
 	data-url="<?php echo esc_attr( $url ); ?>"

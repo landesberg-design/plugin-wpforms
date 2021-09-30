@@ -407,8 +407,6 @@ var WPFormsSettingsAccess = window.WPFormsSettingsAccess || ( function( document
 				icon   : 'fa fa-exclamation-circle',
 				type   : 'orange',
 				boxWidth: '500px',
-				backgroundDismiss: false,
-				closeIcon: false,
 				buttons: {
 					confirm: {
 						text    : wpforms_admin.ok,

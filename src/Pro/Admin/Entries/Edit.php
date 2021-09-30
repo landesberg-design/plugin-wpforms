@@ -269,6 +269,14 @@ class Edit {
 			true
 		);
 
+		wp_enqueue_script(
+			'wpforms-punycode',
+			WPFORMS_PLUGIN_URL . "assets/js/punycode{$min}.js",
+			[],
+			'1.0.0',
+			true
+		);
+
 		// Load frontend base JS.
 		wp_enqueue_script(
 			'wpforms-frontend',
@@ -345,6 +353,7 @@ class Edit {
 		if ( empty( $_GET['entry_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			\WPForms\Admin\Notice::error( esc_html__( 'Invalid entry ID.', 'wpforms' ) );
 			$this->abort = true;
+
 			return;
 		}
 
@@ -355,6 +364,7 @@ class Edit {
 		if ( ! $entry || empty( $entry ) ) {
 			\WPForms\Admin\Notice::error( esc_html__( 'Entry not found.', 'wpforms' ) );
 			$this->abort = true;
+
 			return;
 		}
 
@@ -364,7 +374,23 @@ class Edit {
 		// No form was found, error.
 		if ( ! $form || empty( $form ) ) {
 			\WPForms\Admin\Notice::error( esc_html__( 'Form not found.', 'wpforms' ) );
+
 			return;
+		}
+
+		// No editable fields, redirect back.
+		if ( ! wpforms()->get( 'entry' )->has_editable_fields( $entry ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			$entry_list = add_query_arg(
+				[
+					'page'    => 'wpforms-entries',
+					'view'    => 'list',
+					'form_id' => $entry->form_id,
+				],
+				admin_url( 'admin.php' )
+			);
+
+			wp_safe_redirect( wp_get_referer() ? wp_get_referer() : $entry_list );
+			exit;
 		}
 
 		// Form data.
@@ -387,7 +413,7 @@ class Edit {
 		$this->form_id      = $form->ID;
 
 		// Lastly, mark entry as read if needed.
-		if ( '1' !== $entry->viewed && empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		if ( $entry->viewed !== '1' && empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			$is_success = wpforms()->entry->update(
 				$entry->entry_id,
 				[
@@ -426,17 +452,17 @@ class Edit {
 			return;
 		}
 
-		if ( ! wpforms_current_user_can( 'edit_entries_form_single', $form_data['id'] ) ) {
+		if ( ! wpforms_current_user_can( 'edit_entries_form_single', $form_data['id'] ) || ! wpforms()->get( 'entry' )->has_editable_fields( $entry ) ) {
 			return;
 		}
 
 		// Edit Entry URL.
 		$edit_url = add_query_arg(
-			array(
+			[
 				'page'     => 'wpforms-entries',
 				'view'     => 'edit',
 				'entry_id' => $entry->entry_id,
-			),
+			],
 			admin_url( 'admin.php' )
 		);
 
@@ -1128,7 +1154,7 @@ class Edit {
 	 */
 	private function is_field_can_be_displayed( $type ) {
 
-		$dont_display = [ 'divider', 'html', 'pagebreak' ];
+		$dont_display = [ 'divider', 'entry-preview', 'html', 'pagebreak' ];
 
 		return ! empty( $type ) && ! in_array( $type, (array) apply_filters( 'wpforms_pro_admin_entries_edit_fields_dont_display', $dont_display ), true );
 	}

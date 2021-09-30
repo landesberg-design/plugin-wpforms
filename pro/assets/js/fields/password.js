@@ -44,7 +44,11 @@ window.WPFormsPasswordField = window.WPFormsPasswordField || ( function( documen
 				return 0;
 			}
 
-			var strength = wp.passwordStrength.meter( value, wp.passwordStrength.userInputDisallowedList(), value );
+			var disallowedList = Object.prototype.hasOwnProperty.call( wp.passwordStrength, 'userInputDisallowedList' ) ?
+				wp.passwordStrength.userInputDisallowedList() :
+				wp.passwordStrength.userInputBlacklist();
+
+			var strength = wp.passwordStrength.meter( value, disallowedList, value );
 
 			$strengthResult = app.updateStrengthResultEl( $strengthResult, strength );
 

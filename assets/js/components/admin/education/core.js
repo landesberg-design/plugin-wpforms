@@ -87,6 +87,86 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 				$.post( wpforms_education.ajax_url, data );
 			} );
 		},
+
+		/**
+		 * Get UTM content for different elements.
+		 *
+		 * @since 1.6.9
+		 *
+		 * @param {jQuery} $el Element.
+		 *
+		 * @returns {string} UTM content string.
+		 */
+		getUTMContentValue: function( $el ) {
+
+			// UTM content for Fields.
+			if ( $el.hasClass( 'wpforms-add-fields-button' ) ) {
+				return $el.data( 'utm-content' ) + ' Field';
+			}
+
+			// UTM content for Templates.
+			if ( $el.hasClass( 'wpforms-template-select' ) ) {
+				return app.slugToUTMcontent( $el.data( 'slug' ) );
+			}
+
+			// UTM content for Addons (sidebar).
+			if ( $el.hasClass( 'wpforms-panel-sidebar-section' ) ) {
+				return app.slugToUTMcontent( $el.data( 'slug' ) ) + ' Addon';
+			}
+
+			// UTM content by default.
+			return $el.data( 'name' );
+		},
+
+		/**
+		 * Convert slug to UTM content.
+		 *
+		 * @since 1.6.9
+		 *
+		 * @param {string} slug Slug.
+		 *
+		 * @returns {string} UTM content string.
+		 */
+		slugToUTMcontent: function( slug ) {
+
+			if ( ! slug ) {
+				return '';
+			}
+
+			return slug.toString()
+
+				// Replace all non-alphanumeric characters with space.
+				.replace( /[^a-z\d ]/gi, ' ' )
+
+				// Uppercase each word.
+				.replace( /\b[a-z]/g, function( char ) {
+					return char.toUpperCase();
+				} );
+		},
+
+		/**
+		 * Get upgrade URL according to the UTM content and license type.
+		 *
+		 * @since 1.6.9
+		 *
+		 * @param {string} utmContent UTM content.
+		 * @param {string} type       Feature license type: pro or elite.
+		 *
+		 * @returns {string} Upgrade URL.
+		 */
+		getUpgradeURL: function( utmContent, type ) {
+
+			var	baseURL = wpforms_education.upgrade[ type ].url;
+
+			if ( utmContent.toLowerCase().indexOf( 'template' ) > -1 ) {
+				baseURL = wpforms_education.upgrade[ type ].url_template;
+			}
+
+			// Test if the base URL already contains `?`.
+			var appendChar = /(\?)/.test( baseURL ) ? '&' : '?';
+
+			return baseURL + appendChar + 'utm_content=' + encodeURIComponent( utmContent.trim() );
+		},
 	};
 
 	// Provide access to public functions/properties.

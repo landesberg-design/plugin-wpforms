@@ -371,8 +371,8 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 
 			el.$fieldsCheckboxes.html( html.checkboxes );
 
-			el.$searchField.find( 'option:not(:first-child)' ).remove();
-			el.$searchField.append( html.options );
+			el.$searchField.find( 'optgroup:first-child option:not(:first-child)' ).remove();
+			el.$searchField.find( 'optgroup:first-child' ).append( html.options );
 		},
 
 		/**

@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'WPForms\\' => array($baseDir . '/src'),
+    'TrueBV\\' => array($vendorDir . '/true/punycode/src'),
     'TijsVerkoyen\\CssToInlineStyles\\' => array($vendorDir . '/tijsverkoyen/css-to-inline-styles/src'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Polyfill\\Iconv\\' => array($vendorDir . '/symfony/polyfill-iconv'),

@@ -2,35 +2,30 @@
 
 namespace WPForms\Pro\Integrations\WPorg;
 
-use WPForms\Integrations\IntegrationInterface;
+use \WPForms\Integrations\WPorg\Translations as DefaultTranslations;
 
 /**
  * Load translations from WordPress.org for the Lite version.
  *
  * @since 1.5.6
  */
-class Translations implements IntegrationInterface {
-
-	/**
-	 * Indicate if current integration is allowed to load.
-	 *
-	 * @since 1.5.6
-	 *
-	 * @return bool
-	 */
-	public function allow_load() {
-
-		return true;
-	}
+class Translations extends DefaultTranslations {
 
 	/**
 	 * Load an integration.
 	 *
 	 * @since 1.5.6
+	 * @since 1.6.9 Added custom event for the translations update.
 	 */
 	public function load() {
 
-		add_filter( 'http_request_args', array( $this, 'request_lite_translations' ), 10, 2 );
+		// Load lite translations with other plugins translations check.
+		add_filter( 'http_request_args', [ $this, 'request_lite_translations' ], 10, 2 );
+
+		// Download translations when plugin upgrade from Lite to Pro.
+		add_action( 'wpforms_install', [ $this, 'download_translations' ] );
+
+		parent::load();
 	}
 
 	/**
@@ -51,24 +46,25 @@ class Translations implements IntegrationInterface {
 		}
 
 		/*
-		 * Checking this by name because the install path is not guaranteed.
+		 * Checking this by name because the installed path is not guaranteed.
 		 * The capitalized json data defines the array keys, therefore we need to check and define these as such.
 		 */
 		$plugins      = json_decode( $args['body']['plugins'], true );
 		$wpforms_data = [];
 
-		foreach ( $plugins['plugins'] as $slug => $data ) {
+		foreach ( $plugins['plugins'] as $data ) {
 			if ( ! isset( $data['Name'] ) ) {
 				continue;
 			}
+
 			// If WPForms Lite is already in the list, don't add it again.
-			if ( 'WPForms Lite' === $data['Name'] ) {
-				continue;
+			if ( $data['Name'] === 'WPForms Lite' ) {
+				return $args;
 			}
+
 			// Check real data for WPForms plugin.
-			if ( 'WPForms' === $data['Name'] ) {
+			if ( $data['Name'] === 'WPForms' ) {
 				$wpforms_data = $data;
-				break;
 			}
 		}
 
@@ -83,8 +79,10 @@ class Translations implements IntegrationInterface {
 		 * settings are as expected. Take care of the capitalized array key as before.
 		 */
 		$plugins['plugins']['wpforms-lite/wpforms.php'] = $wpforms_data;
+
 		// Override the name of the plugin.
 		$plugins['plugins']['wpforms-lite/wpforms.php']['Name'] = 'WPForms Lite';
+
 		// Override the version of the plugin to prevent increasing the update count.
 		$plugins['plugins']['wpforms-lite/wpforms.php']['Version'] = '9999.0';
 

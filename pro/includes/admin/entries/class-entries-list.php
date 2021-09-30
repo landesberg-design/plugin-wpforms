@@ -1,11 +1,15 @@
 <?php
 
+use WPForms\Pro\Admin\Entries\Helpers;
+
 /**
  * Display list of all entries for a single form.
  *
  * @since 1.0.0
  */
 class WPForms_Entries_List {
+
+	use WPForms\Pro\Admin\Entries\FilterSearch;
 
 	/**
 	 * Store admin alerts.
@@ -60,15 +64,6 @@ class WPForms_Entries_List {
 	 * @var WPForms_Entries_Table
 	 */
 	public $entries;
-
-	/**
-	 * Array of entries to select for filtering.
-	 *
-	 * @since 1.4.4
-	 *
-	 * @var array
-	 */
-	protected $filter = [];
 
 	/**
 	 * Primary class constructor.
@@ -235,16 +230,16 @@ class WPForms_Entries_List {
 		wp_enqueue_script(
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
-			array( 'jquery' ),
-			'4.6.3'
+			[ 'jquery' ],
+			'4.6.9'
 		);
 
 		// CSS.
 		wp_enqueue_style(
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
-			array(),
-			'4.6.3'
+			[],
+			'4.6.9'
 		);
 
 		$min = wpforms_get_min_suffix();
@@ -465,41 +460,37 @@ class WPForms_Entries_List {
 				'is_not'       => __( 'is not', 'wpforms' ),
 			];
 			$comparison  = isset( $comparisons[ $data['comparison'] ] ) ? $comparisons[ $data['comparison'] ] : $comparisons['contains'];
-			$field       = sanitize_text_field( $data['field'] );
-			$term        = sanitize_text_field( $data['term'] );
+			$field       = sanitize_text_field( wp_unslash( $data['field'] ) );
+
+			$term = '';
+
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			if ( ! empty( $_GET['search']['term'] ) ) {
+				$term = sanitize_text_field( wp_unslash( $_GET['search']['term'] ) );
+				$term = empty( $term ) ? htmlspecialchars( wp_unslash( $_GET['search']['term'] ) ) : $term;
+			}
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			if ( is_numeric( $field ) && $form_id ) {
 				$meta = wpforms()->form->get_field( $form_id, $field );
+
 				if ( isset( $meta['label'] ) ) {
 					$field = $meta['label'];
 				}
 			} else {
-				$field = __( 'any form field', 'wpforms' );
+				$advanced_options = Helpers::get_search_fields_advanced_options();
+				$field            = ! empty( $advanced_options[ $field ] ) ? $advanced_options[ $field ] : __( 'any form field', 'wpforms' );
 			}
 
-			$html = sprintf( /* translators: 1:  field name 2: operation 3: term */
+			return sprintf( /* translators: 1: field name, 2: operation, 3: term */
 				__( 'where %1$s %2$s "%3$s"', 'wpforms' ),
 				'<em>' . $field . '</em>',
 				$comparison,
 				'<em>' . $term . '</em>'
 			);
-
-			return $html;
 		}
 
 		return '';
-	}
-
-	/**
-	 * Get filtered form ID.
-	 *
-	 * @since 1.6.3
-	 *
-	 * @return int
-	 */
-	private function get_filtered_form_id() {
-
-		return ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
@@ -596,109 +587,6 @@ class WPForms_Entries_List {
 				]
 			)
 		);
-	}
-
-	/**
-	 * Watch for filtering requests from a search field.
-	 *
-	 * @since 1.4.4
-	 */
-	public function process_filter_search() {
-
-		//phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$form_id = $this->get_filtered_form_id();
-		// Check for run switch and that all data is present.
-		if (
-			! $form_id ||
-			! isset( $_GET['search'] ) ||
-			(
-				! isset( $_GET['search']['term'] ) ||
-				! isset( $_GET['search']['field'] ) ||
-				empty( $_GET['search']['comparison'] )
-			)
-		) {
-			return;
-		}
-
-		// Prepare the data.
-		$term       = sanitize_text_field( wp_unslash( $_GET['search']['term'] ) );
-		$field      = sanitize_text_field( wp_unslash( $_GET['search']['field'] ) ); // We must use as a string for the work field with id equal 0.
-		$comparison = in_array( $_GET['search']['comparison'], array( 'contains', 'contains_not', 'is', 'is_not' ), true ) ? sanitize_text_field( wp_unslash( $_GET['search']['comparison'] ) ) : 'contains';
-		$args       = array();
-
-		/*
-		 * Because empty fields were not migrated to a fields table in 1.4.3, we don't have that data
-		 * and can't filter those with empty values.
-		 * The current workaround - display all entries (instead of none at all).
-		 *
-		 * TODO: remove this "! empty( $term )" check when empty data will be saved to DB table.
-		 */
-		if ( ! empty( $term ) ) {
-
-			$args['select']        = 'entry_ids';
-			$args['number']        = -1;
-			$args['form_id']       = $form_id;
-			$args['value']         = $term;
-			$args['value_compare'] = $comparison;
-
-			if ( is_numeric( $field ) ) {
-				$args['field_id'] = $field;
-			}
-		}
-
-		if ( empty( $args ) ) {
-			return;
-		}
-
-		$this->prepare_entry_ids_for_get_entries_args(
-			wpforms()->entry_fields->get_fields( $args )
-		);
-		//phpcs:enable WordPress.Security.NonceVerification.Recommended
-	}
-
-	/**
-	 * Get the entry IDs based on the entries array and pass it further to the WPForms_Entry_Handler::get_entries() method via a filter.
-	 *
-	 * @since 1.4.4
-	 *
-	 * @param array $entries
-	 */
-	protected function prepare_entry_ids_for_get_entries_args( $entries ) {
-
-		$entry_ids = array();
-
-		if ( is_array( $entries ) ) {
-			foreach ( $entries as $entry ) {
-				$entry_ids[] = $entry->entry_id;
-			}
-		}
-
-		$entry_ids = array_unique( $entry_ids );
-
-		if ( ! isset( $this->filter['entry_id'] ) ) {
-			$this->filter = array(
-				'entry_id' => $entry_ids,
-			);
-		} else {
-			$this->filter['entry_id'] = array_intersect( $this->filter['entry_id'], $entry_ids );
-		}
-
-		// TODO: when we will drop PHP 5.2 support, this can be changed to a closure.
-		add_filter( 'wpforms_entry_handler_get_entries_args', array( $this, 'get_filtered_entry_table_args' ) );
-	}
-
-	/**
-	 * Merge default arguments to entries retrieval with the one we send to filter.
-	 *
-	 * @since 1.4.4
-	 *
-	 * @param array $args
-	 *
-	 * @return array Filtered arguments.
-	 */
-	public function get_filtered_entry_table_args( $args ) {
-		$this->filter['is_filtered'] = true;
-		return array_merge( $args, $this->filter );
 	}
 
 	/**

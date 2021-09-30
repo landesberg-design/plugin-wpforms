@@ -28,6 +28,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 			// Template for form builder previews.
 			add_action( 'wpforms_builder_print_footer_scripts', [ $this, 'field_preview_templates' ] );
+			add_action( 'wpforms_builder_print_footer_scripts', [ $this, 'choices_limit_message_template' ] );
 		}
 	}
 
@@ -293,9 +294,9 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 		foreach ( $fields as $field ) {
 
 			$css  = ! empty( $field['size'] ) ? 'size-' . esc_attr( $field['size'] ) : '';
-			$css .= ! empty( $field['label_hide'] ) && $field['label_hide'] == '1' ? ' label_hide' : '';
-			$css .= ! empty( $field['sublabel_hide'] ) && $field['sublabel_hide'] == '1' ? ' sublabel_hide' : '';
-			$css .= ! empty( $field['required'] ) && $field['required'] == '1' ? ' required' : '';
+			$css .= ! empty( $field['label_hide'] ) ? ' label_hide' : '';
+			$css .= ! empty( $field['sublabel_hide'] ) ? ' sublabel_hide' : '';
+			$css .= ! empty( $field['required'] ) ? ' required' : '';
 			$css .= ! empty( $field['input_columns'] ) && $field['input_columns'] === '2' ? ' wpforms-list-2-columns' : '';
 			$css .= ! empty( $field['input_columns'] ) && $field['input_columns'] === '3' ? ' wpforms-list-3-columns' : '';
 			$css .= ! empty( $field['input_columns'] ) && $field['input_columns'] === 'inline' ? ' wpforms-list-inline' : '';
@@ -322,7 +323,15 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 			printf( '<a href="#" class="wpforms-field-delete" title="%s"><i class="fa fa-trash-o" aria-hidden="true"></i></a>', esc_html__( 'Delete Field', 'wpforms-lite' ) );
 
-			printf( '<span class="wpforms-field-helper">%s</span>', esc_html__( 'Click to edit. Drag to reorder.', 'wpforms-lite' ) );
+			printf(
+				// language=HTML PhpStorm.
+				'<div class="wpforms-field-helper">
+					<span class="wpforms-field-helper-edit">%s</span>
+					<span class="wpforms-field-helper-drag">%s</span>
+				</div>',
+				esc_html__( 'Click to edit.', 'wpforms-lite' ),
+				esc_html__( 'Drag to reorder.', 'wpforms-lite' )
+			);
 
 			do_action( "wpforms_builder_fields_previews_{$field['type']}", $field );
 
@@ -514,6 +523,31 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 		// phpcs:enable
 	}
 
+	/**
+	 * Template for form builder preview.
+	 *
+	 * @since 1.6.9
+	 */
+	public function choices_limit_message_template() {
+
+		?>
+		<script type="text/html" id="tmpl-wpforms-choices-limit-message">
+			<div class="wpforms-alert-dynamic wpforms-alert wpforms-alert-warning">
+				<?php
+				printf(
+					wp_kses( /* translators: %s - total amount of choices. */
+						__( 'Showing the first 20 choices.<br> All %s choices will be displayed when viewing the form.', 'wpforms-lite' ),
+						[
+							'br' => [],
+						]
+					),
+					'{{ data.total }}'
+				);
+				?>
+			</div>
+		</script>
+		<?php
+	}
 }
 
 new WPForms_Builder_Panel_Fields();

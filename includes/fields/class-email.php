@@ -8,6 +8,13 @@
 class WPForms_Field_Email extends WPForms_Field {
 
 	/**
+	 * Encoding.
+	 *
+	 * @since 1.6.9
+	 */
+	const ENCODING = 'UTF-8';
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 1.0.0
@@ -353,7 +360,7 @@ class WPForms_Field_Email extends WPForms_Field {
 					$field,
 					[
 						'slug'  => 'allowlist',
-						'value' => ! empty( $field['allowlist'] ) ? esc_attr( $field['allowlist'] ) : '',
+						'value' => ! empty( $field['allowlist'] ) ? esc_attr( $this->decode_email_patterns_rules_list( $field['allowlist'] ) ) : '',
 					],
 					false
 				),
@@ -370,7 +377,7 @@ class WPForms_Field_Email extends WPForms_Field {
 					$field,
 					[
 						'slug'  => 'denylist',
-						'value' => ! empty( $field['denylist'] ) ? esc_attr( $field['denylist'] ) : '',
+						'value' => ! empty( $field['denylist'] ) ? esc_attr( $this->decode_email_patterns_rules_list( $field['denylist'] ) ) : '',
 					],
 					false
 				),
@@ -514,7 +521,7 @@ class WPForms_Field_Email extends WPForms_Field {
 		// Set final field details.
 		wpforms()->process->fields[ $field_id ] = array(
 			'name'  => sanitize_text_field( $name ),
-			'value' => sanitize_text_field( $value ),
+			'value' => sanitize_text_field( $this->decode_punycode( $value ) ),
 			'id'    => absint( $field_id ),
 			'type'  => $this->type,
 		);
@@ -541,13 +548,17 @@ class WPForms_Field_Email extends WPForms_Field {
 			];
 		}
 
+		if ( ! empty( $field_submit['primary'] ) ) {
+			$field_submit['primary'] = $this->encode_punycode( $field_submit['primary'] );
+		}
+
 		// Validate email field with confirmation.
 		if ( isset( $form_data['fields'][ $field_id ]['confirmation'] ) && ! empty( $field_submit['primary'] ) && ! empty( $field_submit['secondary'] ) ) {
 
 			if ( ! is_email( $field_submit['primary'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ] = esc_html__( 'The provided email is not valid.', 'wpforms-lite' );
 
-			} elseif ( $field_submit['primary'] !== $field_submit['secondary'] ) {
+			} elseif ( $field_submit['primary'] !== $this->encode_punycode( $field_submit['secondary'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ] = esc_html__( 'The provided emails do not match.', 'wpforms-lite' );
 
 			} elseif ( ! $this->is_restricted_email( $field_submit['primary'], $form_data['fields'][ $field_id ] ) ) {
@@ -582,7 +593,7 @@ class WPForms_Field_Email extends WPForms_Field {
 
 		$form_id  = filter_input( INPUT_POST, 'form_id', FILTER_SANITIZE_NUMBER_INT );
 		$field_id = filter_input( INPUT_POST, 'field_id', FILTER_SANITIZE_NUMBER_INT );
-		$email    = filter_input( INPUT_POST, 'email', FILTER_SANITIZE_EMAIL );
+		$email    = filter_input( INPUT_POST, 'email', FILTER_SANITIZE_STRING );
 
 		if ( ! $form_id || ! $field_id || ! $email ) {
 			wp_send_json_error();
@@ -621,7 +632,15 @@ class WPForms_Field_Email extends WPForms_Field {
 		$rules = $this->sanitize_restricted_rules( $content );
 
 		wp_send_json_success(
-			implode( PHP_EOL, $rules )
+			implode(
+				PHP_EOL,
+				array_map(
+					function ( $rule ) {
+						return $this->decode_punycode( $rule );
+					},
+					$rules
+				)
+			)
 		);
 	}
 
@@ -645,7 +664,7 @@ class WPForms_Field_Email extends WPForms_Field {
 				unset( $patterns[ $key ] );
 			}
 
-			$pattern     = strtolower( $pattern );
+			$pattern     = $this->encode_punycode( mb_strtolower( $pattern, self::ENCODING ) );
 			$email_parts = explode( '@', $pattern );
 
 			$local_part = preg_replace(
@@ -709,14 +728,15 @@ class WPForms_Field_Email extends WPForms_Field {
 			return true;
 		}
 
-		$email    = strtolower( $email );
+		$email = $this->encode_punycode( mb_strtolower( $email, self::ENCODING ) );
+
 		$patterns = $this->sanitize_restricted_rules( $field[ $field['filter_type'] ] );
 		$patterns = array_unique( array_map( [ $this, 'sanitize_email_pattern' ], $patterns ) );
 
 		$check = $field['filter_type'] === 'allowlist';
 
 		foreach ( $patterns as $pattern ) {
-			if ( true === (bool) preg_match( '/' . $pattern . '/', $email ) ) {
+			if ( (bool) preg_match( '/' . $pattern . '/', $email ) === true ) {
 				return $check;
 			}
 		}
@@ -760,12 +780,153 @@ class WPForms_Field_Email extends WPForms_Field {
 				continue;
 			}
 
-			$form_data['fields'][ $key ]['allowlist'] = implode( PHP_EOL, $this->sanitize_restricted_rules( $field['allowlist'] ) );
-			$form_data['fields'][ $key ]['denylist']  = implode( PHP_EOL, $this->sanitize_restricted_rules( $field['denylist'] ) );
+			$form_data['fields'][ $key ]['allowlist'] = ! empty( $field['allowlist'] ) ? implode( PHP_EOL, $this->sanitize_restricted_rules( $field['allowlist'] ) ) : '';
+			$form_data['fields'][ $key ]['denylist']  = ! empty( $field['denylist'] ) ? implode( PHP_EOL, $this->sanitize_restricted_rules( $field['denylist'] ) ) : '';
 		}
 
 		$form['post_content'] = wpforms_encode( $form_data );
 
 		return $form;
+	}
+
+	/**
+	 * Get Punycode lib class.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @return \TrueBV\Punycode
+	 */
+	private function get_punycode() {
+
+		static $punycode;
+
+		if ( ! $punycode ) {
+			$punycode = new \TrueBV\Punycode();
+		}
+
+		return $punycode;
+	}
+
+	/**
+	 * Get email patterns parts splitted by @ and *.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @param string $email_pattern Email pattern.
+	 *
+	 * @return array
+	 */
+	private function get_email_pattern_parts( $email_pattern ) {
+
+		$parts = preg_split( '/[*@.]/', $email_pattern, - 1, PREG_SPLIT_OFFSET_CAPTURE );
+
+		if ( empty( $parts ) ) {
+			return [];
+		}
+
+		foreach ( $parts as $key => $part ) {
+
+			// Replace split symbol position to the split symbol.
+			$part[1] = $part[1] > 0 ? $email_pattern[ $part[1] - 1 ] : '';
+
+			$parts[ $key ] = $part;
+		}
+
+		return $parts;
+	}
+
+	/**
+	 * Glue email patterns parts.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @param array $parts Email pattern parts.
+	 *
+	 * @return string
+	 */
+	private function glue_email_pattern_parts( $parts ) {
+
+		$email_pattern = '';
+
+		foreach ( $parts as $part ) {
+			$email_pattern .= $part[1] . $part[0];
+		}
+
+		return $email_pattern;
+	}
+
+	/**
+	 * Decode email patterns rules list.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @param string $rules Patterns rules list.
+	 *
+	 * @return string
+	 */
+	private function decode_email_patterns_rules_list( $rules ) {
+
+		return implode(
+			PHP_EOL,
+			array_map(
+				function ( $rule ) {
+					return $this->decode_punycode( $rule );
+				},
+				array_filter( preg_split( '/\r\n|\r|\n|,/', $rules ) )
+			)
+		);
+	}
+
+	/**
+	 * Encode email pattern.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @param string $email_pattern Email pattern.
+	 *
+	 * @return string
+	 */
+	private function encode_punycode( $email_pattern ) {
+
+		return $this->transform_punycode( $email_pattern, [ $this->get_punycode(), 'encode' ] );
+	}
+
+	/**
+	 * Decode email pattern.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @param string $email_pattern Email pattern.
+	 *
+	 * @return string
+	 */
+	private function decode_punycode( $email_pattern ) {
+
+		return $this->transform_punycode( $email_pattern, [ $this->get_punycode(), 'decode' ] );
+	}
+
+	/**
+	 * Transform email pattern.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @param string   $email_pattern Email pattern.
+	 * @param callable $callback      Punycode callback.
+	 *
+	 * @return string
+	 */
+	private function transform_punycode( $email_pattern, callable $callback ) {
+
+		$parts = $this->get_email_pattern_parts( $email_pattern );
+
+		foreach ( $parts as $key => $part ) {
+			if ( ! $part[0] ) {
+				continue;
+			}
+
+			$parts[ $key ][0] = call_user_func( $callback, $part[0] );
+		}
+
+		return $this->glue_email_pattern_parts( $parts );
 	}
 }

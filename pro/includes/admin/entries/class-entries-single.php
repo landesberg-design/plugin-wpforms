@@ -464,31 +464,32 @@ class WPForms_Entries_Single {
 		$entry->entry_prev_url   = ! empty( $entry->entry_prev ) ? add_query_arg( array( 'page' => 'wpforms-entries', 'view' => 'details', 'entry_id' => absint( $entry->entry_prev->entry_id ) ), admin_url( 'admin.php' ) ) : '#';
 		$entry->entry_prev_class = ! empty( $entry->entry_prev ) ? '' : 'inactive';
 		$entry->entry_prev_count = wpforms()->entry->get_prev_count( $entry->entry_id, $form_data['id'] );
-		$entry->entry_count      = wpforms()->entry->get_entries( array( 'form_id' => $form_data['id'] ), true );
+		$entry->entry_count      = wpforms()->entry->get_entries( [ 'form_id' => $form_data['id'] ], true );
 
 		$entry->entry_notes = wpforms()->entry_meta->get_meta(
-			array(
+			[
 				'entry_id' => $entry->entry_id,
 				'type'     => 'note',
-			)
+			]
 		);
 		$entry->entry_logs  = wpforms()->entry_meta->get_meta(
-			array(
+			[
 				'entry_id' => $entry->entry_id,
 				'type'     => 'log',
-			)
+			]
 		);
 
 		// Check for other entries by this user.
 		if ( ! empty( $entry->user_id ) || ! empty( $entry->user_uuid ) ) {
-			$args = array(
+			$args    = [
 				'form_id'   => $form_data['id'],
 				'user_id'   => ! empty( $entry->user_id ) ? $entry->user_id : '',
 				'user_uuid' => ! empty( $entry->user_uuid ) ? $entry->user_uuid : '',
-			);
+			];
 			$related = wpforms()->entry->get_entries( $args );
+
 			foreach ( $related as $key => $r ) {
-				if ( $r->entry_id == $entry->entry_id ) {
+				if ( (int) $r->entry_id === (int) $entry->entry_id ) {
 					unset( $related[ $key ] );
 				}
 			}
@@ -500,33 +501,33 @@ class WPForms_Entries_Single {
 		$this->form  = $form;
 
 		// Lastly, mark entry as read if needed.
-		if ( '1' !== $entry->viewed && empty( $_GET['action'] ) ) {
+		if ( $entry->viewed !== '1' && empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$is_success = wpforms()->entry->update(
 				$entry->entry_id,
-				array(
+				[
 					'viewed' => '1',
-				)
+				]
 			);
 		}
 
 		if ( ! empty( $is_success ) ) {
 			wpforms()->entry_meta->add(
-				array(
+				[
 					'entry_id' => $entry->entry_id,
 					'form_id'  => $form_data['id'],
 					'user_id'  => get_current_user_id(),
 					'type'     => 'log',
 					'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry read.', 'wpforms' ) ) ),
-				),
+				],
 				'entry_meta'
 			);
 
 			$this->entry->viewed     = '1';
 			$this->entry->entry_logs = wpforms()->entry_meta->get_meta(
-				array(
+				[
 					'entry_id' => $entry->entry_id,
 					'type'     => 'log',
-				)
+				]
 			);
 		}
 

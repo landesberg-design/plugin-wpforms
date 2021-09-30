@@ -197,26 +197,27 @@ class WPForms_Constant_Contact extends WPForms_Provider {
 
 				// Constant Contact stores address in multiple fields, so we
 				// have to separate it.
-				if ( 'address' === $name ) {
+				if ( $name === 'address' ) {
 
 					// Only support Address fields.
-					if ( 'address' !== $fields[ $id ]['type'] ) {
+					if ( $fields[ $id ]['type'] !== 'address' ) {
 						continue;
 					}
 
 					// Postal code may be in extended US format.
-					$postal = array(
+					$postal = [
 						'code'    => '',
 						'subcode' => '',
-					);
+					];
+
 					if ( ! empty( $fields[ $id ]['postal'] ) ) {
 						$p                 = explode( '-', $fields[ $id ]['postal'] );
 						$postal['code']    = ! empty( $p[0] ) ? $p[0] : '';
 						$postal['subcode'] = ! empty( $p[1] ) ? $p[1] : '';
 					}
 
-					$merge_vars['addresses'] = array(
-						array(
+					$merge_vars['addresses'] = [
+						[
 							'address_type'    => 'BUSINESS',
 							'city'            => ! empty( $fields[ $id ]['city'] ) ? $fields[ $id ]['city'] : '',
 							'country_code'    => ! empty( $fields[ $id ]['country'] ) ? $fields[ $id ]['country'] : '',
@@ -225,8 +226,9 @@ class WPForms_Constant_Contact extends WPForms_Provider {
 							'postal_code'     => $postal['code'],
 							'state'           => ! empty( $fields[ $id ]['state'] ) ? $fields[ $id ]['state'] : '',
 							'sub_postal_code' => $postal['subcode'],
-						),
-					);
+						],
+					];
+
 					continue;
 				}
 
@@ -248,58 +250,58 @@ class WPForms_Constant_Contact extends WPForms_Provider {
 					foreach ( $data['lists'] as $list ) {
 
 						// If they are already assigned to this list, return early.
-						if ( isset( $list['id'] ) && $list_id == $list['id'] ) {
+						if ( isset( $list['id'] ) && (string) $list_id === (string) $list['id'] ) {
 							return;
 						}
 					}
 
 					// Otherwise, add them to the list.
-					$data['lists'][ count( $data['lists'] ) ] = array(
+					$data['lists'][ count( $data['lists'] ) ] = [
 						'id'     => $list_id,
 						'status' => 'ACTIVE',
-					);
+					];
 
 				} else {
 
 					// Add the contact to the list.
-					$data['lists'][0] = array(
+					$data['lists'][0] = [
 						'id'     => $list_id,
 						'status' => 'ACTIVE',
-					);
+					];
 				}
 
 				// Combine merge vars into data before sending.
 				$data = array_merge( $data, $merge_vars );
 
 				// Args to use.
-				$args = array(
+				$args = [
 					'body'    => wp_json_encode( $data ),
 					'method'  => 'PUT',
-					'headers' => array(
+					'headers' => [
 						'Content-Type' => 'application/json',
-					),
-				);
+					],
+				];
 
 				$update = wp_remote_request( 'https://api.constantcontact.com/v2/contacts/' . $data['id'] . '?api_key=' . $this->api_key . '&access_token=' . $this->access_token . '&action_by=ACTION_BY_VISITOR', $args );
 				$res    = json_decode( wp_remote_retrieve_body( $update ), true );
 
 			} else {
 				// Add a new contact.
-				$data = array(
-					'email_addresses' => array( array( 'email_address' => $email ) ),
-					'lists'           => array( array( 'id' => $list_id ) ),
-				);
+				$data = [
+					'email_addresses' => [ [ 'email_address' => $email ] ],
+					'lists'           => [ [ 'id' => $list_id ] ],
+				];
 
 				// Combine merge vars into data before sending.
 				$data = array_merge( $data, $merge_vars );
 
 				// Args to use.
-				$args = array(
+				$args = [
 					'body'    => wp_json_encode( $data ),
-					'headers' => array(
+					'headers' => [
 						'Content-Type' => 'application/json',
-					),
-				);
+					],
+				];
 
 				$add = wp_remote_post( 'https://api.constantcontact.com/v2/contacts?api_key=' . $this->api_key . '&access_token=' . $this->access_token . '&action_by=ACTION_BY_VISITOR', $args );
 				$res = json_decode( wp_remote_retrieve_body( $add ), true );
@@ -310,11 +312,11 @@ class WPForms_Constant_Contact extends WPForms_Provider {
 				wpforms_log(
 					esc_html__( 'Constant Contact API Error', 'wpforms-lite' ),
 					$res->get_error_message(),
-					array(
-						'type'    => array( 'provider', 'error' ),
+					[
+						'type'    => [ 'provider', 'error' ],
 						'parent'  => $entry_id,
 						'form_id' => $form_data['id'],
-					)
+					]
 				);
 			}
 

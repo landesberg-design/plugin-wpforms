@@ -35,6 +35,8 @@ class WPForms_Field_Password extends WPForms_Field {
 
 		// Add frontend strings.
 		add_action( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
+
+		add_action( 'wpforms_pro_fields_entry_preview_get_field_value_password_field', [ $this, 'modify_entry_preview_value' ], 10, 3 );
 	}
 
 	/**
@@ -628,6 +630,22 @@ class WPForms_Field_Password extends WPForms_Field {
 	private function strength_error_message() {
 
 		return wpforms_setting( 'validation-passwordstrength', esc_html__( 'A stronger password is required. Consider using upper and lower case letters, numbers, and symbols.', 'wpforms' ) );
+	}
+
+	/**
+	 * Modify value for the entry preview field.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @param string $value     Value.
+	 * @param array  $field     Field data.
+	 * @param array  $form_data Form data.
+	 *
+	 * @return string
+	 */
+	public function modify_entry_preview_value( $value, $field, $form_data ) {
+
+		return str_repeat( '*', strlen( $value ) );
 	}
 }
 

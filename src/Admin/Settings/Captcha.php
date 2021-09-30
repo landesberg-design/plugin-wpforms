@@ -131,7 +131,7 @@ class Captcha {
 			self::VIEW . '-provider' => [
 				'id'      => self::VIEW . '-provider',
 				'type'    => 'radio',
-				'default' => 'recaptcha',
+				'default' => 'none',
 				'options' => [
 					'hcaptcha'  => esc_html__( 'hCaptcha', 'wpforms-lite' ),
 					'recaptcha' => esc_html__( 'reCAPTCHA', 'wpforms-lite' ),

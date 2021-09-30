@@ -190,6 +190,7 @@ class WPForms_Builder {
 				'mediaelement',
 				'media-views',
 				'buttons',
+				'admin-bar',
 			]
 		);
 
@@ -334,6 +335,9 @@ class WPForms_Builder {
 			null,
 			'2.2.6'
 		);
+
+		// Remove TinyMCE editor styles from third-party themes and plugins.
+		remove_editor_styles();
 
 		/*
 		 * JavaScript.
@@ -579,6 +583,7 @@ class WPForms_Builder {
 			'template_addons_error'          => esc_html__( 'Could not install OR activate all the required addons. Please download from wpforms.com and install manually. Would you like to use the template anyway?', 'wpforms-lite' ),
 			'use_template'                   => esc_html__( 'Yes, use template', 'wpforms-lite' ),
 			'error_select_template'          => esc_html__( 'Something went wrong while applying the template.', 'wpforms-lite' ),
+			'blank_form'                     => esc_html__( 'Blank Form', 'wpforms-lite' ),
 		];
 
 		$strings['disable_entries'] = sprintf(

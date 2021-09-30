@@ -467,6 +467,8 @@ class Migrations {
 		if ( $t15s->allow_load() ) {
 			$t15s->download_plugins_translations();
 		}
+
+		$this->is_migrated = true;
 	}
 
 	/**

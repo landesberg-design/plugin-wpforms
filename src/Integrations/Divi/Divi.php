@@ -240,6 +240,14 @@ class Divi implements IntegrationInterface {
 			function () {
 
 				echo '</fieldset>';
+
+				// This empty image is needed to execute JS code that triggers the custom event.
+				// Unfortunately <script> tag doesn't work in Divi builder.
+				echo "<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+					height='0'
+					width='0'
+					onLoad=\"jQuery( document ).trigger( 'wpformsDiviModuleDisplay' );\"
+				/>";
 			},
 			30
 		);

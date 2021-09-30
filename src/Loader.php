@@ -143,6 +143,9 @@ class Loader {
 				'id'   => 'builder_help',
 			],
 			[
+				'name' => 'Admin\Builder\Shortcuts',
+			],
+			[
 				'name' => 'Admin\Builder\TemplatesCache',
 				'id'   => 'builder_templates_cache',
 			],
@@ -286,6 +289,7 @@ class Loader {
 			'Builder\Payments',
 			'Builder\DidYouKnow',
 			'Builder\Geolocation',
+			'Builder\Confirmations',
 			'Admin\DidYouKnow',
 			'Admin\Settings\Integrations',
 			'Admin\Settings\Geolocation',

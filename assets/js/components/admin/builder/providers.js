@@ -702,8 +702,6 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 					content: wpforms_builder_providers.prompt_connection.replace( /%type%/g, 'connection' ) +
 						'<input autofocus="" type="text" id="wpforms-builder-provider-connection-name" placeholder="' + wpforms_builder_providers.prompt_placeholder + '">' +
 						'<p class="error">' + wpforms_builder_providers.error_name + '</p>',
-					backgroundDismiss: false,
-					closeIcon: false,
 					icon: 'fa fa-info-circle',
 					type: 'blue',
 					buttons: {

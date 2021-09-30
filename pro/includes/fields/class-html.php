@@ -18,7 +18,7 @@ class WPForms_Field_HTML extends WPForms_Field {
 		$this->name  = esc_html__( 'HTML', 'wpforms' );
 		$this->type  = 'html';
 		$this->icon  = 'fa-code';
-		$this->order = 170;
+		$this->order = 180;
 		$this->group = 'fancy';
 
 		// Define additional field properties.

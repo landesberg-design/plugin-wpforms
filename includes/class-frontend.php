@@ -147,7 +147,7 @@ class WPForms_Frontend {
 		$form_id     = absint( $form->ID );
 		$settings    = $form_data['settings'];
 		$action      = esc_url_raw( remove_query_arg( 'wpforms' ) );
-		$classes     = wpforms_setting( 'disable-css', '1' ) == '1' ? array( 'wpforms-container-full' ) : array();
+		$classes     = (int) wpforms_setting( 'disable-css', '1' ) === 1 ? [ 'wpforms-container-full' ] : [];
 		$errors      = empty( wpforms()->process->errors[ $form_id ] ) ? array() : wpforms()->process->errors[ $form_id ];
 		$title       = filter_var( $title, FILTER_VALIDATE_BOOLEAN );
 		$description = filter_var( $description, FILTER_VALIDATE_BOOLEAN );
@@ -361,15 +361,28 @@ class WPForms_Frontend {
 			$entry_id = ! empty( $_POST['wpforms']['entry_id'] ) ? $_POST['wpforms']['entry_id'] : 0;
 		}
 
-		$confirmation_message = wpforms()->process->get_confirmation_message( $form_data, $fields, $entry_id );
+		$confirmation         = wpforms()->get( 'process' )->get_current_confirmation();
+		$confirmation_message = wpforms()->get( 'process' )->get_confirmation_message( $form_data, $fields, $entry_id );
 
 		// Only display if a confirmation message has been configured.
-		if ( empty( $confirmation_message ) ) {
+		if ( empty( $confirmation ) || empty( $confirmation_message ) ) {
 			return;
 		}
 
 		// Load confirmation specific assets.
 		$this->assets_confirmation();
+
+		/**
+		 * Fires once before the confirmation message.
+		 *
+		 * @since 1.6.9
+		 *
+		 * @param array $confirmation Current confirmation data.
+		 * @param array $form_data    Form data and settings.
+		 * @param array $fields       Sanitized field data.
+		 * @param int   $entry_id     Entry id.
+		 */
+		do_action( 'wpforms_frontend_confirmation_message_before', $confirmation, $form_data, $fields, $entry_id );
 
 		$class .= $this->confirmation_message_scroll ? ' wpforms-confirmation-scroll' : '';
 
@@ -379,6 +392,18 @@ class WPForms_Frontend {
 			absint( $form_data['id'] ),
 			$confirmation_message
 		);
+
+		/**
+		 * Fires once after the confirmation message.
+		 *
+		 * @since 1.6.9
+		 *
+		 * @param array $confirmation Current confirmation data.
+		 * @param array $form_data    Form data and settings.
+		 * @param array $fields       Sanitized field data.
+		 * @param int   $entry_id     Entry id.
+		 */
+		do_action( 'wpforms_frontend_confirmation_message_after', $confirmation, $form_data, $fields, $entry_id );
 	}
 
 	/**
@@ -1076,6 +1101,7 @@ class WPForms_Frontend {
 	 * @return bool
 	 */
 	public function assets_global() {
+
 		return apply_filters( 'wpforms_global_assets', wpforms_setting( 'global-assets', false ) );
 	}
 
@@ -1123,31 +1149,31 @@ class WPForms_Frontend {
 			wp_enqueue_style(
 				'wpforms-jquery-timepicker',
 				WPFORMS_PLUGIN_URL . 'assets/css/jquery.timepicker.css',
-				array(),
+				[],
 				'1.11.5'
 			);
 			wp_enqueue_style(
 				'wpforms-flatpickr',
 				WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
-				array(),
-				'4.6.3'
+				[],
+				'4.6.9'
 			);
 		}
 
 		// Load CSS per global setting.
-		if ( wpforms_setting( 'disable-css', '1' ) == '1' ) {
+		if ( (int) wpforms_setting( 'disable-css', '1' ) === 1 ) {
 			wp_enqueue_style(
 				'wpforms-full',
 				WPFORMS_PLUGIN_URL . "assets/css/wpforms-full{$min}.css",
-				array(),
+				[],
 				WPFORMS_VERSION
 			);
 		}
-		if ( wpforms_setting( 'disable-css', '1' ) == '2' ) {
+		if ( (int) wpforms_setting( 'disable-css', '1' ) === 2 ) {
 			wp_enqueue_style(
 				'wpforms-base',
 				WPFORMS_PLUGIN_URL . "assets/css/wpforms-base{$min}.css",
-				array(),
+				[],
 				WPFORMS_VERSION
 			);
 		}
@@ -1166,11 +1192,13 @@ class WPForms_Frontend {
 
 		do_action( 'wpforms_frontend_js', $this->forms );
 
+		$min = wpforms_get_min_suffix();
+
 		// Load jQuery validation library - https://jqueryvalidation.org/.
 		wp_enqueue_script(
 			'wpforms-validation',
 			WPFORMS_PLUGIN_URL . 'assets/js/jquery.validate.min.js',
-			array( 'jquery' ),
+			[ 'jquery' ],
 			'1.19.0',
 			true
 		);
@@ -1184,14 +1212,14 @@ class WPForms_Frontend {
 			wp_enqueue_script(
 				'wpforms-flatpickr',
 				WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
-				array( 'jquery' ),
-				'4.6.3',
+				[ 'jquery' ],
+				'4.6.9',
 				true
 			);
 			wp_enqueue_script(
 				'wpforms-jquery-timepicker',
 				WPFORMS_PLUGIN_URL . 'assets/js/jquery.timepicker.min.js',
-				array( 'jquery' ),
+				[ 'jquery' ],
 				'1.11.5',
 				true
 			);
@@ -1200,28 +1228,36 @@ class WPForms_Frontend {
 		// Load jQuery input mask library - https://github.com/RobinHerbots/jquery.inputmask.
 		if (
 			$this->assets_global() ||
-			true === wpforms_has_field_type( array( 'phone', 'address' ), $this->forms, true ) ||
+			true === wpforms_has_field_type( [ 'phone', 'address' ], $this->forms, true ) ||
 			true === wpforms_has_field_setting( 'input_mask', $this->forms, true )
 		) {
 			wp_enqueue_script(
 				'wpforms-maskedinput',
 				WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.min.js',
-				array( 'jquery' ),
+				[ 'jquery' ],
 				'5.0.6',
 				true
 			);
 		}
 
-		// Load mailcheck library - https://github.com/mailcheck/mailcheck.
+		// Load mailcheck <https://github.com/mailcheck/mailcheck> and punycode libraries.
 		if (
 			$this->assets_global() ||
-			true === wpforms_has_field_type( array( 'email' ), $this->forms, true )
+			true === wpforms_has_field_type( [ 'email' ], $this->forms, true )
 		) {
 			wp_enqueue_script(
 				'wpforms-mailcheck',
 				WPFORMS_PLUGIN_URL . 'assets/js/mailcheck.min.js',
 				false,
 				'1.1.2',
+				true
+			);
+
+			wp_enqueue_script(
+				'wpforms-punycode',
+				WPFORMS_PLUGIN_URL . "assets/js/punycode{$min}.js",
+				[],
+				'1.0.0',
 				true
 			);
 		}
@@ -1235,7 +1271,7 @@ class WPForms_Frontend {
 			wp_enqueue_script(
 				'wpforms-payment',
 				WPFORMS_PLUGIN_URL . 'assets/js/jquery.payment.min.js',
-				array( 'jquery' ),
+				[ 'jquery' ],
 				WPFORMS_VERSION,
 				true
 			);
@@ -1245,7 +1281,7 @@ class WPForms_Frontend {
 		wp_enqueue_script(
 			'wpforms',
 			WPFORMS_PLUGIN_URL . 'assets/js/wpforms.js',
-			array( 'jquery' ),
+			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
 		);
@@ -1280,9 +1316,11 @@ class WPForms_Frontend {
 
 		// Whether at least 1 form on a page has CAPTCHA enabled.
 		$captcha = false;
+
 		foreach ( $this->forms as $form ) {
 			if ( ! empty( $form['settings']['recaptcha'] ) ) {
 				$captcha = true;
+
 				break;
 			}
 		}
@@ -1308,7 +1346,7 @@ class WPForms_Frontend {
 		wp_enqueue_script(
 			'wpforms-recaptcha',
 			$captcha_api,
-			$is_recaptcha_v3 ? array() : array( 'jquery' ),
+			$is_recaptcha_v3 ? [] : [ 'jquery' ],
 			null,
 			true
 		);
@@ -1336,11 +1374,9 @@ class WPForms_Frontend {
 	 */
 	protected function get_captcha_inline_script( $captcha_settings ) {
 
-		// phpcs:disable Generic.Commenting.DocComment.MissingShort
-
 		// IE11 polyfills for native `matches()` and `closest()` methods.
-		$polyfills = /** @lang JavaScript */ '
-			if (!Element.prototype.matches) {
+		$polyfills = // language=JavaScript PhpStorm.
+			'if (!Element.prototype.matches) {
 			    Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
 			}
 			if (!Element.prototype.closest) {
@@ -1356,8 +1392,8 @@ class WPForms_Frontend {
 		';
 
 		// Native equivalent for jQuery's `trigger()` method.
-		$dispatch = /** @lang JavaScript */ '
-			var wpformsDispatchEvent = function (el, ev, custom) {
+		$dispatch = // language=JavaScript PhpStorm.
+			'var wpformsDispatchEvent = function (el, ev, custom) {
 			    var e = document.createEvent(custom ? "CustomEvent" : "HTMLEvents");
 			    custom ? e.initCustomEvent(ev, true, true, false) : e.initEvent(ev, true, true);
 			    el.dispatchEvent(e);
@@ -1365,8 +1401,8 @@ class WPForms_Frontend {
 		';
 
 		// Captcha callback, used by hCaptcha and checkbox reCaptcha v2.
-		$callback = /** @lang JavaScript */ '
-			var wpformsRecaptchaCallback = function (el) {
+		$callback = // language=JavaScript PhpStorm.
+			'var wpformsRecaptchaCallback = function (el) {
 			    var hdn = el.parentNode.querySelector(".wpforms-recaptcha-hidden");
 			    var err = el.parentNode.querySelector("#g-recaptcha-hidden-error");
 			    hdn.value = "1";
@@ -1381,8 +1417,8 @@ class WPForms_Frontend {
 			$data  = $dispatch;
 			$data .= $callback;
 
-			$data .= /** @lang JavaScript */ '
-				var wpformsRecaptchaLoad = function () {
+			$data .= // language=JavaScript PhpStorm.
+				'var wpformsRecaptchaLoad = function () {
 				    Array.prototype.forEach.call(document.querySelectorAll(".g-recaptcha"), function (el) {
 				        var captchaID = hcaptcha.render(el, {
 				            callback: function () {
@@ -1402,8 +1438,8 @@ class WPForms_Frontend {
 
 			$data = $dispatch;
 
-			$data .= /** @lang JavaScript */ '
-				var wpformsRecaptchaLoad = function () {
+			$data .= // language=JavaScript PhpStorm.
+				'var wpformsRecaptchaLoad = function () {
 				    grecaptcha.execute("' . $captcha_settings['site_key'] . '", {action: "wpforms"}).then(function (token) {
 				        Array.prototype.forEach.call(document.getElementsByName("wpforms[recaptcha]"), function (el) {
 				            el.value = token;
@@ -1419,8 +1455,8 @@ class WPForms_Frontend {
 			$data  = $polyfills;
 			$data .= $dispatch;
 
-			$data .= /** @lang JavaScript */ '
-				var wpformsRecaptchaLoad = function () {
+			$data .= // language=JavaScript PhpStorm.
+				'var wpformsRecaptchaLoad = function () {
 				    Array.prototype.forEach.call(document.querySelectorAll(".g-recaptcha"), function (el) {
 				        try {
 				            var recaptchaID = grecaptcha.render(el, {
@@ -1449,8 +1485,8 @@ class WPForms_Frontend {
 			$data  = $dispatch;
 			$data .= $callback;
 
-			$data .= /** @lang JavaScript */ '
-				var wpformsRecaptchaLoad = function () {
+			$data .= // language=JavaScript PhpStorm.
+				'var wpformsRecaptchaLoad = function () {
 				    Array.prototype.forEach.call(document.querySelectorAll(".g-recaptcha"), function (el) {
 				        try {
 				            var recaptchaID = grecaptcha.render(el, {
@@ -1467,8 +1503,6 @@ class WPForms_Frontend {
 
 		}
 
-		// phpcs:enable Generic.Commenting.DocComment.MissingShort
-
 		return $data;
 	}
 
@@ -1482,11 +1516,11 @@ class WPForms_Frontend {
 		$min = wpforms_get_min_suffix();
 
 		// Base CSS only.
-		if ( wpforms_setting( 'disable-css', '1' ) == '1' ) {
+		if ( (int) wpforms_setting( 'disable-css', '1' ) === 1 ) {
 			wp_enqueue_style(
 				'wpforms-full',
 				WPFORMS_PLUGIN_URL . "assets/css/wpforms-full{$min}.css",
-				array(),
+				[],
 				WPFORMS_VERSION
 			);
 		}
@@ -1496,7 +1530,7 @@ class WPForms_Frontend {
 			wp_enqueue_script(
 				'wpforms-confirmation',
 				WPFORMS_PLUGIN_URL . 'assets/js/wpforms-confirmation.js',
-				array( 'jquery' ),
+				[ 'jquery' ],
 				WPFORMS_VERSION,
 				true
 			);

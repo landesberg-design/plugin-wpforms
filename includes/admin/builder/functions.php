@@ -23,22 +23,41 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 	}
 
 	// Setup basic vars.
-	$panel       = esc_attr( $panel );
-	$field       = esc_attr( $field );
-	$panel_id    = sanitize_html_class( $panel );
-	$parent      = ! empty( $args['parent'] ) ? esc_attr( $args['parent'] ) : '';
-	$subsection  = ! empty( $args['subsection'] ) ? esc_attr( $args['subsection'] ) : '';
-	$label       = ! empty( $label ) ? esc_html( $label ) : '';
-	$class       = ! empty( $args['class'] ) ? esc_attr( $args['class'] ) : '';
-	$input_class = ! empty( $args['input_class'] ) ? esc_attr( $args['input_class'] ) : '';
-	$default     = isset( $args['default'] ) ? $args['default'] : '';
-	$placeholder = ! empty( $args['placeholder'] ) ? esc_attr( $args['placeholder'] ) : '';
-	$data_attr   = '';
-	$output      = '';
-	$input_id    = sprintf( 'wpforms-panel-field-%s-%s', sanitize_html_class( $panel_id ), sanitize_html_class( $field ) );
+	$panel            = esc_attr( $panel );
+	$field            = esc_attr( $field );
+	$panel_id         = sanitize_html_class( $panel );
+	$parent           = ! empty( $args['parent'] ) ? esc_attr( $args['parent'] ) : '';
+	$subsection       = ! empty( $args['subsection'] ) ? esc_attr( $args['subsection'] ) : '';
+	$label            = ! empty( $label ) ? esc_html( $label ) : '';
+	$class            = ! empty( $args['class'] ) ? wpforms_sanitize_classes( $args['class'] ) : '';
+	$input_class      = ! empty( $args['input_class'] ) ? wpforms_sanitize_classes( $args['input_class'] ) : '';
+	$default          = isset( $args['default'] ) ? $args['default'] : '';
+	$placeholder      = ! empty( $args['placeholder'] ) ? esc_attr( $args['placeholder'] ) : '';
+	$data_attr        = '';
+	$output           = '';
+	$smarttags_toggle = '';
+	$input_id         = sprintf( 'wpforms-panel-field-%s-%s', sanitize_html_class( $panel_id ), sanitize_html_class( $field ) );
 
 	if ( ! empty( $args['input_id'] ) ) {
 		$input_id = esc_attr( $args['input_id'] );
+	}
+
+	if ( ! empty( $args['smarttags'] ) ) {
+		$type   = ! empty( $args['smarttags']['type'] ) ? esc_attr( $args['smarttags']['type'] ) : 'fields';
+		$fields = ! empty( $args['smarttags']['fields'] ) ? esc_attr( $args['smarttags']['fields'] ) : '';
+
+		$smarttags_toggle = sprintf(
+			'<a href="#" class="toggle-smart-tag-display toggle-unfoldable-cont" data-type="%s" data-fields="%s">
+				<i class="fa fa-tags"></i><span>%s</span>
+			</a>',
+			esc_attr( $type ),
+			esc_attr( $fields ),
+			esc_html__( 'Show Smart Tags', 'wpforms-lite' )
+		);
+	}
+
+	if ( ! empty( $args['pro_badge'] ) ) {
+		$label .= '<span class="wpforms-field-option-education-pro-badge">pro</span>';
 	}
 
 	// Check if we should store values in a parent array.
@@ -277,12 +296,8 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 		if ( ! empty( $args['after_tooltip'] ) ) {
 			$field_label .= $args['after_tooltip'];
 		}
-		if ( ! empty( $args['smarttags'] ) ) {
-
-			$type   = ! empty( $args['smarttags']['type'] ) ? esc_attr( $args['smarttags']['type'] ) : 'fields';
-			$fields = ! empty( $args['smarttags']['fields'] ) ? esc_attr( $args['smarttags']['fields'] ) : '';
-
-			$field_label .= '<a href="#" class="toggle-smart-tag-display toggle-unfoldable-cont" data-type="' . $type . '" data-fields="' . $fields . '"><i class="fa fa-tags"></i><span>' . esc_html__( 'Show Smart Tags', 'wpforms-lite' ) . '</span></a>';
+		if ( $smarttags_toggle && ! ( $option === 'textarea' && ! empty( $args['tinymce'] ) ) ) {
+			$field_label .= $smarttags_toggle;
 		}
 		$field_label .= '</label>';
 
@@ -293,7 +308,13 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 		$field_label = '';
 	}
 
-	$field_close  = ! empty( $args['after'] ) ? $args['after'] : '';
+	$field_close = '';
+
+	if ( $smarttags_toggle && $option === 'textarea' && ! empty( $args['tinymce'] ) ) {
+		$field_close .= $smarttags_toggle;
+	}
+
+	$field_close .= ! empty( $args['after'] ) ? $args['after'] : '';
 	$field_close .= '</div>';
 	$output       = $field_open . $field_label . $output . $field_close;
 

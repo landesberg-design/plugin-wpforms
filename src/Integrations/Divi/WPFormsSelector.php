@@ -119,7 +119,7 @@ class WPFormsSelector extends ET_Builder_Module {
 	 *
 	 * @return string
 	 */
-	public function render( $attrs, $content = null, $render_slug ) {
+	public function render( $attrs, $content = null, $render_slug = '' ) {
 
 		if ( empty( $this->props['form_id'] ) ) {
 			return '';

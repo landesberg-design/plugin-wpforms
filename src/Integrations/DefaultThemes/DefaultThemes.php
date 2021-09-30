@@ -103,12 +103,14 @@ class DefaultThemes implements IntegrationInterface {
 	 */
 	private function tt1_hooks() {
 
-		if ( wpforms_setting( 'disable-css' ) === '1' ) {
+		$form_styling = wpforms_setting( 'disable-css', '1' );
+
+		if ( $form_styling === '1' ) {
 			add_action( 'wp_enqueue_scripts', [ $this, 'tt1_multiple_fields_fix' ], 11 );
 			add_action( 'wp_enqueue_scripts', [ $this, 'tt1_dropdown_fix' ], 11 );
 		}
 
-		if ( wpforms_setting( 'disable-css' ) === '2' ) {
+		if ( $form_styling === '2' ) {
 			add_action( 'wp_enqueue_scripts', [ $this, 'tt1_base_style_fix' ], 11 );
 		}
 	}
@@ -123,7 +125,7 @@ class DefaultThemes implements IntegrationInterface {
 
 		wp_add_inline_style(
 			'twenty-twenty-one-style',
-			/** @lang CSS */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			// language=CSS PhpStorm.
 			'@supports (-webkit-appearance: none) or (-moz-appearance: none) {
 				div.wpforms-container-full .wpforms-form input[type=checkbox] {
 					-webkit-appearance: checkbox;
@@ -150,8 +152,8 @@ class DefaultThemes implements IntegrationInterface {
 
 		wp_add_inline_style(
 			'twenty-twenty-one-style',
-			/** @lang CSS */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
-			'div.wpforms-container-full .wpforms-form select {
+			// language=CSS PhpStorm.
+			'div.wpforms-container-full form.wpforms-form select {
 				background-image: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'10\' fill=\'%2328303d\'><polygon points=\'0,0 10,0 5,5\'/></svg>");
 				background-repeat: no-repeat;
 				background-position: right var(--form--spacing-unit) top 60%;
@@ -168,7 +170,7 @@ class DefaultThemes implements IntegrationInterface {
 
 		wp_add_inline_style(
 			'twenty-twenty-one-style',
-			/** @lang CSS */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			// language=CSS PhpStorm.
 			'.wpforms-container .wpforms-field input[type=checkbox],
 			.wpforms-container .wpforms-field input[type=radio] {
 				width: 25px;
@@ -190,7 +192,7 @@ class DefaultThemes implements IntegrationInterface {
 
 		wp_add_inline_script(
 			'twentytwenty-js',
-			/** @lang JavaScript */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			// language=JavaScript PhpStorm.
 			'window.addEventListener( "load", function() {
 
 				if ( typeof jQuery === "undefined" ) {

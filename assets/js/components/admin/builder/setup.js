@@ -254,10 +254,10 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 
 			e.preventDefault();
 
-			var $button = $( e.target ),
-				formName = el.$formName.val(),
-				template = $button.data( 'template' ),
-				templateName = $button.data( 'template-name-raw' );
+			var $button      = $( e.target ),
+				template     = $button.data( 'template' ),
+				templateName = $button.data( 'template-name-raw' ),
+				formName     = el.$formName.val() || templateName;
 
 			// Don't do anything for templates that trigger education modal OR addons-modal.
 			if ( $button.hasClass( 'education-modal' ) ) {
@@ -273,12 +273,23 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 			// Display loading indicator.
 			$button.html( vars.spinner + wpforms_builder.loading );
 
-			el.$builder.trigger( 'wpformsTemplateSelect', template );
+			app.applyTemplate( formName, template, $button );
+		},
 
-			// Check that form title is provided.
-			if ( ! formName ) {
-				formName = templateName;
-			}
+		/**
+		 * Apply template.
+		 *
+		 * The final part of the select template routine.
+		 *
+		 * @since 1.6.9
+		 *
+		 * @param {string} formName Name of the form.
+		 * @param {string} template Template slug.
+		 * @param {jQuery} $button  Use template button object.
+		 */
+		applyTemplate: function( formName, template, $button ) {
+
+			el.$builder.trigger( 'wpformsTemplateSelect', template );
 
 			if ( vars.formID ) {
 
@@ -302,9 +313,13 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 		 */
 		selectBlankTemplate: function( e ) {
 
-			el.$builder
-				.find( '#wpforms-template-blank .wpforms-template-select' )
-				.trigger( 'click' );
+			e.preventDefault();
+
+			var $button  = $( e.target ),
+				formName = el.$formName.val() || wpforms_builder.blank_form,
+				template = 'blank';
+
+			app.applyTemplate( formName, template, $button );
 		},
 
 		/**
@@ -321,8 +336,6 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 			$.confirm( {
 				title: wpforms_builder.heads_up,
 				content: wpforms_builder.template_confirm,
-				backgroundDismiss: false,
-				closeIcon: false,
 				icon: 'fa fa-exclamation-circle',
 				type: 'orange',
 				buttons: {

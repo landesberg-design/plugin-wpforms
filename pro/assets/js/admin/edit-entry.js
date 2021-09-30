@@ -388,8 +388,6 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 			$.confirm( {
 				title: false,
 				content:  wpforms_admin_edit_entry.strings.entry_delete_file.replace( '{file_name}', $fileInput.html() ),
-				backgroundDismiss: false,
-				closeIcon: false,
 				icon: 'fa fa-exclamation-circle',
 				type: 'orange',
 				buttons: {

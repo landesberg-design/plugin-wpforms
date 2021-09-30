@@ -82,7 +82,7 @@ class WPForms_Conditional_Logic_Fields {
 	public function builder_field_conditionals( $field, $instance ) {
 
 		// Certain fields don't support conditional logic.
-		if ( in_array( $field['type'], [ 'pagebreak', 'hidden' ], true ) ) {
+		if ( in_array( $field['type'], [ 'entry-preview', 'hidden', 'pagebreak' ], true ) ) {
 			return;
 		}
 		?>
@@ -470,7 +470,10 @@ class WPForms_Conditional_Logic_Fields {
 	public function field_is_conditional( $field ) {
 
 		// First thing, check if conditional logic is enabled for the field.
-		if ( empty( $field['conditional_logic'] ) || empty( $field['conditionals'] ) || '1' != $field['conditional_logic'] ) {
+		if (
+			empty( $field['conditional_logic'] ) ||
+			empty( $field['conditionals'] )
+		) {
 			return false;
 		}
 
@@ -516,7 +519,10 @@ class WPForms_Conditional_Logic_Fields {
 		foreach ( $form_data['fields'] as $field ) {
 
 			// First thing, check if conditional logic is enabled for the field.
-			if ( empty( $field['conditional_logic'] ) || empty( $field['conditionals'] ) || '1' != $field['conditional_logic'] ) {
+			if (
+				empty( $field['conditional_logic'] ) ||
+				empty( $field['conditionals'] )
+			) {
 				continue;
 			}
 
@@ -529,8 +535,8 @@ class WPForms_Conditional_Logic_Fields {
 					}
 
 					if (
-						( in_array( $rule['operator'], array( 'e', '!e' ), true ) && $rule['field'] == $field_id ) ||
-						( isset( $rule['value'] ) && '' !== trim( $rule['value'] ) && $rule['field'] == $field_id )
+						( in_array( $rule['operator'], [ 'e', '!e' ], true ) && (int) $rule['field'] === (int) $field_id ) ||
+						( isset( $rule['value'] ) && trim( $rule['value'] ) !== '' && (int) $rule['field'] === (int) $field_id )
 					) {
 						return true;
 					}

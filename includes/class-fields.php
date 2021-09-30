@@ -45,6 +45,7 @@ class WPForms_Fields {
 				'radio',
 				'checkbox',
 				'divider',
+				'entry-preview',
 				'email',
 				'url',
 				'hidden',

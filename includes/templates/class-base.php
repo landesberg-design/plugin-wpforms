@@ -150,9 +150,30 @@ abstract class WPForms_Template {
 			'description' => $this->description,
 			'includes'    => $this->includes,
 			'icon'        => $this->icon,
+			'plugin_dir'  => $this->get_plugin_dir(),
 		];
 
 		return $templates;
+	}
+
+	/**
+	 * Get the directory name of the plugin in which current template resides.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @return string
+	 */
+	private function get_plugin_dir() {
+
+		$reflection         = new \ReflectionClass( $this );
+		$template_file_path = wp_normalize_path( $reflection->getFileName() );
+
+		// Cutting out the WP_PLUGIN_DIR from the beginning of the template file path.
+		$template_file_path = preg_replace( '{^' . wp_slash( wp_normalize_path( WP_PLUGIN_DIR ) ) . '}', '', $template_file_path );
+
+		$template_file_chunks = explode( '/', $template_file_path );
+
+		return $template_file_chunks[1];
 	}
 
 	/**

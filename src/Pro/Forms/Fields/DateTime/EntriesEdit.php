@@ -36,14 +36,14 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
 			[],
-			'4.5.5'
+			'4.6.9'
 		);
 
 		wp_enqueue_script(
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
 			[ 'jquery' ],
-			'4.5.5',
+			'4.6.9',
 			true
 		);
 		wp_enqueue_script(

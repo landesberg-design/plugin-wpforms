@@ -179,7 +179,7 @@ class Chain {
 
 			$params = null === $params ? array() : $params;
 			array_unshift( $params, $this->value );
-			$this->value = call_user_func_array( $name, $params );
+			$this->value = call_user_func_array( $name, array_values( $params ) );
 
 			return $this;
 		}

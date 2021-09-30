@@ -145,8 +145,32 @@ class WPFormsSelector extends Component {
 	}
 }
 
-jQuery( window ).on( 'et_builder_api_ready', ( event, API ) => {
+jQuery( window )
 
-	// Register custom modules
-	API.registerModules( [ WPFormsSelector ] );
-} );
+	// Register custom modules.
+	.on( 'et_builder_api_ready', ( event, API ) => {
+		API.registerModules( [ WPFormsSelector ] );
+	} )
+
+	// Re-initialize WPForms frontend.
+	.on( 'wpformsDiviModuleDisplay', ( event ) => {
+		window.wpforms.init();
+	} );
+
+// Make all the modern dropdowns disabled.
+jQuery( document )
+	.on( 'wpformsReady', ( event ) => {
+
+		var $ = jQuery;
+
+		$( '.choicesjs-select' ).each( function() {
+
+			var $instance = $( this ).data( 'choicesjs' );
+
+			if ( ! $instance || typeof $instance.disable !== 'function' ) {
+				return;
+			}
+
+			$instance.disable();
+		} );
+	} );

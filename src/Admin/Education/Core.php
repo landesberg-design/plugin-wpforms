@@ -95,20 +95,22 @@ class Core {
 
 		$strings['upgrade'] = [
 			'pro'   => [
-				'title'   => esc_html__( 'is a PRO Feature', 'wpforms-lite' ),
-				'message' => '<p>' . esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wpforms-lite' ) . '</p>',
-				'doc'     => '<a href="https://wpforms.com/docs/upgrade-wpforms-lite-paid-license/?utm_source=WordPress&amp;utm_medium=link&amp;utm_campaign=liteplugin&amp;utm_content=upgrade-pro" target="_blank" rel="noopener noreferrer" class="already-purchased">' . esc_html__( 'Already purchased?', 'wpforms-lite' ) . '</a>',
-				'button'  => esc_html__( 'Upgrade to PRO', 'wpforms-lite' ),
-				'url'     => wpforms_admin_upgrade_link( 'builder-modal', 'upgrade-pro' ),
-				'modal'   => wpforms_get_upgrade_modal_text( 'pro' ),
+				'title'        => esc_html__( 'is a PRO Feature', 'wpforms-lite' ),
+				'message'      => '<p>' . esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features.', 'wpforms-lite' ) . '</p>',
+				'doc'          => '<a href="https://wpforms.com/docs/upgrade-wpforms-lite-paid-license/?utm_source=WordPress&amp;utm_medium=link&amp;utm_campaign=liteplugin&amp;utm_content=upgrade-pro" target="_blank" rel="noopener noreferrer" class="already-purchased">' . esc_html__( 'Already purchased?', 'wpforms-lite' ) . '</a>',
+				'button'       => esc_html__( 'Upgrade to PRO', 'wpforms-lite' ),
+				'url'          => wpforms_admin_upgrade_link( 'builder-modal' ),
+				'url_template' => wpforms_admin_upgrade_link( 'builder-modal-template' ),
+				'modal'        => wpforms_get_upgrade_modal_text( 'pro' ),
 			],
 			'elite' => [
-				'title'   => esc_html__( 'is an Elite Feature', 'wpforms-lite' ),
-				'message' => '<p>' . esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the Elite plan to unlock all these awesome features.', 'wpforms-lite' ) . '</p>',
-				'doc'     => '<a href="https://wpforms.com/docs/upgrade-wpforms-lite-paid-license/?utm_source=WordPress&amp;utm_medium=link&amp;utm_campaign=liteplugin&amp;utm_content=upgrade-elite" target="_blank" rel="noopener noreferrer" class="already-purchased">' . esc_html__( 'Already purchased?', 'wpforms-lite' ) . '</a>',
-				'button'  => esc_html__( 'Upgrade to Elite', 'wpforms-lite' ),
-				'url'     => wpforms_admin_upgrade_link( 'builder-modal', 'upgrade-elite' ),
-				'modal'   => wpforms_get_upgrade_modal_text( 'elite' ),
+				'title'        => esc_html__( 'is an Elite Feature', 'wpforms-lite' ),
+				'message'      => '<p>' . esc_html__( 'We\'re sorry, the %name% is not available on your plan. Please upgrade to the Elite plan to unlock all these awesome features.', 'wpforms-lite' ) . '</p>',
+				'doc'          => '<a href="https://wpforms.com/docs/upgrade-wpforms-lite-paid-license/?utm_source=WordPress&amp;utm_medium=link&amp;utm_campaign=liteplugin&amp;utm_content=upgrade-elite" target="_blank" rel="noopener noreferrer" class="already-purchased">' . esc_html__( 'Already purchased?', 'wpforms-lite' ) . '</a>',
+				'button'       => esc_html__( 'Upgrade to Elite', 'wpforms-lite' ),
+				'url'          => wpforms_admin_upgrade_link( 'builder-modal' ),
+				'url_template' => wpforms_admin_upgrade_link( 'builder-modal-template' ),
+				'modal'        => wpforms_get_upgrade_modal_text( 'elite' ),
 			],
 		];
 

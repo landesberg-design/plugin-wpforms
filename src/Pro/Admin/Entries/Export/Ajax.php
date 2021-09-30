@@ -3,6 +3,7 @@
 namespace WPForms\Pro\Admin\Entries\Export;
 
 use WPForms\Helpers\Transient;
+use WPForms\Pro\Admin\Entries;
 
 /**
  * Ajax endpoints and data processing.
@@ -10,6 +11,8 @@ use WPForms\Helpers\Transient;
  * @since 1.5.5
  */
 class Ajax {
+
+	use Entries\FilterSearch;
 
 	/**
 	 * Instance of Export Class.
@@ -158,6 +161,9 @@ class Ajax {
 			// Unlimited execution time.
 			wpforms_set_time_limit();
 
+			// Apply search by fields and advanced options.
+			$this->process_filter_search();
+
 			$this->request_data = $this->get_request_data( $args );
 
 			if ( empty( $this->request_data ) ) {
@@ -223,10 +229,10 @@ class Ajax {
 		$db_args['select'] = 'entry_ids';
 
 		// Count total entries.
-		$count = wpforms()->entry->get_entries( $db_args, true );
+		$count = wpforms()->get( 'entry' )->get_entries( $db_args, true );
 
 		// Retrieve form data.
-		$form_data = wpforms()->form->get(
+		$form_data = wpforms()->get( 'form' )->get(
 			$args['form_id'],
 			[
 				'content_only' => true,

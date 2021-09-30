@@ -437,14 +437,15 @@ function wpforms_has_payment( $type = 'entry', $data = array() ) {
 
 			// For entries, only return true if the payment field has an amount.
 			if (
-				'form' === $type ||
+				$type === 'form' ||
 				(
-					'entry' === $type &&
+					$type === 'entry' &&
 					! empty( $field['amount'] ) &&
-					$field['amount'] != wpforms_sanitize_amount( 0 )
+					! empty( (float) $field['amount'] )
 				)
 			) {
 				$payment = true;
+
 				break;
 			}
 		}
@@ -527,7 +528,7 @@ function wpforms_get_payment_items( $fields = array() ) {
 			empty( $field['type'] ) ||
 			! in_array( $field['type'], $payment_fields, true ) ||
 			empty( $field['amount'] ) ||
-			$field['amount'] == wpforms_sanitize_amount( '0' )
+			empty( (float) $field['amount'] )
 		) {
 			// Remove all non-payment fields as well as payment fields with no amount.
 			unset( $fields[ $id ] );

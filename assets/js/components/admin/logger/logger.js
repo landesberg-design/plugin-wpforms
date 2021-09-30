@@ -89,8 +89,8 @@ var WPFormsLogger = window.WPFormsLogger || ( function( document, window, $ ) {
 				},
 				animation: 'scale',
 				columnClass: 'medium',
+				closeIcon: true,
 				closeAnimation: 'scale',
-				backgroundDismiss: true,
 			} );
 		},
 

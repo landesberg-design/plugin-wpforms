@@ -415,7 +415,11 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 		$field_submit = (float) $this->sanitize_value( $field_submit );
 
 		// Basic required check - if field is marked as required, check for entry data.
-		if ( ! empty( $form_data['fields'][ $field_id ]['required'] ) && empty( $field_submit ) && 0 != $field_submit ) {
+		if (
+			! empty( $form_data['fields'][ $field_id ]['required'] ) &&
+			empty( $field_submit ) &&
+			(string) $field_submit !== '0'
+		) {
 			wpforms()->process->errors[ $form_id ][ $field_id ] = wpforms_get_required_label();
 		}
 

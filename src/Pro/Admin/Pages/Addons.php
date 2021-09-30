@@ -364,6 +364,15 @@ class Addons {
 
 		$addon = wpforms()->get( 'addons' )->get_addon( $addon['slug'] );
 		$image = ! empty( $addon['icon'] ) ? $addon['icon'] : 'sullie.png';
+		$url   = add_query_arg(
+			[
+				'utm_source'   => 'WordPress',
+				'utm_campaign' => 'plugin',
+				'utm_medium'   => 'addons',
+				'utm_content'  => $addon['title'],
+			],
+			! empty( $addon['status'] ) && $addon['status'] === 'active' && $addon['plugin_allow'] ? $addon['doc_url'] : $addon['page_url']
+		);
 
 		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			'admin/addons-item',
@@ -371,7 +380,7 @@ class Addons {
 				'addon'        => $addon,
 				'status_label' => $this->get_addon_status_label( $addon['status'] ),
 				'image'        => WPFORMS_PLUGIN_URL . 'assets/images/' . $image,
-				'url'          => ! empty( $addon['status'] ) && $addon['status'] === 'active' && $addon['plugin_allow'] ? $addon['doc_url'] : $addon['page_url'],
+				'url'          => $url,
 				'button'       => $this->get_addon_button_html( $addon ),
 			],
 			true
@@ -390,7 +399,16 @@ class Addons {
 	private function get_addon_button_html( $addon ) {
 
 		if ( $addon['action'] === 'upgrade' || $addon['action'] === 'license' || ! $addon['plugin_allow'] ) {
-			return '<a href="https://wpforms.com/account/" target="_blank" rel="noopener noreferrer" class="wpforms-btn wpforms-btn-orange">' . esc_html__( 'Upgrade Now', 'wpforms' ) . '</a>';
+			return sprintf(
+				'<a href="%1$s" target="_blank" rel="noopener noreferrer" class="wpforms-btn wpforms-btn-orange">%2$s</a>',
+				add_query_arg(
+					[
+						'utm_content' => $addon['title'],
+					],
+					'https://wpforms.com/account/licenses/?utm_source=WordPress&utm_campaign=plugin&utm_medium=addons'
+				),
+				esc_html__( 'Upgrade Now', 'wpforms' )
+			);
 		}
 
 		$html = '';

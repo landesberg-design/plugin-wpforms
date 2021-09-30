@@ -934,14 +934,15 @@ class WPForms_Pro {
 	 * Form confirmation settings, supports multiple confirmations.
 	 *
 	 * @since 1.4.8
-	 * @param object $settings
+	 *
+	 * @param WPForms_Builder_Panel_Settings $settings Builder panel settings.
 	 */
 	public function form_settings_confirmations( $settings ) {
 
 		wp_enqueue_editor();
 
-		$form_settings = ! empty( $settings->form_data['settings'] ) ? $settings->form_data['settings'] : array();
-		$confirmations = is_array( $form_settings ) && isset( $form_settings['confirmations'] ) ? $form_settings['confirmations'] : array();
+		$form_settings = ! empty( $settings->form_data['settings'] ) ? $settings->form_data['settings'] : [];
+		$confirmations = is_array( $form_settings ) && isset( $form_settings['confirmations'] ) ? $form_settings['confirmations'] : [];
 
 		// Fetch next ID and handle backwards compatibility.
 		if ( empty( $confirmations ) ) {
@@ -965,30 +966,38 @@ class WPForms_Pro {
 		echo '<button class="wpforms-confirmation-add wpforms-builder-settings-block-add" data-block-type="confirmation" data-next-id="' . absint( $next_id ) . '">' . esc_html__( 'Add New Confirmation', 'wpforms' ) . '</button>';
 		echo '</div>';
 
-		foreach ( $confirmations as $id => $confirmation ) {
+		foreach ( $confirmations as $field_id => $confirmation ) {
 
 			$name          = ! empty( $confirmation['name'] ) ? $confirmation['name'] : esc_html__( 'Default Confirmation', 'wpforms' );
 			$closed_state  = '';
 			$toggle_state  = '<i class="fa fa-chevron-circle-up"></i>';
 			$block_classes = 'wpforms-confirmation wpforms-builder-settings-block';
 
-			if ( $default_confirmation_key === $id ) {
+			if ( $default_confirmation_key === $field_id ) {
 				$block_classes .= ' wpforms-builder-settings-block-default';
 			}
 
-			if ( ! empty( $settings->form_data['id'] ) && 'closed' === wpforms_builder_settings_block_get_state( $settings->form_data['id'], $id, 'confirmation' ) ) {
+			if ( ! empty( $settings->form_data['id'] ) && 'closed' === wpforms_builder_settings_block_get_state( $settings->form_data['id'], $field_id, 'confirmation' ) ) {
 				$closed_state = 'style="display:none"';
 				$toggle_state = '<i class="fa fa-chevron-circle-down"></i>';
 			}
 
-			do_action( 'wpforms_form_settings_confirmations_single_before', $settings, $id );
+			/**
+			 * Fires before each confirmation to add custom fields.
+			 *
+			 * @since 1.4.8
+			 *
+			 * @param WPForms_Builder_Panel_Settings $settings Builder panel settings.
+			 * @param int                            $field_id Field ID.
+			 */
+			do_action( 'wpforms_form_settings_confirmations_single_before', $settings, $field_id );
 			?>
 
-			<div class="<?php echo esc_attr( $block_classes ); ?>" data-block-type="confirmation" data-block-id="<?php echo absint( $id ); ?>">
+			<div class="<?php echo esc_attr( $block_classes ); ?>" data-block-type="confirmation" data-block-id="<?php echo absint( $field_id ); ?>">
 
 				<div class="wpforms-builder-settings-block-header">
 					<div class="wpforms-builder-settings-block-actions">
-						<?php do_action( 'wpforms_form_settings_confirmations_single_action', $id, $confirmation, $settings ); ?>
+						<?php do_action( 'wpforms_form_settings_confirmations_single_action', $field_id, $confirmation, $settings ); ?>
 
 						<button class="wpforms-builder-settings-block-delete" title="<?php esc_attr_e( 'Delete', 'wpforms' ); ?>"><i class="fa fa-trash-o"></i></button><!--
 						--><button class="wpforms-builder-settings-block-toggle" title="<?php esc_attr_e( 'Open / Close', 'wpforms' ); ?>">
@@ -1000,7 +1009,7 @@ class WPForms_Pro {
 						<span class="wpforms-builder-settings-block-name"><?php echo esc_html( $name ); ?></span>
 
 						<div class="wpforms-builder-settings-block-name-edit">
-							<input type="text" name="settings[confirmations][<?php echo absint( $id ); ?>][name]" value="<?php echo esc_attr( $name ); ?>">
+							<input type="text" name="settings[confirmations][<?php echo absint( $field_id ); ?>][name]" value="<?php echo esc_attr( $name ); ?>">
 						</div>
 						<button class="wpforms-builder-settings-block-edit" title="<?php esc_attr_e( 'Edit', 'wpforms' ); ?>"><i class="fa fa-pencil"></i></button>
 					</div>
@@ -1016,20 +1025,21 @@ class WPForms_Pro {
 						'type',
 						$settings->form_data,
 						esc_html__( 'Confirmation Type', 'wpforms' ),
-						array(
+						[
 							'default'     => 'message',
-							'options'     => array(
+							'options'     => [
 								'message'  => esc_html__( 'Message', 'wpforms' ),
 								'page'     => esc_html__( 'Show Page', 'wpforms' ),
 								'redirect' => esc_html__( 'Go to URL (Redirect)', 'wpforms' ),
-							),
+							],
 							'class'       => 'wpforms-panel-field-confirmations-type-wrap',
-							'input_id'    => 'wpforms-panel-field-confirmations-type-' . $id,
+							'input_id'    => 'wpforms-panel-field-confirmations-type-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-type',
 							'parent'      => 'settings',
-							'subsection'  => $id,
-						)
+							'subsection'  => $field_id,
+						]
 					);
+
 					wpforms_panel_field(
 						'textarea',
 						'confirmations',
@@ -1041,13 +1051,17 @@ class WPForms_Pro {
 							'tinymce'     => [
 								'editor_height' => '200',
 							],
-							'input_id'    => 'wpforms-panel-field-confirmations-message-' . $id,
+							'input_id'    => 'wpforms-panel-field-confirmations-message-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-message',
 							'parent'      => 'settings',
-							'subsection'  => $id,
+							'subsection'  => $field_id,
 							'class'       => 'wpforms-panel-field-tinymce',
+							'smarttags'   => [
+								'type' => 'all',
+							],
 						]
 					);
+
 					wpforms_panel_field(
 						'toggle',
 						'confirmations',
@@ -1055,10 +1069,10 @@ class WPForms_Pro {
 						$settings->form_data,
 						esc_html__( 'Automatically scroll to the confirmation message', 'wpforms' ),
 						[
-							'input_id'    => 'wpforms-panel-field-confirmations-message_scroll-' . $id,
+							'input_id'    => 'wpforms-panel-field-confirmations-message_scroll-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-message_scroll',
 							'parent'      => 'settings',
-							'subsection'  => $id,
+							'subsection'  => $field_id,
 						]
 					);
 
@@ -1069,57 +1083,68 @@ class WPForms_Pro {
 						$depth          = count( $page->ancestors );
 						$p[ $page->ID ] = str_repeat( '-', $depth ) . ' ' . $page->post_title;
 					}
+
 					wpforms_panel_field(
 						'select',
 						'confirmations',
 						'page',
 						$settings->form_data,
 						esc_html__( 'Confirmation Page', 'wpforms' ),
-						array(
+						[
 							'options'     => $p,
-							'input_id'    => 'wpforms-panel-field-confirmations-page-' . $id,
+							'input_id'    => 'wpforms-panel-field-confirmations-page-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-page',
 							'parent'      => 'settings',
-							'subsection'  => $id,
-						)
+							'subsection'  => $field_id,
+						]
 					);
+
 					wpforms_panel_field(
 						'text',
 						'confirmations',
 						'redirect',
 						$settings->form_data,
 						esc_html__( 'Confirmation Redirect URL', 'wpforms' ),
-						array(
-							'input_id'    => 'wpforms-panel-field-confirmations-redirect-' . $id,
+						[
+							'input_id'    => 'wpforms-panel-field-confirmations-redirect-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-redirect',
 							'parent'      => 'settings',
-							'subsection'  => $id,
-						)
+							'subsection'  => $field_id,
+						]
 					);
 
-					wpforms_conditional_logic()->builder_block( array(
-						'form'        => $settings->form_data,
-						'type'        => 'panel',
-						'panel'       => 'confirmations',
-						'parent'      => 'settings',
-						'subsection'  => $id,
-						'actions'     => array(
-							'go'   => esc_html__( 'Use', 'wpforms' ),
-							'stop' => esc_html__( 'Don\'t use', 'wpforms' ),
-						),
-						'action_desc' => esc_html__( 'this confirmation if', 'wpforms' ),
-						'reference'   => esc_html__( 'Form confirmations', 'wpforms' ),
-					) );
+					wpforms_conditional_logic()->builder_block(
+						[
+							'form'        => $settings->form_data,
+							'type'        => 'panel',
+							'panel'       => 'confirmations',
+							'parent'      => 'settings',
+							'subsection'  => $field_id,
+							'actions'     => [
+								'go'   => esc_html__( 'Use', 'wpforms' ),
+								'stop' => esc_html__( 'Don\'t use', 'wpforms' ),
+							],
+							'action_desc' => esc_html__( 'this confirmation if', 'wpforms' ),
+							'reference'   => esc_html__( 'Form confirmations', 'wpforms' ),
+						]
+					);
 
 					do_action_deprecated(
 						'wpforms_form_settings_confirmation',
-						array( $settings ),
+						[ $settings ],
 						'1.4.8 of WPForms plugin',
 						'wpforms_form_settings_confirmations_single_after'
 					);
 
-					// Hook for addons.
-					do_action( 'wpforms_form_settings_confirmations_single_after', $settings, $id );
+					/**
+					 * Fires after each confirmation to add custom fields.
+					 *
+					 * @since 1.4.8
+					 *
+					 * @param WPForms_Builder_Panel_Settings $settings Builder panel settings.
+					 * @param int                            $field_id Field ID.
+					 */
+					do_action( 'wpforms_form_settings_confirmations_single_after', $settings, $field_id );
 					?>
 
 				</div><!-- /.wpforms-builder-settings-block-content -->
@@ -1261,6 +1286,7 @@ class WPForms_Pro {
 			<div id="wpforms-panel-field-confirmations-message-{{ data.id }}-wrap" class="wpforms-panel-field wpforms-panel-field-tinymce" style="display: block;">
 				<label for="wpforms-panel-field-confirmations-message-{{ data.id }}"><?php esc_html_e( 'Confirmation Message', 'wpforms' ); ?></label>
 				<textarea id="wpforms-panel-field-confirmations-message-{{ data.id }}" name="settings[confirmations][{{ data.id }}][message]" rows="3" placeholder="" class="wpforms-panel-field-confirmations-message"></textarea>
+				<a href="#" class="toggle-smart-tag-display toggle-unfoldable-cont" data-type="all" data-fields=""><i class="fa fa-tags"></i><span><?php esc_html_e( 'Show Smart Tags', 'wpforms' ); ?></span></a>
 			</div>
 		</script>
 

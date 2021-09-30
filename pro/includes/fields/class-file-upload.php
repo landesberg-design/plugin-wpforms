@@ -1007,7 +1007,13 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		// If there was no file uploaded or if this field has conditional logic
 		// rules active, stop here before we continue with the
 		// upload process.
-		if ( ! $file || 0 !== $file['error'] || in_array( $this->field_id, $this->form_data['conditional_fields'], true ) ) {
+		if (
+			! $file ||
+			$file['error'] !== 0 ||
+			(
+				! empty( $this->form_data['conditional_fields'] ) && in_array( $this->field_id, $this->form_data['conditional_fields'], true )
+			)
+		) {
 
 			wpforms()->process->fields[ $this->field_id ] = array(
 				'name'          => sanitize_text_field( $field_label ),
@@ -1064,7 +1070,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		// Move the file to the uploads dir - similar to _wp_handle_upload().
 		$move_new_file = @move_uploaded_file( $file['tmp_name'], $file_new ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		if ( false === $move_new_file ) {
+		if ( $move_new_file === false ) {
 			wpforms_log(
 				'Upload Error, could not upload file',
 				$file_url,

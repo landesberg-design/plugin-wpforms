@@ -319,6 +319,7 @@ class Addons {
 		/* translators: %s - addon name. */
 		$addon['modal_name']    = sprintf( esc_html__( '%s addon', 'wpforms-lite' ), $addon['name'] );
 		$addon['clear_slug']    = str_replace( 'wpforms-', '', $addon['slug'] );
+		$addon['utm_content']   = ucwords( str_replace( '-', ' ', $addon['clear_slug'] ) );
 		$addon['license']       = empty( $addon['license'] ) ? [] : (array) $addon['license'];
 		$addon['license_level'] = $this->get_license_level( $addon );
 		$addon['icon']          = ! empty( $addon['icon'] ) ? $addon['icon'] : '';

@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Admin\Entries\Export;
 
+use WPForms\Pro\Admin\Entries\Helpers;
+
 /**
  * HTML-related stuff for Admin page.
  *
@@ -163,7 +165,8 @@ class Admin {
 		$fields    = $this->export->data['get_args']['fields'];
 
 		if ( empty( $form_data['fields'] ) ) {
-			printf( '<span>%s</span>', $this->export->errors['form_empty'] ); // phpcs:ignore
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			printf( '<span>%s</span>', $this->export->errors['form_empty'] );
 
 			return;
 		}
@@ -174,16 +177,22 @@ class Admin {
 			if ( in_array( $field['type'], $this->export->configuration['disallowed_fields'], true ) ) {
 				continue;
 			}
-			/* translators: %d - Field ID. */
-			$name = ! empty( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $id );
+
+			$name = ! empty( $field['label'] )
+                ? trim( wp_strip_all_tags( $field['label'] ) )
+                : sprintf( /* translators: %d - Field ID. */
+                    esc_html__( 'Field #%d', 'wpforms' ),
+                    (int) $id
+                );
 
 			printf(
-				'<label><input type="checkbox" name="fields[%d]" value="%d"%s> %s</label>',
-				$i,
+				'<label><input type="checkbox" name="fields[%1$d]" value="%2$d" %3$s> %4$s</label>',
+				(int) $i,
 				(int) $id,
 				esc_attr( $this->get_checked_property( $id, $fields ) ),
 				esc_html( $name )
 			);
+
 			$i ++;
 		}
 	}
@@ -202,12 +211,15 @@ class Admin {
 
 		foreach ( $additional_info_fields as $slug => $label ) {
 
-			if ( $slug === 'pginfo' && ! ( class_exists( 'WPForms_Paypal_Standard' ) || class_exists( '\WPFormsStripe\Loader' ) || class_exists( '\WPFormsAuthorizeNet\Loader' ) ) ) {
+			if (
+                $slug === 'pginfo'
+                && ! ( class_exists( 'WPForms_Paypal_Standard' ) || class_exists( '\WPFormsStripe\Loader' ) || class_exists( '\WPFormsAuthorizeNet\Loader' ) )
+            ) {
 				continue;
 			}
 
 			printf(
-				'<label><input type="checkbox" name="additional_info[%d]" value="%s"%s> %s</label>',
+				'<label><input type="checkbox" name="additional_info[%1$d]" value="%2$s" %3$s> %4$s</label>',
 				(int) $i,
 				esc_attr( $slug ),
 				esc_attr( $this->get_checked_property( $slug, $additional_info, '' ) ),
@@ -239,12 +251,13 @@ class Admin {
 
 		foreach ( $export_options as $slug => $label ) {
 			printf(
-				'<label><input type="checkbox" name="export_options[%d]" value="%s"%s> %s</label>',
+				'<label><input type="checkbox" name="export_options[%1$d]" value="%2$s" %3$s> %4$s</label>',
 				(int) $i,
 				esc_attr( $slug ),
 				esc_attr( $this->get_checked_property( $slug, $export_option, '' ) ),
 				esc_html( $label )
 			);
+
 			$i ++;
 		}
 
@@ -258,30 +271,46 @@ class Admin {
 	 */
 	public function display_search_block() {
 
-		$search    = $this->export->data['get_args']['search'];
-		$form_data = $this->export->data['form_data'];
-
+		$search           = $this->export->data['get_args']['search'];
+		$form_data        = $this->export->data['form_data'];
+		$advanced_options = Helpers::get_search_fields_advanced_options();
 		?>
 		<select name="search[field]" class="wpforms-search-box-field" id="wpforms-tools-entries-export-options-search-field">
-			<option value="any" <?php selected( 'any', $search['field'], true ); ?>><?php esc_html_e( 'Any form field', 'wpforms' ); ?></option>
-			<?php
-			if ( ! empty( $form_data['fields'] ) ) {
-				foreach ( $form_data['fields'] as $id => $field ) {
-					if ( in_array( $field['type'], $this->export->configuration['disallowed_fields'], true ) ) {
-						continue;
-					}
-					/* translators: %d - Field ID. */
-					$name = ! empty( $field['label'] ) ? wp_strip_all_tags( $field['label'] ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $id );
+			<optgroup label="<?php esc_attr_e( 'Form fields', 'wpforms' ); ?>">
+				<option value="any" <?php selected( 'any', $search['field'], true ); ?>><?php esc_html_e( 'Any form field', 'wpforms' ); ?></option>
+				<?php
+				if ( ! empty( $form_data['fields'] ) ) {
+					foreach ( $form_data['fields'] as $id => $field ) {
+						if ( in_array( $field['type'], $this->export->configuration['disallowed_fields'], true ) ) {
+							continue;
+						}
+						/* translators: %d - Field ID. */
+						$name = ! empty( $field['label'] ) ? wp_strip_all_tags( $field['label'] ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $id );
 
-					printf(
-						'<option value="%d" %s>%s</option>',
-						(int) $id,
-						esc_attr( selected( $id, $search['field'], false ) ),
-						esc_html( $name )
-					);
+						printf(
+							'<option value="%d" %s>%s</option>',
+							(int) $id,
+							esc_attr( selected( $id, $search['field'], false ) ),
+							esc_html( $name )
+						);
+					}
 				}
-			}
-			?>
+				?>
+			</optgroup>
+			<?php if ( ! empty( $advanced_options ) ) : ?>
+				<optgroup label="<?php esc_attr_e( 'Advanced Options', 'wpforms' ); ?>">
+					<?php
+					foreach ( $advanced_options as $val => $name ) {
+						printf(
+							'<option value="%s" %s>%s</option>',
+							esc_attr( $val ),
+							selected( $val, $search['field'], false ),
+							esc_html( $name )
+						);
+					}
+					?>
+				</optgroup>
+			<?php endif; // Advanced options group. ?>
 		</select>
 		<select name="search[comparison]" class="wpforms-search-box-comparison">
 			<option value="contains" <?php selected( 'contains', $search['comparison'] ); ?>><?php esc_html_e( 'contains', 'wpforms' ); ?></option>
@@ -315,7 +344,7 @@ class Admin {
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
 			[],
-			'4.6.3'
+			'4.6.9'
 		);
 
 		/*
@@ -326,7 +355,7 @@ class Admin {
 			'wpforms-flatpickr',
 			WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
 			[ 'jquery' ],
-			'4.6.3',
+			'4.6.9',
 			true
 		);
 

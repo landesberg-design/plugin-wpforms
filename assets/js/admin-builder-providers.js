@@ -135,8 +135,6 @@
 			$.confirm( {
 				title: false,
 				content: wpforms_builder_providers.confirm_connection,
-				backgroundDismiss: false,
-				closeIcon: false,
 				icon: 'fa fa-exclamation-circle',
 				type: 'orange',
 				buttons: {
@@ -187,8 +185,6 @@
 				content: modalContent,
 				icon: 'fa fa-info-circle',
 				type: 'blue',
-				backgroundDismiss: false,
-				closeIcon: false,
 				buttons: {
 					confirm: {
 						text: wpforms_builder.ok,
@@ -394,8 +390,6 @@
 					$.confirm( {
 						title: false,
 						content: wpforms_builder_providers.confirm_save,
-						backgroundDismiss: false,
-						closeIcon: false,
 						icon: 'fa fa-info-circle',
 						type: 'blue',
 						buttons: {

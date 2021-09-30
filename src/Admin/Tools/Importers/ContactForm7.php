@@ -438,7 +438,7 @@ class ContactForm7 extends Base {
 			}
 		}
 
-		if ( ! empty( $cf7_properties['mail_2'] ) && $cf7_properties['mail_2']['active'] == '1' ) {
+		if ( ! empty( $cf7_properties['mail_2'] ) && (int) $cf7_properties['mail_2']['active'] === 1 ) {
 			// Check if a secondary notification is enabled, if so set defaults
 			// and set it up.
 			$form['settings']['notifications'][2] = [

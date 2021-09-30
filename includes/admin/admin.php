@@ -50,6 +50,9 @@ function wpforms_admin_styles() {
 		WPFORMS_VERSION
 	);
 
+	// Remove TinyMCE editor styles from third-party themes and plugins.
+	remove_editor_styles();
+
 	// WordPress 5.7 color set.
 	if ( version_compare( get_bloginfo( 'version' ), '5.7', '>=' ) ) {
 		wp_enqueue_style(
@@ -272,50 +275,70 @@ add_action( 'in_admin_header', 'wpforms_admin_header', 100 );
  * Remove non-WPForms notices from WPForms pages.
  *
  * @since 1.3.9
+ * @since 1.6.9 Added callback for removing on `admin_footer` hook.
  */
-function wpforms_admin_hide_unrelated_notices() {
+function wpforms_admin_hide_unrelated_notices() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded, Generic.Metrics.NestingLevel.MaxExceeded
 
-	// Bail if we're not on a WPForms screen or page.
-	if ( empty( $_REQUEST['page'] ) || strpos( $_REQUEST['page'], 'wpforms' ) === false ) {
+	if ( ! wpforms_is_admin_page() ) {
 		return;
 	}
 
-	// Extra banned classes and callbacks from third-party plugins.
-	$blacklist = array(
-		'classes'   => array(),
-		'callbacks' => array(
-			'wpformsdb_admin_notice', // 'Database for WPforms' plugin.
-		),
-	);
-
 	global $wp_filter;
 
-	foreach ( array( 'user_admin_notices', 'admin_notices', 'all_admin_notices' ) as $notices_type ) {
-		if ( empty( $wp_filter[ $notices_type ]->callbacks ) || ! is_array( $wp_filter[ $notices_type ]->callbacks ) ) {
+	// Define rules to remove callbacks.
+	$rules = [
+		'user_admin_notices' => [], // remove all callbacks.
+		'admin_notices'      => [],
+		'all_admin_notices'  => [],
+		'admin_footer'       => [
+			'render_delayed_admin_notices', // remove this particular callback.
+		],
+	];
+
+	// Extra deny callbacks (will be removed for each hook tag defined in $rules).
+	$common_deny_callbacks = [
+		'wpformsdb_admin_notice', // 'Database for WPForms' plugin.
+	];
+
+	$notice_types = array_keys( $rules );
+
+	foreach ( $notice_types as $notice_type ) {
+		if ( empty( $wp_filter[ $notice_type ]->callbacks ) || ! is_array( $wp_filter[ $notice_type ]->callbacks ) ) {
 			continue;
 		}
-		foreach ( $wp_filter[ $notices_type ]->callbacks as $priority => $hooks ) {
+
+		$remove_all_filters = empty( $rules[ $notice_type ] );
+
+		foreach ( $wp_filter[ $notice_type ]->callbacks as $priority => $hooks ) {
 			foreach ( $hooks as $name => $arr ) {
-				if ( is_object( $arr['function'] ) && $arr['function'] instanceof Closure ) {
-					unset( $wp_filter[ $notices_type ]->callbacks[ $priority ][ $name ] );
+				if ( is_object( $arr['function'] ) && is_callable( $arr['function'] ) ) {
+					if ( $remove_all_filters ) {
+						unset( $wp_filter[ $notice_type ]->callbacks[ $priority ][ $name ] );
+					}
 					continue;
 				}
+
 				$class = ! empty( $arr['function'][0] ) && is_object( $arr['function'][0] ) ? strtolower( get_class( $arr['function'][0] ) ) : '';
-				if (
-					! empty( $class ) &&
-					strpos( $class, 'wpforms' ) !== false &&
-					! in_array( $class, $blacklist['classes'], true )
-				) {
+
+				// Remove all callbacks except WPForms notices.
+				if ( $remove_all_filters && strpos( $class, 'wpforms' ) === false ) {
+					unset( $wp_filter[ $notice_type ]->callbacks[ $priority ][ $name ] );
 					continue;
 				}
-				if (
-					! empty( $name ) && (
-						strpos( $name, 'wpforms' ) === false ||
-						in_array( $class, $blacklist['classes'], true ) ||
-						in_array( $name, $blacklist['callbacks'], true )
-					)
-				) {
-					unset( $wp_filter[ $notices_type ]->callbacks[ $priority ][ $name ] );
+
+				$cb = is_array( $arr['function'] ) ? $arr['function'][1] : $arr['function'];
+
+				// Remove a specific callback.
+				if ( ! $remove_all_filters ) {
+					if ( in_array( $cb, $rules[ $notice_type ], true ) ) {
+						unset( $wp_filter[ $notice_type ]->callbacks[ $priority ][ $name ] );
+					}
+					continue;
+				}
+
+				// Remove non-WPForms callbacks from `$common_deny_callbacks` denylist.
+				if ( in_array( $cb, $common_deny_callbacks, true ) ) {
+					unset( $wp_filter[ $notice_type ]->callbacks[ $priority ][ $name ] );
 				}
 			}
 		}
@@ -338,15 +361,30 @@ add_action( 'admin_print_scripts', 'wpforms_admin_hide_unrelated_notices' );
  */
 function wpforms_admin_upgrade_link( $medium = 'link', $content = '' ) {
 
-	$upgrade = add_query_arg(
-		[
-			'discount'     => 'LITEUPGRADE',
-			'utm_source'   => 'WordPress',
-			'utm_campaign' => 'liteplugin',
-			'utm_medium'   => apply_filters( 'wpforms_upgrade_link_medium', $medium ),
-		],
-		'https://wpforms.com/lite-upgrade/'
-	);
+	$medium      = apply_filters( 'wpforms_upgrade_link_medium', $medium );
+	$license_key = wpforms_get_license_key();
+
+	if ( wpforms()->pro ) {
+		$upgrade = add_query_arg(
+			[
+				'utm_source'   => 'WordPress',
+				'utm_campaign' => 'plugin',
+				'utm_medium'   => $medium,
+				'license_key'  => sanitize_text_field( $license_key ),
+			],
+			'https://wpforms.com/pricing/'
+		);
+	} else {
+		$upgrade = add_query_arg(
+			[
+				'discount'     => 'LITEUPGRADE',
+				'utm_source'   => 'WordPress',
+				'utm_campaign' => 'liteplugin',
+				'utm_medium'   => $medium,
+			],
+			'https://wpforms.com/lite-upgrade/'
+		);
+	}
 
 	if ( ! empty( $content ) ) {
 		$upgrade = add_query_arg( 'utm_content', $content, $upgrade );

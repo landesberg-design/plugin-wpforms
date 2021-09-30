@@ -348,10 +348,23 @@ class Templates {
 		// Unset settings that should be defined locally.
 		unset(
 			$template['data']['settings']['form_title'],
-			$template['data']['settings']['notifications'],
 			$template['data']['settings']['conversational_forms_title'],
 			$template['data']['settings']['form_pages_title']
 		);
+
+		// Unset certain values for each Notification, since:
+		// - Email Subject Line field (subject) depends on the form name that is generated from the template name and form_id.
+		// - From Name field (sender_name) depends on the blog name and can be replaced by WP Mail SMTP plugin.
+		// - From Email field (sender_address) depends on the internal logic and can be replaced by WP Mail SMTP plugin.
+		if ( ! empty( $template['data']['settings']['notifications'] ) ) {
+			foreach ( (array) $template['data']['settings']['notifications'] as $key => $notification ) {
+				unset(
+					$template['data']['settings']['notifications'][ $key ]['subject'],
+					$template['data']['settings']['notifications'][ $key ]['sender_name'],
+					$template['data']['settings']['notifications'][ $key ]['sender_address']
+				);
+			}
+		}
 
 		// Encode template data to post content.
 		$args['post_content'] = wpforms_encode( $template['data'] );
