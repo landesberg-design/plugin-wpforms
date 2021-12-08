@@ -11,6 +11,15 @@
 	var isSlow = null;
 
 	/**
+	 * Previously submitted data.
+	 *
+	 * @since 1.7.1
+	 *
+	 * @type {Array}
+	 */
+	var submittedValues = [];
+
+	/**
 	 * Default settings for our speed test.
 	 *
 	 * @since 1.6.2
@@ -286,14 +295,36 @@
 	 * Convert files to input value.
 	 *
 	 * @since 1.5.6
+	 * @since 1.7.1 Added the dz argument.
 	 *
 	 * @param {object} files Files list.
+	 * @param {object} dz Dropzone object.
 	 *
 	 * @returns {string} Converted value.
 	 */
-	function convertFilesToValue( files ) {
+	function convertFilesToValue( files, dz ) {
 
-		return files.length ? JSON.stringify( files ) : '';
+		if ( ! submittedValues[ dz.dataTransfer.formId ] || ! submittedValues[ dz.dataTransfer.formId ][ dz.dataTransfer.fieldId ] ) {
+			return files.length ? JSON.stringify( files ) : '';
+		}
+
+		files.push.apply( files, submittedValues[ dz.dataTransfer.formId ][ dz.dataTransfer.fieldId ] );
+
+		return JSON.stringify( files );
+	}
+
+	/**
+	 * Get input element.
+	 *
+	 * @since 1.7.1
+	 *
+	 * @param {object} dz Dropzone object.
+	 *
+	 * @returns {jQuery} Hidden input element.
+	 */
+	function getInput( dz ) {
+
+		return jQuery( dz.element ).parents( '.wpforms-field-file-upload' ).find( 'input[name=' + dz.dataTransfer.name + ']' );
 	}
 
 	/**
@@ -305,9 +336,9 @@
 	 */
 	function updateInputValue( dz ) {
 
-		var $input = jQuery( dz.element ).parents( '.wpforms-field-file-upload' ).find( 'input[name=' + dz.dataTransfer.name + ']' );
+		var $input = getInput( dz );
 
-		$input.val( convertFilesToValue( getValue( dz.files ) ) ).trigger( 'input' );
+		$input.val( convertFilesToValue( getValue( dz.files ), dz ) ).trigger( 'input' );
 
 		if ( typeof jQuery.fn.valid !== 'undefined' ) {
 			$input.valid();
@@ -620,6 +651,13 @@
 				}
 			}
 
+			// Remove submitted value.
+			if ( Object.prototype.hasOwnProperty.call( file, 'isDefault' ) && file.isDefault ) {
+				submittedValues[ dz.dataTransfer.formId ][ dz.dataTransfer.fieldId ].splice( file.index, 1 );
+				dz.options.maxFiles++;
+				removeFromServer( file.file, dz );
+			}
+
 			updateInputValue( dz );
 
 			dz.loading = dz.loading || 0;
@@ -655,6 +693,44 @@
 			file.isErrorNotUploadedDisplayed = true;
 			file.previewElement.querySelectorAll( '[data-dz-errormessage]' )[0].textContent = window.wpforms_file_upload.errors.file_not_uploaded + ' ' + errorMessage;
 		};
+	}
+
+	/**
+	 * Preset previously submitted files to the dropzone.
+	 *
+	 * @since 1.7.1
+	 *
+	 * @param {object} dz Dropzone object.
+	 */
+	function presetSubmittedData( dz ) {
+
+		var files = parseJSON( getInput( dz ).val() );
+
+		if ( ! files || ! files.length ) {
+			return;
+		}
+
+		submittedValues[dz.dataTransfer.formId] = [];
+
+		// We do deep cloning an object to be sure that data is passed without links.
+		submittedValues[dz.dataTransfer.formId][dz.dataTransfer.fieldId] = JSON.parse( JSON.stringify( files ) );
+
+		files.forEach( function( file, index ) {
+
+			file.isDefault = true;
+			file.index = index;
+
+			if ( file.type.match( /image.*/ ) ) {
+				dz.displayExistingFile( file, file.url );
+
+				return;
+			}
+
+			dz.emit( 'addedfile', file );
+			dz.emit( 'complete', file );
+		} );
+
+		dz.options.maxFiles = dz.options.maxFiles - files.length;
 	}
 
 	/**
@@ -704,6 +780,8 @@
 			fieldId: fieldId,
 		};
 
+		presetSubmittedData( dz );
+
 		// Process events.
 		dz.on( 'sending', sending( dz, {
 			action: 'wpforms_upload_chunk',
@@ -729,7 +807,7 @@
 	}
 
 	/**
-	 * Moden File Uplaod engine.
+	 * Modern File Upload engine.
 	 *
 	 * @since 1.6.0
 	 */

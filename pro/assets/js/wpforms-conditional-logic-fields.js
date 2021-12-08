@@ -1,4 +1,4 @@
-/* global wpforms_conditional_logic */
+/* global wpforms_conditional_logic, tinyMCE */
 ( function( $ ) {
 
 	'use strict';
@@ -86,6 +86,18 @@
 				WPFormsConditionals.processConditionals( $( this ), true );
 			} );
 
+			$( document ).on( 'tinymce-editor-init', function( event, editor ) {
+
+				if ( ! editor.id.startsWith( 'wpforms-' ) ) {
+					return;
+				}
+
+				editor.on( 'keyup', function() {
+
+					WPFormsConditionals.processConditionals( $( '#' + editor.id ), true );
+				} );
+			} );
+
 			$( '.wpforms-form' ).submit( function() {
 				WPFormsConditionals.resetHiddenFields( $( this ) );
 			} );
@@ -148,6 +160,17 @@
 						}
 						break;
 				}
+			} );
+
+			$form.find( '.wpforms-field-richtext.wpforms-conditional-hide' ).each( function() {
+
+				var editor = tinyMCE.get( 'wpforms-' + $( this ).closest( '.wpforms-form' ).data( 'formid' ) + '-field_' + $( this ).data( 'field-id' ) );
+
+				if ( ! editor ) {
+					return '';
+				}
+
+				editor.setContent( '' );
 			} );
 		},
 
@@ -529,8 +552,9 @@
 				if ( $check.length ) {
 					val = true;
 				}
+			} else if ( rule.type === 'richtext' ) {
+				return WPFormsConditionals.getRichTextValue( $form, formID, rule.field );
 			} else {
-
 				val = $form.find( '#wpforms-' + formID + '-field_' + rule.field ).val();
 
 				if ( ! val ) {
@@ -584,6 +608,8 @@
 					} );
 				}
 
+			} else if ( rule.type === 'richtext' ) {
+				return WPFormsConditionals.getRichTextValue( $form, formID, rule.field );
 			} else { // text, textarea, number.
 
 				val = $form.find( '#wpforms-' + formID + '-field_' + rule.field ).val();
@@ -594,6 +620,32 @@
 			}
 
 			return val;
+		},
+
+		/**
+		 * Get value for Rich Text field.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @param {object} $form   The form DOM element.
+		 * @param {string} formID  Form ID.
+		 * @param {string} fieldID Field ID.
+		 *
+		 * @returns {string} Rich Text field value.
+		 */
+		getRichTextValue: function( $form, formID, fieldID ) {
+
+			if ( $form.find( '#wpforms-' + formID + '-field_' + fieldID + '-container .wp-editor-wrap' ).hasClass( 'html-active' ) ) {
+				return $form.find( '#wpforms-' + formID + '-field_' + fieldID ).val();
+			}
+
+			var editor = tinyMCE.get( 'wpforms-' + formID + '-field_' + fieldID );
+
+			if ( ! editor ) {
+				return '';
+			}
+
+			return editor.getContent( { format: 'text' } );
 		},
 
 		/**

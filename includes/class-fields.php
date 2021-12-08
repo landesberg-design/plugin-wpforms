@@ -66,6 +66,7 @@ class WPForms_Fields {
 				'payment-credit-card',
 				'payment-total',
 				'number-slider',
+				'richtext',
 			)
 		);
 

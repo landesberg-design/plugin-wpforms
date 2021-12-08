@@ -1,4 +1,4 @@
-/* global wpforms_admin, wpforms_admin_edit_entry, wpf, wpforms */
+/* global wpforms_admin, wpforms_admin_edit_entry, wpf, wpforms, tinyMCE */
 /**
  * WPForms Edit Entry function.
  *
@@ -145,6 +145,8 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 		 */
 		preSubmitActions: function() {
 
+			var formID = $( '#wpforms-edit-entry-form' ).data( 'formid' );
+
 			// Fix for Smart Phone fields.
 			$( '.wpforms-smart-phone-field' ).trigger( 'input' );
 
@@ -164,6 +166,17 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 						class: 'wpforms-entry-field-value',
 						text: wpforms_admin_edit_entry.strings.entry_empty_file,
 					} ) );
+				}
+			} );
+
+			// Update Rich Text fields content.
+			$( '.wpforms-field-richtext' ).each( function() {
+
+				var fieldID = $( this ).data( 'field-id' ),
+					editor = tinyMCE.get( 'wpforms-' + formID + '-field_' + fieldID );
+
+				if ( editor ) {
+					editor.save();
 				}
 			} );
 		},

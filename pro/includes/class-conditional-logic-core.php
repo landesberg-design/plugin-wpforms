@@ -406,7 +406,7 @@ class WPForms_Conditional_Logic_Core {
 
 										echo '</td>';
 
-										$text_and_numbers_fields = [ 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'number-slider', 'net_promoter_score' ];
+										$text_and_numbers_fields = [ 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'number-slider', 'net_promoter_score', 'richtext' ];
 
 										// Rule operator - allows the user to
 										// determine the comparison operator used
@@ -617,7 +617,7 @@ class WPForms_Conditional_Logic_Core {
 					$rule_operator = $rule['operator'];
 					$rule_value    = isset( $rule['value'] ) ? $rule['value'] : '';
 
-					if ( in_array( $fields[ $rule_field ]['type'], [ 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'number-slider', 'net_promoter_score' ], true ) ) {
+					if ( in_array( $fields[ $rule_field ]['type'], [ 'text', 'textarea', 'email', 'url', 'number', 'hidden', 'rating', 'number-slider', 'net_promoter_score', 'richtext' ], true ) ) {
 
 						// Text based fields.
 						$left  = strtolower( trim( wpforms_decode_string( $fields[ $rule_field ]['value'] ) ) );

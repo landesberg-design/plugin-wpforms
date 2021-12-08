@@ -33,6 +33,14 @@ class Fields {
 
 		$this->fields = [
 			[
+				'icon'    => 'fa-pencil-square-o',
+				'name'    => esc_html__( 'Rich Text', 'wpforms-lite' ),
+				'name_en' => 'Rich Text',
+				'type'    => 'richtext',
+				'group'   => 'fancy',
+				'order'   => '300',
+			],
+			[
 				'icon'    => 'fa-phone',
 				'name'    => esc_html__( 'Phone', 'wpforms-lite' ),
 				'name_en' => 'Phone',
@@ -197,12 +205,39 @@ class Fields {
 				'order'   => '4',
 			],
 			[
+				'icon'    => 'fa-credit-card',
+				'name'    => esc_html__( 'Stripe Credit Card', 'wpforms-lite' ),
+				'name_en' => 'Stripe Credit Card',
+				'type'    => 'stripe-credit-card',
+				'group'   => 'payment',
+				'addon'   => 'wpforms-stripe',
+				'order'   => '90',
+			],
+			[
+				'icon'    => 'fa-credit-card',
+				'name'    => esc_html__( 'Square', 'wpforms-lite' ),
+				'name_en' => 'Square',
+				'type'    => 'square',
+				'group'   => 'payment',
+				'addon'   => 'wpforms-square',
+				'order'   => '92',
+			],
+			[
+				'icon'    => 'fa-credit-card',
+				'name'    => esc_html__( 'Authorize.Net', 'wpforms-lite' ),
+				'name_en' => 'Authorize.Net',
+				'type'    => 'authorize_net',
+				'group'   => 'payment',
+				'addon'   => 'wpforms-authorize-net',
+				'order'   => '95',
+			],
+			[
 				'icon'    => 'fa-money',
 				'name'    => esc_html__( 'Total', 'wpforms-lite' ),
 				'name_en' => 'Total',
 				'type'    => 'payment-total',
 				'group'   => 'payment',
-				'order'   => '5',
+				'order'   => '110',
 			],
 		];
 
@@ -279,7 +314,7 @@ class Fields {
 		$filtered_fields = [];
 
 		foreach ( $args as $prop => $prop_val ) {
-			foreach ( $fields as $key => $field ) {
+			foreach ( $fields as $field ) {
 				if ( ! empty( $field[ $prop ] ) && $field[ $prop ] === $prop_val ) {
 					array_push( $filtered_fields, $field );
 				}

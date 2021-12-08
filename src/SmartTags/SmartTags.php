@@ -158,7 +158,7 @@ class SmartTags {
 	}
 
 	/**
-	 * Replace smart tags.
+	 * Process smart tags.
 	 *
 	 * @since 1.6.7
 	 *

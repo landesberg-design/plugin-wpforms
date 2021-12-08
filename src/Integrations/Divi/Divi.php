@@ -12,7 +12,7 @@ use WPForms\Integrations\IntegrationInterface;
 class Divi implements IntegrationInterface {
 
 	/**
-	 * Load integration.
+	 * Indicate if current integration is allowed to load.
 	 *
 	 * @since 1.6.3
 	 *
@@ -33,7 +33,7 @@ class Divi implements IntegrationInterface {
 	}
 
 	/**
-	 * Load integration.
+	 * Load an integration.
 	 *
 	 * @since 1.6.3
 	 */
@@ -50,21 +50,23 @@ class Divi implements IntegrationInterface {
 	public function hooks() {
 
 		add_action( 'et_builder_ready', [ $this, 'register_module' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'frontend_styles' ], 5 );
+		add_action( 'wp_enqueue_scripts', [ $this, 'frontend_styles' ], 12 );
 
 		if ( wp_doing_ajax() ) {
 			add_action( 'wp_ajax_wpforms_divi_preview', [ $this, 'preview' ] );
 		}
 
 		if ( $this->is_divi_builder() ) {
-			add_filter( 'wpforms_global_assets', '__return_true' );
 			add_action( 'wp_enqueue_scripts', [ $this, 'builder_styles' ], 12 );
 			add_action( 'wp_enqueue_scripts', [ $this, 'builder_scripts' ] );
+
+			add_filter( 'wpforms_global_assets', '__return_true' );
+			add_filter( 'wpforms_frontend_missing_assets_error_js_disable', '__return_true', PHP_INT_MAX );
 		}
 	}
 
 	/**
-	 * Check is divi builder page.
+	 * Determine if a current page is opened in the Divi Builder.
 	 *
 	 * @since 1.6.3
 	 *
@@ -78,7 +80,8 @@ class Divi implements IntegrationInterface {
 
 	/**
 	 * Get current style name.
-	 * Overwrite styles for the Divi plugin.
+	 *
+	 * Overwrite styles for the Divi Builder.
 	 *
 	 * @since 1.6.3
 	 *
@@ -87,10 +90,12 @@ class Divi implements IntegrationInterface {
 	public function get_current_styles_name() {
 
 		$disable_css = absint( wpforms_setting( 'disable-css', 1 ) );
-		if ( 1 === $disable_css ) {
+
+		if ( $disable_css === 1 ) {
 			return 'full';
 		}
-		if ( 2 === $disable_css ) {
+
+		if ( $disable_css === 2 ) {
 			return 'base';
 		}
 
@@ -98,7 +103,7 @@ class Divi implements IntegrationInterface {
 	}
 
 	/**
-	 * Is the Divi plugin loaded.
+	 * Determine if the Divi Builder plugin is loaded.
 	 *
 	 * @since 1.6.3
 	 *
@@ -115,6 +120,7 @@ class Divi implements IntegrationInterface {
 
 	/**
 	 * Register frontend styles.
+	 * Required for the plugin version of builder only.
 	 *
 	 * @since 1.6.3
 	 */
@@ -137,6 +143,7 @@ class Divi implements IntegrationInterface {
 				WPFORMS_VERSION
 			);
 		}
+
 		wp_register_style(
 			'wpforms-choicesjs',
 			WPFORMS_PLUGIN_URL . "assets/css/integrations/divi/choices{$min}.css",
@@ -146,7 +153,7 @@ class Divi implements IntegrationInterface {
 	}
 
 	/**
-	 * Load styles for builder.
+	 * Load styles.
 	 *
 	 * @since 1.6.3
 	 */
@@ -160,10 +167,22 @@ class Divi implements IntegrationInterface {
 			null,
 			WPFORMS_VERSION
 		);
+
+		$styles_name = $this->get_current_styles_name();
+
+		if ( $styles_name ) {
+			// Load CSS per global setting.
+			wp_register_style(
+				"wpforms-{$styles_name}",
+				WPFORMS_PLUGIN_URL . "assets/css/integrations/divi/wpforms-{$styles_name}{$min}.css",
+				[],
+				WPFORMS_VERSION
+			);
+		}
 	}
 
 	/**
-	 * Load scripts for builder.
+	 * Load scripts.
 	 *
 	 * @since 1.6.3
 	 */
@@ -219,7 +238,7 @@ class Divi implements IntegrationInterface {
 
 		add_filter(
 			'wpforms_frontend_container_class',
-			function ( $classes ) {
+			function( $classes ) {
 
 				$classes[] = 'wpforms-gutenberg-form-selector';
 				$classes[] = 'wpforms-container-full';
@@ -227,22 +246,24 @@ class Divi implements IntegrationInterface {
 				return $classes;
 			}
 		);
+
 		add_action(
 			'wpforms_frontend_output',
-			function () {
+			function() {
 
 				echo '<fieldset disabled>';
 			},
 			3
 		);
+
 		add_action(
 			'wpforms_frontend_output',
-			function () {
+			function() {
 
 				echo '</fieldset>';
 
 				// This empty image is needed to execute JS code that triggers the custom event.
-				// Unfortunately <script> tag doesn't work in Divi builder.
+				// Unfortunately, <script> tag doesn't work in the Divi Builder.
 				echo "<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
 					height='0'
 					width='0'

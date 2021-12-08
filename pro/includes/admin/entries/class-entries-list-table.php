@@ -126,7 +126,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function get_views() {
 
-		$base = remove_query_arg( [ 'type', 'paged' ] );
+		$base = remove_query_arg( [ 'type', 'status', 'paged' ] );
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$current = isset( $_GET['type'] ) ? sanitize_key( wp_unslash( $_GET['type'] ) ) : '';
@@ -386,7 +386,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$entry_fields = wpforms_decode( $entry->fields );
 
 		if (
-			! empty( $entry_fields[ $field_id ] ) &&
+			isset( $entry_fields[ $field_id ]['value'] ) &&
 			! wpforms_is_empty_string( $entry_fields[ $field_id ]['value'] )
 		) {
 
@@ -432,22 +432,27 @@ class WPForms_Entries_Table extends WP_List_Table {
 			case 'entry_id':
 			case 'id':
 				$value = absint( $entry->entry_id );
+
 				break;
 
 			case 'notes_count':
 				$value = absint( $entry->notes_count );
+
 				break;
 
 			case 'date':
 				$value = wpforms_datetime_format( $entry->date, '', true );
+
 				break;
 
 			case 'status':
 				$value = $this->column_status_field( $entry, $column_name );
+
 				break;
 
 			case 'payment_total':
 				$value = $this->column_payment_total_field( $entry, $column_name );
+
 				break;
 
 			default:
@@ -456,10 +461,21 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		// Adds a wrapper with a field type in data attribute.
 		if ( ! empty( $value ) && ! empty( $field_type ) ) {
-			$value = sprintf( '<div data-field-type="%s">%s</div>', $field_type, $value );
+			$value = sprintf( '<div data-field-type="%s">%s</div>', esc_attr( $field_type ), $value );
 		}
 
-		return apply_filters( 'wpforms_entry_table_column_value', $value, $entry, $column_name );
+		/*
+		 * Allow filtering entry table column value.
+		 *
+		 * @since 1.0.0
+		 * @since 1.7.0 Added Field type.
+		 *
+		 * @param string $value       Value.
+		 * @param object $entry       Current entry data.
+		 * @param string $column_name Current column name.
+		 * @param string $field_type  Field type.
+		 */
+		return apply_filters( 'wpforms_entry_table_column_value', $value, $entry, $column_name, $field_type );
 	}
 
 	/**
@@ -1239,7 +1255,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 		if ( ! empty( $_GET['status'] ) ) {
 			$data_args['status'] = sanitize_text_field( $_GET['status'] ); // phpcs:ignore WordPress.Security
-			$total_items         = $this->counts['abandoned'];
+			$total_items         = ! empty( $this->counts[ $data_args['status'] ] ) ? $this->counts[ $data_args['status'] ] : 0;
 		}
 
 		if ( array_key_exists( 'notes_count', $columns ) ) {

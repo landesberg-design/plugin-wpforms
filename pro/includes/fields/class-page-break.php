@@ -30,13 +30,24 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		$this->order = 140;
 		$this->group = 'fancy';
 
-		add_filter( 'wpforms_field_preview_class', array( $this, 'preview_field_class' ), 10, 2 );
-		add_filter( 'wpforms_field_new_class', array( $this, 'preview_field_class' ), 10, 2 );
-		add_filter( 'wpforms_frontend_form_data', array( $this, 'maybe_sort_fields' ), PHP_INT_MAX );
-		add_action( 'wpforms_frontend_output', array( $this, 'display_page_indicator' ), 9, 5 );
-		add_action( 'wpforms_display_fields_before', array( $this, 'display_fields_before' ), 20, 2 );
-		add_action( 'wpforms_display_fields_after', array( $this, 'display_fields_after' ), 5, 2 );
-		add_action( 'wpforms_display_field_after', array( $this, 'display_field_after' ), 20, 2 );
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.7.1
+	 */
+	private function hooks() {
+
+		add_filter( 'wpforms_field_preview_class', [ $this, 'preview_field_class' ], 10, 2 );
+		add_filter( 'wpforms_field_new_class', [ $this, 'preview_field_class' ], 10, 2 );
+		add_filter( 'wpforms_frontend_form_data', [ $this, 'maybe_sort_fields' ], PHP_INT_MAX );
+		add_action( 'wpforms_frontend_output', [ $this, 'display_page_indicator' ], 9, 5 );
+		add_action( 'wpforms_display_fields_before', [ $this, 'display_fields_before' ], 20, 2 );
+		add_action( 'wpforms_display_fields_after', [ $this, 'display_fields_after' ], 5, 2 );
+		add_action( 'wpforms_display_field_after', [ $this, 'display_field_after' ], 20, 2 );
+		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
 	}
 
 	/**
@@ -447,7 +458,8 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 				$field,
 				[
 					'slug'    => 'prev_toggle',
-					'value'   => ! empty( $field['prev_toggle'] ) || ! empty( $field['prev'] ) ? true : false,
+					// Backward compatibility for forms that were created before the toggle was added.
+					'value'   => ! empty( $field['prev_toggle'] ) || ! empty( $field['prev'] ),
 					'desc'    => esc_html__( 'Display Previous', 'wpforms' ),
 					'tooltip' => esc_html__( 'Toggle displaying the Previous page navigation button.', 'wpforms' ),
 				],
@@ -612,12 +624,19 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 					$prev_class,
 					$prev
 				);
-				if ( 'bottom' !== $position ) {
+
+				if ( $position !== 'bottom' ) {
 					printf(
 						'<button class="wpforms-pagebreak-button wpforms-pagebreak-next %s">%s</button>',
 						$next_class,
 						$next
 					);
+
+					if ( $next_class !== 'wpforms-hidden' ) {
+
+						/** This action is documented in includes/class-frontend.php. */
+						do_action( 'wpforms_display_submit_after', $this->form_data );
+					}
 				}
 			echo '</div>';
 		}
@@ -698,8 +717,10 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 				(int) $form_data['id'],
 				esc_html( $next )
 			);
-		}
 
+			/** This action is documented in includes/class-frontend.php. */
+			do_action( 'wpforms_display_submit_after', $form_data );
+		}
 		echo '</div>';
 	}
 

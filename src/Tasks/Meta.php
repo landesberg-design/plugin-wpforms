@@ -169,21 +169,7 @@ class Meta extends \WPForms_DB {
 		$data['action'] = sanitize_key( $data['action'] );
 
 		if ( isset( $data['data'] ) ) {
-			$string = wp_json_encode( $data['data'] );
-
-			if ( $string === false ) {
-				$string = '';
-			}
-
-			/*
-			 * We are encoding the string representation of all the data
-			 * to make sure that nothing can harm the database.
-			 * This is not an encryption, and we need this data later as is,
-			 * so we are using one of the fastest way to do that.
-			 * This data is removed from DB on a daily basis.
-			 */
-			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
-			$data['data'] = base64_encode( $string );
+			$data['data'] = $this->prepare_data( $data['data'] );
 		}
 
 		if ( empty( $type ) ) {
@@ -194,9 +180,37 @@ class Meta extends \WPForms_DB {
 	}
 
 	/**
+	 * Prepare data.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array $data Meta data.
+	 *
+	 * @return string
+	 */
+	private function prepare_data( $data ) {
+
+		$string = wp_json_encode( $data );
+
+		if ( $string === false ) {
+			$string = '';
+		}
+
+		/*
+		 * We are encoding the string representation of all the data
+		 * to make sure that nothing can harm the database.
+		 * This is not an encryption, and we need this data later as is,
+		 * so we are using one of the fastest way to do that.
+		 * This data is removed from DB on a daily basis.
+		 */
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		return base64_encode( $string );
+	}
+
+	/**
 	 * Retrieve a row from the database based on a given row ID.
 	 *
-	 * @since 1.5.9}
+	 * @since 1.5.9
 	 *
 	 * @param int $meta_id Meta ID.
 	 *
@@ -220,5 +234,34 @@ class Meta extends \WPForms_DB {
 		}
 
 		return $meta;
+	}
+
+	/**
+	 * Get meta ID by action name and params.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $action Action name.
+	 * @param array  $params Action params.
+	 *
+	 * @return int
+	 */
+	public function get_meta_id( $action, $params ) {
+
+		global $wpdb;
+
+		$table  = self::get_table_name();
+		$action = sanitize_key( $action );
+		$params = $this->prepare_data( array_values( $params ) );
+
+		return absint(
+			$wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"SELECT id FROM `$table` WHERE action = %s AND data = %s LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$action,
+					$params
+				)
+			)
+		);
 	}
 }

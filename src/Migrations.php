@@ -174,7 +174,7 @@ class Migrations {
 			]
 		);
 
-		// At least 1 form exists - set the detault value.
+		// At least 1 form exists - set the default value.
 		if ( ! empty( $forms ) ) {
 			add_option( 'wpforms_builder_opened_date', 0, '', 'no' );
 		}

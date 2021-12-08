@@ -151,6 +151,9 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 				$submit_style = empty( $this->form_data['fields'] ) ? 'display: none;' : '';
 
 				printf( '<p class="wpforms-field-submit" style="%1$s"><input type="submit" value="%2$s" class="wpforms-field-submit-button"></p>', esc_attr( $submit_style ), esc_attr( $submit ) );
+
+				/** This action is documented in includes/class-frontend.php. */
+				do_action( 'wpforms_display_submit_after', $this->form_data );
 				?>
 
 				<?php wpforms_debug_data( $this->form_data ); ?>
@@ -289,12 +292,14 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 			return;
 		}
 
-		$fields = $this->form_data['fields'];
+		$fields            = $this->form_data['fields'];
+		$field_helper_hide = ! empty( $_COOKIE['wpforms_field_helper_hide'] );
 
 		foreach ( $fields as $field ) {
 
 			$css  = ! empty( $field['size'] ) ? 'size-' . esc_attr( $field['size'] ) : '';
 			$css .= ! empty( $field['label_hide'] ) ? ' label_hide' : '';
+			$css .= isset( $field['label'] ) && empty( $field['label'] ) && $field['type'] !== 'html' ? ' label_empty' : '';
 			$css .= ! empty( $field['sublabel_hide'] ) ? ' sublabel_hide' : '';
 			$css .= ! empty( $field['required'] ) ? ' required' : '';
 			$css .= ! empty( $field['input_columns'] ) && $field['input_columns'] === '2' ? ' wpforms-list-2-columns' : '';
@@ -323,15 +328,21 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 			printf( '<a href="#" class="wpforms-field-delete" title="%s"><i class="fa fa-trash-o" aria-hidden="true"></i></a>', esc_html__( 'Delete Field', 'wpforms-lite' ) );
 
-			printf(
+			if ( ! $field_helper_hide ) {
+				printf(
 				// language=HTML PhpStorm.
-				'<div class="wpforms-field-helper">
-					<span class="wpforms-field-helper-edit">%s</span>
-					<span class="wpforms-field-helper-drag">%s</span>
-				</div>',
-				esc_html__( 'Click to edit.', 'wpforms-lite' ),
-				esc_html__( 'Drag to reorder.', 'wpforms-lite' )
-			);
+					'<div class="wpforms-field-helper">
+						<span class="wpforms-field-helper-edit">%s</span>
+						<span class="wpforms-field-helper-drag">%s</span>
+						<span class="wpforms-field-helper-hide" title="%s">
+							<i class="fa fa-times-circle" aria-hidden="true"></i>
+						</span>
+					</div>',
+					esc_html__( 'Click to Edit', 'wpforms-lite' ),
+					esc_html__( 'Drag to Reorder', 'wpforms-lite' ),
+					esc_html__( 'Hide Helper', 'wpforms-lite' )
+				);
+			}
 
 			do_action( "wpforms_builder_fields_previews_{$field['type']}", $field );
 

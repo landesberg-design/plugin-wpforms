@@ -33,12 +33,15 @@ class WPForms_Entry_Preview extends WPForms_Field {
 
 		add_filter( 'wpforms_builder_strings', [ $this, 'add_builder_strings' ], 10, 2 );
 		add_action( 'wpforms_frontend_css', [ $this, 'enqueue_styles' ] );
+		add_action( 'wpforms_frontend_js', [ $this, 'enqueue_scripts' ] );
 		add_action( 'wpforms_frontend_confirmation', [ $this, 'enqueue_styles' ] );
+		add_action( 'wpforms_frontend_confirmation', [ $this, 'enqueue_scripts' ] );
 		add_action( 'wp_ajax_wpforms_get_entry_preview', [ $this, 'ajax_get_entry_preview' ] );
 		add_action( 'wp_ajax_nopriv_wpforms_get_entry_preview', [ $this, 'ajax_get_entry_preview' ] );
 		add_action( 'wpforms_form_settings_confirmations_single_after', [ $this, 'add_confirmation_fields' ], 10, 2 );
 		add_action( 'wpforms_frontend_confirmation_message_after', [ $this, 'entry_preview_confirmation' ], 10, 4 );
 		add_filter( 'wpforms_frontend_form_data', [ $this, 'ignore_fields' ] );
+		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
 	}
 
 	/**
@@ -67,6 +70,33 @@ class WPForms_Entry_Preview extends WPForms_Field {
 			WPFORMS_PLUGIN_URL . "pro/assets/css/fields/entry-preview{$min}.css",
 			[],
 			WPFORMS_VERSION
+		);
+
+	}
+
+	/**
+	 * Enqueue scripts.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array $forms Forms on the page.
+	 */
+	public function enqueue_scripts( $forms ) {
+
+		$forms = ! empty( $forms ) && is_array( $forms ) ? $forms : [];
+
+		if ( ! $this->is_page_has_entry_preview( $forms ) ) {
+			return;
+		}
+
+		$min = wpforms_get_min_suffix();
+
+		wp_enqueue_script(
+			'wpforms-entry-preview',
+			WPFORMS_PLUGIN_URL . "pro/assets/js/fields/entry-preview{$min}.js",
+			[ 'jquery' ],
+			WPFORMS_VERSION,
+			true
 		);
 	}
 
@@ -392,23 +422,51 @@ class WPForms_Entry_Preview extends WPForms_Field {
 
 		$fields         = $this->filter_conditional_logic( $fields, $form_data );
 		$ignored_fields = self::get_ignored_fields();
-
-		printf( '<div class="wpforms-entry-preview wpforms-entry-preview-%s">', esc_attr( $type ) );
+		$fields_html    = '';
 
 		foreach ( $fields as $field ) {
 			if ( in_array( $field['type'], $ignored_fields, true ) ) {
 				continue;
 			}
 
-			printf(
+			$value = $this->get_field_value( $field, $form_data );
+
+			if ( empty( $value ) ) {
+				continue;
+			}
+
+			/**
+			 * Hide the field.
+			 *
+			 * @since 1.7.0
+			 *
+			 * @param bool  $hide      Hide the field.
+			 * @param array $field     Field data.
+			 * @param array $form_data Form data.
+			 *
+			 * @return bool
+			 */
+			if ( (bool) apply_filters( 'wpforms_pro_fields_entry_preview_print_entry_preview_exclude_field', false, $field, $form_data ) ) {
+				continue;
+			}
+
+			$fields_html .= sprintf(
 				'<div class="wpforms-entry-preview-label">%s</div>
 				<div class="wpforms-entry-preview-value">%s</div>',
 				esc_html( $this->get_field_label( $field, $form_data ) ),
-				wp_kses_post( $this->get_field_value( $field, $form_data ) )
+				wp_kses_post( $value )
 			);
 		}
 
-		echo '</div>';
+		if ( empty( $fields_html ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="wpforms-entry-preview wpforms-entry-preview-%s">%s</div>',
+			esc_attr( $type ),
+			wp_kses_post( $fields_html )
+		);
 	}
 
 	/**
@@ -449,7 +507,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 
 		$label = ! empty( $field['name'] )
 			? wp_strip_all_tags( $field['name'] )
-			: sprintf( /* translators: %d - field id. */
+			: sprintf( /* translators: %d - field ID. */
 				esc_html__( 'Field ID #%d', 'wpforms' ),
 				absint( $field['id'] )
 			);
@@ -513,18 +571,55 @@ class WPForms_Entry_Preview extends WPForms_Field {
 		$value = (string) apply_filters( 'wpforms_pro_fields_entry_preview_get_field_value', $value, $field, $form_data );
 
 		if ( ! $this->is_field_support_preview( $value, $field, $form_data ) ) {
-			return sprintf( '<em>%s</em>', esc_html__( 'Preview not available', 'wpforms' ) );
+			/**
+			 * Show fields that do not have available preview.
+			 *
+			 * @since 1.7.0
+			 *
+			 * @param bool  $show      Show the field.
+			 * @param array $field     Field data.
+			 * @param array $form_data Form data.
+			 *
+			 * @return bool
+			 */
+			$show = (bool) apply_filters( 'wpforms_pro_fields_entry_preview_get_field_value_show_preview_not_available', true, $field, $form_data );
+
+			return $show ? sprintf( '<em>%s</em>', esc_html__( 'Preview not available', 'wpforms' ) ) : '';
 		}
 
 		if ( wpforms_is_empty_string( $value ) ) {
-			return sprintf( '<em>%s</em>', esc_html__( 'Empty', 'wpforms' ) );
+			/**
+			 * Show fields with the empty value.
+			 *
+			 * @since 1.7.0
+			 *
+			 * @param bool  $show      Show the field.
+			 * @param array $field     Field data.
+			 * @param array $form_data Form data.
+			 *
+			 * @return bool
+			 */
+			$show = (bool) apply_filters( 'wpforms_pro_fields_entry_preview_get_field_value_show_empty', true, $field, $form_data );
+
+			return $show ? sprintf( '<em>%s</em>', esc_html__( 'Empty', 'wpforms' ) ) : '';
 		}
 
-		return nl2br( $value );
+		/**
+		 * The field value inside the entry preview for exact field type after all checks.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @param string $value     Value.
+		 * @param array  $field     Field data.
+		 * @param array  $form_data Form data.
+		 *
+		 * @return string
+		 */
+		return (string) apply_filters( "wpforms_pro_fields_entry_preview_get_field_value_{$type}_field_after", $value, $field, $form_data );
 	}
 
 	/**
-	 * The field is available to show inside the entry preview field.
+	 * Determine whether the field is available to show inside the entry preview field.
 	 *
 	 * @since 1.6.9
 	 *
@@ -537,16 +632,10 @@ class WPForms_Entry_Preview extends WPForms_Field {
 	private function is_field_support_preview( $value, $field, $form_data ) {
 
 		$field_type   = $field['type'];
-		$field_id     = $field['id'];
-		$field_data   = ! empty( $form_data['fields'][ $field_id ] ) ? $form_data['fields'][ $field_id ] : [];
 		$is_supported = true;
 
 		// Compatibility with Authorize.Net and Stripe addons.
 		if ( wpforms_is_empty_string( $value ) && in_array( $field_type, [ 'stripe-credit-card', 'authorize_net' ], true ) ) {
-			return false;
-		}
-
-		if ( $field_type === 'file-upload' && ! empty( $field_data['style'] ) && $field_data['style'] === 'modern' ) {
 			return false;
 		}
 
@@ -565,11 +654,12 @@ class WPForms_Entry_Preview extends WPForms_Field {
 		$is_supported = (bool) apply_filters( "wpforms_pro_fields_entry_preview_is_field_support_preview_{$field_type}_field", $is_supported, $value, $field, $form_data );
 
 		/**
-		 * The field availability inside the entry preview field.
+		 * Fields availability inside the entry preview field.
+		 * Actually, it can control availabilities for all field types.
 		 *
 		 * @since 1.6.9
 		 *
-		 * @param bool   $is_supported The field availability.
+		 * @param bool   $is_supported Fields availability.
 		 * @param string $value        Value.
 		 * @param array  $field        Field data.
 		 * @param array  $form_data    Form data.

@@ -60,7 +60,7 @@ class Fields extends Education\Builder\Fields {
 		$edu_fields   = $this->fields->get_by_group( $group );
 		$edu_fields   = $this->fields->set_values( $edu_fields, 'class', 'education-modal', 'empty' );
 
-		foreach ( $edu_fields as $f => $edu_field ) {
+		foreach ( $edu_fields as $edu_field ) {
 
 			// Skip if in the current group already exist field of this type.
 			if ( ! empty( wp_list_filter( $group_fields, [ 'type' => $edu_field['type'] ] ) ) ) {
@@ -82,10 +82,11 @@ class Fields extends Education\Builder\Fields {
 				$edu_field['action']      = isset( $addon['action'] ) ? $addon['action'] : '';
 				$edu_field['url']         = isset( $addon['url'] ) && $edu_field['action'] === 'install' ? $addon['url'] : '';
 				$edu_field['video']       = isset( $addon['video'] ) ? $addon['video'] : '';
+				$edu_field['license']     = isset( $addon['license_level'] ) ? $addon['license_level'] : '';
 				$edu_field['nonce']       = $nonce;
 			}
 
-			array_push( $fields[ $group ]['fields'], $edu_field );
+			$fields[ $group ]['fields'][] = $edu_field;
 		}
 
 		return $fields;
@@ -130,6 +131,10 @@ class Fields extends Education\Builder\Fields {
 
 		if ( ! empty( $field['video'] ) ) {
 			$atts['data']['video'] = $field['video'];
+		}
+
+		if ( ! empty( $field['license'] ) ) {
+			$atts['data']['license'] = $field['license'];
 		}
 
 		return $atts;

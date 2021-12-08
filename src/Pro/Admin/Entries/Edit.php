@@ -60,7 +60,8 @@ class Edit {
 	 * Entry ID.
 	 *
 	 * @since 1.6.0
-	 * @var integer
+	 *
+	 * @var int
 	 */
 	public $entry_id;
 
@@ -143,12 +144,10 @@ class Edit {
 		if ( wpforms_is_admin_page( 'entries', 'details' ) ) {
 
 			add_action( 'wpforms_entry_details_sidebar_details_action', [ $this, 'display_edit_button' ], 10, 2 );
-
 		}
 
 		// Check edit entry page.
 		if ( ! wpforms_is_admin_page( 'entries', 'edit' ) ) {
-
 			return;
 		}
 
@@ -180,6 +179,7 @@ class Edit {
 
 		// Enqueues.
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'before_enqueue_media' ], 0 );
 
 		// Hook for add-ons.
 		do_action( 'wpforms_pro_admin_entries_edit_init', $this );
@@ -208,8 +208,19 @@ class Edit {
 
 		foreach ( $field_types as $field_type ) {
 			$obj = $this->get_entries_edit_field_object( $field_type );
+
 			$obj->enqueues();
 		}
+	}
+
+	/**
+	 * Initialize Rich Text field related settings before calling wp_enqueue_media().
+	 *
+	 * @since 1.7.0
+	 */
+	public function before_enqueue_media() {
+
+		( new \WPForms_Field_Richtext( false ) )->edit_entry_before_enqueues();
 	}
 
 	/**
@@ -277,6 +288,16 @@ class Edit {
 			true
 		);
 
+		if ( wpforms_has_field_type( 'richtext', $this->form ) ) {
+			wp_enqueue_script(
+				'wpforms-richtext-field',
+				WPFORMS_PLUGIN_URL . "pro/assets/js/fields/richtext{$min}.js",
+				[ 'jquery' ],
+				WPFORMS_VERSION,
+				true
+			);
+		}
+
 		// Load frontend base JS.
 		wp_enqueue_script(
 			'wpforms-frontend',
@@ -323,7 +344,10 @@ class Edit {
 			'continue_editing'  => esc_html__( 'Continue Editing', 'wpforms' ),
 			'view_entry'        => esc_html__( 'View Entry', 'wpforms' ),
 			'msg_saved'         => esc_html__( 'The entry was successfully saved.', 'wpforms' ),
-			'entry_delete_file' => esc_html__( 'Are you sure you want to permanently delete the file "{file_name}"?', 'wpforms' ),
+			'entry_delete_file' => sprintf( /* translators: %s - file name. */
+				esc_html__( 'Are you sure you want to permanently delete the file "%s"?', 'wpforms' ),
+				'{file_name}'
+			),
 			'entry_empty_file'  => esc_html__( 'Empty', 'wpforms' ),
 		];
 
@@ -486,9 +510,17 @@ class Edit {
 			exit;
 		}
 
-		$entry     = $this->entry;
-		$form_data = $this->form_data;
-		$form_id   = ! empty( $form_data['id'] ) ? (int) $form_data['id'] : 0;
+		$entry          = $this->entry;
+		$form_data      = $this->form_data;
+		$form_id        = ! empty( $form_data['id'] ) ? (int) $form_data['id'] : 0;
+		$view_entry_url = add_query_arg(
+			[
+				'page'     => 'wpforms-entries',
+				'view'     => 'details',
+				'entry_id' => $entry->entry_id,
+			],
+			admin_url( 'admin.php' )
+		);
 
 		$form_atts = [
 			'id'    => 'wpforms-edit-entry-form',
@@ -508,7 +540,7 @@ class Edit {
 
 			<h1 class="page-title">
 				<?php esc_html_e( 'Edit Entry', 'wpforms' ); ?>
-				<a href="<?php echo esc_url( $this->form->form_entries_url ); ?>" class="add-new-h2 wpforms-btn-orange"><?php esc_html_e( 'Back to All Entries', 'wpforms' ); ?></a>
+				<a href="<?php echo esc_url( $view_entry_url ); ?>" class="add-new-h2 wpforms-btn-orange"><?php esc_html_e( 'Back to Entry', 'wpforms' ); ?></a>
 			</h1>
 
 			<div class="wpforms-admin-content">
@@ -605,7 +637,7 @@ class Edit {
 
 		$form_id = (int) $form_data['id'];
 
-		echo '<input type="hidden" name="wpforms[id]" value="' . esc_attr( $form_id ) . '">';
+		echo '<input type="hidden" name="wpforms[id]" value="' . absint( $form_id ) . '">';
 		echo '<input type="hidden" name="wpforms[entry_id]" value="' . esc_attr( $this->entry->entry_id ) . '">';
 		echo '<input type="hidden" name="nonce" value="' . esc_attr( wp_create_nonce( 'wpforms-entry-edit-' . $form_id . '-' . $this->entry->entry_id ) ) . '">';
 
@@ -637,8 +669,8 @@ class Edit {
 
 		$field_type = ! empty( $field['type'] ) ? $field['type'] : '';
 
-		// Do not display some fields at all.
-		if ( ! $this->is_field_can_be_displayed( $field_type ) ) {
+		// We can't display the field of unknown type or field, that is not displayable.
+		if ( ! $this->is_field_displayable( $field_type, $field, $form_data ) ) {
 			return;
 		}
 
@@ -1147,16 +1179,49 @@ class Edit {
 	 * Check if the field can be displayed.
 	 *
 	 * @since 1.6.0
+	 * @since 1.7.1 Added $field and $form_data arguments.
 	 *
-	 * @param string $type Field type.
+	 * @param string $field_type Field type.
+	 * @param array  $field      Field data.
+	 * @param array  $form_data  Form data and settings.
 	 *
 	 * @return bool
 	 */
-	private function is_field_can_be_displayed( $type ) {
+	private function is_field_displayable( $field_type, $field, $form_data ) {
+
+		if ( empty( $field_type ) ) {
+			return false;
+		}
+
+		/**
+		 * Determine if the field is displayable on the backend.
+		 *
+		 * @since 1.7.1
+		 *
+		 * @param bool  $is_displayable Is the field displayable?
+		 * @param array $field          Field data.
+		 * @param array $form_data      Form data and settings.
+		 *
+		 * @return bool
+		 */
+		$is_displayable = (bool) apply_filters( "wpforms_pro_admin_entries_edit_is_field_displayable_{$field_type}", true, $field, $form_data );
+
+		if ( ! has_filter( 'wpforms_pro_admin_entries_edit_fields_dont_display' ) ) {
+			return $is_displayable;
+		}
 
 		$dont_display = [ 'divider', 'entry-preview', 'html', 'pagebreak' ];
 
-		return ! empty( $type ) && ! in_array( $type, (array) apply_filters( 'wpforms_pro_admin_entries_edit_fields_dont_display', $dont_display ), true );
+		return ! in_array(
+			$field_type,
+			(array) apply_filters_deprecated(
+				'wpforms_pro_admin_entries_edit_fields_dont_display',
+				[ $dont_display ],
+				'1.7.1 of the WPForms plugin',
+				"wpforms_pro_admin_entries_edit_is_field_displayable_{$field_type}"
+			),
+			true
+		);
 	}
 
 	/**
@@ -1170,25 +1235,18 @@ class Edit {
 	 */
 	private function is_field_entries_editable( $type ) {
 
-		$editable_types = [
-			'checkbox',
-			'email',
-			'name',
-			'number',
-			'number-slider',
-			'radio',
-			'select',
-			'text',
-			'textarea',
-			'address',
-			'date-time',
-			'phone',
-			'rating',
-			'url',
-		];
+		$editable = in_array( $type,  wpforms()->get( 'entry' )->get_editable_field_types(), true );
 
-		$editable = in_array( $type, $editable_types, true );
-
+		/**
+		 * Allow change if the field is editable regarding to its type.
+		 *
+		 * @since 1.6.0
+		 *
+		 * @param bool   $editable True if is editable.
+		 * @param string $type     Field type.
+		 *
+		 * @return bool
+		 */
 		return (bool) apply_filters( 'wpforms_pro_admin_entries_edit_field_editable', $editable, $type );
 	}
 

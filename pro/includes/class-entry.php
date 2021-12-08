@@ -22,6 +22,35 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	}
 
 	/**
+	 * List of editable fields type.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array
+	 */
+	public function get_editable_field_types() {
+
+		return [
+			'checkbox',
+			'email',
+			'name',
+			'number',
+			'number-slider',
+			'radio',
+			'select',
+			'text',
+			'textarea',
+			'address',
+			'date-time',
+			'phone',
+			'rating',
+			'richtext',
+			'url',
+			'file-upload',
+		];
+	}
+
+	/**
 	 * Get table columns.
 	 *
 	 * @since 1.0.0
@@ -1020,12 +1049,51 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 */
 	public function has_editable_fields( $entry ) {
 
-		$fields = wpforms_decode( $entry->fields );
+		$entry_fields = wpforms_decode( $entry->fields );
 
-		if ( empty( $fields ) ) {
+		if ( empty( $entry_fields ) ) {
 			return false;
 		}
 
-		return true;
+		$form_data = wpforms()->get( 'form' )->get( (int) $entry->form_id, [ 'content_only' => true ] );
+
+		if ( ! is_array( $form_data ) || empty( $form_data['fields'] ) ) {
+			return false;
+		}
+
+		foreach ( $form_data['fields'] as $id => $form_field ) {
+
+			/** This filter is documented in src/Pro/Admin/Entries/Edit.php */
+			$is_editable = (bool) apply_filters(
+				'wpforms_pro_admin_entries_edit_field_output_editable',
+				$this->is_field_editable( $form_field['type'] ),
+				$form_field,
+				$entry_fields,
+				$form_data
+			);
+
+			if ( ! $is_editable ) {
+				unset( $form_data['fields'][ $id ] );
+			}
+		}
+
+		return ! empty( $form_data['fields'] );
+	}
+
+	/**
+	 * Determine whether the field type is editable.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param string $type Field type.
+	 *
+	 * @return bool True if editable.
+	 */
+	private function is_field_editable( $type ) {
+
+		$editable = in_array( $type, $this->get_editable_field_types(), true );
+
+		/** This filter is documented in src/Pro/Admin/Entries/Edit.php */
+		return (bool) apply_filters( 'wpforms_pro_admin_entries_edit_field_editable', $editable, $type );
 	}
 }

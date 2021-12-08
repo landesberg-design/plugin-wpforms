@@ -390,7 +390,7 @@ class WPForms_Field_Email extends WPForms_Field {
 		// Hide Label.
 		$this->field_option( 'label_hide', $field );
 
-		// Hide sub-labels.
+		// Hide sublabels.
 		$this->field_option( 'sublabel_hide', $field );
 
 		// Options close markup.
@@ -584,12 +584,6 @@ class WPForms_Field_Email extends WPForms_Field {
 	 * @since 1.6.3
 	 */
 	public function ajax_check_restricted_email() {
-
-		$token = wpforms()->get( 'token' );
-
-		if ( ! $token || ! $token->verify( filter_input( INPUT_POST, 'token', FILTER_SANITIZE_STRING ) ) ) {
-			wp_send_json_error();
-		}
 
 		$form_id  = filter_input( INPUT_POST, 'form_id', FILTER_SANITIZE_NUMBER_INT );
 		$field_id = filter_input( INPUT_POST, 'field_id', FILTER_SANITIZE_NUMBER_INT );

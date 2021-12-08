@@ -403,7 +403,10 @@ class WPForms_Settings {
 					'id'      => 'validation-email-suggestion',
 					'name'    => esc_html__( 'Email Suggestion', 'wpforms-lite' ),
 					'type'    => 'text',
-					'default' => esc_html__( 'Did you mean {suggestion}?', 'wpforms-lite' ),
+					'default' => sprintf( /* translators: %s - suggested email address. */
+						esc_html__( 'Did you mean %s?', 'wpforms-lite' ),
+						'{suggestion}'
+					),
 				],
 				'validation-email-restricted'      => [
 					'id'      => 'validation-email-restricted',
@@ -445,13 +448,21 @@ class WPForms_Settings {
 					'id'      => 'validation-character-limit',
 					'name'    => esc_html__( 'Character Limit', 'wpforms-lite' ),
 					'type'    => 'text',
-					'default' => esc_html__( 'Limit is {limit} characters. Characters remaining: {remaining}.', 'wpforms-lite' ),
+					'default' => sprintf( /* translators: %1$s - characters limit, %2$s - number of characters left. */
+						esc_html__( 'Limit is %1$s characters. Characters remaining: %2$s.', 'wpforms-lite' ),
+						'{limit}',
+						'{remaining}'
+					),
 				],
 				'validation-word-limit'            => [
 					'id'      => 'validation-word-limit',
 					'name'    => esc_html__( 'Word Limit', 'wpforms-lite' ),
 					'type'    => 'text',
-					'default' => esc_html__( 'Limit is {limit} words. Words remaining: {remaining}.', 'wpforms-lite' ),
+					'default' => sprintf( /* translators: %1$s - words limit, %2$s - number of words left. */
+						esc_html__( 'Limit is %1$s words. Words remaining: %2$s.', 'wpforms-lite' ),
+						'{limit}',
+						'{remaining}'
+					),
 				],
 			],
 			// Provider integrations settings tab.

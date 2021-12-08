@@ -264,7 +264,7 @@ class WPForms_About {
 					<?php
 					printf(
 						wp_kses(
-						    /* translators: %1$s - WPBeginner URL; %2$s - OptinMonster URL; %3$s - MonsterInsights URL. */
+							/* translators: %1$s - WPBeginner URL; %2$s - OptinMonster URL; %3$s - MonsterInsights URL. */
 							__( 'WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href="%1$s" target="_blank" rel="noopener noreferrer">WPBeginner</a>, the most popular lead-generation software, <a href="%2$s" target="_blank" rel="noopener noreferrer">OptinMonster</a>, the best WordPress analytics plugin, <a href="%3$s" target="_blank" rel="noopener noreferrer">MonsterInsights</a>, and the more!', 'wpforms-lite' ),
 							[
 								'a' => [
@@ -528,7 +528,7 @@ class WPForms_About {
 						<?php
 						printf(
 							wp_kses( /* translators: %s - stars. */
-								__( 'We know that you will truly love WPForms. It has over <strong>9000+ five star ratings</strong> (%s) and is active on over 4 million websites.', 'wpforms-lite' ),
+								__( 'We know that you will truly love WPForms. It has over <strong>9000+ five star ratings</strong> (%s) and is active on over 5 million websites.', 'wpforms-lite' ),
 								[
 									'strong' => [],
 								]
@@ -565,7 +565,7 @@ class WPForms_About {
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
-									<?php esc_html_e( 'Create payment forms with Stripe, PayPal, and Authorize.Net.', 'wpforms-lite' ); ?>
+									<?php esc_html_e( 'Create payment forms with Stripe, Square, PayPal, and Authorize.Net.', 'wpforms-lite' ); ?>
 								</li>
 							</ul>
 						</div>
@@ -1085,21 +1085,21 @@ class WPForms_About {
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Access to all Standard and Fancy Fields', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Address, Phone, Website / URL, Date / Time, Password, File Upload, HTML, Pagebreaks, Section Dividers, Ratings, and Hidden Field', 'wpforms-lite' ),
+						esc_html__( 'Address, Phone, Website / URL, Date / Time, Password, File Upload, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, Rich Text, and Hidden Field', 'wpforms-lite' ),
 					],
 				],
 				'plus'  => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Access to all Standard and Fancy Fields', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Address, Phone, Website URL, Date/Time, Password, File Upload, HTML, Pagebreaks, Section Dividers, Ratings, and Hidden Field', 'wpforms-lite' ),
+						esc_html__( 'Address, Phone, Website URL, Date/Time, Password, File Upload, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, Rich Text, and Hidden Field', 'wpforms-lite' ),
 					],
 				],
 				'pro'   => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Access to all Standard and Fancy Fields', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Address, Phone, Website URL, Date/Time, Password, File Upload, HTML, Pagebreaks, Section Dividers, Ratings, and Hidden Field', 'wpforms-lite' ),
+						esc_html__( 'Address, Phone, Website URL, Date/Time, Password, File Upload, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, Rich Text, Hidden, and Payment fields', 'wpforms-lite' ),
 					],
 				],
 			],
@@ -1257,28 +1257,28 @@ class WPForms_About {
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Create Payment Forms', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Accept payments using Stripe (credit card) and PayPal', 'wpforms-lite' ),
+						esc_html__( 'Accept payments using Stripe, Square, and PayPal', 'wpforms-lite' ),
 					],
 				],
 				'elite'    => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Create Payment Forms', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Accept payments using Stripe, PayPal, and Authorize.Net', 'wpforms-lite' ),
+						esc_html__( 'Accept payments using Stripe, Square, PayPal, and Authorize.Net', 'wpforms-lite' ),
 					],
 				],
 				'agency'   => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Create Payment Forms', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Accept payments using Stripe, PayPal, and Authorize.Net', 'wpforms-lite' ),
+						esc_html__( 'Accept payments using Stripe, Square, PayPal, and Authorize.Net', 'wpforms-lite' ),
 					],
 				],
 				'ultimate' => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Create Payment Forms', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Accept payments using Stripe, PayPal, and Authorize.Net', 'wpforms-lite' ),
+						esc_html__( 'Accept payments using Stripe, Square, PayPal, and Authorize.Net', 'wpforms-lite' ),
 					],
 				],
 			],
@@ -1326,14 +1326,14 @@ class WPForms_About {
 					'status' => 'partial',
 					'text'   => [
 						'<strong>' . esc_html__( 'Limited Advanced Features', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Multi-page Forms, File Upload Forms, Multiple Form Notifications, Conditional Form Confirmation', 'wpforms-lite' ),
+						esc_html__( 'Multi-page Forms, File Upload Forms, Multiple Form Notifications, Conditional Form Confirmation, Save and Resume Form', 'wpforms-lite' ),
 					],
 				],
 				'pro'   => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Advanced Features', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Multi-page Forms, File Upload Forms, Multiple Form Notifications, Conditional Form Confirmation, Custom CAPTCHA, Offline Forms, Signature Forms', 'wpforms-lite' ),
+						esc_html__( 'Multi-page Forms, File Upload Forms, Multiple Form Notifications, Conditional Form Confirmation, Custom CAPTCHA, Offline Forms, Signature Forms, Save and Resume Form', 'wpforms-lite' ),
 					],
 				],
 			],
@@ -1367,21 +1367,21 @@ class WPForms_About {
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, and more (27 total)', 'wpforms-lite' ),
+						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, and more (27 total)', 'wpforms-lite' ),
 					],
 				],
 				'ultimate' => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, and more (27 total)', 'wpforms-lite' ),
+						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, and more (27 total)', 'wpforms-lite' ),
 					],
 				],
 				'agency'   => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'All Addons Included', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, and more (27 total)', 'wpforms-lite' ),
+						esc_html__( 'Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, and more (27 total)', 'wpforms-lite' ),
 					],
 				],
 			],

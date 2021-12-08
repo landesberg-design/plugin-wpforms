@@ -1,15 +1,13 @@
 <?php
 /**
- * Form Builder Help Screen tetemplate.
+ * Form Builder Help Screen template.
  *
  * @since 1.6.3
  *
- * @version 1.6.3
- *
- * @var array  $settings
+ * @var array $settings
  */
 
-if ( ! \defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 

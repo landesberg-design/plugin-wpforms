@@ -1,4 +1,4 @@
-/* global wpforms_education, WPFormsBuilder, WPFormsAdmin, wpforms_admin */
+/* global wpforms_education, WPFormsAdmin, wpforms_admin */
 /**
  * WPForms Education core for Pro.
  *
@@ -10,15 +10,6 @@
 var WPFormsEducation = window.WPFormsEducation || {};
 
 WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( document, window, $ ) {
-
-	/**
-	 * Runtime variables.
-	 *
-	 * @since 1.6.8
-	 *
-	 * @type {object}
-	 */
-	var vars = {};
 
 	/**
 	 * Public functions and properties.
@@ -35,8 +26,6 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 		 * @since 1.6.6
 		 */
 		init: function() {
-
-			vars.spinner = '<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
 
 			$( app.ready );
 		},
@@ -76,25 +65,14 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 
 					var $this = $( this );
 
+					if ( ! $this.data( 'action' ) || [ 'activate', 'install' ].includes( $this.data( 'action' ) ) ) {
+						return;
+					}
+
 					event.preventDefault();
 					event.stopImmediatePropagation();
 
 					switch ( $this.data( 'action' ) ) {
-						case 'activate':
-							app.activateModal(
-								$this.data( 'name' ),
-								$this.data( 'path' ),
-								$this.data( 'nonce' )
-							);
-							break;
-						case 'install':
-							app.installModal(
-								$this.data( 'name' ),
-								$this.data( 'url' ),
-								$this.data( 'nonce' ),
-								$this.data( 'license' )
-							);
-							break;
 						case 'upgrade':
 							app.upgradeModal(
 								$this.data( 'name' ),
@@ -162,243 +140,6 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 						}, 5000 );
 					} );
 			} );
-		},
-
-		/**
-		 * Addon activate modal.
-		 *
-		 * @since 1.6.6
-		 *
-		 * @param {string} feature Feature name.
-		 * @param {string} path    Addon path.
-		 * @param {string} nonce   Action nonce.
-		 */
-		activateModal: function( feature, path, nonce ) {
-
-			$.alert( {
-				title  : false,
-				content: wpforms_education.activate_prompt.replace( /%name%/g, feature ),
-				icon   : 'fa fa-info-circle',
-				type   : 'blue',
-				buttons: {
-					confirm: {
-						text    : wpforms_education.activate_confirm,
-						btnClass: 'btn-confirm',
-						keys    : [ 'enter' ],
-						action  : function() {
-
-							this.$$confirm
-								.prop( 'disabled', true )
-								.html( vars.spinner + wpforms_education.activating );
-
-							this.$$cancel
-								.prop( 'disabled', true );
-
-							app.activateAddon( path, nonce, this );
-
-							return false;
-						},
-					},
-					cancel : {
-						text: wpforms_education.cancel,
-					},
-				},
-			} );
-		},
-
-		/**
-		 * Activate addon via AJAX.
-		 *
-		 * @since 1.6.6
-		 *
-		 * @param {string} path          Addon path.
-		 * @param {string} nonce         Action nonce.
-		 * @param {object} previousModal Previous modal instance.
-		 */
-		activateAddon: function( path, nonce, previousModal ) {
-
-			$.post(
-				wpforms_education.ajax_url,
-				{
-					action: 'wpforms_activate_addon',
-					nonce : nonce,
-					plugin: path,
-				},
-				function( res ) {
-
-					previousModal.close();
-
-					if ( res.success ) {
-						app.saveModal();
-					} else {
-						$.alert( {
-							title  : false,
-							content: res.data,
-							icon   : 'fa fa-exclamation-circle',
-							type   : 'orange',
-							buttons: {
-								confirm: {
-									text    : wpforms_education.close,
-									btnClass: 'btn-confirm',
-									keys    : [ 'enter' ],
-								},
-							},
-						} );
-					}
-				}
-			);
-		},
-
-		/**
-		 * Ask user if they would like to save form and refresh form builder.
-		 *
-		 * @since 1.6.6
-		 *
-		 * @param {string} title Modal title.
-		 */
-		saveModal: function( title ) {
-
-			title = title || wpforms_education.activated;
-
-			$.alert( {
-				title  : title.replace( /\.$/, '' ), // Remove a dot in the title end.
-				content: wpforms_education.save_prompt,
-				icon   : 'fa fa-check-circle',
-				type   : 'green',
-				buttons: {
-					confirm: {
-						text    : wpforms_education.save_confirm,
-						btnClass: 'btn-confirm',
-						keys    : [ 'enter' ],
-						action  : function() {
-
-							if ( 'undefined' === typeof WPFormsBuilder ) {
-								location.reload();
-
-								return;
-							}
-
-							this.$$confirm
-								.prop( 'disabled', true )
-								.html( vars.spinner + wpforms_education.saving );
-
-							this.$$cancel
-								.prop( 'disabled', true );
-
-							if ( WPFormsBuilder.formIsSaved() ) {
-								location.reload();
-							}
-
-							WPFormsBuilder.formSave().done( function() {
-								location.reload();
-							} );
-
-							return false;
-						},
-					},
-					cancel : {
-						text: wpforms_education.close,
-					},
-				},
-			} );
-		},
-
-		/**
-		 * Addon install modal.
-		 *
-		 * @since 1.6.6
-		 *
-		 * @param {string} feature Feature name.
-		 * @param {string} url     Install URL.
-		 * @param {string} nonce   Action nonce.
-		 * @param {string} type    License level.
-		 */
-		installModal: function( feature, url, nonce, type ) {
-
-			if ( ! url || '' === url ) {
-				app.upgradeModal( feature, '', 'Empty install URL', type, '' );
-				return;
-			}
-
-			$.alert( {
-				title   : false,
-				content : wpforms_education.install_prompt.replace( /%name%/g, feature ),
-				icon    : 'fa fa-info-circle',
-				type    : 'blue',
-				boxWidth: '425px',
-				buttons : {
-					confirm: {
-						text    : wpforms_education.install_confirm,
-						btnClass: 'btn-confirm',
-						keys    : [ 'enter' ],
-						isHidden: ! wpforms_education.can_install_addons,
-						action  : function() {
-
-							this.$$confirm.prop( 'disabled', true )
-								.html( vars.spinner + wpforms_education.installing );
-
-							this.$$cancel
-								.prop( 'disabled', true );
-
-							app.installAddon( url, nonce, this );
-
-							return false;
-						},
-					},
-					cancel : {
-						text: wpforms_education.cancel,
-					},
-				},
-			} );
-		},
-
-		/**
-		 * Install addon via AJAX.
-		 *
-		 * @since 1.6.6
-		 *
-		 * @param {string} url           Install URL.
-		 * @param {string} nonce         Action nonce.
-		 * @param {object} previousModal Previous modal instance.
-		 */
-		installAddon: function( url, nonce, previousModal ) {
-
-			$.post(
-				wpforms_education.ajax_url,
-				{
-					action: 'wpforms_install_addon',
-					nonce : nonce,
-					plugin: url,
-				},
-				function( res ) {
-
-					previousModal.close();
-
-					if ( res.success ) {
-						app.saveModal( res.data.msg );
-					} else {
-						var message = res.data;
-
-						if ( 'object' === typeof res.data ) {
-							message = wpforms_education.addon_error;
-						}
-
-						$.alert( {
-							title  : false,
-							content: message,
-							icon   : 'fa fa-exclamation-circle',
-							type   : 'orange',
-							buttons: {
-								confirm: {
-									text    : wpforms_education.close,
-									btnClass: 'btn-confirm',
-									keys    : [ 'enter' ],
-								},
-							},
-						} );
-					}
-				}
-			);
 		},
 
 		/**

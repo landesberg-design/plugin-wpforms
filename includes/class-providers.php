@@ -28,7 +28,7 @@ class WPForms_Providers {
 		require_once WPFORMS_PLUGIN_DIR . 'includes/providers/class-base.php';
 
 		// Load default templates on WP init.
-		add_action( 'wpforms_loaded', array( $this, 'load' ) );
+		add_action( 'wpforms_loaded', [ $this, 'load' ] );
 	}
 
 	/**
@@ -38,19 +38,29 @@ class WPForms_Providers {
 	 */
 	public function load() {
 
-		$providers = array(
+		$providers = [
 			'constant-contact',
-		);
+		];
 
-		$providers = apply_filters( 'wpforms_load_providers', $providers );
+		$providers = (array) apply_filters( 'wpforms_load_providers', $providers );
 
 		foreach ( $providers as $provider ) {
 
 			$provider = sanitize_file_name( $provider );
+			$path     = WPFORMS_PLUGIN_DIR . 'includes/providers/class-' . $provider . '.php';
 
-			require_once WPFORMS_PLUGIN_DIR . 'includes/providers/class-' . $provider . '.php';
+			if ( file_exists( $path ) ) {
+				require_once $path;
+			}
+
+			/**
+			 * Allow third-party plugins to load their own providers.
+			 *
+			 * @since 1.7.0
+			 */
+			do_action( "wpforms_load_{$provider}_provider" );
 		}
 	}
 }
 
-new WPForms_Providers;
+new WPForms_Providers();

@@ -83,64 +83,56 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		$time_format      = ! empty( $field['time_format'] ) ? $field['time_format'] : $this->defaults['time_format'];
 		$time_interval    = ! empty( $field['time_interval'] ) ? $field['time_interval'] : $this->defaults['time_interval'];
 
-		if (
-			! empty( $field['time_format'] ) &&
-			( 'H:i' === $field['time_format'] || 'H:i A' === $field['time_format'] )
-		) {
-			$time_validation = 'time24h';
-		} else {
-			$time_validation = 'time12h';
-		}
-
 		// Backwards compatibility with old datepicker format.
-		if ( 'mm/dd/yyyy' === $date_format ) {
+		if ( $date_format === 'mm/dd/yyyy' ) {
 			$date_format = 'm/d/Y';
-		} elseif ( 'dd/mm/yyyy' === $date_format ) {
+		} elseif ( $date_format === 'dd/mm/yyyy' ) {
 			$date_format = 'd/m/Y';
-		} elseif ( 'mmmm d, yyyy' === $date_format ) {
+		} elseif ( $date_format === 'mmmm d, yyyy' ) {
 			$date_format = 'F j, Y';
 		}
 
-		$default_date = array(
-			'container' => array(
-				'attr'  => array(),
-				'class' => array(
+		$default_date = [
+			'container' => [
+				'attr'  => [],
+				'class' => [
 					'wpforms-field-row-block',
 					'wpforms-one-half',
 					'wpforms-first',
-				),
-				'data'  => array(),
+				],
+				'data'  => [],
 				'id'    => '',
-			),
-			'attr'      => array(
+			],
+			'attr'      => [
 				'name'        => "wpforms[fields][{$field_id}][date]",
 				'value'       => '',
 				'placeholder' => $date_placeholder,
-			),
-			'sublabel'  => array(
+			],
+			'sublabel'  => [
 				'hidden' => ! empty( $field['sublabel_hide'] ),
 				'value'  => esc_html__( 'Date', 'wpforms' ),
-			),
-			'class'     => array(
+			],
+			'class'     => [
 				'wpforms-field-date-time-date',
 				'wpforms-datepicker',
 				! empty( $field_required ) ? 'wpforms-field-required' : '',
 				! empty( wpforms()->process->errors[ $form_id ][ $field_id ]['date'] ) ? 'wpforms-error' : '',
-			),
-			'data'      => array(
+			],
+			'data'      => [
 				'date-format' => $date_format,
-			),
+			],
 			'id'        => "wpforms-{$form_id}-field_{$field_id}",
 			'required'  => $field_required,
-		);
+		];
 
 		// Limit Days.
 		if ( $limits_available && ! empty( $field['date_limit_days'] ) && $date_type === 'datepicker' ) {
 			$days       = [ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' ];
 			$limit_days = [];
+
 			foreach ( $days as $day ) {
 				if ( ! empty( $field[ 'date_limit_days_' . $day ] ) ) {
-					array_push( $limit_days, $day );
+					$limit_days[] = $day;
 				}
 			}
 			$default_date['data']['limit-days'] = implode( ',', $limit_days );
@@ -149,84 +141,94 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			$default_date['data']['disable-past-dates'] = ! empty( $field['date_disable_past_dates'] ) ? '1' : '0';
 		}
 
-		$default_time = array(
-			'container' => array(
-				'attr'  => array(),
-				'class' => array(
+		$default_time = [
+			'container' => [
+				'attr'  => [],
+				'class' => [
 					'wpforms-field-row-block',
 					'wpforms-one-half',
-				),
-				'data'  => array(),
+				],
+				'data'  => [],
 				'id'    => '',
-			),
-			'attr'      => array(
+			],
+			'attr'      => [
 				'name'        => "wpforms[fields][{$field_id}][time]",
 				'value'       => '',
 				'placeholder' => $time_placeholder,
-			),
-			'sublabel'  => array(
+			],
+			'sublabel'  => [
 				'hidden' => ! empty( $field['sublabel_hide'] ),
 				'value'  => esc_html__( 'Time', 'wpforms' ),
-			),
-			'class'     => array(
+			],
+			'class'     => [
 				'wpforms-field-date-time-time',
 				'wpforms-timepicker',
 				! empty( $field_required ) ? 'wpforms-field-required' : '',
 				! empty( wpforms()->process->errors[ $form_id ][ $field_id ]['time'] ) ? 'wpforms-error' : '',
-			),
-			'data'      => array(
-				'rule-' . $time_validation => 'true',
-				'time-format'              => $time_format,
-				'step'                     => $time_interval,
-			),
+			],
+			'data'      => [
+				'time-format' => $time_format,
+				'step'        => $time_interval,
+			],
 			'id'        => "wpforms-{$form_id}-field_{$field_id}-time",
 			'required'  => $field_required,
-		);
+		];
+
+		// Determine time format validation rule only for default (embedded) time formats.
+		if ( in_array( $time_format, [ 'H:i', 'H:i A' ], true ) ) {
+			$default_time['data']['rule-time24h'] = 'true';
+		} elseif ( $time_format === 'g:i A' ) {
+			$default_time['data']['rule-time12h'] = 'true';
+		}
 
 		if ( ! empty( $field['time_limit_hours'] ) && $limits_available ) {
 			$default_time['data']['min-time']  = ! empty( $field['time_limit_hours_start_hour'] ) ? $field['time_limit_hours_start_hour'] : $this->defaults['time_limit_hours_start_hour'];
 			$default_time['data']['min-time'] .= ':';
 			$default_time['data']['min-time'] .= ! empty( $field['time_limit_hours_start_min'] ) ? $field['time_limit_hours_start_min'] : $this->defaults['time_limit_hours_start_min'];
-			if ( $time_format === 'g:i A' ) {
-				$default_time['data']['min-time'] .= ! empty( $field['time_limit_hours_start_ampm'] ) ? $field['time_limit_hours_start_ampm'] : $this->defaults['time_limit_hours_start_ampm'];
-			}
 
 			$default_time['data']['max-time']  = ! empty( $field['time_limit_hours_end_hour'] ) ? $field['time_limit_hours_end_hour'] : $this->defaults['time_limit_hours_end_hour'];
 			$default_time['data']['max-time'] .= ':';
 			$default_time['data']['max-time'] .= ! empty( $field['time_limit_hours_end_min'] ) ? $field['time_limit_hours_end_min'] : $this->defaults['time_limit_hours_end_min'];
-			if ( $time_format === 'g:i A' ) {
+
+			// If the format contains `g` or `h`, then this is 12 hours format.
+			if ( preg_match( '/[gh]/', $time_format ) ) {
+				$default_time['data']['min-time'] .= ! empty( $field['time_limit_hours_start_ampm'] ) ? $field['time_limit_hours_start_ampm'] : $this->defaults['time_limit_hours_start_ampm'];
 				$default_time['data']['max-time'] .= ! empty( $field['time_limit_hours_end_ampm'] ) ? $field['time_limit_hours_end_ampm'] : $this->defaults['time_limit_hours_end_ampm'];
+			}
+
+			// Limit Hours validation should apply only for default (embedded) time formats.
+			if ( in_array( $time_format, [ 'g:i A', 'H:i' ], true ) ) {
+				$default_time['data']['rule-time-limit'] = 'true';
 			}
 		}
 
 		switch ( $field_format ) {
 			case 'date-time':
-				$properties['input_container'] = array(
+				$properties['input_container'] = [
 					'id'    => '',
-					'class' => array(
+					'class' => [
 						'wpforms-field-row',
 						$field_size_cls,
-					),
-					'data'  => array(),
-					'attr'  => array(),
-				);
+					],
+					'data'  => [],
+					'attr'  => [],
+				];
 
 				$properties['inputs']['date'] = $default_date;
-
 				$properties['inputs']['time'] = $default_time;
+
 				break;
 
 			case 'date':
-				$properties['inputs']['date'] = $default_date;
-
+				$properties['inputs']['date']            = $default_date;
 				$properties['inputs']['date']['class'][] = $field_size_cls;
 
 				break;
 
 			case 'time':
-				$properties['inputs']['time'] = $default_time;
-
+				$properties['inputs']['time']            = $default_time;
 				$properties['inputs']['time']['class'][] = $field_size_cls;
+
 				break;
 		}
 
@@ -581,7 +583,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		// Hide label.
 		$this->field_option( 'label_hide', $field );
 
-		// Hide sub-labels.
+		// Hide sublabels.
 		$this->field_option( 'sublabel_hide', $field );
 
 		// Options close markup.
@@ -734,6 +736,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			],
 			false
 		);
+
 		$this->field_element(
 			'row',
 			$field,
@@ -744,10 +747,13 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			true
 		);
 
-		$time_format = ! empty( $field['time_format'] ) && $field['time_format'] === 'H:i' ? 24 : 12;
+		// Determine time format type.
+		// If the format contains `g` or `h`, then this is 12 hours format, otherwise 24 hours.
+		$time_format = empty( $field['time_format'] ) || ( ! empty( $field['time_format'] ) && preg_match( '/[gh]/', $field['time_format'] ) ) ? 12 : 24;
 
 		// Limit Hours body.
 		$output = '';
+
 		foreach ( [ 'start', 'end' ] as $option ) {
 
 			$output .= '<div class="wpforms-field-options-columns wpforms-field-options-columns-4">'; // Open columns container.
@@ -791,7 +797,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 					],
 					'class'   => [
 						'wpforms-field-options-column',
-						$time_format === 24 ? 'wpforms-hidden' : '',
+						$time_format === 24 ? 'wpforms-hidden-strict' : '',
 					],
 				],
 				false
@@ -814,7 +820,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 
 			$output .= sprintf(
 				'<div class="%s wpforms-field-options-column"></div>',
-				$time_format === 12 ? 'wpforms-hidden' : ''
+				$time_format === 12 ? 'wpforms-hidden-strict' : ''
 			);
 
 			$output .= '</div>'; // Close columns container.
@@ -889,11 +895,11 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 	 */
 	public function field_preview( $field ) {
 
-		$date_placeholder = ! empty( $field['date_placeholder'] ) ? esc_attr( $field['date_placeholder'] ) : '';
-		$time_placeholder = ! empty( $field['time_placeholder'] ) ? esc_attr( $field['time_placeholder'] ) : '';
-		$format           = ! empty( $field['format'] ) ? esc_attr( $field['format'] ) : 'date-time';
-		$date_type        = ! empty( $field['date_type'] ) ? esc_attr( $field['date_type'] ) : 'datepicker';
-		$date_format      = ! empty( $field['date_format'] ) ? esc_attr( $field['date_format'] ) : 'm/d/Y';
+		$date_placeholder = ! empty( $field['date_placeholder'] ) ? $field['date_placeholder'] : '';
+		$time_placeholder = ! empty( $field['time_placeholder'] ) ? $field['time_placeholder'] : '';
+		$format           = ! empty( $field['format'] ) ? $field['format'] : 'date-time';
+		$date_type        = ! empty( $field['date_type'] ) ? $field['date_type'] : 'datepicker';
+		$date_format      = ! empty( $field['date_format'] ) ? $field['date_format'] : 'm/d/Y';
 
 		if ( 'mm/dd/yyyy' === $date_format || 'm/d/Y' === $date_format ) {
 			$date_first_select  = 'MM';
@@ -906,10 +912,16 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		// Label.
 		$this->field_preview_option( 'label', $field );
 
-		echo '<div class="format-selected-' . $format . ' format-selected">';
+		printf(
+			'<div class="%s format-selected">',
+			sanitize_html_class( 'format-selected-' . $format )
+		);
 
 			// Date.
-			printf( '<div class="wpforms-date wpforms-date-type-%s">', $date_type );
+			printf(
+				'<div class="wpforms-date %s">',
+				sanitize_html_class( 'wpforms-date-type-' . $date_type )
+			);
 				echo '<div class="wpforms-date-datepicker">';
 					printf( '<input type="text" placeholder="%s" class="primary-input" readonly>', esc_attr( $date_placeholder ) );
 					printf( '<label class="wpforms-sub-label">%s</label>', esc_html__( 'Date', 'wpforms' ) );
@@ -1015,7 +1027,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				printf(
 					'<input type="text" %s %s>',
 					wpforms_html_attributes( $time_prop['id'], $time_prop['class'], $time_prop['data'], $time_prop['attr'] ),
-					$time_prop['required']
+					! empty( $time_prop['required'] ) ? 'required' : ''
 				);
 
 				$this->field_display_error( 'time', $field );
@@ -1048,8 +1060,10 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				printf(
 					'<input type="text" %s %s>',
 					wpforms_html_attributes( $time_prop['id'], $time_prop['class'], $time_prop['data'], $time_prop['attr'] ),
-					$time_prop['required']
+					! empty( $time_prop['required'] ) ? 'required' : ''
 				);
+				$this->field_display_error( 'time', $field );
+
 				break;
 		}
 	}
@@ -1238,38 +1252,101 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
 
+		$this->validate_time_limit( $field_id, $field_submit, $form_data );
+
+		if ( empty( $form_data['fields'][ $field_id ]['required'] ) ) {
+			return;
+		}
+
 		// Extended validation needed for the different address fields.
-		if ( ! empty( $form_data['fields'][ $field_id ]['required'] ) ) {
+		$form_id  = $form_data['id'];
+		$format   = $form_data['fields'][ $field_id ]['format'];
+		$required = wpforms_get_required_label();
 
-			$form_id  = $form_data['id'];
-			$format   = $form_data['fields'][ $field_id ]['format'];
-			$required = wpforms_get_required_label();
+		$is_date_format = $format === 'date' || $format === 'date-time';
+		$is_time_format = $format === 'time' || $format === 'date-time';
 
+		if (
+			! empty( $form_data['fields'][ $field_id ]['date_type'] ) &&
+			$form_data['fields'][ $field_id ]['date_type'] === 'dropdown'
+		) {
 			if (
-				! empty( $form_data['fields'][ $field_id ]['date_type'] ) &&
-				'dropdown' === $form_data['fields'][ $field_id ]['date_type']
+				$is_date_format &&
+				( empty( $field_submit['date']['m'] ) || empty( $field_submit['date']['d'] ) || empty( $field_submit['date']['y'] ) )
 			) {
-				if (
-					( 'date' === $format || 'date-time' === $format ) &&
-					( empty( $field_submit['date']['m'] ) || empty( $field_submit['date']['d'] ) || empty( $field_submit['date']['y'] ) )
-				) {
-					wpforms()->process->errors[ $form_id ][ $field_id ]['date'] = $required;
-				}
-			} else {
-				if (
-					( 'date' === $format || 'date-time' === $format ) &&
-					empty( $field_submit['date'] )
-				) {
-					wpforms()->process->errors[ $form_id ][ $field_id ]['date'] = $required;
-				}
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['date'] = $required;
 			}
-
+		} else {
 			if (
-				( 'time' === $format || 'date-time' === $format ) &&
-				empty( $field_submit['time'] )
+				$is_date_format &&
+				empty( $field_submit['date'] )
 			) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['time'] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['date'] = $required;
 			}
+		}
+
+		if (
+			$is_time_format &&
+			empty( $field_submit['time'] )
+		) {
+			wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['time'] = $required;
+		}
+	}
+
+	/**
+	 * Validate time limit (Limit Hours).
+	 *
+	 * @since 1.7.1
+	 *
+	 * @param int   $field_id     Field ID.
+	 * @param array $field_submit Submitted field value.
+	 * @param array $form_data    Form data and settings.
+	 */
+	private function validate_time_limit( $field_id, $field_submit, $form_data ) { // phpcs:disable Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		if ( empty( $form_data['fields'][ $field_id ] ) ) {
+			return;
+		}
+
+		$field = $form_data['fields'][ $field_id ];
+
+		if ( empty( $field['time_limit_hours'] ) || empty( $field_submit['time'] ) ) {
+			return;
+		}
+
+		// Limit Hours validation should apply only for default (embedded) time formats.
+		if (
+			empty( $field['time_format'] ) ||
+			! in_array( $field['time_format'], [ 'g:i A', 'H:i' ], true )
+		) {
+			return;
+		}
+
+		$min_time = $field['time_limit_hours_start_hour'] . ':' . $field['time_limit_hours_start_min'];
+		$max_time = $field['time_limit_hours_end_hour'] . ':' . $field['time_limit_hours_end_min'];
+
+		if ( $field['time_format'] === 'g:i A' ) {
+			$min_time .= ' ' . strtoupper( $field['time_limit_hours_start_ampm'] );
+			$max_time .= ' ' . strtoupper( $field['time_limit_hours_end_ampm'] );
+		}
+
+		$min_timestamp    = strtotime( $min_time );
+		$max_timestamp    = strtotime( $max_time );
+		$submit_timestamp = strtotime( $field_submit['time'] );
+
+		if ( $max_timestamp > $min_timestamp ) {
+			$is_valid = ( $submit_timestamp >= $min_timestamp ) && ( $submit_timestamp <= $max_timestamp );
+		} else {
+			$is_valid = ( ( $submit_timestamp >= $min_timestamp ) && ( $submit_timestamp >= $max_timestamp ) ) ||
+						( ( $submit_timestamp <= $min_timestamp ) && ( $submit_timestamp <= $max_timestamp ) );
+		}
+
+		if ( ! $is_valid ) {
+
+			$error = wpforms_setting( 'validation-time-limit', esc_html__( 'Please enter time between {minTime} and {maxTime}.', 'wpforms' ) );
+			$error = str_replace( [ '{minTime}', '{maxTime}' ], [ $min_time, $max_time ], $error );
+
+			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ]['time'] = $error;
 		}
 	}
 

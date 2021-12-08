@@ -139,29 +139,29 @@ class Analytics {
 
 		$error_could_not_install = sprintf(
 			wp_kses( /* translators: %s - Lite plugin download URL. */
-				__( 'Could not install plugin. Please <a href="%s">download</a> and install manually.', 'wpforms-lite' ),
-				array(
-					'a' => array(
+				__( 'Could not install the plugin automatically. Please <a href="%s">download</a> it and install it manually.', 'wpforms-lite' ),
+				[
+					'a' => [
 						'href' => true,
-					),
-				)
+					],
+				]
 			),
 			esc_url( $this->config['lite_download_url'] )
 		);
 
 		$error_could_not_activate = sprintf(
 			wp_kses( /* translators: %s - Lite plugin download URL. */
-				__( 'Could not activate plugin. Please activate from the <a href="%s">Plugins page</a>.', 'wpforms-lite' ),
-				array(
-					'a' => array(
+				__( 'Could not activate the plugin. Please activate it on the <a href="%s">Plugins page</a>.', 'wpforms-lite' ),
+				[
+					'a' => [
 						'href' => true,
-					),
-				)
+					],
+				]
 			),
 			esc_url( admin_url( 'plugins.php' ) )
 		);
 
-		return array(
+		return [
 			'installing'               => esc_html__( 'Installing...', 'wpforms-lite' ),
 			'activating'               => esc_html__( 'Activating...', 'wpforms-lite' ),
 			'activated'                => esc_html__( 'MonsterInsights Installed & Activated', 'wpforms-lite' ),
@@ -173,7 +173,7 @@ class Analytics {
 			'error_could_not_activate' => $error_could_not_activate,
 			'mi_manual_install_url'    => $this->config['lite_download_url'],
 			'mi_manual_activate_url'   => admin_url( 'plugins.php' ),
-		);
+		];
 	}
 
 	/**

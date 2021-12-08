@@ -28,19 +28,21 @@ class Token {
 	 */
 	public function hooks() {
 
-		add_filter( 'wpforms_frontend_form_atts', [ $this, 'add_token_to_form_atts' ] );
+		add_filter( 'wpforms_frontend_form_atts', [ $this, 'add_token_to_form_atts' ], 10, 2 );
 	}
 
 	/**
 	 * Return a valid token.
 	 *
 	 * @since 1.6.2
+	 * @since 1.7.1 Added the $form_data argument.
 	 *
-	 * @param mixed $current True to use current time, otherwise a timestamp string.
+	 * @param mixed $current   True to use current time, otherwise a timestamp string.
+	 * @param array $form_data Form data and settings.
 	 *
 	 * @return string Token.
 	 */
-	public function get( $current = true ) {
+	public function get( $current = true, $form_data = [] ) {
 
 		// If $current was not passed, or it is true, we use the current timestamp.
 		// If $current was passed in as a string, we'll use that passed in timestamp.
@@ -53,12 +55,14 @@ class Token {
 		// Format the timestamp to be less exact, as we want to deal in days.
 		// June 19th, 2020 would get formatted as: 1906202017125.
 		// Day of the month, month number, year, day number of the year, week number of the year.
-		$token_date = gmdate( 'dmYzW', $time );
+		$token_data = gmdate( 'dmYzW', $time );
+
+		if ( ! empty( $form_data['id'] ) ) {
+			$token_data .= "::{$form_data['id']}";
+		}
 
 		// Combine our token date and our token salt, and md5 it.
-		$form_token_string = md5( $token_date . \WPForms\Helpers\Crypto::get_secret_key() );
-
-		return $form_token_string;
+		return md5( $token_data . \WPForms\Helpers\Crypto::get_secret_key() );
 	}
 
 	/**
@@ -70,10 +74,13 @@ class Token {
 	 * 'wpforms_form_token_check_after_today'
 	 *
 	 * @since 1.6.2
+	 * @since 1.7.1 Added the $form_data argument.
+	 *
+	 * @param array $form_data Form data and settings.
 	 *
 	 * @return array Array of all valid tokens to check against.
 	 */
-	public function get_valid_tokens() {
+	public function get_valid_tokens( $form_data = [] ) {
 
 		$current_date = time();
 
@@ -101,15 +108,15 @@ class Token {
 
 		// Add in all the previous times we check.
 		foreach ( $valid_token_times_before as $time ) {
-			$valid_tokens[] = $this->get( $current_date - $time );
+			$valid_tokens[] = $this->get( $current_date - $time, $form_data );
 		}
 
 		// Add in our current date.
-		$valid_tokens[] = $this->get( $current_date );
+		$valid_tokens[] = $this->get( $current_date, $form_data );
 
 		// Add in the times after our check.
 		foreach ( $valid_token_times_after as $time ) {
-			$valid_tokens[] = $this->get( $current_date + $time );
+			$valid_tokens[] = $this->get( $current_date + $time, $form_data );
 		}
 
 		return $valid_tokens;
@@ -123,29 +130,33 @@ class Token {
 	 * By default tokens are valid for day.
 	 *
 	 * @since 1.6.2
+	 * @since 1.7.1 Added the $form_data argument.
 	 *
-	 * @param string $token Token to validate.
+	 * @param string $token     Token to validate.
+	 * @param array  $form_data Form data and settings.
 	 *
 	 * @return bool Whether the token is valid or not.
 	 */
-	public function verify( $token ) {
+	public function verify( $token, $form_data = [] ) {
 
-		// Check to see if our token is inside of the valid tokens.
-		return in_array( $token, $this->get_valid_tokens(), true );
+		// Check to see if our token is inside the valid tokens.
+		return in_array( $token, $this->get_valid_tokens( $form_data ), true );
 	}
 
 	/**
 	 * Add the token to the form attributes.
 	 *
 	 * @since 1.6.2
+	 * @since 1.7.1 Added the $form_data argument.
 	 *
-	 * @param array $attrs Form attributes.
+	 * @param array $attrs     Form attributes.
+	 * @param array $form_data Form data and settings.
 	 *
 	 * @return array Form attributes.
 	 */
-	public function add_token_to_form_atts( array $attrs ) {
+	public function add_token_to_form_atts( array $attrs, array $form_data ) {
 
-		$attrs['atts']['data-token'] = $this->get();
+		$attrs['atts']['data-token'] = $this->get( true, $form_data );
 
 		return $attrs;
 	}
@@ -169,21 +180,18 @@ class Token {
 		}
 
 		// Bail out if the antispam setting isn't enabled.
-		if ( '1' !== $form_data['settings']['antispam'] ) {
+		if ( $form_data['settings']['antispam'] !== '1' ) {
 			return true;
 		}
 
-		// If the antispam setting is enabled and we don't have a token, bail.
-		if ( ! isset( $entry['token'] ) ) {
-			return $this->process_antispam_filter_wrapper( $this->get_missing_token_message(), $fields, $entry, $form_data );
+		$valid = isset( $entry['token'] ) && $this->verify( $entry['token'], $form_data );
+		$valid = $this->process_antispam_filter_wrapper( $valid, $fields, $entry, $form_data );
+
+		if ( ! $valid ) {
+			return $this->get_missing_token_message();
 		}
 
-		// Verify the token.
-		if ( ! $this->verify( $entry['token'] ) ) {
-			return $this->process_antispam_filter_wrapper( $this->get_invalid_token_message(), $fields, $entry, $form_data );
-		}
-
-		return $this->process_antispam_filter_wrapper( true, $fields, $entry, $form_data );
+		return true;
 	}
 
 	/**
@@ -199,6 +207,7 @@ class Token {
 	 * @return bool Is valid or not.
 	 */
 	public function process_antispam_filter_wrapper( $is_valid_not_spam, array $fields, array $entry, array $form_data ) {
+
 		return apply_filters( 'wpforms_process_antispam', $is_valid_not_spam, $fields, $entry, $form_data );
 	}
 
@@ -257,7 +266,7 @@ class Token {
 	 *
 	 * @since 1.6.2.1
 	 *
-	 * @return string Support text if super admin, emtpy string if not.
+	 * @return string Support text if super admin, empty string if not.
 	 */
 	private function maybe_get_support_text() {
 
@@ -267,7 +276,7 @@ class Token {
 		}
 
 		// If the user is an admin, return text with a link to support.
-		// We add a space here to seperate the sentences, but outside of the localized
+		// We add a space here to separate the sentences, but outside of the localized
 		// text to avoid it being removed.
 		return ' ' . sprintf(
 			// translators: placeholders are links.

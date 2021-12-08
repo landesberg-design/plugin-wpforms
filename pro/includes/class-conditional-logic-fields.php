@@ -132,7 +132,7 @@ class WPForms_Conditional_Logic_Fields {
 		wp_enqueue_script(
 			'wpforms-builder-conditionals',
 			WPFORMS_PLUGIN_URL . 'pro/assets/js/wpforms-conditional-logic-fields.js',
-			array( 'jquery' ),
+			[ 'jquery', 'wpforms' ],
 			WPFORMS_VERSION,
 			true
 		);

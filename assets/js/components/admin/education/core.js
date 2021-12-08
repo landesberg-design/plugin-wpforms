@@ -1,4 +1,4 @@
-/* global wpforms_education */
+/* global wpforms_education, WPFormsBuilder */
 /**
  * WPForms Education Core.
  *
@@ -10,6 +10,15 @@
 var WPFormsEducation = window.WPFormsEducation || {};
 
 WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, window, $ ) {
+
+	/**
+	 * Spinner markup.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @type {string}
+	 */
+	var spinner = '<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
 
 	/**
 	 * Public functions and properties.
@@ -48,6 +57,35 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 		events: function() {
 
 			app.dismissEvents();
+			app.openModalButtonClick();
+		},
+
+		/**
+		 * Open education modal.
+		 *
+		 * @since 1.7.0
+		 */
+		openModalButtonClick: function() {
+
+			$( document ).on(
+				'click',
+				'.education-modal',
+				function( event ) {
+
+					var $this = $( this );
+
+					event.preventDefault();
+
+					switch ( $this.data( 'action' ) ) {
+						case 'activate':
+							app.activateModal( $this );
+							break;
+						case 'install':
+							app.installModal( $this );
+							break;
+					}
+				}
+			);
 		},
 
 		/**
@@ -114,8 +152,8 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 				return app.slugToUTMcontent( $el.data( 'slug' ) ) + ' Addon';
 			}
 
-			// UTM content by default.
-			return $el.data( 'name' );
+			// UTM content by default with fallback `data-name`.
+			return $el.data( 'utm-content' ) || $el.data( 'name' );
 		},
 
 		/**
@@ -166,6 +204,262 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 			var appendChar = /(\?)/.test( baseURL ) ? '&' : '?';
 
 			return baseURL + appendChar + 'utm_content=' + encodeURIComponent( utmContent.trim() );
+		},
+
+		/**
+		 * Addon activate modal.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @param {jQuery} $button jQuery button element.
+		 */
+		activateModal: function( $button  ) {
+
+			var feature = $button.data( 'name' );
+
+			$.alert( {
+				title  : false,
+				content: wpforms_education.activate_prompt.replace( /%name%/g, feature ),
+				icon   : 'fa fa-info-circle',
+				type   : 'blue',
+				buttons: {
+					confirm: {
+						text    : wpforms_education.activate_confirm,
+						btnClass: 'btn-confirm',
+						keys    : [ 'enter' ],
+						action  : function() {
+
+							this.$$confirm
+								.prop( 'disabled', true )
+								.html( spinner + wpforms_education.activating );
+
+							this.$$cancel
+								.prop( 'disabled', true );
+
+							app.activateAddon( $button, this );
+
+							return false;
+						},
+					},
+					cancel : {
+						text: wpforms_education.cancel,
+					},
+				},
+			} );
+		},
+
+		/**
+		 * Activate addon via AJAX.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @param {jQuery} $button       jQuery button element.
+		 * @param {object} previousModal Previous modal instance.
+		 */
+		activateAddon: function( $button, previousModal ) {
+
+			var path = $button.data( 'path' ),
+				pluginType = $button.data( 'type' ),
+				nonce = $button.data( 'nonce' ),
+				hideOnSuccess = $button.data( 'hide-on-success' );
+
+			$.post(
+				wpforms_education.ajax_url,
+				{
+					action: 'wpforms_activate_addon',
+					nonce : nonce,
+					plugin: path,
+					type  : pluginType,
+				},
+				function( res ) {
+
+					previousModal.close();
+
+					if ( res.success ) {
+						if ( hideOnSuccess ) {
+							$button.hide();
+						}
+
+						app.saveModal( pluginType === 'plugin' ? wpforms_education.plugin_activated : wpforms_education.addon_activated );
+					} else {
+						$.alert( {
+							title  : false,
+							content: res.data,
+							icon   : 'fa fa-exclamation-circle',
+							type   : 'orange',
+							buttons: {
+								confirm: {
+									text    : wpforms_education.close,
+									btnClass: 'btn-confirm',
+									keys    : [ 'enter' ],
+								},
+							},
+						} );
+					}
+				}
+			);
+		},
+
+		/**
+		 * Ask user if they would like to save form and refresh form builder.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @param {string} title Modal title.
+		 */
+		saveModal: function( title ) {
+
+			title = title || wpforms_education.addon_activated;
+
+			$.alert( {
+				title  : title.replace( /\.$/, '' ), // Remove a dot in the title end.
+				content: wpforms_education.save_prompt,
+				icon   : 'fa fa-check-circle',
+				type   : 'green',
+				buttons: {
+					confirm: {
+						text    : wpforms_education.save_confirm,
+						btnClass: 'btn-confirm',
+						keys    : [ 'enter' ],
+						action  : function() {
+
+							if ( 'undefined' === typeof WPFormsBuilder ) {
+								location.reload();
+
+								return;
+							}
+
+							this.$$confirm
+								.prop( 'disabled', true )
+								.html( spinner + wpforms_education.saving );
+
+							this.$$cancel
+								.prop( 'disabled', true );
+
+							if ( WPFormsBuilder.formIsSaved() ) {
+								location.reload();
+							}
+
+							WPFormsBuilder.formSave().done( function() {
+								location.reload();
+							} );
+
+							return false;
+						},
+					},
+					cancel : {
+						text: wpforms_education.close,
+					},
+				},
+			} );
+		},
+
+		/**
+		 * Addon install modal.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @param {jQuery} $button jQuery button element.
+		 */
+		installModal: function( $button ) {
+
+			var feature = $button.data( 'name' ),
+				url = $button.data( 'url' ),
+				licenseType = $button.data( 'license' );
+
+			if ( ! url || '' === url ) {
+				app.upgradeModal( feature, '', 'Empty install URL', licenseType, '' );
+				return;
+			}
+
+			$.alert( {
+				title   : false,
+				content : wpforms_education.install_prompt.replace( /%name%/g, feature ),
+				icon    : 'fa fa-info-circle',
+				type    : 'blue',
+				boxWidth: '425px',
+				buttons : {
+					confirm: {
+						text    : wpforms_education.install_confirm,
+						btnClass: 'btn-confirm',
+						keys    : [ 'enter' ],
+						isHidden: ! wpforms_education.can_install_addons,
+						action  : function() {
+
+							this.$$confirm.prop( 'disabled', true )
+								.html( spinner + wpforms_education.installing );
+
+							this.$$cancel
+								.prop( 'disabled', true );
+
+							app.installAddon( $button, this );
+
+							return false;
+						},
+					},
+					cancel : {
+						text: wpforms_education.cancel,
+					},
+				},
+			} );
+		},
+
+		/**
+		 * Install addon via AJAX.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @param {jQuery} $button       jQuery button element.
+		 * @param {object} previousModal Previous modal instance.
+		 */
+		installAddon: function( $button, previousModal ) {
+
+			var url = $button.data( 'url' ),
+				pluginType = $button.data( 'type' ),
+				nonce = $button.data( 'nonce' ),
+				hideOnSuccess = $button.data( 'hide-on-success' );
+
+			$.post(
+				wpforms_education.ajax_url,
+				{
+					action: 'wpforms_install_addon',
+					nonce : nonce,
+					plugin: url,
+					type  : pluginType,
+				},
+				function( res ) {
+
+					previousModal.close();
+
+					if ( res.success ) {
+						if ( hideOnSuccess ) {
+							$button.hide();
+						}
+
+						app.saveModal( res.data.msg );
+					} else {
+						var message = res.data;
+
+						if ( 'object' === typeof res.data ) {
+							message = wpforms_education.addon_error;
+						}
+
+						$.alert( {
+							title  : false,
+							content: message,
+							icon   : 'fa fa-exclamation-circle',
+							type   : 'orange',
+							buttons: {
+								confirm: {
+									text    : wpforms_education.close,
+									btnClass: 'btn-confirm',
+									keys    : [ 'enter' ],
+								},
+							},
+						} );
+					}
+				}
+			);
 		},
 	};
 

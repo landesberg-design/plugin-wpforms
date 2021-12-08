@@ -21,9 +21,20 @@ class WPForms_Field_HTML extends WPForms_Field {
 		$this->order = 180;
 		$this->group = 'fancy';
 
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.7.1
+	 */
+	private function hooks() {
+
 		// Define additional field properties.
-		add_filter( 'wpforms_field_properties_html', array( $this, 'field_properties' ), 5, 3 );
-		add_filter( 'wpforms_field_new_default', array( $this, 'field_new_default' ) );
+		add_filter( 'wpforms_field_properties_html', [ $this, 'field_properties' ], 5, 3 );
+		add_filter( 'wpforms_field_new_default', [ $this, 'field_new_default' ] );
+		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
 	}
 
 	/**

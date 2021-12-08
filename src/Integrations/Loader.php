@@ -32,21 +32,23 @@ class Loader {
 	 */
 	public function __construct() {
 
-		$core_class_names = array(
+		$core_class_names = [
 			'Divi\Divi',
 			'Elementor\Elementor',
 			'Gutenberg\FormSelector',
 			'WPMailSMTP\Notifications',
 			'WPorg\Translations',
+			'UncannyAutomator\UncannyAutomator',
 			'UsageTracking\UsageTracking',
 			'DefaultThemes\DefaultThemes',
 			'TranslationsPress\Translations',
-		);
+		];
 
-		$class_names = \apply_filters( 'wpforms_integrations_available', $core_class_names );
+		$class_names = (array) apply_filters( 'wpforms_integrations_available', $core_class_names );
 
 		foreach ( $class_names as $class_name ) {
 			$integration = $this->register_class( $class_name );
+
 			if ( ! empty( $integration ) ) {
 				$this->load_integration( $integration );
 			}

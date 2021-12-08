@@ -26,7 +26,7 @@ class InfoBlocks {
 
 		$cache_file = $this->get_cache_file_path();
 
-		if ( empty( $cache_file ) || ! file_exists( $cache_file ) ) {
+		if ( empty( $cache_file ) || ! is_readable( $cache_file ) ) {
 			return $this->fetch_all();
 		}
 

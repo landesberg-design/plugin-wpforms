@@ -484,7 +484,13 @@ class WPForms_Builder {
 			'date_select_day'                => 'DD',
 			'date_select_month'              => 'MM',
 			'debug'                          => wpforms_debug(),
-			'dynamic_choice_limit'           => esc_html__( 'The {source} {type} contains over {limit} items ({total}). This may make the field difficult for your visitors to use and/or cause the form to be slow.', 'wpforms-lite' ),
+			'dynamic_choice_limit'           => sprintf( /* translators: %1$s - data source name (e.g. Categories, Posts), %2$s - data source type (e.g. post type, taxonomy), %3$s - display limit, %4$s - total number of items. */
+				esc_html__( 'The %1$s %2$s contains over %3$s items (%4$s). This may make the field difficult for your visitors to use and/or cause the form to be slow.', 'wpforms-lite' ),
+				'{source}',
+				'{type}',
+				'{limit}',
+				'{total}'
+			),
 			'cancel'                         => esc_html__( 'Cancel', 'wpforms-lite' ),
 			'ok'                             => esc_html__( 'OK', 'wpforms-lite' ),
 			'close'                          => esc_html__( 'Close', 'wpforms-lite' ),
@@ -555,7 +561,10 @@ class WPForms_Builder {
 			'payments_entries_off'           => esc_html__( 'Entry storage is currently disabled, but is required to accept payments. Please enable in your form settings.', 'wpforms-lite' ),
 			'payments_on_entries_off'        => esc_html__( 'This form is currently accepting payments. Entry storage is required to accept payments. To disable entry storage, please first disable payments.', 'wpforms-lite' ),
 			'previous'                       => esc_html__( 'Previous', 'wpforms-lite' ),
-			'provider_required_flds'         => esc_html__( "In order to complete your form's {provider} integration, please check that the dropdowns for all required (*) List Fields have been filled out.", 'wpforms-lite' ),
+			'provider_required_flds'         => sprintf( /* translators: %s - marketing integration name. */
+				esc_html__( "In order to complete your form's %s integration, please check that the dropdowns for all required (*) List Fields have been filled out.", 'wpforms-lite' ),
+				'{provider}'
+			),
 			'rule_create'                    => esc_html__( 'Create new rule', 'wpforms-lite' ),
 			'rule_create_group'              => esc_html__( 'Add New Group', 'wpforms-lite' ),
 			'rule_delete'                    => esc_html__( 'Delete rule', 'wpforms-lite' ),
@@ -574,16 +583,22 @@ class WPForms_Builder {
 			'cl_fields_supported'            => wpforms_get_conditional_logic_form_fields_supported(),
 			'redirect_url_field_error'       => esc_html__( 'You should enter a valid absolute address to the Confirmation Redirect URL field.', 'wpforms-lite' ),
 			'add_custom_value_label'         => esc_html__( 'Add Custom Value', 'wpforms-lite' ),
-			'choice_empty_label_tpl'         => esc_html__( 'Choice {number}', 'wpforms-lite' ),
+			'choice_empty_label_tpl'         => sprintf( /* translators: %s - choice number. */
+				esc_html__( 'Choice %s', 'wpforms-lite' ),
+				'{number}'
+			),
 			'error_save_form'                => esc_html__( 'Something went wrong while saving the form. Please reload the page and try again.', 'wpforms-lite' ),
 			'error_contact_support'          => esc_html__( 'Please contact the plugin support team if this behavior persists.', 'wpforms-lite' ),
 			'ms_win_css_url'                 => WPFORMS_PLUGIN_URL . 'assets/css/builder/builder-ms-win.css',
 			'template_addon_prompt'          => esc_html__( 'The %template% template requires the %addons%. Would you like to install and activate it?', 'wpforms-lite' ),
 			'template_addons_prompt'         => esc_html__( 'The %template% template requires the %addons%. Would you like to install and activate all the required addons?', 'wpforms-lite' ),
-			'template_addons_error'          => esc_html__( 'Could not install OR activate all the required addons. Please download from wpforms.com and install manually. Would you like to use the template anyway?', 'wpforms-lite' ),
+			'template_addons_error'          => esc_html__( 'Could not install OR activate all the required addons. Please download from wpforms.com and install them manually. Would you like to use the template anyway?', 'wpforms-lite' ),
 			'use_template'                   => esc_html__( 'Yes, use template', 'wpforms-lite' ),
 			'error_select_template'          => esc_html__( 'Something went wrong while applying the template.', 'wpforms-lite' ),
 			'blank_form'                     => esc_html__( 'Blank Form', 'wpforms-lite' ),
+            'something_went_wrong'           => esc_html__( 'Something went wrong', 'wpforms-lite' ),
+			'field_cannot_be_reordered'      => esc_html__( 'This field cannot be moved.', 'wpforms-lite' ),
+			'empty_label'                    => esc_html__( 'Empty Label', 'wpforms-lite' ),
 		];
 
 		$strings['disable_entries'] = sprintf(

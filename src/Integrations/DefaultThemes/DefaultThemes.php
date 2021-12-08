@@ -35,7 +35,7 @@ class DefaultThemes implements IntegrationInterface {
 	private $current_theme;
 
 	/**
-	 * Determinate default theme.
+	 * Determine if WordPress default theme is used.
 	 *
 	 * @since 1.6.6
 	 *
@@ -53,7 +53,7 @@ class DefaultThemes implements IntegrationInterface {
 	}
 
 	/**
-	 * Allow load integration.
+	 * Indicate if current integration is allowed to load.
 	 *
 	 * @since 1.6.6
 	 *
@@ -67,7 +67,7 @@ class DefaultThemes implements IntegrationInterface {
 	}
 
 	/**
-	 * Load integration.
+	 * Load an integration.
 	 *
 	 * @since 1.6.6
 	 */
@@ -87,7 +87,7 @@ class DefaultThemes implements IntegrationInterface {
 	}
 
 	/**
-	 * Load hooks for the Twenty Twenty theme.
+	 * Hooks for the Twenty Twenty theme.
 	 *
 	 * @since 1.6.6
 	 */
@@ -97,7 +97,7 @@ class DefaultThemes implements IntegrationInterface {
 	}
 
 	/**
-	 * Load hooks for the Twenty Twenty-One theme.
+	 * Hooks for the Twenty Twenty-One theme.
 	 *
 	 * @since 1.6.6
 	 */
@@ -117,7 +117,7 @@ class DefaultThemes implements IntegrationInterface {
 
 
 	/**
-	 * Apply fix for checkboxes and radio fields in the Twenty Twenty-One theme.
+	 * Apply fix for Checkboxes and Radio fields in the Twenty Twenty-One theme.
 	 *
 	 * @since 1.6.6
 	 */
@@ -144,7 +144,7 @@ class DefaultThemes implements IntegrationInterface {
 	}
 
 	/**
-	 * Apply fix for dropdown field arrow, when it disappeared from select in the Twenty Twenty-One theme.
+	 * Apply fix for Dropdown field arrow, when it disappeared from select in the Twenty Twenty-One theme.
 	 *
 	 * @since 1.6.8
 	 */
@@ -162,7 +162,7 @@ class DefaultThemes implements IntegrationInterface {
 	}
 
 	/**
-	 * Apply fix for checkboxes and radio fields width in the Twenty Twenty-One theme, when the user uses only base styles.
+	 * Apply fix for Checkboxes and Radio fields width in the Twenty Twenty-One theme, when the user uses only base styles.
 	 *
 	 * @since 1.6.8
 	 */
@@ -184,7 +184,7 @@ class DefaultThemes implements IntegrationInterface {
 	}
 
 	/**
-	 * Apply resize-fix for iframe HTML element, when the next page was clicked in the Twenty Twenty theme.
+	 * Apply resize fix for iframe HTML element, when the next page was clicked in the Twenty Twenty theme.
 	 *
 	 * @since 1.6.6
 	 */
@@ -206,6 +206,11 @@ class DefaultThemes implements IntegrationInterface {
 					}
 	
 					twentytwenty.intrinsicRatioVideos.makeFit();
+				} );
+
+				jQuery( document ).on( "wpformsRichTextEditorInit", function( e, editor ) { 
+				
+					jQuery( editor.container ).find( "iframe" ).addClass( "intrinsic-ignore" );
 				} );
 			} );'
 		);

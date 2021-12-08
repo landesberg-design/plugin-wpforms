@@ -484,7 +484,7 @@ class WPForms_WP_Emails {
 	 */
 	public function process_tag( $string = '' ) {
 
-		return apply_filters( 'wpforms_process_smart_tags', $string, $this->form_data, $this->fields, $this->entry_id );
+		return wpforms_process_smart_tags( $string, $this->form_data, $this->fields, $this->entry_id );
 	}
 
 	/**

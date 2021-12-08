@@ -407,52 +407,140 @@ class DashboardWidget {
 		// Number of forms to display in the forms list before "Show More" button appears.
 		$show_forms     = $this->settings['forms_list_number_to_display'];
 		$active_form_id = $this->widget_meta( 'get', 'active_form_id' );
+		$widget_slug    = static::SLUG;
 		?>
 
 		<table id="wpforms-dash-widget-forms-list-table" cellspacing="0">
 			<?php
-			echo \apply_filters( 'wpforms_' . static::SLUG . '_forms_list_columns', '', $forms ); // phpcs:ignore
-			foreach ( \array_values( $forms ) as $key => $form ) :
-				if ( ! \is_array( $form ) ) {
+			echo wp_kses(
+				apply_filters( "wpforms_{$widget_slug}_forms_list_columns", '', $forms ),
+				[
+					'tr' => [
+						'class' => [],
+					],
+					'td' => [
+						'class' => [],
+					],
+				]
+			);
+
+			foreach ( array_values( $forms ) as $key => $form ) :
+				if ( ! is_array( $form ) ) {
 					continue;
 				}
 				if ( ! isset( $form['form_id'], $form['title'], $form['count'], $form['edit_url'] ) ) {
 					continue;
 				}
 
-				$classes = array(
+				$classes = [
 					$key >= $show_forms && $show_forms > 0 ? 'wpforms-dash-widget-forms-list-hidden-el' : '',
 					$form['form_id'] === $active_form_id ? 'wpforms-dash-widget-form-active' : '',
-				);
+				];
 				?>
 
-				<tr data-form-id="<?php echo \absint( $form['form_id'] ); ?>"
+				<tr data-form-id="<?php echo absint( $form['form_id'] ); ?>"
 					class="<?php echo esc_attr( implode( ' ', array_unique( $classes ) ) ); ?>"
 				>
 					<td>
 						<span class="wpforms-dash-widget-form-title">
-							<?php echo \apply_filters( 'wpforms_' . static::SLUG . '_forms_list_form_title', $form['title'], $form ); ?>
+							<?php
+							echo wp_kses(
+								/**
+								 * Allow modifying a widget title.
+								 *
+								 * @since 1.5.5
+								 *
+								 * @param string $form_title Widget title.
+								 * @param array  $form       Form data and settings.
+								 *
+								 * @return string
+								 */
+								apply_filters(
+									"wpforms_{$widget_slug}_forms_list_form_title",
+									$form['title'],
+									$form
+								),
+								[
+									'a' => [
+										'href'  => [],
+										'class' => [],
+									],
+								]
+							);
+							?>
 						</span>
 					</td>
-					<?php echo \apply_filters( 'wpforms_' . static::SLUG . '_forms_list_additional_cells', '', $form ); ?>
+					<?php
+					echo wp_kses(
+						/**
+						 * Allow adding additional cells for a widget table.
+						 *
+						 * @since 1.5.5
+						 *
+						 * @param string $form_title Widget title.
+						 * @param array  $form       Form data and settings.
+						 *
+						 * @return string
+						 */
+						apply_filters(
+							"wpforms_{$widget_slug}_forms_list_additional_cells",
+							'',
+							$form
+						),
+						[
+							'td' => [],
+							'a'  => [
+								'href' => [],
+							],
+						]
+					);
+					?>
 					<td>
-						<a href="<?php echo \esc_url( $form['edit_url'] ); ?>">
-							<?php echo \absint( $form['count'] ); ?>
+						<a href="<?php echo esc_url( $form['edit_url'] ); ?>">
+							<?php echo absint( $form['count'] ); ?>
 						</a>
 					</td>
 					<td class="graph">
-						<?php if ( \absint( $form['count'] ) > 0 ) : ?>
+						<?php if ( absint( $form['count'] ) > 0 ) : ?>
 							<button type="button" class="wpforms-dash-widget-single-chart-btn" title="<?php \esc_attr_e( 'Display only this form data on a chart', 'wpforms' ); ?>"></button>
-							<?php echo \apply_filters( 'wpforms_' . static::SLUG . '_forms_list_additional_buttons', '', $form ); ?>
+							<?php
+							echo wp_kses(
+								/**
+								 * Allow adding additional buttons for a widget table.
+								 *
+								 * @since 1.5.5
+								 *
+								 * @param string $form_title Widget title.
+								 * @param array  $form       Form data and settings.
+								 *
+								 * @return string
+								 */
+								apply_filters(
+									"wpforms_{$widget_slug}_forms_list_additional_buttons",
+									'',
+									$form
+								),
+								[
+									'button' => [
+										'type'  => [],
+										'class' => [],
+										'title' => [],
+									],
+									'span'   => [
+										'class' => [],
+									],
+								]
+							);
+							?>
 						<?php endif; ?>
 					</td>
 				</tr>
 			<?php endforeach; ?>
 		</table>
 
-		<?php if ( \count( $forms ) > $show_forms && $show_forms > 0 ) : ?>
-			<button type="button" id="wpforms-dash-widget-forms-more" class="wpforms-dash-widget-forms-more" title="<?php \esc_attr_e( 'Show all forms', 'wpforms' ); ?>">
-				<?php \esc_html_e( 'Show More', 'wpforms' ); ?> <span class="dashicons dashicons-arrow-down"></span>
+		<?php if ( count( $forms ) > $show_forms && $show_forms > 0 ) : ?>
+			<button type="button" id="wpforms-dash-widget-forms-more" class="wpforms-dash-widget-forms-more" title="<?php esc_attr_e( 'Show all forms', 'wpforms' ); ?>">
+				<?php esc_html_e( 'Show More', 'wpforms' ); ?> <span class="dashicons dashicons-arrow-down"></span>
 			</button>
 		<?php endif; ?>
 

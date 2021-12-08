@@ -366,10 +366,12 @@ class WPForms_Overview_Table extends WP_List_Table {
 			$total = count_user_posts( get_current_user_id(), 'wpforms', true );
 		}
 
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$page     = $this->get_pagenum();
-		$order    = isset( $_GET['order'] ) ? $_GET['order'] : 'DESC';
-		$orderby  = isset( $_GET['orderby'] ) ? $_GET['orderby'] : 'ID';
+		$order    = isset( $_GET['order'] ) && strtoupper( sanitize_text_field( wp_unslash( $_GET['order'] ) ) ) === 'ASC' ? 'ASC' : 'DESC';
+		$orderby  = isset( $_GET['orderby'] ) ? sanitize_key( $_GET['orderby'] ) : 'ID';
 		$per_page = $this->get_items_per_page( 'wpforms_forms_per_page', $this->per_page );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		$args = array(
 			'orderby'        => $orderby,

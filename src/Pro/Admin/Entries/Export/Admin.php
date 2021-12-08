@@ -213,7 +213,7 @@ class Admin {
 
 			if (
                 $slug === 'pginfo'
-                && ! ( class_exists( 'WPForms_Paypal_Standard' ) || class_exists( '\WPFormsStripe\Loader' ) || class_exists( '\WPFormsAuthorizeNet\Loader' ) )
+                && ! ( class_exists( 'WPForms_Paypal_Standard' ) || class_exists( '\WPFormsStripe\Loader' ) || class_exists( '\WPFormsAuthorizeNet\Loader' ) || class_exists( '\WPFormsSquare\Plugin' ) )
             ) {
 				continue;
 			}

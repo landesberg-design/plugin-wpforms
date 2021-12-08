@@ -29,8 +29,7 @@ abstract class Fields extends AddonsItemBase {
 	 */
 	public function allow_load() {
 
-		// Load only in the Form Builder.
-		return wpforms_is_admin_page( 'builder' );
+		return wp_doing_ajax() || wpforms_is_admin_page( 'builder' );
 	}
 
 	/**

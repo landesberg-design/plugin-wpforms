@@ -21,7 +21,7 @@ class Elementor implements IntegrationInterface {
 	 */
 	public function allow_load() {
 
-		return did_action( 'elementor/loaded' );
+		return (bool) did_action( 'elementor/loaded' );
 	}
 
 	/**
@@ -70,9 +70,9 @@ class Elementor implements IntegrationInterface {
 		 *
 		 * @param bool $use_compat
 		 */
-		$use_compat = apply_filters( 'wpforms_apply_elementor_preview_compat', true );
+		$use_compat = (bool) apply_filters( 'wpforms_apply_elementor_preview_compat', true );
 
-		if ( true !== $use_compat ) {
+		if ( $use_compat !== true ) {
 			return;
 		}
 
@@ -157,7 +157,7 @@ class Elementor implements IntegrationInterface {
 	}
 
 	/**
-	 * Load an integration css in the elementor document.
+	 * Load assets in the elementor document.
 	 *
 	 * @since 1.6.2
 	 */

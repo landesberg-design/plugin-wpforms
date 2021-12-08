@@ -260,11 +260,11 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 		$fld = $this->field_element(
 			'text',
 			$field,
-			array(
+			[
 				'slug'  => 'value_display',
 				'class' => 'wpforms-number-slider-value-display',
-				'value' => isset( $field['value_display'] ) ? $field['value_display'] : esc_html__( 'Selected Value: {value}', 'wpforms-lite' ),
-			),
+				'value' => isset( $field['value_display'] ) ? $field['value_display'] : $this->get_default_display_value(),
+			],
 			false
 		);
 
@@ -329,6 +329,21 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 	}
 
 	/**
+	 * Get default display value.
+	 *
+	 * @since 1.7.1
+	 *
+	 * @return string
+	 */
+	private function get_default_display_value() {
+
+		return sprintf( /* translators: %s - value. */
+			esc_html__( 'Selected Value: %s', 'wpforms-lite' ),
+			'{value}'
+		);
+	}
+
+	/**
 	 * Field preview inside the builder.
 	 *
 	 * @since 1.5.7
@@ -340,7 +355,7 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 		// Label.
 		$this->field_preview_option( 'label', $field );
 
-		$value_display = isset( $field['value_display'] ) ? esc_attr( $field['value_display'] ) : esc_html__( 'Selected Value: {value}', 'wpforms-lite' );
+		$value_display = isset( $field['value_display'] ) ? esc_attr( $field['value_display'] ) : $this->get_default_display_value();
 		$default_value = ! empty( $field['default_value'] ) ? (float) $field['default_value'] : 0;
 
 		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -384,17 +399,19 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 		// phpcs:ignore
 		echo wpforms_render(
 			'fields/number-slider/frontend',
-			array(
-				'min'           => isset( $field['min'] ) && is_numeric( $field['min'] ) ? (float) $field['min'] : self::SLIDER_MIN,
+			[
+				'atts'          => $primary['attr'],
+				'class'         => $primary['class'],
+				'datas'         => $primary['data'],
+				'default_value' => $default_value,
+				'id'            => $primary['id'],
 				'max'           => isset( $field['max'] ) && is_numeric( $field['max'] ) ? (float) $field['max'] : self::SLIDER_MAX,
+				'min'           => isset( $field['min'] ) && is_numeric( $field['min'] ) ? (float) $field['min'] : self::SLIDER_MIN,
+				'required'      => $primary['required'],
 				'step'          => isset( $field['step'] ) && is_numeric( $field['step'] ) ? (float) $field['step'] : self::SLIDER_STEP,
 				'value_display' => $value_display,
-				'default_value' => $default_value,
 				'value_hint'    => $hint,
-				'field_id'      => $field['id'],
-				'required'      => $primary['required'],
-				'html_atts'     => wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
-			),
+			],
 			true
 		);
 	}

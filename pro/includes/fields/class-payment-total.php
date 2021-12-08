@@ -186,23 +186,27 @@ class WPForms_Field_Payment_Total extends WPForms_Field {
 	 *
 	 * @param array $field      Field data and settings.
 	 * @param array $deprecated Deprecated, not used parameter.
-	 * @param array $form_data Form data and settings.
+	 * @param array $form_data  Form data and settings.
 	 */
 	public function field_display( $field, $deprecated, $form_data ) {
 
 		$primary = $field['properties']['inputs']['primary'];
 		$type    = ! empty( $field['required'] ) ? 'text' : 'hidden';
-		$style   = ! empty( $field['required'] ) ? 'style="position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;" readonly ' : '';
+		$attrs   = $primary['attr'];
+
+		if ( ! empty( $field['required'] ) ) {
+			$attrs['style']    = 'position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;';
+			$attrs['readonly'] = 'readonly';
+		}
 
 		// This displays the total the user sees.
 		echo '<div class="wpforms-payment-total">' . wpforms_format_amount( 0, true ) . '</div>';
 
 		// Hidden input for processing.
 		printf(
-			'<input type="%s" %s %s>',
-			$type,
-			wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
-			$style
+			'<input type="%s" %s>',
+			esc_attr( $type ),
+			wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $attrs )
 		);
 	}
 

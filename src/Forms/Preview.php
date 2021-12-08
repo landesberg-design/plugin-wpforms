@@ -97,12 +97,16 @@ class Preview {
 	 * Modify query, limit to one post.
 	 *
 	 * @since 1.5.1
+	 * @since 1.7.0 Added `page_id`, `post_type` and `post__in` query variables.
 	 *
 	 * @param \WP_Query $query The WP_Query instance.
 	 */
 	public function pre_get_posts( $query ) {
 
 		if ( ! is_admin() && $query->is_main_query() ) {
+			$query->set( 'page_id', '' );
+			$query->set( 'post_type', 'wpforms' );
+			$query->set( 'post__in', [ (int) $this->form_data['id'] ] );
 			$query->set( 'posts_per_page', 1 );
 		}
 	}

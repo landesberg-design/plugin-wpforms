@@ -20,6 +20,18 @@ class WPForms_Field_Divider extends WPForms_Field {
 		$this->icon  = 'fa-arrows-h';
 		$this->order = 150;
 		$this->group = 'fancy';
+
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.7.1
+	 */
+	private function hooks() {
+
+		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
 	}
 
 	/**

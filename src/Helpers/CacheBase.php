@@ -143,7 +143,7 @@ abstract class CacheBase {
 		$current_time        = time();
 		$cache_file          = $this->get_cache_dir() . $this->settings['cache_file'];
 
-		if ( file_exists( $cache_file ) ) {
+		if ( is_file( $cache_file ) && is_readable( $cache_file ) ) {
 			clearstatcache( true, $cache_file );
 			$cache_modified_time = (int) filemtime( $cache_file );
 			$data                = json_decode( file_get_contents( $cache_file ), true );
@@ -195,7 +195,8 @@ abstract class CacheBase {
 			return $data;
 		}
 
-		file_put_contents( // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
+		file_put_contents(
 			$dir . $this->settings['cache_file'],
 			wp_json_encode( $data )
 		);

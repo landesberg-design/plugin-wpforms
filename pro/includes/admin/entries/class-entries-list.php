@@ -95,11 +95,10 @@ class WPForms_Entries_List {
 	public function init() {
 
 		// Check what page and view.
-		$page = ! empty( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$view = $this->get_current_screen_view();
 
 		// Only load if we are actually on the overview page.
-		if ( $page !== 'wpforms-entries' || $view !== 'list' ) {
+		if ( ! wpforms_is_admin_page( 'entries' ) || $view !== 'list' ) {
 			return;
 		}
 
@@ -259,20 +258,21 @@ class WPForms_Entries_List {
 	/**
 	 * Watch for and run complete form exports.
 	 *
-	 * @since 1.1.6
+	 * @since      1.1.6
+	 * @deprecated 1.5.5
 	 */
 	public function process_export() {
 
 		$form_id = $this->get_filtered_form_id();
 		// Check for run switch.
-		if ( empty( $_GET['export'] ) || ! $form_id || 'all' !== $_GET['export'] ) {
+		if ( empty( $_GET['export'] ) || ! $form_id || $_GET['export'] !== 'all' || empty( $_GET['_wpnonce'] ) ) {
 			return;
 		}
 
 		_deprecated_function( __CLASS__ . '::' . __METHOD__, '1.5.5 of WPForms plugin', 'WPForms\Pro\Admin\Export\Export class' );
 
 		// Security check.
-		if ( empty( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wpforms_entry_list_export' ) ) {
+		if ( ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'wpforms_entry_list_export' ) ) {
 			return;
 		}
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/entries/class-entries-export.php';
@@ -291,12 +291,12 @@ class WPForms_Entries_List {
 
 		$form_id = $this->get_filtered_form_id();
 		// Check for run switch.
-		if ( empty( $_GET['action'] ) || ! $form_id || 'markread' !== $_GET['action'] ) {
+		if ( empty( $_GET['action'] ) || ! $form_id || $_GET['action'] !== 'markread' || empty( $_GET['_wpnonce'] ) ) {
 			return;
 		}
 
 		// Security check.
-		if ( empty( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'wpforms_entry_list_markread' ) ) {
+		if ( ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'wpforms_entry_list_markread' ) ) {
 			return;
 		}
 
@@ -317,12 +317,12 @@ class WPForms_Entries_List {
 	public function process_columns() {
 
 		// Check for run switch and data.
-		if ( empty( $_POST['action'] ) || empty( $_POST['form_id'] ) || $_POST['action'] !== 'list-columns' ) {
+		if ( empty( $_POST['action'] ) || empty( $_POST['form_id'] ) || $_POST['action'] !== 'list-columns' || empty( $_POST['_wpnonce'] ) ) {
 			return;
 		}
 
 		// Security check.
-		if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'wpforms_entry_list_columns' ) ) {
+		if ( ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'wpforms_entry_list_columns' ) ) {
 			return;
 		}
 
@@ -420,24 +420,21 @@ class WPForms_Entries_List {
 	 */
 	protected function get_filter_search_parts() {
 
-		if ( empty( $_GET['search'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( empty( $_GET['search'] ) ) {
 			return false;
 		}
 
 		$expected = [ 'field', 'comparison', 'term' ];
-		$valid    = true;
+
 		foreach ( $expected as $field ) {
-			if ( ! isset( $_GET['search'][ $field ] ) || '' === $_GET['search'][ $field ] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$valid = false;
-				break;
+			if ( ! isset( $_GET['search'][ $field ] ) || $_GET['search'][ $field ] === '' ) {
+				return false;
 			}
 		}
 
-		if ( ! $valid ) {
-			return false;
-		}
-
-		return array_map( 'sanitize_text_field', $_GET['search'] ); // phpcs:ignore
+		return array_map( 'sanitize_text_field', wp_unslash( $_GET['search'] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
@@ -452,45 +449,44 @@ class WPForms_Entries_List {
 		$form_id = $this->get_filtered_form_id();
 		$data    = $this->get_filter_search_parts();
 
-		if ( $data ) {
-			$comparisons = [
-				'contains'     => __( 'contains', 'wpforms' ),
-				'contains_not' => __( 'does not contain', 'wpforms' ),
-				'is'           => __( 'is', 'wpforms' ),
-				'is_not'       => __( 'is not', 'wpforms' ),
-			];
-			$comparison  = isset( $comparisons[ $data['comparison'] ] ) ? $comparisons[ $data['comparison'] ] : $comparisons['contains'];
-			$field       = sanitize_text_field( wp_unslash( $data['field'] ) );
-
-			$term = '';
-
-			// phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			if ( ! empty( $_GET['search']['term'] ) ) {
-				$term = sanitize_text_field( wp_unslash( $_GET['search']['term'] ) );
-				$term = empty( $term ) ? htmlspecialchars( wp_unslash( $_GET['search']['term'] ) ) : $term;
-			}
-			// phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-
-			if ( is_numeric( $field ) && $form_id ) {
-				$meta = wpforms()->form->get_field( $form_id, $field );
-
-				if ( isset( $meta['label'] ) ) {
-					$field = $meta['label'];
-				}
-			} else {
-				$advanced_options = Helpers::get_search_fields_advanced_options();
-				$field            = ! empty( $advanced_options[ $field ] ) ? $advanced_options[ $field ] : __( 'any form field', 'wpforms' );
-			}
-
-			return sprintf( /* translators: 1: field name, 2: operation, 3: term */
-				__( 'where %1$s %2$s "%3$s"', 'wpforms' ),
-				'<em>' . $field . '</em>',
-				$comparison,
-				'<em>' . $term . '</em>'
-			);
+		if ( ! $data ) {
+			return '';
 		}
 
-		return '';
+		$comparisons = [
+			'contains'     => __( 'contains', 'wpforms' ),
+			'contains_not' => __( 'does not contain', 'wpforms' ),
+			'is'           => __( 'is', 'wpforms' ),
+			'is_not'       => __( 'is not', 'wpforms' ),
+		];
+		$comparison  = isset( $comparisons[ $data['comparison'] ] ) ? $comparisons[ $data['comparison'] ] : $comparisons['contains'];
+		$field       = isset( $data['field'] ) ? $data['field'] : '';
+		$term        = isset( $data['term'] ) ? $data['term'] : '';
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $_GET['search']['term'] ) && wpforms_is_empty_string( $term ) ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$term = htmlspecialchars( wp_unslash( $_GET['search']['term'] ) );
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		if ( is_numeric( $field ) && $form_id ) {
+			$meta = wpforms()->form->get_field( $form_id, $field );
+
+			if ( isset( $meta['label'] ) ) {
+				$field = $meta['label'];
+			}
+		} else {
+			$advanced_options = Helpers::get_search_fields_advanced_options();
+			$field            = ! empty( $advanced_options[ $field ] ) ? $advanced_options[ $field ] : __( 'any form field', 'wpforms' );
+		}
+
+		return sprintf( /* translators: 1: field name, 2: operation, 3: term */
+			__( 'where %1$s %2$s "%3$s"', 'wpforms' ),
+			'<em>' . esc_html( $field ) . '</em>',
+			esc_html( $comparison ),
+			'<em>' . esc_html( $term ) . '</em>'
+		);
 	}
 
 	/**
@@ -502,12 +498,15 @@ class WPForms_Entries_List {
 	 */
 	private function get_filtered_dates() {
 
-		if ( empty( $_GET['date'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( empty( $_GET['date'] ) ) {
 			return [];
 		}
-		$dates = (array) explode( ' - ', sanitize_text_field( wp_unslash( $_GET['date'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		$dates = (array) explode( ' - ', sanitize_text_field( wp_unslash( $_GET['date'] ) ) );
 
 		return array_map( 'sanitize_text_field', $dates );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
@@ -527,7 +526,7 @@ class WPForms_Entries_List {
 
 		if ( $dates ) {
 			$dates = array_map(
-				function ( $date ) {
+				static function ( $date ) {
 
 					return date_i18n( 'M j, Y', strtotime( $date ) );
 				},
@@ -646,14 +645,8 @@ class WPForms_Entries_List {
 	 */
 	protected function is_list_filtered() {
 
-		$is_filtered = false;
-
-		if (
-			isset( $_GET['search'] ) ||
-			isset( $_GET['date'] )
-		) {
-			$is_filtered = true;
-		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$is_filtered = isset( $_GET['search'] ) || isset( $_GET['date'] );
 
 		return apply_filters( 'wpforms_entries_list_is_list_filtered', $is_filtered );
 	}
@@ -767,12 +760,8 @@ class WPForms_Entries_List {
 	 */
 	public function field_column_setting() {
 
-		$form_data         = ! empty( $this->form->post_content ) ? wpforms_decode( $this->form->post_content ) : array();
-		$entry_id_selected = false;
+		$form_data = ! empty( $this->form->post_content ) ? wpforms_decode( $this->form->post_content ) : [];
 
-		if ( ! empty( $form_data['meta']['entry_columns'] ) && is_array( $form_data['meta']['entry_columns'] ) ) {
-			$entry_id_selected = in_array( WPForms_Entries_Table::COLUMN_ENTRY_ID, $form_data['meta']['entry_columns'], true );
-		}
 		?>
 		<div id="wpforms-field-column-select" style="display:none;">
 
@@ -891,16 +880,18 @@ class WPForms_Entries_List {
 		$preview_url = esc_url( wpforms_get_form_preview_url( $this->form_id ) );
 
 		// Export Entry URL.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$export_url = add_query_arg(
-			array(
+			[
 				'page'   => 'wpforms-tools',
 				'view'   => 'export',
 				'form'   => absint( $this->form_id ),
-				'search' => ! empty( $_GET['search'] ) ? $_GET['search'] : array(), // phpcs:ignore
-				'date'   => ! empty( $_GET['date'] ) ? $_GET['date'] : array(), // phpcs:ignore
-			),
+				'search' => ! empty( $_GET['search'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_GET['search'] ) ) : [],
+				'date'   => ! empty( $_GET['date'] ) ? sanitize_text_field( wp_unslash( $_GET['date'] ) ) : [],
+			],
 			admin_url( 'admin.php' )
 		);
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		// Mark Read URL.
 		$read_url = wp_nonce_url(
@@ -915,6 +906,18 @@ class WPForms_Entries_List {
 
 		// Delete all entries.
 		$delete_url = wp_nonce_url( $base, 'bulk-entries' );
+		$form_title = ! isset( $form_data['settings']['form_title'] ) ? $form_data['settings']['form_title'] : '';
+
+		if ( empty( $form_title ) ) {
+			$form = wpforms()->get( 'form' )->get( $this->form_id );
+
+			$form_title = ! empty( $form )
+				? $form->post_title
+				: sprintf( /* translators: %d - form id. */
+					esc_html__( 'Form (#%d)', 'wpforms' ),
+					$this->form_id
+				);
+		}
 		?>
 
 		<div class="form-details wpforms-clear">
@@ -923,9 +926,7 @@ class WPForms_Entries_List {
 
 			<h3 class="form-details-title">
 				<?php
-				if ( ! empty( $form_data['settings']['form_title'] ) ) {
-					echo wp_strip_all_tags( $form_data['settings']['form_title'] );
-				}
+				echo esc_html( wp_strip_all_tags( $form_title ) );
 				$this->form_selector_html();
 				?>
 			</h3>
@@ -1070,12 +1071,27 @@ class WPForms_Entries_List {
 				$type = ! empty( $alert['type'] ) ? $alert['type'] : 'info';
 
 				if ( in_array( $type, $display, true ) ) {
-					$class  = 'notice-' . $type;
-					$class .= ! empty( $alert['dismiss'] ) ? ' is-dismissible' : '';
-					$output = '<div class="notice ' . $class . '"><p>' . $alert['message'] . '</p></div>';
+					$classes  = 'notice-' . $type;
+					$classes .= ! empty( $alert['dismiss'] ) ? ' is-dismissible' : '';
+
+					$output = sprintf(
+						'<div class="notice %s"><p>%s</p></div>',
+						wpforms_sanitize_classes( $classes ),
+						wp_kses(
+							$alert['message'],
+							[
+								'a' => [
+									'href' => [],
+								],
+							]
+						)
+					);
+
 					if ( $wrap ) {
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						echo '<div class="wrap">' . $output . '</div>';
 					} else {
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						echo $output;
 					}
 					if ( ! empty( $alert['abort'] ) ) {

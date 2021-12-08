@@ -112,7 +112,8 @@
 				useBootstrap: false,
 				theme: 'modern',
 				boxWidth: '400px',
-				animateFromElement: false
+				animateFromElement: false,
+				content: wpforms_admin.something_went_wrong,
 			};
 
 			// Upgrade information modal for upgrade links.

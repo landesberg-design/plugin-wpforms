@@ -138,7 +138,7 @@ class Help {
 	 */
 	public function get_docs() {
 
-		if ( file_exists( $this->settings['cache_file'] ) ) {
+		if ( is_file( $this->settings['cache_file'] ) && is_readable( $this->settings['cache_file'] ) ) {
 			$docs = json_decode( file_get_contents( $this->settings['cache_file'] ), true );
 		}
 
@@ -146,7 +146,7 @@ class Help {
 
 		if (
 			empty( $docs ) ||
-			(int) filemtime( $this->settings['cache_file'] ) + $this->settings['cache_ttl'] > time()
+			(int) filemtime( $this->settings['cache_file'] ) + $this->settings['cache_ttl'] < time()
 		) {
 			// This code should execute once when the method called the first time,
 			// Next update_docs() should be executed by schedule.
@@ -282,6 +282,7 @@ class Help {
 			'fields/field_options/file-upload'                   => 'file upload',
 			'fields/field_options/custom-captcha'                => 'custom captcha',
 			'fields/field_options/rating'                        => 'rating',
+			'fields/field_options/richtext'                      => 'rich text',
 			'fields/field_options/likert_scale'                  => 'likert scale',
 			'fields/field_options/payment-single'                => 'single item',
 			'fields/field_options/payment-multiple'              => 'multiple items',
@@ -302,6 +303,7 @@ class Help {
 			'settings/conversational_forms'                      => 'conversational forms',
 			'settings/form_locker'                               => 'form locker',
 			'settings/form_pages'                                => 'form pages',
+			'settings/save_resume'                               => 'save and resume',
 			'settings/webhooks'                                  => 'webhooks',
 			'providers'                                          => '',
 			'providers/aweber'                                   => 'aweber',
@@ -598,6 +600,18 @@ class Help {
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
+			],
+			'rich text'                 => [
+				'/docs/how-to-use-the-rich-text-field-in-wpforms/',
+			],
+			'wysiwyg'                   => [
+				'/docs/how-to-use-the-rich-text-field-in-wpforms/',
+			],
+			'editor'                    => [
+				'/docs/how-to-use-the-rich-text-field-in-wpforms/',
+			],
+			'rich editor'               => [
+				'/docs/how-to-use-the-rich-text-field-in-wpforms/',
 			],
 			'page break'                => [
 				'/docs/how-to-create-multi-page-forms-in-wpforms/',
@@ -1066,6 +1080,21 @@ class Help {
 			'form pages'                => [
 				'/docs/how-to-install-and-use-the-form-pages-addon/',
 			],
+			'save'                      => [
+				'/docs/how-to-install-and-use-the-save-and-resume-addon-with-wpforms/',
+			],
+			'resume'                    => [
+				'/docs/how-to-install-and-use-the-save-and-resume-addon-with-wpforms/',
+			],
+			'continue'                  => [
+				'/docs/how-to-install-and-use-the-save-and-resume-addon-with-wpforms/',
+			],
+			'save and resume'           => [
+				'/docs/how-to-install-and-use-the-save-and-resume-addon-with-wpforms/',
+			],
+			'save and continue'         => [
+				'/docs/how-to-install-and-use-the-save-and-resume-addon-with-wpforms/',
+			],
 			'webhooks'                  => [
 				'/docs/how-to-install-and-use-the-webhooks-addon-with-wpforms/',
 			],
@@ -1172,7 +1201,7 @@ class Help {
 
 		$result = array_filter(
 			$this->docs,
-			function( $doc ) use ( $link ) {
+			static function( $doc ) use ( $link ) {
 
 				return ! empty( $doc['url'] ) && $doc['url'] === 'https://wpforms.com' . $link;
 			}

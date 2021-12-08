@@ -148,22 +148,23 @@ var WPFormsPagesSMTP = window.WPFormsPagesSMTP || ( function( document, window, 
 				el.$stepInstallNum.attr( 'src', el.$stepInstallNum.attr( 'src' ).replace( 'step-1.', 'step-complete.' ) );
 				$btn.addClass( 'grey' ).removeClass( 'button-primary' ).text( wpforms_pluginlanding.activated );
 				app.stepInstallPluginStatus();
-			} else {
-				var activationFail = ( 'install' === action && res.success && ! res.data.is_activated ) || 'activate' === action,
-					url            = ! activationFail ? wpforms_pluginlanding.manual_install_url : wpforms_pluginlanding.manual_activate_url,
-					msg            = ! activationFail ? wpforms_pluginlanding.error_could_not_install : wpforms_pluginlanding.error_could_not_activate,
-					btn            = ! activationFail ? wpforms_pluginlanding.download_now : wpforms_pluginlanding.plugins_page;
 
-				$btn.removeClass( 'grey disabled' ).text( btn ).attr( 'data-action', 'goto-url' ).attr( 'data-url', url );
-				$btn.after( '<p class="error">' + msg + '</p>' );
+				return;
 			}
+
+			var activationFail = ( 'install' === action && res.success && ! res.data.is_activated ) || 'activate' === action,
+				url            = ! activationFail ? wpforms_pluginlanding.manual_install_url : wpforms_pluginlanding.manual_activate_url,
+				msg            = ! activationFail ? wpforms_pluginlanding.error_could_not_install : wpforms_pluginlanding.error_could_not_activate,
+				btn            = ! activationFail ? wpforms_pluginlanding.download_now : wpforms_pluginlanding.plugins_page;
+
+			$btn.removeClass( 'grey disabled' ).text( btn ).attr( 'data-action', 'goto-url' ).attr( 'data-url', url );
+			$btn.after( '<p class="error">' + msg + '</p>' );
 		},
 
 		/**
 		 * Callback for step 'Install' completion.
 		 *
 		 * @since 1.5.7
-		 *
 		 */
 		stepInstallPluginStatus: function() {
 
@@ -171,6 +172,7 @@ var WPFormsPagesSMTP = window.WPFormsPagesSMTP || ( function( document, window, 
 				action: 'wpforms_smtp_page_check_plugin_status',
 				nonce : wpforms_admin.nonce,
 			};
+
 			$.post( wpforms_admin.ajax_url, data )
 				.done( app.stepInstallPluginStatusDone );
 		},
@@ -194,8 +196,12 @@ var WPFormsPagesSMTP = window.WPFormsPagesSMTP || ( function( document, window, 
 
 			if ( res.data.setup_status > 0 ) {
 				el.$stepSetupNum.attr( 'src', el.$stepSetupNum.attr( 'src' ).replace( 'step-2.svg', 'step-complete.svg' ) );
-				el.$stepSetupBtn.text( wpforms_pluginlanding.smtp_settings_button );
+				el.$stepSetupBtn.attr( 'data-url', wpforms_pluginlanding.smtp_settings_url ).text( wpforms_pluginlanding.smtp_settings );
+
+				return;
 			}
+
+			el.$stepSetupBtn.attr( 'data-url', wpforms_pluginlanding.smtp_wizard_url ).text( wpforms_pluginlanding.smtp_wizard );
 		},
 
 		/**

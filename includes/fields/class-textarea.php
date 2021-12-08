@@ -45,7 +45,7 @@ class WPForms_Field_Textarea extends WPForms_Field {
 			! empty( $input ) &&
 			isset( $properties['inputs'][ $input ] )
 		) {
-			$properties['inputs'][ $input ]['attr']['value'] = wpforms_sanitize_textarea_field( $raw_value );
+			$properties['inputs'][ $input ]['attr']['value'] = wpforms_sanitize_textarea_field( wp_unslash( $raw_value ) );
 		}
 
 		return $properties;
