@@ -1,5 +1,5 @@
 {
-    "name": "not-a-robot-agency/wpforms",
+    "name": "not-a-robot-agency/plugin-wpforms",
     "type": "wordpress-plugin",
     "description": "",
     "require": {
