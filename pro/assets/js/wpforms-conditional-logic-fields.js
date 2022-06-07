@@ -473,6 +473,7 @@
 						.show()
 						.removeClass( 'wpforms-conditional-hide' )
 						.addClass( 'wpforms-conditional-show' );
+					$this.trigger( 'wpformsShowConditionalsField' );
 				}
 
 				$( document ).trigger( 'wpformsProcessConditionalsField', [ formID, fieldID, pass, action ] );

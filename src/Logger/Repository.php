@@ -37,7 +37,7 @@ class Repository {
 	/**
 	 * Get not-limited total query.
 	 *
-	 * @since {VESRION}
+	 * @since 1.6.4.1
 	 *
 	 * @var int
 	 */

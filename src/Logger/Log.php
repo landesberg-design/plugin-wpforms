@@ -99,6 +99,7 @@ class Log {
 			'provider'          => esc_html__( 'Providers', 'wpforms-lite' ),
 			'security'          => esc_html__( 'Security', 'wpforms-lite' ),
 			'spam'              => esc_html__( 'Spam', 'wpforms-lite' ),
+			'log'               => esc_html__( 'Log', 'wpforms-lite' ),
 		];
 	}
 

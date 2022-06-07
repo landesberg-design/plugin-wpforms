@@ -487,7 +487,8 @@ class WPForms_Field_Password extends WPForms_Field {
 		if (
 			! empty( $fields[ $field_id ]['password-strength'] ) &&
 			! empty( $fields[ $field_id ]['password-strength-level'] ) &&
-			version_compare( PHP_VERSION, '7.2.0', '>=' )
+			PHP_VERSION_ID >= 70200 &&
+			! $this->is_empty_not_required_field( $field_id, $field_submit, $fields ) // Don't check the password strength for empty fields which is set as not required.
 		) {
 
 			require_once WPFORMS_PLUGIN_DIR . 'libs/bjeavons/zxcvbn-php/autoload.php';
@@ -646,6 +647,26 @@ class WPForms_Field_Password extends WPForms_Field {
 	public function modify_entry_preview_value( $value, $field, $form_data ) {
 
 		return str_repeat( '*', strlen( $value ) );
+	}
+
+	/**
+	 * Checks if password field has been submitted empty and set as not required at the same time.
+	 *
+	 * @since 1.7.4
+	 *
+	 * @param int   $field_id     Field ID.
+	 * @param array $field_submit Submitted field value.
+	 * @param array $fields       Fields settings.
+	 *
+	 * @return bool
+	 */
+	private function is_empty_not_required_field( $field_id, $field_submit, $fields ) {
+
+		return (
+				// If submitted value is empty or is an array of empty values (that happens when password confirmation is enabled).
+				empty( $field_submit ) || empty( implode( '', array_values( (array) $field_submit ) ) )
+			)
+			&& empty( $fields[ $field_id ]['required'] ); // If field is not set as required.
 	}
 }
 

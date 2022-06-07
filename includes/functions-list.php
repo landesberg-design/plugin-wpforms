@@ -240,7 +240,32 @@ function wpforms_list_insert_after( $array, $key, $new ) {
 
 	$keys  = array_keys( $array );
 	$index = array_search( $key, $keys, true );
-	$pos   = false === $index ? count( $array ) : $index + 1;
+	$pos   = $index === false ? count( $array ) : $index + 1;
 
 	return array_merge( array_slice( $array, 0, $pos ), $new, array_slice( $array, $pos ) );
+}
+
+/**
+ * Cleanup $items array recursively removing from it all keys not existing in the $default array.
+ *
+ * @since 1.7.2
+ *
+ * @param array $items   Items.
+ * @param array $default Default items.
+ *
+ * @return array
+ */
+function wpforms_list_intersect_key( $items, $default ) {
+
+	if ( ! is_array( $items ) ) {
+		return $items;
+	}
+
+	$items = array_intersect_key( $items, $default );
+
+	foreach ( $items as $key => &$item ) {
+		$item = wpforms_list_intersect_key( $item, $default[ $key ] );
+	}
+
+	return $items;
 }

@@ -58,7 +58,7 @@ class Community {
 	 */
 	public function get_blocks_data() {
 
-		$type = wpforms()->pro ? 'plugin' : 'liteplugin';
+		$type = wpforms()->is_pro() ? 'plugin' : 'liteplugin';
 		$data = [];
 
 		$data['vip_circle'] = [

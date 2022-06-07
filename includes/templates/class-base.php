@@ -216,13 +216,31 @@ abstract class WPForms_Template {
 	 */
 	public function template_replace( $form, $data, $args ) {
 
-		if ( ! empty( $args['template'] ) ) {
-			if ( $args['template'] === $this->slug ) {
-				$new                  = $this->data;
-				$new['settings']      = ! empty( $form['post_content']['settings'] ) ? $form['post_content']['settings'] : [];
-				$form['post_content'] = wpforms_encode( $new );
-			}
+		// We should proceed only if the template slug passed via $args['template'] is equal to the current template slug.
+		// This will work only for offline templates: Blank Form, all the Addons Templates, and all the custom templates.
+		// All the online (modern) templates use the hash as the identifier,
+		// and they are handled by `\WPForms\Admin\Builder\Templates::apply_to_existing_form()`.
+		if ( empty( $args['template'] ) || $args['template'] !== $this->slug ) {
+			return $form;
 		}
+
+		$form_data = wpforms_decode( wp_unslash( $form['post_content'] ) );
+
+		// Something is wrong with the form data.
+		if ( empty( $form_data ) ) {
+			return $form;
+		}
+
+		// Compile the new form data preserving needed data from the existing form.
+		$new                     = $this->data;
+		$new['id']               = isset( $form_data['id'] ) ? $form_data['id'] : 0;
+		$new['settings']         = isset( $form_data['settings'] ) ? $form_data['settings'] : [];
+		$new['payments']         = isset( $form_data['payments'] ) ? $form_data['payments'] : [];
+		$new['meta']             = isset( $form_data['meta'] ) ? $form_data['meta'] : [];
+		$new['meta']['template'] = isset( $this->data['meta']['template'] ) ? $this->data['meta']['template'] : '';
+
+		// Update the form with new data.
+		$form['post_content'] = wpforms_encode( $new );
 
 		return $form;
 	}

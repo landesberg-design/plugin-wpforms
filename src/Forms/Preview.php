@@ -42,31 +42,28 @@ class Preview {
 	public function is_preview_page() {
 
 		// Only proceed for the form preview page.
-		if ( empty( $_GET['wpforms_form_preview'] ) ) { // phpcs:ignore
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( empty( $_GET['wpforms_form_preview'] ) ) {
 			return false;
 		}
 
-		// Check for logged in user with correct capabilities.
-		if ( ! \is_user_logged_in() ) {
+		// Check for logged-in user with correct capabilities.
+		if ( ! is_user_logged_in() ) {
 			return false;
 		}
 
-		$form_id = \absint( $_GET['wpforms_form_preview'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$form_id = absint( $_GET['wpforms_form_preview'] );
 
-		if ( ! \wpforms_current_user_can( 'view_form_single', $form_id ) ) {
+		if ( ! wpforms_current_user_can( 'view_form_single', $form_id ) ) {
 			return false;
 		}
 
-		// Fetch form details for the entry.
-		$this->form_data = \wpforms()->form->get(
-			$form_id,
-			array(
-				'content_only' => true,
-			)
-		);
+		// Fetch form details.
+		$this->form_data = wpforms()->get( 'form' )->get( $form_id, [ 'content_only' => true ] );
 
 		// Check valid form was found.
-		if ( empty( $this->form_data ) ) {
+		if ( empty( $this->form_data ) || empty( $this->form_data['id'] ) ) {
 			return false;
 		}
 
@@ -80,17 +77,13 @@ class Preview {
 	 */
 	public function hooks() {
 
-		\add_action( 'pre_get_posts', array( $this, 'pre_get_posts' ) );
-
-		\add_filter( 'the_title', array( $this, 'the_title' ), 100, 1 );
-
-		\add_filter( 'the_content', array( $this, 'the_content' ), 999 );
-
-		\add_filter( 'get_the_excerpt', array( $this, 'the_content' ), 999 );
-
-		\add_filter( 'template_include', array( $this, 'template_include' ) );
-
-		\add_filter( 'post_thumbnail_html', '__return_empty_string' );
+		add_action( 'pre_get_posts', [ $this, 'pre_get_posts' ] );
+		add_filter( 'the_title', [ $this, 'the_title' ], 100, 1 );
+		add_filter( 'the_content', [ $this, 'the_content' ], 999 );
+		add_filter( 'get_the_excerpt', [ $this, 'the_content' ], 999 );
+		add_filter( 'home_template_hierarchy', [ $this, 'force_page_template_hierarchy' ] );
+		add_filter( 'frontpage_template_hierarchy', [ $this, 'force_page_template_hierarchy' ] );
+		add_filter( 'post_thumbnail_html', '__return_empty_string' );
 	}
 
 	/**
@@ -103,12 +96,14 @@ class Preview {
 	 */
 	public function pre_get_posts( $query ) {
 
-		if ( ! is_admin() && $query->is_main_query() ) {
-			$query->set( 'page_id', '' );
-			$query->set( 'post_type', 'wpforms' );
-			$query->set( 'post__in', [ (int) $this->form_data['id'] ] );
-			$query->set( 'posts_per_page', 1 );
+		if ( is_admin() || ! $query->is_main_query() ) {
+			return;
 		}
+
+		$query->set( 'page_id', '' );
+		$query->set( 'post_type', 'wpforms' );
+		$query->set( 'post__in', empty( $this->form_data['id'] ) ? [] : [ (int) $this->form_data['id'] ] );
+		$query->set( 'posts_per_page', 1 );
 	}
 
 	/**
@@ -167,7 +162,7 @@ class Preview {
 			];
 		}
 
-		if ( wpforms()->pro && wpforms_current_user_can( 'view_entries_form_single', $this->form_data['id'] ) ) {
+		if ( wpforms()->is_pro() && wpforms_current_user_can( 'view_entries_form_single', $this->form_data['id'] ) ) {
 			$links[] = [
 				'url'  => esc_url(
 					add_query_arg(
@@ -191,16 +186,22 @@ class Preview {
 		}
 
 		$content  = '<p>';
-		$content .= esc_html__( 'This is a preview of your form. This page is not publicly accessible.', 'wpforms-lite' );
+		$content .= esc_html__( 'This is a preview of the latest saved revision of your form. If this preview does not match your form, save your changes and then refresh this page. This form preview is not publicly accessible.', 'wpforms-lite' );
+
 		if ( ! empty( $links ) ) {
 			$content .= '<br>';
+			$content .= '<span class="wpforms-preview-notice-links">';
+
 			foreach ( $links as $key => $link ) {
 				$content .= '<a href="' . $link['url'] . '">' . $link['text'] . '</a>';
 				$l        = array_keys( $links );
+
 				if ( end( $l ) !== $key ) {
 					$content .= ' <span style="display:inline-block;margin:0 6px;opacity: 0.5">|</span> ';
 				}
 			}
+
+			$content .= '</span>';
 		}
 		$content .= '</p>';
 
@@ -229,12 +230,29 @@ class Preview {
 	/**
 	 * Force page template types.
 	 *
-	 * @since 1.5.1
+	 * @since 1.7.2
 	 *
-	 * @return string
+	 * @param array $templates A list of template candidates, in descending order of priority.
+	 *
+	 * @return array
 	 */
-	public function template_include() {
+	public function force_page_template_hierarchy( $templates ) {
 
-		return locate_template( array( 'page.php', 'single.php', 'index.php' ) );
+		return [ 'page.php', 'single.php', 'index.php' ];
 	}
+
+    /**
+     * Force page template types.
+     *
+     * @since 1.5.1
+     * @deprecated 1.7.2
+     *
+     * @return string
+     */
+    public function template_include() {
+
+        _deprecated_function( __METHOD__, '1.7.2 of WPForms plugin' );
+
+        return locate_template( [ 'page.php', 'single.php', 'index.php' ] );
+    }
 }

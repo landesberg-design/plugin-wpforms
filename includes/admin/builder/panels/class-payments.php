@@ -69,7 +69,7 @@ class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 			return;
 		}
 
-		if ( ! wpforms()->pro ) {
+		if ( ! wpforms()->is_pro() ) {
 
 			// WPForms Lite users.
 			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-info">

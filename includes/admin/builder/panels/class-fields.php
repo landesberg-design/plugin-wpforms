@@ -111,8 +111,17 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 				<div class="wpforms-title-desc">
 					<div class="wpforms-title-desc-inner">
-						<h2 class="wpforms-form-name"><?php echo esc_html( $this->form->post_title ); ?></h2>
-						<span class="wpforms-form-desc"><?php echo wp_kses( $this->form->post_excerpt, wpforms_builder_preview_get_allowed_tags() ); ?></span>
+						<h2 class="wpforms-form-name">
+							<?php echo esc_html( isset( $this->form_data['settings']['form_title'] ) ? $this->form_data['settings']['form_title'] : $this->form->post_title ); ?>
+						</h2>
+						<span class="wpforms-form-desc">
+							<?php
+							echo wp_kses(
+								isset( $this->form_data['settings']['form_desc'] ) ? $this->form_data['settings']['form_desc'] : $this->form->post_excerpt,
+								wpforms_builder_preview_get_allowed_tags()
+							);
+							?>
+						</span>
 					</div>
 				</div>
 
@@ -306,6 +315,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 			$css .= ! empty( $field['input_columns'] ) && $field['input_columns'] === '3' ? ' wpforms-list-3-columns' : '';
 			$css .= ! empty( $field['input_columns'] ) && $field['input_columns'] === 'inline' ? ' wpforms-list-inline' : '';
 			$css .= isset( $field['meta']['delete'] ) && $field['meta']['delete'] === false ? ' no-delete' : '';
+			$css .= isset( $field['meta']['duplicate'] ) && $field['meta']['duplicate'] === false ? ' no-duplicate' : '';
 
 			$css = apply_filters( 'wpforms_field_preview_class', $css, $field );
 
@@ -330,7 +340,6 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 			if ( ! $field_helper_hide ) {
 				printf(
-				// language=HTML PhpStorm.
 					'<div class="wpforms-field-helper">
 						<span class="wpforms-field-helper-edit">%s</span>
 						<span class="wpforms-field-helper-drag">%s</span>
@@ -396,16 +405,16 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 		switch ( $field['type'] ) {
 			case 'url':
 				$field_type = 'URL';
-
 				break;
+
 			case 'html':
 				$field_type = 'HTML';
-
 				break;
+
 			case 'gdpr-checkbox':
 				$field_type = 'GDPR Checkbox';
-
 				break;
+
 			default:
 				$field_type = ucwords( preg_replace( '/[_-]/', ' ', $field['type'] ) );
 		}

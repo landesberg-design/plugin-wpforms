@@ -59,7 +59,7 @@ class WPForms_Install {
 			$this->run();
 		}
 
-		set_transient( 'wpforms_just_activated', wpforms()->pro ? 'pro' : 'lite', 60 );
+		set_transient( 'wpforms_just_activated', wpforms()->is_pro() ? 'pro' : 'lite', 60 );
 
 		// Abort so we only set the transient for single site installs.
 		if ( isset( $_GET['activate-multi'] ) || is_network_admin() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended

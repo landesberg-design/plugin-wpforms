@@ -68,7 +68,7 @@ class Elementor implements IntegrationInterface {
 		 *
 		 * @since 1.6.0
 		 *
-		 * @param bool $use_compat
+		 * @param bool $use_compat Use compatibility.
 		 */
 		$use_compat = (bool) apply_filters( 'wpforms_apply_elementor_preview_compat', true );
 

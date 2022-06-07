@@ -7,7 +7,6 @@
 	var WPFormsProviders = {
 
 		settings: {
-			form  : $( '#wpforms-builder-form' ),
 			spinner: '<i class="wpforms-loading-spinner wpforms-loading-inline"></i>',
 			spinnerWhite: '<i class="wpforms-loading-spinner wpforms-loading-inline wpforms-loading-white"></i>',
 		},
@@ -35,7 +34,7 @@
 		ready: function() {
 
 			// Setup/cache some vars not available before.
-			s.formID = $( '#wpforms-builder-form' ).data( 'id' );
+			s.form = $( '#wpforms-builder-form' );
 		},
 
 		/**
@@ -360,7 +359,7 @@
 				task         : 'select_list',
 				account_id   : $connection.find( '.wpforms-provider-accounts option:selected' ).val(),
 				list_id      : $this.find( ':selected' ).val(),
-				form_id      : s.formID,
+				form_id      : s.form.data( 'id' ),
 			};
 
 			WPFormsProviders.fireAJAX( $this, data, function( res ) {
@@ -384,7 +383,7 @@
 		providerPanelConfirm: function( targetPanel ) {
 
 			wpforms_panel_switch = true;
-			if ( targetPanel === 'providers' ) {
+			if ( targetPanel === 'providers' && ! s.form.data( 'revision' ) ) {
 				if ( wpf.savedState != wpf.getFormState( '#wpforms-builder-form' ) ) {
 					wpforms_panel_switch = false;
 					$.confirm( {

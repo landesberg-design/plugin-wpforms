@@ -4,10 +4,11 @@
  *
  * @since 1.6.2
  *
- * @var integer $minutes
+ * @var int    $minutes
+ * @var string $congrats_popup_footer Congrats popup footer HTML.
  */
 
-if ( ! \defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -18,20 +19,20 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<h3><?php esc_html_e( 'Add a Block', 'wpforms-lite' ); ?></h3>
 			<p>
 				<?php
-				echo wp_kses(
-					sprintf(
+				printf(
+					wp_kses(
 						/* translators: %s - Link to the WPForms documentation page. */
 						__( 'Click the plus button, search for WPForms, click the block to<br>embed it. <a href="%s" target="_blank" rel="noopener noreferrer">Learn More</a>.', 'wpforms-lite' ),
-						'https://wpforms.com/docs/creating-first-form/#display-form'
+						[
+							'a'  => [
+								'href'   => [],
+								'rel'    => [],
+								'target' => [],
+							],
+							'br' => [],
+						]
 					),
-					[
-						'a'  => [
-							'href'   => [],
-							'rel'    => [],
-							'target' => [],
-						],
-						'br' => [],
-					]
+					'https://wpforms.com/docs/creating-first-form/#display-form'
 				);
 				?>
 			</p>
@@ -45,12 +46,13 @@ if ( ! \defined( 'ABSPATH' ) ) {
 </div>
 
 <div class="wpforms-challenge-popup-container">
-	<div id="wpforms-challenge-congrats-popup" class="wpforms-challenge-popup">
-		<div class="wpforms-challenge-popup-header wpforms-challenge-popup-header-congrats">
-			<i class="wpforms-challenge-popup-close fa fa-times-circle fa-lg"></i>
-		</div>
+	<div id="wpforms-challenge-congrats-popup" class="wpforms-challenge-popup wpforms-challenge-popup-congrats">
+		<i class="wpforms-challenge-popup-close fa fa-times-circle fa-lg"></i>
 		<div class="wpforms-challenge-popup-content">
-			<h3><?php esc_html_e( 'Congrats, you did it!', 'wpforms-lite' ); ?></h3>
+			<h3>
+				<?php esc_html_e( 'Congrats, You Did It!', 'wpforms-lite' ); ?>
+				<img src="<?php echo esc_url( WPFORMS_PLUGIN_URL . 'assets/images/challenge/party-popper.png' ); ?>" alt="">
+			</h3>
 			<p>
 				<?php
 				echo wp_kses(
@@ -79,6 +81,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<a href="https://wordpress.org/support/plugin/wpforms-lite/reviews/?filter=5#new-post" class="wpforms-challenge-popup-btn wpforms-challenge-popup-rate-btn" target="_blank" rel="noopener"><?php esc_html_e( 'Rate WPForms on WordPress.org', 'wpforms-lite' ); ?>
 				<span class="dashicons dashicons-external"></span></a>
 		</div>
+		<?php echo $congrats_popup_footer; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
 
 	<div id="wpforms-challenge-contact-popup" class="wpforms-challenge-popup">

@@ -567,7 +567,7 @@ class WPForms_WP_Emails {
 						continue;
 					}
 
-					$field_name = $this->fields[ $field_id ]['name'];
+					$field_name = isset( $this->fields[ $field_id ]['name'] ) ? $this->fields[ $field_id ]['name'] : '';
 					$field_val  = empty( $this->fields[ $field_id ]['value'] ) && ! is_numeric( $this->fields[ $field_id ]['value'] ) ? '<em>' . esc_html__( '(empty)', 'wpforms-lite' ) . '</em>' : $this->fields[ $field_id ]['value'];
 				}
 

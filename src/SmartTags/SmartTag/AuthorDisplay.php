@@ -24,10 +24,12 @@ class AuthorDisplay extends SmartTag {
 
 		$name = get_the_author();
 
-		if ( empty( $name ) && ! empty( $_POST['wpforms']['author'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$name = get_the_author_meta( 'display_name', absint( $_POST['wpforms']['author'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
+		if ( empty( $name ) && ! empty( $_POST['wpforms']['author'] ) ) {
+			$name = get_the_author_meta( 'display_name', absint( $_POST['wpforms']['author'] ) );
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
-		return ! empty( $name ) ? sanitize_text_field( $name ) : '';
+		return ! empty( $name ) ? esc_html( wp_strip_all_tags( $name ) ) : '';
 	}
 }

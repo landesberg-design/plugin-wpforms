@@ -33,6 +33,7 @@ class Loader {
 	public function __construct() {
 
 		$core_class_names = [
+			'LiteConnect\LiteConnect',
 			'Divi\Divi',
 			'Elementor\Elementor',
 			'Gutenberg\FormSelector',
@@ -42,6 +43,7 @@ class Loader {
 			'UsageTracking\UsageTracking',
 			'DefaultThemes\DefaultThemes',
 			'TranslationsPress\Translations',
+			'DefaultContent\DefaultContent',
 		];
 
 		$class_names = (array) apply_filters( 'wpforms_integrations_available', $core_class_names );
@@ -80,23 +82,26 @@ class Loader {
 	 */
 	public function register_class( $class_name ) {
 
-		$class_name = \sanitize_text_field( $class_name );
+		$class_name = sanitize_text_field( $class_name );
 
 		// Load Lite class if exists.
-		if ( ! \wpforms()->pro && \class_exists( 'WPForms\Lite\Integrations\\' . $class_name ) ) {
+		if ( class_exists( 'WPForms\Lite\Integrations\\' . $class_name ) && ! wpforms()->is_pro() ) {
 			$class_name = 'WPForms\Lite\Integrations\\' . $class_name;
+
 			return new $class_name();
 		}
 
 		// Load Pro class if exists.
-		if ( \wpforms()->pro && \class_exists( 'WPForms\Pro\Integrations\\' . $class_name ) ) {
+		if ( class_exists( 'WPForms\Pro\Integrations\\' . $class_name ) && wpforms()->is_pro() ) {
 			$class_name = 'WPForms\Pro\Integrations\\' . $class_name;
+
 			return new $class_name();
 		}
 
 		// Load general class if neither Pro nor Lite class exists.
-		if ( \class_exists( __NAMESPACE__ . '\\' . $class_name ) ) {
+		if ( class_exists( __NAMESPACE__ . '\\' . $class_name ) ) {
 			$class_name = __NAMESPACE__ . '\\' . $class_name;
+
 			return new $class_name();
 		}
 	}

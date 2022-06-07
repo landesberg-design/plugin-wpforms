@@ -22,6 +22,6 @@ class UserIp extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		return wpforms_get_ip();
+		return esc_html( wpforms_get_ip() );
 	}
 }

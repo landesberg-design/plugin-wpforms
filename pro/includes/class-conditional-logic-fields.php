@@ -124,14 +124,15 @@ class WPForms_Conditional_Logic_Fields {
 	 */
 	public function frontend_assets() {
 
-		if ( ! $this->conditional_logic && ! wpforms()->frontend->assets_global() ) {
+		if ( ! $this->conditional_logic && ! wpforms()->get( 'frontend' )->assets_global() ) {
 			return;
 		}
 
-		// JavaScript.
+		$min = wpforms_get_min_suffix();
+
 		wp_enqueue_script(
 			'wpforms-builder-conditionals',
-			WPFORMS_PLUGIN_URL . 'pro/assets/js/wpforms-conditional-logic-fields.js',
+			WPFORMS_PLUGIN_URL . "pro/assets/js/wpforms-conditional-logic-fields{$min}.js",
 			[ 'jquery', 'wpforms' ],
 			WPFORMS_VERSION,
 			true

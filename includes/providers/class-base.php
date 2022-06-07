@@ -1,6 +1,7 @@
 <?php
 
-use \WPForms\Providers\Provider\Settings\FormBuilder;
+use WPForms\Providers\Provider\Settings\FormBuilder;
+use WPForms\Providers\Provider\Status;
 
 /**
  * Provider class.
@@ -996,14 +997,33 @@ abstract class WPForms_Provider {
 	 */
 	public function builder_form_data() {
 
-		if ( ! empty( $_GET['form_id'] ) && empty( $this->form_data ) ) {
-			$this->form_data = wpforms()->form->get(
-				absint( $_GET['form_id'] ),
-				array(
-					'content_only' => true,
-				)
-			);
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		if ( empty( $_GET['form_id'] ) || ! empty( $this->form_data ) ) {
+			return;
 		}
+
+		$revisions = wpforms()->get( 'revisions' );
+		$revision  = $revisions ? $revisions->get_revision() : null;
+
+		if ( $revision ) {
+			// Setup form data based on the revision_id.
+			$this->form_data = wpforms_decode( $revision->post_content );
+
+			return;
+		}
+
+		// Setup form data based on the ID.
+		$form = wpforms()->get( 'form' );
+
+		if ( ! $form ) {
+			return;
+		}
+
+		$this->form_data = $form->get(
+			absint( $_GET['form_id'] ),
+			[ 'content_only' => true ]
+		);
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
@@ -1040,7 +1060,7 @@ abstract class WPForms_Provider {
 	 */
 	private function get_configured() {
 
-		return \WPForms\Providers\Provider\Status::init( $this->slug )->is_configured()
+		return ! empty( $this->form_data['id'] ) && Status::init( $this->slug )->is_ready( $this->form_data['id'] )
 			? 'configured'
 			: '';
 	}
@@ -1103,7 +1123,7 @@ abstract class WPForms_Provider {
 			<?php
 
 			FormBuilder::display_content_default_screen(
-				\WPForms\Providers\Provider\Status::init( $this->slug )->is_connected( $form_id ),
+				Status::init( $this->slug )->is_connected( $form_id ),
 				$this->slug,
 				$this->name,
 				$this->icon

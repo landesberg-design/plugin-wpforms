@@ -35,7 +35,7 @@ class WPForms_License {
 	public function __construct() {
 
 		// Admin notices.
-		if ( wpforms()->pro && ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'wpforms-settings' ) ) { // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		if ( wpforms()->is_pro() && ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'wpforms-settings' ) ) { // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 			add_action( 'admin_notices', [ $this, 'notices' ] );
 		}
 
@@ -191,7 +191,7 @@ class WPForms_License {
 			return;
 		}
 
-		// Perform a request to validate the key  - Only run every 12 hours.
+		// Perform a request to validate the key once a day.
 		$timestamp = get_option( 'wpforms_license_updates' );
 
 		if ( ! $timestamp ) {
@@ -549,12 +549,13 @@ class WPForms_License {
 	}
 
 	/**
-	 * Request the remote URL via wp_remote_post and return a json decoded response.
+	 * Request the remote URL via wp_remote_get() and return a json decoded response.
 	 *
 	 * @since 1.0.0
+	 * @since 1.7.2 Switch from POST to GET request.
 	 *
-	 * @param string $action        The name of the $_POST action var.
-	 * @param array  $body          The content to retrieve from the remote URL.
+	 * @param string $action        The name of the request action var.
+	 * @param array  $body          The GET query attributes.
 	 * @param array  $headers       The headers to send to the remote URL.
 	 * @param string $return_format The format for returning content from the remote URL.
 	 *
@@ -562,35 +563,24 @@ class WPForms_License {
 	 */
 	public function perform_remote_request( $action, $body = [], $headers = [], $return_format = 'json' ) {
 
-		// Build the body of the request.
-		$body = wp_parse_args(
+		// Request query parameters.
+		$query_params = wp_parse_args(
 			$body,
 			[
-				'tgm-updater-action'     => $action,
-				'tgm-updater-key'        => $body['tgm-updater-key'],
-				'tgm-updater-wp-version' => get_bloginfo( 'version' ),
-				'tgm-updater-referer'    => site_url(),
-			]
-		);
-		$body = http_build_query( $body, '', '&' );
-
-		// Build the headers of the request.
-		$headers = wp_parse_args(
-			$headers,
-			[
-				'Content-Type'   => 'application/x-www-form-urlencoded',
-				'Content-Length' => strlen( $body ),
+				'tgm-updater-action'      => $action,
+				'tgm-updater-key'         => $body['tgm-updater-key'],
+				'tgm-updater-wp-version'  => get_bloginfo( 'version' ),
+				'tgm-updater-php-version' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION,
+				'tgm-updater-referer'     => site_url(),
 			]
 		);
 
-		// Setup variable for wp_remote_post.
-		$post = [
+		$args = [
 			'headers' => $headers,
-			'body'    => $body,
 		];
 
 		// Perform the query and retrieve the response.
-		$response      = wp_remote_post( WPFORMS_UPDATER_API, $post );
+		$response      = wp_remote_get( add_query_arg( $query_params, WPFORMS_UPDATER_API ), $args );
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
 
@@ -604,7 +594,7 @@ class WPForms_License {
 	}
 
 	/**
-	 * Check to see if the site is using an active license.
+	 * Whether the site is using an active license.
 	 *
 	 * @since 1.5.0
 	 *
@@ -624,5 +614,57 @@ class WPForms_License {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Whether the site is using an expired license.
+	 *
+	 * @since 1.7.2
+	 *
+	 * @return bool
+	 */
+	public function is_expired() {
+
+		return $this->has_status( 'is_expired' );
+	}
+
+	/**
+	 * Whether the site is using a disabled license.
+	 *
+	 * @since 1.7.2
+	 *
+	 * @return bool
+	 */
+	public function is_disabled() {
+
+		return $this->has_status( 'is_disabled' );
+	}
+
+	/**
+	 * Whether the site is using an invalid license.
+	 *
+	 * @since 1.7.2
+	 *
+	 * @return bool
+	 */
+	public function is_invalid() {
+
+		return $this->has_status( 'is_invalid' );
+	}
+
+	/**
+	 * Check whether there is a specific license status.
+	 *
+	 * @since 1.7.2
+	 *
+	 * @param string $status License status.
+	 *
+	 * @return bool
+	 */
+	private function has_status( $status ) {
+
+		$license = get_option( 'wpforms_license', false );
+
+		return ( isset( $license[ $status ] ) && $license[ $status ] );
 	}
 }

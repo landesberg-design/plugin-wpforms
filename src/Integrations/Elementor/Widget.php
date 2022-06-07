@@ -97,7 +97,7 @@ class Widget extends Widget_Base {
 	 *
 	 * @since 1.6.2
 	 */
-	protected function _register_controls() { // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+	protected function register_controls() { // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
 
 		$this->content_controls();
 	}

@@ -149,7 +149,7 @@ WPFormsChallenge.admin = window.WPFormsChallenge.admin || ( function( document, 
 		 *
 		 * @param {object} optionData Query using option schema keys.
 		 *
-		 * @returns {promise} jQuey.post() promise interface.
+		 * @returns {promise} jQuery.post() promise interface.
 		 */
 		saveChallengeOption: function( optionData ) {
 

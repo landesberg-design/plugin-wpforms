@@ -1,14 +1,157 @@
 # Changelog
-All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/en/1.0.0/).
+All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
+
+## [1.7.4.2] - 2022-05-19
+### Changed
+- DOMPurify library updated to 2.3.8.
+
+### Fixed
+- PHP notices avoided in Lite Connect if decrypted entry data didn't contain required keys.
+- Lite Connect: entries counting and import-complete notice improved.
+- WordPress 6.0 compatibility: WPForms block styling fixed inside the Full Site Editor.
+
+## [1.7.4.1] - 2022-05-05
+### Fixed
+- LiteConnect auth key request didn't work with plain permalinks and with subdirectory install.
+- Do not display the import entries notice if the license key is not valid.
+- Improved Form Locations compatibility with the Full Site Editor template parts.
+
+## [1.7.4] - 2022-04-26
+### Added
+- Form Locations! On the Forms Overview page easily check all places where each form is currently embedded.
+- Back up form submissions into the cloud and restore them to your database as Entries after upgrading to a paid plan.
+- New `{entry_details_url}` smart tag.
+
+### Changed
+- Improved text wrapping of field labels and descriptions.
+- Each smart tag inserted by a user in the Form Builder will now be placed as the last one in relevant inputs.
+- Show error message during Entry Export if some error occurs.
+- Admin dashboard widget can now change the color scheme and graph style.
+- The input field in the Form Embed wizard popup in the Form Builder is now focused by default.
+- Updated DOMPurify lib to 2.3.6.
+
+### Fixed
+- Adding Entry Preview field after visiting the Revisions panel.
+- Search result was not reset when the user clicked "x" sign in the search field on the Addons page.
+- Strength validation was failing when the Password field was empty and not required.
+- Entry Preview field didn't show fields with an input value of `0`.
+- Some fields' `0` value was shown as empty on Edit Entry and Print pages.
+- Form's Entries page unread/read and starred/unstarred notices were behaving incorrectly.
+- Entry values weren't exported (.xlsx) if form fields had the same label.
+- Entry export didn't work for non-admins with 'View Entries' access.
+- Error occurred when the user clicked on the Export Entries download link.
+- Configurations on the Payments tab in the Form Builder were not previewed when a user was previewing form revisions.
+- Dynamic choices were not prefilling values for the Multiple Choice field on the Edit Entry page.
+- Plugin data should not be deleted when Lite was deleted, and Pro is still active.
+- The form could be saved while still adding a field, but it should not.
+- Improved compatibility with Elementor popups.
+- Cleaned up deprecation notice for `_register_controls()` with recent Elementor versions.
+
+## [1.7.3] - 2022-03-16
+### IMPORTANT
+- Support for PHP 5.5 has been discontinued. If you are running PHP 5.5, you MUST upgrade PHP before installing WPForms 1.7.3. Failure to do that will disable WPForms core functionality.
+- Support for WordPress 5.1 has been discontinued. If you are running WordPress 5.1, you MUST upgrade WordPress before installing WPForms 1.7.3. Failure to do that will disable WPForms core functionality.
+
+### Added
+- Forms now can be moved to Trash and restored on the Forms Overview page.
+- Forms now support Revisions with new UI and ability to switch between them.
+- Exported entries (.csv and .xlsx) now have an Entry Status column that indicates completed, abandoned, or partial entry.
+- Export Entries and Form Template Export selection on the Tools > Export page now support search.
+
+### Changed
+- Improved support for WordPress Core UI colors and admin themes in the admin notifications panel.
+- Improved submitted email field value validation (take into account real-world usage and RFC information).
+- Improved `wpforms_get_ip()` IP detection quality by taking care of proxies (e.g. when the site is behind Cloudflare).
+- Improved Time selector display with a limited number of choices.
+- Updated Action Scheduler library to 3.4.0.
+- Improved the manual addon installation message if automatic installation fails, added links to the downloads page and a manual installation guide.
+- Hide Sub-Labels option should be hidden for some formats in the Name and Date / Time fields.
+- Improved performance of Action Scheduler tasks.
+- Drop jQuery matchHeight library in favor of a CSS solution.
+- Abandoned and partial entries are now displayed in search results on the Entries page.
+- Unified and improved modals across all plugin pages and the Form Builder.
+- Forms now can be deleted when the user who created them is deleted.
+
+### Fixed
+- Confusing alignment of Print Preview options on small screens.
+- Long field titles didn't wrap within the field container.
+- Stuck on loading the Form Builder when switching to a new form template with unsaved changes and dismissing the native browser prompt.
+- Buttons had no spacing when the Embed button is not available for a user without the capability to edit pages and/or posts.
+- Fly-out menu was not auto-hiding on the Entries page with Survey Results enabled.
+- Incorrect position of the notification counter in the admin bar when a notification was dismissed.
+- Misaligned buttons in the Entries navigation block on the single Entry admin page.
+- Make the form Submit button disabled all the time after the submit action when AJAX form submission or confirmation redirect are enabled.
+- Toggle control labels did not have a hand cursor.
+- The `iframe` element in the HTML field was not displaying after meeting a conditional logic in the Twenty Twenty theme.
+- The dropdown list was shown partially when located at the end of the form in the Twenty Twenty theme.
+- Country flag from the Phone field was overlapped in the Enfold theme.
+- Multiple selected options in the Classic Dropdown field didn't have a visual active state.
+- CSV export filesystem issue on WordPress VIP platform.
+- Deprecation notice when processing smart tags.
+- False JavaScript issue error when WP Rocket's Delay JavaScript execution option is on.
+- PHP notice generated when email notifications were sent.
+- "Did You Know" block now always spaned across all columns.
+- Validation error if an email was not required and left empty.
+- Email field validation failed with long and invalid emails.
+- Import from other plugins.
+- Compatibility with PHP 8.1.
+
+## [1.7.2.2] - 2022-02-03
+### Fixed
+- Compatibility with current versions of the User Journey and Form Locker addons.
+
+## [1.7.2.1] - 2022-02-03
+### Fixed
+- Compatibility with PHP 8.0 and PHP 8.1.
+- Compatibility with WordPress 5.9, including its new Full Site Editing feature.
+- Broken cache directory path if `WP_CONTENT_DIR` is set in the `wp-config.php` without trailing slash.
+- PHP Notice when using the `wpforms_log()` function in certain conditions.
+- Type mismatch breaks a list of scheduled actions in Action Scheduler if typed arguments are passed.
+
+## [1.7.2] - 2022-01-04
+### Added
+- Search by form name and description is available on the Forms Overview page.
+- New "Author" column in the Forms Overview table to display a name of a person who created the form.
+- Display log records on the single Entry page when an entry note has been added or deleted.
+
+### Changed
+- Adjusted an error message for the Locked Field modal when attempting to delete required form fields.
+- Hide image choice style options if image choices are not enabled.
+- Improved sanitization for Page and Form IDs in Form embed wizard popup.
+- Adjusted Weekly Summary email text for Lite users.
+- Updated the WPForms > About Us page.
+- Updated jQuery inputmask lib to 5.0.7-beta29.
+- Updated DOMPurify lib to 2.3.4.
+
+### Fixed
+- Missing search docs in the Form Builder Help.
+- Display empty table instead of empty state screen for Unread (0), Starred (0), Abandoned (0), etc., views.
+- Input mask prevents fields with conditional logic from being displayed on paste.
+- Classic file uploader: error message about the maximum allowed number of files wasn't displayed in a correct field.
+- Media modal 'Actions' menu was missing when using the Divi Builder.
+- PHP notice was generated on a form preview if a page template is changed.
+- Correctly handle the legacy widget options (show/hide form title and description) on the front-end.
+- Do not generate PHP notices in debug mode when Address field inputs were removed using filters.
+- If a form with configured Google reCAPTCHA v3 is submitted after 2 minutes, there was an error "Google reCAPTCHA verification failed, please try again later."
+- Better compatibility for From Name and From Email fields in the Form Builder > Notifications screen when the WP Mail SMTP plugin forces those values.
+- `{field_id="#"}` smart tag stripped out HTML encoding in the URL that is saved in the URL field.
+- PHP warning occurred when the `%` symbol is used inside some Form Builder settings.
+- Form Preview didn't work properly on the upcoming Twenty Twenty-Two theme.
+- PHP timeout occurred in the Form Builder when large multi-level term taxonomies were used as dynamic choices for Checkboxes/Multiple Choices/Dropdown fields.
+- PHP notice generated on the Entry Print Preview page if a form was changed.
+- PHP fatal error generated in some cases when Site Health information was displayed.
+- WP.com VIP clients used to have caching issues with external data.
+- WooCommerce product import (CSV) to update existing products wasn't updating product images while WPForms was active.
+- Form couldn't be submitted on the Lite version of the plugin when it contained the Page Break field from the paid version.
 
 ## [1.7.1.2] - 2021-11-18
-## Fixed
+### Fixed
 - Uploads via Modern File Upload field fail if `ext-fileinfo` PHP extension is disabled.
 - File Upload field not storing the upload with Conditional Logic configured in certain ways.
 - Edge case when form tokens (anti-spam protection) failed verification at certain time of a new day.
 
 ## [1.7.1.1] - 2021-11-11
-## Fixed
+### Fixed
 - Email address validation against allowlist or denylist always fails.
 - Country flag from Phone field position on top of Dropdown field choices on Edit Entry page.
 - Legacy Stripe field not showing years in credit card expiration subfield.

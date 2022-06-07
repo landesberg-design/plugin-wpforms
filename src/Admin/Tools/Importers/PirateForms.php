@@ -199,11 +199,11 @@ class PirateForms extends Base {
 			$label    = ! empty( $pf_form[ 'pirateformsopt_label_' . $field ] ) ? $pf_form[ 'pirateformsopt_label_' . $field ] : ucwords( $field );
 
 			// If it is Lite and it's a field type not included, make a note then continue to the next field.
-			if ( ! wpforms()->pro && in_array( $field, $fields_pro_plain, true ) ) {
+			if ( ! wpforms()->is_pro() && in_array( $field, $fields_pro_plain, true ) ) {
 				$upgrade_plain[] = $label;
 			}
 
-			if ( ! wpforms()->pro && in_array( $field, $fields_pro_omit, true ) ) {
+			if ( ! wpforms()->is_pro() && in_array( $field, $fields_pro_omit, true ) ) {
 				$upgrade_omit[] = $label;
 
 				continue;
@@ -241,7 +241,6 @@ class PirateForms extends Base {
 					if ( $field === 'name' ) {
 						$fields[ $field_id ]['format'] = 'simple';
 					}
-
 					break;
 
 				case 'checkbox':
@@ -259,7 +258,6 @@ class PirateForms extends Base {
 						'required'   => $required,
 						'label_hide' => true,
 					];
-
 					break;
 
 				case 'attachment':
@@ -295,10 +293,10 @@ class PirateForms extends Base {
 			$label    = sanitize_text_field( $field['label'] );
 
 			// If it is Lite and it's a field type not included, make a note then continue to the next field.
-			if ( ! wpforms()->pro && in_array( $field['type'], $fields_pro_plain, true ) ) {
+			if ( ! wpforms()->is_pro() && in_array( $field['type'], $fields_pro_plain, true ) ) {
 				$upgrade_plain[] = $label;
 			}
-			if ( ! wpforms()->pro && in_array( $field['type'], $fields_pro_omit, true ) ) {
+			if ( ! wpforms()->is_pro() && in_array( $field['type'], $fields_pro_omit, true ) ) {
 				$upgrade_omit[] = $label;
 
 				continue;
@@ -353,7 +351,6 @@ class PirateForms extends Base {
 						'required'   => $required,
 						'label_hide' => true,
 					];
-
 					break;
 
 				case 'select':
@@ -384,7 +381,6 @@ class PirateForms extends Base {
 						'size'     => 'medium',
 						'choices'  => $options,
 					];
-
 					break;
 
 				case 'label':
@@ -394,7 +390,6 @@ class PirateForms extends Base {
 						'code'          => $field['label'],
 						'label_disable' => true,
 					];
-
 					break;
 
 				case 'file':

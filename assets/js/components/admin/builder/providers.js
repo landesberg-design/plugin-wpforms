@@ -105,6 +105,7 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 		 * @since 1.4.7
 		 */
 		ajax: {
+
 			/**
 			 * Merge custom AJAX data object with defaults.
 			 *
@@ -112,14 +113,16 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 			 * @since 1.5.9 Added a new parameter - provider
 			 *
 			 * @param {string} provider Current provider slug.
-			 * @param {object} custom AJAX data object with custom settings.
+			 * @param {object} custom Ajax data object with custom settings.
 			 *
-			 * @returns {Object}
+			 * @returns {object} Ajax data.
 			 */
 			_mergeData: function( provider, custom ) {
 
 				var data = {
-					id: $( '#wpforms-builder-form' ).data( 'id' ),
+					id: app.form.data( 'id' ),
+					// eslint-disable-next-line camelcase
+					revision_id: app.form.data( 'revision' ),
 					nonce: wpforms_builder.nonce,
 					action: 'wpforms_builder_provider_ajax_' + provider,
 				};

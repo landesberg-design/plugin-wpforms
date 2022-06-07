@@ -259,8 +259,8 @@ class Logs extends View {
 			$settings                = get_option( 'wpforms_settings' );
 			$was_enabled             = ! empty( $settings['logs-enable'] ) ? $settings['logs-enable'] : 0;
 			$settings['logs-enable'] = filter_input( INPUT_POST, 'logs-enable', FILTER_VALIDATE_BOOLEAN );
-			$logs_types              = filter_input( INPUT_POST, 'logs-types', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
-			$logs_user_roles         = filter_input( INPUT_POST, 'logs-user-roles', FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
+			$logs_types              = filter_input( INPUT_POST, 'logs-types', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
+			$logs_user_roles         = filter_input( INPUT_POST, 'logs-user-roles', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
 			$logs_users              = filter_input( INPUT_POST, 'logs-users', FILTER_SANITIZE_NUMBER_INT, FILTER_REQUIRE_ARRAY );
 
 			if ( $was_enabled ) {

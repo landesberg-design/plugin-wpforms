@@ -31,7 +31,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 			'wpforms-maskedinput',
 			WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.min.js',
 			[ 'jquery' ],
-			'5.0.6',
+			'5.0.7-beta.29',
 			true
 		);
 	}

@@ -148,6 +148,7 @@ class Export {
 			'entry_id'   => esc_html__( 'Entry ID', 'wpforms' ),
 			'date'       => esc_html__( 'Entry Date', 'wpforms' ),
 			'notes'      => esc_html__( 'Entry Notes', 'wpforms' ),
+			'status'     => esc_html__( 'Entry Status', 'wpforms' ),
 			'viewed'     => esc_html__( 'Viewed', 'wpforms' ),
 			'starred'    => esc_html__( 'Starred', 'wpforms' ),
 			'user_agent' => esc_html__( 'User Agent', 'wpforms' ),
@@ -196,6 +197,7 @@ class Export {
 			'file_not_readable' => esc_html__( 'Export file cannot be retrieved from a file system.', 'wpforms' ),
 			'file_empty'        => esc_html__( 'Export file is empty.', 'wpforms' ),
 			'form_empty'        => esc_html__( 'The form does not have any fields for export.', 'wpforms' ),
+			'no_direct_access'  => esc_html__( 'We need direct access to the filesystem for export.', 'wpforms' ),
 		);
 
 		// Strings to localize.
@@ -349,12 +351,10 @@ class Export {
 			switch ( count( $dates ) ) {
 				case 1:
 					$args['dates'] = sanitize_text_field( $req['date'] );
-
 					break;
 
 				case 2:
 					$args['dates'] = array_map( 'sanitize_text_field', $dates );
-
 					break;
 			}
 		}

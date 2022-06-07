@@ -35,9 +35,9 @@ class FieldValueId extends SmartTag {
 		}
 
 		if ( isset( $fields[ $field_id ]['value_raw'] ) && ! is_array( $fields[ $field_id ]['value_raw'] ) && (string) $fields[ $field_id ]['value_raw'] !== '' ) {
-			return wpforms_sanitize_textarea_field( $fields[ $field_id ]['value_raw'] );
+			return wp_kses_post( wp_unslash( $fields[ $field_id ]['value_raw'] ) );
 		}
 
-		return isset( $fields[ $field_id ]['value'] ) ? wpforms_sanitize_textarea_field( $fields[ $field_id ]['value'] ) : '';
+		return isset( $fields[ $field_id ]['value'] ) ? wp_kses_post( wp_unslash( $fields[ $field_id ]['value'] ) ) : '';
 	}
 }

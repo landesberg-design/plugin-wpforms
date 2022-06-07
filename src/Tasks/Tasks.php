@@ -3,7 +3,9 @@
 namespace WPForms\Tasks;
 
 use WPForms\Helpers\Transient;
+use WPForms\Tasks\Actions\EntryEmailsMetaCleanupTask;
 use WPForms\Tasks\Actions\EntryEmailsTask;
+use WPForms\Tasks\Actions\FormsLocatorScanTask;
 
 /**
  * Class Tasks manages the tasks queue and provides API to work with it.
@@ -20,11 +22,30 @@ class Tasks {
 	const GROUP = 'wpforms';
 
 	/**
+	 * Actions setting name.
+	 *
+	 * @since 1.7.3
+	 */
+	const ACTIONS = 'actions';
+
+	/**
+	 * WPForms pending or in-progress actions.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @var array
+	 */
+	private $active_actions;
+
+	/**
 	 * Perform certain things on class init.
 	 *
 	 * @since 1.5.9
 	 */
 	public function init() {
+
+		// Get WPForms pending or in-progress actions.
+		$this->active_actions = $this->get_active_actions();
 
 		// Register WPForms tasks.
 		foreach ( $this->get_tasks() as $task ) {
@@ -72,7 +93,8 @@ class Tasks {
 		}
 
 		$tasks = [
-			Actions\EntryEmailsMetaCleanupTask::class,
+			EntryEmailsMetaCleanupTask::class,
+			FormsLocatorScanTask::class,
 		];
 
 		return apply_filters( 'wpforms_tasks_get_tasks', $tasks );
@@ -109,7 +131,7 @@ class Tasks {
 	 * Function `thats_what_you_call_me()` will receive `$meta_id` param,
 	 * and you will be able to receive all params from the action like this:
 	 *     $params = ( new Meta() )->get( (int) $meta_id );
-	 *     list( $name, $year ) = $meta->data;
+	 *     list( $name, $year ) = $params->data;
 	 *
 	 * @since 1.5.9
 	 *
@@ -160,20 +182,48 @@ class Tasks {
 	}
 
 	/**
-	 * Whether task has been scheduled and is pending.
+	 * Whether task has been scheduled and is pending or in-progress.
 	 *
 	 * @since 1.6.0
 	 *
 	 * @param string $hook Hook to check for.
 	 *
-	 * @return bool
+	 * @return bool|null
 	 */
 	public function is_scheduled( $hook ) {
 
-		if ( ! function_exists( 'as_next_scheduled_action' ) ) {
-			return false;
+		if ( ! function_exists( 'as_has_scheduled_action' ) ) {
+			return null;
 		}
 
-		return as_next_scheduled_action( $hook );
+		if ( in_array( $hook, $this->active_actions, true ) ) {
+			return true;
+		}
+
+		// Action is not in the array, so it is not scheduled or belongs to another group.
+		return as_has_scheduled_action( $hook );
+	}
+
+	/**
+	 * Get all WPForms pending or in-progress actions.
+	 *
+	 * @since 1.7.3
+	 */
+	private function get_active_actions() {
+
+		global $wpdb;
+
+		$group = self::GROUP;
+		$sql   = "SELECT a.hook FROM {$wpdb->prefix}actionscheduler_actions a
+					JOIN {$wpdb->prefix}actionscheduler_groups g ON g.group_id = a.group_id
+					WHERE g.slug = '$group' AND a.status IN ('in-progress', 'pending')";
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+		$results = $wpdb->get_results( $sql, 'ARRAY_N' );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+
+		return $results ? array_merge( ...$results ) : [];
 	}
 }

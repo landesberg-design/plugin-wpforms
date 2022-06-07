@@ -144,29 +144,24 @@ abstract class PageIntegrations implements PageIntegrationsInterface {
 	 */
 	protected function display_add_new() {
 
-		/* translators: %s - provider name. */
-		$title = \sprintf( \esc_html__( 'Connect to %s', 'wpforms-lite' ), $this->core->name );
 		?>
 
 		<p class="wpforms-settings-provider-accounts-toggle">
-			<a class="wpforms-btn wpforms-btn-md wpforms-btn-light-grey" href="#" data-provider="<?php echo \esc_attr( $this->core->slug ); ?>">
-				<i class="fa fa-plus"></i> <?php \esc_html_e( 'Add New Account', 'wpforms-lite' ); ?>
+			<a class="wpforms-btn wpforms-btn-md wpforms-btn-light-grey" href="#" data-provider="<?php echo esc_attr( $this->core->slug ); ?>">
+				<i class="fa fa-plus"></i> <?php esc_html_e( 'Add New Account', 'wpforms-lite' ); ?>
 			</a>
 		</p>
 
 		<div class="wpforms-settings-provider-accounts-connect">
 
 			<form>
-				<p><?php \esc_html_e( 'Please fill out all of the fields below to add your new provider account.', 'wpforms-lite' ); ?></span></p>
+				<p><?php esc_html_e( 'Please fill out all of the fields below to add your new provider account.', 'wpforms-lite' ); ?></span></p>
 
 				<p class="wpforms-settings-provider-accounts-connect-fields">
 					<?php $this->display_add_new_connection_fields(); ?>
 				</p>
 
-				<button type="submit" class="wpforms-btn wpforms-btn-md wpforms-btn-orange wpforms-settings-provider-connect"
-					data-provider="<?php echo \esc_attr( $this->core->slug ); ?>" title="<?php echo \esc_attr( $title ); ?>">
-					<?php echo \esc_html( $title ); ?>
-				</button>
+				<?php $this->display_add_new_connection_submit_button(); ?>
 			</form>
 		</div>
 
@@ -179,6 +174,23 @@ abstract class PageIntegrations implements PageIntegrationsInterface {
 	 * @since 1.4.7
 	 */
 	protected function display_add_new_connection_fields() {
+	}
+
+	/**
+	 * Some providers may modify the form button and add their form handler.
+	 *
+	 * @since 1.7.4
+	 */
+	protected function display_add_new_connection_submit_button() {
+
+		/* translators: %s - provider name. */
+		$title = sprintf( __( 'Connect to %s', 'wpforms-lite' ), $this->core->name );
+		?>
+		<button type="submit" class="wpforms-btn wpforms-btn-md wpforms-btn-orange wpforms-settings-provider-connect"
+				data-provider="<?php echo esc_attr( $this->core->slug ); ?>" title="<?php echo esc_attr( $title ); ?>">
+			<?php echo esc_html( $title ); ?>
+		</button>
+		<?php
 	}
 
 	/**

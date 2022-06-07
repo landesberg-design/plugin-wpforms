@@ -2,6 +2,8 @@
 
 namespace WPForms\Providers\Provider;
 
+use stdClass;
+
 /**
  * Class Status gives ability to check/work with provider statuses.
  * Might be used later to track Provider errors on data-delivery.
@@ -100,16 +102,19 @@ class Status {
 
 		$is_connected = false;
 
-		$this->form_data = \wpforms()->form->get(
-			(int) $form_id,
-			[
-				'content_only' => true,
-			]
-		);
+		$revisions = wpforms()->get( 'revisions' );
+		$revision  = $revisions ? $revisions->get_revision() : null;
+
+		if ( $revision ) {
+			$form_id = $revision->ID;
+		}
+
+		$this->form_data = wpforms()->get( 'form' )->get( (int) $form_id );
+		$content         = isset( $this->form_data->post_content ) ? json_decode( $this->form_data->post_content ) : new stdClass();
 
 		if (
-			! empty( $this->form_data['providers'][ $this->provider ] ) ||
-			! empty( $this->form_data['payments'][ $this->provider ] )
+			! empty( $content->providers->{$this->provider} ) ||
+			! empty( $content->payments->{$this->provider} )
 		) {
 			$is_connected = true;
 		}

@@ -428,31 +428,25 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$field_type = $this->get_field_type( $entry, $column_name );
 
 		switch ( strtolower( $column_name ) ) {
-
 			case 'entry_id':
 			case 'id':
 				$value = absint( $entry->entry_id );
-
 				break;
 
 			case 'notes_count':
 				$value = absint( $entry->notes_count );
-
 				break;
 
 			case 'date':
 				$value = wpforms_datetime_format( $entry->date, '', true );
-
 				break;
 
 			case 'status':
 				$value = $this->column_status_field( $entry, $column_name );
-
 				break;
 
 			case 'payment_total':
 				$value = $this->column_payment_total_field( $entry, $column_name );
-
 				break;
 
 			default:
@@ -464,7 +458,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 			$value = sprintf( '<div data-field-type="%s">%s</div>', esc_attr( $field_type ), $value );
 		}
 
-		/*
+		/**
 		 * Allow filtering entry table column value.
 		 *
 		 * @since 1.0.0
@@ -710,7 +704,6 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$sendback = remove_query_arg( array( 'read', 'unread', 'starred', 'unstarred', 'deleted' ) );
 
 		switch ( $doaction ) {
-
 			// Mark as read.
 			case 'read':
 				$sendback = $this->process_bulk_action_single_read( $entries_list, $ids, $sendback );
@@ -1060,11 +1053,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function no_items() {
 
-		if ( isset( $_GET['search'] ) || isset( $_GET['date'] ) ) { // phpcs:ignore
-			esc_html_e( 'No entries found.', 'wpforms' );
-		} else {
-			esc_html_e( 'Whoops, it appears you do not have any form entries yet.', 'wpforms' );
-		}
+		esc_html_e( 'No entries found.', 'wpforms' );
 	}
 
 	/**
@@ -1263,7 +1252,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 
 		$data_args = apply_filters( 'wpforms_entry_table_args', $data_args );
-		$data      = wpforms()->entry->get_entries( $data_args );
+		$data      = wpforms()->get( 'entry' )->get_entries( $data_args );
 
 		// Maybe sort by payment total.
 		if ( $orderby === 'payment_total' ) {

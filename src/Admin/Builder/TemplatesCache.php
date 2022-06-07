@@ -19,7 +19,16 @@ class TemplatesCache extends \WPForms\Helpers\CacheBase {
 	protected function allow_load() {
 
 		// Load only in the Form Builder.
-		return wp_doing_ajax() || wpforms_is_admin_page( 'builder' );
+		$allow = wp_doing_ajax() || wpforms_is_admin_page( 'builder' );
+
+		/**
+		 * Whether to load this class.
+		 *
+		 * @since 1.7.2
+		 *
+		 * @param bool $allow True or false.
+		 */
+		return (bool) apply_filters( 'wpforms_admin_builder_templatescache_allow_load', $allow );
 	}
 
 	/**

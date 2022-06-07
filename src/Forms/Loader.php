@@ -52,25 +52,30 @@ class Loader {
 	 */
 	public function register_class( $class_name ) {
 
-		$class_name = \sanitize_text_field( $class_name );
+		$class_name = sanitize_text_field( $class_name );
 
 		// Load Lite class if exists.
-		if ( ! \wpforms()->pro && \class_exists( 'WPForms\Lite\Forms\\' . $class_name ) ) {
+		if ( class_exists( 'WPForms\Lite\Forms\\' . $class_name ) && ! wpforms()->is_pro() ) {
 			$class_name = 'WPForms\Lite\Forms\\' . $class_name;
+
 			new $class_name();
+
 			return;
 		}
 
 		// Load Pro class if exists.
-		if ( \wpforms()->pro && \class_exists( 'WPForms\Pro\Forms\\' . $class_name ) ) {
+		if ( class_exists( 'WPForms\Pro\Forms\\' . $class_name ) && wpforms()->is_pro() ) {
 			$class_name = 'WPForms\Pro\Forms\\' . $class_name;
+
 			new $class_name();
+
 			return;
 		}
 
 		// Load general class if neither Pro nor Lite class exists.
-		if ( \class_exists( __NAMESPACE__ . '\\' . $class_name ) ) {
+		if ( class_exists( __NAMESPACE__ . '\\' . $class_name ) ) {
 			$class_name = __NAMESPACE__ . '\\' . $class_name;
+
 			new $class_name();
 		}
 	}

@@ -20,10 +20,10 @@ class EntryId extends SmartTag {
 	 * @param array  $fields    List of fields.
 	 * @param string $entry_id  Entry ID.
 	 *
-	 * @return int
+	 * @return int|string
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		return absint( $entry_id );
+		return ! empty( $entry_id ) ? absint( $entry_id ) : '';
 	}
 }

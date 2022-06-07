@@ -1,5 +1,7 @@
 <?php
 
+use WPForms\Pro\Integrations\LiteConnect\Integration;
+
 /**
  * WPForms Pro. Load Pro specific features/functionality.
  *
@@ -29,7 +31,7 @@ class WPForms_Pro {
 
 		// Plugin Updater API.
 		if ( ! defined( 'WPFORMS_UPDATER_API' ) ) {
-			define( 'WPFORMS_UPDATER_API', 'https://wpforms.com/' );
+			define( 'WPFORMS_UPDATER_API', 'https://wpforms.com/license-api' );
 		}
 	}
 
@@ -64,27 +66,27 @@ class WPForms_Pro {
 	 */
 	public function init() {
 
-		add_action( 'init', array( $this, 'load_textdomain' ), 10 );
-		add_filter( 'plugin_action_links_' . plugin_basename( WPFORMS_PLUGIN_DIR . 'wpforms.php' ), array( $this, 'plugin_action_links' ), 11 );
-		add_action( 'wpforms_loaded', array( $this, 'objects' ), 1 );
-		add_action( 'wpforms_loaded', array( $this, 'updater' ), 30 );
-		add_action( 'wpforms_install', array( $this, 'install' ), 10 );
-		add_filter( 'wpforms_settings_tabs', array( $this, 'register_settings_tabs' ), 5, 1 );
-		add_filter( 'wpforms_settings_defaults', array( $this, 'register_settings_fields' ), 5, 1 );
-		add_action( 'wpforms_settings_init', array( $this, 'reinstall_custom_tables' ) );
-		add_action( 'wpforms_process_entry_save', array( $this, 'entry_save' ), 10, 4 );
-		add_action( 'wpforms_form_settings_general', array( $this, 'form_settings_general' ), 10 );
-		add_filter( 'wpforms_overview_table_columns', array( $this, 'form_table_columns' ), 10, 1 );
-		add_filter( 'wpforms_overview_table_column_value', array( $this, 'form_table_columns_value' ), 10, 3 );
-		add_action( 'wpforms_form_settings_notifications', array( $this, 'form_settings_notifications' ), 8, 1 );
-		add_action( 'wpforms_form_settings_confirmations', array( $this, 'form_settings_confirmations' ) );
-		add_filter( 'wpforms_builder_strings', array( $this, 'form_builder_strings' ), 10, 2 );
-		add_filter( 'wpforms_frontend_strings', array( $this, 'frontend_strings' ) );
-		add_action( 'admin_notices', array( $this, 'conditional_logic_addon_notice' ) );
-		add_action( 'wpforms_builder_print_footer_scripts', array( $this, 'builder_templates' ) );
-		add_filter( 'wpforms_email_footer_text', array( $this, 'form_notification_footer' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueues' ) );
-		add_filter( 'wpforms_helpers_templates_get_theme_template_paths', array( $this, 'add_templates' ) );
+		add_action( 'init', [ $this, 'load_textdomain' ], 10 );
+		add_filter( 'plugin_action_links_' . plugin_basename( WPFORMS_PLUGIN_DIR . 'wpforms.php' ), [ $this, 'plugin_action_links' ], 11, 4 );
+		add_action( 'wpforms_loaded', [ $this, 'objects' ], 1 );
+		add_action( 'wpforms_loaded', [ $this, 'updater' ], 30 );
+		add_action( 'wpforms_install', [ $this, 'install' ], 10 );
+		add_filter( 'wpforms_settings_tabs', [ $this, 'register_settings_tabs' ], 5, 1 );
+		add_filter( 'wpforms_settings_defaults', [ $this, 'register_settings_fields' ], 5, 1 );
+		add_action( 'wpforms_settings_init', [ $this, 'reinstall_custom_tables' ] );
+		add_action( 'wpforms_process_entry_save', [ $this, 'entry_save' ], 10, 4 );
+		add_action( 'wpforms_form_settings_general', [ $this, 'form_settings_general' ], 10 );
+		add_filter( 'wpforms_overview_table_columns', [ $this, 'form_table_columns' ], 10, 1 );
+		add_filter( 'wpforms_overview_table_column_value', [ $this, 'form_table_columns_value' ], 10, 3 );
+		add_action( 'wpforms_form_settings_notifications', [ $this, 'form_settings_notifications' ], 8, 1 );
+		add_action( 'wpforms_form_settings_confirmations', [ $this, 'form_settings_confirmations' ] );
+		add_filter( 'wpforms_builder_strings', [ $this, 'form_builder_strings' ], 10, 2 );
+		add_filter( 'wpforms_frontend_strings', [ $this, 'frontend_strings' ] );
+		add_action( 'admin_notices', [ $this, 'conditional_logic_addon_notice' ] );
+		add_action( 'wpforms_builder_print_footer_scripts', [ $this, 'builder_templates' ] );
+		add_filter( 'wpforms_email_footer_text', [ $this, 'form_notification_footer' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueues' ] );
+		add_filter( 'wpforms_helpers_templates_get_theme_template_paths', [ $this, 'add_templates' ] );
 		add_filter( 'wpforms_integrations_usagetracking_is_enabled', '__return_true' );
 
 		$this->allow_wp_auto_update_plugins();
@@ -160,16 +162,22 @@ class WPForms_Pro {
 		if ( $license ) {
 			update_option(
 				'wpforms_license',
-				array(
+				[
 					'key' => $license,
-				)
+				]
 			);
 			$wpforms_install->license = new WPForms_License();
+
 			$wpforms_install->license->validate_key( $license );
 			delete_option( 'wpforms_connect' );
 		}
 
 		$this->force_translations_update();
+
+		// Restart the import flags for Lite Connect if needed.
+		if ( class_exists( Integration::class ) ) {
+			Integration::maybe_restart_import_flag();
+		}
 	}
 
 	/**
@@ -248,34 +256,57 @@ class WPForms_Pro {
 	 *
 	 * @since 1.5.9
 	 *
-	 * @param array $links Plugin row links.
+	 * @param array  $links       Plugin row links.
+	 * @param string $plugin_file Path to the plugin file relative to the plugins directory.
+	 * @param array  $plugin_data An array of plugin data. See `get_plugin_data()`.
+	 * @param string $context     The plugin context.
 	 *
 	 * @return array
 	 */
-	public function plugin_action_links( $links ) {
+	public function plugin_action_links( $links, $plugin_file, $plugin_data, $context ) {
 
-		$custom = array();
+		$custom = [];
 
-		if ( isset( $links['support'] ) ) {
-			unset( $links['support'] );
-		}
+		unset( $links['pro'], $links['docs'] );
 
 		if ( isset( $links['settings'] ) ) {
 			$custom['settings'] = $links['settings'];
+
 			unset( $links['settings'] );
 		}
 
-		$custom['docs']    = sprintf(
-			'<a href="%1$s" target="_blank" aria-label="%2$s" rel="noopener noreferrer">%3$s</a>',
-			'https://wpforms.com/docs/',
-			esc_attr__( 'Go to WPForms.com Docs page', 'wpforms' ),
-			esc_html__( 'Docs', 'wpforms' )
-		);
 		$custom['support'] = sprintf(
-			'<a href="%1$s" target="_blank" aria-label="%2$s" rel="noopener noreferrer">%3$s</a>',
-			'https://wpforms.com/account/support/',
+			'<a href="%1$s" aria-label="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a>',
+			esc_url(
+				add_query_arg(
+					[
+						'utm_content'  => 'Support',
+						'utm_campaign' => 'plugin',
+						'utm_medium'   => 'all-plugins',
+						'utm_source'   => 'WordPress',
+					],
+					'https://wpforms.com/account/support/'
+				)
+			),
 			esc_attr__( 'Go to WPForms.com Support page', 'wpforms' ),
 			esc_html__( 'Support', 'wpforms' )
+		);
+
+		$custom['docs'] = sprintf(
+			'<a href="%1$s" aria-label="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a>',
+			esc_url(
+				add_query_arg(
+					[
+						'utm_content'  => 'Documentation',
+						'utm_campaign' => 'plugin',
+						'utm_medium'   => 'all-plugins',
+						'utm_source'   => 'WordPress',
+					],
+					'https://wpforms.com/docs/'
+				)
+			),
+			esc_attr__( 'Read the documentation', 'wpforms' ),
+			esc_html__( 'Docs', 'wpforms' )
 		);
 
 		return array_merge( $custom, (array) $links );
@@ -475,70 +506,26 @@ class WPForms_Pro {
 	 * @param int|string $form_id   Form ID.
 	 * @param array      $form_data Prepared form settings.
 	 */
-	public function entry_save( $fields, $entry, $form_id, $form_data = array() ) {
+	public function entry_save( $fields, $entry, $form_id, $form_data = [] ) {
 
 		// Check if form has entries disabled.
 		if ( isset( $form_data['settings']['disable_entries'] ) ) {
 			return;
 		}
 
-		// Provide the opportunity to override via a filter.
-		if ( ! apply_filters( 'wpforms_entry_save', true, $fields, $entry, $form_data ) ) {
-			return;
-		}
+		// Register the Submission class.
+		$submission = wpforms()->get( 'submission' );
 
-		$fields     = apply_filters( 'wpforms_entry_save_data', $fields, $entry, $form_data );
-		$user_id    = is_user_logged_in() ? get_current_user_id() : 0;
-		$user_ip    = wpforms_get_ip();
-		$user_agent = ! empty( $_SERVER['HTTP_USER_AGENT'] ) ? substr( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ), 0, 256 ) : '';
-		$user_uuid  = ! empty( $_COOKIE['_wpfuuid'] ) ? sanitize_key( $_COOKIE['_wpfuuid'] ) : '';
-		$date       = date( 'Y-m-d H:i:s' );
+		$submission->register( $fields, $entry, $form_id, $form_data );
 
-		// If GDPR enhancements are enabled and user details are disabled
-		// globally or in the form settings, discard the IP and UA.
-		if ( ! wpforms_is_collecting_ip_allowed( $form_data ) || ! apply_filters( 'wpforms_disable_entry_user_ip', '__return_false', $fields, $form_data ) ) {
-			$user_agent = '';
-			$user_ip    = '';
-		}
-
-		$entry_args = apply_filters(
-			'wpforms_entry_save_args',
-			array(
-				'form_id'    => absint( $form_id ),
-				'user_id'    => absint( $user_id ),
-				'fields'     => wp_json_encode( $fields ),
-				'ip_address' => sanitize_text_field( $user_ip ),
-				'user_agent' => sanitize_text_field( $user_agent ),
-				'date'       => $date,
-				'user_uuid'  => sanitize_text_field( $user_uuid ),
-			),
-			$form_data
-		);
+		// Prepare the entry data.
+		$entry_args = $submission->prepare_entry_data();
 
 		// Create entry.
-		$entry_id = wpforms()->entry->add( $entry_args );
+		$entry_id = wpforms()->get( 'entry' )->add( $entry_args );
 
 		// Create fields.
-		if ( $entry_id ) {
-			foreach ( $fields as $field ) {
-
-				$field = apply_filters( 'wpforms_entry_save_fields', $field, $form_data, $entry_id );
-
-				if ( isset( $field['value'] ) && '' !== $field['value'] ) {
-					wpforms()->entry_fields->add(
-						array(
-							'entry_id' => $entry_id,
-							'form_id'  => absint( $form_id ),
-							'field_id' => absint( $field['id'] ),
-							'value'    => $field['value'],
-							'date'     => $date,
-						)
-					);
-				}
-			}
-		}
-
-		wpforms()->process->entry_id = $entry_id;
+		$submission->create_fields( $entry_id );
 	}
 
 	/**
@@ -546,7 +533,7 @@ class WPForms_Pro {
 	 *
 	 * @since 1.2.1
 	 *
-	 * @param \WPForms_Builder_Panel_Settings $instance Settings management panel instance.
+	 * @param WPForms_Builder_Panel_Settings $instance Settings management panel instance.
 	 */
 	public function form_settings_general( $instance ) {
 
@@ -715,7 +702,7 @@ class WPForms_Pro {
 			echo '<p>';
 			printf(
 				wp_kses( /* translators: 1$s, %2$s - Links to the WPForms.com doc articles. */
-					__( 'After saving these settings, be sure to <a href="%1$s" target="_blank" rel="noopener noreferrer">test a form submission</a>. This lets you see how emails will look, and to ensure that<br>they <a href="%2$s" target="_blank" rel="noopener noreferrer">are delivered successfully</a>.', 'wpforms' ),
+					__( 'After saving these settings, be sure to <a href="%1$s" target="_blank" rel="noopener noreferrer">test a form submission</a>. This lets you see how emails will look, and to ensure that they <a href="%2$s" target="_blank" rel="noopener noreferrer">are delivered successfully</a>.', 'wpforms' ),
 					[
 						'a'  => [
 							'href'   => [],
@@ -1095,14 +1082,6 @@ class WPForms_Pro {
 						]
 					);
 
-					$p     = [];
-					$pages = get_pages();
-
-					foreach ( $pages as $page ) {
-						$depth          = count( $page->ancestors );
-						$p[ $page->ID ] = str_repeat( '-', $depth ) . ' ' . $page->post_title;
-					}
-
 					wpforms_panel_field(
 						'select',
 						'confirmations',
@@ -1110,7 +1089,7 @@ class WPForms_Pro {
 						$settings->form_data,
 						esc_html__( 'Confirmation Page', 'wpforms' ),
 						[
-							'options'     => $p,
+							'options'     => wpforms_get_pages_list(),
 							'input_id'    => 'wpforms-panel-field-confirmations-page-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-page',
 							'parent'      => 'settings',
@@ -1384,7 +1363,7 @@ class WPForms_Pro {
 	 * @return array List of table names.
 	 */
 	public function get_existing_custom_tables() {
-		_deprecated_function( __CLASS__ . '::' . __METHOD__, '1.6.3', 'wpforms()->get_existing_custom_tables()' );
+		_deprecated_function( __METHOD__, '1.6.3', 'wpforms()->get_existing_custom_tables()' );
 
 		return wpforms()->get_existing_custom_tables();
 	}

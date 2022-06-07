@@ -233,8 +233,8 @@ class Divi implements IntegrationInterface {
 		check_ajax_referer( 'wpforms_divi_builder', 'nonce' );
 
 		$form_id    = absint( filter_input( INPUT_POST, 'form_id', FILTER_SANITIZE_NUMBER_INT ) );
-		$show_title = 'on' === filter_input( INPUT_POST, 'show_title', FILTER_SANITIZE_STRING );
-		$show_desc  = 'on' === filter_input( INPUT_POST, 'show_desc', FILTER_SANITIZE_STRING );
+		$show_title = 'on' === filter_input( INPUT_POST, 'show_title', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$show_desc  = 'on' === filter_input( INPUT_POST, 'show_desc', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		add_filter(
 			'wpforms_frontend_container_class',

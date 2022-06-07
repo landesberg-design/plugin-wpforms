@@ -10,6 +10,7 @@
  * WPForms_Admin_Notice::warning( 'Do something please.' );
  *
  * @since 1.3.9
+ * @deprecated 1.7.2
  */
 class WPForms_Admin_Notice {
 
@@ -50,6 +51,9 @@ class WPForms_Admin_Notice {
 	 * @since 1.3.9
 	 */
 	public function __construct() {
+
+		_deprecated_function( __METHOD__, '1.7.2 of the WPForms plugin' );
+
 		add_action( 'admin_notices', array( &$this, 'display' ) );
 	}
 
@@ -77,6 +81,8 @@ class WPForms_Admin_Notice {
 	 * @param string $type    Type of the notice (default: '').
 	 */
 	public static function add( $message, $type = '' ) {
+
+		_deprecated_function( __METHOD__, '1.7.2 of the WPForms plugin' );
 
 		$instance = self::getInstance();
 		$id       = 'wpforms-notice-' . ( count( $instance->notices ) + 1 );

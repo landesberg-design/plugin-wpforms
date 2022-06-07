@@ -22,6 +22,6 @@ class UrlRegister extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		return wp_registration_url();
+		return esc_url( wp_registration_url() );
 	}
 }

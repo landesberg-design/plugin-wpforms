@@ -11,6 +11,7 @@ class WPForms_Field_Address extends WPForms_Field {
 	 * Address schemes: 'us' or 'international' by default.
 	 *
 	 * @since 1.2.7
+	 *
 	 * @var array
 	 */
 	public $schemes;
@@ -30,31 +31,37 @@ class WPForms_Field_Address extends WPForms_Field {
 		$this->group = 'fancy';
 
 		// Allow for additional or customizing address schemes.
-		$this->schemes = apply_filters(
-			'wpforms_address_schemes',
-			array(
-				'us'            => array(
-					'label'          => esc_html__( 'US', 'wpforms' ),
-					'address1_label' => esc_html__( 'Address Line 1', 'wpforms' ),
-					'address2_label' => esc_html__( 'Address Line 2', 'wpforms' ),
-					'city_label'     => esc_html__( 'City', 'wpforms' ),
-					'postal_label'   => esc_html__( 'Zip Code', 'wpforms' ),
-					'state_label'    => esc_html__( 'State', 'wpforms' ),
-					'states'         => wpforms_us_states(),
-				),
-				'international' => array(
-					'label'          => esc_html__( 'International', 'wpforms' ),
-					'address1_label' => esc_html__( 'Address Line 1', 'wpforms' ),
-					'address2_label' => esc_html__( 'Address Line 2', 'wpforms' ),
-					'city_label'     => esc_html__( 'City', 'wpforms' ),
-					'postal_label'   => esc_html__( 'Postal Code', 'wpforms' ),
-					'state_label'    => esc_html__( 'State / Province / Region', 'wpforms' ),
-					'states'         => '',
-					'country_label'  => esc_html__( 'Country', 'wpforms' ),
-					'countries'      => wpforms_countries(),
-				),
-			)
-		);
+		$default_schemes = [
+			'us'            => [
+				'label'          => esc_html__( 'US', 'wpforms' ),
+				'address1_label' => esc_html__( 'Address Line 1', 'wpforms' ),
+				'address2_label' => esc_html__( 'Address Line 2', 'wpforms' ),
+				'city_label'     => esc_html__( 'City', 'wpforms' ),
+				'postal_label'   => esc_html__( 'Zip Code', 'wpforms' ),
+				'state_label'    => esc_html__( 'State', 'wpforms' ),
+				'states'         => wpforms_us_states(),
+			],
+			'international' => [
+				'label'          => esc_html__( 'International', 'wpforms' ),
+				'address1_label' => esc_html__( 'Address Line 1', 'wpforms' ),
+				'address2_label' => esc_html__( 'Address Line 2', 'wpforms' ),
+				'city_label'     => esc_html__( 'City', 'wpforms' ),
+				'postal_label'   => esc_html__( 'Postal Code', 'wpforms' ),
+				'state_label'    => esc_html__( 'State / Province / Region', 'wpforms' ),
+				'states'         => '',
+				'country_label'  => esc_html__( 'Country', 'wpforms' ),
+				'countries'      => wpforms_countries(),
+			],
+		];
+
+		/**
+		 * Allow modifying address schemes.
+		 *
+		 * @since 1.2.7
+		 *
+		 * @param array $schemes Address schemes.
+		 */
+		$this->schemes = apply_filters( 'wpforms_address_schemes', $default_schemes );
 
 		// Define additional field properties.
 		add_filter( 'wpforms_field_properties_address', array( $this, 'field_properties' ), 5, 3 );
@@ -648,18 +655,25 @@ class WPForms_Field_Address extends WPForms_Field {
 
 			$active = $slug !== $scheme_selected ? 'wpforms-hide' : '';
 
+			$address1_label = isset( $scheme['address1_label'] ) ? $scheme['address1_label'] : '';
+			$address2_label = isset( $scheme['address2_label'] ) ? $scheme['address2_label'] : '';
+			$city_label     = isset( $scheme['city_label'] ) ? $scheme['city_label'] : '';
+			$state_label    = isset( $scheme['state_label'] ) ? $scheme['state_label'] : '';
+			$postal_label   = isset( $scheme['postal_label'] ) ? $scheme['postal_label'] : '';
+			$country_label  = isset( $scheme['country_label'] ) ? $scheme['country_label'] : '';
+
 			printf( '<div class="wpforms-address-scheme wpforms-address-scheme-%s %s">', wpforms_sanitize_classes( $slug ), wpforms_sanitize_classes( $active ) );
 
 				// Row 1 - Address Line 1.
 				echo '<div class="wpforms-field-row wpforms-address-1">';
 					printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $address1_placeholder ) );
-					printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $scheme['address1_label'] ) );
+					printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $address1_label ) );
 				echo '</div>';
 
 				// Row 2 - Address Line 2.
 				printf( '<div class="wpforms-field-row wpforms-address-2 %s">', wpforms_sanitize_classes( $address2_hide ) );
 					printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $address2_placeholder ) );
-					printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $scheme['address2_label'] ) );
+					printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $address2_label ) );
 				echo '</div>';
 
 				// Row 3 - City & State.
@@ -668,7 +682,7 @@ class WPForms_Field_Address extends WPForms_Field {
 					// City.
 					echo '<div class="wpforms-city wpforms-one-half ">';
 						printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $city_placeholder ) );
-						printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $scheme['city_label'] ) );
+						printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $city_label ) );
 					echo '</div>';
 
 					// State / Providence / Region.
@@ -696,7 +710,7 @@ class WPForms_Field_Address extends WPForms_Field {
 							echo '</select>';
 						}
 
-						printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $scheme['state_label'] ) );
+						printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $state_label ) );
 					echo '</div>';
 
 				echo '</div>';
@@ -706,8 +720,8 @@ class WPForms_Field_Address extends WPForms_Field {
 
 					// ZIP / Postal.
 					printf( '<div class="wpforms-postal wpforms-one-half %s">', wpforms_sanitize_classes( $postal_hide ) );
-						printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $scheme['postal_label'] ) );
-						printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $scheme['postal_label'] ) );
+						printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $postal_label ) );
+						printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $postal_label ) );
 					echo '</div>';
 
 					// Country.
@@ -717,7 +731,7 @@ class WPForms_Field_Address extends WPForms_Field {
 
 							// Country text input.
 							printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $state_placeholder ) );
-							printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $scheme['country_label'] ) );
+							printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $country_label ) );
 
 						} elseif ( ! empty( $scheme['countries'] ) && is_array( $scheme['countries'] ) ) {
 
@@ -734,7 +748,7 @@ class WPForms_Field_Address extends WPForms_Field {
 								);
 							}
 							echo '</select>';
-							printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $scheme['country_label'] ) );
+							printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $country_label ) );
 						}
 
 					echo '</div>';

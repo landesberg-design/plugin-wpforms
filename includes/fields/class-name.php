@@ -341,7 +341,9 @@ class WPForms_Field_Name extends WPForms_Field {
 		$this->field_option( 'label_hide', $field );
 
 		// Hide sublabels.
-		$this->field_option( 'sublabel_hide', $field );
+		$sublabel_class = isset( $field['format'] ) && ! in_array( $field['format'], [ 'first-last', 'first-middle-last' ], true ) ? 'wpforms-hidden' : '';
+
+		$this->field_option( 'sublabel_hide', $field, [ 'class' => $sublabel_class ] );
 
 		// Options close markup.
 		$args = [

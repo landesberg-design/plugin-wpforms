@@ -14,25 +14,68 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 	 *
 	 * @since 1.5.0
 	 *
-	 * @type {Object}
+	 * @type {object}
 	 */
 	var el = {
-
 		$widget              : $( '#wpforms_reports_widget_pro' ),
-		$chartTitle          : $( '#wpforms-dash-widget-chart-title' ),
 		$chartResetBtn       : $( '#wpforms-dash-widget-reset-chart' ),
 		$DaysSelect          : $( '#wpforms-dash-widget-timespan' ),
+		$settingsBtn         : $( '#wpforms-dash-widget-settings-button' ),
 		$canvas              : $( '#wpforms-dash-widget-chart' ),
 		$formsListBlock      : $( '#wpforms-dash-widget-forms-list-block' ),
 		$recomBlockDismissBtn: $( '#wpforms-dash-widget-dismiss-recommended-plugin-block' ),
 	};
 
 	/**
+	 * WPForms color scheme.
+	 *
+	 * @since 1.7.4
+	 *
+	 * @type {{pointBackgroundColor: string, backgroundColor: string, borderColor: string}}
+	 */
+	let wpformsColors = {
+		backgroundColor      : 'rgb(226, 119, 48)',
+		hoverBackgroundColor : '#da691f',
+		borderColor          : 'rgb(226, 119, 48)',
+		hoverBorderColor     : '#da691f',
+		pointBackgroundColor : 'rgba(255, 255, 255, 1)',
+	};
+
+	/**
+	 * WordPress color scheme.
+	 *
+	 * @since 1.7.4
+	 *
+	 * @type {{pointBackgroundColor: string, backgroundColor: string, borderColor: string}}
+	 */
+	let wpColors = {
+		backgroundColor      : 'rgba(34, 113, 177, 1)',
+		hoverBackgroundColor : '#135e96',
+		borderColor          : 'rgba(34, 113, 177, 1)',
+		hoverBorderColor     : '#135e96',
+		pointBackgroundColor : 'rgba(255, 255, 255, 1)',
+	};
+
+	if ( wpforms_dashboard_widget.chart_type === 'line' ) {
+		wpColors.backgroundColor      = '#E2ECF5';
+		wpformsColors.backgroundColor = 'rgba(255, 129, 0, 0.135)';
+	}
+
+	/**
+	 * Color scheme in use.
+	 *
+	 * @since 1.7.4
+	 *
+	 * @type {{pointBackgroundColor: string, backgroundColor: string, borderColor: string}}
+	 */
+	let colorScheme = wpforms_dashboard_widget.color_scheme === 'wp' ? wpColors : wpformsColors;
+
+	/**
 	 * Chart.js functions and properties.
 	 *
 	 * @since 1.5.0
 	 *
-	 * @type {Object}
+	 * @type {object}
 	 */
 	var chart = {
 
@@ -49,18 +92,16 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 * @since 1.5.0
 		 */
 		settings: {
-			type   : 'line',
+			type   : wpforms_dashboard_widget.chart_type,
 			data   : {
 				labels  : [],
-				datasets: [ {
-					label               : wpforms_dashboard_widget.i18n.entries,
-					data                : [],
-					backgroundColor     : 'rgba(255, 129, 0, 0.135)',
-					borderColor         : 'rgba(211, 126, 71, 1)',
-					borderWidth         : 2,
-					pointRadius         : 4,
-					pointBorderWidth    : 1,
-					pointBackgroundColor: 'rgba(255, 255, 255, 1)',
+				datasets: [ { ...{
+					label: wpforms_dashboard_widget.i18n.entries,
+					data: [],
+					borderWidth: 2,
+					pointRadius: 4,
+					pointBorderWidth: 1,
+				}, ...colorScheme,
 				} ],
 			},
 			options: {
@@ -177,7 +218,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {Object} data Dataset for the chart.
+		 * @param {object} data Dataset for the chart.
 		 */
 		updateUI: function( data ) {
 
@@ -202,14 +243,30 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {Object} data Dataset for the chart.
+		 * @param {object} data Dataset for the chart.
 		 */
 		updateData: function( data ) {
 
 			chart.settings.data.labels = [];
 			chart.settings.data.datasets[ 0 ].data = [];
 
+			chart.updateTotal( data );
+		},
+
+		/**
+		 * Updates total entries number in table title.
+		 *
+		 * @since 1.7.4
+		 *
+		 * @param {object} data Dataset for the chart.
+		 */
+		updateTotal: function( data ) {
+
+			let totalCount = 0;
+
 			$.each( data, function( index, value ) {
+
+				totalCount = Number( totalCount ) + Number( value.count );
 
 				var date = moment( value.day );
 
@@ -219,6 +276,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 					y: value.count,
 				} );
 			} );
+			$( '#entry-count-value' ).text( totalCount );
 		},
 
 		/**
@@ -298,17 +356,25 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 			 *
 			 * @since 1.5.0
 			 *
-			 * @param {Object} $el Forms list "single form chart" button jQuery element.
+			 * @param {object} $el Forms list "single form chart" button jQuery element.
 			 */
 			singleFormView: function( $el ) {
+
+				$( '.wpforms-dash-widget-single-chart-btn' ).show();
 
 				var days = el.$DaysSelect.val();
 				var formId = $el.closest( 'tr' ).attr( 'data-form-id' );
 				var formTitle = $el.closest( 'tr' ).find( '.wpforms-dash-widget-form-title' ).text();
 
+				$( '#wpforms-dash-widget-chart-title' ).text( formTitle );
+
 				el.$DaysSelect.attr( 'data-active-form-id', formId );
-				el.$chartTitle.text( formTitle );
+				el.$chartResetBtn.appendTo( $el.closest( 'td' ) );
+				$el.hide();
 				el.$chartResetBtn.show();
+
+				// update text in table header.
+				$( '#entry-count-text' ).text( wpforms_dashboard_widget.i18n.form_entries );
 
 				chart.ajaxUpdate( days, formId );
 				app.saveWidgetMeta( 'active_form_id', formId );
@@ -324,8 +390,12 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 				var days = el.$DaysSelect.val();
 
 				el.$DaysSelect.removeAttr( 'data-active-form-id' );
-				el.$chartTitle.text( wpforms_dashboard_widget.i18n.total_entries );
 				el.$chartResetBtn.hide();
+				el.$chartResetBtn.closest( 'td' ).find( '.wpforms-dash-widget-single-chart-btn' ).show();
+
+				// update text in table header.
+				$( '#entry-count-text' ).text( wpforms_dashboard_widget.i18n.total_entries );
+				$( '#wpforms-dash-widget-chart-title' ).text( wpforms_dashboard_widget.i18n.total_entries );
 
 				chart.ajaxUpdate( days, 0 );
 				app.saveWidgetMeta( 'active_form_id', 0 );
@@ -338,7 +408,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 	 *
 	 * @since 1.5.0
 	 *
-	 * @type {Object}
+	 * @type {object}
 	 */
 	var app = {
 
@@ -367,6 +437,62 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 
 			chart.init();
 			app.events();
+			app.graphSettings();
+		},
+
+		/**
+		 * Graph settings related events.
+		 *
+		 * @since 1.7.4
+		 */
+		graphSettings: function() {
+
+			el.$settingsBtn.on( 'click', function() {
+
+				$( this ).siblings( '.wpforms-dash-widget-settings-menu' ).toggle();
+			} );
+
+			el.$widget.find( '.wpforms-dash-widget-settings-menu-save' ).on( 'click', function() {
+
+				app.saveSettings();
+			} );
+		},
+
+		/**
+		 * Save the widgets settings and update the view.
+		 *
+		 * @since 1.7.4
+		 */
+		saveSettings: function() {
+
+			const style = el.$widget.find( '.wpforms-dash-widget-settings-menu input[name=wpforms-style]:checked' ).val();
+			const color = el.$widget.find( '.wpforms-dash-widget-settings-menu input[name=wpforms-color]:checked' ).val();
+
+			if ( style ) {
+				app.saveWidgetMeta( 'graph_style', style );
+				if ( style === '2' ) {
+					chart.settings.type = 'line';
+					wpColors.backgroundColor      = 'rgba(34, 113, 177, 0.135)';
+					wpformsColors.backgroundColor = 'rgba(255, 129, 0, 0.135)';
+				} else {
+					chart.settings.type = 'bar';
+					wpColors.backgroundColor      = 'rgba(34, 113, 177, 1)';
+					wpformsColors.backgroundColor = '#E27730';
+				}
+			}
+
+			if ( color ) {
+				app.saveWidgetMeta( 'color_scheme', color );
+				if ( color === '2' ) {
+					chart.settings.data.datasets[ 0 ] = { ...chart.settings.data.datasets[ 0 ], ...wpColors };
+				} else {
+					chart.settings.data.datasets[ 0 ] = { ...chart.settings.data.datasets[ 0 ], ...wpformsColors };
+				}
+			}
+
+			chart.instance.update();
+
+			el.$widget.find( '.wpforms-dash-widget-settings-menu' ).hide();
 		},
 
 		/**
@@ -391,11 +517,6 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 			el.$DaysSelect.change( function() {
 				chart.events.daysChanged();
 			} );
-
-			el.$chartResetBtn.click( function() {
-				chart.events.resetToGeneralView();
-				el.$formsListBlock.find( 'tr.wpforms-dash-widget-form-active' ).removeClass( 'wpforms-dash-widget-form-active' );
-			} );
 		},
 
 		/**
@@ -418,7 +539,10 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 			} );
 
 			el.$formsListBlock.on( 'click', '.wpforms-dash-widget-reset-chart', function() {
-				el.$chartResetBtn.click();
+				$( '.wpforms-dash-widget-reset-chart' ).hide();
+				chart.events.resetToGeneralView();
+				el.$formsListBlock.find( 'tr.wpforms-dash-widget-form-active' ).removeClass( 'wpforms-dash-widget-form-active' );
+
 			} );
 
 			el.$widget.on( 'click', '#wpforms-dash-widget-forms-more', function() {
@@ -517,7 +641,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {Object} $el jQuery element inside a widget block.
+		 * @param {object} $el jQuery element inside a widget block.
 		 */
 		removeOverlay: function( $el ) {
 			$el.siblings( '.wpforms-dash-widget-overlay' ).remove();

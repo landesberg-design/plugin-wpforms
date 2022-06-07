@@ -20,9 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="addon-container">
 	<div class="addon-item">
 		<div class="details wpforms-clear">
-			<img src="<?php echo esc_url( $image ); ?>">
+			<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $addon['title'] ); ?> <?php esc_attr_e( 'logo', 'wpforms' ); ?>">
 			<h5 class="addon-name">
-				<a target="_blank" rel="noopener noreferrer"
+				<a target="_blank" rel="noopener noreferrer" class="addon-link"
 					href="<?php echo esc_url( $url ); ?>"
 					title="<?php echo esc_attr__( 'Learn more', 'wpforms' ); ?>">
 					<?php echo esc_html( $addon['title'] ); ?>

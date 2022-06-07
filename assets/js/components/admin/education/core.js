@@ -58,6 +58,7 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 
 			app.dismissEvents();
 			app.openModalButtonClick();
+			app.setDykColspan();
 		},
 
 		/**
@@ -124,6 +125,27 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 
 				$.post( wpforms_education.ajax_url, data );
 			} );
+		},
+
+		/**
+		 * Calculate and dynamically set the DYK block cell colspan attribute.
+		 *
+		 * @since 1.7.3
+		 */
+		setDykColspan: function() {
+
+			$( '#adv-settings' ).on(
+				'change',
+				'input.hide-column-tog',
+				function( event ) {
+
+					var $dykCell  = $( '.wpforms-dyk td' ),
+						colCount  = $( '.wp-list-table thead .manage-column' ).not( '.hidden' ).length;
+
+					$dykCell.attr( 'colspan', colCount );
+
+				}
+			);
 		},
 
 		/**
@@ -460,6 +482,26 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 					}
 				}
 			);
+		},
+
+		/**
+		 * Get upgrade modal width.
+		 *
+		 * @since 1.7.3
+		 *
+		 * @param {boolean} isVideoModal Upgrade modal type (with video or not).
+		 *
+		 * @returns {string} Modal width in pixels.
+		 */
+		getUpgradeModalWidth: function( isVideoModal ) {
+
+			var windowWidth = $( window ).width();
+
+			if ( ! isVideoModal || windowWidth <= 1024 ) {
+				return '550px';
+			}
+
+			return windowWidth > 1070 ? '1040px' : '994px';
 		},
 	};
 

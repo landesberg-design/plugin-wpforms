@@ -23,8 +23,9 @@ class SmartTags extends \WPForms\SmartTags\SmartTags {
 		return (array) wpforms_array_insert(
 			parent::smart_tags_list(),
 			[
-				'entry_id'   => esc_html__( 'Entry ID', 'wpforms' ),
-				'entry_date' => esc_html__( 'Entry Date', 'wpforms' ),
+				'entry_id'          => esc_html__( 'Entry ID', 'wpforms' ),
+				'entry_date'        => esc_html__( 'Entry Date', 'wpforms' ),
+				'entry_details_url' => esc_html__( 'Entry Details URL', 'wpforms' ),
 			],
 			'form_name'
 		);

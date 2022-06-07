@@ -22,6 +22,6 @@ class PageTitle extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		return get_the_ID() ? get_the_title( get_the_ID() ) : '';
+		return get_the_ID() ? wp_kses_post( get_the_title( get_the_ID() ) ) : '';
 	}
 }

@@ -28,6 +28,7 @@ class QueryVar extends SmartTag {
 			return '';
 		}
 
-		return ! empty( $_GET[ $attributes['key'] ] ) ? wp_unslash( sanitize_text_field( $_GET[ $attributes['key'] ] ) ) : ''; // phpcs:ignore
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return ! empty( $_GET[ $attributes['key'] ] ) ? esc_html( sanitize_text_field( wp_unslash( $_GET[ $attributes['key'] ] ) ) ) : '';
 	}
 }

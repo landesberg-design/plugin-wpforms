@@ -59,7 +59,6 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 
 			if ( [ 'started', 'paused' ].indexOf( wpforms_challenge_admin.option.status ) > -1 ) {
 				WPFormsChallenge.core.updateTooltipUI();
-				app.gotoStep();
 			}
 
 			$( '.wpforms-challenge' ).show();
@@ -90,6 +89,8 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 
 				WPFormsChallenge.core.initTooltips( i + 1, anchor, null );
 			} );
+
+			$( document ).on( 'wpformsWizardPopupClose', app.enableEmbed );
 		},
 
 		/**
@@ -206,19 +207,30 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 		 */
 		builderTemplateSelect: function( el, e ) {
 
-			if ( wpforms_challenge_admin.option.status === 'paused' ) {
-				WPFormsChallenge.core.resumeChallenge();
+			var selectTemplate = function() {
+
+				var step = WPFormsChallenge.core.loadStep();
+
+				if ( step <= 1 ) {
+					WPFormsChallenge.core.stepCompleted( 2 )
+						.done( WPForms.Admin.Builder.Setup.selectTemplate.bind( null, e ) );
+					return;
+				}
+
+				WPForms.Admin.Builder.Setup.selectTemplate.bind( null, e );
+			};
+
+			if ( wpforms_challenge_admin.option.status !== 'paused' ) {
+				return selectTemplate();
 			}
 
-			var step = WPFormsChallenge.core.loadStep();
+			var resumeResult = WPFormsChallenge.core.resumeChallenge( e );
 
-			if ( step <= 1 ) {
-				WPFormsChallenge.core.stepCompleted( 2 )
-					.done( WPForms.Admin.Builder.Setup.selectTemplate.bind( null, e ) );
-				return;
+			if ( typeof resumeResult === 'object' && typeof resumeResult.done === 'function' ) {
+				resumeResult.done( selectTemplate );
+			} else {
+				selectTemplate();
 			}
-
-			WPForms.Admin.Builder.Setup.selectTemplate.bind( null, e );
 		},
 
 		/**
@@ -262,6 +274,16 @@ WPFormsChallenge.builder = window.WPFormsChallenge.builder || ( function( docume
 
 			WPFormsChallenge.core.stepCompleted( 4 );
 			WPFormsFormEmbedWizard.openPopup();
+		},
+
+		/**
+		 * Enable Embed button when Embed popup is closed.
+		 *
+		 * @since 1.7.4
+		 */
+		enableEmbed: function() {
+
+			$( '#wpforms-embed' ).removeClass( 'wpforms-disabled' );
 		},
 	};
 

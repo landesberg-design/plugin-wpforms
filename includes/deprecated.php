@@ -18,7 +18,7 @@ class_alias( 'WPForms\Helpers\PluginSilentUpgraderSkin', 'WPForms_Install_Silent
  *
  * @since 1.6.7
  */
-class_alias( wpforms()->pro ? 'WPForms\Pro\Admin\Pages\Addons' : 'WPForms\Lite\Admin\Pages\Addons', 'WPForms_Addons' );
+class_alias( wpforms()->is_pro() ? 'WPForms\Pro\Admin\Pages\Addons' : 'WPForms\Lite\Admin\Pages\Addons', 'WPForms_Addons' );
 
 /**
  * This alias is a safeguard to those developers who decided to use our internal class WPForms_Smart_Tags,
@@ -26,7 +26,15 @@ class_alias( wpforms()->pro ? 'WPForms\Pro\Admin\Pages\Addons' : 'WPForms\Lite\A
  *
  * @since 1.6.7
  */
-class_alias( wpforms()->pro ? 'WPForms\Pro\SmartTags\SmartTags' : 'WPForms\SmartTags\SmartTags', 'WPForms_Smart_Tags' );
+class_alias( wpforms()->is_pro() ? 'WPForms\Pro\SmartTags\SmartTags' : 'WPForms\SmartTags\SmartTags', 'WPForms_Smart_Tags' );
+
+/**
+ * This alias is a safeguard to those developers who decided to use our internal class \WPForms\Providers\Loader,
+ * which we deleted.
+ *
+ * @since 1.7.3
+ */
+class_alias( '\WPForms\Providers\Providers', '\WPForms\Providers\Loader' );
 
 /**
  * Get notification state, whether it's opened or closed.

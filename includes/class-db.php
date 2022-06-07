@@ -430,4 +430,36 @@ abstract class WPForms_DB {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table;
 	}
+
+	/**
+	 * Build WHERE for a query.
+	 *
+	 * @since 1.7.2.2
+	 *
+	 * @param array           $args    Optional args.
+	 * @param array           $keys    Allowed arg items.
+	 * @param string|string[] $formats Formats of arg items.
+	 *
+	 * @return string
+	 */
+	protected function build_where( $args, $keys = [], $formats = [] ) {
+
+		$formats = array_pad( $formats, count( $keys ), '%d' );
+		$where   = '';
+
+		foreach ( $keys as $index => $key ) {
+			// Value `$args[ $key ]` can be a natural number and a numeric string.
+			// We should skip empty string values, but continue working with '0'.
+			if ( empty( $args[ $key ] ) && $args[ $key ] !== '0' ) {
+				continue;
+			}
+
+			$ids = wpforms_wpdb_prepare_in( $args[ $key ], $formats[ $index ] );
+
+			$where .= empty( $where ) ? 'WHERE' : 'AND';
+			$where .= " `{$key}` IN ( {$ids} ) ";
+		}
+
+		return $where;
+	}
 }

@@ -253,7 +253,7 @@ class Upload {
 
 		$field_type = $file['type'];
 
-		/*
+		/**
 		 * Allow filtering attachment title used in WordPress Media Library for an uploaded file.
 		 *
 		 * @since 1.6.1
@@ -286,7 +286,7 @@ class Upload {
 
 		$field_type = $file['type'];
 
-		/*
+		/**
 		 * Allow filtering attachment description used in WordPress Media Library for an uploaded file.
 		 *
 		 * @since 1.6.1

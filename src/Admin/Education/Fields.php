@@ -387,10 +387,10 @@ class Fields {
 		}
 
 		foreach ( $fields as $f => $field ) {
+
 			switch ( $condition ) {
 				case 'empty':
 					$fields[ $f ][ $key ] = empty( $field[ $key ] ) ? $value : $field[ $key ];
-
 					break;
 
 				default:

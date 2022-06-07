@@ -185,17 +185,14 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 			switch ( $captcha_settings['recaptcha_type'] ) {
 				case 'v2':
 					$lbl = esc_html__( 'Enable Google Checkbox v2 reCAPTCHA', 'wpforms-lite' );
-
 					break;
 
 				case 'invisible':
 					$lbl = esc_html__( 'Enable Google Invisible v2 reCAPTCHA', 'wpforms-lite' );
-
 					break;
 
 				case 'v3':
 					$lbl = esc_html__( 'Enable Google v3 reCAPTCHA', 'wpforms-lite' );
-
 					break;
 			}
 

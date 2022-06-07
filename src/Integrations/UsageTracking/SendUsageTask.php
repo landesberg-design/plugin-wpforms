@@ -52,19 +52,26 @@ class SendUsageTask extends Task {
 	public function init() {
 
 		// Register the action handler.
-		add_action( self::ACTION, [ $this, 'process' ] );
+		$this->hooks();
 
-		if ( ! function_exists( 'as_next_scheduled_action' ) ) {
-			return;
-		}
+		$tasks = wpforms()->get( 'tasks' );
 
 		// Add new if none exists.
-		if ( as_next_scheduled_action( self::ACTION ) !== false ) {
+		if ( $tasks->is_scheduled( self::ACTION ) !== false ) {
 			return;
 		}
 
-		$this->recurring( $this->generate_start_date(), WEEK_IN_SECONDS )
-		     ->register();
+		$this->recurring( $this->generate_start_date(), WEEK_IN_SECONDS )->register();
+	}
+
+	/**
+	 * Add hooks.
+	 *
+	 * @since 1.7.3
+	 */
+	private function hooks() {
+
+		add_action( self::ACTION, [ $this, 'process' ] );
 	}
 
 	/**

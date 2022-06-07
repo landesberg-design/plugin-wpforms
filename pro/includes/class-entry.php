@@ -606,7 +606,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		 * @param array $args  Entries query arguments (arguments of the \WPForms_Entry_Handler::`get_entries( $args )` method).
 		 */
 		$where     = (array) apply_filters( 'wpforms_entry_handler_get_entries_where', $where, $args );
-		$where_sql = implode( ' AND ', array_filter( $where ) );
+		$where_sql = implode( ' AND ', array_unique( array_filter( $where ) ) );
 
 		if ( $count === true ) {
 			return absint(

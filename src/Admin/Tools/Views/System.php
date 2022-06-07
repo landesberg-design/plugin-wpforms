@@ -177,6 +177,7 @@ class System extends View {
 		$data .= 'WPFORMS_DEBUG:            ' . ( defined( 'WPFORMS_DEBUG' ) ? WPFORMS_DEBUG ? 'Enabled' : 'Disabled' : 'Not set' ) . "\n";
 		$data .= 'Memory Limit:             ' . WP_MEMORY_LIMIT . "\n";
 		$data .= 'Registered Post Stati:    ' . implode( ', ', get_post_stati() ) . "\n";
+		$data .= 'Revisions:                ' . ( WP_POST_REVISIONS ? WP_POST_REVISIONS > 1 ? 'Limited to ' . WP_POST_REVISIONS : 'Enabled' : 'Disabled' ) . "\n";
 
 		return $data;
 	}

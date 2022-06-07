@@ -22,6 +22,6 @@ class UrlLogout extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		return wp_logout_url();
+		return esc_url( wp_logout_url() );
 	}
 }

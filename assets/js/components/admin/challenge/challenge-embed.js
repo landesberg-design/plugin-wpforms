@@ -68,6 +68,7 @@ WPFormsChallenge.embed = window.WPFormsChallenge.embed || ( function( document, 
 
 			if ( WPFormsChallenge.core.isGutenberg() ) {
 				WPFormsChallenge.core.initTooltips( 5, '.block-editor .edit-post-header', { side: 'bottom' } );
+				app.updateTooltipVisibility();
 			} else {
 				WPFormsChallenge.core.initTooltips( 5, '.wpforms-insert-form-button', { side: 'right' } );
 			}
@@ -100,7 +101,7 @@ WPFormsChallenge.embed = window.WPFormsChallenge.embed || ( function( document, 
 			$( '.wpforms-challenge-step5-done' )
 				.on( 'click', app.lastStep );
 
-			$( '.wpforms-challenge-popup-close, .wpforms-challenge-popup-rate-btn, .wpforms-challenge-end' )
+			$( '.wpforms-challenge-popup-close, .wpforms-challenge-end' )
 				.on( 'click', app.completeChallenge );
 
 			$( '#wpforms-challenge-contact-form .wpforms-challenge-popup-contact-btn' )
@@ -267,6 +268,49 @@ WPFormsChallenge.embed = window.WPFormsChallenge.embed || ( function( document, 
 
 			obs.observer = new MutationObserver( obs.callback );
 			obs.observer.observe( obs.targetNode, obs.config );
+		},
+
+		/**
+		 * Update tooltip z-index when Gutenberg sidebar is open.
+		 *
+		 * @since 1.7.4
+		 *
+		 * @returns {Function} Default function.
+		 */
+		updateTooltipVisibility: function() {
+
+			var targetNode = document.querySelector( '.interface-interface-skeleton__body' );
+
+			if ( targetNode === null ) {
+				return app.updateTooltipVisibilityDefault();
+			}
+
+			var observer = new MutationObserver( function( mutationsList ) {
+
+				var $step5 = $( '.wpforms-challenge-tooltip-step5' );
+
+				for ( var mutation of mutationsList ) {
+
+					if ( mutation.type === 'childList' ) {
+						$step5.toggleClass( 'wpforms-challenge-tooltip-step5-hide' );
+					}
+				}
+			} );
+
+			observer.observe( targetNode, { attributes: true, childList: true } );
+		},
+
+		/**
+		 * Update tooltip visibility for WP 5.6 version.
+		 *
+		 * @since 1.7.4
+		 */
+		updateTooltipVisibilityDefault: function() {
+
+			$( '.editor-inserter__toggle' ).on( 'click', function() {
+
+				$( '.wpforms-challenge-tooltip-step5' ).toggleClass( 'wpforms-challenge-tooltip-step5-hide' );
+			} );
 		},
 	};
 

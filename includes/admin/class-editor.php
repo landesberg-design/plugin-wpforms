@@ -13,7 +13,8 @@ class WPForms_Admin_Editor {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		add_action( 'media_buttons', array( $this, 'media_button' ), 15 );
+
+		add_action( 'media_buttons', [ $this, 'media_button' ], 15 );
 	}
 
 	/**
@@ -21,7 +22,7 @@ class WPForms_Admin_Editor {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $editor_id
+	 * @param string $editor_id Editor Id.
 	 */
 	public function media_button( $editor_id ) {
 
@@ -43,14 +44,23 @@ class WPForms_Admin_Editor {
 			'<a href="#" class="button wpforms-insert-form-button" data-editor="%s" title="%s">%s %s</a>',
 			esc_attr( $editor_id ),
 			esc_attr__( 'Add Form', 'wpforms-lite' ),
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			$icon,
 			esc_html__( 'Add Form', 'wpforms-lite' )
 		);
 
-		// If we have made it this far then load the JS.
-		wp_enqueue_script( 'wpforms-editor', WPFORMS_PLUGIN_URL . 'assets/js/admin-editor.js', array( 'jquery' ), WPFORMS_VERSION, true );
+		$min = wpforms_get_min_suffix();
 
-		add_action( 'admin_footer', array( $this, 'shortcode_modal' ) );
+		// If we have made it this far then load the JS.
+		wp_enqueue_script(
+			'wpforms-editor',
+			WPFORMS_PLUGIN_URL . "assets/js/admin-editor{$min}.js",
+			[ 'jquery' ],
+			WPFORMS_VERSION,
+			true
+		);
+
+		add_action( 'admin_footer', [ $this, 'shortcode_modal' ] );
 	}
 
 	/**

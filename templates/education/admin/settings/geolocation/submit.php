@@ -4,7 +4,7 @@
  *
  * @since 1.6.6
  *
- * @var bool   $action       Is plugin installed?
+ * @var string $action       Is plugin installed?
  * @var string $path         Plugin file.
  * @var string $url          URL for download plugin.
  * @var bool   $plugin_allow Allow using plugin.
@@ -33,7 +33,7 @@ if ( $plugin_allow && $action === 'activate' ) {
 	</button>
 <?php } else { ?>
 	<a
-		href="https://wpforms.com/lite-upgrade/?discount=LITEUPGRADE&utm_source=WordPress&utm_medium=settings-license&utm_campaign=liteplugin"
+		href="<?php echo esc_url( wpforms_admin_upgrade_link( 'settings-license', 'Geolocation%20Addon' ) ); ?>"
 		target="_blank"
 		rel="noopener noreferrer"
 		class="wpforms-upgrade-modal wpforms-btn wpforms-btn-lg wpforms-btn-orange">

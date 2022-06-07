@@ -415,6 +415,9 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 				.done( function( res ) {
 
 					if ( res.success ) {
+
+						// We have already warned the user that unsaved changes will be ignored.
+						WPFormsBuilder.setCloseConfirmation( false );
 						window.location.href = res.data.redirect;
 					} else {
 						wpf.debug( res );

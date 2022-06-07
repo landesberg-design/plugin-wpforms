@@ -711,7 +711,6 @@ abstract class WPForms_Field {
 		}
 
 		switch ( $option ) {
-
 			// Row.
 			case 'row':
 				$output = sprintf(
@@ -730,6 +729,7 @@ abstract class WPForms_Field {
 			case 'label':
 				$class  = ! empty( $class ) ? ' class="' . $class . '"' : '';
 				$output = sprintf( '<label for="wpforms-field-option-%d-%s"%s>%s', $id, $slug, $class, esc_html( $args['value'] ) );
+
 				if ( isset( $args['tooltip'] ) && ! empty( $args['tooltip'] ) ) {
 					$output .= sprintf( '<i class="fa fa-question-circle-o wpforms-help-tooltip" title="%s"></i>', esc_attr( $args['tooltip'] ) );
 				}
@@ -744,6 +744,7 @@ abstract class WPForms_Field {
 				$type        = ! empty( $args['type'] ) ? esc_attr( $args['type'] ) : 'text';
 				$placeholder = ! empty( $args['placeholder'] ) ? esc_attr( $args['placeholder'] ) : '';
 				$before      = ! empty( $args['before'] ) ? '<span class="before-input">' . esc_html( $args['before'] ) . '</span>' : '';
+
 				if ( ! empty( $before ) ) {
 					$class .= ' has-before';
 				}
@@ -761,6 +762,7 @@ abstract class WPForms_Field {
 				$checked = checked( '1', $args['value'], false );
 				$output  = sprintf( '<input type="checkbox" class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" value="1" %s %s>', $class, $id, $slug, $id, $slug, $checked, $attrs );
 				$output .= empty( $args['nodesc'] ) ? sprintf( '<label for="wpforms-field-option-%d-%s" class="inline">%s', $id, $slug, $args['desc'] ) : '';
+
 				if ( isset( $args['tooltip'] ) && ! empty( $args['tooltip'] ) ) {
 					$output .= sprintf( '<i class="fa fa-question-circle-o wpforms-help-tooltip" title="%s"></i>', esc_attr( $args['tooltip'] ) );
 				}
@@ -770,7 +772,6 @@ abstract class WPForms_Field {
 			// Toggle.
 			case 'toggle':
 				$output = $this->field_element_toggle( $args, $id, $slug, $attrs, $class );
-
 				break;
 
 			// Select.
@@ -778,6 +779,7 @@ abstract class WPForms_Field {
 				$options = $args['options'];
 				$value   = isset( $args['value'] ) ? $args['value'] : '';
 				$output  = sprintf( '<select class="%s" id="wpforms-field-option-%d-%s" name="fields[%d][%s]" %s>', $class, $id, $slug, $id, $slug, $attrs );
+
 				foreach ( $options as $arg_key => $arg_option ) {
 					$output .= sprintf( '<option value="%s" %s>%s</option>', esc_attr( $arg_key ), selected( $arg_key, $value, false ), $arg_option );
 				}
@@ -849,7 +851,6 @@ abstract class WPForms_Field {
 		$markup = '';
 
 		switch ( $option ) {
-
 			/**
 			 * Basic Fields.
 			 */
@@ -928,7 +929,6 @@ abstract class WPForms_Field {
 					],
 					false
 				);
-
 				break;
 
 			/*
@@ -954,7 +954,6 @@ abstract class WPForms_Field {
 					],
 					false
 				);
-
 				break;
 
 			/*
@@ -1014,7 +1013,7 @@ abstract class WPForms_Field {
 				);
 				foreach ( $values as $key => $value ) {
 					$default        = ! empty( $value['default'] ) ? $value['default'] : '';
-					$base           = sprintf( 'fields[%s][choices][%s]', absint( $field['id'] ), sanitize_key( $key ) );
+					$base           = sprintf( 'fields[%d][choices][%d]', absint( $field['id'] ), absint( $key ) );
 					$image          = ! empty( $value['image'] ) ? $value['image'] : '';
 					$hide_image_btn = false;
 
@@ -1147,7 +1146,7 @@ abstract class WPForms_Field {
 				);
 				foreach ( $values as $key => $value ) {
 					$default        = ! empty( $value['default'] ) ? $value['default'] : '';
-					$base           = sprintf( 'fields[%s][choices][%s]', absint( $field['id'] ), esc_attr( $key ) );
+					$base           = sprintf( 'fields[%d][choices][%d]', absint( $field['id'] ), absint( $key ) );
 					$image          = ! empty( $value['image'] ) ? $value['image'] : '';
 					$hide_image_btn = false;
 
@@ -1220,7 +1219,7 @@ abstract class WPForms_Field {
 					'<div class="wpforms-alert-warning wpforms-alert %s">',
 					! empty( $field['choices_images'] ) ? '' : 'wpforms-hidden'
 				);
-				$note .= wp_kses( /* translators: %s - URL to the ActiveCampaign Getting started page. */
+				$note .= wp_kses(
 					__( '<h4>Images are not cropped or resized.</h4><p>For best results, they should be the same size and 250x250 pixels or smaller.</p>', 'wpforms-lite' ),
 					[
 						'h4' => [],
@@ -1406,7 +1405,6 @@ abstract class WPForms_Field {
 					],
 					false
 				);
-
 				break;
 
 			/*
@@ -1434,10 +1432,10 @@ abstract class WPForms_Field {
 					[
 						'slug'    => 'sublabel_hide',
 						'content' => $output,
+						'class'   => ! empty( $args['class'] ) ? wpforms_sanitize_classes( $args['class'] ) : '',
 					],
 					false
 				);
-
 				break;
 
 			/*
@@ -1463,14 +1461,41 @@ abstract class WPForms_Field {
 			case 'dynamic_choices':
 				$value   = ! empty( $field['dynamic_choices'] ) ? esc_attr( $field['dynamic_choices'] ) : '';
 				$tooltip = esc_html__( 'Select auto-populate method to use.', 'wpforms-lite' );
-				$options = array(
+				$options = [
 					''          => esc_html__( 'Off', 'wpforms-lite' ),
 					'post_type' => esc_html__( 'Post Type', 'wpforms-lite' ),
 					'taxonomy'  => esc_html__( 'Taxonomy', 'wpforms-lite' ),
+				];
+				$output  = $this->field_element(
+					'label',
+					$field,
+					[
+						'slug'    => 'dynamic_choices',
+						'value'   => esc_html__( 'Dynamic Choices', 'wpforms-lite' ),
+						'tooltip' => $tooltip,
+					],
+					false
 				);
-				$output  = $this->field_element( 'label', $field, array( 'slug' => 'dynamic_choices', 'value' => esc_html__( 'Dynamic Choices', 'wpforms-lite' ), 'tooltip' => $tooltip ), false );
-				$output .= $this->field_element( 'select', $field, array( 'slug' => 'dynamic_choices', 'value' => $value, 'options' => $options ), false );
-				$output  = $this->field_element( 'row', $field, array( 'slug' => 'dynamic_choices', 'content' => $output ), false );
+				$output .= $this->field_element(
+					'select',
+					$field,
+					[
+						'slug'    => 'dynamic_choices',
+						'value'   => $value,
+						'options' => $options,
+					],
+					false
+				);
+				$output  = $this->field_element(
+					'row',
+					$field,
+					[
+						'slug'    => 'dynamic_choices',
+						'class'   => ! empty( $field['choices_images'] ) ? 'wpforms-hidden' : '',
+						'content' => $output,
+					],
+					false
+				);
 				break;
 
 			/*
@@ -1611,7 +1636,6 @@ abstract class WPForms_Field {
 		$allowed_tags = wpforms_builder_preview_get_allowed_tags();
 
 		switch ( $option ) {
-
 			case 'label':
 				$label        = isset( $field['label'] ) && ! empty( $field['label'] ) ? esc_html( $field['label'] ) : esc_html__( 'Empty Label', 'wpforms-lite' );
 				$label_hidden = esc_html__( 'Label Hidden', 'wpforms-lite' );
@@ -1623,14 +1647,12 @@ abstract class WPForms_Field {
 					$label_empty,
 					$label
 				);
-
 				break;
 
 			case 'description':
 				$description = isset( $field['description'] ) && ! empty( $field['description'] ) ? wp_kses( $field['description'], $allowed_tags ) : '';
 				$description = strpos( $class, 'nl2br' ) !== false ? nl2br( $description ) : $description;
 				$output      = sprintf( '<div class="description %s">%s</div>', $class, $description );
-
 				break;
 
 			case 'choices':
@@ -1646,6 +1668,7 @@ abstract class WPForms_Field {
 				 * either auto populating from a post type or a taxonomy.
 				 */
 				if ( ! empty( $field['dynamic_post_type'] ) || ! empty( $field['dynamic_taxonomy'] ) ) {
+
 					switch ( $dynamic ) {
 						case 'post_type':
 							// Post type dynamic populating.
@@ -1720,18 +1743,15 @@ abstract class WPForms_Field {
 					case 'gdpr-checkbox':
 					case 'payment-checkbox':
 						$type = 'checkbox';
-
 						break;
 
 					case 'select':
 					case 'payment-select':
 						$type = 'select';
-
 						break;
 
 					default:
 						$type = 'radio';
-
 						break;
 				}
 
@@ -1880,7 +1900,6 @@ abstract class WPForms_Field {
 						$output .= '</div>';
 					}
 				}
-
 				break;
 		}
 
@@ -1959,7 +1978,6 @@ abstract class WPForms_Field {
 
 		if ( ! $field_helper_hide ) {
 			$preview .= sprintf(
-				// language=HTML PhpStorm.
 				'<div class="wpforms-field-helper">
 					<span class="wpforms-field-helper-edit">%s</span>
 					<span class="wpforms-field-helper-drag">%s</span>

@@ -312,16 +312,19 @@ abstract class FormBuilder implements FormBuilderInterface {
 		}
 
 		$form_id = (int) $_POST['id'];
-		$task    = \sanitize_key( $_POST['task'] );
-		$data    = null;
+		$task    = sanitize_key( $_POST['task'] );
 
-		// Setup form data based on the ID, that we got from AJAX request.
-		$this->form_data = \wpforms()->form->get(
-			$form_id,
-			array(
-				'content_only' => true,
-			)
-		);
+		$revisions = wpforms()->get( 'revisions' );
+		$revision  = $revisions ? $revisions->get_revision() : null;
+
+		if ( $revision ) {
+			// Setup form data based on the revision_id, that we got from AJAX request.
+			$this->form_data = wpforms_decode( $revision->post_content );
+		} else {
+			// Setup form data based on the ID, that we got from AJAX request.
+			$form_handler    = wpforms()->get( 'form' );
+			$this->form_data = $form_handler ? $form_handler->get( $form_id, [ 'content_only' => true ] ) : [];
+		}
 
 		// Do not allow to proceed further, as form_id may be incorrect.
 		if ( empty( $this->form_data ) ) {

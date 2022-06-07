@@ -65,13 +65,12 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 			}
 		);
 
-		add_filter( 'wpforms_entries_default_screen_forms_list_columns', array( $this, 'forms_list_columns' ), 10, 2 );
-		add_filter( 'wpforms_entries_default_screen_forms_list_form_title', array( $this, 'forms_list_form_title' ), 10, 2 );
-		add_filter( 'wpforms_entries_default_screen_form_item_fields', array( $this, 'form_item_fields' ), 10, 2 );
-		add_filter( 'wpforms_entries_default_screen_forms_list_additional_cells', array( $this, 'forms_list_additional_cells' ), 10, 2 );
-		add_filter( 'wpforms_entries_default_screen_forms_list_additional_buttons', array( $this, 'forms_list_additional_buttons' ), 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_forms_list_columns', [ $this, 'forms_list_columns' ], 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_forms_list_form_title', [ $this, 'forms_list_form_title' ], 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_form_item_fields', [ $this, 'form_item_fields' ], 10, 2 );
+		add_filter( 'wpforms_entries_default_screen_forms_list_additional_cells', [ $this, 'forms_list_additional_cells' ], 10, 2 );
 		add_filter( 'wpforms_entries_default_screen_timespan_at_top', '__return_true' );
-		add_filter( 'wpforms_entries_default_screen_total_entries_title', array( $this, 'total_entries_title' ) );
+		add_filter( 'wpforms_entries_default_screen_total_entries_title', [ $this, 'total_entries_title' ] );
 
 		// Do not cache results in a table - always display up-to-date information.
 		add_filter(
@@ -182,23 +181,6 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	}
 
 	/**
-	 * Forms list additional buttons.
-	 *
-	 * @since 1.5.5
-	 *
-	 * @param string $html Buttons markup.
-	 * @param array  $form Form data.
-	 *
-	 * @return string "Reset" button markup.
-	 */
-	public function forms_list_additional_buttons( $html, $form ) {
-
-		return '<button type="button" class="wpforms-dash-widget-reset-chart wpforms-hide" title="' . \esc_attr__( 'Reset chart to display all forms', 'wpforms' ) . '">
-					<span class="dashicons dashicons-dismiss"></span>
-				</button>';
-	}
-
-	/**
 	 * Form item data elements filter.
 	 *
 	 * @since 1.5.5
@@ -245,15 +227,18 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	 */
 	public function total_entries_title( $title ) {
 
-		return \esc_html__( 'Entries Overview', 'wpforms' );
+		return esc_html__( 'Total Entries', 'wpforms' );
 	}
 
 	/**
 	 * Do not display recommended plugin block.
 	 *
 	 * @since 1.5.5
+	 * @since 1.7.3 Added plugin parameter.
+	 *
+	 * @param array $plugin Plugin data.
 	 */
-	public function recommended_plugin_block_html() {
+	public function recommended_plugin_block_html( $plugin = [] ) {
 	}
 
 	/**

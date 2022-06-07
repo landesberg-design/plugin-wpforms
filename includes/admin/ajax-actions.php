@@ -70,18 +70,29 @@ function wpforms_save_form() {
 		wp_send_json_error( esc_html__( 'Something went wrong while saving the form.', 'wpforms-lite' ) );
 	}
 
-	wp_send_json_success(
-		apply_filters(
-			'wpforms_builder_save_form_response_data',
-			array(
-				'form_name' => esc_html( $data['settings']['form_title'] ),
-				'form_desc' => $data['settings']['form_desc'],
-				'redirect'  => admin_url( 'admin.php?page=wpforms-overview' ),
-			),
-			$form_id,
-			$data
-		)
+	$response_data = [
+		'form_name' => esc_html( $data['settings']['form_title'] ),
+		'form_desc' => $data['settings']['form_desc'],
+		'redirect'  => admin_url( 'admin.php?page=wpforms-overview' ),
+	];
+
+	/**
+	 * Allows filtering ajax response data after form was saved.
+	 *
+	 * @since 1.5.1
+	 *
+	 * @param array $response_data The data to be sent in the response.
+	 * @param int   $form_id       Form ID.
+	 * @param array $data          Form data.
+	 */
+	$response_data = apply_filters(
+		'wpforms_builder_save_form_response_data',
+		$response_data,
+		$form_id,
+		$data
 	);
+
+	wp_send_json_success( $response_data );
 }
 
 add_action( 'wp_ajax_wpforms_save_form', 'wpforms_save_form' );
@@ -114,12 +125,19 @@ function wpforms_new_form() {
 	);
 
 	if ( $title_exists !== null ) {
+
+		// Skip creating a revision for this action.
+		remove_action( 'post_updated', 'wp_save_post_revision' );
+
 		wp_update_post(
 			[
 				'ID'         => $form_id,
 				'post_title' => $form_title . ' (ID #' . $form_id . ')',
 			]
 		);
+
+		// Restore the initial revisions state.
+		add_action( 'post_updated', 'wp_save_post_revision', 10, 1 );
 	}
 
 	if ( ! $form_id ) {
@@ -532,7 +550,20 @@ function wpforms_install_addon() {
 
 	$error = $type === 'plugin'
 		? esc_html__( 'Could not install the plugin. Please download and install it manually.', 'wpforms-lite' )
-		: esc_html__( 'Could not install the addon. Please download it from wpforms.com and install it manually.', 'wpforms-lite' );
+		: sprintf(
+			wp_kses( /* translators: %1$s - An addon download URL, %2$s - Link to manual installation guide. */
+				__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpforms.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>.', 'wpforms-lite' ),
+				[
+					'a' => [
+						'href'   => true,
+						'target' => true,
+						'rel'    => true,
+					],
+				]
+			),
+			'https://wpforms.com/account/licenses/',
+			'https://wpforms.com/docs/how-to-manually-install-addons-in-wpforms/'
+		);
 
 	$plugin_url = ! empty( $_POST['plugin'] ) ? esc_url_raw( wp_unslash( $_POST['plugin'] ) ) : '';
 

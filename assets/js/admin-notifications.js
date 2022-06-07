@@ -87,7 +87,7 @@ var WPFormsAdminNotifications = window.WPFormsAdminNotifications || ( function( 
 			var count = parseInt( el.$adminBarCounter.text(), 10 );
 			if ( count > 1 ) {
 				--count;
-				el.$adminBarCounter.html( '<span>' + count + '</span>' );
+				el.$adminBarCounter.html( count );
 			} else {
 				el.$adminBarCounter.remove();
 				el.$adminBarMenuItem.remove();

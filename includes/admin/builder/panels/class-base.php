@@ -78,21 +78,31 @@ abstract class WPForms_Builder_Panel {
 	public function __construct() {
 
 		// Load form if found.
-		$form_id         = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
-		$this->form      = wpforms()->form->get( $form_id );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$form_id    = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
+		$this->form = wpforms()->get( 'form' )->get( $form_id );
+
 		$this->form_data = $this->form ? wpforms_decode( $this->form->post_content ) : false;
+
+		// Get current revision, if available.
+		$revision = wpforms()->get( 'revisions' )->get_revision();
+
+		// If we're viewing a valid revision, replace the form data so the Form Builder shows correct state.
+		if ( $revision && isset( $revision->post_content ) ) {
+			$this->form_data = wpforms_decode( $revision->post_content );
+		}
 
 		// Bootstrap.
 		$this->init();
 
 		// Load panel specific enqueues.
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueues' ), 15 );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ], 15 );
 
 		// Primary panel button.
-		add_action( 'wpforms_builder_panel_buttons', array( $this, 'button' ), $this->order, 2 );
+		add_action( 'wpforms_builder_panel_buttons', [ $this, 'button' ], $this->order, 2 );
 
 		// Output.
-		add_action( 'wpforms_builder_panels', array( $this, 'panel_output' ), $this->order, 2 );
+		add_action( 'wpforms_builder_panels', [ $this, 'panel_output' ], $this->order, 2 );
 	}
 
 	/**
@@ -137,15 +147,23 @@ abstract class WPForms_Builder_Panel {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param object $form
-	 * @param string $view
+	 * @param object $form Current form object.
+	 * @param string $view Active Form Builder view (panel).
 	 */
 	public function panel_output( $form, $view ) {
 
-		$active = $view === $this->slug ? 'active' : '';
-		$wrap   = $this->sidebar ? 'wpforms-panel-sidebar-content' : 'wpforms-panel-full-content';
+		$wrap    = $this->sidebar ? 'wpforms-panel-sidebar-content' : 'wpforms-panel-full-content';
+		$classes = [ 'wpforms-panel' ];
 
-		printf( '<div class="wpforms-panel %s" id="wpforms-panel-%s">', esc_attr( $active ), esc_attr( $this->slug ) );
+		if ( in_array( $this->slug, [ 'fields', 'revisions' ], true ) ) {
+			$classes[] = 'wpforms-panel-fields';
+		}
+
+		if ( $view === $this->slug ) {
+			$classes[] = 'active';
+		}
+
+		printf( '<div class="%s" id="wpforms-panel-%s">', wpforms_sanitize_classes( $classes, true ), esc_attr( $this->slug ) );
 
 		printf( '<div class="%s">', $wrap );
 

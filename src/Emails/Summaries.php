@@ -257,7 +257,7 @@ class Summaries {
 		 *
 		 * @since 1.5.4
 		 *
-		 * @param string Default summaries recipient email address.
+		 * @param string $option Default summaries recipient email address.
 		 */
 		$to_email = apply_filters( 'wpforms_emails_summaries_cron_to_email', get_option( 'admin_email' ) );
 
@@ -281,7 +281,7 @@ class Summaries {
 	 */
 	protected function get_entries() {
 
-		if ( \wpforms()->pro ) {
+		if ( wpforms()->is_pro() ) {
 			$entries_count = new \WPForms\Pro\Reports\EntriesCount();
 			$results       = $entries_count->get_by( 'form', 0, 7, 'previous sunday' );
 		} else {

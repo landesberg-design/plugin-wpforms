@@ -180,10 +180,10 @@ class NinjaForms extends Base {
 			// Now check if this install is Lite. If it is Lite and it's a
 			// field type not included, make a note then continue to the next
 			// field.
-			if ( ! wpforms()->pro && in_array( $nf_field['type'], $fields_pro_plain, true ) ) {
+			if ( ! wpforms()->is_pro() && in_array( $nf_field['type'], $fields_pro_plain, true ) ) {
 				$upgrade_plain[] = $label;
 			}
-			if ( ! wpforms()->pro && in_array( $nf_field['type'], $fields_pro_omit, true ) ) {
+			if ( ! wpforms()->is_pro() && in_array( $nf_field['type'], $fields_pro_omit, true ) ) {
 				$upgrade_omit[] = $label;
 
 				continue;
@@ -229,7 +229,6 @@ class NinjaForms extends Base {
 						'default_value' => ! empty( $nf_field['default'] ) ? $nf_field['default'] : '',
 						'nf_key'        => $nf_field['key'],
 					];
-
 					break;
 
 				// Single checkbox field.
@@ -250,7 +249,6 @@ class NinjaForms extends Base {
 						'label_hide'  => '1',
 						'nf_key'      => $nf_field['key'],
 					];
-
 					break;
 
 				// Multi-check field, radio, select, state, and country fields.
@@ -298,7 +296,6 @@ class NinjaForms extends Base {
 						'required'    => ! empty( $nf_field['required'] ) ? '1' : '',
 						'nf_key'      => $nf_field['key'],
 					];
-
 					break;
 
 				// HTML field.
@@ -310,7 +307,6 @@ class NinjaForms extends Base {
 						'label_disable' => '1',
 						'nf_key'        => $nf_field['key'],
 					];
-
 					break;
 
 				// Divider field.
@@ -323,12 +319,11 @@ class NinjaForms extends Base {
 						'label_disable' => '1',
 						'nf_key'        => $nf_field['key'],
 					];
-
 					break;
 
 				// Phone number field.
 				case 'phone':
-					$type = wpforms()->pro ? 'phone' : 'text';
+					$type = wpforms()->is_pro() ? 'phone' : 'text';
 
 					$form['fields'][ $field_id ] = [
 						'id'            => $field_id,
@@ -342,12 +337,11 @@ class NinjaForms extends Base {
 						'default_value' => ! empty( $nf_field['default'] ) ? $nf_field['default'] : '',
 						'nf_key'        => $nf_field['key'],
 					];
-
 					break;
 
 				// Date field.
 				case 'date':
-					$type = wpforms()->pro ? 'date-time' : 'text';
+					$type = wpforms()->is_pro() ? 'date-time' : 'text';
 
 					$form['fields'][ $field_id ] = [
 						'id'               => $field_id,
@@ -364,7 +358,6 @@ class NinjaForms extends Base {
 						'time_interval'    => 30,
 						'nf_key'           => $nf_field['key'],
 					];
-
 					break;
 
 				// ReCAPTCHA field.

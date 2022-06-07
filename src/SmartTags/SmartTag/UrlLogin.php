@@ -22,6 +22,6 @@ class UrlLogin extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		return wp_login_url();
+		return esc_url( wp_login_url() );
 	}
 }

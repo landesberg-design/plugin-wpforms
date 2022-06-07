@@ -61,10 +61,11 @@ namespace WPForms {
 		 * Paid returns true, free (Lite) returns false.
 		 *
 		 * @since 1.3.9
+		 * @since 1.7.3 changed to private.
 		 *
 		 * @var bool
 		 */
-		public $pro = false;
+		private $pro = false;
 
 		/**
 		 * Backward compatibility method for accessing the class registry in an old way,
@@ -79,13 +80,15 @@ namespace WPForms {
 		public function __get( $name ) {
 
 			if ( $name === 'smart_tags' ) {
-				trigger_error( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
-					esc_html__(
-						"Property smart_tags was deprecated, use wpforms()->get( 'smart_tags' ) instead of wpforms()->smart_tags",
-						'wpforms-lite'
-					),
-					E_USER_DEPRECATED
+				_deprecated_argument(
+					'wpforms()->smart_tags',
+					'1.6.7 of the WPForms plugin',
+					"Please use `wpforms()->get( 'smart_tags' )` instead."
 				);
+			}
+
+			if ( $name === 'pro' ) {
+				return wpforms()->is_pro();
 			}
 
 			return $this->get( $name );
@@ -114,7 +117,7 @@ namespace WPForms {
 				self::$instance->includes();
 
 				// Load Pro or Lite specific files.
-				if ( self::$instance->pro ) {
+				if ( self::$instance->is_pro() ) {
 					self::$instance->registry['pro'] = require_once WPFORMS_PLUGIN_DIR . 'pro/wpforms-pro.php';
 				} else {
 					require_once WPFORMS_PLUGIN_DIR . 'lite/wpforms-lite.php';
@@ -138,6 +141,7 @@ namespace WPForms {
 			$this->version = WPFORMS_VERSION;
 
 			// Plugin Slug - Determine plugin type and set slug accordingly.
+			// This filter is documented in \WPForms\WPForms::is_pro.
 			if ( apply_filters( 'wpforms_allow_pro_version', file_exists( WPFORMS_PLUGIN_DIR . 'pro/wpforms-pro.php' ) ) ) {
 				$this->pro = true;
 
@@ -253,7 +257,7 @@ namespace WPForms {
 			/*
 			 * Properly init the providers loader, that will handle all the related logic and further loading.
 			 */
-			add_action( 'wpforms_loaded', [ '\WPForms\Providers\Loader', 'get_instance' ] );
+			add_action( 'wpforms_loaded', [ '\WPForms\Providers\Providers', 'get_instance' ] );
 
 			/*
 			 * Properly init the integrations loader, that will handle all the related logic and further loading.
@@ -294,7 +298,7 @@ namespace WPForms {
 				return;
 			}
 
-			$full_name = $this->pro ? '\WPForms\Pro\\' . $class['name'] : '\WPForms\Lite\\' . $class['name'];
+			$full_name = $this->is_pro() ? '\WPForms\Pro\\' . $class['name'] : '\WPForms\Lite\\' . $class['name'];
 			$full_name = class_exists( $full_name ) ? $full_name : '\WPForms\\' . $class['name'];
 
 			if ( ! class_exists( $full_name ) ) {
@@ -384,6 +388,25 @@ namespace WPForms {
 			$tables = $wpdb->get_results( "SHOW TABLES LIKE '" . $wpdb->prefix . "wpforms_%'", 'ARRAY_N' ); // phpcs:ignore
 
 			return ! empty( $tables ) ? wp_list_pluck( $tables, 0 ) : [];
+		}
+
+		/**
+		 * Whether the current instance of the plugin is a paid version, or free.
+		 *
+		 * @since 1.7.3
+		 *
+		 * @return bool
+		 */
+		public function is_pro() {
+
+			/**
+			 * Filters whether the current plugin version is pro.
+			 *
+			 * @since 1.7.3
+			 *
+			 * @param bool $pro Whether the current plugin version is pro.
+			 */
+			return (bool) apply_filters( 'wpforms_allow_pro_version', $this->pro );
 		}
 	}
 }

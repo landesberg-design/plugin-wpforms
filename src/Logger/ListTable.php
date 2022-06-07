@@ -16,11 +16,18 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 class ListTable extends WP_List_Table {
 
 	/**
+	 * Number of items to display on a single page.
+	 *
+	 * @since 1.6.3
+	 */
+	const PER_PAGE = 10;
+
+	/**
 	 * Record Query.
 	 *
 	 * @since 1.6.3
 	 *
-	 * @var \WPForms\Logger\Repository
+	 * @var Repository
 	 */
 	private $repository;
 
@@ -29,11 +36,12 @@ class ListTable extends WP_List_Table {
 	 *
 	 * @since 1.6.3
 	 *
-	 * @param \WPForms\Logger\Repository $repository Repository.
+	 * @param Repository $repository Repository.
 	 */
 	public function __construct( $repository ) {
 
 		$this->repository = $repository;
+
 		parent::__construct(
 			[
 				'plural'   => esc_html__( 'Logs', 'wpforms-lite' ),
@@ -41,13 +49,6 @@ class ListTable extends WP_List_Table {
 			]
 		);
 	}
-
-	/**
-	 * Items per page.
-	 *
-	 * @since 1.6.3
-	 */
-	const PER_PAGE = 10;
 
 	/**
 	 * Whether the table has items to display or not.
@@ -63,7 +64,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Prepares the data to feed WP_Table_List.
+	 * Prepares the list of items for displaying.
 	 *
 	 * @since 1.6.3
 	 */
@@ -74,6 +75,7 @@ class ListTable extends WP_List_Table {
 		$types       = $this->get_items_type();
 		$this->items = $this->repository->records( self::PER_PAGE, $offset, $search, $types );
 		$total_items = $this->get_total();
+
 		$this->set_pagination_args(
 			[
 				'total_items' => $total_items,
@@ -83,9 +85,8 @@ class ListTable extends WP_List_Table {
 		);
 	}
 
-
 	/**
-	 * Return the type of records
+	 * Return the type of records.
 	 *
 	 * @since 1.6.3
 	 *
@@ -93,11 +94,11 @@ class ListTable extends WP_List_Table {
 	 */
 	private function get_items_type() {
 
-		return filter_input( INPUT_GET, 'log_type', FILTER_SANITIZE_STRING );
+		return filter_input( INPUT_GET, 'log_type', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 	}
 
 	/**
-	 * Returns the number of items to offset/skip for this current view.
+	 * Return the number of items to offset/skip for this current view.
 	 *
 	 * @since 1.6.3
 	 *
@@ -119,34 +120,17 @@ class ListTable extends WP_List_Table {
 	 */
 	private function get_request_search_query() {
 
-		return filter_input( INPUT_GET, 's', FILTER_SANITIZE_STRING );
+		return filter_input( INPUT_GET, 's', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 	}
 
 	/**
-	 * Column log_id.
+	 * Column title.
 	 *
 	 * @since 1.6.3
 	 *
-	 * @param \WPForms\Logger\Record $item List table item.
+	 * @param Record $item List table item.
 	 *
-	 * @return int|string
-	 */
-	public function column_log_id( $item ) {
-
-		return sprintf(
-			'<a href="#" class="js-single-log-target" data-log-id="%1$d"><strong>%1$d</strong></a>',
-			absint( $item->get_id() )
-		);
-	}
-
-	/**
-	 * Column log_title.
-	 *
-	 * @since 1.6.3
-	 *
-	 * @param \WPForms\Logger\Record $item List table item.
-	 *
-	 * @return int|string
+	 * @return string
 	 */
 	public function column_log_title( $item ) {
 
@@ -162,23 +146,33 @@ class ListTable extends WP_List_Table {
 	 *
 	 * @since 1.6.3
 	 *
-	 * @param \WPForms\Logger\Record $item List table item.
+	 * @param Record $item List table item.
 	 *
-	 * @return int|string
+	 * @return string
 	 */
 	public function column_message( $item ) {
 
-		return esc_html( $this->crop_message( $item->get_message() ) );
+		$message = $item->get_message();
+
+		if ( preg_match( '/\[body].+{"error":"(.+)"}/i', $message, $m ) ) {
+			$message = $m[1];
+		}
+
+		if ( preg_match( '/\[error] =&gt; (.+)/i', $message, $m ) ) {
+			$message = $m[1];
+		}
+
+		return esc_html( $this->crop_message( $message ) );
 	}
 
 	/**
-	 * Column form_id.
+	 * Column form ID.
 	 *
 	 * @since 1.6.3
 	 *
-	 * @param \WPForms\Logger\Record $item List table item.
+	 * @param Record $item List table item.
 	 *
-	 * @return int|string
+	 * @return int
 	 */
 	public function column_form_id( $item ) {
 
@@ -190,9 +184,9 @@ class ListTable extends WP_List_Table {
 	 *
 	 * @since 1.6.3
 	 *
-	 * @param \WPForms\Logger\Record $item List table item.
+	 * @param Record $item List table item.
 	 *
-	 * @return int|string
+	 * @return string
 	 */
 	public function column_types( $item ) {
 
@@ -204,13 +198,13 @@ class ListTable extends WP_List_Table {
 	 *
 	 * @since 1.6.3
 	 *
-	 * @param \WPForms\Logger\Record $item List table item.
+	 * @param Record $item List table item.
 	 *
-	 * @return int|string
+	 * @return string
 	 */
 	public function column_date( $item ) {
 
-		return esc_html( $item->get_date() );
+		return esc_html( $item->get_date( 'sql' ) );
 	}
 
 	/**
@@ -243,7 +237,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Returns the columns names for rendering.
+	 * Return the columns names for rendering.
 	 *
 	 * @since 1.6.3
 	 *
@@ -252,7 +246,6 @@ class ListTable extends WP_List_Table {
 	public function get_columns() {
 
 		return [
-			'log_id'    => __( 'Log ID', 'wpforms-lite' ),
 			'log_title' => __( 'Log Title', 'wpforms-lite' ),
 			'message'   => __( 'Message', 'wpforms-lite' ),
 			'form_id'   => __( 'Form ID', 'wpforms-lite' ),
@@ -274,8 +267,8 @@ class ListTable extends WP_List_Table {
 				<?php if ( $this->get_request_search_query() ) { ?>
 					<span class="subtitle">
 				<?php
-				echo sprintf( /* translators: %s: search query */
-					esc_attr__( 'Search results for "%s"', 'wpforms-lite' ),
+				echo sprintf( /* translators: %s: search query. */
+					esc_html__( 'Search results for "%s"', 'wpforms-lite' ),
 					esc_html( $this->get_request_search_query() )
 				);
 				?>
@@ -303,7 +296,7 @@ class ListTable extends WP_List_Table {
 		<div class="tablenav <?php echo esc_attr( $which ); ?>">
 
 			<?php
-			if ( 'top' === $which ) {
+			if ( $which === 'top' ) {
 				$this->extra_tablenav( $which );
 			}
 			$this->pagination( $which );
@@ -326,6 +319,7 @@ class ListTable extends WP_List_Table {
 		if ( ! $this->get_total() ) {
 			return;
 		}
+
 		$this->log_type_select();
 		$this->clear_all();
 	}
@@ -338,11 +332,7 @@ class ListTable extends WP_List_Table {
 	private function clear_all() {
 
 		?>
-		<button
-			name="clear-all"
-			type="submit"
-			class="button"
-			value="1"><?php esc_html_e( 'Delete All Logs', 'wpforms-lite' ); ?></button>
+		<button name="clear-all" type="submit" class="button" value="1"><?php esc_html_e( 'Delete All Logs', 'wpforms-lite' ); ?></button>
 		<?php
 	}
 
@@ -355,24 +345,28 @@ class ListTable extends WP_List_Table {
 	public function process_admin_ui() {
 
 		$uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-		//phpcs:disable WordPress.Security.NonceVerification.Recommended
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( ! empty( $_REQUEST['_wp_http_referer'] ) || ! empty( $_REQUEST['clear-all'] ) ) {
+
 			if ( ! empty( $_REQUEST['clear-all'] ) ) {
 				$this->repository->clear_all();
 			}
+
 			wp_safe_redirect(
 				remove_query_arg(
 					[ '_wp_http_referer', '_wpnonce', 'clear-all' ],
 					$uri
 				)
 			);
+
 			exit;
 		}
-		//phpcs:enable WordPress.Security.NonceVerification.Recommended
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
-	 * No items text.
+	 * Message to be displayed when there are no items.
 	 *
 	 * @since 1.6.3
 	 */
@@ -381,7 +375,6 @@ class ListTable extends WP_List_Table {
 		esc_html_e( 'No logs found.', 'wpforms-lite' );
 	}
 
-
 	/**
 	 * Print all hidden fields.
 	 *
@@ -389,11 +382,13 @@ class ListTable extends WP_List_Table {
 	 */
 	private function hidden_fields() {
 
-		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		foreach ( $_GET as $key => $value ) {
-			if ( '_' === $key[0] || 'paged' === $key || 'ID' === $key ) {
+
+			if ( $key[0] === '_' || $key === 'paged' || $key === 'ID' ) {
 				continue;
 			}
+
 			echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '" />';
 		}
 	}
@@ -405,7 +400,7 @@ class ListTable extends WP_List_Table {
 	 */
 	private function log_type_select() {
 
-		//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$current_type = ! empty( $_GET['log_type'] ) ? sanitize_text_field( wp_unslash( $_GET['log_type'] ) ) : '';
 		?>
 		<select name="log_type">
@@ -418,7 +413,7 @@ class ListTable extends WP_List_Table {
 				</option>
 			<?php } ?>
 		</select>
-		<input type="submit" class="button" value="<?php esc_html_e( 'Apply', 'wpforms-lite' ); ?>">
+		<input type="submit" class="button" value="<?php esc_attr_e( 'Apply', 'wpforms-lite' ); ?>">
 		<?php
 	}
 
@@ -482,7 +477,7 @@ class ListTable extends WP_List_Table {
 					<div>
 						<div class="wpforms-log-popup-label"><?php esc_html_e( 'User ID', 'wpforms-lite' ); ?></div>
 						<div class="wpforms-log-popup-user-id">
-							<# if (data.user_id ) { #>
+							<# if ( data.user_id ) { #>
 							<a href="{{ data.user_url }}">
 								<# } #>
 								{{ data.user_id }}

@@ -78,7 +78,7 @@ class WPForms_Builder_Panel_Setup extends WPForms_Builder_Panel {
 	 * @return array
 	 */
 	private function get_templates() {
-		/*
+		/**
 		 * Form templates available in the WPForms core plugin.
 		 *
 		 * @since 1.4.0
@@ -87,7 +87,7 @@ class WPForms_Builder_Panel_Setup extends WPForms_Builder_Panel {
 		 */
 		$core_templates = apply_filters( 'wpforms_form_templates_core', [] );
 
-		/*
+		/**
 		 * Form templates available with the WPForms addons.
 		 * Allows developers to provide additional templates with an addons.
 		 *
@@ -253,7 +253,7 @@ class WPForms_Builder_Panel_Setup extends WPForms_Builder_Panel {
 		$args['demo_url']    = '';
 
 		if ( ! empty( $template['url'] ) ) {
-			$utm_campaign     = wpforms()->pro ? 'plugin' : 'liteplugin';
+			$utm_campaign     = wpforms()->is_pro() ? 'plugin' : 'liteplugin';
 			$args['demo_url'] = add_query_arg(
 				[
 					'utm_content' => $template['name'],

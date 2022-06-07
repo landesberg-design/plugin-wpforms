@@ -110,7 +110,7 @@ class SiteHealth {
 			'value' => wp_count_posts( 'wpforms' )->publish,
 		];
 
-		if ( ! wpforms()->pro ) {
+		if ( ! wpforms()->is_pro() ) {
 
 			$forms = wpforms()->form->get( '', array( 'fields' => 'ids' ) );
 

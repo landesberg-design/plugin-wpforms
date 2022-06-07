@@ -103,7 +103,7 @@ class FlyoutMenu {
 	 */
 	private function menu_items() {
 
-		$is_pro = \wpforms()->pro;
+		$is_pro = wpforms()->is_pro();
 
 		$utm_campaign = $is_pro ? 'plugin' : 'liteplugin';
 

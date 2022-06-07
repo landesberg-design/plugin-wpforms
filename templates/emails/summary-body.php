@@ -6,10 +6,8 @@
  *
  * @since 1.5.4
  *
- * @version 1.5.4
- *
- * @var array  $entries
- * @var array  $info_block
+ * @var array $entries
+ * @var array $info_block
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<tr>
 		<td>
 			<h6 class="greeting"><?php esc_html_e( 'Hi there!', 'wpforms-lite' ); ?></h6>
-			<?php if ( wpforms()->pro ) : ?>
+			<?php if ( wpforms()->is_pro() ) : ?>
 				<p class="large"><?php esc_html_e( 'Let’s see how your forms performed in the past week.', 'wpforms-lite' ); ?></p>
 			<?php else : ?>
 				<p class="large"><?php esc_html_e( 'Let’s see how your forms performed.', 'wpforms-lite' ); ?></p>
@@ -38,7 +36,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 					?>
 				</p>
 				<p class="lite-disclaimer">
-					<?php esc_html_e( 'To generate detailed reports and view future entries inside your WordPress dashboard, consider upgrading to Pro.', 'wpforms-lite' ); ?>
+					<?php
+					printf(
+						wp_kses( /* translators: %s - WPForms.com Upgrade page URL. */
+							__( 'To view future entries inside your WordPress dashboard, and get more detailed reports, consider <a href="%s" target="_blank" rel="noopener noreferrer">upgrading to Pro</a>', 'wpforms-lite' ),
+							[
+								'a' => [
+									'href'   => [],
+									'rel'    => [],
+									'target' => [],
+								],
+							]
+						),
+						'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade'
+					);
+					?>
 				</p>
 			<?php endif; ?>
 			<table class="email-summaries">

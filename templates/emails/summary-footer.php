@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php
 						echo wp_kses(
 							sprintf( /* translators: %1$s - link to a site; %2$s - link to the documentation. */
-								__( 'This email was auto-generated and sent from %1$s. Learn <a href="%2$s">how to disable</a>', 'wpforms-lite' ),
+								__( 'This email was auto-generated and sent from %1$s. Learn <a href="%2$s">how to disable</a>.', 'wpforms-lite' ),
 								'<a href="' . esc_url( home_url() ) . '">' . esc_html( wp_specialchars_decode( get_bloginfo( 'name' ) ) ) . '</a>',
 								'https://wpforms.com/docs/how-to-use-email-summaries/#faq'
 							),

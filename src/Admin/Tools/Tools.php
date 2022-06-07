@@ -55,9 +55,6 @@ class Tools {
 			$this->init_view();
 			$this->hooks();
 
-		} elseif ( wp_doing_ajax() ) {
-
-			( new Importers() )->load();
 		}
 
 	}

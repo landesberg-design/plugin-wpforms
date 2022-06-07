@@ -17,7 +17,7 @@ class WPForms_Form_Handler {
 	public function __construct() {
 
 		// Register wpforms custom post type.
-		$this->register_cpt();
+		add_action( 'init', [ $this, 'register_cpt' ] );
 
 		// Add wpforms to new-content admin bar menu.
 		add_action( 'admin_bar_menu', [ $this, 'admin_bar' ], 99 );
@@ -43,7 +43,7 @@ class WPForms_Form_Handler {
 				'rewrite'             => false,
 				'query_var'           => false,
 				'can_export'          => false,
-				'supports'            => [ 'title' ],
+				'supports'            => [ 'title', 'author', 'revisions' ],
 				'capability_type'     => 'wpforms_form', // Not using 'capability_type' anywhere. It just has to be custom for security reasons.
 				'map_meta_cap'        => false, // Don't let WP to map meta caps to have a granular control over this process via 'map_meta_cap' filter.
 			]
@@ -96,15 +96,16 @@ class WPForms_Form_Handler {
 		}
 
 		// Check whether we have any forms other than the currently created one.
-		$other_form = wpforms()->form->get(
+		$other_form = $this->get(
 			'',
 			[
-				'order'          => 'id',
-				'orderby'        => 'desc',
-				'posts_per_page' => 1,
-				'nopaging'       => false,
-				'fields'         => 'ids',
-				'post__not_in'   => [ $form_id ],
+				'posts_per_page'         => 1,
+				'nopaging'               => false,
+				'fields'                 => 'ids',
+				'post__not_in'           => [ $form_id ],
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'cap'                    => false,
 			]
 		);
 
@@ -128,19 +129,34 @@ class WPForms_Form_Handler {
 	 */
 	public function get( $id = '', $args = [] ) {
 
-		$args = apply_filters( 'wpforms_get_form_args', $args, $id );
-
 		if ( $id === false ) {
 			return false;
 		}
 
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+
+		/**
+		 * Allow developers to filter the WPForms_Form_Handler::get() arguments.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $args Arguments array.
+		 * @param mixed $id   Form ID.
+		 */
+		$args = (array) apply_filters( 'wpforms_get_form_args', $args, $id );
+
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+
+		// By default, we should return only published forms.
+		$defaults = [
+			'post_status' => 'publish',
+		];
+
+		$args = (array) wp_parse_args( $args, $defaults );
+
 		$forms = empty( $id ) ? $this->get_multiple( $args ) : $this->get_single( $id, $args );
 
-		if ( empty( $forms ) ) {
-			return false;
-		}
-
-		return $forms;
+		return ! empty( $forms ) ? $forms : false;
 	}
 
 	/**
@@ -162,7 +178,7 @@ class WPForms_Form_Handler {
 		}
 
 		 if ( ! empty( $args['cap'] ) && ! wpforms_current_user_can( $args['cap'], $id ) ) {
-		 	return false;
+			return false;
 		 }
 
 		// @todo add $id array support
@@ -180,6 +196,7 @@ class WPForms_Form_Handler {
 	 * Fetch multiple forms.
 	 *
 	 * @since 1.5.8
+	 * @since 1.7.2 Added support for $args['search']['term'] - search form title or description by term.
 	 *
 	 * @param array $args Additional arguments array.
 	 *
@@ -187,21 +204,128 @@ class WPForms_Form_Handler {
 	 */
 	protected function get_multiple( $args = [] ) {
 
-		$args = apply_filters( 'wpforms_get_multiple_forms_args', $args );
+		/**
+		 * Allow developers to filter the get_multiple() arguments.
+		 *
+		 * @since 1.5.8
+		 *
+		 * @param array $args Arguments array. Almost the same as for `get_posts()` function.
+		 *                    Additional element:
+		 *                    ['search']['term'] - search the form title or description by term.
+		 */
+		$args = (array) apply_filters( 'wpforms_get_multiple_forms_args', $args );
 
 		// No ID provided, get multiple forms.
 		$defaults = [
-			'orderby'       => 'id',
-			'order'         => 'ASC',
-			'no_found_rows' => true,
-			'nopaging'      => true,
+			'orderby'          => 'id',
+			'order'            => 'ASC',
+			'no_found_rows'    => true,
+			'nopaging'         => true,
+			'suppress_filters' => false,
 		];
 
 		$args = wp_parse_args( $args, $defaults );
 
 		$args['post_type'] = 'wpforms';
 
-		return get_posts( $args );
+		/**
+		 * Allow developers to execute some code before get_posts() call inside \WPForms_Form_Handler::get_multiple().
+		 *
+		 * @since 1.7.2
+		 *
+		 * @param array $args Arguments of the `get_posts()`.
+		 */
+		do_action( 'wpforms_form_handler_get_multiple_before_get_posts', $args );
+
+		$forms = get_posts( $args );
+
+		/**
+		 * Allow developers to execute some code right after get_posts() call inside \WPForms_Form_Handler::get_multiple().
+		 *
+		 * @since 1.7.2
+		 *
+		 * @param array $args  Arguments of the `get_posts`.
+		 * @param array $forms Forms data. Result of getting multiple forms.
+		 */
+		do_action( 'wpforms_form_handler_get_multiple_after_get_posts', $args, $forms );
+
+		/**
+		 * Allow developers to filter the result of get_multiple().
+		 *
+		 * @since 1.7.2
+		 *
+		 * @param array $forms Result of getting multiple forms.
+		 */
+		return apply_filters( 'wpforms_form_handler_get_multiple_forms_result', $forms );
+	}
+
+	/**
+	 * Update the form status.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @param int    $form_id Form ID.
+	 * @param string $status  New status.
+	 *
+	 * @return bool
+	 */
+	public function update_status( $form_id, $status ) {
+
+		// Status updates are used only in trash and restore actions,
+		// which are actually part of the deletion operation.
+		// Therefore, we should check the `delete_form_single` and not `edit_form_single` permission.
+		if ( ! wpforms_current_user_can( 'delete_form_single', $form_id ) ) {
+			return false;
+		}
+
+		$form_id = absint( $form_id );
+		$status  = empty( $status ) ? 'publish' : sanitize_key( $status );
+
+		/**
+		 * Filters the allowed form statuses.
+		 *
+		 * @since 1.7.3
+		 *
+		 * @param array $allowed_statuses Array of allowed form statuses. Default: publish, trash.
+		 */
+		$allowed = (array) apply_filters( 'wpforms_form_handler_update_status_allowed', [ 'publish', 'trash' ] );
+
+		if ( ! in_array( $status, $allowed, true ) ) {
+			return false;
+		}
+
+		$result = wp_update_post(
+			[
+				'ID'          => $form_id,
+				'post_status' => $status,
+			]
+		);
+
+		return $result !== 0;
+	}
+
+	/**
+	 * Delete all forms in the Trash.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @return int|bool Number of deleted forms OR false.
+	 */
+	public function empty_trash() {
+
+		$forms = $this->get_multiple(
+			[
+				'post_status'      => 'trash',
+				'fields'           => 'ids',
+				'suppress_filters' => true,
+			]
+		);
+
+		if ( empty( $forms ) ) {
+			return false;
+		}
+
+		return $this->delete( $forms ) ? count( $forms ) : false;
 	}
 
 	/**
@@ -286,7 +410,7 @@ class WPForms_Form_Handler {
 		];
 
 		// Prevent $args['post_content'] from overwriting predefined $form_content.
-		// Typically it happens if the form was created with a form template and a user was not redirected to a form editing screen afterwards.
+		// Typically, it happens if the form was created with a form template and a user was not redirected to a form editing screen afterwards.
 		// This is only possible if a user has 'wpforms_create_forms' and no 'wpforms_edit_own_forms' capability.
 		if ( isset( $args['post_content'] ) && is_array( json_decode( wp_unslash( $args['post_content'] ), true ) ) ) {
 			$args['post_content'] = wpforms_encode( array_replace_recursive( $form_content, json_decode( wp_unslash( $args['post_content'] ), true ) ) );
@@ -599,7 +723,13 @@ class WPForms_Form_Handler {
 			$form['field_id'] = '1';
 		}
 
+		// Skip creating a revision for this action.
+		remove_action( 'post_updated', 'wp_save_post_revision' );
+
 		$this->update( $form_id, $form );
+
+		// Restore the initial revisions state.
+		add_action( 'post_updated', 'wp_save_post_revision', 10, 1 );
 
 		return $field_id;
 	}

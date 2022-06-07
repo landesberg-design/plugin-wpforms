@@ -165,23 +165,27 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 				return;
 			}
 
-			var modalTitle = feature + ' ' + wpforms_education.upgrade[type].title;
+			var modalTitle   = feature + ' ' + wpforms_education.upgrade[type].title,
+				isVideoModal = ! _.isEmpty( video ),
+				modalWidth   = WPFormsEducation.core.getUpgradeModalWidth( isVideoModal );
 
 			if ( typeof fieldName !== 'undefined' && fieldName.length > 0 ) {
 				modalTitle = fieldName + ' ' + wpforms_education.upgrade[type].title;
 			}
 
-			$.alert( {
-				title       : modalTitle,
-				icon        : 'fa fa-lock',
-				content     : wpforms_education.upgrade[type].message.replace( /%name%/g, feature ),
-				boxWidth    : '550px',
-				theme       : 'modern,wpforms-education',
-				closeIcon   : true,
+			var modal = $.alert( {
+				backgroundDismiss: true,
+				title            : modalTitle,
+				icon             : 'fa fa-lock',
+				content          : wpforms_education.upgrade[type].message.replace( /%name%/g, feature ),
+				boxWidth         : modalWidth,
+				theme            : 'modern,wpforms-education',
+				closeIcon        : true,
 				onOpenBefore: function() {
 
-					if ( ! _.isEmpty( video ) ) {
-						this.$btnc.after( '<iframe src="' + video + '" class="pro-feature-video" frameborder="0" allowfullscreen="" width="490" height="276"></iframe>' );
+					if ( isVideoModal ) {
+						this.$el.addClass( 'upgrade-modal has-video' );
+						this.$btnc.after( '<iframe src="' + video + '" class="pro-feature-video" frameborder="0" allowfullscreen="" width="475" height="267"></iframe>' );
 					}
 
 					this.$body.find( '.jconfirm-content' ).addClass( 'lite-upgrade' );
@@ -197,6 +201,15 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 						},
 					},
 				},
+			} );
+
+			$( window ).on( 'resize', function() {
+
+				modalWidth = WPFormsEducation.core.getUpgradeModalWidth( isVideoModal );
+
+				if ( modal.isOpen() ) {
+					modal.setBoxWidth( modalWidth );
+				}
 			} );
 		},
 

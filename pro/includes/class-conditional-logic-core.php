@@ -562,7 +562,7 @@ class WPForms_Conditional_Logic_Core {
 	 */
 	public function conditionals_block( $args = [], $echo = true ) {
 
-		_deprecated_function( __CLASS__ . '::' . __METHOD__, '1.3.8 of the WPForms', 'wpforms_conditional_logic()->builder_block()' );
+		_deprecated_function( __METHOD__, '1.3.8 of the WPForms', 'wpforms_conditional_logic()->builder_block()' );
 
 		if ( $echo ) {
 			echo $this->builder_block( $args, $echo ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -626,57 +626,50 @@ class WPForms_Conditional_Logic_Core {
 						switch ( $rule_operator ) {
 							case '==':
 								$pass_rule = $left === $right;
-
 								break;
 
 							case '!=':
 								$pass_rule = $left !== $right;
-
 								break;
 
 							case 'c':
 								$pass_rule = ( strpos( $left, $right ) !== false );
-
 								break;
 
 							case '!c':
 								$pass_rule = ( strpos( $left, $right ) === false );
-
 								break;
 
 							case '^':
 								$pass_rule = ( strrpos( $left, $right, -strlen( $left ) ) !== false );
-
 								break;
 
 							case '~':
+								// phpcs:ignore Squiz.PHP.DisallowMultipleAssignments.Found
 								$pass_rule = ( ( $temp = strlen( $left ) - strlen( $right ) ) >= 0 && strpos( $left, $right, $temp ) !== false );
-
 								break;
 
 							case 'e':
 								$pass_rule = $left === '';
-
 								break;
 
 							case '!e':
 								$pass_rule = $left !== '';
-
 								break;
 
 							case '>':
 								$left      = preg_replace( '/[^-0-9.]/', '', $left );
 								$pass_rule = ( $left !== '' ) && ( floatval( $left ) > floatval( $right ) );
-
 								break;
 
 							case '<':
 								$left      = preg_replace( '/[^-0-9.]/', '', $left );
 								$pass_rule = ( $left !== '' ) && ( floatval( $left ) < floatval( $right ) );
-
 								break;
 
 							default:
+								// phpcs:disable WPForms.Comments.PHPDocHooks.RequiredHookDocumentation, WPForms.PHP.ValidateHooks.InvalidHookName
+
 								/*
 								 * Allows developers to extend conditional logic with own rule operators.
 								 *
@@ -688,7 +681,7 @@ class WPForms_Conditional_Logic_Core {
 								 * @param string $rule_value    Rule value.
 								 */
 								$pass_rule = apply_filters( 'wpforms_process_conditional_logic', false, $rule_operator, $left, $right );
-
+								// phpcs:enable
 								break;
 						}
 					} else {
@@ -747,30 +740,29 @@ class WPForms_Conditional_Logic_Core {
 							case 'c': // BC, no longer available.
 							case '^': // BC, no longer available.
 							case '~': // BC, no longer available.
+								// phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 								$pass_rule = in_array( $right, $left );
-
 								break;
 
 							case '!=':
 							case '!c': // BC, no longer available.
+								// phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 								$pass_rule = ! in_array( $right, $left );
-
 								break;
 
 							case 'e':
 								$pass_rule = empty( $left[0] );
-
 								break;
 
 							case '!e':
 								$pass_rule = ! empty( $left[0] );
-
 								break;
 
 							default:
-								/** This filter is documented above in same file. */
+								// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+								/** This filter is documented in the current file. */
 								$pass_rule = apply_filters( 'wpforms_process_conditional_logic', false, $rule_operator, $left, $right );
-
+								// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 								break;
 						}
 					} // End `if()`.

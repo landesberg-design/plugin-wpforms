@@ -125,17 +125,22 @@ class WPForms_Settings {
 
 				switch ( $field['type'] ) {
 					case 'checkbox':
+					case 'toggle':
 						$value = (bool) $value;
 						break;
+
 					case 'image':
 						$value = esc_url_raw( $value );
 						break;
+
 					case 'color':
 						$value = wpforms_sanitize_hex_color( $value );
 						break;
+
 					case 'number':
 						$value = (float) $value;
 						break;
+
 					case 'text':
 					case 'radio':
 					case 'select':
@@ -332,7 +337,19 @@ class WPForms_Settings {
 				'email-async'            => [
 					'id'   => 'email-async',
 					'name' => esc_html__( 'Optimize Email Sending', 'wpforms-lite' ),
-					'desc' => esc_html__( 'Check this option to enable sending emails asynchronously, which can make submission processing faster.', 'wpforms-lite' ),
+					'desc' => sprintf(
+						wp_kses( /* translators: %s - WPForms.com Email settings documentation URL. */
+							__( 'Check this option to enable sending emails asynchronously, which can make submission processing faster but may delay email delivery by a minute or two. Learn more <a href="%s" target="_blank" rel="noopener noreferrer">in our documentation</a>.', 'wpforms-lite' ),
+							[
+								'a' => [
+									'href'   => [],
+									'target' => [],
+									'rel'    => [],
+								],
+							]
+						),
+						'https://wpforms.com/docs/a-complete-guide-to-wpforms-settings/#email'
+					),
 					'type' => 'checkbox',
 				],
 				'email-template'         => [
@@ -512,7 +529,7 @@ class WPForms_Settings {
 		];
 
 		// TODO: move this to Pro.
-		if ( wpforms()->pro ) {
+		if ( wpforms()->is_pro() ) {
 			$defaults['misc']['uninstall-data']['desc'] = esc_html__( 'Check this option to remove ALL WPForms data upon plugin deletion. All forms, entries, and uploaded files will be unrecoverable.', 'wpforms-lite' );
 		}
 
@@ -568,7 +585,7 @@ class WPForms_Settings {
 			<h1 class="wpforms-h1-placeholder"></h1>
 
 			<?php
-			if ( wpforms()->pro && class_exists( 'WPForms_License', false ) ) {
+			if ( wpforms()->is_pro() && class_exists( 'WPForms_License', false ) ) {
 				wpforms()->license->notices( true );
 			}
 			?>

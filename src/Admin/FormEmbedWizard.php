@@ -244,7 +244,7 @@ class FormEmbedWizard {
 
 		check_admin_referer( 'wpforms_admin_form_embed_wizard_nonce' );
 
-		$page_id = ! empty( $_POST['pageId'] ) ? sanitize_key( wp_unslash( $_POST['pageId'] ) ) : 0;
+		$page_id = ! empty( $_POST['pageId'] ) ? absint( $_POST['pageId'] ) : 0;
 
 		if ( ! empty( $page_id ) ) {
 			$url  = get_edit_post_link( $page_id, '' );
@@ -259,7 +259,7 @@ class FormEmbedWizard {
 			];
 		}
 
-		$meta['form_id'] = ! empty( $_POST['formId'] ) ? sanitize_key( wp_unslash( $_POST['formId'] ) ) : 0;
+		$meta['form_id'] = ! empty( $_POST['formId'] ) ? absint( $_POST['formId'] ) : 0;
 
 		$this->set_meta( $meta );
 

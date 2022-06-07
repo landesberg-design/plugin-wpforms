@@ -47,7 +47,7 @@ class SmartTags {
 	public function get( $return = 'array' ) {
 
 		_deprecated_argument( __METHOD__, '1.6.7' );
-		_deprecated_function( __METHOD__, '1.6.7', __CLASS__ . '->get_smart_tags()' );
+		_deprecated_function( __METHOD__, '1.6.7', __CLASS__ . '::get_smart_tags()' );
 
 		$tags = $this->get_smart_tags();
 
@@ -84,7 +84,7 @@ class SmartTags {
 		 *
 		 * @since 1.4.0
 		 *
-		 * @param array The list of smart tags.
+		 * @param array $tags The list of smart tags.
 		 */
 		$this->smart_tags = (array) apply_filters(
 			'wpforms_smart_tags',
@@ -187,7 +187,7 @@ class SmartTags {
 			 * @since 1.6.7
 			 * @since 1.6.7.1 Added the 5th argument.
 			 *
-			 * @param null|string $value            Smart Tag value.
+			 * @param scalar|null $value            Smart Tag value.
 			 * @param array       $form_data        Form data.
 			 * @param string      $fields           List of fields.
 			 * @param int         $entry_id         Entry ID.
@@ -207,7 +207,7 @@ class SmartTags {
 			 *
 			 * @since 1.6.7.1
 			 *
-			 * @param null|string $value            Smart Tag value.
+			 * @param scalar|null $value            Smart Tag value.
 			 * @param string      $tag_name         Smart tag name.
 			 * @param array       $form_data        Form data.
 			 * @param string      $fields           List of fields.

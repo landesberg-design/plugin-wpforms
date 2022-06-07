@@ -3,6 +3,8 @@
 namespace WPForms\Pro;
 
 use WPForms\Pro\Integrations\TranslationsPress\Translations;
+use WPForms\Tasks\Actions\Migration173Task;
+use WPForms_Pro; // phpcs:ignore WPForms.PHP.UseStatement.UnusedUseStatement
 
 /**
  * Class Migrations handles Pro plugin upgrade routines.
@@ -26,6 +28,15 @@ class Migrations {
 	 * @var bool
 	 */
 	private $is_migrated = false;
+
+	/**
+	 * WPForms_Pro instance.
+	 *
+	 * @since 1.7.4
+	 *
+	 * @var WPForms_Pro|null
+	 */
+	private $wpforms_pro = null;
 
 	/**
 	 * Class init.
@@ -94,34 +105,34 @@ class Migrations {
 	 */
 	private function migrate( $version ) {
 
-		wpforms()->get( 'pro' )->objects();
+		$this->wpforms_pro = wpforms()->get( 'pro' );
 
-		if ( version_compare( $version, '1.1.6', '<' ) ) {
-			$this->v116_upgrade();
+		if ( ! $this->wpforms_pro ) {
+			return;
 		}
 
-		if ( version_compare( $version, '1.3.3', '<' ) ) {
-			$this->v133_upgrade();
-		}
+		$this->wpforms_pro->objects();
 
-		if ( version_compare( $version, '1.4.3', '<' ) ) {
-			$this->v143_upgrade();
-		}
+		$methods        = get_class_methods( $this );
+		$method_pattern = '/^v(\d+)_upgrade$/';
+		$methods        = array_filter(
+			$methods,
+			static function ( $method ) use ( $method_pattern ) {
 
-		if ( version_compare( $version, '1.5.0', '<' ) ) {
-			$this->v150_upgrade();
-		}
+				return preg_match( $method_pattern, $method );
+			}
+		);
 
-		if ( version_compare( $version, '1.5.9', '<' ) ) {
-			$this->v159_upgrade();
-		}
+		sort( $methods );
 
-		if ( version_compare( $version, '1.6.5', '<' ) ) {
-			$this->v165_upgrade();
-		}
+		foreach ( $methods as $method ) {
+			$upgrade_version     = preg_replace( $method_pattern, '$1', $method );
+			$upgrade_version_arr = str_split( $upgrade_version );
+			$upgrade_version     = implode( '.', $upgrade_version_arr );
 
-		if ( version_compare( $version, '1.6.8', '<' ) ) {
-			$this->v168_upgrade();
+			if ( version_compare( $version, $upgrade_version, '<' ) ) {
+				$this->$method();
+			}
 		}
 	}
 
@@ -156,6 +167,8 @@ class Migrations {
 	 *
 	 * @since 1.1.6
 	 * @since 1.5.9 Moved from WPForms_Upgrades.
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
 	private function v116_upgrade() {
 
@@ -169,6 +182,8 @@ class Migrations {
 	 *
 	 * @since 1.1.3
 	 * @since 1.5.9 Moved from WPForms_Upgrades.
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
 	private function v133_upgrade() {
 
@@ -184,6 +199,8 @@ class Migrations {
 	 *
 	 * @since 1.4.3
 	 * @since 1.5.9 Moved from WPForms_Upgrades.
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
 	private function v143_upgrade() {
 
@@ -292,15 +309,15 @@ class Migrations {
 
 				if ( ! empty( $fields ) ) {
 					foreach ( $fields as $field ) {
-						if ( isset( $field['id'] ) && isset( $field['value'] ) && '' !== $field['value'] ) {
+						if ( isset( $field['id'] ) && isset( $field['value'] ) && $field['value'] !== '' ) {
 							wpforms()->entry_fields->add(
-								array(
+								[
 									'entry_id' => absint( $entry->entry_id ),
 									'form_id'  => absint( $entry->form_id ),
 									'field_id' => absint( $field['id'] ),
 									'value'    => $field['value'],
 									'date'     => $entry->date,
-								)
+								]
 							);
 						}
 					}
@@ -326,6 +343,8 @@ class Migrations {
 	 *
 	 * @since 1.5.0
 	 * @since 1.5.9 Moved from WPForms_Upgrades.
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
 	private function v150_upgrade() {
 
@@ -347,6 +366,8 @@ class Migrations {
 	 * who upgraded to Pro using the settings workflow for v1.5.9.
 	 *
 	 * @since 1.5.9
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
 	private function v159_upgrade() {
 
@@ -455,6 +476,8 @@ class Migrations {
 	 * Do all the required migrations for WPForms v1.6.5.
 	 *
 	 * @since 1.6.5
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
 	private function v165_upgrade() {
 
@@ -475,6 +498,8 @@ class Migrations {
 	 * Do all the required migrations for WPForms v1.6.8.
 	 *
 	 * @since 1.6.8
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
 	private function v168_upgrade() {
 
@@ -487,6 +512,49 @@ class Migrations {
 			static function() {
 				deactivate_plugins( 'wpforms-form-templates-pack/wpforms-form-templates-pack.php' );
 			}
+		);
+	}
+
+	/**
+	 * Do all the required migrations for WPForms v1.7.3.
+	 * We run migration as Action Scheduler task.
+	 * Class Tasks does not exist at this point, so here we can only check task completion status.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @noinspection PhpUnusedPrivateMethodInspection
+	 */
+	private function v173_upgrade() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
+
+		// Do not run migration if custom tables do not exist (this happens on migration from Lite).
+		// Tables will be created later in reinstall_custom_tables() at wpforms_settings_init hook.
+		if ( ! $this->wpforms_pro->custom_tables_exist() ) {
+			$this->is_migrated = true;
+
+			return;
+		}
+
+		add_action(
+			'init',
+			function () {
+				$status = get_option( Migration173Task::STATUS );
+
+				if ( ! $status ) {
+					update_option( Migration173Task::STATUS, Migration173Task::START );
+				}
+
+				if ( $status !== Migration173Task::COMPLETED ) {
+					( new Migration173Task() )->init();
+
+					return;
+				}
+
+				$this->is_migrated = true;
+
+				// We have to call `update_version` manually, as its hook `wpforms_loaded` has been already executed.
+				$this->update_version();
+			},
+			PHP_INT_MAX
 		);
 	}
 }

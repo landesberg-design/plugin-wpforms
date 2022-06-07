@@ -125,7 +125,7 @@ class WPForms_Welcome {
 	 */
 	public function output() {
 
-		$class = wpforms()->pro ? 'pro' : 'lite';
+		$class = wpforms()->is_pro() ? 'pro' : 'lite';
 		?>
 
 		<div id="wpforms-welcome" class="<?php echo sanitize_html_class( $class ); ?>">
@@ -237,7 +237,7 @@ class WPForms_Welcome {
 							<div class="feature-block last">
 								<img src="<?php echo WPFORMS_PLUGIN_URL; ?>assets/images/welcome-feature-icon-10.png">
 								<h5><?php esc_html_e( 'Spam Protection', 'wpforms-lite' ); ?></h5>
-								<p><?php esc_html_e( 'Our smart captcha and honeypot automatically prevent spam submissions.', 'wpforms-lite' ); ?></p>
+								<p><?php esc_html_e( 'Our smart captcha and spam protection automatically prevents spam submissions.', 'wpforms-lite' ); ?></p>
 							</div>
 
 						</div>

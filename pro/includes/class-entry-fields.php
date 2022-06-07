@@ -148,24 +148,21 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 				case '': // Preserving backward compatibility.
 				case 'is':
 					$condition_value = " = '{$escaped_value}'";
-
 					break;
 
 				case 'is_not':
 					$condition_value = " <> '{$escaped_value}'";
-
 					break;
 
 				case 'contains':
 					$condition_value = " LIKE '%{$escaped_value}%'";
-
 					break;
 
 				case 'contains_not':
 					$condition_value = " NOT LIKE '%{$escaped_value}%'";
-
 					break;
 			}
+
 			$where['arg_value'] = '`value`' . $condition_value;
 
 		// Empty value should be allowed in case certain comparisons are used.
@@ -257,6 +254,116 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return $results;
+	}
+
+	/**
+	 * Save all fields of the entry.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @param array $fields    Fields.
+	 * @param array $form_data Form data.
+	 * @param int   $entry_id  Entry id.
+	 * @param bool  $update    Update field if it exists.
+	 *
+	 * @return void
+	 */
+	public function save( $fields, $form_data, $entry_id, $update = false ) {
+
+		if ( ! $entry_id ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+		$date = isset( $form_data['date'] ) ? $form_data['date'] : date( 'Y-m-d H:i:s' );
+
+		foreach ( $fields as $field ) {
+			$this->save_field( $field, $form_data, $entry_id, $update, $date );
+		}
+	}
+
+	/**
+	 * Save one field of the entry.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @param array  $field     Field.
+	 * @param array  $form_data Form data.
+	 * @param int    $entry_id  Entry id.
+	 * @param bool   $update    Update field if it exists.
+	 * @param string $date      Date.
+	 *
+	 * @return void
+	 */
+	private function save_field( $field, $form_data, $entry_id, $update, $date ) {
+
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+		/**
+		 * Filter entry field before saving.
+		 *
+		 * @since 1.4.3
+		 *
+		 * @param array $fields    Fields data array.
+		 * @param array $form_data Form data.
+		 * @param int   $entry_id  Entry id.
+		 */
+		$field = apply_filters( 'wpforms_entry_save_fields', $field, $form_data, $entry_id );
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+
+		if ( ! isset( $field['id'], $field['value'] ) || $field['value'] === '' ) {
+			return;
+		}
+
+		$form_id        = $form_data['id'];
+		$field_id       = $field['id'];
+		$entry_field_id = null;
+
+		if ( $update ) {
+			$entry_field_id = $this->get_entry_field_id( $entry_id, $form_id, $field_id );
+		}
+
+		$data = [
+			'entry_id' => $entry_id,
+			'form_id'  => absint( $form_id ),
+			'field_id' => absint( $field_id ),
+			'value'    => $field['value'],
+			'date'     => $date,
+		];
+
+		if ( $entry_field_id ) {
+			$this->update( $entry_field_id, $data );
+
+			return;
+		}
+
+		$this->add( $data );
+	}
+
+	/**
+	 * Get entry field id.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @param int $entry_id Entry id.
+	 * @param int $form_id  Form id.
+	 * @param int $field_id Field id.
+	 *
+	 * @return string|null
+	 */
+	private function get_entry_field_id( $entry_id, $form_id, $field_id ) {
+
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_var(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT id FROM $this->table_name WHERE entry_id = %d AND form_id = %d AND field_id = %d LIMIT 1",
+				$entry_id,
+				$form_id,
+				$field_id
+			)
+		);
 	}
 
 	/**

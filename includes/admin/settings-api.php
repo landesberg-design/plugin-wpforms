@@ -97,14 +97,14 @@ function wpforms_settings_content_callback( $args ) {
  *
  * @since 1.3.9
  *
- * @param array $args
+ * @param array $args Settings arguments.
  *
  * @return string
  */
 function wpforms_settings_license_callback( $args ) {
 
 	// Lite users don't need to worry about license keys.
-	if ( ! wpforms()->pro || ! class_exists( 'WPForms_License', false ) ) {
+	if ( ! wpforms()->is_pro() || ! class_exists( 'WPForms_License', false ) ) {
 
 		$output  = '<p>' . esc_html__( 'You\'re using WPForms Lite - no license needed. Enjoy!', 'wpforms-lite' ) . ' 🙂</p>';
 		$output .=
@@ -113,15 +113,15 @@ function wpforms_settings_license_callback( $args ) {
 				wp_kses(
 					/* translators: %s - WPForms.com upgrade URL. */
 					__( 'To unlock more features consider <strong><a href="%s" target="_blank" rel="noopener noreferrer" class="wpforms-upgrade-modal">upgrading to PRO</a></strong>.', 'wpforms-lite' ),
-					array(
-						'a'      => array(
-							'href'   => array(),
-							'class'  => array(),
-							'target' => array(),
-							'rel'    => array(),
-						),
-						'strong' => array(),
-					)
+					[
+						'a'      => [
+							'href'   => [],
+							'class'  => [],
+							'target' => [],
+							'rel'    => [],
+						],
+						'strong' => [],
+					]
 				),
 				esc_url( wpforms_admin_upgrade_link( 'settings-license' ) )
 			) .
@@ -130,17 +130,17 @@ function wpforms_settings_license_callback( $args ) {
 			'<p class="discount-note">' .
 				wp_kses(
 					__( 'As a valued WPForms Lite user you receive <strong>50% off</strong>, automatically applied at checkout!', 'wpforms-lite' ),
-					array(
-						'strong' => array(),
-						'br'     => array(),
-					)
+					[
+						'strong' => [],
+						'br'     => [],
+					]
 				) .
 			'</p>';
 
-		$output .= '<hr><p>' . esc_html__( 'Already purchased?  Simply enter your license key below to connect with WPForms PRO!', 'wpforms-lite' ) . '</p>';
+		$output .= '<hr><p>' . esc_html__( 'Already purchased? Simply enter your license key below to enable WPForms PRO!', 'wpforms-lite' ) . '</p>';
 		$output .= '<p>';
 		$output .= '<input type="password" id="wpforms-settings-upgrade-license-key" placeholder="' . esc_attr__( 'Paste license key here', 'wpforms-lite' ) . '" value="" />';
-		$output .= '<button type="button" class="wpforms-btn wpforms-btn-md wpforms-btn-orange" id="wpforms-settings-connect-btn">' . esc_attr__( 'Connect', 'wpforms-lite' ) . '</button>';
+		$output .= '<button type="button" class="wpforms-btn wpforms-btn-md wpforms-btn-orange" id="wpforms-settings-connect-btn">' . esc_html__( 'Verify Key', 'wpforms-lite' ) . '</button>';
 		$output .= '</p>';
 
 		return $output;
@@ -150,9 +150,9 @@ function wpforms_settings_license_callback( $args ) {
 	$key          = ! empty( $license['key'] ) ? $license['key'] : '';
 	$type         = ! empty( $license['type'] ) ? $license['type'] : '';
 	$is_valid_key = ! empty( $key ) &&
-	                ( isset( $license['is_expired'] ) && $license['is_expired'] === false ) &&
-	                ( isset( $license['is_disabled'] ) && $license['is_disabled'] === false ) &&
-	                ( isset( $license['is_invalid'] ) && $license['is_invalid'] === false );
+					( isset( $license['is_expired'] ) && $license['is_expired'] === false ) &&
+					( isset( $license['is_disabled'] ) && $license['is_disabled'] === false ) &&
+					( isset( $license['is_invalid'] ) && $license['is_invalid'] === false );
 
 	$output  = '<span class="wpforms-setting-license-wrapper">';
 	$output .= '<input type="password" id="wpforms-setting-license-key" value="' . esc_attr( $key ) . '"' . disabled( true, $is_valid_key, false ) . ' />';
@@ -357,6 +357,53 @@ function wpforms_settings_radio_callback( $args ) {
 
 	if ( ! empty( $args['desc'] ) ) {
 		$output .= '<p class="desc">' . wp_kses_post( $args['desc'] ) . '</p>';
+	}
+
+	return $output;
+}
+
+/**
+ * Settings toggle field callback.
+ *
+ * @since 1.7.4
+ *
+ * @param array $args Arguments.
+ *
+ * @return string
+ */
+function wpforms_settings_toggle_callback( $args ) {
+
+	$value  = wpforms_setting( $args['id'] );
+	$id     = wpforms_sanitize_key( $args['id'] );
+	$class  = ! empty( $args['control-class'] ) ? $args['control-class'] : '';
+	$class .= ! empty( $args['is-important'] ) ? ' wpforms-important' : '';
+	$output = wpforms_panel_field_toggle_control(
+		[
+			'control-class' => $class,
+		],
+		'wpforms-setting-' . $id,
+		$id,
+		! empty( $args['label'] ) ? $args['label'] : '',
+		$value,
+		''
+	);
+
+	$desc_on  = ! empty( $args['desc'] ) ? $args['desc'] : '';
+	$desc_on  = ! empty( $args['desc-on'] ) ? $args['desc-on'] : $desc_on;
+	$desc_off = ! empty( $args['desc-off'] ) ? $args['desc-off'] : '';
+
+	$output .= sprintf(
+		'<p class="desc desc-on wpforms-toggle-desc%1$s">%2$s</p>',
+		empty( $value ) && ! empty( $desc_off ) ? ' wpforms-hidden' : '',
+		wp_kses_post( $desc_on )
+	);
+
+	if ( ! empty( $desc_off ) ) {
+		$output .= sprintf(
+			'<p class="desc desc-off wpforms-toggle-desc%1$s">%2$s</p>',
+			empty( $value ) ? '' : ' wpforms-hidden',
+			wp_kses_post( $desc_off )
+		);
 	}
 
 	return $output;

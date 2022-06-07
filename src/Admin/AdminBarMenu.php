@@ -2,6 +2,8 @@
 
 namespace WPForms\Admin;
 
+use WP_Admin_Bar;
+
 /**
  * WPForms admin bar menu.
  *
@@ -148,9 +150,9 @@ class AdminBarMenu {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
+	 * @param WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
 	 */
-	public function register( \WP_Admin_Bar $wp_admin_bar ) {
+	public function register( WP_Admin_Bar $wp_admin_bar ) {
 
 		$items = (array) apply_filters(
 			'wpforms_admin_adminbarmenu_register',
@@ -178,9 +180,9 @@ class AdminBarMenu {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
+	 * @param WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
 	 */
-	public function main_menu( \WP_Admin_Bar $wp_admin_bar ) {
+	public function main_menu( WP_Admin_Bar $wp_admin_bar ) {
 
 		$indicator     = '';
 		$notifications = $this->has_notifications();
@@ -204,9 +206,9 @@ class AdminBarMenu {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
+	 * @param WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
 	 */
-	public function notification_menu( \WP_Admin_Bar $wp_admin_bar ) {
+	public function notification_menu( WP_Admin_Bar $wp_admin_bar ) {
 
 		if ( ! $this->has_notifications() ) {
 			return;
@@ -227,9 +229,9 @@ class AdminBarMenu {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
+	 * @param WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
 	 */
-	public function all_forms_menu( \WP_Admin_Bar $wp_admin_bar ) {
+	public function all_forms_menu( WP_Admin_Bar $wp_admin_bar ) {
 
 		$wp_admin_bar->add_menu(
 			[
@@ -246,9 +248,9 @@ class AdminBarMenu {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
+	 * @param WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
 	 */
-	public function add_new_menu( \WP_Admin_Bar $wp_admin_bar ) {
+	public function add_new_menu( WP_Admin_Bar $wp_admin_bar ) {
 
 		$wp_admin_bar->add_menu(
 			[
@@ -265,9 +267,9 @@ class AdminBarMenu {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
+	 * @param WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
 	 */
-	public function community_menu( \WP_Admin_Bar $wp_admin_bar ) {
+	public function community_menu( WP_Admin_Bar $wp_admin_bar ) {
 
 		$wp_admin_bar->add_menu(
 			[
@@ -287,17 +289,28 @@ class AdminBarMenu {
 	 * Render Support admin bar menu item.
 	 *
 	 * @since 1.6.0
+	 * @since 1.7.4 Update the `Support` item title to `Help Docs`.
 	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
+	 * @param WP_Admin_Bar $wp_admin_bar WordPress Admin Bar object.
 	 */
-	public function support_menu( \WP_Admin_Bar $wp_admin_bar ) {
+	public function support_menu( WP_Admin_Bar $wp_admin_bar ) {
+
+		$href = add_query_arg(
+			[
+				'utm_campaign' => wpforms()->is_pro() ? 'plugin' : 'liteplugin',
+				'utm_medium'   => 'admin-bar',
+				'utm_source'   => 'WordPress',
+				'utm_content'  => 'Documentation',
+			],
+			'https://wpforms.com/docs/'
+		);
 
 		$wp_admin_bar->add_menu(
 			[
 				'parent' => 'wpforms-menu',
-				'id'     => 'wpforms-support',
-				'title'  => esc_html__( 'Support', 'wpforms-lite' ),
-				'href'   => 'https://wpforms.com/docs/',
+				'id'     => 'wpforms-help-docs',
+				'title'  => esc_html__( 'Help Docs', 'wpforms-lite' ),
+				'href'   => $href,
 				'meta'   => [
 					'target' => '_blank',
 					'rel'    => 'noopener noreferrer',

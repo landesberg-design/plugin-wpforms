@@ -744,6 +744,10 @@
 	 */
 	function dropZoneInit( $el ) {
 
+		if ( $el.dropzone ) {
+			return $el.dropzone;
+		}
+
 		var formId = parseInt( $el.dataset.formId, 10 );
 		var fieldId = parseInt( $el.dataset.fieldId, 10 ) || 0;
 		var maxFiles = parseInt( $el.dataset.maxFileNumber, 10 );

@@ -30,6 +30,15 @@ class WPForms_Entries_List {
 	public $abort = false;
 
 	/**
+	 * The human-readable error message.
+	 *
+	 * @since 1.7.3
+	 *
+	 * @var string
+	 */
+	private $abort_message;
+
+	/**
 	 * Form ID.
 	 *
 	 * @since 1.1.6
@@ -92,13 +101,10 @@ class WPForms_Entries_List {
 	 *
 	 * @since 1.0.0
 	 */
-	public function init() {
-
-		// Check what page and view.
-		$view = $this->get_current_screen_view();
+	public function init() { // phpcs:disable WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		// Only load if we are actually on the overview page.
-		if ( ! wpforms_is_admin_page( 'entries' ) || $view !== 'list' ) {
+		if ( ! wpforms_is_admin_page( 'entries' ) || $this->get_current_screen_view() !== 'list' ) {
 			return;
 		}
 
@@ -107,6 +113,13 @@ class WPForms_Entries_List {
 		// Init default entries screen.
 		if ( empty( $form_id ) || ! wpforms_current_user_can( 'view_entries_form_single', $form_id ) ) {
 			return;
+		}
+
+		$form = wpforms()->get( 'form' )->get( $form_id );
+
+		if ( empty( $form ) || $form->post_status === 'trash' ) {
+			$this->abort_message = esc_html__( 'It looks like the form you are trying to access is no longer available.', 'wpforms' );
+			$this->abort         = true;
 		}
 
 		// Load the classes that builds the entries table.
@@ -125,13 +138,14 @@ class WPForms_Entries_List {
 
 		// Output.
 		add_action( 'wpforms_admin_page', [ $this, 'list_all' ] );
+		add_action( 'wpforms_admin_page', [ $this, 'display_abort_message' ] );
 		add_action( 'wpforms_admin_page', [ $this, 'field_column_setting' ] );
 		add_action( 'wpforms_entry_list_title', [ $this, 'list_form_actions' ], 10, 1 );
 
 		// Enqueues.
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ] );
 		add_filter( 'wpforms_admin_strings', [ $this, 'js_strings' ] );
-	}
+	} // phpcs:enable WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 	/**
 	 * Remove unnecessary $_GET parameters for shorter URL.
@@ -140,7 +154,7 @@ class WPForms_Entries_List {
 	 */
 	private function remove_get_parameters() {
 
-		$_SERVER['REQUEST_URI'] = remove_query_arg( '_wp_http_referer', $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$_SERVER['REQUEST_URI'] = remove_query_arg( [ '_wp_http_referer', 'action', 'read', 'unread', 'unstarred', 'starred', 'deleted' ], $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	}
 
 	/**
@@ -269,7 +283,7 @@ class WPForms_Entries_List {
 			return;
 		}
 
-		_deprecated_function( __CLASS__ . '::' . __METHOD__, '1.5.5 of WPForms plugin', 'WPForms\Pro\Admin\Export\Export class' );
+		_deprecated_function( __METHOD__, '1.5.5 of WPForms plugin', 'WPForms\Pro\Admin\Export\Export class' );
 
 		// Security check.
 		if ( ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'wpforms_entry_list_export' ) ) {
@@ -542,6 +556,7 @@ class WPForms_Entries_List {
 						'<em>' . $dates[0] . '</em>'
 					);
 					break;
+
 				case 2:
 					$html = sprintf( /* translators: 1: Date 2: Date */
 						esc_html__( 'between %1$s and %2$s', 'wpforms' ),
@@ -658,6 +673,10 @@ class WPForms_Entries_List {
 	 */
 	public function list_all() {
 
+		if ( $this->abort ) {
+			return;
+		}
+
 		$form_data = ! empty( $this->form->post_content ) ? wpforms_decode( $this->form->post_content ) : '';
 		?>
 
@@ -666,32 +685,43 @@ class WPForms_Entries_List {
 			<h1 class="page-title"><?php esc_html_e( 'Entries', 'wpforms' ); ?></h1>
 
 			<?php
-
-			if ( $this->abort ) {
-				echo '</div>'; // close wrap.
-
-				return;
-			}
-
 			$this->entries->form_id   = $this->form_id;
 			$this->entries->form_data = $form_data;
 
 			$this->entries->prepare_items();
 
-			$last_entry = wpforms()->entry->get_last( $this->form_id );
+			$last_entry = wpforms()->get( 'entry' )->get_last( $this->form_id );
 			?>
 
 			<div class="wpforms-admin-content">
 
 			<?php
 
-			if ( empty( $this->entries->items ) && ! isset( $_GET['search'] ) && ! isset( $_GET['date'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if (
+				empty( $this->entries->items ) &&
+				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				! isset( $_GET['search'] ) && ! isset( $_GET['date'] ) && ! isset( $_GET['type'] ) && ! isset( $_GET['status'] )
+			) {
 
 				// Output no entries screen.
-				echo wpforms_render( 'admin/empty-states/no-entries' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo wpforms_render(
+					'admin/empty-states/no-entries',
+					[
+						'message' => __( 'It looks like you don\'t have any form entries just yet - check back soon!', 'wpforms' ),
+					],
+					true
+				);
 
 			} else {
-
+				/**
+				 * Fire before entries table.
+				 *
+				 * @since 1.1.6
+				 *
+				 * @param array                $form_data    Form content.
+				 * @param WPForms_Entries_List $entries_list WPForms_Entries_List class instance.
+				 */
 				do_action( 'wpforms_entry_list_title', $form_data, $this );
 			?>
 
@@ -749,6 +779,40 @@ class WPForms_Entries_List {
 
 		</div>
 
+		<?php
+	}
+
+	/**
+	 * Display abort message using empty state page.
+	 *
+	 * @since 1.7.3
+	 */
+	public function display_abort_message() {
+
+		if ( ! $this->abort ) {
+			return;
+		}
+
+		?>
+		<div id="wpforms-entries-list" class="wrap wpforms-admin-wrap">
+
+			<h1 class="page-title">
+				<?php esc_html_e( 'Entries', 'wpforms' ); ?>
+			</h1>
+			<div class="wpforms-admin-content">
+				<?php
+				// Output empty state screen.
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo wpforms_render(
+					'admin/empty-states/no-entries',
+					[
+						'message' => $this->abort_message,
+					],
+					true
+				);
+				?>
+			</div>
+		</div>
 		<?php
 	}
 
@@ -906,7 +970,9 @@ class WPForms_Entries_List {
 
 		// Delete all entries.
 		$delete_url = wp_nonce_url( $base, 'bulk-entries' );
-		$form_title = ! isset( $form_data['settings']['form_title'] ) ? $form_data['settings']['form_title'] : '';
+
+		// Form title.
+		$form_title = isset( $form_data['settings']['form_title'] ) ? $form_data['settings']['form_title'] : '';
 
 		if ( empty( $form_title ) ) {
 			$form = wpforms()->get( 'form' )->get( $this->form_id );
@@ -1053,7 +1119,7 @@ class WPForms_Entries_List {
 	 */
 	public function display_alerts( $display = '', $wrap = false ) {
 
-		_deprecated_function( __CLASS__ . '::' . __METHOD__, '1.6.7.1 of WPForms plugin' );
+		_deprecated_function( __METHOD__, '1.6.7.1 of WPForms plugin' );
 
 		if ( empty( $this->alerts ) ) {
 			return;

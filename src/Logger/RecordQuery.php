@@ -67,7 +67,7 @@ class RecordQuery {
 		if ( $where ) {
 			$sql .= ' WHERE ' . implode( ' AND ', $where );
 		}
-		$sql .= ' ORDER BY `id` DESC';
+		$sql .= ' ORDER BY `create_at` DESC, `id` DESC';
 		$sql .= $wpdb->prepare( ' LIMIT %d, %d', absint( $offset ), absint( $limit ) );
 
 		return $sql;

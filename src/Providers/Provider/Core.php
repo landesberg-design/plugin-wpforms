@@ -50,6 +50,7 @@ abstract class Core {
 	 * Get the instance of the class.
 	 *
 	 * @since 1.4.7
+	 * @since 1.7.3 Compatibility with PHP 8.1
 	 *
 	 * @return Core
 	 */
@@ -57,13 +58,14 @@ abstract class Core {
 
 		static $instance;
 
-		if ( ! $instance ) {
-			// Same as new static(), but allows to avoid "abstract class init" error.
-			$core     = \get_called_class();
-			$instance = new $core();
+		$class = static::class;
+
+		if ( empty( $instance[ $class ] ) ) {
+			// Same as new static(), but allows avoiding "abstract class init" error.
+			$instance[ $class ] = new $class();
 		}
 
-		return $instance;
+		return $instance[ $class ];
 	}
 
 	/**

@@ -116,14 +116,23 @@ abstract class WPForms_Payment {
 	 */
 	public function builder_form_data() {
 
-		if ( ! empty( $_GET['form_id'] ) ) {
-			$this->form_data = wpforms()->form->get(
-				absint( $_GET['form_id'] ),
-				array(
-					'content_only' => true,
-				)
-			);
+		// Get current revision, if available.
+		$revision = wpforms()->get( 'revisions' )->get_revision();
+
+		// If we're viewing a valid revision, set the form data so the Form Builder shows correct state.
+		if ( $revision && isset( $revision->post_content ) ) {
+			$this->form_data = wpforms_decode( $revision->post_content );
+
+			return;
 		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$form_id = isset( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
+
+		$this->form_data = wpforms()->get( 'form' )->get(
+			$form_id,
+			[ 'content_only' => true ]
+		);
 	}
 
 	/**

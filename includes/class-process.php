@@ -436,15 +436,17 @@ class WPForms_Process {
 		$_POST['wpforms']['entry_id'] = $this->entry_id;
 
 		// Logs entry depending on log levels set.
-		wpforms_log(
-			$this->entry_id ? "Entry {$this->entry_id}" : 'Entry',
-			$this->fields,
-			array(
-				'type'    => array( 'entry' ),
-				'parent'  => $this->entry_id,
-				'form_id' => $this->form_data['id'],
-			)
-		);
+		if ( wpforms()->is_pro() ) {
+			wpforms_log(
+				$this->entry_id ? "Entry {$this->entry_id}" : 'Entry',
+				$this->fields,
+				[
+					'type'    => [ 'entry' ],
+					'parent'  => $this->entry_id,
+					'form_id' => $this->form_data['id'],
+				]
+			);
+		}
 
 		// Post-process hooks.
 		do_action( 'wpforms_process_complete', $this->fields, $entry, $this->form_data, $this->entry_id );
@@ -617,9 +619,17 @@ class WPForms_Process {
 		// Redirect if needed, to either a page or URL, after form processing.
 		if ( ! empty( $confirmations[ $confirmation_id ]['type'] ) && 'message' !== $confirmations[ $confirmation_id ]['type'] ) {
 
-			if ( 'redirect' === $confirmations[ $confirmation_id ]['type'] ) {
-				add_filter( 'wpforms_field_smart_tag_value', 'rawurlencode' );
+			if ( $confirmations[ $confirmation_id ]['type'] === 'redirect' ) {
+
+				$rawurlencode_callback = static function ( $value ) {
+					return $value === null ? null : rawurlencode( $value );
+				};
+
+				add_filter( 'wpforms_smarttags_process_field_id_value', $rawurlencode_callback );
+
 				$url = wpforms_process_smart_tags( $confirmations[ $confirmation_id ]['redirect'], $this->form_data, $this->fields, $this->entry_id );
+
+				remove_filter( 'wpforms_smarttags_process_field_id_value', $rawurlencode_callback );
 			}
 
 			if ( 'page' === $confirmations[ $confirmation_id ]['type'] ) {

@@ -216,19 +216,16 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 
 				$properties['inputs']['date'] = $default_date;
 				$properties['inputs']['time'] = $default_time;
-
 				break;
 
 			case 'date':
 				$properties['inputs']['date']            = $default_date;
 				$properties['inputs']['date']['class'][] = $field_size_cls;
-
 				break;
 
 			case 'time':
 				$properties['inputs']['time']            = $default_time;
 				$properties['inputs']['time']['class'][] = $field_size_cls;
-
 				break;
 		}
 
@@ -584,7 +581,9 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		$this->field_option( 'label_hide', $field );
 
 		// Hide sublabels.
-		$this->field_option( 'sublabel_hide', $field );
+		$sublabel_class = isset( $field['format'] ) && $field['format'] !== 'date-time' ? 'wpforms-hidden' : '';
+
+		$this->field_option( 'sublabel_hide', $field, [ 'class' => $sublabel_class ] );
 
 		// Options close markup.
 		$this->field_option(
@@ -1063,7 +1062,6 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 					! empty( $time_prop['required'] ) ? 'required' : ''
 				);
 				$this->field_display_error( 'time', $field );
-
 				break;
 		}
 	}

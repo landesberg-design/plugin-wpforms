@@ -55,7 +55,16 @@ class Templates {
 	private function allow_load() {
 
 		// Load only in the Form Builder.
-		return wp_doing_ajax() || wpforms_is_admin_page( 'builder' );
+		$allow = wp_doing_ajax() || wpforms_is_admin_page( 'builder' );
+
+		/**
+		 * Whether to allow the form templates functionality to load.
+		 *
+		 * @since 1.7.2
+		 *
+		 * @param bool $allow True or false.
+		 */
+		return (bool) apply_filters( 'wpforms_admin_builder_templates_allow_load', $allow );
 	}
 
 	/**
@@ -161,7 +170,7 @@ class Templates {
 		$templates_higher = array_replace( array_flip( $higher_templates_slugs ), $templates_higher );
 		$templates_higher = array_filter( $templates_higher, 'is_array' );
 
-		// Finally merge all together.
+		// Finally, merge everything together.
 		$this->templates = array_merge( $templates_higher, $templates_access, $templates_denied );
 	}
 
@@ -398,11 +407,24 @@ class Templates {
 			return $form;
 		}
 
+		$form_data = wpforms_decode( wp_unslash( $form['post_content'] ) );
+
+		// Something is wrong with the form data.
+		if ( empty( $form_data ) ) {
+			return $form;
+		}
+
+		// Compile the new form data preserving needed data from the existing form.
 		$new                     = $template['data'];
-		$new['settings']         = ! empty( $form['post_content']['settings'] ) ? $form['post_content']['settings'] : [];
-		$new['meta']             = ! empty( $form['post_content']['meta'] ) ? $form['post_content']['meta'] : [];
+		$new['id']               = isset( $form['ID'] ) ? $form['ID'] : 0;
+		$new['field_id']         = isset( $form_data['field_id'] ) ? $form_data['field_id'] : 0;
+		$new['settings']         = isset( $form_data['settings'] ) ? $form_data['settings'] : [];
+		$new['payments']         = isset( $form_data['payments'] ) ? $form_data['payments'] : [];
+		$new['meta']             = isset( $form_data['meta'] ) ? $form_data['meta'] : [];
 		$new['meta']['template'] = $template['id'];
-		$form['post_content']    = wpforms_encode( $new );
+
+		// Update the form with new data.
+		$form['post_content'] = wpforms_encode( $new );
 
 		return $form;
 	}

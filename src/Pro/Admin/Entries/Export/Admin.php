@@ -132,7 +132,7 @@ class Admin {
 		if ( ! empty( $forms ) ) {
 			?>
 			<span class="choicesjs-select-wrap">
-				<select id="wpforms-tools-entries-export-selectform" class="choicesjs-select" name="form">
+				<select id="wpforms-tools-entries-export-selectform" class="choicesjs-select" name="form" data-search="true" data-choices-position="bottom">
 					<option value="" placeholder><?php esc_attr_e( 'Select a Form', 'wpforms' ); ?></option>
 					<?php
 					foreach ( $forms as $form ) {

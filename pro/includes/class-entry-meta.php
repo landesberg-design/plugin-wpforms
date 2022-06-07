@@ -92,29 +92,14 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 			$args['number'] = PHP_INT_MAX;
 		}
 
-		$where = '';
-
-		// Allowed int arg items.
-		$keys = [ 'id', 'entry_id', 'form_id', 'user_id' ];
-
-		foreach ( $keys as $key ) {
-			// Value `$args[ $key ]` can be a natural number and a numeric string.
-			// We should skip empty string values, but continue working with '0'.
-			if ( empty( $args[ $key ] ) && $args[ $key ] !== '0' ) {
-				continue;
-			}
-
-			if ( is_array( $args[ $key ] ) && ! empty( $args[ $key ] ) ) {
-				$ids = implode( ',', array_map( 'intval', $args[ $key ] ) );
-			} else {
-				$ids = intval( $args[ $key ] );
-			}
-			$where .= empty( $where ) ? 'WHERE' : 'AND';
-			$where .= " `{$key}` IN( {$ids} ) ";
-		}
+		$where = $this->build_where(
+			$args,
+			[ 'id', 'entry_id', 'form_id', 'user_id' ]
+		);
 
 		// Allowed string arg items.
-		$keys = array( 'status', 'type' );
+		$keys = [ 'status', 'type', 'data' ];
+
 		foreach ( $keys as $key ) {
 
 			if ( ! empty( $args[ $key ] ) ) {

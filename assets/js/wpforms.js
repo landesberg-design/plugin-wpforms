@@ -1,4 +1,4 @@
-/* global wpforms_settings, grecaptcha, hcaptcha, wpformsRecaptchaCallback, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices, WPFormsPasswordField, WPFormsEntryPreview, punycode, tinyMCE */
+/* global wpforms_settings, grecaptcha, hcaptcha, wpformsRecaptchaCallback, wpformsRecaptchaV3Execute, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices, WPFormsPasswordField, WPFormsEntryPreview, punycode, tinyMCE */
 
 'use strict';
 
@@ -115,14 +115,14 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					$( this ).attr( 'name', 'wpf-temp-' + random );
 				} );
 
-				// Prepend URL field contents with http:// if user input doesn't contain a schema.
+				// Prepend URL field contents with https:// if user input doesn't contain a schema.
 				$( '.wpforms-validate input[type=url]' ).change( function() {
 					var url = $( this ).val();
 					if ( ! url ) {
 						return false;
 					}
 					if ( url.substr( 0, 7 ) !== 'http://' && url.substr( 0, 8 ) !== 'https://' ) {
-						$( this ).val( 'http://' + url );
+						$( this ).val( 'https://' + url );
 					}
 				} );
 
@@ -173,6 +173,38 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				// Validate email addresses.
 				$.validator.methods.email = function( value, element ) {
 
+					// For comments, see wpforms_is_email() function.
+					const isEmail = function( value ) {
+						if ( value.length > 254 ) {
+							return false;
+						}
+
+						const valueArr = value.split( '@' );
+
+						if ( valueArr.length !== 2 ) {
+							return false;
+						}
+
+						const local  = valueArr[ 0 ];
+						const domain = valueArr[ 1 ];
+
+						if ( local.length > 63 ) {
+							return false;
+						}
+
+						const domainArr = domain.split( '.' );
+
+						for ( const domainLabel of domainArr ) {
+							if ( domainLabel.length > 63 ) {
+								return false;
+							}
+						}
+
+						return true;
+					}
+
+					const isEmailTest = isEmail( value );
+
 					// Test email on the multiple @ and spaces:
 					// - no spaces allowed in the local and domain parts
 					// - only one @ after the local part allowed
@@ -183,7 +215,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					// - two dots in a row not allowed
 					var dotsTest = /^(?!\.)(?!.*?\.\.).*[^.]$/.test( value );
 
-					return this.optional( element ) || ( structureTest && dotsTest );
+					return this.optional( element ) || ( structureTest && dotsTest && isEmailTest );
 				};
 
 				// Validate email by allowlist/blocklist.
@@ -233,7 +265,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 				// Validate confirmations.
 				$.validator.addMethod( 'confirm', function( value, element, param ) {
-					return value === $( element ).closest( '.wpforms-field' ).find( 'input:first-child' ).val();
+					const field = $( element ).closest( '.wpforms-field' );
+					return $( field.find( 'input' )[ 0 ] ).val() === $( field.find( 'input' )[ 1 ] ).val();
 				}, wpforms_settings.val_confirm );
 
 				// Validate required payments.
@@ -352,7 +385,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				// Validate password strength.
 				$.validator.addMethod( 'password-strength', function( value, element ) {
 
-					return WPFormsPasswordField.passwordStrength( value, element ) >= Number( $( element ).data( 'password-strength-level' ) );
+					var $el = $( element );
+
+					return $el.val().trim() === '' && ! $el.hasClass( 'wpforms-field-required' ) || // Don't check the password strength for empty fields which is set as not required.
+						WPFormsPasswordField.passwordStrength( value, element ) >= Number( $el.data( 'password-strength-level' ) );
 				}, wpforms_settings.val_password_strength );
 
 				// Finally load jQuery Validation library for our forms.
@@ -411,41 +447,60 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 							},
 							submitHandler: function( form ) {
 
-								var $form       = $( form ),
-									$submit     = $form.find( '.wpforms-submit' ),
-									altText     = $submit.data( 'alt-text' ),
-									recaptchaID = $submit.get( 0 ).recaptchaID;
+								/**
+								 * Submit handler routine.
+								 *
+								 * @since 1.7.2
+								 *
+								 * @returns {boolean|void} False if form won't submit.
+								 */
+								var submitHandlerRoutine = function() {
 
-								if ( $form.data( 'token' ) && 0 === $( '.wpforms-token', $form ).length ) {
-									$( '<input type="hidden" class="wpforms-token" name="wpforms[token]" />' )
-										.val( $form.data( 'token' ) )
-										.appendTo( $form );
+									var $form = $( form ),
+										$submit = $form.find( '.wpforms-submit' ),
+										altText = $submit.data( 'alt-text' ),
+										recaptchaID = $submit.get( 0 ).recaptchaID;
+
+									if ( $form.data( 'token' ) && 0 === $( '.wpforms-token', $form ).length ) {
+										$( '<input type="hidden" class="wpforms-token" name="wpforms[token]" />' )
+											.val( $form.data( 'token' ) )
+											.appendTo( $form );
+									}
+
+									$submit.prop( 'disabled', true );
+									$form.find( '#wpforms-field_recaptcha-error' ).remove();
+
+									// Display processing text.
+									if ( altText ) {
+										$submit.text( altText );
+									}
+
+									if ( ! app.empty( recaptchaID ) || recaptchaID === 0 ) {
+
+										// Form contains invisible reCAPTCHA.
+										grecaptcha.execute( recaptchaID ).then( null, function( reason ) {
+
+											reason = ( null === reason ) ? '' : '<br>' + reason;
+											$form.find( '.wpforms-recaptcha-container' )
+												.append( '<label id="wpforms-field_recaptcha-error" class="wpforms-error"> ' + wpforms_settings.val_recaptcha_fail_msg + reason + '</label>' );
+											$submit.prop( 'disabled', false );
+										} );
+										return false;
+									}
+
+									// Remove name attributes if needed.
+									$( '.wpforms-input-temp-name' ).removeAttr( 'name' );
+
+									app.formSubmit( $form );
+								};
+
+								// In the case of active Google reCAPTCHA v3, first, we should call `grecaptcha.execute`.
+								// This is needed to obtain proper grecaptcha token before submitting the form.
+								if ( typeof wpformsRecaptchaV3Execute === 'function' ) {
+									return wpformsRecaptchaV3Execute( submitHandlerRoutine );
 								}
 
-								$submit.prop( 'disabled', true );
-								$form.find( '#wpforms-field_recaptcha-error' ).remove();
-
-								// Display processing text.
-								if ( altText ) {
-									$submit.text( altText );
-								}
-
-								if ( ! app.empty( recaptchaID ) || recaptchaID === 0 ) {
-
-									// Form contains invisible reCAPTCHA.
-									grecaptcha.execute( recaptchaID ).then( null, function( reason ) {
-
-										reason = ( null === reason ) ? '' : '<br>' + reason;
-										$form.find( '.wpforms-recaptcha-container' ).append( '<label id="wpforms-field_recaptcha-error" class="wpforms-error"> ' + wpforms_settings.val_recaptcha_fail_msg + reason + '</label>' );
-										$submit.prop( 'disabled', false );
-									} );
-									return false;
-								}
-
-								// Remove name attributes if needed.
-								$( '.wpforms-input-temp-name' ).removeAttr( 'name' );
-
-								app.formSubmit( $form );
+								return submitHandlerRoutine();
 							},
 							invalidHandler: function( event, validator ) {
 
@@ -906,11 +961,14 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 			// Loads if function exists.
 			if ( typeof window.Choices !== 'function' ) {
-
 				return;
 			}
 
 			$( '.wpforms-field-select-style-modern .choicesjs-select, .wpforms-field-payment-select .choicesjs-select' ).each( function( idx, el ) {
+
+				if ( $( el ).data( 'choicesjs' ) ) {
+					return;
+				}
 
 				var args          = window.wpforms_choicesjs_config || {},
 					searchEnabled = $( el ).data( 'search-enabled' );
@@ -2225,8 +2283,18 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 			args.complete = function( jqHXR, textStatus ) {
 
-				// Do not make form active if the action is required.
-				if ( jqHXR.responseJSON && jqHXR.responseJSON.data && jqHXR.responseJSON.data.action_required ) {
+				/*
+				 * Do not make form active if the action is required or
+				 * if the ajax request was successful and the form has a redirect.
+				 */
+				if (
+					jqHXR.responseJSON &&
+					jqHXR.responseJSON.data &&
+					(
+						jqHXR.responseJSON.data.action_required ||
+						( textStatus === 'success' && jqHXR.responseJSON.data.redirect_url )
+					)
+				) {
 					return;
 				}
 

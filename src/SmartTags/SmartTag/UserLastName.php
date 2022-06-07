@@ -30,6 +30,6 @@ class UserLastName extends SmartTag {
 			return '';
 		}
 
-		return $current_user->exists() ? sanitize_text_field( $current_user->user_lastname ) : '';
+		return $current_user->exists() ? esc_html( wp_strip_all_tags( $current_user->user_lastname ) ) : '';
 	}
 }
