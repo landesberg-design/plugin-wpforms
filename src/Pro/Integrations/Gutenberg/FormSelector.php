@@ -26,7 +26,7 @@ class FormSelector extends \WPForms\Integrations\Gutenberg\FormSelector {
 
 		wp_register_style(
 			'wpforms-pro-integrations',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/admin-integrations{$min}.css",
+			WPFORMS_PLUGIN_URL . "assets/pro/css/admin-integrations{$min}.css",
 			[ 'wpforms-integrations' ],
 			WPFORMS_VERSION
 		);

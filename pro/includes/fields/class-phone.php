@@ -12,7 +12,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 *
 	 * @since 1.6.3
 	 */
-	const INTL_VERSION = '17.0.5';
+	const INTL_VERSION = '17.0.17';
 
 	/**
 	 * Primary class constructor.
@@ -88,13 +88,14 @@ class WPForms_Field_Phone extends WPForms_Field {
 		if ( ! wpforms()->frontend->assets_global() && ! $this->has_smart_format( $forms ) ) {
 			return;
 		}
-		$min = \wpforms_get_min_suffix();
+
+		$min = wpforms_get_min_suffix();
 
 		// International Telephone Input library CSS.
 		wp_enqueue_style(
 			'wpforms-smart-phone-field',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/vendor/intl-tel-input{$min}.css",
-			array(),
+			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/phone/intl-tel-input{$min}.css",
+			[],
 			self::INTL_VERSION
 		);
 	}
@@ -111,13 +112,12 @@ class WPForms_Field_Phone extends WPForms_Field {
 		if ( ! wpforms()->frontend->assets_global() && ! $this->has_smart_format( $forms ) ) {
 			return;
 		}
-		$min = \wpforms_get_min_suffix();
 
 		// Load International Telephone Input library - https://github.com/jackocnr/intl-tel-input.
 		wp_enqueue_script(
 			'wpforms-smart-phone-field',
-			WPFORMS_PLUGIN_URL . "pro/assets/js/vendor/jquery.intl-tel-input{$min}.js",
-			array( 'jquery' ),
+			WPFORMS_PLUGIN_URL . 'assets/pro/lib/intl-tel-input/jquery.intl-tel-input.min.js',
+			[ 'jquery' ],
 			self::INTL_VERSION,
 			true
 		);
@@ -272,13 +272,14 @@ class WPForms_Field_Phone extends WPForms_Field {
 	public function field_preview( $field ) {
 
 		// Define data.
-		$placeholder = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
+		$placeholder   = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
+		$default_value = ! empty( $field['default_value'] ) ? $field['default_value'] : '';
 
 		// Label.
 		$this->field_preview_option( 'label', $field );
 
 		// Primary input.
-		echo '<input type="text" placeholder="' . esc_attr( $placeholder ) . '" class="primary-input" readonly>';
+		echo '<input type="text" placeholder="' . esc_attr( $placeholder ) . '" value="' . esc_attr( $default_value ) . '" class="primary-input" readonly>';
 
 		// Description.
 		$this->field_preview_option( 'description', $field );

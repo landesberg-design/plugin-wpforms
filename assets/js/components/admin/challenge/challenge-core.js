@@ -372,13 +372,13 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		initElements: function() {
 
 			el = {
-				$challenge: $( '.wpforms-challenge' ),
-				$btnPause: $( '.wpforms-challenge-pause' ),
-				$btnResume: $( '.wpforms-challenge-resume' ),
-				$listSteps: $( '.wpforms-challenge-list' ),
-				$listBlock: $( '.wpforms-challenge-list-block' ),
+				$challenge:     $( '.wpforms-challenge' ),
+				$btnPause:      $( '.wpforms-challenge-pause' ),
+				$btnResume:     $( '.wpforms-challenge-resume' ),
+				$listSteps:     $( '.wpforms-challenge-list' ),
+				$listBlock:     $( '.wpforms-challenge-list-block' ),
 				$listBtnToggle: $( '.wpforms-challenge-list-block .toggle-list' ),
-				$progressBar: $( '.wpforms-challenge-bar' ),
+				$progressBar:   $( '.wpforms-challenge-bar' ),
 				$tooltipBtnDone: function() {
 					return $( '.wpforms-challenge-tooltip .wpforms-challenge-done-btn' );
 				},
@@ -415,7 +415,7 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		},
 
 		/**
-		 * Update a step with backend data..
+		 * Update a step with backend data.
 		 *
 		 * @since 1.5.0
 		 */
@@ -725,6 +725,35 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 		},
 
 		/**
+		 * Resume Challenge and execute the callback.
+		 *
+		 * @since 1.7.5
+		 *
+		 * @param {object}   e        Event object.
+		 * @param {Function} callback Callback function.
+		 */
+		resumeChallengeAndExec: function( e, callback ) {
+
+			if ( typeof callback !== 'function' ) {
+				callback = function() {};
+			}
+
+			if ( wpforms_challenge_admin.option.status !== 'paused' ) {
+				callback();
+
+				return;
+			}
+
+			var resumeResult = app.resumeChallenge( e );
+
+			if ( typeof resumeResult === 'object' && typeof resumeResult.done === 'function' ) {
+				resumeResult.done( callback );
+			} else {
+				callback();
+			}
+		},
+
+		/**
 		 * Refresh Page in order to re-init current step.
 		 *
 		 * @since 1.6.2
@@ -780,7 +809,7 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 				return;
 			}
 
-			// Use MutationObserver to wait while Guttenberg create/display panel with Publish button.
+			// Use MutationObserver to wait while Gutenberg create/display panel with Publish button.
 			var obs = {
 				targetNode  : $gb.find( '.edit-post-layout, .block-editor-editor-skeleton__publish > div' )[0],
 				config      : {

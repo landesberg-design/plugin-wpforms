@@ -359,6 +359,7 @@ class WPForms_Field_Password extends WPForms_Field {
 
 		$placeholder         = ! empty( $field['placeholder'] ) ? $field['placeholder'] : '';
 		$confirm_placeholder = ! empty( $field['confirmation_placeholder'] ) ? $field['confirmation_placeholder'] : '';
+		$default_value       = ! empty( $field['default_value'] ) ? $field['default_value'] : '';
 		$confirm             = ! empty( $field['confirmation'] ) ? 'enabled' : 'disabled';
 
 		// Label.
@@ -368,7 +369,7 @@ class WPForms_Field_Password extends WPForms_Field {
 		<div class="wpforms-confirm wpforms-confirm-<?php echo esc_attr( $confirm ); ?>">
 
 			<div class="wpforms-confirm-primary">
-				<input type="password" placeholder="<?php echo esc_attr( $placeholder ); ?>" class="primary-input" readonly>
+				<input type="password" placeholder="<?php echo esc_attr( $placeholder ); ?>" value="<?php echo esc_attr( $default_value ); ?>" class="primary-input" readonly>
 				<label class="wpforms-sub-label"><?php esc_html_e( 'Password', 'wpforms' ); ?></label>
 			</div>
 
@@ -548,7 +549,7 @@ class WPForms_Field_Password extends WPForms_Field {
 
 		wp_enqueue_style(
 			'wpforms-password-field',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/fields/password{$min}.css",
+			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/password{$min}.css",
 			[],
 			WPFORMS_VERSION
 		);
@@ -571,7 +572,7 @@ class WPForms_Field_Password extends WPForms_Field {
 
 		wp_enqueue_script(
 			'wpforms-password-field',
-			WPFORMS_PLUGIN_URL . "pro/assets/js/fields/password{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/fields/password{$min}.js",
 			[ 'jquery', 'password-strength-meter' ],
 			WPFORMS_VERSION,
 			true

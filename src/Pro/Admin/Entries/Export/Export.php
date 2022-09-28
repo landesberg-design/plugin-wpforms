@@ -33,6 +33,8 @@ class Export {
 			'divider',
 			'html',
 			'pagebreak',
+			'internal-information',
+			'layout',
 		],
 	];
 
@@ -43,7 +45,7 @@ class Export {
 	 *
 	 * @var array
 	 */
-	public $i18n = array();
+	public $i18n = [];
 
 	/**
 	 * Error messages.
@@ -52,7 +54,7 @@ class Export {
 	 *
 	 * @var array
 	 */
-	public $errors = array();
+	public $errors = [];
 
 	/**
 	 * Additional Information checkboxes.
@@ -61,7 +63,7 @@ class Export {
 	 *
 	 * @var array
 	 */
-	public $additional_info_fields = array();
+	public $additional_info_fields = [];
 
 	/**
 	 * Type checkboxes.
@@ -79,14 +81,14 @@ class Export {
 	 *
 	 * @var array
 	 */
-	public $data = array();
+	public $data = [];
 
 	/**
 	 * Instance of Admin Object.
 	 *
 	 * @since 1.5.5
 	 *
-	 * @var \WPForms\Pro\Admin\Entries\Export\Admin
+	 * @var Admin
 	 */
 	public $admin;
 
@@ -95,7 +97,7 @@ class Export {
 	 *
 	 * @since 1.5.5
 	 *
-	 * @var \WPForms\Pro\Admin\Entries\Export\Ajax
+	 * @var Ajax
 	 */
 	public $ajax;
 
@@ -104,7 +106,7 @@ class Export {
 	 *
 	 * @since 1.5.5
 	 *
-	 * @var \WPForms\Pro\Admin\Entries\Export\File
+	 * @var File
 	 */
 	public $file;
 
@@ -121,7 +123,7 @@ class Export {
 
 		if (
 			! $this->is_entries_export_ajax() &&
-			! $this->is_tools_export_page() &&
+			! wpforms_is_admin_page( 'tools' ) &&
 			! wp_doing_cron()
 		) {
 			return;
@@ -187,7 +189,7 @@ class Export {
 		);
 
 		// Error strings.
-		$this->errors = array(
+		$this->errors = [
 			'common'            => esc_html__( 'There were problems while preparing your export file. Please recheck export settings and try again.', 'wpforms' ),
 			'security'          => esc_html__( 'You don\'t have enough capabilities to complete this request.', 'wpforms' ),
 			'unknown_form_id'   => esc_html__( 'Incorrect form ID has been specified.', 'wpforms' ),
@@ -198,19 +200,20 @@ class Export {
 			'file_empty'        => esc_html__( 'Export file is empty.', 'wpforms' ),
 			'form_empty'        => esc_html__( 'The form does not have any fields for export.', 'wpforms' ),
 			'no_direct_access'  => esc_html__( 'We need direct access to the filesystem for export.', 'wpforms' ),
-		);
+		];
 
 		// Strings to localize.
-		$this->i18n = array(
+		$this->i18n = [
 			'error_prefix'      => $this->errors['common'],
 			'error_form_empty'  => $this->errors['form_empty'],
+			'label_select_all'  => esc_html__( 'Select All', 'wpforms' ),
 			'prc_1_filtering'   => esc_html__( 'Generating a list of entries according to your filters.', 'wpforms' ),
 			'prc_1_please_wait' => esc_html__( 'This can take a while. Please wait.', 'wpforms' ),
 			'prc_2_no_entries'  => esc_html__( 'No entries found after applying your filters.', 'wpforms' ),
 			'prc_3_done'        => esc_html__( 'The file was generated successfully.', 'wpforms' ),
 			'prc_3_download'    => esc_html__( 'If the download does not start automatically', 'wpforms' ),
 			'prc_3_click_here'  => esc_html__( 'click here', 'wpforms' ),
-		);
+		];
 
 		// Keeping default configuration data.
 		$default_configuration = $this->configuration;
@@ -408,10 +411,13 @@ class Export {
 	 * Check if current page request meets requirements for Export tool.
 	 *
 	 * @since 1.5.5
+	 * @deprecated 1.7.6
 	 *
 	 * @return bool
 	 */
 	public function is_tools_export_page() {
+
+		_deprecated_function( __METHOD__, '1.7.6 of the WPForms plugin' );
 
 		// Only proceed for the Tools > Export.
 		if ( ! wpforms_is_admin_page( 'tools', 'export' ) ) {
@@ -441,19 +447,10 @@ class Export {
 		}
 
 		$query = wp_parse_url( $ref, PHP_URL_QUERY );
+
 		wp_parse_str( $query, $query_vars );
 
-		if (
-			empty( $query_vars['page'] ) ||
-			empty( $query_vars['view'] )
-		) {
-			return false;
-		}
-
-		if (
-			$query_vars['page'] !== 'wpforms-tools' ||
-			$query_vars['view'] !== 'export'
-		) {
+		if ( empty( $query_vars['page'] ) || $query_vars['page'] !== 'wpforms-tools' ) {
 			return false;
 		}
 

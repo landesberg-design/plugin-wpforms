@@ -112,8 +112,9 @@ class WPForms_Updater {
 			$this->$arg = $config[ $arg ];
 		}
 
-		// If the user cannot update plugins, stop processing here.
-		if ( ! current_user_can( 'update_plugins' ) ) {
+		// If the user cannot update plugins, stop processing here. In WP-CLI context
+		// there is no user available, so we should ignore this check in CLI.
+		if ( ! current_user_can( 'update_plugins' ) && ! wpforms_doing_wp_cli() ) {
 			return;
 		}
 

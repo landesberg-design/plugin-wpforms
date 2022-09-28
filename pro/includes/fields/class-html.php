@@ -217,13 +217,11 @@ class WPForms_Field_HTML extends WPForms_Field {
 		$label = ! empty( $field['name'] ) ? $field['name'] : '';
 		?>
 
-		<div class="code-block">
-			<label class="label-title">
-				<div class="text"><?php echo esc_html( $label ); ?></div>
-				<div class="grey"><i class="fa fa-code"></i> <?php esc_html_e( 'HTML / Code Block', 'wpforms' ); ?></div>
-			</label>
-			<div class="description"><?php esc_html_e( 'Contents of this field are not displayed in the form builder preview.', 'wpforms' ); ?></div>
-		</div>
+		<label class="label-title">
+			<div class="text"><?php echo esc_html( $label ); ?></div>
+			<div class="grey"><i class="fa fa-code"></i> <?php esc_html_e( 'HTML / Code Block', 'wpforms' ); ?></div>
+		</label>
+		<div class="description"><?php esc_html_e( 'Contents of this field are not displayed in the form builder preview.', 'wpforms' ); ?></div>
 
 		<?php
 	}

@@ -8,6 +8,13 @@
 class WPForms_Entry_Handler extends WPForms_DB {
 
 	/**
+	 * Non-persistent cache group.
+	 *
+	 * @since 1.7.5
+	 */
+	const CACHE_GROUP = __CLASS__;
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 1.0.0
@@ -19,6 +26,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$this->table_name  = $wpdb->prefix . 'wpforms_entries';
 		$this->primary_key = 'entry_id';
 		$this->type        = 'entries';
+
+		wp_cache_add_non_persistent_groups( self::CACHE_GROUP );
 	}
 
 	/**
@@ -552,8 +561,10 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		/*
 		 * Modify the ORDER BY.
 		 */
-		$args['orderby'] = ! array_key_exists( $args['orderby'], $this->get_columns() ) ? $this->primary_key : $args['orderby'];
-		$args['orderby'] = "{$this->table_name}.{$args['orderby']}";
+		if ( $args['orderby'] !== 'payment_total' ) {
+			$args['orderby'] = ! array_key_exists( $args['orderby'], $this->get_columns() ) ? $this->primary_key : $args['orderby'];
+			$args['orderby'] = "{$this->table_name}.{$args['orderby']}";
+		}
 
 		if ( 'ASC' === strtoupper( $args['order'] ) ) {
 			$args['order'] = 'ASC';
@@ -590,6 +601,22 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			if ( $args['orderby'] === "{$this->table_name}.notes_count" ) {
 				$args['orderby'] = 'notes_counts.notes_count';
 			}
+		}
+
+		// In the case of ordering by payment_total.
+		if ( $args['orderby'] === 'payment_total' ) {
+			$sql_from .= "
+			LEFT JOIN (
+				SELECT
+					entry_id AS meta_entry_id,
+					data AS payment_total
+				FROM
+					{$meta_table}
+				WHERE
+					{$meta_table}.type = 'payment_total'
+			) AS payment_totals
+			ON
+				payment_totals.meta_entry_id = {$this->table_name}.entry_id";
 		}
 
 		// In the case of search, we maybe need to run an additional query first.
@@ -652,8 +679,6 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return $where;
 		}
 
-		$arg_entry_id_where = isset( $where['arg_entry_id'] ) ? $where['arg_entry_id'] : '';
-
 		unset( $where['arg_entry_id'] );
 
 		$second_where     = array_merge( $where, array_filter( $second_where ) );
@@ -675,7 +700,6 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			FROM {$second_sql_from}
 			WHERE {$second_where_sql}
 			GROUP BY `entry_id`
-			ORDER BY {$args['orderby']} {$args['order']} 
 		";
 
 		global $wpdb;
@@ -684,9 +708,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$second_entry_ids = ! empty( $second_result ) ? wp_list_pluck( $second_result, 'entry_id' ) : [];
 
 		if ( empty( $second_entry_ids ) ) {
-			$where['arg_entry_id'] = empty( $args['value'] )
-				? "{$this->table_name}.`entry_id` IN ( 0 )"
-				: $arg_entry_id_where;
+			$where['arg_entry_id'] = "{$this->table_name}.`entry_id` IN ( 0 )";
 
 			return $where;
 		}
@@ -774,8 +796,12 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			}
 		}
 
+		if ( ! in_array( $args['advanced_search'], [ 'entry_notes', 'payment_details' ], true ) ) {
+			return $second_where;
+		}
+
 		if ( $args['advanced_search'] === 'entry_notes' ) {
-			$entry_ids                         = $this->second_query_where_entry_notes_result_ids( $args );
+			$entry_ids                         = $this->second_query_where_entry_notes_or_payment_details_result_ids( $args );
 			$second_where['meta_entry_not_in'] = "{$this->table_name}.`entry_id` NOT IN ( {$entry_ids} )";
 		}
 
@@ -820,17 +846,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 */
 	protected function second_query_where_arg_value_not_empty( $args ) {
 
-		$value_compare = empty( $args['value_compare'] ) ? 'is' : $args['value_compare'];
-		$escaped_value = esc_sql( $args['value'] );
-
-		$condition_values = [
-			'is'           => " = '{$escaped_value}'",
-			'is_not'       => " <> '{$escaped_value}'",
-			'contains'     => " LIKE '%{$escaped_value}%'",
-			'contains_not' => " NOT LIKE '%{$escaped_value}%'",
-		];
-
-		$condition_value = empty( $condition_values[ $value_compare ] ) ? $condition_values['is'] : $condition_values[ $value_compare ];
+		$value_compare   = empty( $args['value_compare'] ) ? 'is' : $args['value_compare'];
+		$condition_value = $this->get_condition_value( $args );
 
 		if ( empty( $args['advanced_search'] ) ) {
 			$fields_table = wpforms()->get( 'entry_fields' )->table_name;
@@ -877,12 +894,15 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return "{$this->table_name}.`user_agent` {$condition_value}";
 		}
 
-		if ( $args['advanced_search'] !== 'entry_notes' ) {
+		if ( ! in_array( $args['advanced_search'], [ 'entry_notes', 'payment_details' ], true ) ) {
 			return '';
 		}
 
-		if ( in_array( $args['value_compare'], [ 'is', 'contains' ], true ) ) {
-			$entry_ids = $this->second_query_where_entry_notes_result_ids( $args );
+		if (
+			$args['advanced_search'] === 'payment_details' ||
+			in_array( $args['value_compare'], [ 'is', 'contains' ], true )
+		) {
+			$entry_ids = $this->second_query_where_entry_notes_or_payment_details_result_ids( $args );
 
 			return "{$this->table_name}.`entry_id` IN ( {$entry_ids} )";
 		}
@@ -924,34 +944,73 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	}
 
 	/**
-	 * Advanced search by Entry Notes.
+	 * Advanced search by Entry Notes or Payment Entries.
 	 *
-	 * @since 1.6.9
+	 * @since 1.7.5
 	 *
 	 * @param array $args Arguments.
 	 *
 	 * @return string Comma separated list of entry ids.
 	 */
-	private function second_query_where_entry_notes_result_ids( $args ) {
+	private function second_query_where_entry_notes_or_payment_details_result_ids( $args ) {
+
+		// We have to cache it, as the same request is executed 4 times on entry search.
+		$form_ids        = implode( ',', array_map( 'intval', (array) $args['form_id'] ) );
+		$condition_value = $this->get_condition_value( $args );
+		$key             = md5( $args['advanced_search'] . $form_ids . $condition_value );
+		$entry_ids_str   = wp_cache_get( $key, self::CACHE_GROUP, false, $found );
+
+		if ( $found ) {
+			return $entry_ids_str;
+		}
+
+		switch ( $args['advanced_search'] ) {
+			case 'entry_notes':
+				$entry_ids_str = $this->second_query_where_entry_notes_result_ids( $args, $form_ids );
+				break;
+
+			case 'payment_details':
+				$entry_ids_str = $this->second_query_where_entry_payment_details_result_ids( $condition_value, $form_ids );
+				break;
+
+			default:
+				$entry_ids_str = '0';
+				break;
+		}
+
+		wp_cache_set( $key, $entry_ids_str, self::CACHE_GROUP );
+
+		return $entry_ids_str;
+	}
+
+	/**
+	 * Advanced search by Entry Notes.
+	 *
+	 * @since 1.6.9
+	 *
+	 * @param array  $args     Arguments.
+	 * @param string $form_ids Form ids.
+	 *
+	 * @return string Comma separated list of entry ids.
+	 */
+	private function second_query_where_entry_notes_result_ids( $args, $form_ids ) {
 
 		global $wpdb;
 
-		$meta_table = wpforms()->get( 'entry_meta' )->table_name;
-
-		$form_ids       = implode( ',', array_map( 'intval', (array) $args['form_id'] ) );
-		$form_ids_where = ! empty( $form_ids ) ? "AND `form_id` IN ( $form_ids )" : '';
+		$meta_table     = wpforms()->get( 'entry_meta' )->table_name;
 		$escaped_value  = strtolower( esc_sql( $args['value'] ) );
+		$data           = str_replace( [ '  ', ' ' ], [ ' ', '%' ], $escaped_value );
+		$data           = "AND data LIKE '%{$data}%'";
+		$form_ids_where = ! empty( $form_ids ) ? "AND form_id IN ( $form_ids )" : '';
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$notes = $wpdb->get_results(
-			"
-			SELECT `entry_id`, `data`
+			"SELECT entry_id, data
 			FROM {$meta_table}
 			WHERE
-				`type` = 'note'
-				AND `data` LIKE '%{$escaped_value}%'
-				{$form_ids_where}
-			"
+				type = 'note'
+				$data
+				{$form_ids_where}"
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
@@ -964,15 +1023,15 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			$clean_value = strtolower( trim( wp_strip_all_tags( $note->data ) ) );
 
 			if (
-				in_array( $args['value_compare'], [ 'is', 'is_not' ], true ) &&
-				$clean_value !== $escaped_value
+				$clean_value !== $escaped_value &&
+				in_array( $args['value_compare'], [ 'is', 'is_not' ], true )
 			) {
 				unset( $notes[ $key ] );
 			}
 
 			if (
-				in_array( $args['value_compare'], [ 'contains', 'contains_not' ], true ) &&
-				strpos( $clean_value, $escaped_value ) === false
+				strpos( $clean_value, $escaped_value ) === false &&
+				in_array( $args['value_compare'], [ 'contains', 'contains_not' ], true )
 			) {
 				unset( $notes[ $key ] );
 			}
@@ -981,6 +1040,48 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$entry_ids = ! empty( $notes ) ? wp_list_pluck( $notes, 'entry_id' ) : [ 0 ];
 
 		return implode( ',', array_unique( $entry_ids ) );
+	}
+
+	/**
+	 * Advanced search by Payment Details.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @param string $condition_value Condition value.
+	 * @param string $form_ids        Form ids.
+	 *
+	 * @return string Comma separated list of entry ids.
+	 */
+	private function second_query_where_entry_payment_details_result_ids( $condition_value, $form_ids ) {
+
+		global $wpdb;
+
+		$meta_table     = wpforms()->get( 'entry_meta' )->table_name;
+		$data           = 'AND data ' . $condition_value;
+		$form_ids_where = ! empty( $form_ids ) ? "AND form_id IN ( $form_ids )" : '';
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$result = $wpdb->query(
+			"SELECT DISTINCT entry_id
+					FROM $meta_table
+					WHERE
+						type LIKE 'payment_%'
+						$data
+						$form_ids_where"
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		if ( $result ) {
+			$entry_ids = '';
+
+			foreach ( $wpdb->last_result as $item ) {
+				$entry_ids .= $item->entry_id . ',';
+			}
+
+			$entry_ids = rtrim( $entry_ids, ',' );
+		}
+
+		return $result ? $entry_ids : '0';
 	}
 
 	/**
@@ -1003,7 +1104,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			$charset_collate .= " COLLATE {$wpdb->collate}";
 		}
 
-		$sql = "CREATE TABLE {$this->table_name} (
+		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
 			entry_id bigint(20) NOT NULL AUTO_INCREMENT,
 			form_id bigint(20) NOT NULL,
 			post_id bigint(20) NOT NULL,
@@ -1095,5 +1196,84 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		/** This filter is documented in src/Pro/Admin/Entries/Edit.php */
 		return (bool) apply_filters( 'wpforms_pro_admin_entries_edit_field_editable', $editable, $type );
+	}
+
+	/**
+	 * Insert payment data into wpforms_entry_meta table.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @param int   $entry_id     Entry ID.
+	 * @param array $payment_data Payment data to be inserted.
+	 *
+	 * @return void
+	 */
+	public function insert_payment_meta( $entry_id, $payment_data ) {
+
+		global $wpdb;
+
+		$entry_meta_handler = wpforms()->get( 'entry_meta' );
+		$wpforms_entry      = $this->get( $entry_id );
+
+		if ( ! $entry_meta_handler || ! $wpforms_entry ) {
+			return;
+		}
+
+		$values = [];
+
+		foreach ( $payment_data as $meta_key => $meta_value ) {
+			// If meta_key doesn't begin with `payment_`, prefix it.
+			$meta_key = strpos( $meta_key, 'payment_' ) === 0 ? $meta_key : "payment_$meta_key";
+
+			$values[] = sprintf(
+				"( %d, %d, %d, '%s', '%s', '%s', '%s' )",
+				$entry_id,
+				$wpforms_entry->form_id,
+				$wpforms_entry->user_id,
+				$wpforms_entry->status,
+				$meta_key,
+				$meta_value,
+				$wpforms_entry->date
+			);
+		}
+
+		if ( ! $values ) {
+			return;
+		}
+
+		$values = implode( ', ', $values );
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			"INSERT INTO {$entry_meta_handler->table_name}
+			( entry_id, form_id, user_id, status, type, data, date )
+			VALUES {$values}"
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+	}
+
+	/**
+	 * Get condition value.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @param array $args Arguments.
+	 *
+	 * @return string
+	 */
+	private function get_condition_value( array $args ) {
+
+		$escaped_value = esc_sql( $args['value'] );
+
+		$condition_values = [
+			'is'           => " = '{$escaped_value}'",
+			'is_not'       => " <> '{$escaped_value}'",
+			'contains'     => " LIKE '%{$escaped_value}%'",
+			'contains_not' => " NOT LIKE '%{$escaped_value}%'",
+		];
+
+		$value_compare = empty( $args['value_compare'] ) ? 'is' : $args['value_compare'];
+
+		return empty( $condition_values[ $value_compare ] ) ? $condition_values['is'] : $condition_values[ $value_compare ];
 	}
 }

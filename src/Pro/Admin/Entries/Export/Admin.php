@@ -52,6 +52,9 @@ class Admin {
 	 */
 	public function display_entries_export_form() {
 
+		wp_enqueue_style( 'wpforms-flatpickr' );
+		wp_enqueue_script( 'wpforms-flatpickr' );
+		wp_enqueue_script( 'wpforms-tools-entries-export' );
 		?>
 		<div class="wpforms-setting-row tools">
 
@@ -171,6 +174,8 @@ class Admin {
 			return;
 		}
 
+		$this->display_select_all_toggle();
+
 		$i = 0;
 
 		foreach ( $form_data['fields'] as $id => $field ) {
@@ -179,11 +184,11 @@ class Admin {
 			}
 
 			$name = ! empty( $field['label'] )
-                ? trim( wp_strip_all_tags( $field['label'] ) )
-                : sprintf( /* translators: %d - Field ID. */
-                    esc_html__( 'Field #%d', 'wpforms' ),
-                    (int) $id
-                );
+				? trim( wp_strip_all_tags( $field['label'] ) )
+				: sprintf( /* translators: %d - Field ID. */
+					esc_html__( 'Field #%d', 'wpforms' ),
+					(int) $id
+				);
 
 			printf(
 				'<label><input type="checkbox" name="fields[%1$d]" value="%2$d" %3$s> %4$s</label>',
@@ -207,14 +212,16 @@ class Admin {
 		$additional_info        = $this->export->data['get_args']['additional_info'];
 		$additional_info_fields = $this->export->additional_info_fields;
 
+		$this->display_select_all_toggle( false );
+
 		$i = 0;
 
 		foreach ( $additional_info_fields as $slug => $label ) {
 
 			if (
-                $slug === 'pginfo'
-                && ! ( class_exists( 'WPForms_Paypal_Standard' ) || class_exists( '\WPFormsStripe\Loader' ) || class_exists( '\WPFormsAuthorizeNet\Loader' ) || class_exists( '\WPFormsSquare\Plugin' ) )
-            ) {
+				$slug === 'pginfo'
+				&& ! ( class_exists( 'WPForms_Paypal_Standard' ) || class_exists( '\WPFormsStripe\Loader' ) || class_exists( '\WPFormsAuthorizeNet\Loader' ) || class_exists( '\WPFormsSquare\Plugin' ) || class_exists( '\WPFormsPaypalCommerce\Plugin' ) )
+			) {
 				continue;
 			}
 
@@ -330,7 +337,7 @@ class Admin {
 	 */
 	public function scripts() {
 
-		if ( ! $this->export->is_tools_export_page() ) {
+		if ( ! wpforms_is_admin_page( 'tools' ) ) {
 			return;
 		}
 
@@ -340,9 +347,9 @@ class Admin {
 		 *  Styles.
 		 */
 
-		wp_enqueue_style(
+		wp_register_style(
 			'wpforms-flatpickr',
-			WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
+			WPFORMS_PLUGIN_URL . 'assets/lib/flatpickr/flatpickr.min.css',
 			[],
 			'4.6.9'
 		);
@@ -351,17 +358,17 @@ class Admin {
 		 *  Scripts.
 		 */
 
-		wp_enqueue_script(
+		wp_register_script(
 			'wpforms-flatpickr',
-			WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
+			WPFORMS_PLUGIN_URL . 'assets/lib/flatpickr/flatpickr.min.js',
 			[ 'jquery' ],
 			'4.6.9',
 			true
 		);
 
-		wp_enqueue_script(
+		wp_register_script(
 			'wpforms-tools-entries-export',
-			WPFORMS_PLUGIN_URL . "pro/assets/js/admin/tools-entries-export{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/tools-entries-export{$min}.js",
 			[ 'jquery', 'wpforms-flatpickr' ],
 			WPFORMS_VERSION,
 			true
@@ -401,5 +408,21 @@ class Admin {
 		}
 
 		return $checked;
+	}
+
+	/**
+	 * Display "Select All" checkbox toggle for a list of options.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @param bool $checked Whether to check the box. Defaults to checked.
+	 */
+	private function display_select_all_toggle( $checked = true ) {
+
+		printf(
+			'<label class="wpforms-toggle-all"><input type="checkbox"%s> %s</label>',
+			esc_attr( $checked ? ' checked' : '' ),
+			esc_html__( 'Select All', 'wpforms' )
+		);
 	}
 }

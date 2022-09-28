@@ -1,5 +1,8 @@
 <?php
 
+use WPForms\Admin\Forms\Tags;
+use WPForms\Forms\Akismet;
+
 /**
  * Settings management panel.
  *
@@ -44,6 +47,49 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 		foreach ( $sections as $slug => $section ) {
 			$this->panel_sidebar_section( $section, $slug );
 		}
+	}
+
+	/**
+	 * Enqueue assets.
+	 *
+	 * @since 1.7.5
+	 */
+	public function enqueues() {
+
+		$min = wpforms_get_min_suffix();
+
+		wp_enqueue_script(
+			'wpforms-builder-settings',
+			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/settings{$min}.js",
+			[ 'wpforms-builder' ],
+			WPFORMS_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'wpforms-builder-settings',
+			'wpforms_builder_settings',
+			[
+				'choicesjs_config' => $this->get_choicesjs_config(),
+				'all_tags_choices' => Tags::get_all_tags_choices(),
+			]
+		);
+	}
+
+	/**
+	 * Get Choices.js configuration.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @return array
+	 */
+	private function get_choicesjs_config() {
+
+		$config = Tags::get_choicesjs_config();
+
+		$config['noResultsText'] = esc_html__( 'Press Enter or "," key to add new tag', 'wpforms-lite' );
+
+		return $config;
 	}
 
 	/**
@@ -96,6 +142,9 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 				$this->form_data,
 				esc_html__( 'Form Description', 'wpforms-lite' )
 			);
+
+			$this->general_setting_tags();
+
 			wpforms_panel_field(
 				'text',
 				'settings',
@@ -135,6 +184,8 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 				esc_html__( 'Enable anti-spam protection', 'wpforms-lite' )
 			);
 
+			$this->general_setting_akismet();
+
 			$this->general_setting_captcha();
 
 			$this->general_setting_advanced();
@@ -163,6 +214,44 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 		 * Custom panels can be added below.
 		 */
 		do_action( 'wpforms_form_settings_panel_content', $this );
+	}
+
+	/**
+	 * Output the Tags setting.
+	 *
+	 * @since 1.7.5
+	 */
+	private function general_setting_tags() {
+
+		$form_tags = [];
+
+		if ( ! empty( $this->form_data['settings']['form_tags'] ) ) {
+			$form_tags = get_terms(
+				[
+					'taxonomy'   => WPForms_Form_Handler::TAGS_TAXONOMY,
+					'name'       => $this->form_data['settings']['form_tags'],
+					'hide_empty' => false,
+				]
+			);
+			$form_tags = is_wp_error( $form_tags ) ? [] : (array) $form_tags;
+		}
+
+		$tags_value   = wp_list_pluck( $form_tags, 'term_id' );
+		$tags_options = wp_list_pluck( $form_tags, 'name', 'term_id' );
+
+		wpforms_panel_field(
+			'select',
+			'settings',
+			'form_tags',
+			$this->form_data,
+			esc_html__( 'Tags', 'wpforms-lite' ),
+			[
+				'options'  => $tags_options,
+				'value'    => $tags_value,
+				'multiple' => true,
+				'tooltip'  => esc_html__( 'Mark form with the tags. To create a new tag, simply type it and press Enter.', 'wpforms-lite' ),
+			]
+		);
 	}
 
 	/**
@@ -249,9 +338,13 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 			'settings',
 			'dynamic_population',
 			$this->form_data,
-			esc_html__( 'Enable dynamic fields population', 'wpforms-lite' ),
+			esc_html__( 'Enable Prefill by URL', 'wpforms-lite' ),
 			[
-				'tooltip' => '<a href="https://wpforms.com/developers/how-to-enable-dynamic-field-population/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to use Dynamic Field Population', 'wpforms-lite' ) . '</a>',
+				'tooltip' => sprintf(
+					'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
+					wpforms_utm_link( 'https://wpforms.com/developers/how-to-enable-dynamic-field-population/', 'Builder Settings', 'Prefill by URL Tooltip' ),
+					esc_html__( 'How to use Prefill by URL', 'wpforms-lite' )
+				),
 			]
 		);
 
@@ -272,11 +365,51 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 		wpforms_panel_fields_group(
 			ob_get_clean(),
 			[
+				'borders'    => [ 'top' ],
 				'unfoldable' => true,
 				'group'      => 'settings_advanced',
 				'title'      => esc_html__( 'Advanced', 'wpforms-lite' ),
 			],
 			true
+		);
+	}
+
+	/**
+	 * Output the Akismet settings.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @return void
+	 */
+	private function general_setting_akismet() {
+
+		$args = [];
+
+		if ( ! Akismet::is_configured() ) {
+			$args['data']['akismet-status'] = 'akismet_no_api_key';
+		}
+
+		if ( ! Akismet::is_activated() ) {
+			$args['data']['akismet-status'] = 'akismet_not_activated';
+		}
+
+		if ( ! Akismet::is_installed() ) {
+			$args['data']['akismet-status'] = 'akismet_not_installed';
+		}
+
+		// If akismet isn't available, disable the akismet toggle.
+		if ( isset( $args['data'] ) ) {
+			$args['input_class'] = 'wpforms-akismet-disabled';
+			$args['value']       = '0';
+		}
+
+		wpforms_panel_field(
+			'toggle',
+			'settings',
+			'akismet',
+			$this->form_data,
+			esc_html__( 'Enable Akismet anti-spam protection', 'wpforms-lite' ),
+			$args
 		);
 	}
 }

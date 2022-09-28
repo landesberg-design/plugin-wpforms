@@ -39,15 +39,15 @@ class AdminBarMenu extends \WPForms\Admin\AdminBarMenu {
 		}
 
 		// Get our form data to check if surveys are enabled.
-		$form = wpforms()->form->get( $form_id );
-		$form = apply_filters( 'wpforms_frontend_form_data', wpforms_decode( $form->post_content ) );
+		$form      = wpforms()->get( 'form' )->get( $form_id );
+		$form_data = wpforms_decode( $form->post_content );
 
-		if ( ! empty( $form['settings']['survey_enable'] ) ) {
+		if ( ! empty( $form_data['settings']['survey_enable'] ) ) {
 			return true;
 		}
 
-		if ( ! empty( $form['fields'] ) ) {
-			foreach ( $form['fields'] as $field ) {
+		if ( ! empty( $form_data['fields'] ) ) {
+			foreach ( $form_data['fields'] as $field ) {
 				if ( ! empty( $field['survey'] ) ) {
 					return true;
 				}

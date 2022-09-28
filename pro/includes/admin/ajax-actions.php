@@ -222,7 +222,7 @@ add_action( 'wp_ajax_wpforms_refresh_license', 'wpforms_refresh_license' );
  */
 function wpforms_builder_notification_state_save() {
 
-	_deprecated_function( __FUNCTION__, '1.4.8 of WPForms plugin', 'wpforms_builder_settings_block_state_save()' );
+	_deprecated_function( __FUNCTION__, '1.4.8 of the WPForms plugin', 'wpforms_builder_settings_block_state_save()' );
 
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
@@ -286,7 +286,7 @@ add_action( 'wp_ajax_wpforms_builder_settings_block_state_save', 'wpforms_builde
  */
 function wpforms_builder_notification_state_remove() {
 
-	_deprecated_function( __FUNCTION__, '1.4.8 of WPForms plugin', 'wpforms_builder_settings_block_state_remove()' );
+	_deprecated_function( __FUNCTION__, '1.4.8 of the WPForms plugin', 'wpforms_builder_settings_block_state_remove()' );
 
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 

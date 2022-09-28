@@ -87,7 +87,7 @@
 				$connectionBlocks.each( function() {
 					var requiredEmpty = false,
 						providerName;
-					$( this ).find( 'table span.required' ).each(function() {
+					$( this ).find( 'table span.required' ).each( function() {
 						var $element = $( this ).parent().parent().find( 'select' );
 						if ( $element.val() === '' ) {
 							requiredEmpty = true;

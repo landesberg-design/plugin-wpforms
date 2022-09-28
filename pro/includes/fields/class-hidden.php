@@ -18,7 +18,7 @@ class WPForms_Field_Hidden extends WPForms_Field {
 		$this->name  = esc_html__( 'Hidden Field', 'wpforms' );
 		$this->type  = 'hidden';
 		$this->icon  = 'fa-eye-slash';
-		$this->order = 170;
+		$this->order = 210;
 		$this->group = 'fancy';
 	}
 
@@ -76,11 +76,14 @@ class WPForms_Field_Hidden extends WPForms_Field {
 	 */
 	public function field_preview( $field ) {
 
+		// Define data.
+		$default_value = ! empty( $field['default_value'] ) ? $field['default_value'] : '';
+
 		// Label.
 		$this->field_preview_option( 'label', $field );
 
 		// Primary input.
-		echo '<input type="text" class="primary-input" readonly>';
+		echo '<input type="text" class="primary-input"  value="' . esc_attr( $default_value ) . '" readonly>';
 	}
 
 	/**

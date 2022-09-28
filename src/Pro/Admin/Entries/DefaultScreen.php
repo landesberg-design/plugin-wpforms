@@ -25,8 +25,10 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	 */
 	public function init() {
 
-		$is_admin_page   = wpforms_is_admin_page( 'entries' ) && empty( $_GET['view'] ); // phpcs:ignore WordPress.Security.NonceVerification
-		$is_ajax_request = ( wp_doing_ajax() && false !== strpos( $_REQUEST['action'], 'wpforms_entries_default_screen' ) ); // phpcs:ignore
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$is_admin_page   = wpforms_is_admin_page( 'entries' ) && empty( $_GET['view'] );
+		$is_ajax_request = wp_doing_ajax() && isset( $_REQUEST['action'] ) && strpos( sanitize_key( $_REQUEST['action'] ), 'wpforms_entries_default_screen' ) !== false;
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		if ( ! $is_admin_page && ! $is_ajax_request ) {
 			return;
@@ -45,8 +47,7 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	public function hooks() {
 
 		parent::hooks();
-
-		add_action( 'wpforms_admin_page', array( $this, 'content' ) );
+		add_action( 'wpforms_admin_page', [ $this, 'content' ] );
 
 		// Disable "Screen Options" on Default Screen only.
 		add_filter(

@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Reports;
 
+use DateTime;
+
 /**
  * Generate form submissions reports.
  *
@@ -29,24 +31,30 @@ class EntriesCount {
 		}
 
 		try {
-			$date_end   = new \DateTime( $date_end_str );
-			$date_start = new \DateTime( $date_end_str );
+			$now            = new DateTime();
+			$utc_date_end   = new DateTime( $date_end_str );
+			$utc_date_start = new DateTime( $date_end_str );
 		} catch ( \Exception $e ) {
 			return [];
 		}
 
-		$date_end   = $date_end
+		$modify_offset  = (float) get_option( 'gmt_offset' ) * 60 . ' minutes';
+		$utc_date_end   = $utc_date_end
+			->setTime( $now->format( 'H' ), $now->format( 'i' ), $now->format( 's' ) )
+			->modify( $modify_offset )
 			->setTime( 23, 59, 59 );
-		$date_start = $date_start
+		$utc_date_start = $utc_date_start
+			->setTime( $now->format( 'H' ), $now->format( 'i' ), $now->format( 's' ) )
+			->modify( $modify_offset )
 			->modify( '-' . ( absint( $days ) - 1 ) . 'days' )
 			->setTime( 0, 0 );
 
 		if ( $param === 'date' ) {
-			return $this->get_by_date_sql( $form_id, $date_start, $date_end );
+			return $this->get_by_date_sql( $form_id, $utc_date_start, $utc_date_end );
 		}
 
 		if ( $param === 'form' ) {
-			return $this->get_by_form_sql( $form_id, $date_start, $date_end );
+			return $this->get_by_form_sql( $form_id, $utc_date_start, $utc_date_end );
 		}
 
 		return [];
@@ -60,25 +68,32 @@ class EntriesCount {
 	 *
 	 * @since 1.5.4
 	 * @since 1.6.5 Fixed GTM offset.
+	 * @since 1.7.6 Count entries only for published forms.
 	 *
-	 * @param int            $form_id    Form ID to fetch the data for.
-	 * @param \DateTime|null $date_start Start date for the search. Leave it empty to restrict the starting day.
-	 * @param \DateTime|null $date_end   End date for the search. Leave it empty to restrict the ending day.
+	 * @param int           $form_id        Form ID to fetch the data for.
+	 * @param DateTime|null $utc_date_start Start date for the search. Leave it empty to restrict the starting day.
+	 * @param DateTime|null $utc_date_end   End date for the search. Leave it empty to restrict the ending day.
 	 *
 	 * @return array
 	 */
-	public function get_by_date_sql( $form_id = 0, $date_start = null, $date_end = null ) {
+	public function get_by_date_sql( $form_id = 0, $utc_date_start = null, $utc_date_end = null ) {
 
 		global $wpdb;
 
-		$table_name = wpforms()->entry->table_name;
-		$sql        = $wpdb->prepare(
+		$table_name = wpforms()->get( 'entry' )->table_name;
+		$forms      = $this->get_allowed_forms( $form_id );
+
+		if ( empty( $forms ) ) {
+			return [];
+		}
+
+		$sql = $wpdb->prepare(
 			"SELECT CAST(DATE_ADD(date, INTERVAL %d MINUTE) AS DATE) as day, COUNT(entry_id) as count FROM {$table_name}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			(int) ( get_option( 'gmt_offset' ) * 60 )
+			(float) get_option( 'gmt_offset' ) * 60
 		);
 
-		$sql .= $this->prepare_where_conditions( $form_id, $date_start, $date_end );
-		$sql .= ' GROUP BY day;';
+		$sql .= $this->prepare_where_conditions( $forms, $utc_date_start, $utc_date_end );
+		$sql .= ' GROUP BY day ORDER BY day;';
 
 		return (array) $wpdb->get_results( $sql, OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 	}
@@ -91,21 +106,28 @@ class EntriesCount {
 	 *
 	 * @since 1.5.4
 	 * @since 1.6.5 Fixed GTM offset.
+	 * @since 1.7.6 Count entries only for published forms.
 	 *
-	 * @param int            $form_id    Form ID to fetch the data for.
-	 * @param \DateTime|null $date_start Start date for the search. Leave it empty to restrict the starting day.
-	 * @param \DateTime|null $date_end   End date for the search. Leave it empty to restrict the ending day.
+	 * @param int           $form_id        Form ID to fetch the data for.
+	 * @param DateTime|null $utc_date_start Start date for the search. Leave it empty to restrict the starting day.
+	 * @param DateTime|null $utc_date_end   End date for the search. Leave it empty to restrict the ending day.
 	 *
 	 * @return array
 	 */
-	public function get_by_form_sql( $form_id = 0, $date_start = null, $date_end = null ) {
+	public function get_by_form_sql( $form_id = 0, $utc_date_start = null, $utc_date_end = null ) {
 
 		global $wpdb;
 
-		$table_name = wpforms()->entry->table_name;
-		$sql        = "SELECT form_id, COUNT(entry_id) as count FROM {$table_name}";
+		$table_name = wpforms()->get( 'entry' )->table_name;
+		$forms      = $this->get_allowed_forms( $form_id );
 
-		$sql .= $this->prepare_where_conditions( $form_id, $date_start, $date_end );
+		if ( empty( $forms ) ) {
+			return [];
+		}
+
+		$sql = "SELECT form_id, COUNT(entry_id) as count FROM {$table_name}";
+
+		$sql .= $this->prepare_where_conditions( $forms, $utc_date_start, $utc_date_end );
 		$sql .= 'GROUP BY form_id ORDER BY count DESC;';
 
 		$results = (array) $wpdb->get_results( $sql, OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
@@ -131,7 +153,7 @@ class EntriesCount {
 		$processed = [];
 
 		foreach ( $results as $form_id => $result ) {
-			$form = wpforms()->form->get( $form_id );
+			$form = wpforms()->get( 'form' )->get( $form_id );
 
 			if ( empty( $form ) ) {
 				continue;
@@ -161,44 +183,61 @@ class EntriesCount {
 	 * Prepare where conditions.
 	 *
 	 * @since 1.6.5
+	 * @since 1.7.6 Changed $form_id argument to the $forms.
 	 *
-	 * @param int            $form_id    Form ID to fetch the data for.
-	 * @param \DateTime|null $date_start Start date for the search. Leave it empty to restrict the starting day.
-	 * @param \DateTime|null $date_end   End date for the search. Leave it empty to restrict the ending day.
+	 * @param array         $forms          List of form IDs.
+	 * @param DateTime|null $utc_date_start Start date for the search. Leave it empty to restrict the starting day.
+	 * @param DateTime|null $utc_date_end   End date for the search. Leave it empty to restrict the ending day.
 	 *
 	 * @return string
 	 */
-	private function prepare_where_conditions( $form_id = 0, $date_start = null, $date_end = null ) {
+	private function prepare_where_conditions( $forms = [], $utc_date_start = null, $utc_date_end = null ) {
 
 		global $wpdb;
 
 		$format        = 'Y-m-d H:i:s';
-		$placeholders  = [];
-		$sql           = ' WHERE 1=1';
-		$modify_offset = (int) ( 60 * get_option( 'gmt_offset' ) ) . ' minutes';
+		$placeholders  = $forms;
+		$sql           = ' WHERE form_id IN (' . implode( ', ', array_fill( 0, count( $forms ), '%d' ) ) . ')';
+		$modify_offset = (float) get_option( 'gmt_offset' ) * 60 . ' minutes';
 
-		if ( ! empty( $form_id ) ) {
-			$sql .= ' AND form_id = %d';
-
-			$placeholders[] = absint( $form_id );
-		}
-
-		if ( ! empty( $date_start ) ) {
+		if ( $utc_date_start !== null ) {
 			$sql .= ' AND date >= %s';
 
-			$date_start->modify( $modify_offset );
+			$utc_date_start = clone $utc_date_start;
 
-			$placeholders[] = $date_start->format( $format );
+			$utc_date_start->modify( $modify_offset );
+
+			$placeholders[] = $utc_date_start->format( $format );
 		}
 
-		if ( ! empty( $date_end ) ) {
+		if ( $utc_date_end !== null ) {
 			$sql .= ' AND date <= %s';
 
-			$date_end->modify( $modify_offset );
+			$utc_date_end = clone $utc_date_end;
 
-			$placeholders[] = $date_end->format( $format );
+			$utc_date_end->modify( $modify_offset );
+
+			$placeholders[] = $utc_date_end->format( $format );
 		}
 
 		return $wpdb->prepare( $sql, $placeholders ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	}
+
+	/**
+	 * Get list of forms with needed access control capabilities and published post status.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @param int $form_id Form ID.
+	 *
+	 * @return array
+	 */
+	private function get_allowed_forms( $form_id = 0 ) {
+
+		if ( $form_id ) {
+			return wpforms()->get( 'form' )->get( $form_id ) && get_post_status( $form_id ) === 'publish' ? [ $form_id ] : [];
+		}
+
+		return wpforms()->get( 'form' )->get( '', [ 'fields' => 'ids' ] );
 	}
 }

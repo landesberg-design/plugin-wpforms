@@ -1,0 +1,14 @@
+{
+  "name": "awesomemotive/wpforms",
+  "description": "WPForms is a form plugin for everyone. The rug that really ties the room together.",
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "platform": {
+      "php": "5.6"
+    }
+  },
+  "require": {
+    "mk-j/php_xlsxwriter": "0.38"
+  }
+}

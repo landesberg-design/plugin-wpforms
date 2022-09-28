@@ -38,6 +38,7 @@ class Loader {
 	protected function populate_classes() {
 
 		$this->populate_admin();
+		$this->populate_forms_overview();
 		$this->populate_builder();
 		$this->populate_migrations();
 		$this->populate_capabilities();
@@ -64,6 +65,11 @@ class Loader {
 		$this->classes[] = [
 			'name' => 'Forms\Honeypot',
 			'id'   => 'honeypot',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Akismet',
+			'id'   => 'akismet',
 		];
 
 		$this->classes[] = [
@@ -110,12 +116,19 @@ class Loader {
 				'hook' => 'init',
 			],
 			[
-				'name' => 'Admin\Notifications',
+				'name' => 'Admin\Notifications\Notifications',
 				'id'   => 'notifications',
+			],
+			[
+				'name' => 'Admin\Notifications\EventDriven',
 			],
 			[
 				'name' => 'Admin\Entries\Edit',
 				'id'   => 'entries_edit',
+				'hook' => 'admin_init',
+			],
+			[
+				'name' => 'Admin\Pages\Templates',
 				'hook' => 'admin_init',
 			],
 			[
@@ -157,6 +170,26 @@ class Loader {
 			],
 			[
 				'name' => 'Forms\Fields\Richtext\EntryViewContent',
+			]
+		);
+	}
+
+	/**
+	 * Populate Forms Overview admin page related classes.
+	 *
+	 * @since 1.7.5
+	 */
+	private function populate_forms_overview() {
+
+		if ( ! wpforms_is_admin_page( 'overview' ) && ! wp_doing_ajax() ) {
+			return;
+		}
+
+		array_push(
+			$this->classes,
+			[
+				'name' => 'Admin\Forms\Ajax\Tags',
+				'id'   => 'forms_tags_ajax',
 			],
 			[
 				'name' => 'Admin\Forms\Search',
@@ -169,6 +202,10 @@ class Loader {
 			[
 				'name' => 'Admin\Forms\BulkActions',
 				'id'   => 'forms_bulk_actions',
+			],
+			[
+				'name' => 'Admin\Forms\Tags',
+				'id'   => 'forms_tags',
 			]
 		);
 	}
@@ -200,6 +237,12 @@ class Loader {
 			[
 				'name' => 'Admin\Builder\Templates',
 				'id'   => 'builder_templates',
+			],
+			[
+				'name' => 'Admin\Builder\Notifications\Advanced\Settings',
+			],
+			[
+				'name' => 'Admin\Builder\Notifications\Advanced\EntryCsvAttachment',
 			]
 		);
 	}
@@ -212,7 +255,7 @@ class Loader {
 	private function populate_migrations() {
 
 		$this->classes[] = [
-			'name' => 'Migrations',
+			'name' => 'Migrations\Migrations',
 			'hook' => 'plugins_loaded',
 		];
 	}
@@ -335,11 +378,13 @@ class Loader {
 			'Builder\DidYouKnow',
 			'Builder\Geolocation',
 			'Builder\Confirmations',
+			'Builder\Notifications',
 			'Admin\DidYouKnow',
 			'Admin\Settings\Integrations',
 			'Admin\Settings\Geolocation',
 			'Admin\NoticeBar',
 			'Admin\Entries\Geolocation',
+			'Admin\Entries\UserJourney',
 		];
 
 		foreach ( $features as $feature ) {

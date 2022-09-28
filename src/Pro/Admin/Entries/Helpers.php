@@ -19,10 +19,11 @@ class Helpers {
 	public static function get_search_fields_advanced_options() {
 
 		$advanced_options = [
-			'entry_id'    => esc_html__( 'Entry ID', 'wpforms' ),
-			'entry_notes' => esc_html__( 'Entry Notes', 'wpforms' ),
-			'ip_address'  => esc_html__( 'IP Address', 'wpforms' ),
-			'user_agent'  => esc_html__( 'User Agent', 'wpforms' ),
+			'entry_id'        => esc_html__( 'Entry ID', 'wpforms' ),
+			'entry_notes'     => esc_html__( 'Entry Notes', 'wpforms' ),
+			'ip_address'      => esc_html__( 'IP Address', 'wpforms' ),
+			'user_agent'      => esc_html__( 'User Agent', 'wpforms' ),
+			'payment_details' => esc_html__( 'Payment Details', 'wpforms' ),
 		];
 
 		/**

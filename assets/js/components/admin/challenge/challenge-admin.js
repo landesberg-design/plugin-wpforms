@@ -134,7 +134,11 @@ WPFormsChallenge.admin = window.WPFormsChallenge.admin || ( function( document, 
 
 			if ( typeof WPFormsBuilder !== 'undefined' ) {
 				WPFormsChallenge.admin.saveChallengeOption( optionData )
-					.done( WPFormsBuilder.formSave ) // Save the form before reloading if we're in a WPForms Builder.
+					.done( function() { // Save the form before reloading if we're in a WPForms Builder.
+						if ( localStorage.getItem( 'wpformsChallengeStep' ) !==  null ) {
+							WPFormsBuilder.formSave( false );
+						}
+					} )
 					.done( location.reload.bind( location ) ); // Reload the page to remove WPForms Challenge JS.
 			} else {
 				WPFormsChallenge.admin.saveChallengeOption( optionData )

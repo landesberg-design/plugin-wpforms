@@ -86,6 +86,16 @@ class WPForms_Admin_Menu {
 		);
 		do_action( 'wpforms_admin_menu', $this );
 
+		// Templates sub menu item.
+		add_submenu_page(
+			'wpforms-overview',
+			esc_html__( 'WPForms Templates', 'wpforms-lite' ),
+			esc_html__( 'Form Templates', 'wpforms-lite' ),
+			$access->get_menu_cap( 'create_forms' ),
+			'wpforms-templates',
+			[ $this, 'admin_page' ]
+		);
+
 		// Settings sub menu item.
 		add_submenu_page(
 			'wpforms-overview',
@@ -238,22 +248,31 @@ class WPForms_Admin_Menu {
 
 		global $submenu;
 
-		// The "Upgrade to Pro" is 10th submenu item.
-		if ( ! isset( $submenu['wpforms-overview'][10] ) ) {
+		// Bail if plugin menu is not registered.
+		if ( ! isset( $submenu['wpforms-overview'] ) ) {
 			return;
 		}
 
-		// 0 = menu_title, 1 = capability, 2 = menu_slug, 3 = page_title, 4 = classes.
-		if ( strpos( $submenu['wpforms-overview'][10][2], 'https://wpforms.com/lite-upgrade' ) !== 0 ) {
+		$upgrade_link_position = key(
+			array_filter(
+				$submenu['wpforms-overview'],
+				function ( $item ) {
+					return strpos( $item[2], 'https://wpforms.com/lite-upgrade' ) !== false;
+				}
+			)
+		);
+
+		// Bail if "Upgrade to Pro" menu item is not registered.
+		if ( is_null( $upgrade_link_position ) ) {
 			return;
 		}
 
 		// Prepare a HTML class.
 		// phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited
-		if ( isset( $submenu['wpforms-overview'][10][4] ) ) {
-			$submenu['wpforms-overview'][10][4] .= ' wpforms-sidebar-upgrade-pro';
+		if ( isset( $submenu['wpforms-overview'][ $upgrade_link_position ][4] ) ) {
+			$submenu['wpforms-overview'][ $upgrade_link_position ][4] .= ' wpforms-sidebar-upgrade-pro';
 		} else {
-			$submenu['wpforms-overview'][10][] = 'wpforms-sidebar-upgrade-pro';
+			$submenu['wpforms-overview'][ $upgrade_link_position ][] = 'wpforms-sidebar-upgrade-pro';
 		}
 		// phpcs:enable WordPress.WP.GlobalVariablesOverride.Prohibited
 

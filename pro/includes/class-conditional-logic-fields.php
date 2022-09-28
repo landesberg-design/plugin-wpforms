@@ -132,7 +132,7 @@ class WPForms_Conditional_Logic_Fields {
 
 		wp_enqueue_script(
 			'wpforms-builder-conditionals',
-			WPFORMS_PLUGIN_URL . "pro/assets/js/wpforms-conditional-logic-fields{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/wpforms-conditional-logic-fields{$min}.js",
 			[ 'jquery', 'wpforms' ],
 			WPFORMS_VERSION,
 			true
@@ -411,7 +411,7 @@ class WPForms_Conditional_Logic_Fields {
 	 */
 	public function process_confirmation_conditionals( $process, $fields, $form_data, $id ) {
 
-		$settings = $form_data['settings'];
+		$settings = isset( $form_data['settings'] ) ? $form_data['settings'] : [];
 
 		// Confirm conditional logic is enabled.
 		if (

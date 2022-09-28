@@ -2,6 +2,7 @@
 
 namespace WPForms\Integrations\LiteConnect;
 
+use WPForms\Admin\Notice;
 use WPForms\Helpers\Transient;
 use WPForms\Tasks\Tasks;
 
@@ -43,15 +44,28 @@ class Integration extends API {
 
 		parent::__construct();
 
+		$this->hooks();
+
 		// Update the site key and access token.
 		if (
 			! $updated &&
 			( is_admin() && ! wp_doing_ajax() ) &&
 			( ( wpforms()->is_pro() && self::get_enabled_since() ) || LiteConnect::is_enabled() )
 		) {
+			$this->maybe_update_access_token();
 			$this->update_keys();
 			$updated = true;
 		}
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.7.5
+	 */
+	private function hooks() {
+
+		add_action( 'admin_init', [ $this, 'max_attempts_notice' ], 10 );
 	}
 
 	/**
@@ -71,7 +85,6 @@ class Integration extends API {
 			'site_key'     => $site_key,
 			'access_token' => $this->get_access_token( $site_key ),
 		];
-
 	}
 
 	/**
@@ -314,5 +327,56 @@ class Integration extends API {
 		if ( $previous_import_count > self::get_entries_count() ) {
 			update_option( self::LITE_CONNECT_ENTRIES_COUNT_OPTION, $previous_import_count );
 		}
+	}
+
+	/**
+	 * Show the Lite Connect notice about the max attempts to generate the API key.
+	 *
+	 * @since 1.7.5
+	 */
+	public function max_attempts_notice() {
+
+		$attempts_count = get_option( self::GENERATE_KEY_ATTEMPT_COUNTER_OPTION, 0 );
+
+		$notice_text = sprintf(
+			wp_kses( /* translators: %s - WPForms documentation link. */
+				__( 'Your form entries can’t be backed up because WPForms can’t connect to the backup server. If you’d like to back up your entries, find out how to <a href="%s" target="_blank" rel="noopener noreferrer">fix entry backup issues</a>.', 'wpforms-lite' ),
+				[
+					'a' => [
+						'href'   => [],
+						'target' => [],
+						'rel'    => [],
+					],
+				]
+			),
+			wpforms_utm_link( 'https://wpforms.com/docs/how-to-use-lite-connect-for-wpforms/#backup-issues', 'Admin Notice' )
+		);
+
+		if ( $attempts_count >= self::MAX_GENERATE_KEY_ATTEMPTS ) {
+			Notice::warning(
+				$notice_text,
+				[
+					'dismiss' => Notice::DISMISS_GLOBAL,
+					'slug'    => 'max_attempts',
+				]
+			);
+		}
+	}
+
+	/**
+	 * Maybe update access token.
+	 *
+	 * @since 1.7.6
+	 */
+	public function maybe_update_access_token() {
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$action = isset( $_GET['wpforms_lite_connect_action'] ) ? sanitize_key( $_GET['wpforms_lite_connect_action'] ) : '';
+
+		if ( $action !== 'update-access-token' || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$this->get_access_token( $this->get_site_key(), true );
 	}
 }

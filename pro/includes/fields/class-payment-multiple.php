@@ -465,7 +465,7 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 		$choice_label = '';
 		$image        = '';
 
-		if ( ! empty( $field_submit ) && ! empty( $field['choices'][ $field_submit ]['value'] ) ) {
+		if ( ! empty( $field_submit ) && ! empty( $field['choices'][ $field_submit ] ) ) {
 
 			$amount = wpforms_sanitize_amount( $field['choices'][ $field_submit ]['value'] );
 			$value  = wpforms_format_amount( $amount, true );

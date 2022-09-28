@@ -18,7 +18,7 @@ class WPForms_Field_Divider extends WPForms_Field {
 		$this->name  = esc_html__( 'Section Divider', 'wpforms' );
 		$this->type  = 'divider';
 		$this->icon  = 'fa-arrows-h';
-		$this->order = 150;
+		$this->order = 170;
 		$this->group = 'fancy';
 
 		$this->hooks();

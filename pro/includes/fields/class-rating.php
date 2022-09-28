@@ -18,7 +18,7 @@ class WPForms_Rating_Text extends WPForms_Field {
 		$this->name  = esc_html__( 'Rating', 'wpforms' );
 		$this->type  = 'rating';
 		$this->icon  = 'fa-star';
-		$this->order = 210;
+		$this->order = 200;
 		$this->group = 'fancy';
 
 		// Define additional field properties.

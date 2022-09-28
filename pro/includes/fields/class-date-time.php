@@ -371,14 +371,9 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			} elseif ( 'mmmm d, yyyy' === $date_format ) {
 				$date_format = 'F j, Y';
 			}
-			$date_formats = apply_filters(
-				'wpforms_datetime_date_formats',
-				array(
-					'm/d/Y'  => 'm/d/Y',
-					'd/m/Y'  => 'd/m/Y',
-					'F j, Y' => 'F j, Y',
-				)
-			);
+
+			$date_formats = wpforms_date_formats();
+
 			printf(
 				'<div class="wpforms-clear wpforms-field-option-row wpforms-field-option-row-date no-gap" id="wpforms-field-option-row-%d-date" data-subfield="date" data-field-id="%d">',
 				esc_attr( $field['id'] ),
@@ -475,13 +470,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		// Time.
 		$time_placeholder = ! empty( $field['time_placeholder'] ) ? $field['time_placeholder'] : '';
 		$time_format      = ! empty( $field['time_format'] ) ? esc_attr( $field['time_format'] ) : 'g:i A';
-		$time_formats     = apply_filters(
-			'wpforms_datetime_time_formats',
-			array(
-				'g:i A' => '12 H',
-				'H:i'   => '24 H',
-			)
-		);
+		$time_formats     = wpforms_time_formats();
 
 		$time_interval    = ! empty( $field['time_interval'] ) ? esc_attr( $field['time_interval'] ) : '30';
 		$time_intervals   = apply_filters(
@@ -764,7 +753,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				[
 					'slug'    => $slug,
 					'value'   => ! empty( $field[ $slug ] ) ? $field[ $slug ] : $this->defaults[ $slug ],
-					'options' => $this->get_selector_numeric_options( 0, $time_format - 1, 1 ),
+					'options' => $time_format === 12 ? $this->get_selector_numeric_options( 1, $time_format, 1 ) : $this->get_selector_numeric_options( 0, $time_format - 1, 1 ),
 					'class'   => 'wpforms-field-options-column',
 				],
 				false
@@ -1145,7 +1134,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		printf(
 			'<select name="wpforms[fields][%d][date][d]" id="%s" class="%s" %s>',
 			(int) $field['id'],
-			esc_attr( "wpforms-field_{$field['id']}-day" ),
+			esc_attr( "wpforms-{$form_id}-field_{$field['id']}-day" ),
 			esc_attr( $day_class ),
 			esc_attr( $field_required )
 		);
@@ -1184,7 +1173,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		printf(
 			'<select name="wpforms[fields][%d][date][m]" id="%s" class="%s" %s>',
 			(int) $field['id'],
-			esc_attr( "wpforms-field_{$field['id']}-month" ),
+			esc_attr( "wpforms-{$form_id}-field_{$field['id']}-month" ),
 			esc_attr( $month_class ),
 			esc_attr( $field_required )
 		);
@@ -1223,7 +1212,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		printf(
 			'<select name="wpforms[fields][%d][date][y]" id="%s" class="%s" %s>',
 			(int) $field['id'],
-			esc_attr( "wpforms-field_{$field['id']}-year" ),
+			esc_attr( "wpforms-{$form_id}-field_{$field['id']}-year" ),
 			esc_attr( $year_class ),
 			esc_attr( $field_required )
 		);
@@ -1324,6 +1313,14 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		$max_time = $field['time_limit_hours_end_hour'] . ':' . $field['time_limit_hours_end_min'];
 
 		if ( $field['time_format'] === 'g:i A' ) {
+			if ( $field['time_limit_hours_start_hour'] === '00' ) {
+				$min_time = '12:' . $field['time_limit_hours_start_min'];
+			}
+
+			if ( $field['time_limit_hours_end_hour'] === '00' ) {
+				$max_time = '12:' . $field['time_limit_hours_end_min'];
+			}
+
 			$min_time .= ' ' . strtoupper( $field['time_limit_hours_start_ampm'] );
 			$max_time .= ' ' . strtoupper( $field['time_limit_hours_end_ampm'] );
 		}

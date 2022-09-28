@@ -39,7 +39,7 @@ class Addons extends \WPForms\Admin\Addons\Addons {
 	}
 
 	/**
-	 * Return status of a addon.
+	 * Return status of an addon.
 	 *
 	 * @since 1.6.6
 	 *

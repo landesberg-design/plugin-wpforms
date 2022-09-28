@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Access;
 
+use WP_Post;
+
 /**
  * Access/Capability management.
  *
@@ -435,15 +437,15 @@ class Capabilities {
 	 * @since 1.5.8
 	 *
 	 * @param array|string $caps Capability name(s).
-	 * @param int          $id   Optional. ID of the specific object to check against if capability is a "meta" cap.
-	 *                           "Meta" capabilities, e.g. 'edit_post', 'edit_user', etc., are capabilities used
-	 *                           by map_meta_cap() to map to other "primitive" capabilities, e.g. 'edit_posts',
-	 *                           edit_others_posts', etc. Accessed via func_get_args() and passed to WP_User::has_cap(),
-	 *                           then map_meta_cap().
+	 * @param int          $id   Optional. ID of the specific object to check against if capability is a "meta"
+	 *                           cap. "Meta" capabilities, e.g. 'edit_post', 'edit_user', etc., are capabilities
+	 *                           used by map_meta_cap() to map to other "primitive" capabilities, e.g.
+	 *                           'edit_posts', edit_others_posts', etc. Accessed via func_get_args() and passed
+	 *                           to WP_User::has_cap(), then map_meta_cap().
 	 *
 	 * @return bool
 	 */
-	public function current_user_can( $caps = array(), $id = 0 ) {
+	public function current_user_can( $caps = [], $id = 0 ) {
 
 		return (bool) $this->get_first_valid_cap( $caps, $id );
 	}
@@ -464,22 +466,23 @@ class Capabilities {
 	 */
 	protected function get_first_valid_cap( $caps, $id = 0 ) {
 
-		$manage_cap = \wpforms_get_capability_manage_options();
+		$manage_cap = wpforms_get_capability_manage_options();
 
-		if ( \current_user_can( $manage_cap ) ) {
+		if ( current_user_can( $manage_cap ) ) {
 			return $manage_cap;
 		}
 
-		if ( empty( $caps ) && ! \current_user_can( $manage_cap ) ) {
+		if ( empty( $caps ) && ! current_user_can( $manage_cap ) ) {
 			return '';
 		}
 
-		if ( 'any' === $caps ) {
+		if ( $caps === 'any' ) {
 			$caps = array_keys( $this->get_caps() );
 		}
 
 		foreach ( (array) $caps as $cap ) {
 			$validated = $this->validate( $cap, $id );
+
 			if ( $validated ) {
 				return $validated;
 			}
@@ -571,5 +574,65 @@ class Capabilities {
 		$valid = $this->get_first_valid_cap( $caps );
 
 		return $valid ? $valid : wpforms_get_capability_manage_options();
+	}
+
+	/**
+	 * Filter a given array of forms by given capability / capabilities
+	 * of the current logged-in user.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @param array|object|int[] $forms Array of forms / form ids / WP_Post to be filtered.
+	 * @param array|string       $caps  WPForms capabilities name(s).
+	 *
+	 * @return array Filtered forms.
+	 */
+	public function filter_forms_by_current_user_capability( $forms, $caps ) {
+
+		// In $forms argument, we can have single form as object or array.
+		// Typecast (array) creates flat array from an object, so we cannot use it.
+		if (
+			is_a( $forms, WP_Post::class ) ||
+			( is_array( $forms ) && array_key_exists( 'form_id', $forms ) ) ||
+			is_scalar( $forms )
+		) {
+			$forms = [ $forms ];
+		}
+
+		$filtered_forms = [];
+
+		foreach ( $forms as $form ) {
+			$form_id = $this->get_form_id( $form );
+
+			if ( $form_id && wpforms_current_user_can( $caps, $form_id ) ) {
+				$filtered_forms[] = $form;
+			}
+		}
+
+		return $filtered_forms;
+	}
+
+	/**
+	 * Get form id.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @param object|array|int $form Form.
+	 *
+	 * @return int|null
+	 */
+	private function get_form_id( $form ) {
+
+		$form_id = null;
+
+		if ( is_a( $form, WP_Post::class ) ) {
+			$form_id = $form->ID;
+		} elseif ( is_array( $form ) && array_key_exists( 'form_id', $form ) ) {
+			$form_id = absint( $form['form_id'] );
+		} elseif ( is_numeric( $form ) ) {
+			$form_id = absint( $form );
+		}
+
+		return $form_id;
 	}
 }

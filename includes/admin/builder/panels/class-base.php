@@ -71,6 +71,15 @@ abstract class WPForms_Builder_Panel {
 	public $form_data;
 
 	/**
+	 * Class instance.
+	 *
+	 * @since 1.7.7
+	 *
+	 * @var static
+	 */
+	private static $instance;
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 1.0.0
@@ -103,6 +112,25 @@ abstract class WPForms_Builder_Panel {
 
 		// Output.
 		add_action( 'wpforms_builder_panels', [ $this, 'panel_output' ], $this->order, 2 );
+
+		// Save instance.
+		self::$instance = $this;
+	}
+
+	/**
+	 * Get class instance.
+	 *
+	 * @since 1.7.7
+	 *
+	 * @return static
+	 */
+	public static function instance() {
+
+		if ( self::$instance === null || ! self::$instance instanceof static ) {
+			self::$instance = new static();
+		}
+
+		return self::$instance;
 	}
 
 	/**
@@ -168,6 +196,10 @@ abstract class WPForms_Builder_Panel {
 		printf( '<div class="%s">', $wrap );
 
 		if ( true === $this->sidebar ) {
+
+			if ( $this->slug === 'fields' ) {
+				echo '<div class="wpforms-panel-sidebar-toggle"><div class="wpforms-panel-sidebar-toggle-vertical-line"></div><div class="wpforms-panel-sidebar-toggle-icon"><i class="fa fa-angle-left"></i></div></div>';
+			}
 
 			echo '<div class="wpforms-panel-sidebar">';
 

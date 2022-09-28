@@ -64,21 +64,28 @@ class Integrations {
 	 */
 	public function members_enqueue_scripts() {
 
-		if ( ! \function_exists( 'members_register_cap_group' ) ) {
+		if ( ! function_exists( 'members_register_cap_group' ) ) {
 			return;
 		}
 
-		$screen = \get_current_screen();
+		$screen = get_current_screen();
 
-		if ( ! isset( $screen->id, $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $screen->id, $_GET['action'] ) ) {
 			return;
 		}
 
-		if ( 'users_page_roles' !== $screen->id && 'edit' !== $_GET['action'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $screen->id !== 'users_page_roles' && $_GET['action'] !== 'edit' ) {
 			return;
 		}
 
-		\wp_enqueue_style( 'wpforms-dashicons', \WPFORMS_PLUGIN_URL . 'assets/css/wpforms-dashicons.css' );
+		$min = wpforms_get_min_suffix();
+
+		wp_enqueue_style(
+			'wpforms-dashicons',
+			WPFORMS_PLUGIN_URL . "assets/css/wpforms-dashicons{$min}.css"
+		);
 	}
 
 	/**

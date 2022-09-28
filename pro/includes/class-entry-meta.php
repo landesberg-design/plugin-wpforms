@@ -158,13 +158,13 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 			$charset_collate .= " COLLATE {$wpdb->collate}";
 		}
 
-		$sql = "CREATE TABLE {$this->table_name} (
+		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
 			id bigint(20) NOT NULL AUTO_INCREMENT,
 			entry_id bigint(20) NOT NULL,
 			form_id bigint(20) NOT NULL,
 			user_id bigint(20) NOT NULL,
 			status varchar(30) NOT NULL,
-			type varchar(30) NOT NULL,
+			type varchar(255) NOT NULL,
 			data longtext NOT NULL,
 			date datetime NOT NULL,
 			PRIMARY KEY  (id),

@@ -2,6 +2,7 @@
 
 namespace WPForms\Pro\Admin\Entries\Export;
 
+use WPForms\Pro\Helpers\CSV;
 use WPForms\Helpers\Transient;
 use WPForms\Pro\Admin\Entries;
 
@@ -19,9 +20,18 @@ class Ajax {
 	 *
 	 * @since 1.5.5
 	 *
-	 * @var \WPForms\Pro\Admin\Entries\Export\Export
+	 * @var Export
 	 */
 	protected $export;
+
+	/**
+	 * CSV helper class instance.
+	 *
+	 * @since 1.7.7
+	 *
+	 * @var CSV
+	 */
+	private $csv;
 
 	/**
 	 * Request data.
@@ -37,11 +47,12 @@ class Ajax {
 	 *
 	 * @since 1.5.5
 	 *
-	 * @param \WPForms\Pro\Admin\Entries\Export\Export $export Instance of Export.
+	 * @param Export $export Instance of Export.
 	 */
 	public function __construct( $export ) {
 
 		$this->export = $export;
+		$this->csv    = new CSV();
 
 		$this->hooks();
 	}
@@ -349,10 +360,12 @@ class Ajax {
 
 		// Prepare entries data.
 		foreach ( $entries as $entry ) {
+
 			$fields = $this->get_entry_fields_data( $entry );
 			$row    = [];
 
 			foreach ( $this->request_data['columns_row'] as $col_id => $col_label ) {
+
 				if ( is_numeric( $col_id ) ) {
 					$row[ $col_id ] = isset( $fields[ $col_id ]['value'] ) ? $fields[ $col_id ]['value'] : '';
 				} elseif ( strpos( $col_id, 'del_field_' ) !== false ) {
@@ -361,8 +374,10 @@ class Ajax {
 				} else {
 					$row[ $col_id ] = $this->get_additional_info_value( $col_id, $entry, $this->request_data['form_data'] );
 				}
-				$row[ $col_id ] = html_entity_decode( $row[ $col_id ], ENT_QUOTES );
+
+				$row[ $col_id ] = $this->csv->escape_value( $row[ $col_id ] );
 			}
+
 			if ( $no_fields && ! $del_fields ) {
 				continue;
 			}

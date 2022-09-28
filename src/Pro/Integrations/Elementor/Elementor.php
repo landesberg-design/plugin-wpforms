@@ -28,7 +28,7 @@ class Elementor extends \WPForms\Integrations\Elementor\Elementor {
 
 		wp_enqueue_style(
 			'wpforms-pro-integrations',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/admin-integrations{$min}.css",
+			WPFORMS_PLUGIN_URL . "assets/pro/css/admin-integrations{$min}.css",
 			[],
 			WPFORMS_VERSION
 		);
@@ -51,7 +51,7 @@ class Elementor extends \WPForms\Integrations\Elementor\Elementor {
 
 		wp_enqueue_style(
 			'wpforms-pro-integrations',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/admin-integrations{$min}.css",
+			WPFORMS_PLUGIN_URL . "assets/pro/css/admin-integrations{$min}.css",
 			[],
 			WPFORMS_VERSION
 		);

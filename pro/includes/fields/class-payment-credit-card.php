@@ -29,6 +29,32 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 
 		// Hide field if supporting payment gateway is not activated.
 		add_action( 'wpforms_builder_print_footer_scripts', array( $this, 'builder_footer_scripts' ) );
+
+		// Load required scripts.
+		add_action( 'wpforms_frontend_js', [ $this, 'load_js' ], 10 );
+	}
+
+	/**
+	 * Load required scripts.
+	 *
+	 * @since 1.7.5.3
+	 *
+	 * @param array $forms Forms on the current page.
+	 */
+	public function load_js( $forms ) {
+
+		if (
+			wpforms_has_field_type( 'credit-card', $forms, true ) ||
+			wpforms()->get( 'frontend' )->assets_global()
+		) {
+			wp_enqueue_script(
+				'wpforms-payment',
+				WPFORMS_PLUGIN_URL . 'assets/pro/lib/jquery.payment.min.js',
+				[ 'jquery' ],
+				WPFORMS_VERSION,
+				true
+			);
+		}
 	}
 
 	/**

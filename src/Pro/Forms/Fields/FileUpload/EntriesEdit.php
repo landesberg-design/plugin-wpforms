@@ -28,14 +28,14 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 
 		wp_enqueue_style(
 			'tooltipster',
-			WPFORMS_PLUGIN_URL . 'assets/css/tooltipster.css',
+			WPFORMS_PLUGIN_URL . 'assets/lib/jquery.tooltipster/jquery.tooltipster.min.css',
 			null,
 			'4.2.6'
 		);
 
 		wp_enqueue_script(
 			'tooltipster',
-			WPFORMS_PLUGIN_URL . 'assets/js/jquery.tooltipster.min.js',
+			WPFORMS_PLUGIN_URL . 'assets/lib/jquery.tooltipster/jquery.tooltipster.min.js',
 			[ 'jquery' ],
 			'4.2.6',
 			true

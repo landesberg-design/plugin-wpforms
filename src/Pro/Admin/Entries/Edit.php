@@ -257,7 +257,7 @@ class Edit {
 		// Entry Edit styles.
 		wp_enqueue_style(
 			'wpforms-entry-edit',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/entry-edit{$min}.css",
+			WPFORMS_PLUGIN_URL . "assets/pro/css/entry-edit{$min}.css",
 			[],
 			WPFORMS_VERSION
 		);
@@ -276,7 +276,7 @@ class Edit {
 			// Load jQuery input mask library - https://github.com/RobinHerbots/jquery.inputmask.
 			wp_enqueue_script(
 				'wpforms-maskedinput',
-				WPFORMS_PLUGIN_URL . 'assets/js/jquery.inputmask.min.js',
+				WPFORMS_PLUGIN_URL . 'assets/lib/jquery.inputmask.min.js',
 				[ 'jquery' ],
 				'5.0.7-beta.29',
 				true
@@ -286,7 +286,7 @@ class Edit {
 		// Load admin utils JS.
 		wp_enqueue_script(
 			'wpforms-admin-utils',
-			WPFORMS_PLUGIN_URL . 'assets/js/admin-utils.js',
+			WPFORMS_PLUGIN_URL . "assets/js/admin-utils{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -294,7 +294,7 @@ class Edit {
 
 		wp_enqueue_script(
 			'wpforms-punycode',
-			WPFORMS_PLUGIN_URL . "assets/js/punycode{$min}.js",
+			WPFORMS_PLUGIN_URL . 'assets/lib/punycode.min.js',
 			[],
 			'1.0.0',
 			true
@@ -303,17 +303,25 @@ class Edit {
 		if ( wpforms_has_field_type( 'richtext', $this->form ) ) {
 			wp_enqueue_script(
 				'wpforms-richtext-field',
-				WPFORMS_PLUGIN_URL . "pro/assets/js/fields/richtext{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/pro/js/fields/richtext{$min}.js",
 				[ 'jquery' ],
 				WPFORMS_VERSION,
 				true
 			);
 		}
 
+		wp_enqueue_script(
+			'wpforms-generic-utils',
+			WPFORMS_PLUGIN_URL . "assets/js/utils{$min}.js",
+			[ 'jquery' ],
+			WPFORMS_VERSION,
+			true
+		);
+
 		// Load frontend base JS.
 		wp_enqueue_script(
 			'wpforms-frontend',
-			WPFORMS_PLUGIN_URL . 'assets/js/wpforms.js',
+			WPFORMS_PLUGIN_URL . "assets/js/wpforms{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -322,7 +330,7 @@ class Edit {
 		// Load admin JS.
 		wp_enqueue_script(
 			'wpforms-admin-edit-entry',
-			WPFORMS_PLUGIN_URL . "pro/assets/js/admin/edit-entry{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/edit-entry{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -1083,9 +1091,15 @@ class Edit {
 		}
 
 		// Get saved fields data from DB.
-		$entry_fields_obj = wpforms()->entry_fields;
-		$dbdata_result    = $entry_fields_obj->get_fields( [ 'entry_id' => $this->entry_id ] );
+		$entry_fields_obj = wpforms()->get( 'entry_fields' );
+		$dbdata_result    = $entry_fields_obj->get_fields(
+			[
+				'entry_id' => $this->entry_id,
+				'number'   => 1000,
+			]
+		);
 		$dbdata_fields    = [];
+
 		if ( ! empty( $dbdata_result ) ) {
 			$dbdata_fields = array_combine( wp_list_pluck( $dbdata_result, 'field_id' ), $dbdata_result );
 			$dbdata_fields = array_map( 'get_object_vars', $dbdata_fields );
@@ -1097,34 +1111,19 @@ class Edit {
 			$save_field          = apply_filters( 'wpforms_entry_save_fields', $field, $this->form_data, $this->entry_id );
 			$field_id            = $save_field['id'];
 			$field_type          = empty( $save_field['type'] ) ? '' : $save_field['type'];
-			$save_field['value'] = empty( $save_field['value'] ) ? '' : (string) $save_field['value'];
+			$save_field['value'] = empty( $save_field['value'] ) && $save_field['value'] !== '0' ? '' : (string) $save_field['value'];
 			$dbdata_value_exist  = isset( $dbdata_fields[ $field_id ]['value'] );
 
 			// Process the field only if value was changed or not existed in DB at all. Also check if field is editable.
 			if (
-				! $this->is_field_entries_editable( $field_type ) ||
-				(
-					$dbdata_value_exist &&
-					isset( $save_field['value'] ) &&
-					(string) $dbdata_fields[ $field_id ]['value'] === $save_field['value']
-				)
+				( $dbdata_value_exist && (string) $dbdata_fields[ $field_id ]['value'] === $save_field['value'] ) ||
+				! $this->is_field_entries_editable( $field_type )
 			) {
 				continue;
 			}
 
-			if ( $dbdata_value_exist ) {
-				// Update field data in DB.
-				$entry_fields_obj->update(
-					(int) $dbdata_fields[ $field_id ]['id'],
-					[
-						'value' => $save_field['value'],
-						'date'  => $this->date_modified,
-					],
-					'id',
-					'edit_entry'
-				);
-			} else {
-				// Add field data to DB.
+			// Add field data to DB if it doesn't exist and isn't empty.
+			if ( ! $dbdata_value_exist && $save_field['value'] !== '' ) {
 				$entry_fields_obj->add(
 					[
 						'entry_id' => $this->entry_id,
@@ -1135,6 +1134,25 @@ class Edit {
 					]
 				);
 			}
+
+			// Update field data in DB if it exists and isn't empty.
+			if ( $dbdata_value_exist && $save_field['value'] !== '' ) {
+				$entry_fields_obj->update(
+					(int) $dbdata_fields[ $field_id ]['id'],
+					[
+						'value' => $save_field['value'],
+						'date'  => $this->date_modified,
+					],
+					'id',
+					'edit_entry'
+				);
+			}
+
+			// Delete field data in DB if it exists and the value is empty.
+			if ( $dbdata_value_exist && $save_field['value'] === '' ) {
+				$entry_fields_obj->delete( (int) $dbdata_fields[ $field_id ]['id'] );
+			}
+
 			$updated_fields[ $field_id ] = $field;
 		}
 

@@ -174,7 +174,10 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 
 		$this->field_option( 'advanced-options', $field, array( 'markup' => 'open' ) );
 		$this->field_option( 'size', $field );
-		$this->field_option( 'placeholder', $field );
+
+		$visibility = ! empty( $field['format'] ) && $field['format'] === 'user' ? '' : 'wpforms-hidden';
+		$this->field_option( 'placeholder', $field, [ 'class' => $visibility ] );
+
 		$this->field_option( 'css', $field );
 		$this->field_option( 'label_hide', $field );
 		$this->field_option( 'advanced-options', $field, array( 'markup' => 'close' ) );
@@ -194,9 +197,9 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 		$format      = ! empty( $field['format'] ) ? $field['format'] : 'single';
 		$value       = ! empty( $field['price'] ) ? wpforms_format_amount( wpforms_sanitize_amount( $field['price'] ) ) : '';
 
-		echo '<div class="format-selected-' . esc_attr( $format ) . ' format-selected">';
+		$this->field_preview_option( 'label', $field );
 
-			$this->field_preview_option( 'label', $field );
+		echo '<div class="format-selected-' . esc_attr( $format ) . ' format-selected">';
 
 			echo '<p class="item-price">';
 				printf(
@@ -238,15 +241,22 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 
 		$field_format = ! empty( $field['format'] ) ? $field['format'] : 'single';
 
+		// Placeholder attribute is only applicable to password, search, tel, text and url inputs, not hidden.
+		if ( $field_format !== 'user' ) {
+			unset( $primary['attr']['placeholder'] );
+		}
+
 		switch ( $field_format ) {
 			case 'single':
 			case 'hidden':
-				if ( 'single' === $field_format ) {
+				if ( $field_format === 'single' ) {
+					$price = ! empty( $field['price'] ) ? $field['price'] : 0;
+
 					echo '<div class="wpforms-single-item-price">';
 					printf(
 						/* translators: %s - price amount. */
 						esc_html__( 'Price: %s', 'wpforms' ),
-						'<span class="wpforms-price">' . esc_html( wpforms_format_amount( wpforms_sanitize_amount( $field['price'] ), true ) ) . '</span>'
+						'<span class="wpforms-price">' . esc_html( wpforms_format_amount( wpforms_sanitize_amount( $price ), true ) ) . '</span>'
 					);
 					echo '</div>';
 				}

@@ -145,6 +145,9 @@ class WPForms_Entries_List {
 		// Enqueues.
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ] );
 		add_filter( 'wpforms_admin_strings', [ $this, 'js_strings' ] );
+
+		// Apply filter to search by date on Entries page.
+		add_filter( 'wpforms_entry_handler_get_entries_args', [ $this, 'get_filtered_entry_table_args' ] );
 	} // phpcs:enable WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 	/**
@@ -154,7 +157,34 @@ class WPForms_Entries_List {
 	 */
 	private function remove_get_parameters() {
 
-		$_SERVER['REQUEST_URI'] = remove_query_arg( [ '_wp_http_referer', 'action', 'read', 'unread', 'unstarred', 'starred', 'deleted' ], $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$remove_args = [
+			'_wp_http_referer',
+			'action',
+			'action2',
+			'_wpnonce',
+			'read',
+			'unread',
+			'unstarred',
+			'starred',
+			'deleted',
+		];
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['paged'] ) && (int) $_GET['paged'] < 2 ) {
+			$remove_args[] = 'paged';
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+		if ( ! isset( $_GET['search']['term'] ) || wpforms_is_empty_string( $_GET['search']['term'] ) ) {
+			$remove_args[] = 'search';
+		}
+
+		if ( empty( $this->get_filtered_dates() ) ) {
+			$remove_args[] = 'date';
+		}
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$_SERVER['REQUEST_URI'] = remove_query_arg( $remove_args, $_SERVER['REQUEST_URI'] );
 	}
 
 	/**
@@ -242,7 +272,7 @@ class WPForms_Entries_List {
 		// JavaScript.
 		wp_enqueue_script(
 			'wpforms-flatpickr',
-			WPFORMS_PLUGIN_URL . 'assets/js/flatpickr.min.js',
+			WPFORMS_PLUGIN_URL . 'assets/lib/flatpickr/flatpickr.min.js',
 			[ 'jquery' ],
 			'4.6.9'
 		);
@@ -250,7 +280,7 @@ class WPForms_Entries_List {
 		// CSS.
 		wp_enqueue_style(
 			'wpforms-flatpickr',
-			WPFORMS_PLUGIN_URL . 'assets/css/flatpickr.min.css',
+			WPFORMS_PLUGIN_URL . 'assets/lib/flatpickr/flatpickr.min.css',
 			[],
 			'4.6.9'
 		);
@@ -259,7 +289,7 @@ class WPForms_Entries_List {
 
 		wp_enqueue_script(
 			'wpforms-admin-entries',
-			WPFORMS_PLUGIN_URL . "pro/assets/js/admin/entries{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries{$min}.js",
 			[ 'jquery', 'wpforms-flatpickr' ],
 			WPFORMS_VERSION,
 			true
@@ -283,7 +313,7 @@ class WPForms_Entries_List {
 			return;
 		}
 
-		_deprecated_function( __METHOD__, '1.5.5 of WPForms plugin', 'WPForms\Pro\Admin\Export\Export class' );
+		_deprecated_function( __METHOD__, '1.5.5 of the WPForms plugin', 'WPForms\Pro\Admin\Export\Export class' );
 
 		// Security check.
 		if ( ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'wpforms_entry_list_export' ) ) {
@@ -591,15 +621,12 @@ class WPForms_Entries_List {
 			return;
 		}
 
-		$this->prepare_entry_ids_for_get_entries_args(
-			wpforms()->entry->get_entries(
-				[
-					'select'  => 'entry_ids',
-					'number'  => 0,
-					'form_id' => $form_id,
-					'date'    => 1 === count( $dates ) ? $dates[0] : $dates,
-				]
-			)
+		$this->filter = array_merge(
+			$this->filter,
+			[
+				'date'        => count( $dates ) === 1 ? $dates[0] : $dates,
+				'is_filtered' => true,
+			]
 		);
 	}
 
@@ -613,14 +640,16 @@ class WPForms_Entries_List {
 	public function setup() {
 
 		if ( wpforms_current_user_can( 'view_forms' ) ) {
-			// Fetch all forms.
-			$this->forms = wpforms()->form->get(
+			$forms = wpforms()->get( 'form' )->get(
 				'',
-				array(
+				[
 					'orderby' => 'ID',
 					'order'   => 'ASC',
-				)
+				]
 			);
+
+			// Fetch all forms.
+			$this->forms = wpforms()->get( 'access' )->filter_forms_by_current_user_capability( $forms, 'view_entries_form_single' );
 		}
 
 		// Check that the user has created at least one form.
@@ -660,10 +689,21 @@ class WPForms_Entries_List {
 	 */
 	protected function is_list_filtered() {
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$is_filtered = isset( $_GET['search'] ) || isset( $_GET['date'] );
+		$search_parts = $this->get_filter_search_parts();
+		$dates        = $this->get_filtered_dates();
+		$is_filtered  = ! empty( $dates ) || ( isset( $search_parts['term'] ) && ! wpforms_is_empty_string( $search_parts['term'] ) );
 
-		return apply_filters( 'wpforms_entries_list_is_list_filtered', $is_filtered );
+		/**
+		 * Allows to mark the entries list as filtered or not, based on certain conditions.
+		 *
+		 * By default, the list is considered filtered if the date range is set or
+		 * a non-empty search term is applied.
+		 *
+		 * @since 1.4.4
+		 *
+		 * @param bool $is_filtered Is the list filtered?
+		 */
+		return (bool) apply_filters( 'wpforms_entries_list_is_list_filtered', $is_filtered );
 	}
 
 	/**
@@ -866,7 +906,7 @@ class WPForms_Entries_List {
 									$name = isset( $form_data['fields'][ $id ]['label'] ) && ! wpforms_is_empty_string( trim( $form_data['fields'][ $id ]['label'] ) ) ? wp_strip_all_tags( $form_data['fields'][ $id ]['label'] ) : sprintf( /* translators: %d - field ID. */ __( 'Field #%d', 'wpforms' ), absint( $id ) );
 							}
 
-							printf( '<option value="%d" selected>%s</option>', absint( $id ), esc_html( $name ) );
+							printf( '<option value="%d" selected>%s</option>', (int) $id, esc_html( $name ) );
 						}
 					}
 
@@ -1119,7 +1159,7 @@ class WPForms_Entries_List {
 	 */
 	public function display_alerts( $display = '', $wrap = false ) {
 
-		_deprecated_function( __METHOD__, '1.6.7.1 of WPForms plugin' );
+		_deprecated_function( __METHOD__, '1.6.7.1 of the WPForms plugin' );
 
 		if ( empty( $this->alerts ) ) {
 			return;

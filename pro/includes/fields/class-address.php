@@ -65,6 +65,9 @@ class WPForms_Field_Address extends WPForms_Field {
 
 		// Define additional field properties.
 		add_filter( 'wpforms_field_properties_address', array( $this, 'field_properties' ), 5, 3 );
+
+		// Customize value format.
+		add_filter( 'wpforms_html_field_value', [ $this, 'html_field_value' ], 10, 4 );
 	}
 
 	/**
@@ -250,11 +253,11 @@ class WPForms_Field_Address extends WPForms_Field {
 		}
 
 		// Add Postal code input mask for US address.
-		if ( 'us' === $scheme ) {
-			$properties['inputs']['postal']['class'][]                   = 'wpforms-masked-input';
-			$properties['inputs']['postal']['data']['inputmask-mask']    = '99999[-9999]';
-			$properties['inputs']['postal']['data']['inputmask-greedy']  = 'false';
-			$properties['inputs']['postal']['data']['rule-empty-blanks'] = true;
+		if ( $scheme === 'us' ) {
+			$properties['inputs']['postal']['class'][]                           = 'wpforms-masked-input';
+			$properties['inputs']['postal']['data']['inputmask-mask']            = '(99999)|(99999-9999)';
+			$properties['inputs']['postal']['data']['inputmask-keepstatic']      = 'true';
+			$properties['inputs']['postal']['data']['rule-inputmask-incomplete'] = true;
 		}
 
 		return $properties;
@@ -633,19 +636,23 @@ class WPForms_Field_Address extends WPForms_Field {
 	public function field_preview( $field ) {
 
 		// Define data.
-		$address1_placeholder = ! empty( $field['address1_placeholder'] ) ? esc_attr( $field['address1_placeholder'] ) : '';
-		$address2_placeholder = ! empty( $field['address2_placeholder'] ) ? esc_attr( $field['address2_placeholder'] ) : '';
+		$address1_placeholder = ! empty( $field['address1_placeholder'] ) ? $field['address1_placeholder'] : '';
+		$address1_default     = ! empty( $field['address1_default'] ) ? $field['address1_default'] : '';
+		$address2_placeholder = ! empty( $field['address2_placeholder'] ) ? $field['address2_placeholder'] : '';
+		$address2_default     = ! empty( $field['address2_default'] ) ? $field['address2_default'] : '';
 		$address2_hide        = ! empty( $field['address2_hide'] ) ? 'wpforms-hide' : '';
-		$city_placeholder     = ! empty( $field['city_placeholder'] ) ? esc_attr( $field['city_placeholder'] ) : '';
-		$state_placeholder    = ! empty( $field['state_placeholder'] ) ? esc_attr( $field['state_placeholder'] ) : '';
-		$state_default        = ! empty( $field['state_default'] ) ? esc_attr( $field['state_default'] ) : '';
-		$postal_placeholder   = ! empty( $field['postal_placeholder'] ) ? esc_attr( $field['postal_placeholder'] ) : '';
+		$city_placeholder     = ! empty( $field['city_placeholder'] ) ? $field['city_placeholder'] : '';
+		$city_default         = ! empty( $field['city_default'] ) ? $field['city_default'] : '';
+		$state_placeholder    = ! empty( $field['state_placeholder'] ) ? $field['state_placeholder'] : '';
+		$state_default        = ! empty( $field['state_default'] ) ? $field['state_default'] : '';
+		$postal_placeholder   = ! empty( $field['postal_placeholder'] ) ? $field['postal_placeholder'] : '';
+		$postal_default       = ! empty( $field['postal_default'] ) ? $field['postal_default'] : '';
 		$postal_hide          = ! empty( $field['postal_hide'] ) ? 'wpforms-hide' : '';
-		$country_placeholder  = ! empty( $field['country_placeholder'] ) ? esc_attr( $field['country_placeholder'] ) : '';
-		$country_default      = ! empty( $field['country_default'] ) ? esc_attr( $field['country_default'] ) : '';
+		$country_placeholder  = ! empty( $field['country_placeholder'] ) ? $field['country_placeholder'] : '';
+		$country_default      = ! empty( $field['country_default'] ) ? $field['country_default'] : '';
 		$country_hide         = ! empty( $field['country_hide'] ) ? 'wpforms-hide' : '';
-		$format               = ! empty( $field['format'] ) ? esc_attr( $field['format'] ) : 'us';
-		$scheme_selected      = ! empty( $field['scheme'] ) ? esc_attr( $field['scheme'] ) : $format;
+		$format               = ! empty( $field['format'] ) ? $field['format'] : 'us';
+		$scheme_selected      = ! empty( $field['scheme'] ) ? $field['scheme'] : $format;
 
 		// Label.
 		$this->field_preview_option( 'label', $field );
@@ -666,13 +673,13 @@ class WPForms_Field_Address extends WPForms_Field {
 
 				// Row 1 - Address Line 1.
 				echo '<div class="wpforms-field-row wpforms-address-1">';
-					printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $address1_placeholder ) );
+					printf( '<input type="text" placeholder="%s" value="%s" readonly>', esc_attr( $address1_placeholder ), esc_attr( $address1_default ) );
 					printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $address1_label ) );
 				echo '</div>';
 
 				// Row 2 - Address Line 2.
 				printf( '<div class="wpforms-field-row wpforms-address-2 %s">', wpforms_sanitize_classes( $address2_hide ) );
-					printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $address2_placeholder ) );
+					printf( '<input type="text" placeholder="%s" value="%s" readonly>', esc_attr( $address2_placeholder ), esc_attr( $address2_default ) );
 					printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $address2_label ) );
 				echo '</div>';
 
@@ -681,7 +688,7 @@ class WPForms_Field_Address extends WPForms_Field {
 
 					// City.
 					echo '<div class="wpforms-city wpforms-one-half ">';
-						printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $city_placeholder ) );
+						printf( '<input type="text" placeholder="%s" value="%s" readonly>', esc_attr( $city_placeholder ), esc_attr( $city_default ) );
 						printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $city_label ) );
 					echo '</div>';
 
@@ -720,7 +727,7 @@ class WPForms_Field_Address extends WPForms_Field {
 
 					// ZIP / Postal.
 					printf( '<div class="wpforms-postal wpforms-one-half %s">', wpforms_sanitize_classes( $postal_hide ) );
-						printf( '<input type="text" placeholder="%s" readonly>', esc_attr( $postal_label ) );
+						printf( '<input type="text" placeholder="%s" value="%s" readonly>', esc_attr( $postal_placeholder ), esc_attr( $postal_default ) );
 						printf( '<label class="wpforms-sub-label">%s</label>', esc_html( $postal_label ) );
 					echo '</div>';
 
@@ -1060,6 +1067,95 @@ class WPForms_Field_Address extends WPForms_Field {
 		}
 
 		return isset( $input['attr']['name'] ) ? $input['attr']['name'] : $name;
+	}
+
+	/**
+	 * Customize format for HTML display.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @param string $val       Field value.
+	 * @param array  $field     Field data.
+	 * @param array  $form_data Form data and settings.
+	 * @param string $context   Value display context.
+	 *
+	 * @return string
+	 */
+	public function html_field_value( $val, $field, $form_data = [], $context = '' ) {
+
+		if ( empty( $field['value'] ) || $field['type'] !== $this->type ) {
+			return $val;
+		}
+
+		$scheme = isset( $form_data['fields'][ $field['id'] ]['scheme'] ) ? $form_data['fields'][ $field['id'] ]['scheme'] : 'us';
+
+		// In the US it is common to use abbreviations for both the country and states, e.g. New York, NY.
+		if ( $scheme === 'us' ) {
+			return $val;
+		}
+
+		$allowed_contexts = [
+			'entry-table',
+			'entry-single',
+			'entry-preview',
+		];
+
+		/**
+		 * Allows filtering contexts in which the value should be transformed for display.
+		 *
+		 * Available contexts:
+		 * - `entry-table`   - entries list table,
+		 * - `entry-single`  - view entry, edit entry (non-editable field display), print preview,
+		 * - `email-html`    - entry email notification,
+		 * - `entry-preview` - entry preview on the frontend,
+		 * - `smart-tag`     - smart tag in various places (Confirmations, Notifications, integrations etc).
+		 *
+		 * By default, `email-html` and `smart-tag` contexts are ignored. The data in these contexts
+		 * can be used for automation and external data processing, so we keep the original format
+		 * intact for backwards compatibility.
+		 *
+		 * @since 1.7.6
+		 *
+		 * @param array $allowed_contexts Contexts whitelist.
+		 * @param array $field            Field data.
+		 * @param array $form_data        Form data and settings.
+		 */
+		$allowed_contexts = (array) apply_filters( 'wpforms_field_address_html_field_value_allowed_contexts', $allowed_contexts, $field, $form_data );
+
+		return in_array( $context, $allowed_contexts, true ) ?
+			$this->transform_value_for_display( $scheme, $field, $val ) :
+			$val;
+	}
+
+	/**
+	 * Transform the value for display context.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @param string $scheme The scheme used in the field.
+	 * @param array  $field  Field data.
+	 * @param string $value  Value to transform.
+	 *
+	 * @return string
+	 */
+	private function transform_value_for_display( $scheme, $field, $value ) {
+
+		$transform = [
+			'state'   => 'states',
+			'country' => 'countries',
+		];
+
+		foreach ( $transform as $singular => $plural ) {
+
+			$collection = isset( $this->schemes[ $scheme ][ $plural ] ) ? $this->schemes[ $scheme ][ $plural ] : '';
+
+			// The 'countries' or 'states' is array and the value exists as array key.
+			if ( is_array( $collection ) && array_key_exists( $field[ $singular ], $collection ) ) {
+				$value = str_replace( $field[ $singular ], $collection[ $field[ $singular ] ], $value );
+			}
+		}
+
+		return $value;
 	}
 }
 

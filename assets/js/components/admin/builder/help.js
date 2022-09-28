@@ -106,7 +106,7 @@ WPForms.Admin.Builder.Help = WPForms.Admin.Builder.Help || ( function( document,
 			el.$helpBtn.on( 'click', event.openHelp );
 			el.$closeBtn.on( 'click', event.closeHelp );
 
-			// Expand/collapce category.
+			// Expand/collapse category.
 			el.$categories.on( 'click', '.wpforms-builder-help-category header', event.toggleCategory );
 
 			// View all Category Docs button click.

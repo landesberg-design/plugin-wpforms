@@ -12,6 +12,15 @@ use WPForms\Integrations\IntegrationInterface;
 class FormSelector implements IntegrationInterface {
 
 	/**
+	 * Callbacks registered for wpforms_frontend_container_class filter.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @var array
+	 */
+	private $callbacks = [];
+
+	/**
 	 * Indicate if current integration is allowed to load.
 	 *
 	 * @since 1.4.8
@@ -42,6 +51,31 @@ class FormSelector implements IntegrationInterface {
 
 		add_action( 'init', [ $this, 'register_block' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_block_editor_assets' ] );
+		add_action( 'wpforms_frontend_output_container_after', [ $this, 'replace_wpforms_frontend_container_class_filter' ] );
+	}
+
+	/**
+	 * Replace the filter registered for wpforms_frontend_container_class.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @param array $form_data Form data.
+	 *
+	 * @return void
+	 */
+	public function replace_wpforms_frontend_container_class_filter( $form_data ) { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
+
+		if ( empty( $this->callbacks[ $form_data['id'] ] ) ) {
+			return;
+		}
+
+		$callback = array_shift( $this->callbacks[ $form_data['id'] ] );
+
+		remove_filter( 'wpforms_frontend_container_class', $callback );
+
+		if ( ! empty( $this->callbacks[ $form_data['id'] ] ) ) {
+			add_filter( 'wpforms_frontend_container_class', reset( $this->callbacks[ $form_data['id'] ] ), 10, 2 );
+		}
 	}
 
 	/**
@@ -50,9 +84,6 @@ class FormSelector implements IntegrationInterface {
 	 * @since 1.4.8
 	 */
 	public function register_block() {
-
-		$disable_css_setting = wpforms_setting( 'disable-css', '1' );
-		$block_style         = ! empty( $disable_css_setting ) ? 'wpforms-gutenberg-form-selector' : '';
 
 		$attributes = [
 			'formId'       => [
@@ -82,7 +113,7 @@ class FormSelector implements IntegrationInterface {
 				 * @param array $attributes Attributes.
 				 */
 				'attributes'      => apply_filters( 'wpforms_gutenberg_form_selector_attributes', $attributes ), // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
-				'style'           => $block_style,
+				'style'           => 'wpforms-gutenberg-form-selector',
 				'editor_style'    => 'wpforms-integrations',
 				'render_callback' => [ $this, 'get_form_html' ],
 			]
@@ -96,33 +127,33 @@ class FormSelector implements IntegrationInterface {
 	 */
 	protected function register_styles() {
 
-		$min  = wpforms_get_min_suffix();
-		$deps = [];
-
-		if ( is_admin() ) {
-			wp_register_style(
-				'wpforms-integrations',
-				WPFORMS_PLUGIN_URL . "assets/css/admin-integrations{$min}.css",
-				[],
-				WPFORMS_VERSION
-			);
-
-			$deps = [ 'wp-edit-blocks', 'wpforms-integrations' ];
+		if ( ! is_admin() ) {
+			return;
 		}
+
+		$min = wpforms_get_min_suffix();
+
+		wp_register_style(
+			'wpforms-integrations',
+			WPFORMS_PLUGIN_URL . "assets/css/admin-integrations{$min}.css",
+			[],
+			WPFORMS_VERSION
+		);
 
 		$disable_css_setting = (int) wpforms_setting( 'disable-css', '1' );
 
-		if ( $disable_css_setting !== 3 ) {
-
-			$css_file = $disable_css_setting === 2 ? 'base' : 'full';
-
-			wp_register_style(
-				'wpforms-gutenberg-form-selector',
-				WPFORMS_PLUGIN_URL . "assets/css/wpforms-{$css_file}{$min}.css",
-				$deps,
-				WPFORMS_VERSION
-			);
+		if ( $disable_css_setting === 3 ) {
+			return;
 		}
+
+		$css_file = $disable_css_setting === 2 ? 'base' : 'full';
+
+		wp_register_style(
+			'wpforms-gutenberg-form-selector',
+			WPFORMS_PLUGIN_URL . "assets/css/wpforms-{$css_file}{$min}.css",
+			[ 'wp-edit-blocks', 'wpforms-integrations' ],
+			WPFORMS_VERSION
+		);
 	}
 
 	/**
@@ -194,9 +225,9 @@ class FormSelector implements IntegrationInterface {
 	/**
 	 * Get form HTML to display in a WPForms Gutenberg block.
 	 *
-	 * @param array $attr Attributes passed by WPForms Gutenberg block.
-	 *
 	 * @since 1.4.8
+	 *
+	 * @param array $attr Attributes passed by WPForms Gutenberg block.
 	 *
 	 * @return string
 	 */
@@ -211,43 +242,27 @@ class FormSelector implements IntegrationInterface {
 		$title = ! empty( $attr['displayTitle'] );
 		$desc  = ! empty( $attr['displayDesc'] );
 
-		// Disable form fields if called from the Gutenberg editor.
 		if ( $this->is_gb_editor() ) {
-
-			add_filter(
-				'wpforms_frontend_container_class',
-				function ( $classes ) {
-					$classes[] = 'wpforms-gutenberg-form-selector';
-					$classes[] = 'wpforms-container-full';
-
-					return $classes;
-				}
-			);
-			add_action(
-				'wpforms_frontend_output',
-				function () {
-					echo '<fieldset disabled>';
-				},
-				3
-			);
-			add_action(
-				'wpforms_frontend_output',
-				function () {
-					echo '</fieldset>';
-				},
-				30
-			);
+			$this->disable_fields_in_gb_editor();
 		}
 
 		if ( ! empty( $attr['className'] ) ) {
-			add_filter(
-				'wpforms_frontend_container_class',
-				function ( $classes ) use ( $attr ) {
-					$cls = array_map( 'esc_attr', explode( ' ', $attr['className'] ) );
+			$class_callback = static function ( $classes, $form_data ) use ( $id, $attr ) {
 
-					return array_unique( array_merge( $classes, $cls ) );
+				if ( (int) $form_data['id'] !== $id ) {
+					return $classes;
 				}
-			);
+
+				$cls = array_map( 'esc_attr', explode( ' ', $attr['className'] ) );
+
+				return array_unique( array_merge( $classes, $cls ) );
+			};
+
+			if ( empty( $this->callbacks[ $id ] ) ) {
+				add_filter( 'wpforms_frontend_container_class', $class_callback, 10, 2 );
+			}
+
+			$this->callbacks[ $id ][] = $class_callback;
 		}
 
 		ob_start();
@@ -336,5 +351,42 @@ class FormSelector implements IntegrationInterface {
 		// TODO: Find a better way to check if is GB editor API call.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return defined( 'REST_REQUEST' ) && REST_REQUEST && ! empty( $_REQUEST['context'] ) && $_REQUEST['context'] === 'edit';
+	}
+
+	/**
+	 * Disable form fields if called from the Gutenberg editor.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @return void
+	 */
+	private function disable_fields_in_gb_editor() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
+
+		add_filter(
+			'wpforms_frontend_container_class',
+			function ( $classes ) {
+
+				$classes[] = 'wpforms-gutenberg-form-selector';
+				$classes[] = 'wpforms-container-full';
+
+				return $classes;
+			}
+		);
+		add_action(
+			'wpforms_frontend_output',
+			function () {
+
+				echo '<fieldset disabled>';
+			},
+			3
+		);
+		add_action(
+			'wpforms_frontend_output',
+			function () {
+
+				echo '</fieldset>';
+			},
+			30
+		);
 	}
 }

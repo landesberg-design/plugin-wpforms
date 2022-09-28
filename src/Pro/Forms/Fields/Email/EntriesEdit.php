@@ -28,7 +28,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 
 		wp_enqueue_script(
 			'wpforms-mailcheck',
-			WPFORMS_PLUGIN_URL . 'assets/js/mailcheck.min.js',
+			WPFORMS_PLUGIN_URL . 'assets/lib/mailcheck.min.js',
 			false,
 			'1.1.2',
 			true

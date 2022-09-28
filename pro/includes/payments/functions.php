@@ -441,7 +441,7 @@ function wpforms_has_payment( $type = 'entry', $data = array() ) {
 				(
 					$type === 'entry' &&
 					! empty( $field['amount'] ) &&
-					! empty( (float) $field['amount'] )
+					! empty( wpforms_sanitize_amount( $field['amount'] ) )
 				)
 			) {
 				$payment = true;
@@ -475,7 +475,15 @@ function wpforms_has_payment_gateway( $form_data ) {
 		return true;
 	}
 
-	return apply_filters( 'wpforms_has_payment_gateway', false, $form_data );
+	/**
+	 * Allow modifying whether a form has an active payment gateway.
+	 *
+	 * @since 1.4.5
+	 *
+	 * @param bool  $result    True if a form has an active payment gateway.
+	 * @param array $form_data Form data and settings.
+	 */
+	return (bool) apply_filters( 'wpforms_has_payment_gateway', false, $form_data );
 }
 
 /**
@@ -528,7 +536,7 @@ function wpforms_get_payment_items( $fields = array() ) {
 			empty( $field['type'] ) ||
 			! in_array( $field['type'], $payment_fields, true ) ||
 			empty( $field['amount'] ) ||
-			empty( (float) $field['amount'] )
+			empty( wpforms_sanitize_amount( $field['amount'] ) )
 		) {
 			// Remove all non-payment fields as well as payment fields with no amount.
 			unset( $fields[ $id ] );

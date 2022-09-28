@@ -20,6 +20,39 @@ class Fields extends Education\Builder\Fields {
 
 		add_filter( 'wpforms_builder_fields_buttons', [ $this, 'add_fields' ], 500 );
 		add_filter( 'wpforms_builder_field_button_attributes', [ $this, 'fields_attributes' ], 100, 2 );
+
+		if ( ! $this->is_valid_license() ) {
+			add_filter( 'wpforms_builder_fields_buttons', [ $this, 'no_license_fields' ], 501 );
+			add_filter( 'wpforms_builder_field_button_attributes', [ $this, 'no_license_fields_attributes' ], 101, 2 );
+		}
+	}
+
+	/**
+	 * Determine if the license is valid.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @return bool
+	 */
+	private function is_valid_license() {
+
+		// Avoid multiple calculations.
+		static $is_valid = null;
+
+		if ( ! is_null( $is_valid ) ) {
+			return $is_valid;
+		}
+
+		// License data.
+		$license = (array) get_option( 'wpforms_license', [] );
+
+		$is_valid = ! empty( $license['key'] )
+			&& ! empty( $license['type'] )
+			&& empty( $license['is_expired'] )
+			&& empty( $license['is_disabled'] )
+			&& empty( $license['is_invalid'] );
+
+		return $is_valid;
 	}
 
 	/**
@@ -83,6 +116,7 @@ class Fields extends Education\Builder\Fields {
 				$edu_field['url']         = isset( $addon['url'] ) && $edu_field['action'] === 'install' ? $addon['url'] : '';
 				$edu_field['video']       = isset( $addon['video'] ) ? $addon['video'] : '';
 				$edu_field['license']     = isset( $addon['license_level'] ) ? $addon['license_level'] : '';
+				$edu_field['allowed']     = isset( $addon['plugin_allow'] ) ? $addon['plugin_allow'] : false;
 				$edu_field['nonce']       = $nonce;
 			}
 
@@ -104,15 +138,21 @@ class Fields extends Education\Builder\Fields {
 	 */
 	public function fields_attributes( $atts, $field ) {
 
+		if ( empty( $field['name_en'] ) && ! empty( $field['type'] ) ) {
+			$edu_field        = $this->fields->get_field( $field['type'] );
+			$field['name_en'] = isset( $edu_field['name_en'] ) ? $edu_field['name_en'] : '';
+		}
+
+		$atts['data']['utm-content'] = ! empty( $field['name_en'] ) ? $field['name_en'] : '';
+
 		if ( empty( $field['action'] ) ) {
 			return $atts;
 		}
 
 		/* translators: %s - field name. */
-		$atts['data']['field-name']  = sprintf( esc_html__( '%s field', 'wpforms' ), $field['name'] );
-		$atts['data']['action']      = $field['action'];
-		$atts['data']['nonce']       = wp_create_nonce( 'wpforms-admin' );
-		$atts['data']['utm-content'] = ! empty( $field['name_en'] ) ? $field['name_en'] : '';
+		$atts['data']['field-name'] = sprintf( esc_html__( '%s field', 'wpforms' ), $field['name'] );
+		$atts['data']['action']     = $field['action'];
+		$atts['data']['nonce']      = wp_create_nonce( 'wpforms-admin' );
 
 		if ( ! empty( $field['plugin_name'] ) ) {
 			$atts['data']['name'] = ! preg_match( '/addon$/i', $field['plugin_name'] ) ?
@@ -136,6 +176,52 @@ class Fields extends Education\Builder\Fields {
 		if ( ! empty( $field['license'] ) ) {
 			$atts['data']['license'] = $field['license'];
 		}
+
+		return $atts;
+	}
+
+	/**
+	 * Update fields when the license type is empty.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @param array $fields Form fields.
+	 *
+	 * @return array
+	 */
+	public function no_license_fields( $fields ) {
+
+		foreach ( $fields as $group => $group_data ) {
+			if ( $group === 'standard' ) {
+				continue;
+			}
+
+			foreach ( $group_data['fields'] as $key => $field ) {
+				$fields[ $group ]['fields'][ $key ]['action'] = 'license';
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Adjust attributes on field buttons when the license type is empty.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @param array $atts  Button attributes.
+	 * @param array $field Button properties.
+	 *
+	 * @return array Attributes array.
+	 */
+	public function no_license_fields_attributes( $atts, $field ) {
+
+		if ( empty( $field['action'] ) ) {
+			return $atts;
+		}
+
+		$atts['data']['action'] = $field['action'];
+		$atts['class'][]        = 'education-modal';
 
 		return $atts;
 	}

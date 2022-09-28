@@ -147,8 +147,8 @@ class PrintPreview {
 			<meta name="description" content="">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
 			<meta name="robots" content="noindex,nofollow,noarchive">
-			<link rel="stylesheet" href="<?php echo esc_url( WPFORMS_PLUGIN_URL ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet ?>assets/css/font-awesome.min.css" type="text/css">
-			<link rel="stylesheet" href="<?php echo esc_url( WPFORMS_PLUGIN_URL );// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet ?>assets/css/entry-print<?php echo esc_attr( $min ); ?>.css" type="text/css">
+			<link rel="stylesheet" href="<?php echo esc_url( WPFORMS_PLUGIN_URL ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet ?>assets/lib/font-awesome/font-awesome.min.css" type="text/css">
+			<link rel="stylesheet" href="<?php echo esc_url( WPFORMS_PLUGIN_URL );// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet ?>assets/pro/css/entry-print<?php echo esc_attr( $min ); ?>.css" type="text/css">
 			<script type="text/javascript" src="<?php echo esc_url( includes_url( 'js/utils.js' ) ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>"></script>
 			<script type="text/javascript" src="<?php echo esc_url( includes_url( 'js/jquery/jquery.js' ) );// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>"></script>
 			<script type="text/javascript">

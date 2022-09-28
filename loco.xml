@@ -19,10 +19,10 @@
         <directory>.</directory>
       </source>
       <target>
-        <directory>pro/assets/languages</directory>
+        <directory>assets/pro/languages</directory>
       </target>
       <template>
-        <file>pro/assets/languages/wpforms.pot</file>
+        <file>assets/pro/languages/wpforms.pot</file>
       </template>
     </project>
   </domain>

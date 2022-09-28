@@ -80,7 +80,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		$this->name  = esc_html__( 'Rich Text', 'wpforms' );
 		$this->type  = 'richtext';
 		$this->icon  = 'fa-pencil-square-o';
-		$this->order = 300;
+		$this->order = 133;
 		$this->group = 'fancy';
 
 		// Init upload files helper.
@@ -129,7 +129,6 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		add_action( self::MEDIA_CLEANUP_ACTION, [ $this, 'delete_attachment' ] );
 		add_action( 'wpforms_frontend_css', [ $this, 'frontend_css' ] );
 		add_action( 'wpforms_frontend_js', [ $this, 'frontend_js' ] );
-		add_action( 'wpforms_builder_enqueues', [ $this, 'builder_css' ] );
 
 		add_filter( 'wpforms_entry_table_column_value', [ $this, 'entry_table_value' ], 10, 4 );
 
@@ -431,7 +430,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		// Styles for Add Media, Insert Link, and other modals.
 		wp_enqueue_style(
 			'wpforms-modal-views',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/fields/richtext/modal-views{$min}.css",
+			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/richtext/modal-views{$min}.css",
 			[],
 			WPFORMS_VERSION
 		);
@@ -457,7 +456,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		// Field styles based on the Form Styling setting.
 		wp_enqueue_style(
 			"wpforms-richtext-frontend-{$css_file}",
-			WPFORMS_PLUGIN_URL . "pro/assets/css/fields/richtext/frontend-{$css_file}{$min}.css",
+			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/richtext/frontend-{$css_file}{$min}.css",
 			[],
 			WPFORMS_VERSION
 		);
@@ -467,19 +466,13 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * Enqueue builder field CSS.
 	 *
 	 * @since 1.7.0
+	 * @deprecated 1.7.6
 	 *
 	 * @param string $view Current view.
 	 */
 	public function builder_css( $view ) {
 
-		$min = wpforms_get_min_suffix();
-
-		wp_enqueue_style(
-			'wpforms-builder-richtext',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/builder/fields/richtext{$min}.css",
-			[],
-			WPFORMS_VERSION
-		);
+		_deprecated_function( __METHOD__, '1.7.6 of the WPForms plugin' );
 	}
 
 	/**
@@ -499,7 +492,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 
 		wp_enqueue_script(
 			'wpforms-richtext-field',
-			WPFORMS_PLUGIN_URL . "pro/assets/js/fields/richtext{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/fields/richtext{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -1289,7 +1282,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		}
 
 		$wpforms_upload_dir = wpforms_upload_dir();
-		$form_directory     = sprintf( '%d-%s', absint( $this->form_id ), md5( $this->form_id . $this->form_data['created'] ) );
+		$form_directory     = $this->upload->get_form_directory( $this->form_id, $this->form_data['created'] );
 		$dir['path']        = wp_normalize_path( trailingslashit( $wpforms_upload_dir['path'] ) . $form_directory );
 		$dir['url']         = trailingslashit( $wpforms_upload_dir['url'] ) . $form_directory;
 

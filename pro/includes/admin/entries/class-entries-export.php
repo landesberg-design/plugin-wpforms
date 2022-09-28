@@ -311,7 +311,7 @@ class WPForms_Entries_Export {
 		$separator = apply_filters_deprecated(
 			'wpforms_csv_export_seperator',
 			array( ',' ),
-			'1.4.1 of WPForms plugin',
+			'1.4.1 of the WPForms plugin',
 			'wpforms_csv_export_separator'
 		);
 

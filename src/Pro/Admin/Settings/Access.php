@@ -56,7 +56,7 @@ class Access {
 
 		\wp_enqueue_script(
 			'wpforms-settings-access',
-			\WPFORMS_PLUGIN_URL . "pro/assets/js/admin/settings-access{$min}.js",
+			\WPFORMS_PLUGIN_URL . "assets/pro/js/admin/settings-access{$min}.js",
 			array( 'jquery', 'jquery-confirm' ),
 			\WPFORMS_VERSION,
 			true

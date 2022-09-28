@@ -77,7 +77,7 @@ class Upload {
 		$form_id          = $form_data['id'];
 		$upload_dir       = wpforms_upload_dir();
 		$upload_path      = $upload_dir['path'];
-		$form_directory   = absint( $form_id ) . '-' . md5( $form_id . $form_data['created'] );
+		$form_directory   = $this->get_form_directory( $form_id, $form_data['created'] );
 		$upload_path_form = $this->get_form_upload_path( $upload_path, $form_directory );
 		$file_new         = trailingslashit( $upload_path_form ) . $file_details['file_name_new'];
 		$file_url         = trailingslashit( $upload_dir['url'] ) . trailingslashit( $form_directory ) . $file_details['file_name_new'];
@@ -108,6 +108,21 @@ class Upload {
 		$file_details['file_url']      = $file_url;
 
 		return $file_details;
+	}
+
+	/**
+	 * Return the last sub folder where the file is stored.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @param int    $form_id      Form ID.
+	 * @param string $date_created Form entry creation date.
+	 *
+	 * @return string
+	 */
+	public function get_form_directory( $form_id, $date_created ) {
+
+		return absint( $form_id ) . '-' . md5( $form_id . $date_created );
 	}
 
 	/**

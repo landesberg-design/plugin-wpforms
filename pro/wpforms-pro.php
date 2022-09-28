@@ -1,6 +1,7 @@
 <?php
 
 use WPForms\Pro\Integrations\LiteConnect\Integration;
+use WPForms\Admin\Builder\TemplateSingleCache;
 
 /**
  * WPForms Pro. Load Pro specific features/functionality.
@@ -50,7 +51,7 @@ class WPForms_Pro {
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/payments/class-payment.php';
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/payments/functions.php';
 
-		if ( is_admin() || wp_doing_cron() ) {
+		if ( is_admin() || wp_doing_cron() || wpforms_doing_wp_cli() ) {
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/ajax-actions.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/entries/class-entries-single.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/entries/class-entries-list.php';
@@ -66,7 +67,17 @@ class WPForms_Pro {
 	 */
 	public function init() {
 
-		add_action( 'init', [ $this, 'load_textdomain' ], 10 );
+		$this->hooks();
+		$this->allow_wp_auto_update_plugins();
+	}
+
+	/**
+	 * Hook into WordPress lifecycle.
+	 *
+	 * @since 1.7.5
+	 */
+	private function hooks() {
+
 		add_filter( 'plugin_action_links_' . plugin_basename( WPFORMS_PLUGIN_DIR . 'wpforms.php' ), [ $this, 'plugin_action_links' ], 11, 4 );
 		add_action( 'wpforms_loaded', [ $this, 'objects' ], 1 );
 		add_action( 'wpforms_loaded', [ $this, 'updater' ], 30 );
@@ -74,22 +85,19 @@ class WPForms_Pro {
 		add_filter( 'wpforms_settings_tabs', [ $this, 'register_settings_tabs' ], 5, 1 );
 		add_filter( 'wpforms_settings_defaults', [ $this, 'register_settings_fields' ], 5, 1 );
 		add_action( 'wpforms_settings_init', [ $this, 'reinstall_custom_tables' ] );
+		add_filter( 'wpforms_update_settings', [ $this, 'maybe_unset_gdpr_sub_settings' ] );
 		add_action( 'wpforms_process_entry_save', [ $this, 'entry_save' ], 10, 4 );
 		add_action( 'wpforms_form_settings_general', [ $this, 'form_settings_general' ], 10 );
 		add_filter( 'wpforms_overview_table_columns', [ $this, 'form_table_columns' ], 10, 1 );
 		add_filter( 'wpforms_overview_table_column_value', [ $this, 'form_table_columns_value' ], 10, 3 );
 		add_action( 'wpforms_form_settings_notifications', [ $this, 'form_settings_notifications' ], 8, 1 );
 		add_action( 'wpforms_form_settings_confirmations', [ $this, 'form_settings_confirmations' ] );
-		add_filter( 'wpforms_builder_strings', [ $this, 'form_builder_strings' ], 10, 2 );
 		add_filter( 'wpforms_frontend_strings', [ $this, 'frontend_strings' ] );
 		add_action( 'admin_notices', [ $this, 'conditional_logic_addon_notice' ] );
-		add_action( 'wpforms_builder_print_footer_scripts', [ $this, 'builder_templates' ] );
 		add_filter( 'wpforms_email_footer_text', [ $this, 'form_notification_footer' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueues' ] );
 		add_filter( 'wpforms_helpers_templates_get_theme_template_paths', [ $this, 'add_templates' ] );
 		add_filter( 'wpforms_integrations_usagetracking_is_enabled', '__return_true' );
-
-		$this->allow_wp_auto_update_plugins();
 	}
 
 	/**
@@ -116,7 +124,7 @@ class WPForms_Pro {
 	 */
 	public function updater() {
 
-		if ( ! is_admin() ) {
+		if ( ! is_admin() && ! wpforms_doing_wp_cli() ) {
 			return;
 		}
 
@@ -178,6 +186,12 @@ class WPForms_Pro {
 		if ( class_exists( Integration::class ) ) {
 			Integration::maybe_restart_import_flag();
 		}
+
+		// Wipe cache of an empty templates.
+		// We should do it, otherwise it's possible, that some templates will appear empty after upgrading to Pro.
+		if ( class_exists( TemplateSingleCache::class ) ) {
+			( new TemplateSingleCache() )->wipe_empty_templates_cache();
+		}
 	}
 
 	/**
@@ -214,23 +228,6 @@ class WPForms_Pro {
 
 		$upgrader = new Language_Pack_Upgrader( new Automatic_Upgrader_Skin() );
 		$upgrader->bulk_upgrade( $to_update );
-	}
-
-	/**
-	 * Load the separate PRO plugin translation file.
-	 *
-	 * @since 1.5.0
-	 */
-	public function load_textdomain() {
-
-		// If the user is logged in, unset the current text-domains before loading our text domain.
-		// This feels hacky, but this way a user's set language in their profile will be used,
-		// rather than the site-specific language.
-		if ( is_user_logged_in() ) {
-			unload_textdomain( 'wpforms' );
-		}
-
-		load_plugin_textdomain( 'wpforms', false, dirname( plugin_basename( WPFORMS_PLUGIN_FILE ) ) . '/pro/assets/languages/' );
 	}
 
 	/**
@@ -353,7 +350,7 @@ class WPForms_Pro {
 		// Pro admin styles.
 		wp_enqueue_style(
 			'wpforms-pro-admin',
-			WPFORMS_PLUGIN_URL . "pro/assets/css/admin{$min}.css",
+			WPFORMS_PLUGIN_URL . "assets/pro/css/admin{$min}.css",
 			array(),
 			WPFORMS_VERSION
 		);
@@ -379,6 +376,12 @@ class WPForms_Pro {
 		}
 
 		// Validation settings for fields only available in Pro.
+		$settings['validation']['validation-url']              = [
+			'id'      => 'validation-url',
+			'name'    => esc_html__( 'Website URL', 'wpforms' ),
+			'type'    => 'text',
+			'default' => esc_html__( 'Please enter a valid URL.', 'wpforms' ),
+		];
 		$settings['validation']['validation-phone']            = [
 			'id'      => 'validation-phone',
 			'name'    => esc_html__( 'Phone', 'wpforms' ),
@@ -440,8 +443,8 @@ class WPForms_Pro {
 			'id'      => 'validation-post_max_size',
 			'name'    => esc_html__( 'File Upload Total Size', 'wpforms' ),
 			'type'    => 'text',
-			'default' => sprintf( /* translators: %1$s - total size of the selected files in megabytes, %2$s - allowed file upload limit in megabytes.*/
-				esc_html__( 'The total size of the selected files %1$s Mb exceeds the allowed limit %2$s Mb.', 'wpforms' ),
+			'default' => sprintf( /* translators: %1$s - total size of the selected files in megabytes, %2$s - allowed file upload limit in megabytes. */
+				esc_html__( 'The total size of the selected files %1$s MB exceeds the allowed limit %2$s MB.', 'wpforms' ),
 				'{totalSize}',
 				'{maxSize}'
 			),
@@ -478,7 +481,7 @@ class WPForms_Pro {
 				'gdpr-disable-uuid'    => [
 					'id'   => 'gdpr-disable-uuid',
 					'name' => esc_html__( 'Disable User Cookies', 'wpforms' ),
-					'desc' => esc_html__( 'Check this option to disable user tracking cookies. This will disable the Related Entries feature and the Form Abandonment/Geolocation addons.', 'wpforms' ),
+					'desc' => esc_html__( 'Check this option to disable user tracking cookies. This will disable the Related Entries feature and the Form Abandonment addon.', 'wpforms' ),
 					'type' => 'checkbox',
 				],
 				'gdpr-disable-details' => [
@@ -492,6 +495,31 @@ class WPForms_Pro {
 		);
 
 		unset( $settings['misc'][ \WPForms\Integrations\UsageTracking\UsageTracking::SETTINGS_SLUG ] );
+
+		return $settings;
+	}
+
+	/**
+	 * Modify GDPR sub-settings before they are persisted in the database.
+	 *
+	 * Disabling GDPR master switch doesn't modify sub-settings by default. Although we should
+	 * always check for both parent and child settings, unsetting them when the master switch
+	 * is off is the right thing to do.
+	 *
+	 * @since 1.7.5
+	 *
+	 * @param array $settings An array of plugin settings to modify.
+	 *
+	 * @return array
+	 */
+	public function maybe_unset_gdpr_sub_settings( $settings ) {
+
+		$settings['gdpr'] = isset( $settings['gdpr'] ) ? $settings['gdpr'] : false;
+
+		if ( ! $settings['gdpr'] ) {
+			$settings['gdpr-disable-uuid']    = false;
+			$settings['gdpr-disable-details'] = false;
+		}
 
 		return $settings;
 	}
@@ -537,13 +565,10 @@ class WPForms_Pro {
 	 */
 	public function form_settings_general( $instance ) {
 
-		// Only provide this option if the user has configured payments.
+		// Don't provide this option if the user has configured payments.
 		if (
 			isset( $instance->form_data['settings']['disable_entries'] ) ||
-			(
-				empty( $instance->form_data['payments']['paypal_standard']['enable'] ) ||
-				empty( $instance->form_data['payments']['stripe']['enable'] )
-			)
+			! wpforms_has_payment_gateway( $instance->form_data )
 		) {
 			wpforms_panel_field(
 				'toggle',
@@ -639,20 +664,11 @@ class WPForms_Pro {
 	 */
 	public function form_settings_notifications( $settings ) {
 
-		$cc               = wpforms_setting( 'email-carbon-copy', false );
-		$form_settings    = ! empty( $settings->form_data['settings'] ) ? $settings->form_data['settings'] : [];
-		$notifications    = is_array( $form_settings ) && isset( $form_settings['notifications'] ) ? $form_settings['notifications'] : [];
-		$from_name_after  = apply_filters( 'wpforms_builder_notifications_from_name_after', '' );
-		$from_email_after = apply_filters( 'wpforms_builder_notifications_from_email_after', '' );
-		$from_email       = '{admin_email}';
-		$from_name        = sanitize_text_field( get_option( 'blogname' ) );
-
-		// If WP Mail SMTP is available, use its settings.
-		if ( class_exists( '\WPMailSMTP\Options' ) ) {
-			$mail_options = \WPMailSMTP\Options::init()->get_group( 'mail' );
-			$from_email   = $mail_options['from_email_force'] ? $mail_options['from_email'] : $from_email;
-			$from_name    = $mail_options['from_name_force'] ? $mail_options['from_name'] : $from_name;
-		}
+		$cc            = wpforms_setting( 'email-carbon-copy', false );
+		$form_settings = ! empty( $settings->form_data['settings'] ) ? $settings->form_data['settings'] : [];
+		$notifications = is_array( $form_settings ) && isset( $form_settings['notifications'] ) ? $form_settings['notifications'] : [];
+		$from_email    = '{admin_email}';
+		$from_name     = sanitize_text_field( get_option( 'blogname' ) );
 
 		// Fetch next ID and handle backwards compatibility.
 		if ( empty( $notifications ) ) {
@@ -696,7 +712,7 @@ class WPForms_Pro {
 						],
 					]
 				),
-				'https://wpforms.com/docs/setup-form-notification-wpforms/'
+				esc_url( wpforms_utm_link( 'https://wpforms.com/docs/setup-form-notification-wpforms/', 'Builder Notifications', 'Form Notifications Documentation' ) )
 			);
 			echo '</p>';
 			echo '<p>';
@@ -712,8 +728,8 @@ class WPForms_Pro {
 						'br' => [],
 					]
 				),
-				'https://wpforms.com/docs/how-to-properly-test-your-wordpress-forms-before-launching-checklist/',
-				'https://wpforms.com/docs/troubleshooting-email-notifications/'
+				esc_url( wpforms_utm_link( 'https://wpforms.com/docs/how-to-properly-test-your-wordpress-forms-before-launching-checklist/', 'Builder Notifications', 'Testing A Form Documentation' ) ),
+				esc_url( wpforms_utm_link( 'https://wpforms.com/docs/troubleshooting-email-notifications/', 'Builder Notifications', 'Troubleshoot Notifications Documentation' ) )
 			);
 			echo '</p>';
 			echo '</div>';
@@ -736,6 +752,32 @@ class WPForms_Pro {
 			$closed_state  = '';
 			$toggle_state  = '<i class="fa fa-chevron-circle-up"></i>';
 			$block_classes = 'wpforms-notification wpforms-builder-settings-block';
+
+			// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+			/**
+			 * Allow filtering of text after the `From Name` field.
+			 *
+			 * @since 1.2.3
+			 * @since 1.7.6 Added $form_data and $id arguments.
+			 *
+			 * @param string $value     Value to be filtered.
+			 * @param array  $form_data Form data.
+			 * @param int    $id        Notification ID.
+			 */
+			$from_name_after = apply_filters( 'wpforms_builder_notifications_from_name_after', '', $settings->form_data, $id );
+
+			/**
+			 * Allow filtering of text after the `From Email` field.
+			 *
+			 * @since 1.2.3
+			 * @since 1.7.6 Added $form_data and $id arguments.
+			 *
+			 * @param array $value     Value to be filtered.
+			 * @param array $form_data Form data.
+			 * @param int   $id        Notification ID.
+			 */
+			$from_email_after = apply_filters( 'wpforms_builder_notifications_from_email_after', '', $settings->form_data, $id );
+			// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
 			if ( ! empty( $settings->form_data['id'] ) && 'closed' === wpforms_builder_settings_block_get_state( $settings->form_data['id'], $id, 'notification' ) ) {
 				$closed_state = 'style="display:none"';
@@ -837,19 +879,35 @@ class WPForms_Pro {
 						'sender_name',
 						$settings->form_data,
 						esc_html__( 'From Name', 'wpforms' ),
-						[
-							'default'    => $from_name,
-							'smarttags'  => [
-								'type'   => 'fields',
-								'fields' => 'name,text',
+						// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+						/**
+						 * Allow modifying the "From Name" field settings in the builder on Settings > Notifications panel.
+						 *
+						 * @since 1.7.6
+						 *
+						 * @param array $args      Field settings.
+						 * @param array $form_data Form data.
+						 * @param int   $id        Notification ID.
+						 */
+						apply_filters(
+							'wpforms_builder_notifications_sender_name_settings',
+							[
+								'default'    => $from_name,
+								'smarttags'  => [
+									'type'   => 'fields',
+									'fields' => 'name,text',
+								],
+								'parent'     => 'settings',
+								'subsection' => $id,
+								'input_id'   => 'wpforms-panel-field-notifications-sender_name-' . $id,
+								'readonly'   => ! empty( $from_name_after ),
+								'after'      => ! empty( $from_name_after ) ? '<div class="wpforms-alert wpforms-alert-warning">' . $from_name_after . '</div>' : '',
+								'class'      => ! empty( $from_name_after ) ? 'from-name wpforms-panel-field-warning' : 'from-name',
 							],
-							'parent'     => 'settings',
-							'subsection' => $id,
-							'input_id'   => 'wpforms-panel-field-notifications-sender_name-' . $id,
-							'readonly'   => ! empty( $from_name_after ),
-							'after'      => ! empty( $from_name_after ) ? '<p class="note">' . $from_name_after . '</p>' : '',
-							'class'      => 'from-name',
-						]
+							$settings->form_data,
+							$id
+						)
+						// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 					);
 					wpforms_panel_field(
 						'text',
@@ -857,19 +915,35 @@ class WPForms_Pro {
 						'sender_address',
 						$settings->form_data,
 						esc_html__( 'From Email', 'wpforms' ),
-						[
-							'default'    => $from_email,
-							'smarttags'  => [
-								'type'   => 'fields',
-								'fields' => 'email',
+						// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+						/**
+						 * Allow modifying the "From Email" field settings in the builder on Settings > Notifications panel.
+						 *
+						 * @since 1.7.6
+						 *
+						 * @param array $args      Field settings.
+						 * @param array $form_data Form data.
+						 * @param int   $id        Notification ID.
+						 */
+						apply_filters(
+							'wpforms_builder_notifications_sender_address_settings',
+							[
+								'default'    => $from_email,
+								'smarttags'  => [
+									'type'   => 'fields',
+									'fields' => 'email',
+								],
+								'parent'     => 'settings',
+								'subsection' => $id,
+								'input_id'   => 'wpforms-panel-field-notifications-sender_address-' . $id,
+								'readonly'   => ! empty( $from_email_after ),
+								'after'      => ! empty( $from_email_after ) ? '<div class="wpforms-alert wpforms-alert-warning">' . $from_email_after . '</div>' : '',
+								'class'      => ! empty( $from_email_after ) ? 'from-email wpforms-panel-field-warning' : 'from-email',
 							],
-							'parent'     => 'settings',
-							'subsection' => $id,
-							'input_id'   => 'wpforms-panel-field-notifications-sender_address-' . $id,
-							'readonly'   => ! empty( $from_email_after ),
-							'after'      => ! empty( $from_email_after ) ? '<p class="note">' . $from_email_after . '</p>' : '',
-							'class'      => 'from-email',
-						]
+							$settings->form_data,
+							$id
+						)
+						// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 					);
 					wpforms_panel_field(
 						'text',
@@ -925,7 +999,20 @@ class WPForms_Pro {
 					);
 
 					// Hook for addons.
+
+					// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+
+					/**
+					 * Fires after notification block.
+					 *
+					 * @since 1.3.3
+					 *
+					 * @param array $settings Current confirmation data.
+					 * @param int   $id       Notification id.
+					 */
 					do_action( 'wpforms_form_settings_notifications_single_after', $settings, $id );
+
+					// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 					?>
 
 				</div><!-- /.wpforms-builder-settings-block-content -->
@@ -1102,7 +1189,7 @@ class WPForms_Pro {
 						'confirmations',
 						'redirect',
 						$settings->form_data,
-						esc_html__( 'Confirmation Redirect URL', 'wpforms' ),
+						esc_html__( 'Confirmation Redirect URL', 'wpforms' ) . ' <span class="required">*</span>',
 						[
 							'input_id'    => 'wpforms-panel-field-confirmations-redirect-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-redirect',
@@ -1130,7 +1217,7 @@ class WPForms_Pro {
 					do_action_deprecated(
 						'wpforms_form_settings_confirmation',
 						[ $settings ],
-						'1.4.8 of WPForms plugin',
+						'1.4.8 of the WPForms plugin',
 						'wpforms_form_settings_confirmations_single_after'
 					);
 
@@ -1156,6 +1243,8 @@ class WPForms_Pro {
 	/**
 	 * Append additional strings for form builder.
 	 *
+	 * @deprecated 1.7.6
+	 *
 	 * @since 1.2.6
 	 *
 	 * @param array  $strings List of strings.
@@ -1165,47 +1254,9 @@ class WPForms_Pro {
 	 */
 	public function form_builder_strings( $strings, $form ) {
 
-		$currency   = wpforms_get_currency();
-		$currencies = wpforms_get_currencies();
+		_deprecated_function( __METHOD__, '1.7.6 of the WPForms plugin', 'WPForms\Pro\Admin\Builder\Builder::form_builder_strings()' );
 
-		$strings['currency']            = sanitize_text_field( $currency );
-		$strings['currency_name']       = isset( $currencies[ $currency ]['name'] ) ? sanitize_text_field( $currencies[ $currency ]['name'] ) : '';
-		$strings['currency_decimals']   = wpforms_get_currency_decimals( $currencies[ $currency ] );
-		$strings['currency_decimal']    = isset( $currencies[ $currency ]['decimal_separator'] ) ? sanitize_text_field( $currencies[ $currency ]['decimal_separator'] ) : '.';
-		$strings['currency_thousands']  = isset( $currencies[ $currency ]['thousands_separator'] ) ? sanitize_text_field( $currencies[ $currency ]['thousands_separator'] ) : ',';
-		$strings['currency_symbol']     = isset( $currencies[ $currency ]['symbol'] ) ? sanitize_text_field( $currencies[ $currency ]['symbol'] ) : '$';
-		$strings['currency_symbol_pos'] = isset( $currencies[ $currency ]['symbol_pos'] ) ? sanitize_text_field( $currencies[ $currency ]['symbol_pos'] ) : 'left';
-		$strings['notification_clone']  = esc_html__( ' - clone', 'wpforms' );
-
-		$strings['notification_by_status_enable_alert'] = wp_kses(
-		// translators: %s: Payment provider completed payments. Example: `PayPal Standard completed payments`.
-			__( '<p>You have just enabled this notification for <strong>%s</strong>. Please note that this email notification will only send for <strong>%s</strong>.</p><p>If you\'d like to set up additional notifications for this form, please see our <a href="https://wpforms.com/docs/setup-form-notification-wpforms/" rel="nofollow noopener" target="_blank">tutorial</a>.</p>', 'wpforms' ), // phpcs:ignore WordPress.WP.I18n.UnorderedPlaceholdersText
-			[
-				'p'      => [],
-				'strong' => [],
-				'a'      => [
-					'href'   => [],
-					'rel'    => [],
-					'target' => [],
-				],
-			]
-		);
-
-		$strings['notification_by_status_switch_alert'] = wp_kses(
-		// translators: %1$s: Payment provider completed payments. Example: `PayPal Standard completed payments`, %2$s - Disabled Payment provider completed payments.
-			__( '<p>You have just <strong>disabled</strong> the notification for <strong>%2$s</strong> and <strong>enabled</strong> the notification for <strong>%1$s</strong>. Please note that this email notification will only send for <strong>%1$s</strong>.</p><p>If you\'d like to set up additional notifications for this form, please see our <a href="https://wpforms.com/docs/setup-form-notification-wpforms/" rel="nofollow noopener" target="_blank">tutorial</a>.</p>', 'wpforms' ), // phpcs:ignore WordPress.WP.I18n.UnorderedPlaceholdersText
-			[
-				'p'      => [],
-				'strong' => [],
-				'a'      => [
-					'href'   => [],
-					'rel'    => [],
-					'target' => [],
-				],
-			]
-		);
-
-		return $strings;
+		return ( new WPForms\Pro\Admin\Builder\Builder() )->form_builder_strings( $strings, $form );
 	}
 
 	/**
@@ -1227,8 +1278,8 @@ class WPForms_Pro {
 		$strings['val_creditcard']      = wpforms_setting( 'validation-creditcard', esc_html__( 'Please enter a valid credit card number.', 'wpforms' ) );
 		$strings['val_post_max_size']   = wpforms_setting(
 			'validation-post_max_size',
-			sprintf( /* translators: %1$s - total size of the selected files in megabytes, %2$s - allowed file upload limit in megabytes.*/
-				esc_html__( 'The total size of the selected files %1$s Mb exceeds the allowed limit %2$s Mb.', 'wpforms' ),
+			sprintf( /* translators: %1$s - total size of the selected files in megabytes, %2$s - allowed file upload limit in megabytes. */
+				esc_html__( 'The total size of the selected files %1$s MB exceeds the allowed limit %2$s MB.', 'wpforms' ),
 				'{totalSize}',
 				'{maxSize}'
 			)
@@ -1281,39 +1332,13 @@ class WPForms_Pro {
 	 * Used to register the templates for setting blocks inside form builder.
 	 *
 	 * @since 1.4.8
+	 * @deprecated 1.7.6
 	 */
 	public function builder_templates() {
 
-		$conditional_logic_tooltip = '<a href="https://wpforms.com/docs/how-to-use-conditional-logic-with-wpforms/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to use Conditional Logic', 'wpforms' ) . '</a>';
-		?>
+		_deprecated_function( __METHOD__, '1.7.6 of the WPForms plugin', 'WPForms\Pro\Admin\Builder\Builder::builder_templates()' );
 
-		<!-- Confirmation block 'message' field template -->
-		<script type="text/html" id="tmpl-wpforms-builder-confirmations-message-field">
-			<div id="wpforms-panel-field-confirmations-message-{{ data.id }}-wrap" class="wpforms-panel-field wpforms-panel-field-tinymce" style="display: block;">
-				<label for="wpforms-panel-field-confirmations-message-{{ data.id }}"><?php esc_html_e( 'Confirmation Message', 'wpforms' ); ?></label>
-				<textarea id="wpforms-panel-field-confirmations-message-{{ data.id }}" name="settings[confirmations][{{ data.id }}][message]" rows="3" placeholder="" class="wpforms-panel-field-confirmations-message"></textarea>
-				<a href="#" class="toggle-smart-tag-display toggle-unfoldable-cont" data-type="all" data-fields=""><i class="fa fa-tags"></i><span><?php esc_html_e( 'Show Smart Tags', 'wpforms' ); ?></span></a>
-			</div>
-		</script>
-
-		<!-- Conditional logic toggle field template -->
-		<script  type="text/html" id="tmpl-wpforms-builder-conditional-logic-toggle-field">
-			<div id="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-wrap" class="wpforms-panel-field wpforms-conditionals-enable-toggle wpforms-panel-field-checkbox">
-				<span class="wpforms-toggle-control">
-					<input type="checkbox" id="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-checkbox" name="settings[{{ data.type }}s][{{ data.id }}][conditional_logic]" value="1"
-						class="wpforms-panel-field-conditional_logic-checkbox"
-						data-name="settings[{{ data.type }}s][{{ data.id }}]"
-						data-actions="{{ data.actions }}"
-						data-action-desc="{{ data.actionDesc }}">
-					<label class="wpforms-toggle-control-icon" for="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-checkbox"></label>
-					<label for="wpforms-panel-field-settings-{{ data.type }}s-{{ data.id }}-conditional_logic-checkbox" class="wpforms-toggle-control-label">
-						<?php esc_html_e( 'Enable Conditional Logic', 'wpforms' ); ?>
-					</label><i class="fa fa-question-circle-o wpforms-help-tooltip tooltipstered" title="<?php echo esc_attr( $conditional_logic_tooltip ); ?>"></i>
-				</span>
-			</div>
-		</script>
-
-		<?php
+		( new WPForms\Pro\Admin\Builder\Builder() )->builder_templates();
 	}
 
 	/**
@@ -1363,7 +1388,7 @@ class WPForms_Pro {
 	 * @return array List of table names.
 	 */
 	public function get_existing_custom_tables() {
-		_deprecated_function( __METHOD__, '1.6.3', 'wpforms()->get_existing_custom_tables()' );
+		_deprecated_function( __METHOD__, '1.6.3 of the WPForms plugin', 'wpforms()->get_existing_custom_tables()' );
 
 		return wpforms()->get_existing_custom_tables();
 	}
@@ -1552,6 +1577,21 @@ class WPForms_Pro {
 		}
 
 		return $new_plugins;
+	}
+
+	/**
+	 * Enqueue builder's assets.
+	 *
+	 * @since 1.7.5
+	 * @deprecated 1.7.6
+	 *
+	 * @param string $view Current view.
+	 */
+	public function builder_enqueues( $view ) {
+
+		_deprecated_function( __METHOD__, '1.7.6 of the WPForms plugin', 'WPForms\Pro\Admin\Builder\Builder::builder_enqueues()' );
+
+		( new WPForms\Pro\Admin\Builder\Builder() )->builder_enqueues( $view );
 	}
 
 	/**

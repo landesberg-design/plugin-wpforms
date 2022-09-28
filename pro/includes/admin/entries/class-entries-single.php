@@ -127,7 +127,7 @@ class WPForms_Entries_Single {
 
 		wp_enqueue_script(
 			'wpforms-admin-view-entry',
-			WPFORMS_PLUGIN_URL . "pro/assets/js/admin/view-entry{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/view-entry{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -148,7 +148,7 @@ class WPForms_Entries_Single {
 			return;
 		}
 
-		_deprecated_function( __METHOD__, '1.5.5 of WPForms plugin', 'WPForms\Pro\Admin\Export\Export class' );
+		_deprecated_function( __METHOD__, '1.5.5 of the WPForms plugin', 'WPForms\Pro\Admin\Export\Export class' );
 
 		if ( empty( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'wpforms_entry_details_export' ) ) {
 			return;
@@ -1051,6 +1051,13 @@ class WPForms_Entries_Single {
 			return;
 		}
 
+		/** This filter is documented in /includes/functions.php */
+		$allow_display = apply_filters( 'wpforms_debug_data_allow_display', true ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+
+		if ( ! $allow_display ) {
+			return;
+		}
+
 		?>
 		<!-- Entry Debug metabox -->
 		<div id="wpforms-entry-debug" class="postbox">
@@ -1281,7 +1288,7 @@ class WPForms_Entries_Single {
 				$gateway = esc_html__( 'PayPal Standard', 'wpforms' );
 				if ( ! empty( $entry_meta['payment_transaction'] ) ) {
 					$type = 'production' === $mode ? '' : 'sandbox.';
-					$transaction = sprintf( '<a href="https://www.%spaypal.com/webscr?cmd=_history-details-from-hub&id=%s" target="_blank" rel="noopener noreferrer">%s</a>', $type, $entry_meta['payment_transaction'], $entry_meta['payment_transaction'] );
+					$transaction = sprintf( '<a href="https://www.%spaypal.com/activity/payment/%s" target="_blank" rel="noopener noreferrer">%s</a>', $type, $entry_meta['payment_transaction'], $entry_meta['payment_transaction'] );
 				}
 				break;
 		}
@@ -1652,7 +1659,7 @@ class WPForms_Entries_Single {
 	 */
 	public function display_alerts( $display = '', $wrap = false ) {
 
-		_deprecated_function( __METHOD__, '1.6.7.1 of WPForms plugin' );
+		_deprecated_function( __METHOD__, '1.6.7.1 of the WPForms plugin' );
 
 		if ( empty( $this->alerts ) ) {
 			return;
