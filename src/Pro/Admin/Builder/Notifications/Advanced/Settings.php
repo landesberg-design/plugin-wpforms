@@ -29,7 +29,7 @@ class Settings {
 	private function hooks() {
 
 		add_action( 'wpforms_builder_enqueues', [ $this, 'builder_assets' ] );
-		add_action( 'wpforms_form_settings_notifications_single_after', [ $this, 'content' ], 10, 2 );
+		add_action( 'wpforms_form_settings_notifications_single_after', [ $this, 'content' ], 20, 2 );
 	}
 
 	/**

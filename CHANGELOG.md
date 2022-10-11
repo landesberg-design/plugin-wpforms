@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.7.7.1] - 2022-10-05
+### Fixed
+- Email Notifications options for completed payments were displayed in an incorrect place - below the Settings > Notifications > Advanced section in the Form Builder.
+- Very long field labels were not wrapped and were breaking mid-word.
+
 ## [1.7.7] - 2022-09-27
 ### Added
 - Introducing a completely new Layout field to help you build advanced form layouts that automatically adjust to the users’ screen size.

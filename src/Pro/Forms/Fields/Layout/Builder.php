@@ -237,7 +237,7 @@ class Builder {
 			esc_html__( 'Drag and drop fields into the columns below, or click a column to make it active. You may then click on new fields to easily place them directly into the active column.', 'wpforms' ),
 			esc_url(
 				wpforms_utm_link(
-					'https://wpforms.com/docs/using-the-layout-field/',
+					'https://wpforms.com/docs/how-to-use-the-layout-field-in-wpforms/',
 					'Builder Notice',
 					'Layout Field Documentation'
 				)

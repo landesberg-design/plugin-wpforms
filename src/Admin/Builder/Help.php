@@ -477,11 +477,11 @@ class Help {
 				'/docs/how-to-bulk-add-choices-for-multiple-choice-checkbox-and-dropdown-fields/',
 			],
 			'multiple columns'          => [
-				'/docs/using-the-layout-field/',
+				'/docs/how-to-use-the-layout-field-in-wpforms/',
 				'/docs/how-to-create-a-multi-column-layout-for-radio-buttons-and-checkboxes/',
 			],
 			'columns'                   => [
-				'/docs/using-the-layout-field/',
+				'/docs/how-to-use-the-layout-field-in-wpforms/',
 				'/docs/how-to-create-a-multi-column-layout-for-radio-buttons-and-checkboxes/',
 			],
 			'randomize'                 => [
@@ -646,19 +646,22 @@ class Help {
 				'/docs/how-to-use-the-rich-text-field-in-wpforms/',
 			],
 			'layout'                    => [
-				'/docs/using-the-layout-field/',
+				'/docs/how-to-use-the-layout-field-in-wpforms/',
 			],
 			'two columns'               => [
-				'/docs/using-the-layout-field/',
+				'/docs/how-to-use-the-layout-field-in-wpforms/',
 			],
 			'three columns'             => [
-				'/docs/using-the-layout-field/',
+				'/docs/how-to-use-the-layout-field-in-wpforms/',
+			],
+			'four columns'              => [
+				'/docs/how-to-use-the-layout-field-in-wpforms/',
 			],
 			'fields horizontally'       => [
-				'/docs/using-the-layout-field/',
+				'/docs/how-to-use-the-layout-field-in-wpforms/',
 			],
 			'fields in a row'           => [
-				'/docs/using-the-layout-field/',
+				'/docs/how-to-use-the-layout-field-in-wpforms/',
 			],
 			'page break'                => [
 				'/docs/how-to-create-multi-page-forms-in-wpforms/',
