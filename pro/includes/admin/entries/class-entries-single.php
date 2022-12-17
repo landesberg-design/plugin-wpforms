@@ -1269,15 +1269,17 @@ class WPForms_Entries_Single {
 
 		switch ( $entry_meta['payment_type'] ) {
 			case 'stripe':
-				$gateway = esc_html__( 'Stripe', 'wpforms' );
+				$gateway       = esc_html__( 'Stripe', 'wpforms' );
+				$dashboard_url = ! empty( $entry_meta['payment_mode'] ) && $entry_meta['payment_mode'] === 'test' ? 'https://dashboard.stripe.com/test/' : 'https://dashboard.stripe.com/';
+
 				if ( ! empty( $entry_meta['payment_transaction'] ) ) {
-					$transaction = sprintf( '<a href="https://dashboard.stripe.com/payments/%s" target="_blank" rel="noopener noreferrer">%s</a>', $entry_meta['payment_transaction'], $entry_meta['payment_transaction'] );
+					$transaction = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc_url( $dashboard_url . 'payments/' . $entry_meta['payment_transaction'] ), $entry_meta['payment_transaction'] );
 				}
 				if ( ! empty( $entry_meta['payment_subscription'] ) ) {
-					$subscription = sprintf( '<a href="https://dashboard.stripe.com/subscriptions/%s" target="_blank" rel="noopener noreferrer">%s</a>', $entry_meta['payment_subscription'], $entry_meta['payment_subscription'] );
+					$subscription = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc_url( $dashboard_url . 'subscriptions/' . $entry_meta['payment_subscription'] ), $entry_meta['payment_subscription'] );
 				}
 				if ( ! empty( $entry_meta['payment_customer'] ) ) {
-					$customer = sprintf( '<a href="https://dashboard.stripe.com/customers/%s" target="_blank" rel="noopener noreferrer">%s</a>', $entry_meta['payment_customer'], $entry_meta['payment_customer'] );
+					$customer = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc_url( $dashboard_url . 'customers/' . $entry_meta['payment_customer'] ), $entry_meta['payment_customer'] );
 				}
 				if ( ! empty( $entry_meta['payment_period'] ) ) {
 					$total .= ' <span style="font-weight:400; color:#999; display:inline-block;margin-left:4px;"><i class="fa fa-refresh" aria-hidden="true"></i> ' . $entry_meta['payment_period'] . '</span>';

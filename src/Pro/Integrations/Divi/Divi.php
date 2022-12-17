@@ -39,6 +39,13 @@ class Divi extends \WPForms\Integrations\Divi\Divi {
 			\WPForms_Field_Phone::INTL_VERSION
 		);
 
+		wp_enqueue_style(
+			'wpforms-content-field',
+			WPFORMS_PLUGIN_URL . "assets/pro/css/integrations/divi/content{$min}.css",
+			[],
+			WPFORMS_VERSION
+		);
+
 		$styles_name = $this->get_current_styles_name();
 
 		if ( $styles_name ) {
@@ -73,6 +80,13 @@ class Divi extends \WPForms\Integrations\Divi\Divi {
 		wp_enqueue_style(
 			'wpforms-richtext-field',
 			WPFORMS_PLUGIN_URL . "assets/pro/css/integrations/divi/richtext{$min}.css",
+			[],
+			WPFORMS_VERSION
+		);
+
+		wp_enqueue_style(
+			'wpforms-content-field',
+			WPFORMS_PLUGIN_URL . "assets/pro/css/integrations/divi/content{$min}.css",
 			[],
 			WPFORMS_VERSION
 		);

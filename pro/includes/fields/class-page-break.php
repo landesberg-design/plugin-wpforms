@@ -255,15 +255,25 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	public function display_fields_before( $form_data ) {
 
 		// Check if we have an opening pagebreak, if not then bail.
-		$top = ! empty( wpforms()->frontend->pages['top'] ) ? wpforms()->frontend->pages['top'] : false;
+		$field = ! empty( wpforms()->get( 'frontend' )->pages['top'] ) ? wpforms()->get( 'frontend' )->pages['top'] : false;
 
-		if ( ! $top ) {
+		if ( ! $field ) {
 			return;
 		}
 
-		$css = ! empty( $top['css'] ) ? $top['css'] : '';
+		$css = ! empty( $field['css'] ) ? $field['css'] : '';
 
 		echo '<div class="wpforms-page wpforms-page-1 ' . wpforms_sanitize_classes( $css ) . '">';
+
+		/**
+		 * Fires before all fields on the page.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param array $field     Field data and settings.
+		 * @param array $form_data Form data and settings.
+		 */
+		do_action( 'wpforms_field_page_break_page_fields_before', $field, $form_data );
 	}
 
 	/**
@@ -275,13 +285,13 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	 */
 	public function display_fields_after( $form_data ) {
 
-		if ( empty( wpforms()->frontend->pages ) ) {
+		if ( empty( wpforms()->get( 'frontend' )->pages ) ) {
 			return;
 		}
 
 		// If we don't have a bottom pagebreak, the form is pre-v1.2.1 and
 		// this is for backwards compatibility.
-		$bottom = ! empty( wpforms()->frontend->pages['bottom'] ) ? wpforms()->frontend->pages['top'] : false;
+		$bottom = ! empty( wpforms()->get( 'frontend' )->pages['bottom'] ) ? wpforms()->get( 'frontend' )->pages['top'] : false;
 
 		if ( ! $bottom ) {
 
@@ -290,12 +300,24 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 			echo '<div class="wpforms-field wpforms-field-pagebreak">';
 				printf(
 					'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%d">%s</button>',
-					absint( wpforms()->frontend->pages['current'] + 1 ),
+					absint( wpforms()->get( 'frontend' )->pages['current'] + 1 ),
 					absint( $form_data['id'] ),
 					esc_html( $prev )
 				);
 			echo '</div>';
 		}
+
+		$field = ! empty( wpforms()->get( 'frontend' )->pages['bottom'] ) ? wpforms()->get( 'frontend' )->pages['bottom'] : $bottom;
+
+		/**
+		 * Fires after all fields on the page.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param array $field     Field data and settings.
+		 * @param array $form_data Form data and settings.
+		 */
+		do_action( 'wpforms_field_page_break_page_fields_after', $field, $form_data );
 
 		echo '</div>';
 	}
@@ -310,18 +332,28 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	 */
 	public function display_field_after( $field, $form_data ) {
 
-		if ( 'pagebreak' !== $field['type'] ) {
+		if ( $field['type'] !== 'pagebreak' ) {
 			return;
 		}
 
-		$total   = wpforms()->frontend->pages['total'];
-		$current = wpforms()->frontend->pages['current'];
+		$total   = wpforms()->get( 'frontend' )->pages['total'];
+		$current = wpforms()->get( 'frontend' )->pages['current'];
 
-		if ( ( empty( $field['position'] ) || 'top' !== $field['position'] ) && $current !== $total ) {
+		if ( ( empty( $field['position'] ) || $field['position'] !== 'top' ) && $current !== $total ) {
 
 			$next = $current + 1;
 			$last = $next === $total ? 'last' : '';
 			$css  = ! empty( $field['css'] ) ? $field['css'] : '';
+
+			/**
+			 * Fires after all fields on the page.
+			 *
+			 * @since 1.7.8
+			 *
+			 * @param array $field     Field data and settings.
+			 * @param array $form_data Form data and settings.
+			 */
+			do_action( 'wpforms_field_page_break_page_fields_after', $field, $form_data );
 
 			printf(
 				'</div><div class="wpforms-page wpforms-page-%s %s %s" style="display:none;">',
@@ -330,8 +362,18 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 				wpforms_sanitize_classes( $css )
 			);
 
+			/**
+			 * Fires before all fields on the page.
+			 *
+			 * @since 1.7.8
+			 *
+			 * @param array $field     Field data and settings.
+			 * @param array $form_data Form data and settings.
+			 */
+			do_action( 'wpforms_field_page_break_page_fields_before', $field, $form_data );
+
 			// Increase count for next page.
-			wpforms()->frontend->pages['current'] ++;
+			wpforms()->get( 'frontend' )->pages['current'] ++;
 		}
 	}
 

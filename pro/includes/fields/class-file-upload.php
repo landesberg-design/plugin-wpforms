@@ -2330,6 +2330,57 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		return isset( $field_data['style'] ) && $field_data['style'] === self::STYLE_MODERN;
 	}
+
+	/**
+	 * Returns an array containing the file paths of the files uploading in a file upload entry.
+	 *
+	 * @since 1.7.8
+	 *
+	 * @param string $form_id     Form ID.
+	 * @param array  $entry_field Entry field data.
+	 *
+	 * @return array The file path of the uploaded file. Returns an empty string if the file path isn't fetched.
+	 */
+	public static function get_entry_field_file_paths( $form_id, $entry_field ) {
+
+		$form_file_path = self::get_form_files_path( $form_id );
+		$files          = [];
+
+		if ( self::is_modern_upload( $entry_field ) ) {
+
+			foreach ( $entry_field['value_raw'] as $value ) {
+				$file_path = self::get_file_path( $value['attachment_id'], $value['file'], $form_file_path );
+
+				if ( empty( $file_path ) ) {
+					continue;
+				}
+
+				$files[] = $file_path;
+			}
+		} else {
+			$files[] = self::get_file_path( $entry_field['attachment_id'], $entry_field['file'], $form_file_path );
+		}
+
+		return $files;
+	}
+
+	/**
+	 * Returns the file path of a given attachment ID or file name.
+	 *
+	 * @since 1.7.8
+	 *
+	 * @param int    $attachment_id  Attachment ID.
+	 * @param string $file_name      File name.
+	 * @param string $file_base_path The base path of uploaded files.
+	 *
+	 * @return string
+	 */
+	private static function get_file_path( $attachment_id, $file_name, $file_base_path ) {
+
+		$file_path = empty( $attachment_id ) ? trailingslashit( $file_base_path ) . $file_name : get_attached_file( $attachment_id );
+
+		return ( empty( $file_path ) || ! is_file( $file_path ) ) ? '' : $file_path;
+	}
 }
 
 new WPForms_Field_File_Upload();

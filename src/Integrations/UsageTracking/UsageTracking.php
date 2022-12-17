@@ -157,6 +157,7 @@ class UsageTracking implements IntegrationInterface {
 			'is_multisite'                   => is_multisite(),
 			'is_wpcom'                       => defined( 'IS_WPCOM' ) && IS_WPCOM,
 			'is_wpcom_vip'                   => ( defined( 'WPCOM_IS_VIP_ENV' ) && WPCOM_IS_VIP_ENV ) || ( function_exists( 'wpcom_is_vip' ) && wpcom_is_vip() ),
+			'is_wp_cache'                    => defined( 'WP_CACHE' ) && WP_CACHE,
 			'sites_count'                    => $this->get_sites_total(),
 			'active_plugins'                 => $this->get_active_plugins(),
 			'theme_name'                     => $theme_data->name,

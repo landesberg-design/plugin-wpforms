@@ -690,6 +690,18 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 						wpf.fieldUpdate();
 					}
 				} );
+
+				// Remove error class in required fields if a value is supplied.
+				app.panelHolder.on( 'change', '.wpforms-builder-provider select.wpforms-required', function() {
+
+					const $this = $( this );
+
+					if ( ! $this.hasClass( 'wpforms-error' ) || $this.val().length === 0 ) {
+						return;
+					}
+
+					$this.removeClass( 'wpforms-error' );
+				} );
 			},
 
 			/**

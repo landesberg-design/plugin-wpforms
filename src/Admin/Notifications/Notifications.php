@@ -392,6 +392,7 @@ class Notifications {
 	 * Update notification data from feed.
 	 *
 	 * @since 1.7.5
+	 * @since 1.7.8 Added `wp_cache_flush()` call when the option has been updated.
 	 */
 	public function update() {
 
@@ -414,7 +415,11 @@ class Notifications {
 		$data = (array) apply_filters( 'wpforms_admin_notifications_update_data', $data );
 		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
-		update_option( 'wpforms_notifications', $data );
+		// Flush the cache after the option has been updated
+		// for the case when it earlier returns an old value without the new data from DB.
+		if ( update_option( 'wpforms_notifications', $data ) ) {
+			wp_cache_flush();
+		}
 	}
 
 	/**

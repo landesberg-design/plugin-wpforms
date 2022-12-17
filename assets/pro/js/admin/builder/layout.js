@@ -178,6 +178,15 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 
 			// Update the order of the options of the fields inside the Layout field.
 			app.reorderLayoutFieldsOptions( $fieldPreview );
+
+			/**
+			 * Event fired at the end of the change of layout preset.
+			 *
+			 * @since 1.7.8
+			 *
+			 * @param {object} data Layout field data object.
+			 */
+			el.$builder.trigger( 'wpformsLayoutAfterPresetChange', { fieldId: fieldId, preset: preset, newColumnsData: newColumnsData, oldColumnsData: oldColumnsData } );
 		},
 
 		/**
@@ -230,16 +239,48 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		},
 
 		/**
+		 * Check if field with given ID is inside one of the columns in the layout with given ID.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param {int} layoutId The ID of the layout field.
+		 * @param {int} fieldId  The ID of the field to look for.
+		 *
+		 * @returns {boolean} If the field exists in the layout.
+		 */
+		columnsHasFieldID: function( layoutId, fieldId ) {
+
+			/*
+			Get field columns data, and filter it to have only those columns, which in column.fields has field ID value.
+			Return true if length of such reduced data is bigger than 0.
+			 */
+			return app.getFieldColumnsData( layoutId ).filter( function( column ) {
+				return column.fields.includes( fieldId );
+			} ).length > 0;
+		},
+
+		/**
 		 * Update field columns data.
 		 *
 		 * @since 1.7.7
+		 * @since 1.7.8 Added new triggers: `wpformsLayoutColumnsDataUpdated`, `wpformsLayoutAfterUpdateColumnsData`.
 		 *
 		 * @param {integer|number} fieldId Field Id.
 		 * @param {Array}          data    Columns data.
 		 */
 		updateFieldColumnsData: function( fieldId, data ) {
 
-			$( `#wpforms-field-option-${fieldId}-columns-json` ).val( JSON.stringify( data ) );
+			const $holder = $( `#wpforms-field-option-${fieldId}-columns-json` ),
+				currentColumnsData = $holder.val(),
+				newColumnsData = JSON.stringify( data );
+
+			$holder.val( newColumnsData );
+
+			if ( currentColumnsData !== newColumnsData ) {
+				el.$builder.trigger( 'wpformsLayoutColumnsDataUpdated', { fieldId: fieldId, data: data } );
+			}
+
+			el.$builder.trigger( 'wpformsLayoutAfterUpdateColumnsData', { fieldId: fieldId, data: data } );
 		},
 
 		/**
@@ -546,6 +587,15 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 
 			app.positionFieldInColumn( fieldId, position, $sortable );
 			app.fieldOptionsUpdate( null, fieldId );
+
+			/**
+			 * Trigger on the end of the process of receiving field in layouts column.
+			 *
+			 * @since 1.7.8
+			 *
+			 * @param {object} data Field data object.
+			 */
+			el.$builder.trigger( 'wpformsLayoutAfterReceiveFieldToColumn', { fieldId: fieldId, position: position, column: $sortable } );
 		},
 
 		/**

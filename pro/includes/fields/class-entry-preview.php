@@ -1016,8 +1016,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 	 */
 	private function is_fields_ignored( $form_data ) {
 
-		// Backward compatibility with Conversational Forms addon.
-		$is_ignore = ! empty( $form_data['settings']['conversational_forms_enable'] ) && get_query_var( 'post_type' ) === 'wpforms';
+		$is_ignore = false;
 
 		/**
 		 * Allow ignoring entry preview fields for some forms.

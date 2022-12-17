@@ -39,6 +39,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 
 		$sections = [
 			'general'       => esc_html__( 'General', 'wpforms-lite' ),
+			'anti_spam'     => esc_html__( 'Spam Protection and Security', 'wpforms-lite' ),
 			'notifications' => esc_html__( 'Notifications', 'wpforms-lite' ),
 			'confirmation'  => esc_html__( 'Confirmations', 'wpforms-lite' ),
 		];
@@ -166,28 +167,6 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 				]
 			);
 
-			if ( ! empty( $this->form_data['settings']['honeypot'] ) ) {
-				wpforms_panel_field(
-					'toggle',
-					'settings',
-					'honeypot',
-					$this->form_data,
-					esc_html__( 'Enable anti-spam honeypot', 'wpforms-lite' )
-				);
-			}
-
-			wpforms_panel_field(
-				'toggle',
-				'settings',
-				'antispam',
-				$this->form_data,
-				esc_html__( 'Enable anti-spam protection', 'wpforms-lite' )
-			);
-
-			$this->general_setting_akismet();
-
-			$this->general_setting_captcha();
-
 			$this->general_setting_advanced();
 
 		echo '</div>';
@@ -259,54 +238,6 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 	 *
 	 * @since 1.6.8
 	 */
-	private function general_setting_captcha() {
-
-		$captcha_settings = wpforms_get_captcha_settings();
-
-		if (
-			! empty( $captcha_settings['provider'] ) &&
-			$captcha_settings['provider'] !== 'none' &&
-			! empty( $captcha_settings['site_key'] ) &&
-			! empty( $captcha_settings['secret_key'] )
-		) {
-			$lbl = '';
-
-			switch ( $captcha_settings['recaptcha_type'] ) {
-				case 'v2':
-					$lbl = esc_html__( 'Enable Google Checkbox v2 reCAPTCHA', 'wpforms-lite' );
-					break;
-
-				case 'invisible':
-					$lbl = esc_html__( 'Enable Google Invisible v2 reCAPTCHA', 'wpforms-lite' );
-					break;
-
-				case 'v3':
-					$lbl = esc_html__( 'Enable Google v3 reCAPTCHA', 'wpforms-lite' );
-					break;
-			}
-
-			$lbl = $captcha_settings['provider'] === 'hcaptcha' ? esc_html__( 'Enable hCaptcha', 'wpforms-lite' ) : $lbl;
-
-			wpforms_panel_field(
-				'toggle',
-				'settings',
-				'recaptcha',
-				$this->form_data,
-				$lbl,
-				[
-					'data' => [
-						'provider' => $captcha_settings['provider'],
-					],
-				]
-			);
-		}
-	}
-
-	/**
-	 * Output the *CAPTCHA settings.
-	 *
-	 * @since 1.6.8
-	 */
 	private function general_setting_advanced() {
 
 		ob_start();
@@ -371,45 +302,6 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 				'title'      => esc_html__( 'Advanced', 'wpforms-lite' ),
 			],
 			true
-		);
-	}
-
-	/**
-	 * Output the Akismet settings.
-	 *
-	 * @since 1.7.6
-	 *
-	 * @return void
-	 */
-	private function general_setting_akismet() {
-
-		$args = [];
-
-		if ( ! Akismet::is_configured() ) {
-			$args['data']['akismet-status'] = 'akismet_no_api_key';
-		}
-
-		if ( ! Akismet::is_activated() ) {
-			$args['data']['akismet-status'] = 'akismet_not_activated';
-		}
-
-		if ( ! Akismet::is_installed() ) {
-			$args['data']['akismet-status'] = 'akismet_not_installed';
-		}
-
-		// If akismet isn't available, disable the akismet toggle.
-		if ( isset( $args['data'] ) ) {
-			$args['input_class'] = 'wpforms-akismet-disabled';
-			$args['value']       = '0';
-		}
-
-		wpforms_panel_field(
-			'toggle',
-			'settings',
-			'akismet',
-			$this->form_data,
-			esc_html__( 'Enable Akismet anti-spam protection', 'wpforms-lite' ),
-			$args
 		);
 	}
 }

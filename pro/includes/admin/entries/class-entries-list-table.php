@@ -492,6 +492,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		if (
 			! empty( $entry_fields[ $field_id ] ) &&
+			isset( $entry_fields[ $field_id ]['type'] ) &&
 			! wpforms_is_empty_string( $entry_fields[ $field_id ]['type'] )
 		) {
 			$field_type = $entry_fields[ $field_id ]['type'];
@@ -1102,7 +1103,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		$cur_term = '';
 
-		if ( ! empty( $_GET['search']['term'] ) ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+		if ( isset( $_GET['search']['term'] ) && ! wpforms_is_empty_string( $_GET['search']['term'] ) ) {
 			$cur_term = sanitize_text_field( wp_unslash( $_GET['search']['term'] ) );
 			$cur_term = empty( $cur_term ) ? htmlspecialchars( wp_unslash( $_GET['search']['term'] ) ) : $cur_term; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}

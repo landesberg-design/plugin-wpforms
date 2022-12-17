@@ -479,6 +479,8 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 					// Custom positioning.
 					if ( step === 4 || step === 3 ) {
 						instance.option( 'side', 'right' );
+					} else if ( step === 1 ) {
+						instance.option( 'side', 'left' );
 					}
 
 					// Reposition is needed to render max-width CSS correctly.
@@ -603,8 +605,8 @@ WPFormsChallenge.core = window.WPFormsChallenge.core || ( function( document, wi
 
 			step = step || app.loadStep();
 
-			el.$listSteps.find( 'li:lt(' + step + ')' ).addClass( 'wpforms-challenge-item-completed' ).removeClass( 'wpforms-challenge-item-current' );
-			el.$listSteps.find( 'li:eq(' + step + ')' ).addClass( 'wpforms-challenge-item-current' );
+			el.$listSteps.find( 'li' ).slice( 0, step ).addClass( 'wpforms-challenge-item-completed' ).removeClass( 'wpforms-challenge-item-current' );
+			el.$listSteps.find( 'li' ).eq( step ).addClass( 'wpforms-challenge-item-current' );
 			el.$progressBar.find( 'div' ).css( 'width', ( step * 20 ) + '%' );
 		},
 

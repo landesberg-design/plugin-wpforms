@@ -1,23 +1,23 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms Lite 1.7.7.1\n"
+"Project-Id-Version: WPForms Lite 1.7.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms-lite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-10-05T11:20:20+00:00\n"
+"POT-Creation-Date: 2022-11-08T19:23:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: wpforms-lite\n"
 
 #. Plugin Name of the plugin
 #. Author of the plugin
-#: includes/admin/class-menu.php:42
 #: includes/admin/class-menu.php:43
-#: includes/admin/class-menu.php:54
-#: includes/admin/class-menu.php:122
+#: includes/admin/class-menu.php:44
+#: includes/admin/class-menu.php:55
+#: includes/admin/class-menu.php:123
 #: includes/class-form.php:125
 #: includes/integrations.php:36
 #: src/Emails/Templates/General.php:93
@@ -64,18 +64,18 @@ msgstr ""
 
 #: includes/admin/admin.php:151
 #: includes/admin/admin.php:204
-#: includes/admin/class-about.php:410
+#: includes/admin/class-about.php:411
 #: templates/education/admin/settings/geolocation/submit.php:24
 msgid "Activate"
 msgstr ""
 
 #: includes/admin/admin.php:152
-#: includes/admin/class-about.php:402
+#: includes/admin/class-about.php:403
 msgid "Activated"
 msgstr ""
 
 #: includes/admin/admin.php:153
-#: includes/admin/class-about.php:399
+#: includes/admin/class-about.php:400
 msgid "Active"
 msgstr ""
 
@@ -84,7 +84,7 @@ msgid "Deactivate"
 msgstr ""
 
 #: includes/admin/admin.php:155
-#: includes/admin/class-about.php:407
+#: includes/admin/class-about.php:408
 msgid "Inactive"
 msgstr ""
 
@@ -107,7 +107,7 @@ msgid "Searching Addons"
 msgstr ""
 
 #: includes/admin/admin.php:174
-#: includes/admin/builder/class-builder.php:534
+#: includes/admin/builder/class-builder.php:537
 #: includes/admin/class-editor.php:158
 #: src/Admin/Education/Core.php:91
 #: src/Admin/Forms/Tags.php:453
@@ -117,11 +117,12 @@ msgid "Cancel"
 msgstr ""
 
 #: includes/admin/admin.php:175
-#: includes/admin/builder/class-builder.php:536
+#: includes/admin/builder/class-builder.php:539
 #: includes/admin/class-editor.php:105
 #: src/Admin/Education/Core.php:92
 #: src/Forms/Locator.php:340
 #: src/Lite/Admin/Education/LiteConnect.php:235
+#: templates/builder/fullscreen/mobile-notice.php:28
 #: templates/builder/help.php:35
 msgid "Close"
 msgstr ""
@@ -188,7 +189,7 @@ msgid "Are you sure you want to duplicate this form?"
 msgstr ""
 
 #: includes/admin/admin.php:194
-#: includes/admin/builder/class-builder.php:546
+#: includes/admin/builder/class-builder.php:549
 #: src/Admin/Education/Builder/Captcha.php:156
 #: src/Integrations/Gutenberg/FormSelector.php:180
 #: wpforms.php:152
@@ -213,7 +214,7 @@ msgid "Oops!"
 msgstr ""
 
 #: includes/admin/admin.php:201
-#: includes/admin/builder/class-builder.php:535
+#: includes/admin/builder/class-builder.php:538
 msgid "OK"
 msgstr ""
 
@@ -272,12 +273,12 @@ msgid "Upgrade was successfully completed!"
 msgstr ""
 
 #: includes/admin/admin.php:242
-#: includes/admin/builder/class-builder.php:620
+#: includes/admin/builder/class-builder.php:623
 msgid "Upload or Choose Your Image"
 msgstr ""
 
 #: includes/admin/admin.php:243
-#: includes/admin/builder/class-builder.php:621
+#: includes/admin/builder/class-builder.php:624
 msgid "Use Image"
 msgstr ""
 
@@ -286,7 +287,7 @@ msgid "To edit the License Key, please first click the Deactivate Key button. Pl
 msgstr ""
 
 #: includes/admin/admin.php:251
-#: includes/admin/builder/class-builder.php:644
+#: includes/admin/builder/class-builder.php:647
 msgid "Something went wrong"
 msgstr ""
 
@@ -295,12 +296,12 @@ msgid "Success"
 msgstr ""
 
 #: includes/admin/admin.php:254
-#: includes/admin/builder/class-builder.php:579
+#: includes/admin/builder/class-builder.php:582
 msgid "Use Simple Contact Form Template"
 msgstr ""
 
 #: includes/admin/admin.php:255
-#: includes/admin/builder/class-builder.php:642
+#: includes/admin/builder/class-builder.php:645
 msgid "Something went wrong while applying the template."
 msgstr ""
 
@@ -473,224 +474,224 @@ msgstr ""
 msgid "You can't edit this form because it's in the trash."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:514
+#: includes/admin/builder/class-builder.php:517
 msgid "And"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:516
+#: includes/admin/builder/class-builder.php:519
 msgid "Add New Choices"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:517
+#: includes/admin/builder/class-builder.php:520
 #: includes/fields/class-base.php:1001
 msgid "Bulk Add"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:518
+#: includes/admin/builder/class-builder.php:521
 msgid "Are you sure you want to leave? You have unsaved changes"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:519
+#: includes/admin/builder/class-builder.php:522
 msgid "Hide Bulk Add"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:520
+#: includes/admin/builder/class-builder.php:523
 msgid "Add Choices (one per line)"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:521
+#: includes/admin/builder/class-builder.php:524
 msgid ""
 "Blue\n"
 "Red\n"
 "Green"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:522
+#: includes/admin/builder/class-builder.php:525
 msgid "Show presets"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:523
+#: includes/admin/builder/class-builder.php:526
 msgid "Hide presets"
 msgstr ""
 
 #. translators: %1$s - data source name (e.g. Categories, Posts), %2$s - data source type (e.g. post type, taxonomy), %3$s - display limit, %4$s - total number of items.
-#: includes/admin/builder/class-builder.php:528
+#: includes/admin/builder/class-builder.php:531
 msgid "The %1$s %2$s contains over %3$s items (%4$s). This may make the field difficult for your visitors to use and/or cause the form to be slow."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:537
+#: includes/admin/builder/class-builder.php:540
 msgid "Due to form changes, conditional logic rules will be removed or updated:"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:538
+#: includes/admin/builder/class-builder.php:541
 msgid "Are you sure you want to disable conditional logic? This will remove the rules for this field or setting."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:539
+#: includes/admin/builder/class-builder.php:542
 msgid "Field"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:540
+#: includes/admin/builder/class-builder.php:543
 msgid "Field Locked"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:541
+#: includes/admin/builder/class-builder.php:544
 msgid "This field cannot be deleted or duplicated."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:542
+#: includes/admin/builder/class-builder.php:545
 msgid "This field cannot be deleted."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:543
+#: includes/admin/builder/class-builder.php:546
 msgid "This field cannot be duplicated."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:544
+#: includes/admin/builder/class-builder.php:547
 msgid "Available Fields"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:545
+#: includes/admin/builder/class-builder.php:548
 msgid "No fields available"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:550
+#: includes/admin/builder/class-builder.php:553
 msgid "No email fields"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:551
+#: includes/admin/builder/class-builder.php:554
 msgid "Are you sure you want to delete this notification?"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:552
+#: includes/admin/builder/class-builder.php:555
 msgid "Enter a notification name"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:553
+#: includes/admin/builder/class-builder.php:556
 msgid "Eg: User Confirmation"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:554
+#: includes/admin/builder/class-builder.php:557
 msgid "You must provide a notification name"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:555
+#: includes/admin/builder/class-builder.php:558
 #: lite/wpforms-lite.php:162
 #: src/Admin/Tools/Importers/PirateForms.php:452
 msgid "Default Notification"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:556
+#: includes/admin/builder/class-builder.php:559
 msgid "Are you sure you want to delete this confirmation?"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:557
+#: includes/admin/builder/class-builder.php:560
 msgid "Enter a confirmation name"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:558
+#: includes/admin/builder/class-builder.php:561
 msgid "Eg: Alternative Confirmation"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:559
+#: includes/admin/builder/class-builder.php:562
 msgid "You must provide a confirmation name"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:560
+#: includes/admin/builder/class-builder.php:563
 #: lite/wpforms-lite.php:416
 msgid "Default Confirmation"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:561
-#: includes/admin/builder/class-builder.php:997
+#: includes/admin/builder/class-builder.php:564
+#: includes/admin/builder/class-builder.php:979
 msgid "Save"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:562
+#: includes/admin/builder/class-builder.php:565
 msgid "Saving"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:563
+#: includes/admin/builder/class-builder.php:566
 msgid "Saved!"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:564
+#: includes/admin/builder/class-builder.php:567
 msgid "Save and Exit"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:565
+#: includes/admin/builder/class-builder.php:568
 msgid "Save and Embed"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:567
+#: includes/admin/builder/class-builder.php:570
 #: includes/fields/class-base.php:1376
 msgid "Show Layouts"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:568
+#: includes/admin/builder/class-builder.php:571
 msgid "Hide Layouts"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:569
+#: includes/admin/builder/class-builder.php:572
 msgid "Select your layout"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:570
+#: includes/admin/builder/class-builder.php:573
 msgid "Select your column"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:571
+#: includes/admin/builder/class-builder.php:574
 #: includes/class-frontend.php:1168
 msgid "Loading"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:577
-#: src/Admin/Traits/FormTemplates.php:299
+#: includes/admin/builder/class-builder.php:580
+#: src/Admin/Traits/FormTemplates.php:300
 msgid "Use Template"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:578
+#: includes/admin/builder/class-builder.php:581
 msgid "Changing templates on an existing form will DELETE existing form fields. Are you sure you want apply the new template?"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:580
-#: includes/admin/builder/class-builder.php:990
+#: includes/admin/builder/class-builder.php:583
+#: includes/admin/builder/class-builder.php:972
 msgid "Embed"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:581
+#: includes/admin/builder/class-builder.php:584
 msgid "Exit"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:583
+#: includes/admin/builder/class-builder.php:586
 msgid "Your form contains unsaved changes. Would you like to save your changes first."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:584
+#: includes/admin/builder/class-builder.php:587
 msgid "Are you sure you want to delete this field?"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:585
+#: includes/admin/builder/class-builder.php:588
 msgid "Are you sure you want to delete this choice?"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:586
+#: includes/admin/builder/class-builder.php:589
 msgid "Are you sure you want to duplicate this field?"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:587
+#: includes/admin/builder/class-builder.php:590
 msgid "(copy)"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:588
+#: includes/admin/builder/class-builder.php:591
 msgid "Please enter a form name."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:589
+#: includes/admin/builder/class-builder.php:592
 msgid "This item must contain at least one choice."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:590
+#: includes/admin/builder/class-builder.php:593
 #: includes/admin/builder/functions.php:400
 #: includes/fields/class-base.php:1469
 #: src/Integrations/Divi/WPFormsSelector.php:72
@@ -698,130 +699,130 @@ msgstr ""
 msgid "Off"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:591
+#: includes/admin/builder/class-builder.php:594
 #: includes/admin/builder/functions.php:399
 #: src/Integrations/Divi/WPFormsSelector.php:73
 #: src/Integrations/Divi/WPFormsSelector.php:83
 msgid "On"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:592
+#: includes/admin/builder/class-builder.php:595
 msgid "or"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:593
+#: includes/admin/builder/class-builder.php:596
 msgid "Other"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:594
+#: includes/admin/builder/class-builder.php:597
 msgid "is"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:595
+#: includes/admin/builder/class-builder.php:598
 msgid "is not"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:596
+#: includes/admin/builder/class-builder.php:599
 msgid "empty"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:597
+#: includes/admin/builder/class-builder.php:600
 msgid "not empty"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:598
+#: includes/admin/builder/class-builder.php:601
 msgid "contains"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:599
+#: includes/admin/builder/class-builder.php:602
 msgid "does not contain"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:600
+#: includes/admin/builder/class-builder.php:603
 msgid "starts with"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:601
+#: includes/admin/builder/class-builder.php:604
 msgid "ends with"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:602
+#: includes/admin/builder/class-builder.php:605
 msgid "greater than"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:603
+#: includes/admin/builder/class-builder.php:606
 msgid "less than"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:604
+#: includes/admin/builder/class-builder.php:607
 msgid "Entry storage is currently disabled, but is required to accept payments. Please enable in your form settings."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:605
+#: includes/admin/builder/class-builder.php:608
 msgid "This form is currently accepting payments. Entry storage is required to accept payments. To disable entry storage, please first disable payments."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:606
+#: includes/admin/builder/class-builder.php:609
 msgid "Previous"
 msgstr ""
 
 #. translators: %s - marketing integration name.
-#: includes/admin/builder/class-builder.php:608
+#: includes/admin/builder/class-builder.php:611
 msgid "In order to complete your form's %s integration, please check that the dropdowns for all required (*) List Fields have been filled out."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:611
+#: includes/admin/builder/class-builder.php:614
 msgid "Create new rule"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:612
+#: includes/admin/builder/class-builder.php:615
 msgid "Add New Group"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:613
+#: includes/admin/builder/class-builder.php:616
 msgid "Delete rule"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:616
+#: includes/admin/builder/class-builder.php:619
 #: includes/admin/builder/functions.php:57
 #: includes/fields/class-base.php:1313
 msgid "Show Smart Tags"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:617
+#: includes/admin/builder/class-builder.php:620
 msgid "Hide Smart Tags"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:618
+#: includes/admin/builder/class-builder.php:621
 #: src/Providers/Provider/Settings/FormBuilder.php:132
 #: src/Providers/Provider/Settings/FormBuilder.php:189
 msgid "--- Select Field ---"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:619
+#: includes/admin/builder/class-builder.php:622
 msgid "--- Select Choice ---"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:622
+#: includes/admin/builder/class-builder.php:625
 #: includes/fields/class-base.php:1047
 #: includes/fields/class-base.php:1181
 msgid "Remove Image"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:623
+#: includes/admin/builder/class-builder.php:626
 msgid "Add"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:627
+#: includes/admin/builder/class-builder.php:630
 msgid "You should enter a valid absolute address to the Confirmation Redirect URL field."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:628
+#: includes/admin/builder/class-builder.php:631
 msgid "Add Custom Value"
 msgstr ""
 
 #. translators: %s - choice number.
-#: includes/admin/builder/class-builder.php:630
+#: includes/admin/builder/class-builder.php:633
 #: includes/fields/class-checkbox.php:153
 #: includes/fields/class-checkbox.php:711
 #: includes/fields/class-radio.php:130
@@ -829,155 +830,132 @@ msgstr ""
 msgid "Choice %s"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:633
+#: includes/admin/builder/class-builder.php:636
 msgid "Something went wrong while saving the form. Please reload the page and try again."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:634
+#: includes/admin/builder/class-builder.php:637
 msgid "Please contact the plugin support team if this behavior persists."
 msgstr ""
 
 #. translators: %1$s - template name, %2$s - addon name(s).
-#: includes/admin/builder/class-builder.php:637
+#: includes/admin/builder/class-builder.php:640
 msgid "The %1$s template requires the %2$s. Would you like to install and activate it?"
 msgstr ""
 
 #. translators: %1$s - template name, %2$s - addon name(s).
-#: includes/admin/builder/class-builder.php:639
+#: includes/admin/builder/class-builder.php:642
 msgid "The %1$s template requires the %2$s. Would you like to install and activate all the required addons?"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:640
+#: includes/admin/builder/class-builder.php:643
 msgid "Could not install OR activate all the required addons. Please download from wpforms.com and install them manually. Would you like to use the template anyway?"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:641
+#: includes/admin/builder/class-builder.php:644
 msgid "Yes, use template"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:643
+#: includes/admin/builder/class-builder.php:646
 #: includes/templates/class-blank.php:18
 msgid "Blank Form"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:645
+#: includes/admin/builder/class-builder.php:648
 msgid "This field cannot be moved."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:646
+#: includes/admin/builder/class-builder.php:649
 #: includes/fields/class-base.php:1644
 msgid "Empty Label"
 msgstr ""
 
 #. translators: %s - Link to the WPForms.com doc article.
-#: includes/admin/builder/class-builder.php:651
+#: includes/admin/builder/class-builder.php:654
 msgid "Disabling entry storage for this form will completely prevent any new submissions from getting saved to your site. If you still intend to keep a record of entries through notification emails, then please <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">test your form</a> to ensure emails send reliably."
 msgstr ""
 
 #. translators: %1$s - Link to the plugin search page, %2$s - Link to the WPForms.com doc article.
-#: includes/admin/builder/class-builder.php:671
+#: includes/admin/builder/class-builder.php:674
 msgid "This feature cannot be used at this time because the Akismet plugin <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">has not been installed</a>. For information on how to use this feature please <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">refer to our documentation</a>."
 msgstr ""
 
 #. translators: %1$s - Link to the plugins page, %2$s - Link to the WPForms.com doc article.
-#: includes/admin/builder/class-builder.php:692
+#: includes/admin/builder/class-builder.php:695
 msgid "This feature cannot be used at this time because the Akismet plugin <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">has not been activated</a>. For information on how to use this feature please <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">refer to our documentation</a>."
 msgstr ""
 
 #. translators: %1$s - Link to the Akismet settings page, %2$s - Link to the WPForms.com doc article.
-#: includes/admin/builder/class-builder.php:713
+#: includes/admin/builder/class-builder.php:716
 msgid "This feature cannot be used at this time because the Akismet plugin <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">has not been properly configured</a>. For information on how to use this feature please <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">refer to our documentation</a>."
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:784
+#: includes/admin/builder/class-builder.php:787
 msgid "Countries"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:788
+#: includes/admin/builder/class-builder.php:791
 msgid "Countries Postal Code"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:792
+#: includes/admin/builder/class-builder.php:795
 msgid "States"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:796
+#: includes/admin/builder/class-builder.php:799
 msgid "States Postal Code"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:800
+#: includes/admin/builder/class-builder.php:803
 msgid "Months"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:804
+#: includes/admin/builder/class-builder.php:807
 msgid "Days"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:897
-msgid "You are using an outdated browser!"
-msgstr ""
-
-#. translators: %1$s - Link to the update Internet Explorer page, %2$s - link to the browse happy page.
-#: includes/admin/builder/class-builder.php:902
-msgid "The Internet Explorer browser no more supported.<br>Our form builder is optimized for modern browsers.<br>Please <a href=\"%1$s\" target=\"_blank\" rel=\"nofollow noopener\">install Microsoft Edge</a> or learn<br>how to <a href=\"%2$s\" target=\"_blank\" rel=\"nofollow noopener\">browse happy</a>."
-msgstr ""
-
-#: includes/admin/builder/class-builder.php:917
-#: includes/admin/builder/class-builder.php:924
-#: templates/admin/form-embed-wizard/popup.php:72
-msgid "Go back"
-msgstr ""
-
-#: includes/admin/builder/class-builder.php:921
-#: includes/admin/builder/class-builder.php:949
+#: includes/admin/builder/class-builder.php:931
 #: includes/admin/class-welcome.php:138
 #: lite/templates/education/lite-connect-modal.php:15
 #: src/Lite/Admin/DashboardWidget.php:242
 #: templates/admin/challenge/modal.php:52
+#: templates/builder/fullscreen/mobile-notice.php:15
 #: templates/builder/help.php:32
 msgid "Sullie the WPForms mascot"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:922
-msgid "Oh, hi there!"
-msgstr ""
-
-#: includes/admin/builder/class-builder.php:923
-msgid "Our form builder is optimized for desktop computers and tablets. Please manage your forms on a different device, or if you're on a tablet, try rotating it."
-msgstr ""
-
-#: includes/admin/builder/class-builder.php:956
+#: includes/admin/builder/class-builder.php:938
 msgid "Now editing"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:969
+#: includes/admin/builder/class-builder.php:951
 msgid "Help Ctrl+H"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:970
+#: includes/admin/builder/class-builder.php:952
 msgid "Help"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:979
+#: includes/admin/builder/class-builder.php:961
 msgid "Preview Form Ctrl+P"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:982
+#: includes/admin/builder/class-builder.php:964
 #: src/Admin/Forms/Views.php:433
 #: src/Admin/Settings/Captcha.php:233
 #: src/Admin/Tools/Views/Importer.php:332
 msgid "Preview"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:989
+#: includes/admin/builder/class-builder.php:971
 msgid "Embed Form Ctrl+B"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:996
+#: includes/admin/builder/class-builder.php:978
 msgid "Save Form Ctrl+S"
 msgstr ""
 
-#: includes/admin/builder/class-builder.php:1002
+#: includes/admin/builder/class-builder.php:984
 msgid "Exit Ctrl+Q"
 msgstr ""
 
@@ -1005,15 +983,15 @@ msgstr ""
 
 #: includes/admin/builder/panels/class-fields.php:160
 #: includes/class-frontend.php:958
-#: includes/class-process.php:202
+#: includes/class-process.php:252
 #: src/Admin/Education/Builder/Captcha.php:123
-#: src/Admin/Education/Fields.php:286
+#: src/Admin/Education/Fields.php:294
 #: src/Admin/Settings/Captcha.php:136
 msgid "hCaptcha"
 msgstr ""
 
 #: includes/admin/builder/panels/class-fields.php:161
-#: src/Admin/Education/Fields.php:286
+#: src/Admin/Education/Fields.php:294
 #: src/Admin/Settings/Captcha.php:137
 msgid "reCAPTCHA"
 msgstr ""
@@ -1023,7 +1001,7 @@ msgid "Enabled"
 msgstr ""
 
 #: includes/admin/builder/panels/class-fields.php:170
-#: includes/admin/builder/panels/class-settings.php:155
+#: includes/admin/builder/panels/class-settings.php:156
 #: includes/class-form.php:519
 #: includes/templates/class-simple-contact-form.php:54
 #: src/Admin/Tools/Importers/ContactForm7.php:124
@@ -1229,13 +1207,13 @@ msgid "You’re currently viewing a form revision from %1$s at %2$s. %3$s or %4$
 msgstr ""
 
 #: includes/admin/builder/panels/class-settings.php:21
-#: includes/admin/class-menu.php:103
-#: includes/admin/class-menu.php:336
+#: includes/admin/class-menu.php:104
+#: includes/admin/class-menu.php:346
 msgid "Settings"
 msgstr ""
 
 #: includes/admin/builder/panels/class-settings.php:41
-#: includes/admin/builder/panels/class-settings.php:125
+#: includes/admin/builder/panels/class-settings.php:126
 #: includes/admin/class-settings.php:187
 #: includes/admin/class-settings.php:269
 #: includes/fields/class-base.php:873
@@ -1243,122 +1221,100 @@ msgid "General"
 msgstr ""
 
 #: includes/admin/builder/panels/class-settings.php:42
+#: includes/admin/class-about.php:76
+#: src/Admin/Builder/AntiSpam.php:57
+msgid "Spam Protection and Security"
+msgstr ""
+
+#: includes/admin/builder/panels/class-settings.php:43
 #: lite/wpforms-lite.php:101
 #: src/Admin/AdminBarMenu.php:221
 #: templates/admin/notifications.php:23
 msgid "Notifications"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:43
+#: includes/admin/builder/panels/class-settings.php:44
 #: lite/wpforms-lite.php:404
 msgid "Confirmations"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:90
+#: includes/admin/builder/panels/class-settings.php:91
 #: src/Admin/Forms/Tags.php:259
 msgid "Press Enter or \",\" key to add new tag"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:106
+#: includes/admin/builder/panels/class-settings.php:107
 msgid "You need to <a href=\"#\" class=\"wpforms-panel-switch\" data-panel=\"setup\">setup your form</a> before you can manage the settings."
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:133
+#: includes/admin/builder/panels/class-settings.php:134
 #: src/Integrations/Elementor/Widget.php:222
 #: src/SmartTags/SmartTags.php:112
 msgid "Form Name"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:143
+#: includes/admin/builder/panels/class-settings.php:144
 #: src/Integrations/Elementor/Widget.php:236
 msgid "Form Description"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:153
+#: includes/admin/builder/panels/class-settings.php:154
 msgid "Submit Button Text"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:163
+#: includes/admin/builder/panels/class-settings.php:164
 msgid "Submit Button Processing Text"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:165
+#: includes/admin/builder/panels/class-settings.php:166
 msgid "Enter the submit button text you would like the button display while the form submit is processing."
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:175
-msgid "Enable anti-spam honeypot"
-msgstr ""
-
-#: includes/admin/builder/panels/class-settings.php:184
-msgid "Enable anti-spam protection"
-msgstr ""
-
-#: includes/admin/builder/panels/class-settings.php:247
+#: includes/admin/builder/panels/class-settings.php:226
 #: includes/admin/overview/class-overview-table.php:92
 msgid "Tags"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:252
+#: includes/admin/builder/panels/class-settings.php:231
 msgid "Mark form with the tags. To create a new tag, simply type it and press Enter."
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:276
-msgid "Enable Google Checkbox v2 reCAPTCHA"
-msgstr ""
-
-#: includes/admin/builder/panels/class-settings.php:280
-msgid "Enable Google Invisible v2 reCAPTCHA"
-msgstr ""
-
-#: includes/admin/builder/panels/class-settings.php:284
-msgid "Enable Google v3 reCAPTCHA"
-msgstr ""
-
-#: includes/admin/builder/panels/class-settings.php:288
-msgid "Enable hCaptcha"
-msgstr ""
-
-#: includes/admin/builder/panels/class-settings.php:319
+#: includes/admin/builder/panels/class-settings.php:250
 msgid "Form CSS Class"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:321
+#: includes/admin/builder/panels/class-settings.php:252
 msgid "Enter CSS class names for the form wrapper. Multiple class names should be separated with spaces."
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:330
+#: includes/admin/builder/panels/class-settings.php:261
 msgid "Submit Button CSS Class"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:332
+#: includes/admin/builder/panels/class-settings.php:263
 msgid "Enter CSS class names for the form submit button. Multiple names should be separated with spaces."
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:341
+#: includes/admin/builder/panels/class-settings.php:272
 msgid "Enable Prefill by URL"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:346
+#: includes/admin/builder/panels/class-settings.php:277
 msgid "How to use Prefill by URL"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:356
+#: includes/admin/builder/panels/class-settings.php:287
 msgid "Enable AJAX form submission"
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:358
+#: includes/admin/builder/panels/class-settings.php:289
 msgid "Enables form submission without page reload."
 msgstr ""
 
-#: includes/admin/builder/panels/class-settings.php:371
+#: includes/admin/builder/panels/class-settings.php:302
 #: includes/fields/class-base.php:1346
-#: src/Lite/Admin/Education/Builder/Notifications.php:95
+#: src/Lite/Admin/Education/Builder/Notifications.php:117
 msgid "Advanced"
-msgstr ""
-
-#: includes/admin/builder/panels/class-settings.php:411
-msgid "Enable Akismet anti-spam protection"
 msgstr ""
 
 #: includes/admin/builder/panels/class-setup.php:21
@@ -1388,7 +1344,7 @@ msgid "To speed up the process you can select from one of our pre-made templates
 msgstr ""
 
 #: includes/admin/class-about.php:73
-#: includes/admin/class-menu.php:74
+#: includes/admin/class-menu.php:75
 msgid "Form Entries"
 msgstr ""
 
@@ -1397,673 +1353,693 @@ msgid "Form Fields"
 msgstr ""
 
 #: includes/admin/class-about.php:75
-#: includes/admin/class-menu.php:93
+#: includes/admin/class-menu.php:94
 #: includes/admin/class-welcome.php:191
 #: src/Admin/Pages/Templates.php:95
 msgid "Form Templates"
 msgstr ""
 
-#: includes/admin/class-about.php:76
+#: includes/admin/class-about.php:77
 #: includes/admin/class-welcome.php:203
 #: src/Lite/Admin/Education/Builder/Fields.php:79
 msgid "Smart Conditional Logic"
 msgstr ""
 
-#: includes/admin/class-about.php:77
+#: includes/admin/class-about.php:78
 #: includes/admin/class-welcome.php:274
 msgid "Marketing Integrations"
 msgstr ""
 
-#: includes/admin/class-about.php:78
+#: includes/admin/class-about.php:79
 #: includes/admin/class-welcome.php:265
 msgid "Payment Forms"
 msgstr ""
 
-#: includes/admin/class-about.php:79
+#: includes/admin/class-about.php:80
 #: includes/admin/class-welcome.php:266
 msgid "Surveys & Polls"
 msgstr ""
 
-#: includes/admin/class-about.php:80
+#: includes/admin/class-about.php:81
 msgid "Advanced Form Features"
 msgstr ""
 
-#: includes/admin/class-about.php:81
-#: includes/admin/class-menu.php:132
+#: includes/admin/class-about.php:82
+#: includes/admin/class-menu.php:133
 #: lite/templates/admin/addons.php:18
 msgid "WPForms Addons"
 msgstr ""
 
-#: includes/admin/class-about.php:82
+#: includes/admin/class-about.php:83
 msgid "Customer Support"
 msgstr ""
 
-#: includes/admin/class-about.php:83
+#: includes/admin/class-about.php:84
 msgid "Number of Sites"
 msgstr ""
 
-#: includes/admin/class-about.php:111
-#: includes/admin/class-menu.php:163
+#: includes/admin/class-about.php:112
+#: includes/admin/class-menu.php:164
 msgid "About Us"
 msgstr ""
 
-#: includes/admin/class-about.php:112
+#: includes/admin/class-about.php:113
 #: src/Admin/Builder/Help.php:257
 msgid "Getting Started"
 msgstr ""
 
 #. translators: %1$s - current license type; %2$s - suggested license type.
-#: includes/admin/class-about.php:126
+#: includes/admin/class-about.php:127
 msgid "%1$s vs %2$s"
 msgstr ""
 
-#: includes/admin/class-about.php:242
+#: includes/admin/class-about.php:243
 msgid "Hello and welcome to WPForms, the most beginner friendly drag & drop WordPress forms plugin. At WPForms, we build software that helps you create beautiful responsive online forms for your website in minutes."
 msgstr ""
 
-#: includes/admin/class-about.php:245
+#: includes/admin/class-about.php:246
 msgid "Over the years, we found that most WordPress contact form plugins were bloated, buggy, slow, and very hard to use. So we started with a simple goal: build a WordPress forms plugin that’s both easy and powerful."
 msgstr ""
 
-#: includes/admin/class-about.php:248
+#: includes/admin/class-about.php:249
 msgid "Our goal is to take the pain out of creating online forms and make it easy."
 msgstr ""
 
 #. translators: %1$s - WPBeginner URL; %2$s - OptinMonster URL; %3$s - MonsterInsights URL.
-#: includes/admin/class-about.php:255
+#: includes/admin/class-about.php:256
 msgid "WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WPBeginner</a>, the most popular lead-generation software, <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">OptinMonster</a>, the best WordPress analytics plugin, <a href=\"%3$s\" target=\"_blank\" rel=\"noopener noreferrer\">MonsterInsights</a>, and more!"
 msgstr ""
 
-#: includes/admin/class-about.php:271
+#: includes/admin/class-about.php:272
 msgid "Yup, we know a thing or two about building awesome products that customers love."
 msgstr ""
 
-#: includes/admin/class-about.php:277
+#: includes/admin/class-about.php:278
 msgid "The WPForms Team photo"
 msgstr ""
 
-#: includes/admin/class-about.php:279
+#: includes/admin/class-about.php:280
 msgid "The WPForms Team"
 msgstr ""
 
 #. translators: %s - addon status label.
-#: includes/admin/class-about.php:335
+#: includes/admin/class-about.php:336
 msgid "Status: %s"
 msgstr ""
 
-#: includes/admin/class-about.php:348
+#: includes/admin/class-about.php:349
 msgid "WordPress.org"
 msgstr ""
 
-#: includes/admin/class-about.php:421
+#: includes/admin/class-about.php:422
 #: src/Admin/Tools/Views/Import.php:195
 msgid "Not Installed"
 msgstr ""
 
-#: includes/admin/class-about.php:424
+#: includes/admin/class-about.php:425
 msgid "Install Plugin"
 msgstr ""
 
-#: includes/admin/class-about.php:459
+#: includes/admin/class-about.php:460
 msgid "Creating Your First Form"
 msgstr ""
 
-#: includes/admin/class-about.php:463
+#: includes/admin/class-about.php:464
 msgid "Want to get started creating your first form with WPForms? By following the step by step instructions in this walkthrough, you can easily publish your first form on your site."
 msgstr ""
 
-#: includes/admin/class-about.php:467
+#: includes/admin/class-about.php:468
 msgid "To begin, you’ll need to be logged into the WordPress admin area. Once there, click on WPForms in the admin sidebar to go the Forms Overview page."
 msgstr ""
 
-#: includes/admin/class-about.php:471
+#: includes/admin/class-about.php:472
 msgid "In the Forms Overview page, the forms list will be empty because there are no forms yet. To create a new form, click on the Add New button, and this will launch the WPForms Form Builder."
 msgstr ""
 
-#: includes/admin/class-about.php:477
+#: includes/admin/class-about.php:478
 msgid "How to Add a New Form"
 msgstr ""
 
-#: includes/admin/class-about.php:482
+#: includes/admin/class-about.php:483
 msgid "How to Customize Form Fields"
 msgstr ""
 
-#: includes/admin/class-about.php:487
+#: includes/admin/class-about.php:488
 msgid "How to Display Forms on Your Site"
 msgstr ""
 
-#: includes/admin/class-about.php:505
+#: includes/admin/class-about.php:506
 #: lite/wpforms-lite.php:585
 msgid "Get WPForms Pro and Unlock all the Powerful Features"
 msgstr ""
 
-#: includes/admin/class-about.php:511
+#: includes/admin/class-about.php:512
 msgid "Thanks for being a loyal WPForms Lite user. <strong>Upgrade to WPForms Pro</strong> to unlock all the awesome features and experience<br>why WPForms is consistently rated the best WordPress form builder."
 msgstr ""
 
 #. translators: %s - stars.
-#: includes/admin/class-about.php:524
+#: includes/admin/class-about.php:525
 msgid "We know that you will truly love WPForms. It has over <strong>11,000+ five star ratings</strong> (%s) and is active on over 5 million websites."
 msgstr ""
 
-#: includes/admin/class-about.php:545
+#: includes/admin/class-about.php:546
 #: lite/wpforms-lite.php:606
-msgid "400+ customizable form templates"
+msgid "500+ customizable form templates"
 msgstr ""
 
-#: includes/admin/class-about.php:549
+#: includes/admin/class-about.php:550
 #: lite/wpforms-lite.php:607
 msgid "Store and manage form entries in WordPress"
 msgstr ""
 
-#: includes/admin/class-about.php:553
+#: includes/admin/class-about.php:554
 #: lite/wpforms-lite.php:608
 msgid "Unlock all fields & features, including Rich Text & conditional logic"
 msgstr ""
 
-#: includes/admin/class-about.php:557
+#: includes/admin/class-about.php:558
 #: lite/wpforms-lite.php:609
 msgid "Make Surveys and Polls and create reports"
 msgstr ""
 
-#: includes/admin/class-about.php:561
+#: includes/admin/class-about.php:562
 #: lite/wpforms-lite.php:610
 msgid "Accept user-submitted content with the Post Submissions addon"
 msgstr ""
 
-#: includes/admin/class-about.php:569
+#: includes/admin/class-about.php:570
 #: lite/wpforms-lite.php:613
 msgid "5000+ integrations with marketing and payment services"
 msgstr ""
 
-#: includes/admin/class-about.php:573
+#: includes/admin/class-about.php:574
 #: lite/wpforms-lite.php:614
 msgid "Let users Save and Resume submissions to prevent abandonment"
 msgstr ""
 
-#: includes/admin/class-about.php:577
+#: includes/admin/class-about.php:578
 #: lite/wpforms-lite.php:615
 msgid "Take payments with PayPal Commerce, Stripe, Square, Authorize.Net, and PayPal Standard"
 msgstr ""
 
-#: includes/admin/class-about.php:581
+#: includes/admin/class-about.php:582
 #: lite/wpforms-lite.php:616
 msgid "Collect signatures, geolocation data, and file uploads"
 msgstr ""
 
-#: includes/admin/class-about.php:585
+#: includes/admin/class-about.php:586
 #: lite/wpforms-lite.php:617
 msgid "Create user registration and login forms"
 msgstr ""
 
-#: includes/admin/class-about.php:600
+#: includes/admin/class-about.php:601
 msgid "Get WPForms Pro Today and Unlock all the Powerful Features"
 msgstr ""
 
-#: includes/admin/class-about.php:609
-#: includes/admin/class-about.php:831
+#: includes/admin/class-about.php:610
+#: includes/admin/class-about.php:832
 msgid "Bonus: WPForms Lite users get <span class=\"price-20-off\">50% off regular price</span>, automatically applied at checkout."
 msgstr ""
 
-#: includes/admin/class-about.php:630
+#: includes/admin/class-about.php:631
 msgid "How to Choose the Right Form Field"
 msgstr ""
 
-#: includes/admin/class-about.php:634
+#: includes/admin/class-about.php:635
 msgid "Are you wondering which form fields you have access to in WPForms and what each field does? WPForms has lots of field types to make creating and filling out forms easy. In this tutorial, we’ll cover all of the fields available in WPForms."
 msgstr ""
 
-#: includes/admin/class-about.php:638
-#: includes/admin/class-about.php:657
-#: includes/admin/class-about.php:676
-#: includes/admin/class-about.php:695
+#: includes/admin/class-about.php:639
+#: includes/admin/class-about.php:658
+#: includes/admin/class-about.php:677
+#: includes/admin/class-about.php:696
 msgid "Read Documentation"
 msgstr ""
 
-#: includes/admin/class-about.php:649
+#: includes/admin/class-about.php:650
 msgid "A Complete Guide to WPForms Settings"
 msgstr ""
 
-#: includes/admin/class-about.php:653
+#: includes/admin/class-about.php:654
 msgid "Would you like to learn more about all of the settings available in WPForms? In addition to tons of customization options within the form builder, WPForms has an extensive list of plugin-wide options available. This includes choosing your currency, adding GDPR enhancements, setting up integrations."
 msgstr ""
 
-#: includes/admin/class-about.php:668
+#: includes/admin/class-about.php:669
 msgid "How to Create GDPR Compliant Forms"
 msgstr ""
 
-#: includes/admin/class-about.php:672
+#: includes/admin/class-about.php:673
 msgid "Do you need to check that your forms are compliant with the European Union’s General Data Protection Regulation? The best way to ensure GDPR compliance for your specific site is always to consult legal counsel. In this guide, we’ll discuss general considerations for GDPR compliance in your WordPress forms."
 msgstr ""
 
-#: includes/admin/class-about.php:687
+#: includes/admin/class-about.php:688
 msgid "How to Install and Activate WPForms Addons"
 msgstr ""
 
-#: includes/admin/class-about.php:691
+#: includes/admin/class-about.php:692
 msgid "Would you like to access WPForms addons to extend the functionality of your forms? The first thing you need to do is install WPForms. Once that’s done, let’s go ahead and look at the process of activating addons."
 msgstr ""
 
-#: includes/admin/class-about.php:742
+#: includes/admin/class-about.php:743
 msgid "Get the most out of WPForms by upgrading to Pro and unlocking all of the powerful features."
 msgstr ""
 
-#: includes/admin/class-about.php:751
+#: includes/admin/class-about.php:752
 msgid "Feature"
 msgstr ""
 
 #. translators: %s - next license level.
-#: includes/admin/class-about.php:820
+#: includes/admin/class-about.php:821
 msgid "Get WPForms %s Today and Unlock all the Powerful Features"
 msgstr ""
 
-#: includes/admin/class-about.php:862
+#: includes/admin/class-about.php:863
 msgid "OptinMonster"
 msgstr ""
 
-#: includes/admin/class-about.php:863
+#: includes/admin/class-about.php:864
 msgid "Instantly get more subscribers, leads, and sales with the #1 conversion optimization toolkit. Create high converting popups, announcement bars, spin a wheel, and more with smart targeting and personalization."
 msgstr ""
 
-#: includes/admin/class-about.php:870
+#: includes/admin/class-about.php:871
 #: src/Admin/Dashboard/Widget.php:185
 #: src/Admin/Pages/Analytics.php:413
 msgid "MonsterInsights"
 msgstr ""
 
-#: includes/admin/class-about.php:871
-#: includes/admin/class-about.php:878
+#: includes/admin/class-about.php:872
+#: includes/admin/class-about.php:879
 msgid "The leading WordPress analytics plugin that shows you how people find and use your website, so you can make data driven decisions to grow your business. Properly set up Google Analytics without writing code."
 msgstr ""
 
-#: includes/admin/class-about.php:877
+#: includes/admin/class-about.php:878
 msgid "MonsterInsights Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:886
+#: includes/admin/class-about.php:887
 #: src/Admin/Dashboard/Widget.php:209
 #: src/Admin/Pages/SMTP.php:378
 msgid "WP Mail SMTP"
 msgstr ""
 
-#: includes/admin/class-about.php:887
-#: includes/admin/class-about.php:894
-msgid "Improve your WordPress email deliverability and make sure that your website emails reach user's inbox with the #1 SMTP plugin for WordPress. Over 2 million websites use it to fix WordPress email issues."
+#: includes/admin/class-about.php:888
+#: includes/admin/class-about.php:895
+msgid "Improve your WordPress email deliverability and make sure that your website emails reach user's inbox with the #1 SMTP plugin for WordPress. Over 3 million websites use it to fix WordPress email issues."
 msgstr ""
 
-#: includes/admin/class-about.php:893
+#: includes/admin/class-about.php:894
 msgid "WP Mail SMTP Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:902
+#: includes/admin/class-about.php:903
 #: src/Admin/Dashboard/Widget.php:193
 msgid "AIOSEO"
 msgstr ""
 
-#: includes/admin/class-about.php:903
-#: includes/admin/class-about.php:910
+#: includes/admin/class-about.php:904
+#: includes/admin/class-about.php:911
 msgid "The original WordPress SEO plugin and toolkit that improves your website's search rankings. Comes with all the SEO features like Local SEO, WooCommerce SEO, sitemaps, SEO optimizer, schema, and more."
 msgstr ""
 
-#: includes/admin/class-about.php:909
+#: includes/admin/class-about.php:910
 msgid "AIOSEO Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:918
+#: includes/admin/class-about.php:919
 #: src/Admin/Dashboard/Widget.php:201
 msgid "SeedProd"
 msgstr ""
 
-#: includes/admin/class-about.php:919
-#: includes/admin/class-about.php:926
+#: includes/admin/class-about.php:920
+#: includes/admin/class-about.php:927
 msgid "The fastest drag & drop landing page builder for WordPress. Create custom landing pages without writing code, connect them with your CRM, collect subscribers, and grow your audience. Trusted by 1 million sites."
 msgstr ""
 
-#: includes/admin/class-about.php:925
+#: includes/admin/class-about.php:926
 msgid "SeedProd Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:934
+#: includes/admin/class-about.php:935
 msgid "RafflePress"
 msgstr ""
 
-#: includes/admin/class-about.php:935
-#: includes/admin/class-about.php:942
+#: includes/admin/class-about.php:936
+#: includes/admin/class-about.php:943
 msgid "Turn your website visitors into brand ambassadors! Easily grow your email list, website traffic, and social media followers with the most powerful giveaways & contests plugin for WordPress."
 msgstr ""
 
-#: includes/admin/class-about.php:941
+#: includes/admin/class-about.php:942
 msgid "RafflePress Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:950
+#: includes/admin/class-about.php:951
 msgid "PushEngage"
 msgstr ""
 
-#: includes/admin/class-about.php:951
+#: includes/admin/class-about.php:952
 msgid "Connect with your visitors after they leave your website with the leading web push notification software. Over 10,000+ businesses worldwide use PushEngage to send 9 billion notifications each month."
 msgstr ""
 
-#: includes/admin/class-about.php:958
+#: includes/admin/class-about.php:959
 msgid "Smash Balloon Instagram Feeds"
 msgstr ""
 
-#: includes/admin/class-about.php:959
-#: includes/admin/class-about.php:966
+#: includes/admin/class-about.php:960
+#: includes/admin/class-about.php:967
 msgid "Easily display Instagram content on your WordPress site without writing any code. Comes with multiple templates, ability to show content from multiple accounts, hashtags, and more. Trusted by 1 million websites."
 msgstr ""
 
-#: includes/admin/class-about.php:965
+#: includes/admin/class-about.php:966
 msgid "Smash Balloon Instagram Feeds Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:974
+#: includes/admin/class-about.php:975
 msgid "Smash Balloon Facebook Feeds"
 msgstr ""
 
-#: includes/admin/class-about.php:975
-#: includes/admin/class-about.php:982
+#: includes/admin/class-about.php:976
+#: includes/admin/class-about.php:983
 msgid "Easily display Facebook content on your WordPress site without writing any code. Comes with multiple templates, ability to embed albums, group content, reviews, live videos, comments, and reactions."
 msgstr ""
 
-#: includes/admin/class-about.php:981
+#: includes/admin/class-about.php:982
 msgid "Smash Balloon Facebook Feeds Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:990
+#: includes/admin/class-about.php:991
 msgid "Smash Balloon YouTube Feeds"
 msgstr ""
 
-#: includes/admin/class-about.php:991
-#: includes/admin/class-about.php:998
+#: includes/admin/class-about.php:992
+#: includes/admin/class-about.php:999
 msgid "Easily display YouTube videos on your WordPress site without writing any code. Comes with multiple layouts, ability to embed live streams, video filtering, ability to combine multiple channel videos, and more."
 msgstr ""
 
-#: includes/admin/class-about.php:997
+#: includes/admin/class-about.php:998
 msgid "Smash Balloon YouTube Feeds Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:1006
+#: includes/admin/class-about.php:1007
 msgid "Smash Balloon Twitter Feeds"
 msgstr ""
 
-#: includes/admin/class-about.php:1007
-#: includes/admin/class-about.php:1014
+#: includes/admin/class-about.php:1008
+#: includes/admin/class-about.php:1015
 msgid "Easily display Twitter content in WordPress without writing any code. Comes with multiple layouts, ability to combine multiple Twitter feeds, Twitter card support, tweet moderation, and more."
 msgstr ""
 
-#: includes/admin/class-about.php:1013
+#: includes/admin/class-about.php:1014
 msgid "Smash Balloon Twitter Feeds Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:1022
+#: includes/admin/class-about.php:1023
 msgid "TrustPulse"
 msgstr ""
 
-#: includes/admin/class-about.php:1023
+#: includes/admin/class-about.php:1024
 msgid "Boost your sales and conversions by up to 15% with real-time social proof notifications. TrustPulse helps you show live user activity and purchases to help convince other users to purchase."
 msgstr ""
 
-#: includes/admin/class-about.php:1030
+#: includes/admin/class-about.php:1031
 msgid "SearchWP"
 msgstr ""
 
-#: includes/admin/class-about.php:1031
+#: includes/admin/class-about.php:1032
 msgid "The most advanced WordPress search plugin. Customize your WordPress search algorithm, reorder search results, track search metrics, and everything you need to leverage search to grow your business."
 msgstr ""
 
-#: includes/admin/class-about.php:1039
+#: includes/admin/class-about.php:1040
 msgid "AffiliateWP"
 msgstr ""
 
-#: includes/admin/class-about.php:1040
+#: includes/admin/class-about.php:1041
 msgid "The #1 affiliate management plugin for WordPress. Easily create an affiliate program for your eCommerce store or membership site within minutes and start growing your sales with the power of referral marketing."
 msgstr ""
 
-#: includes/admin/class-about.php:1048
+#: includes/admin/class-about.php:1049
 msgid "WP Simple Pay"
 msgstr ""
 
-#: includes/admin/class-about.php:1049
-#: includes/admin/class-about.php:1056
+#: includes/admin/class-about.php:1050
+#: includes/admin/class-about.php:1057
 msgid "The #1 Stripe payments plugin for WordPress. Start accepting one-time and recurring payments on your WordPress site without setting up a shopping cart. No code required."
 msgstr ""
 
-#: includes/admin/class-about.php:1055
+#: includes/admin/class-about.php:1056
 msgid "WP Simple Pay Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:1064
+#: includes/admin/class-about.php:1065
 msgid "Easy Digital Downloads"
 msgstr ""
 
-#: includes/admin/class-about.php:1065
+#: includes/admin/class-about.php:1066
 msgid "The best WordPress eCommerce plugin for selling digital downloads. Start selling eBooks, software, music, digital art, and more within minutes. Accept payments, manage subscriptions, advanced access control, and more."
 msgstr ""
 
-#: includes/admin/class-about.php:1072
+#: includes/admin/class-about.php:1073
 msgid "Sugar Calendar"
 msgstr ""
 
-#: includes/admin/class-about.php:1073
-#: includes/admin/class-about.php:1080
+#: includes/admin/class-about.php:1074
+#: includes/admin/class-about.php:1081
 msgid "A simple & powerful event calendar plugin for WordPress that comes with all the event management features including payments, scheduling, timezones, ticketing, recurring events, and more."
 msgstr ""
 
-#: includes/admin/class-about.php:1079
+#: includes/admin/class-about.php:1080
 msgid "Sugar Calendar Pro"
 msgstr ""
 
-#: includes/admin/class-about.php:1105
+#: includes/admin/class-about.php:1106
 msgid "Entries via Email Only"
 msgstr ""
 
-#: includes/admin/class-about.php:1111
-#: includes/admin/class-about.php:1117
-#: includes/admin/class-about.php:1123
+#: includes/admin/class-about.php:1112
+#: includes/admin/class-about.php:1118
+#: includes/admin/class-about.php:1124
 msgid "Complete Entry Management inside WordPress"
 msgstr ""
 
-#: includes/admin/class-about.php:1131
+#: includes/admin/class-about.php:1132
 msgid "Standard Fields Only"
 msgstr ""
 
-#: includes/admin/class-about.php:1132
+#: includes/admin/class-about.php:1133
 msgid "Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, and Number Slider"
-msgstr ""
-
-#: includes/admin/class-about.php:1138
-#: includes/admin/class-about.php:1145
-#: includes/admin/class-about.php:1152
-msgid "Access to all Standard and Fancy Fields"
 msgstr ""
 
 #: includes/admin/class-about.php:1139
 #: includes/admin/class-about.php:1146
 #: includes/admin/class-about.php:1153
-msgid "Address, Phone, Website / URL, Date / Time, Password, File Upload, Layout, Rich Text, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, and Hidden Field"
+msgid "Access to all Standard and Fancy Fields"
 msgstr ""
 
-#: includes/admin/class-about.php:1161
+#: includes/admin/class-about.php:1140
+#: includes/admin/class-about.php:1147
+#: includes/admin/class-about.php:1154
+msgid "Address, Phone, Website / URL, Date / Time, Password, File Upload, Layout, Rich Text, Content, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, and Hidden Field"
+msgstr ""
+
+#: includes/admin/class-about.php:1162
 msgid "Not available"
 msgstr ""
 
-#: includes/admin/class-about.php:1167
-#: includes/admin/class-about.php:1173
-#: includes/admin/class-about.php:1179
+#: includes/admin/class-about.php:1168
+#: includes/admin/class-about.php:1174
+#: includes/admin/class-about.php:1180
 msgid "Powerful Form Logic for Building Smart Forms"
 msgstr ""
 
-#: includes/admin/class-about.php:1187
-#: includes/admin/class-about.php:1193
-#: includes/admin/class-about.php:1199
+#: includes/admin/class-about.php:1188
+#: includes/admin/class-about.php:1194
+#: includes/admin/class-about.php:1200
 msgid "Basic Form Templates"
 msgstr ""
 
-#: includes/admin/class-about.php:1205
-msgid "All Form Templates including Bonus 400+ pre-made form templates"
-msgstr ""
-
-#: includes/admin/class-about.php:1213
-#: includes/admin/class-about.php:1220
-msgid "Limited Marketing Integration"
+#: includes/admin/class-about.php:1206
+msgid "All Form Templates including Bonus 500+ pre-made form templates"
 msgstr ""
 
 #: includes/admin/class-about.php:1214
+msgid "Basic Anti-Spam Settings"
+msgstr ""
+
+#: includes/admin/class-about.php:1215
+msgid "Basic Protection, reCAPTCHA, hCaptcha, and Akismet"
+msgstr ""
+
 #: includes/admin/class-about.php:1221
+#: includes/admin/class-about.php:1228
+#: includes/admin/class-about.php:1235
+msgid "Additional Anti-Spam Settings"
+msgstr ""
+
+#: includes/admin/class-about.php:1222
+#: includes/admin/class-about.php:1229
+#: includes/admin/class-about.php:1236
+msgid "Basic Protection, reCAPTCHA, hCaptcha, Akismet, Country Filter, Keyword Filter, and Custom Captcha"
+msgstr ""
+
+#: includes/admin/class-about.php:1244
+#: includes/admin/class-about.php:1251
+msgid "Limited Marketing Integration"
+msgstr ""
+
+#: includes/admin/class-about.php:1245
+#: includes/admin/class-about.php:1252
 msgid "Constant Contact only"
 msgstr ""
 
-#: includes/admin/class-about.php:1227
-#: includes/admin/class-about.php:1234
+#: includes/admin/class-about.php:1258
+#: includes/admin/class-about.php:1265
 msgid "Additional Marketing Integrations"
 msgstr ""
 
-#: includes/admin/class-about.php:1228
-#: includes/admin/class-about.php:1235
-msgid "Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Sendinblue, HubSpot, Drip and MailerLite"
+#: includes/admin/class-about.php:1259
+#: includes/admin/class-about.php:1266
+msgid "Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Sendinblue, HubSpot, Drip, and MailerLite"
 msgstr ""
 
-#: includes/admin/class-about.php:1238
-#: includes/admin/class-about.php:1252
-#: includes/admin/class-about.php:1266
-#: includes/admin/class-about.php:1280
+#: includes/admin/class-about.php:1269
+#: includes/admin/class-about.php:1283
+#: includes/admin/class-about.php:1297
+#: includes/admin/class-about.php:1311
 msgid "<strong>Bonus:</strong> 5000+ integrations with Zapier."
 msgstr ""
 
-#: includes/admin/class-about.php:1248
-#: includes/admin/class-about.php:1262
-#: includes/admin/class-about.php:1276
+#: includes/admin/class-about.php:1279
+#: includes/admin/class-about.php:1293
+#: includes/admin/class-about.php:1307
 msgid "All Marketing Integrations"
 msgstr ""
 
-#: includes/admin/class-about.php:1249
-#: includes/admin/class-about.php:1263
-#: includes/admin/class-about.php:1277
-msgid "ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Sendinblue, HubSpot, Drip and MailerLite"
+#: includes/admin/class-about.php:1280
+#: includes/admin/class-about.php:1294
+#: includes/admin/class-about.php:1308
+msgid "ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Sendinblue, HubSpot, Drip, and MailerLite"
 msgstr ""
 
-#: includes/admin/class-about.php:1292
-#: includes/admin/class-about.php:1298
-#: includes/admin/class-about.php:1304
-#: includes/admin/class-about.php:1340
-#: includes/admin/class-about.php:1346
-#: includes/admin/class-about.php:1352
+#: includes/admin/class-about.php:1323
+#: includes/admin/class-about.php:1329
+#: includes/admin/class-about.php:1335
+#: includes/admin/class-about.php:1371
+#: includes/admin/class-about.php:1377
+#: includes/admin/class-about.php:1383
 msgid "Not Available"
 msgstr ""
 
-#: includes/admin/class-about.php:1310
-#: includes/admin/class-about.php:1317
-#: includes/admin/class-about.php:1324
-#: includes/admin/class-about.php:1331
+#: includes/admin/class-about.php:1341
+#: includes/admin/class-about.php:1348
+#: includes/admin/class-about.php:1355
+#: includes/admin/class-about.php:1362
 msgid "Create Payment Forms"
 msgstr ""
 
-#: includes/admin/class-about.php:1311
+#: includes/admin/class-about.php:1342
 msgid "Accept payments using PayPal Commerce, Stripe, Square, and PayPal Standard"
 msgstr ""
 
-#: includes/admin/class-about.php:1318
-#: includes/admin/class-about.php:1325
-#: includes/admin/class-about.php:1332
+#: includes/admin/class-about.php:1349
+#: includes/admin/class-about.php:1356
+#: includes/admin/class-about.php:1363
 msgid "Accept payments using PayPal Commerce, Stripe, Square, PayPal Standard, and Authorize.Net"
 msgstr ""
 
-#: includes/admin/class-about.php:1358
+#: includes/admin/class-about.php:1389
 msgid "Create interactive Surveys and Polls with beautiful reports"
 msgstr ""
 
-#: includes/admin/class-about.php:1366
+#: includes/admin/class-about.php:1397
 msgid "No Advanced Features"
 msgstr ""
 
-#: includes/admin/class-about.php:1372
-#: includes/admin/class-about.php:1379
+#: includes/admin/class-about.php:1403
+#: includes/admin/class-about.php:1410
 msgid "Limited Advanced Features"
 msgstr ""
 
-#: includes/admin/class-about.php:1373
-msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, Conditional Form Confirmation"
+#: includes/admin/class-about.php:1404
+msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation"
 msgstr ""
 
-#: includes/admin/class-about.php:1380
-msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, Conditional Form Confirmation, Save and Resume Form"
+#: includes/admin/class-about.php:1411
+msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation, Save and Resume Form"
 msgstr ""
 
-#: includes/admin/class-about.php:1386
+#: includes/admin/class-about.php:1417
 msgid "All Advanced Features"
 msgstr ""
 
-#: includes/admin/class-about.php:1387
-msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, Conditional Form Confirmation, Custom CAPTCHA, Offline Forms, Signature Forms, Save and Resume Form"
+#: includes/admin/class-about.php:1418
+msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation, Custom CAPTCHA, Offline Forms, Signature Forms, Save and Resume Form"
 msgstr ""
 
-#: includes/admin/class-about.php:1395
+#: includes/admin/class-about.php:1426
 msgid "No Addons Included"
 msgstr ""
 
-#: includes/admin/class-about.php:1401
+#: includes/admin/class-about.php:1432
 msgid "Custom Captcha Addon included"
 msgstr ""
 
-#: includes/admin/class-about.php:1407
+#: includes/admin/class-about.php:1438
 msgid "Email Marketing Addons included"
 msgstr ""
 
-#: includes/admin/class-about.php:1413
+#: includes/admin/class-about.php:1444
 msgid "Pro Addons Included"
 msgstr ""
 
-#: includes/admin/class-about.php:1414
-msgid "Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, and more (26 total)"
+#: includes/admin/class-about.php:1445
+msgid "Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, Google Sheets, and more (26 total)"
 msgstr ""
 
-#: includes/admin/class-about.php:1420
-#: includes/admin/class-about.php:1427
-#: includes/admin/class-about.php:1434
+#: includes/admin/class-about.php:1451
+#: includes/admin/class-about.php:1458
+#: includes/admin/class-about.php:1465
 msgid "All Addons Included"
 msgstr ""
 
-#: includes/admin/class-about.php:1421
-#: includes/admin/class-about.php:1428
-#: includes/admin/class-about.php:1435
-msgid "Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, and more (30 total)"
+#: includes/admin/class-about.php:1452
+#: includes/admin/class-about.php:1459
+#: includes/admin/class-about.php:1466
+msgid "Form Abandonment, Conversational Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, Google Sheets, and more (30+ total)"
 msgstr ""
 
-#: includes/admin/class-about.php:1443
+#: includes/admin/class-about.php:1474
 msgid "Limited Support"
 msgstr ""
 
-#: includes/admin/class-about.php:1449
-#: includes/admin/class-about.php:1455
+#: includes/admin/class-about.php:1480
+#: includes/admin/class-about.php:1486
 msgid "Standard Support"
 msgstr ""
 
-#: includes/admin/class-about.php:1461
+#: includes/admin/class-about.php:1492
 msgid "Priority Support"
 msgstr ""
 
-#: includes/admin/class-about.php:1467
-#: includes/admin/class-about.php:1473
-#: includes/admin/class-about.php:1479
+#: includes/admin/class-about.php:1498
+#: includes/admin/class-about.php:1504
+#: includes/admin/class-about.php:1510
 msgid "Premium Support"
 msgstr ""
 
-#: includes/admin/class-about.php:1487
+#: includes/admin/class-about.php:1518
 msgid "1 Site"
 msgstr ""
 
-#: includes/admin/class-about.php:1493
+#: includes/admin/class-about.php:1524
 msgid "3 Sites"
 msgstr ""
 
-#: includes/admin/class-about.php:1499
+#: includes/admin/class-about.php:1530
 msgid "5 Sites"
 msgstr ""
 
-#: includes/admin/class-about.php:1505
-#: includes/admin/class-about.php:1511
-#: includes/admin/class-about.php:1517
+#: includes/admin/class-about.php:1536
+#: includes/admin/class-about.php:1542
+#: includes/admin/class-about.php:1548
 msgid "Unlimited Sites"
 msgstr ""
 
@@ -2099,22 +2075,22 @@ msgstr ""
 msgid "Whoops, you haven't created a form yet. Want to <a href=\"%s\">give it a go</a>?"
 msgstr ""
 
-#: includes/admin/class-menu.php:55
+#: includes/admin/class-menu.php:56
 #: src/Admin/AdminBarMenu.php:240
 msgid "All Forms"
 msgstr ""
 
-#: includes/admin/class-menu.php:64
+#: includes/admin/class-menu.php:65
 msgid "WPForms Builder"
 msgstr ""
 
-#: includes/admin/class-menu.php:65
+#: includes/admin/class-menu.php:66
 #: includes/admin/overview/class-overview.php:186
 #: src/Admin/AdminBarMenu.php:259
 msgid "Add New"
 msgstr ""
 
-#: includes/admin/class-menu.php:75
+#: includes/admin/class-menu.php:76
 #: src/Admin/Builder/Help.php:262
 #: src/Admin/Forms/Views.php:423
 #: src/Lite/Admin/DashboardWidget.php:165
@@ -2124,60 +2100,61 @@ msgstr ""
 msgid "Entries"
 msgstr ""
 
-#: includes/admin/class-menu.php:92
+#: includes/admin/class-menu.php:93
 msgid "WPForms Templates"
 msgstr ""
 
-#: includes/admin/class-menu.php:102
+#: includes/admin/class-menu.php:103
 msgid "WPForms Settings"
 msgstr ""
 
-#: includes/admin/class-menu.php:112
+#: includes/admin/class-menu.php:113
 msgid "WPForms Tools"
 msgstr ""
 
-#: includes/admin/class-menu.php:113
+#: includes/admin/class-menu.php:114
 msgid "Tools"
 msgstr ""
 
-#: includes/admin/class-menu.php:123
+#: includes/admin/class-menu.php:124
 msgid "Info"
 msgstr ""
 
-#: includes/admin/class-menu.php:133
+#: includes/admin/class-menu.php:134
 #: src/Admin/Builder/Help.php:260
 msgid "Addons"
 msgstr ""
 
-#: includes/admin/class-menu.php:142
 #: includes/admin/class-menu.php:143
+#: includes/admin/class-menu.php:144
 msgid "Analytics"
 msgstr ""
 
-#: includes/admin/class-menu.php:152
 #: includes/admin/class-menu.php:153
+#: includes/admin/class-menu.php:154
 msgid "SMTP"
 msgstr ""
 
-#: includes/admin/class-menu.php:162
+#: includes/admin/class-menu.php:163
 msgid "About WPForms"
 msgstr ""
 
-#: includes/admin/class-menu.php:172
 #: includes/admin/class-menu.php:173
+#: includes/admin/class-menu.php:174
 #: src/Admin/AdminBarMenu.php:278
 #: src/Admin/Pages/Community.php:136
 msgid "Community"
 msgstr ""
 
-#: includes/admin/class-menu.php:182
 #: includes/admin/class-menu.php:183
+#: includes/admin/class-menu.php:184
 #: lite/templates/education/builder/did-you-know.php:30
 #: lite/wpforms-lite.php:1317
+#: src/Admin/Builder/AntiSpam.php:220
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: includes/admin/class-menu.php:323
+#: includes/admin/class-menu.php:333
 #: includes/admin/class-welcome.php:333
 #: src/Admin/FlyoutMenu.php:112
 #: src/Admin/Tools/Views/Importer.php:229
@@ -2188,19 +2165,19 @@ msgstr ""
 msgid "Upgrade to WPForms Pro"
 msgstr ""
 
-#: includes/admin/class-menu.php:324
+#: includes/admin/class-menu.php:334
 msgid "Get WPForms Pro"
 msgstr ""
 
-#: includes/admin/class-menu.php:335
+#: includes/admin/class-menu.php:345
 msgid "Go to WPForms Settings page"
 msgstr ""
 
-#: includes/admin/class-menu.php:352
+#: includes/admin/class-menu.php:362
 msgid "Read the documentation"
 msgstr ""
 
-#: includes/admin/class-menu.php:353
+#: includes/admin/class-menu.php:363
 #: templates/builder/help.php:122
 msgid "Docs"
 msgstr ""
@@ -2401,7 +2378,7 @@ msgstr ""
 
 #: includes/admin/class-settings.php:408
 #: includes/class-frontend.php:1694
-#: includes/functions.php:2219
+#: includes/functions.php:2233
 msgid "This field is required."
 msgstr ""
 
@@ -2680,7 +2657,7 @@ msgid "per year"
 msgstr ""
 
 #: includes/admin/class-welcome.php:286
-#: lite/templates/admin/addons.php:55
+#: lite/templates/admin/addons.php:65
 #: src/Admin/Notifications/EventDriven.php:595
 #: src/Admin/Notifications/EventDriven.php:602
 #: src/Admin/Notifications/EventDriven.php:609
@@ -2832,7 +2809,7 @@ msgid "New Entry: %s"
 msgstr ""
 
 #: includes/class-form.php:536
-#: includes/class-process.php:618
+#: includes/class-process.php:668
 #: includes/templates/class-simple-contact-form.php:68
 #: lite/wpforms-lite.php:396
 #: lite/wpforms-lite.php:458
@@ -2892,36 +2869,59 @@ msgstr ""
 msgid "Invalid form."
 msgstr ""
 
-#: includes/class-process.php:206
+#. translators: %s - error unique ID.
+#: includes/class-process.php:179
+msgid "Missing form data on form submission process %s"
+msgstr ""
+
+#: includes/class-process.php:180
+msgid "Form data is not an array in `\\WPForms_Process::process()`. It might be caused by incorrect data returned by `wpforms_process_before_form_data` filter. Verify whether you have a custom code using this filter and debug value it is returning."
+msgstr ""
+
+#: includes/class-process.php:187
+msgid "Your form has not been submitted because data is missing from the entry."
+msgstr ""
+
+#. translators: %s - URL to the WForms Logs admin page.
+#: includes/class-process.php:192
+msgid "Check the WPForms &raquo; Tools &raquo; <a href=\"%s\">Logs</a> for more details."
+msgstr ""
+
+#. translators: %s - error unique ID.
+#: includes/class-process.php:207
+msgid "Error ID: %s."
+msgstr ""
+
+#: includes/class-process.php:256
 msgid "Google reCAPTCHA"
 msgstr ""
 
 #. translators: %s - The CAPTCHA provider name.
-#: includes/class-process.php:211
+#: includes/class-process.php:261
 msgid "%s verification failed, please try again later."
 msgstr ""
 
-#: includes/class-process.php:324
-#: includes/class-process.php:442
-#: includes/class-process.php:779
+#: includes/class-process.php:374
+#: includes/class-process.php:492
+#: includes/class-process.php:829
 msgid "Form has not been submitted, please see the errors below."
 msgstr ""
 
-#: includes/class-process.php:517
+#: includes/class-process.php:567
 msgid "Uploaded files combined size exceeds allowed maximum."
 msgstr ""
 
-#: includes/class-process.php:697
+#: includes/class-process.php:747
 msgid "Redirecting…"
 msgstr ""
 
 #. translators: %1$.3f - the total size of the selected files in megabytes, %2$.3f - allowed file upload limit in megabytes.
-#: includes/class-process.php:781
+#: includes/class-process.php:831
 msgid "The total size of the selected files %1$.3f MB exceeds the allowed limit %2$.3f MB."
 msgstr ""
 
 #. translators: %s - form name.
-#: includes/class-process.php:851
+#: includes/class-process.php:901
 #: lite/wpforms-lite.php:90
 msgid "New %s Entry"
 msgstr ""
@@ -3651,1295 +3651,1295 @@ msgstr[1] ""
 msgid "Paragraph Text"
 msgstr ""
 
-#: includes/functions.php:909
+#: includes/functions.php:921
 msgid "Alabama"
 msgstr ""
 
-#: includes/functions.php:910
+#: includes/functions.php:922
 msgid "Alaska"
 msgstr ""
 
-#: includes/functions.php:911
+#: includes/functions.php:923
 msgid "Arizona"
 msgstr ""
 
-#: includes/functions.php:912
+#: includes/functions.php:924
 msgid "Arkansas"
 msgstr ""
 
-#: includes/functions.php:913
+#: includes/functions.php:925
 msgid "California"
 msgstr ""
 
-#: includes/functions.php:914
+#: includes/functions.php:926
 msgid "Colorado"
 msgstr ""
 
-#: includes/functions.php:915
+#: includes/functions.php:927
 msgid "Connecticut"
 msgstr ""
 
-#: includes/functions.php:916
+#: includes/functions.php:928
 msgid "Delaware"
 msgstr ""
 
-#: includes/functions.php:917
+#: includes/functions.php:929
 msgid "District of Columbia"
 msgstr ""
 
-#: includes/functions.php:918
+#: includes/functions.php:930
 msgid "Florida"
 msgstr ""
 
-#: includes/functions.php:919
+#: includes/functions.php:931
 msgctxt "US State"
 msgid "Georgia"
 msgstr ""
 
-#: includes/functions.php:920
+#: includes/functions.php:932
 msgid "Hawaii"
 msgstr ""
 
-#: includes/functions.php:921
+#: includes/functions.php:933
 msgid "Idaho"
 msgstr ""
 
-#: includes/functions.php:922
+#: includes/functions.php:934
 msgid "Illinois"
 msgstr ""
 
-#: includes/functions.php:923
+#: includes/functions.php:935
 msgid "Indiana"
 msgstr ""
 
-#: includes/functions.php:924
+#: includes/functions.php:936
 msgid "Iowa"
 msgstr ""
 
-#: includes/functions.php:925
+#: includes/functions.php:937
 msgid "Kansas"
 msgstr ""
 
-#: includes/functions.php:926
+#: includes/functions.php:938
 msgid "Kentucky"
 msgstr ""
 
-#: includes/functions.php:927
+#: includes/functions.php:939
 msgid "Louisiana"
 msgstr ""
 
-#: includes/functions.php:928
+#: includes/functions.php:940
 msgid "Maine"
 msgstr ""
 
-#: includes/functions.php:929
+#: includes/functions.php:941
 msgid "Maryland"
 msgstr ""
 
-#: includes/functions.php:930
+#: includes/functions.php:942
 msgid "Massachusetts"
 msgstr ""
 
-#: includes/functions.php:931
+#: includes/functions.php:943
 msgid "Michigan"
 msgstr ""
 
-#: includes/functions.php:932
+#: includes/functions.php:944
 msgid "Minnesota"
 msgstr ""
 
-#: includes/functions.php:933
+#: includes/functions.php:945
 msgid "Mississippi"
 msgstr ""
 
-#: includes/functions.php:934
+#: includes/functions.php:946
 msgid "Missouri"
 msgstr ""
 
-#: includes/functions.php:935
+#: includes/functions.php:947
 msgid "Montana"
 msgstr ""
 
-#: includes/functions.php:936
+#: includes/functions.php:948
 msgid "Nebraska"
 msgstr ""
 
-#: includes/functions.php:937
+#: includes/functions.php:949
 msgid "Nevada"
 msgstr ""
 
-#: includes/functions.php:938
+#: includes/functions.php:950
 msgid "New Hampshire"
 msgstr ""
 
-#: includes/functions.php:939
+#: includes/functions.php:951
 msgid "New Jersey"
 msgstr ""
 
-#: includes/functions.php:940
+#: includes/functions.php:952
 msgid "New Mexico"
 msgstr ""
 
-#: includes/functions.php:941
+#: includes/functions.php:953
 msgid "New York"
 msgstr ""
 
-#: includes/functions.php:942
+#: includes/functions.php:954
 msgid "North Carolina"
 msgstr ""
 
-#: includes/functions.php:943
+#: includes/functions.php:955
 msgid "North Dakota"
 msgstr ""
 
-#: includes/functions.php:944
+#: includes/functions.php:956
 msgid "Ohio"
 msgstr ""
 
-#: includes/functions.php:945
+#: includes/functions.php:957
 msgid "Oklahoma"
 msgstr ""
 
-#: includes/functions.php:946
+#: includes/functions.php:958
 msgid "Oregon"
 msgstr ""
 
-#: includes/functions.php:947
+#: includes/functions.php:959
 msgid "Pennsylvania"
 msgstr ""
 
-#: includes/functions.php:948
+#: includes/functions.php:960
 msgid "Rhode Island"
 msgstr ""
 
-#: includes/functions.php:949
+#: includes/functions.php:961
 msgid "South Carolina"
 msgstr ""
 
-#: includes/functions.php:950
+#: includes/functions.php:962
 msgid "South Dakota"
 msgstr ""
 
-#: includes/functions.php:951
+#: includes/functions.php:963
 msgid "Tennessee"
 msgstr ""
 
-#: includes/functions.php:952
+#: includes/functions.php:964
 msgid "Texas"
 msgstr ""
 
-#: includes/functions.php:953
+#: includes/functions.php:965
 msgid "Utah"
 msgstr ""
 
-#: includes/functions.php:954
+#: includes/functions.php:966
 msgid "Vermont"
 msgstr ""
 
-#: includes/functions.php:955
+#: includes/functions.php:967
 msgid "Virginia"
 msgstr ""
 
-#: includes/functions.php:956
+#: includes/functions.php:968
 msgid "Washington"
 msgstr ""
 
-#: includes/functions.php:957
+#: includes/functions.php:969
 msgid "West Virginia"
 msgstr ""
 
-#: includes/functions.php:958
+#: includes/functions.php:970
 msgid "Wisconsin"
 msgstr ""
 
-#: includes/functions.php:959
+#: includes/functions.php:971
 msgid "Wyoming"
 msgstr ""
 
-#: includes/functions.php:975
+#: includes/functions.php:987
 msgid "Afghanistan"
 msgstr ""
 
-#: includes/functions.php:976
+#: includes/functions.php:988
 msgid "Åland Islands"
 msgstr ""
 
-#: includes/functions.php:977
+#: includes/functions.php:989
 msgid "Albania"
 msgstr ""
 
-#: includes/functions.php:978
+#: includes/functions.php:990
 msgid "Algeria"
 msgstr ""
 
-#: includes/functions.php:979
+#: includes/functions.php:991
 msgid "American Samoa"
 msgstr ""
 
-#: includes/functions.php:980
+#: includes/functions.php:992
 msgid "Andorra"
 msgstr ""
 
-#: includes/functions.php:981
+#: includes/functions.php:993
 msgid "Angola"
 msgstr ""
 
-#: includes/functions.php:982
+#: includes/functions.php:994
 msgid "Anguilla"
 msgstr ""
 
-#: includes/functions.php:983
+#: includes/functions.php:995
 msgid "Antarctica"
 msgstr ""
 
-#: includes/functions.php:984
+#: includes/functions.php:996
 msgid "Antigua and Barbuda"
 msgstr ""
 
-#: includes/functions.php:985
+#: includes/functions.php:997
 msgid "Argentina"
 msgstr ""
 
-#: includes/functions.php:986
+#: includes/functions.php:998
 msgid "Armenia"
 msgstr ""
 
-#: includes/functions.php:987
+#: includes/functions.php:999
 msgid "Aruba"
 msgstr ""
 
-#: includes/functions.php:988
+#: includes/functions.php:1000
 msgid "Australia"
 msgstr ""
 
-#: includes/functions.php:989
+#: includes/functions.php:1001
 msgid "Austria"
 msgstr ""
 
-#: includes/functions.php:990
+#: includes/functions.php:1002
 msgid "Azerbaijan"
 msgstr ""
 
-#: includes/functions.php:991
+#: includes/functions.php:1003
 msgid "Bahamas"
 msgstr ""
 
-#: includes/functions.php:992
+#: includes/functions.php:1004
 msgid "Bahrain"
 msgstr ""
 
-#: includes/functions.php:993
+#: includes/functions.php:1005
 msgid "Bangladesh"
 msgstr ""
 
-#: includes/functions.php:994
+#: includes/functions.php:1006
 msgid "Barbados"
 msgstr ""
 
-#: includes/functions.php:995
+#: includes/functions.php:1007
 msgid "Belarus"
 msgstr ""
 
-#: includes/functions.php:996
+#: includes/functions.php:1008
 msgid "Belgium"
 msgstr ""
 
-#: includes/functions.php:997
+#: includes/functions.php:1009
 msgid "Belize"
 msgstr ""
 
-#: includes/functions.php:998
+#: includes/functions.php:1010
 msgid "Benin"
 msgstr ""
 
-#: includes/functions.php:999
+#: includes/functions.php:1011
 msgid "Bermuda"
 msgstr ""
 
-#: includes/functions.php:1000
+#: includes/functions.php:1012
 msgid "Bhutan"
 msgstr ""
 
-#: includes/functions.php:1001
+#: includes/functions.php:1013
 msgid "Bolivia (Plurinational State of)"
 msgstr ""
 
-#: includes/functions.php:1002
+#: includes/functions.php:1014
 msgid "Bonaire, Saint Eustatius and Saba"
 msgstr ""
 
-#: includes/functions.php:1003
+#: includes/functions.php:1015
 msgid "Bosnia and Herzegovina"
 msgstr ""
 
-#: includes/functions.php:1004
+#: includes/functions.php:1016
 msgid "Botswana"
 msgstr ""
 
-#: includes/functions.php:1005
+#: includes/functions.php:1017
 msgid "Bouvet Island"
 msgstr ""
 
-#: includes/functions.php:1006
+#: includes/functions.php:1018
 msgid "Brazil"
 msgstr ""
 
-#: includes/functions.php:1007
+#: includes/functions.php:1019
 msgid "British Indian Ocean Territory"
 msgstr ""
 
-#: includes/functions.php:1008
+#: includes/functions.php:1020
 msgid "Brunei Darussalam"
 msgstr ""
 
-#: includes/functions.php:1009
+#: includes/functions.php:1021
 msgid "Bulgaria"
 msgstr ""
 
-#: includes/functions.php:1010
+#: includes/functions.php:1022
 msgid "Burkina Faso"
 msgstr ""
 
-#: includes/functions.php:1011
+#: includes/functions.php:1023
 msgid "Burundi"
 msgstr ""
 
-#: includes/functions.php:1012
+#: includes/functions.php:1024
 msgid "Cabo Verde"
 msgstr ""
 
-#: includes/functions.php:1013
+#: includes/functions.php:1025
 msgid "Cambodia"
 msgstr ""
 
-#: includes/functions.php:1014
+#: includes/functions.php:1026
 msgid "Cameroon"
 msgstr ""
 
-#: includes/functions.php:1015
+#: includes/functions.php:1027
 msgid "Canada"
 msgstr ""
 
-#: includes/functions.php:1016
+#: includes/functions.php:1028
 msgid "Cayman Islands"
 msgstr ""
 
-#: includes/functions.php:1017
+#: includes/functions.php:1029
 msgid "Central African Republic"
 msgstr ""
 
-#: includes/functions.php:1018
+#: includes/functions.php:1030
 msgid "Chad"
 msgstr ""
 
-#: includes/functions.php:1019
+#: includes/functions.php:1031
 msgid "Chile"
 msgstr ""
 
-#: includes/functions.php:1020
+#: includes/functions.php:1032
 msgid "China"
 msgstr ""
 
-#: includes/functions.php:1021
+#: includes/functions.php:1033
 msgid "Christmas Island"
 msgstr ""
 
-#: includes/functions.php:1022
+#: includes/functions.php:1034
 msgid "Cocos (Keeling) Islands"
 msgstr ""
 
-#: includes/functions.php:1023
+#: includes/functions.php:1035
 msgid "Colombia"
 msgstr ""
 
-#: includes/functions.php:1024
+#: includes/functions.php:1036
 msgid "Comoros"
 msgstr ""
 
-#: includes/functions.php:1025
+#: includes/functions.php:1037
 msgid "Congo"
 msgstr ""
 
-#: includes/functions.php:1026
+#: includes/functions.php:1038
 msgid "Congo (Democratic Republic of the)"
 msgstr ""
 
-#: includes/functions.php:1027
+#: includes/functions.php:1039
 msgid "Cook Islands"
 msgstr ""
 
-#: includes/functions.php:1028
+#: includes/functions.php:1040
 msgid "Costa Rica"
 msgstr ""
 
-#: includes/functions.php:1029
+#: includes/functions.php:1041
 msgid "Côte d'Ivoire"
 msgstr ""
 
-#: includes/functions.php:1030
+#: includes/functions.php:1042
 msgid "Croatia"
 msgstr ""
 
-#: includes/functions.php:1031
+#: includes/functions.php:1043
 msgid "Cuba"
 msgstr ""
 
-#: includes/functions.php:1032
+#: includes/functions.php:1044
 msgid "Curaçao"
 msgstr ""
 
-#: includes/functions.php:1033
+#: includes/functions.php:1045
 msgid "Cyprus"
 msgstr ""
 
-#: includes/functions.php:1034
+#: includes/functions.php:1046
 msgid "Czech Republic"
 msgstr ""
 
-#: includes/functions.php:1035
+#: includes/functions.php:1047
 msgid "Denmark"
 msgstr ""
 
-#: includes/functions.php:1036
+#: includes/functions.php:1048
 msgid "Djibouti"
 msgstr ""
 
-#: includes/functions.php:1037
+#: includes/functions.php:1049
 msgid "Dominica"
 msgstr ""
 
-#: includes/functions.php:1038
+#: includes/functions.php:1050
 msgid "Dominican Republic"
 msgstr ""
 
-#: includes/functions.php:1039
+#: includes/functions.php:1051
 msgid "Ecuador"
 msgstr ""
 
-#: includes/functions.php:1040
+#: includes/functions.php:1052
 msgid "Egypt"
 msgstr ""
 
-#: includes/functions.php:1041
+#: includes/functions.php:1053
 msgid "El Salvador"
 msgstr ""
 
-#: includes/functions.php:1042
+#: includes/functions.php:1054
 msgid "Equatorial Guinea"
 msgstr ""
 
-#: includes/functions.php:1043
+#: includes/functions.php:1055
 msgid "Eritrea"
 msgstr ""
 
-#: includes/functions.php:1044
+#: includes/functions.php:1056
 msgid "Estonia"
 msgstr ""
 
-#: includes/functions.php:1045
+#: includes/functions.php:1057
 msgid "Ethiopia"
 msgstr ""
 
-#: includes/functions.php:1046
+#: includes/functions.php:1058
 msgid "Falkland Islands (Malvinas)"
 msgstr ""
 
-#: includes/functions.php:1047
+#: includes/functions.php:1059
 msgid "Faroe Islands"
 msgstr ""
 
-#: includes/functions.php:1048
+#: includes/functions.php:1060
 msgid "Fiji"
 msgstr ""
 
-#: includes/functions.php:1049
+#: includes/functions.php:1061
 msgid "Finland"
 msgstr ""
 
-#: includes/functions.php:1050
+#: includes/functions.php:1062
 msgid "France"
 msgstr ""
 
-#: includes/functions.php:1051
+#: includes/functions.php:1063
 msgid "French Guiana"
 msgstr ""
 
-#: includes/functions.php:1052
+#: includes/functions.php:1064
 msgid "French Polynesia"
 msgstr ""
 
-#: includes/functions.php:1053
+#: includes/functions.php:1065
 msgid "French Southern Territories"
 msgstr ""
 
-#: includes/functions.php:1054
+#: includes/functions.php:1066
 msgid "Gabon"
 msgstr ""
 
-#: includes/functions.php:1055
+#: includes/functions.php:1067
 msgid "Gambia"
 msgstr ""
 
-#: includes/functions.php:1056
+#: includes/functions.php:1068
 msgctxt "Country"
 msgid "Georgia"
 msgstr ""
 
-#: includes/functions.php:1057
+#: includes/functions.php:1069
 msgid "Germany"
 msgstr ""
 
-#: includes/functions.php:1058
+#: includes/functions.php:1070
 msgid "Ghana"
 msgstr ""
 
-#: includes/functions.php:1059
+#: includes/functions.php:1071
 msgid "Gibraltar"
 msgstr ""
 
-#: includes/functions.php:1060
+#: includes/functions.php:1072
 msgid "Greece"
 msgstr ""
 
-#: includes/functions.php:1061
+#: includes/functions.php:1073
 msgid "Greenland"
 msgstr ""
 
-#: includes/functions.php:1062
+#: includes/functions.php:1074
 msgid "Grenada"
 msgstr ""
 
-#: includes/functions.php:1063
+#: includes/functions.php:1075
 msgid "Guadeloupe"
 msgstr ""
 
-#: includes/functions.php:1064
+#: includes/functions.php:1076
 msgid "Guam"
 msgstr ""
 
-#: includes/functions.php:1065
+#: includes/functions.php:1077
 msgid "Guatemala"
 msgstr ""
 
-#: includes/functions.php:1066
+#: includes/functions.php:1078
 msgid "Guernsey"
 msgstr ""
 
-#: includes/functions.php:1067
+#: includes/functions.php:1079
 msgid "Guinea"
 msgstr ""
 
-#: includes/functions.php:1068
+#: includes/functions.php:1080
 msgid "Guinea-Bissau"
 msgstr ""
 
-#: includes/functions.php:1069
+#: includes/functions.php:1081
 msgid "Guyana"
 msgstr ""
 
-#: includes/functions.php:1070
+#: includes/functions.php:1082
 msgid "Haiti"
 msgstr ""
 
-#: includes/functions.php:1071
+#: includes/functions.php:1083
 msgid "Heard Island and McDonald Islands"
 msgstr ""
 
-#: includes/functions.php:1072
+#: includes/functions.php:1084
 msgid "Honduras"
 msgstr ""
 
-#: includes/functions.php:1073
+#: includes/functions.php:1085
 msgid "Hong Kong"
 msgstr ""
 
-#: includes/functions.php:1074
+#: includes/functions.php:1086
 msgid "Hungary"
 msgstr ""
 
-#: includes/functions.php:1075
+#: includes/functions.php:1087
 msgid "Iceland"
 msgstr ""
 
-#: includes/functions.php:1076
+#: includes/functions.php:1088
 msgid "India"
 msgstr ""
 
-#: includes/functions.php:1077
+#: includes/functions.php:1089
 msgid "Indonesia"
 msgstr ""
 
-#: includes/functions.php:1078
+#: includes/functions.php:1090
 msgid "Iran (Islamic Republic of)"
 msgstr ""
 
-#: includes/functions.php:1079
+#: includes/functions.php:1091
 msgid "Iraq"
 msgstr ""
 
-#: includes/functions.php:1080
+#: includes/functions.php:1092
 msgid "Ireland (Republic of)"
 msgstr ""
 
-#: includes/functions.php:1081
+#: includes/functions.php:1093
 msgid "Isle of Man"
 msgstr ""
 
-#: includes/functions.php:1082
+#: includes/functions.php:1094
 msgid "Israel"
 msgstr ""
 
-#: includes/functions.php:1083
+#: includes/functions.php:1095
 msgid "Italy"
 msgstr ""
 
-#: includes/functions.php:1084
+#: includes/functions.php:1096
 msgid "Jamaica"
 msgstr ""
 
-#: includes/functions.php:1085
+#: includes/functions.php:1097
 msgid "Japan"
 msgstr ""
 
-#: includes/functions.php:1086
+#: includes/functions.php:1098
 msgid "Jersey"
 msgstr ""
 
-#: includes/functions.php:1087
+#: includes/functions.php:1099
 msgid "Jordan"
 msgstr ""
 
-#: includes/functions.php:1088
+#: includes/functions.php:1100
 msgid "Kazakhstan"
 msgstr ""
 
-#: includes/functions.php:1089
+#: includes/functions.php:1101
 msgid "Kenya"
 msgstr ""
 
-#: includes/functions.php:1090
+#: includes/functions.php:1102
 msgid "Kiribati"
 msgstr ""
 
-#: includes/functions.php:1091
+#: includes/functions.php:1103
 msgid "Korea (Democratic People's Republic of)"
 msgstr ""
 
-#: includes/functions.php:1092
+#: includes/functions.php:1104
 msgid "Korea (Republic of)"
 msgstr ""
 
-#: includes/functions.php:1093
+#: includes/functions.php:1105
 msgid "Kosovo"
 msgstr ""
 
-#: includes/functions.php:1094
+#: includes/functions.php:1106
 msgid "Kuwait"
 msgstr ""
 
-#: includes/functions.php:1095
+#: includes/functions.php:1107
 msgid "Kyrgyzstan"
 msgstr ""
 
-#: includes/functions.php:1096
+#: includes/functions.php:1108
 msgid "Lao People's Democratic Republic"
 msgstr ""
 
-#: includes/functions.php:1097
+#: includes/functions.php:1109
 msgid "Latvia"
 msgstr ""
 
-#: includes/functions.php:1098
+#: includes/functions.php:1110
 msgid "Lebanon"
 msgstr ""
 
-#: includes/functions.php:1099
+#: includes/functions.php:1111
 msgid "Lesotho"
 msgstr ""
 
-#: includes/functions.php:1100
+#: includes/functions.php:1112
 msgid "Liberia"
 msgstr ""
 
-#: includes/functions.php:1101
+#: includes/functions.php:1113
 msgid "Libya"
 msgstr ""
 
-#: includes/functions.php:1102
+#: includes/functions.php:1114
 msgid "Liechtenstein"
 msgstr ""
 
-#: includes/functions.php:1103
+#: includes/functions.php:1115
 msgid "Lithuania"
 msgstr ""
 
-#: includes/functions.php:1104
+#: includes/functions.php:1116
 msgid "Luxembourg"
 msgstr ""
 
-#: includes/functions.php:1105
+#: includes/functions.php:1117
 msgid "Macao"
 msgstr ""
 
-#: includes/functions.php:1106
+#: includes/functions.php:1118
 msgid "North Macedonia (Republic of)"
 msgstr ""
 
-#: includes/functions.php:1107
+#: includes/functions.php:1119
 msgid "Madagascar"
 msgstr ""
 
-#: includes/functions.php:1108
+#: includes/functions.php:1120
 msgid "Malawi"
 msgstr ""
 
-#: includes/functions.php:1109
+#: includes/functions.php:1121
 msgid "Malaysia"
 msgstr ""
 
-#: includes/functions.php:1110
+#: includes/functions.php:1122
 msgid "Maldives"
 msgstr ""
 
-#: includes/functions.php:1111
+#: includes/functions.php:1123
 msgid "Mali"
 msgstr ""
 
-#: includes/functions.php:1112
+#: includes/functions.php:1124
 msgid "Malta"
 msgstr ""
 
-#: includes/functions.php:1113
+#: includes/functions.php:1125
 msgid "Marshall Islands"
 msgstr ""
 
-#: includes/functions.php:1114
+#: includes/functions.php:1126
 msgid "Martinique"
 msgstr ""
 
-#: includes/functions.php:1115
+#: includes/functions.php:1127
 msgid "Mauritania"
 msgstr ""
 
-#: includes/functions.php:1116
+#: includes/functions.php:1128
 msgid "Mauritius"
 msgstr ""
 
-#: includes/functions.php:1117
+#: includes/functions.php:1129
 msgid "Mayotte"
 msgstr ""
 
-#: includes/functions.php:1118
+#: includes/functions.php:1130
 msgid "Mexico"
 msgstr ""
 
-#: includes/functions.php:1119
+#: includes/functions.php:1131
 msgid "Micronesia (Federated States of)"
 msgstr ""
 
-#: includes/functions.php:1120
+#: includes/functions.php:1132
 msgid "Moldova (Republic of)"
 msgstr ""
 
-#: includes/functions.php:1121
+#: includes/functions.php:1133
 msgid "Monaco"
 msgstr ""
 
-#: includes/functions.php:1122
+#: includes/functions.php:1134
 msgid "Mongolia"
 msgstr ""
 
-#: includes/functions.php:1123
+#: includes/functions.php:1135
 msgid "Montenegro"
 msgstr ""
 
-#: includes/functions.php:1124
+#: includes/functions.php:1136
 msgid "Montserrat"
 msgstr ""
 
-#: includes/functions.php:1125
+#: includes/functions.php:1137
 msgid "Morocco"
 msgstr ""
 
-#: includes/functions.php:1126
+#: includes/functions.php:1138
 msgid "Mozambique"
 msgstr ""
 
-#: includes/functions.php:1127
+#: includes/functions.php:1139
 msgid "Myanmar"
 msgstr ""
 
-#: includes/functions.php:1128
+#: includes/functions.php:1140
 msgid "Namibia"
 msgstr ""
 
-#: includes/functions.php:1129
+#: includes/functions.php:1141
 msgid "Nauru"
 msgstr ""
 
-#: includes/functions.php:1130
+#: includes/functions.php:1142
 msgid "Nepal"
 msgstr ""
 
-#: includes/functions.php:1131
+#: includes/functions.php:1143
 msgid "Netherlands"
 msgstr ""
 
-#: includes/functions.php:1132
+#: includes/functions.php:1144
 msgid "New Caledonia"
 msgstr ""
 
-#: includes/functions.php:1133
+#: includes/functions.php:1145
 msgid "New Zealand"
 msgstr ""
 
-#: includes/functions.php:1134
+#: includes/functions.php:1146
 msgid "Nicaragua"
 msgstr ""
 
-#: includes/functions.php:1135
+#: includes/functions.php:1147
 msgid "Niger"
 msgstr ""
 
-#: includes/functions.php:1136
+#: includes/functions.php:1148
 msgid "Nigeria"
 msgstr ""
 
-#: includes/functions.php:1137
+#: includes/functions.php:1149
 msgid "Niue"
 msgstr ""
 
-#: includes/functions.php:1138
+#: includes/functions.php:1150
 msgid "Norfolk Island"
 msgstr ""
 
-#: includes/functions.php:1139
+#: includes/functions.php:1151
 msgid "Northern Mariana Islands"
 msgstr ""
 
-#: includes/functions.php:1140
+#: includes/functions.php:1152
 msgid "Norway"
 msgstr ""
 
-#: includes/functions.php:1141
+#: includes/functions.php:1153
 msgid "Oman"
 msgstr ""
 
-#: includes/functions.php:1142
+#: includes/functions.php:1154
 msgid "Pakistan"
 msgstr ""
 
-#: includes/functions.php:1143
+#: includes/functions.php:1155
 msgid "Palau"
 msgstr ""
 
-#: includes/functions.php:1144
+#: includes/functions.php:1156
 msgid "Palestine (State of)"
 msgstr ""
 
-#: includes/functions.php:1145
+#: includes/functions.php:1157
 msgid "Panama"
 msgstr ""
 
-#: includes/functions.php:1146
+#: includes/functions.php:1158
 msgid "Papua New Guinea"
 msgstr ""
 
-#: includes/functions.php:1147
+#: includes/functions.php:1159
 msgid "Paraguay"
 msgstr ""
 
-#: includes/functions.php:1148
+#: includes/functions.php:1160
 msgid "Peru"
 msgstr ""
 
-#: includes/functions.php:1149
+#: includes/functions.php:1161
 msgid "Philippines"
 msgstr ""
 
-#: includes/functions.php:1150
+#: includes/functions.php:1162
 msgid "Pitcairn"
 msgstr ""
 
-#: includes/functions.php:1151
+#: includes/functions.php:1163
 msgid "Poland"
 msgstr ""
 
-#: includes/functions.php:1152
+#: includes/functions.php:1164
 msgid "Portugal"
 msgstr ""
 
-#: includes/functions.php:1153
+#: includes/functions.php:1165
 msgid "Puerto Rico"
 msgstr ""
 
-#: includes/functions.php:1154
+#: includes/functions.php:1166
 msgid "Qatar"
 msgstr ""
 
-#: includes/functions.php:1155
+#: includes/functions.php:1167
 msgid "Réunion"
 msgstr ""
 
-#: includes/functions.php:1156
+#: includes/functions.php:1168
 msgid "Romania"
 msgstr ""
 
-#: includes/functions.php:1157
+#: includes/functions.php:1169
 msgid "Russian Federation"
 msgstr ""
 
-#: includes/functions.php:1158
+#: includes/functions.php:1170
 msgid "Rwanda"
 msgstr ""
 
-#: includes/functions.php:1159
+#: includes/functions.php:1171
 msgid "Saint Barthélemy"
 msgstr ""
 
-#: includes/functions.php:1160
+#: includes/functions.php:1172
 msgid "Saint Helena, Ascension and Tristan da Cunha"
 msgstr ""
 
-#: includes/functions.php:1161
+#: includes/functions.php:1173
 msgid "Saint Kitts and Nevis"
 msgstr ""
 
-#: includes/functions.php:1162
+#: includes/functions.php:1174
 msgid "Saint Lucia"
 msgstr ""
 
-#: includes/functions.php:1163
+#: includes/functions.php:1175
 msgid "Saint Martin (French part)"
 msgstr ""
 
-#: includes/functions.php:1164
+#: includes/functions.php:1176
 msgid "Saint Pierre and Miquelon"
 msgstr ""
 
-#: includes/functions.php:1165
+#: includes/functions.php:1177
 msgid "Saint Vincent and the Grenadines"
 msgstr ""
 
-#: includes/functions.php:1166
+#: includes/functions.php:1178
 msgid "Samoa"
 msgstr ""
 
-#: includes/functions.php:1167
+#: includes/functions.php:1179
 msgid "San Marino"
 msgstr ""
 
-#: includes/functions.php:1168
+#: includes/functions.php:1180
 msgid "Sao Tome and Principe"
 msgstr ""
 
-#: includes/functions.php:1169
+#: includes/functions.php:1181
 msgid "Saudi Arabia"
 msgstr ""
 
-#: includes/functions.php:1170
+#: includes/functions.php:1182
 msgid "Senegal"
 msgstr ""
 
-#: includes/functions.php:1171
+#: includes/functions.php:1183
 msgid "Serbia"
 msgstr ""
 
-#: includes/functions.php:1172
+#: includes/functions.php:1184
 msgid "Seychelles"
 msgstr ""
 
-#: includes/functions.php:1173
+#: includes/functions.php:1185
 msgid "Sierra Leone"
 msgstr ""
 
-#: includes/functions.php:1174
+#: includes/functions.php:1186
 msgid "Singapore"
 msgstr ""
 
-#: includes/functions.php:1175
+#: includes/functions.php:1187
 msgid "Sint Maarten (Dutch part)"
 msgstr ""
 
-#: includes/functions.php:1176
+#: includes/functions.php:1188
 msgid "Slovakia"
 msgstr ""
 
-#: includes/functions.php:1177
+#: includes/functions.php:1189
 msgid "Slovenia"
 msgstr ""
 
-#: includes/functions.php:1178
+#: includes/functions.php:1190
 msgid "Solomon Islands"
 msgstr ""
 
-#: includes/functions.php:1179
+#: includes/functions.php:1191
 msgid "Somalia"
 msgstr ""
 
-#: includes/functions.php:1180
+#: includes/functions.php:1192
 msgid "South Africa"
 msgstr ""
 
-#: includes/functions.php:1181
+#: includes/functions.php:1193
 msgid "South Georgia and the South Sandwich Islands"
 msgstr ""
 
-#: includes/functions.php:1182
+#: includes/functions.php:1194
 msgid "South Sudan"
 msgstr ""
 
-#: includes/functions.php:1183
+#: includes/functions.php:1195
 msgid "Spain"
 msgstr ""
 
-#: includes/functions.php:1184
+#: includes/functions.php:1196
 msgid "Sri Lanka"
 msgstr ""
 
-#: includes/functions.php:1185
+#: includes/functions.php:1197
 msgid "Sudan"
 msgstr ""
 
-#: includes/functions.php:1186
+#: includes/functions.php:1198
 msgid "Suriname"
 msgstr ""
 
-#: includes/functions.php:1187
+#: includes/functions.php:1199
 msgid "Svalbard and Jan Mayen"
 msgstr ""
 
-#: includes/functions.php:1188
+#: includes/functions.php:1200
 msgid "Eswatini (Kingdom of)"
 msgstr ""
 
-#: includes/functions.php:1189
+#: includes/functions.php:1201
 msgid "Sweden"
 msgstr ""
 
-#: includes/functions.php:1190
+#: includes/functions.php:1202
 msgid "Switzerland"
 msgstr ""
 
-#: includes/functions.php:1191
+#: includes/functions.php:1203
 msgid "Syrian Arab Republic"
 msgstr ""
 
-#: includes/functions.php:1192
+#: includes/functions.php:1204
 msgid "Taiwan, Republic of China"
 msgstr ""
 
-#: includes/functions.php:1193
+#: includes/functions.php:1205
 msgid "Tajikistan"
 msgstr ""
 
-#: includes/functions.php:1194
+#: includes/functions.php:1206
 msgid "Tanzania (United Republic of)"
 msgstr ""
 
-#: includes/functions.php:1195
+#: includes/functions.php:1207
 msgid "Thailand"
 msgstr ""
 
-#: includes/functions.php:1196
+#: includes/functions.php:1208
 msgid "Timor-Leste"
 msgstr ""
 
-#: includes/functions.php:1197
+#: includes/functions.php:1209
 msgid "Togo"
 msgstr ""
 
-#: includes/functions.php:1198
+#: includes/functions.php:1210
 msgid "Tokelau"
 msgstr ""
 
-#: includes/functions.php:1199
+#: includes/functions.php:1211
 msgid "Tonga"
 msgstr ""
 
-#: includes/functions.php:1200
+#: includes/functions.php:1212
 msgid "Trinidad and Tobago"
 msgstr ""
 
-#: includes/functions.php:1201
+#: includes/functions.php:1213
 msgid "Tunisia"
 msgstr ""
 
-#: includes/functions.php:1202
+#: includes/functions.php:1214
 msgid "Türkiye"
 msgstr ""
 
-#: includes/functions.php:1203
+#: includes/functions.php:1215
 msgid "Turkmenistan"
 msgstr ""
 
-#: includes/functions.php:1204
+#: includes/functions.php:1216
 msgid "Turks and Caicos Islands"
 msgstr ""
 
-#: includes/functions.php:1205
+#: includes/functions.php:1217
 msgid "Tuvalu"
 msgstr ""
 
-#: includes/functions.php:1206
+#: includes/functions.php:1218
 msgid "Uganda"
 msgstr ""
 
-#: includes/functions.php:1207
+#: includes/functions.php:1219
 msgid "Ukraine"
 msgstr ""
 
-#: includes/functions.php:1208
+#: includes/functions.php:1220
 msgid "United Arab Emirates"
 msgstr ""
 
-#: includes/functions.php:1209
+#: includes/functions.php:1221
 msgid "United Kingdom of Great Britain and Northern Ireland"
 msgstr ""
 
-#: includes/functions.php:1210
+#: includes/functions.php:1222
 msgid "United States of America"
 msgstr ""
 
-#: includes/functions.php:1211
+#: includes/functions.php:1223
 msgid "United States Minor Outlying Islands"
 msgstr ""
 
-#: includes/functions.php:1212
+#: includes/functions.php:1224
 msgid "Uruguay"
 msgstr ""
 
-#: includes/functions.php:1213
+#: includes/functions.php:1225
 msgid "Uzbekistan"
 msgstr ""
 
-#: includes/functions.php:1214
+#: includes/functions.php:1226
 msgid "Vanuatu"
 msgstr ""
 
-#: includes/functions.php:1215
+#: includes/functions.php:1227
 msgid "Vatican City State"
 msgstr ""
 
-#: includes/functions.php:1216
+#: includes/functions.php:1228
 msgid "Venezuela (Bolivarian Republic of)"
 msgstr ""
 
-#: includes/functions.php:1217
+#: includes/functions.php:1229
 msgid "Vietnam"
 msgstr ""
 
-#: includes/functions.php:1218
+#: includes/functions.php:1230
 msgid "Virgin Islands (British)"
 msgstr ""
 
-#: includes/functions.php:1219
+#: includes/functions.php:1231
 msgid "Virgin Islands (U.S.)"
 msgstr ""
 
-#: includes/functions.php:1220
+#: includes/functions.php:1232
 msgid "Wallis and Futuna"
 msgstr ""
 
-#: includes/functions.php:1221
+#: includes/functions.php:1233
 msgid "Western Sahara"
 msgstr ""
 
-#: includes/functions.php:1222
+#: includes/functions.php:1234
 msgid "Yemen"
 msgstr ""
 
-#: includes/functions.php:1223
+#: includes/functions.php:1235
 msgid "Zambia"
 msgstr ""
 
-#: includes/functions.php:1224
+#: includes/functions.php:1236
 msgid "Zimbabwe"
 msgstr ""
 
-#: includes/functions.php:1240
+#: includes/functions.php:1252
 msgid "January"
 msgstr ""
 
-#: includes/functions.php:1241
+#: includes/functions.php:1253
 msgid "February"
 msgstr ""
 
-#: includes/functions.php:1242
+#: includes/functions.php:1254
 msgid "March"
 msgstr ""
 
-#: includes/functions.php:1243
+#: includes/functions.php:1255
 msgid "April"
 msgstr ""
 
-#: includes/functions.php:1244
+#: includes/functions.php:1256
 msgid "May"
 msgstr ""
 
-#: includes/functions.php:1245
+#: includes/functions.php:1257
 msgid "June"
 msgstr ""
 
-#: includes/functions.php:1246
+#: includes/functions.php:1258
 msgid "July"
 msgstr ""
 
-#: includes/functions.php:1247
+#: includes/functions.php:1259
 msgid "August"
 msgstr ""
 
-#: includes/functions.php:1248
+#: includes/functions.php:1260
 msgid "September"
 msgstr ""
 
-#: includes/functions.php:1249
+#: includes/functions.php:1261
 msgid "October"
 msgstr ""
 
-#: includes/functions.php:1250
+#: includes/functions.php:1262
 msgid "November"
 msgstr ""
 
-#: includes/functions.php:1251
+#: includes/functions.php:1263
 msgid "December"
 msgstr ""
 
-#: includes/functions.php:1267
+#: includes/functions.php:1279
 msgid "Sunday"
 msgstr ""
 
-#: includes/functions.php:1268
+#: includes/functions.php:1280
 msgid "Monday"
 msgstr ""
 
-#: includes/functions.php:1269
+#: includes/functions.php:1281
 msgid "Tuesday"
 msgstr ""
 
-#: includes/functions.php:1270
+#: includes/functions.php:1282
 msgid "Wednesday"
 msgstr ""
 
-#: includes/functions.php:1271
+#: includes/functions.php:1283
 msgid "Thursday"
 msgstr ""
 
-#: includes/functions.php:1272
+#: includes/functions.php:1284
 msgid "Friday"
 msgstr ""
 
-#: includes/functions.php:1273
+#: includes/functions.php:1285
 msgid "Saturday"
 msgstr ""
 
 #. translators: %d - a post ID.
-#: includes/functions.php:3545
+#: includes/functions.php:3559
 msgid "#%d (no title)"
 msgstr ""
 
 #. translators: %d - a taxonomy term ID.
-#: includes/functions.php:3562
+#: includes/functions.php:3576
 msgid "#%d (no name)"
 msgstr ""
 
@@ -4952,6 +4952,7 @@ msgid "No forms found"
 msgstr ""
 
 #: includes/integrations.php:39
+#: src/Admin/Education/Fields.php:125
 msgid "Content"
 msgstr ""
 
@@ -5220,12 +5221,17 @@ msgstr ""
 msgid "Unknown Addon"
 msgstr ""
 
-#: lite/templates/admin/addons.php:39
+#: lite/templates/admin/addons.php:43
 msgid "logo"
 msgstr ""
 
-#: lite/templates/admin/addons.php:45
+#: lite/templates/admin/addons.php:49
 msgid "Learn more"
+msgstr ""
+
+#: lite/templates/admin/addons.php:56
+#: lite/templates/education/builder/providers-item.php:34
+msgid "Recommended"
 msgstr ""
 
 #: lite/templates/education/admin/did-you-know.php:42
@@ -5546,6 +5552,111 @@ msgstr ""
 msgid "Form ID: %d"
 msgstr ""
 
+#: src/Admin/Builder/AntiSpam.php:65
+msgid "Enable anti-spam protection"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:67
+msgid "Turn on invisible spam protection."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:75
+msgid "Behind-the-scenes spam filtering that's invisible to your visitors."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:76
+msgid "Protection"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:86
+msgid "Enable anti-spam honeypot"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:108
+msgid "Also Available"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:135
+msgid "Enable Google Checkbox v2 reCAPTCHA"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:136
+msgid "Enable Google Invisible v2 reCAPTCHA"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:137
+msgid "Enable Google v3 reCAPTCHA"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:146
+msgid "Enable hCaptcha"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:158
+msgid "Enable third-party CAPTCHAs to prevent form submissions from bots."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:166
+msgid "Automated tests that help to prevent bots from submitting your forms."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:167
+#: src/Admin/Education/Builder/Captcha.php:119
+#: src/Admin/Education/Fields.php:298
+#: src/Admin/Settings/Captcha.php:103
+#: src/Admin/Settings/Captcha.php:126
+msgid "CAPTCHA"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:205
+msgid "Enable Akismet anti-spam protection"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:219
+msgid "Get Started &rarr;"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:228
+msgid "Country Filter"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:229
+msgid "Stop spam at its source. Allow or deny entries from specific countries."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:237
+msgid "Keyword Filter"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:238
+msgid "Block form entries that contain specific words or phrases that you define."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:246
+#: src/Admin/Education/Fields.php:157
+msgid "Custom Captcha"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:247
+msgid "Ask custom questions or require your visitor to answer a random math puzzle."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:249
+msgid "Add to Form"
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:256
+msgid "Add Google's free anti-spam service and choose between visible or invisible CAPTCHAs."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:264
+msgid "Turn on free, privacy-oriented spam prevention that displays a visual CAPTCHA."
+msgstr ""
+
+#: src/Admin/Builder/AntiSpam.php:272
+msgid "Integrate the powerful spam-fighting service trusted by millions of sites."
+msgstr ""
+
 #: src/Admin/Builder/Help.php:258
 msgid "Functionality"
 msgstr ""
@@ -5600,6 +5711,42 @@ msgstr ""
 msgid "Never start from scratch again! While WPForms Lite allows you to create any type of form, you can save even more time with WPForms Pro. Upgrade to access hundreds more form templates and advanced form fields."
 msgstr ""
 
+#: src/Admin/Builder/Traits/ContentInput.php:161
+msgid "Insert into form"
+msgstr ""
+
+#: src/Admin/Builder/Traits/ContentInput.php:162
+msgid "Uploaded to this form"
+msgstr ""
+
+#: src/Admin/Builder/Traits/ContentInput.php:301
+msgid "Add Media"
+msgstr ""
+
+#: src/Admin/Builder/Traits/ContentInput.php:306
+msgid "Visual"
+msgstr ""
+
+#: src/Admin/Builder/Traits/ContentInput.php:309
+msgid "Text"
+msgstr ""
+
+#: src/Admin/Builder/Traits/ContentInput.php:351
+msgid "<h4>Add Text and Images to Your Form With Ease</h4> <p>To get started, replace this text with your own.</p>"
+msgstr ""
+
+#: src/Admin/Builder/Traits/ContentInput.php:352
+msgid "Expand Editor"
+msgstr ""
+
+#: src/Admin/Builder/Traits/ContentInput.php:353
+msgid "Collapse Editor"
+msgstr ""
+
+#: src/Admin/Builder/Traits/ContentInput.php:354
+msgid "Update Preview"
+msgstr ""
+
 #: src/Admin/Dashboard/Widget.php:244
 msgid "Select timespan"
 msgstr ""
@@ -5627,13 +5774,6 @@ msgstr ""
 #: src/Admin/Education/Builder/Captcha.php:78
 #: src/Admin/Forms/Tags.php:260
 msgid "Something wrong. Please try again later."
-msgstr ""
-
-#: src/Admin/Education/Builder/Captcha.php:119
-#: src/Admin/Education/Fields.php:290
-#: src/Admin/Settings/Captcha.php:103
-#: src/Admin/Settings/Captcha.php:126
-msgid "CAPTCHA"
 msgstr ""
 
 #: src/Admin/Education/Builder/Captcha.php:127
@@ -5816,67 +5956,63 @@ msgstr ""
 msgid "HTML"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:125
+#: src/Admin/Education/Fields.php:133
 msgid "Entry Preview"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:133
+#: src/Admin/Education/Fields.php:141
 msgid "Rating"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:141
+#: src/Admin/Education/Fields.php:149
 msgid "Hidden Field"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:149
-msgid "Custom Captcha"
-msgstr ""
-
-#: src/Admin/Education/Fields.php:158
+#: src/Admin/Education/Fields.php:166
 msgid "Signature"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:167
+#: src/Admin/Education/Fields.php:175
 msgid "Likert Scale"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:176
+#: src/Admin/Education/Fields.php:184
 msgid "Net Promoter Score"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:185
+#: src/Admin/Education/Fields.php:193
 msgid "Single Item"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:193
+#: src/Admin/Education/Fields.php:201
 msgid "Multiple Items"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:201
+#: src/Admin/Education/Fields.php:209
 msgid "Checkbox Items"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:209
+#: src/Admin/Education/Fields.php:217
 msgid "Dropdown Items"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:217
-msgid "PayPal Commerce"
-msgstr ""
-
-#: src/Admin/Education/Fields.php:226
+#: src/Admin/Education/Fields.php:225
 msgid "Stripe Credit Card"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:235
+#: src/Admin/Education/Fields.php:234
+msgid "PayPal Commerce"
+msgstr ""
+
+#: src/Admin/Education/Fields.php:243
 msgid "Square"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:244
+#: src/Admin/Education/Fields.php:252
 msgid "Authorize.Net"
 msgstr ""
 
-#: src/Admin/Education/Fields.php:253
+#: src/Admin/Education/Fields.php:261
 msgid "Total"
 msgstr ""
 
@@ -6093,7 +6229,7 @@ msgid "Welcome to WPForms!"
 msgstr ""
 
 #: src/Admin/Notifications/EventDriven.php:523
-msgid "We’re grateful that you chose WPForms for your website! Now that you’ve installed the plugin, you’re less than 5 minutes away from publishing your first form. To make it easy, we’ve got 400+ form templates to get you started!"
+msgid "We’re grateful that you chose WPForms for your website! Now that you’ve installed the plugin, you’re less than 5 minutes away from publishing your first form. To make it easy, we’ve got 500+ form templates to get you started!"
 msgstr ""
 
 #: src/Admin/Notifications/EventDriven.php:527
@@ -6183,7 +6319,7 @@ msgstr ""
 msgid "You just hit 100 entries&hellip; and this is just the beginning! Now it’s time to dig into the data and figure out what makes your visitors tick. The User Journey addon shows you what your visitors looked at before submitting your form. Now you can easily find which areas of your site are triggering form conversions."
 msgstr ""
 
-#: src/Admin/Notifications/Notifications.php:739
+#: src/Admin/Notifications/Notifications.php:744
 msgid "Watch Video"
 msgstr ""
 
@@ -6957,39 +7093,43 @@ msgid "Available Templates"
 msgstr ""
 
 #: src/Admin/Traits/FormTemplates.php:127
-msgid "Favorites"
+msgid "Favorite Templates"
 msgstr ""
 
-#: src/Admin/Traits/FormTemplates.php:136
+#: src/Admin/Traits/FormTemplates.php:128
+msgid "New Templates"
+msgstr ""
+
+#: src/Admin/Traits/FormTemplates.php:137
 msgid "Custom Templates"
 msgstr ""
 
-#: src/Admin/Traits/FormTemplates.php:140
+#: src/Admin/Traits/FormTemplates.php:141
 msgid "Addon Templates"
 msgstr ""
 
 #. translators: %s - Form template name.
-#: src/Admin/Traits/FormTemplates.php:233
+#: src/Admin/Traits/FormTemplates.php:234
 msgid "%s template"
 msgstr ""
 
-#: src/Admin/Traits/FormTemplates.php:243
+#: src/Admin/Traits/FormTemplates.php:244
 msgid "Addon"
 msgstr ""
 
-#: src/Admin/Traits/FormTemplates.php:250
+#: src/Admin/Traits/FormTemplates.php:251
 msgid "Custom"
 msgstr ""
 
-#: src/Admin/Traits/FormTemplates.php:273
+#: src/Admin/Traits/FormTemplates.php:274
 msgid "Selected"
 msgstr ""
 
-#: src/Admin/Traits/FormTemplates.php:292
+#: src/Admin/Traits/FormTemplates.php:293
 msgid "Create Blank Form"
 msgstr ""
 
-#: src/Admin/Traits/FormTemplates.php:296
+#: src/Admin/Traits/FormTemplates.php:297
 msgid "Create Form"
 msgstr ""
 
@@ -7420,11 +7560,19 @@ msgstr ""
 msgid "Smart Logic"
 msgstr ""
 
-#: src/Lite/Admin/Education/Builder/Notifications.php:68
+#: src/Lite/Admin/Education/Builder/Notifications.php:66
+msgid "Enable File Upload Attachments"
+msgstr ""
+
+#: src/Lite/Admin/Education/Builder/Notifications.php:74
+msgid "File Upload Attachments"
+msgstr ""
+
+#: src/Lite/Admin/Education/Builder/Notifications.php:90
 msgid "Enable Entry CSV Attachment"
 msgstr ""
 
-#: src/Lite/Admin/Education/Builder/Notifications.php:76
+#: src/Lite/Admin/Education/Builder/Notifications.php:98
 msgid "Entry CSV Attachment"
 msgstr ""
 
@@ -8016,6 +8164,7 @@ msgid "Pause"
 msgstr ""
 
 #: templates/admin/challenge/modal.php:74
+#: templates/builder/fullscreen/mobile-notice.php:25
 msgid "Continue"
 msgstr ""
 
@@ -8060,7 +8209,7 @@ msgid "Save Changes"
 msgstr ""
 
 #: templates/admin/empty-states/no-forms.php:15
-#: templates/builder/abort-message.php:17
+#: templates/builder/fullscreen/abort-message.php:18
 #: templates/emails/summary-body-plain.php:17
 #: templates/emails/summary-body.php:25
 msgid "Hi there!"
@@ -8111,6 +8260,10 @@ msgstr ""
 
 #: templates/admin/form-embed-wizard/popup.php:65
 msgid "Copy embed code to clipboard"
+msgstr ""
+
+#: templates/admin/form-embed-wizard/popup.php:72
+msgid "Go back"
 msgstr ""
 
 #: templates/admin/forms/bulk-edit-tags.php:34
@@ -8300,8 +8453,27 @@ msgstr ""
 msgid "<a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Read our walk through</a> to learn more and for step-by-step directions."
 msgstr ""
 
-#: templates/builder/abort-message.php:25
+#: templates/builder/fullscreen/abort-message.php:27
+#: templates/builder/fullscreen/ie-notice.php:40
+#: templates/builder/fullscreen/mobile-notice.php:22
 msgid "Back to All Forms"
+msgstr ""
+
+#: templates/builder/fullscreen/ie-notice.php:16
+msgid "You are using an outdated browser!"
+msgstr ""
+
+#. translators: %1$s - Link to the update Internet Explorer page, %2$s - link to the browse happy page.
+#: templates/builder/fullscreen/ie-notice.php:22
+msgid "The Internet Explorer browser no more supported.<br>Our form builder is optimized for modern browsers.<br>Please <a href=\"%1$s\" target=\"_blank\" rel=\"nofollow noopener\">install Microsoft Edge</a> or learn<br>how to <a href=\"%2$s\" target=\"_blank\" rel=\"nofollow noopener\">browse happy</a>."
+msgstr ""
+
+#: templates/builder/fullscreen/mobile-notice.php:17
+msgid "Our form builder is optimized for desktop computers."
+msgstr ""
+
+#: templates/builder/fullscreen/mobile-notice.php:18
+msgid "We recommend that you edit your forms on a bigger screen. If you'd like to proceed, please understand that some functionality might not behave as expected."
 msgstr ""
 
 #: templates/builder/help.php:42

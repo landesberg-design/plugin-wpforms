@@ -153,7 +153,7 @@ var WPFormsBuilderPayments = window.WPFormsBuilderPayments || ( function( docume
 		createNewPlan: function( planName, $wrapper ) {
 
 			var $recurringWrapper = $wrapper.find( '.wpforms-panel-content-section-payment-recurring' ),
-				$lastPlanWrapper = $recurringWrapper.find( '.wpforms-panel-content-section-payment-plan:last' ),
+				$lastPlanWrapper = $recurringWrapper.find( '.wpforms-panel-content-section-payment-plan' ).last(),
 				index =  $lastPlanWrapper.length ? $lastPlanWrapper.data( 'plan-id' ) + 1 : 0,
 				template = wp.template( 'wpforms-builder-payments-' + $wrapper.data( 'provider' ) + '-clone' ),
 				data = {
@@ -167,7 +167,7 @@ var WPFormsBuilderPayments = window.WPFormsBuilderPayments || ( function( docume
 			// Needs to replace index manually because {{ data.index }} was sanitized in ID attribute.
 			$recurringWrapper.append( template( data ).replaceAll( '-dataindex-', `-${index}-` ) );
 
-			var $newPlan = $recurringWrapper.find( '.wpforms-panel-content-section-payment-plan:last' ),
+			var $newPlan = $recurringWrapper.find( '.wpforms-panel-content-section-payment-plan' ).last(),
 				$newPlanNameInput = $newPlan.find( '.wpforms-panel-content-section-payment-plan-name input' );
 
 			$newPlanNameInput.val( planName ? planName : app.getDefaultPlanName( index + 1 ) );
@@ -301,7 +301,7 @@ var WPFormsBuilderPayments = window.WPFormsBuilderPayments || ( function( docume
 							$paymentsPanel.trigger( 'wpformsPaymentsPlanDeleted', $plan, $wrapper.data( 'provider' ) );
 
 							if ( ! $wrapper.find( '.wpforms-panel-content-section-payment-plan' ).length ) {
-								$wrapper.find( '.wpforms-panel-content-section-payment-toggle-recurring input' ).click();
+								$wrapper.find( '.wpforms-panel-content-section-payment-toggle-recurring input' ).trigger( 'click' );
 							}
 						},
 					},
@@ -446,7 +446,7 @@ var WPFormsBuilderPayments = window.WPFormsBuilderPayments || ( function( docume
 
 			$el.prop( 'checked', false );
 
-			app.showPopupDisabledOneTimePayments( $section.find( '.wpforms-panel-content-section-title' ).text().toString().trim() );
+			app.showPopupDisabledOneTimePayments( $section.find( '.wpforms-panel-content-section-title' ).text().trim() );
 		},
 
 		/**

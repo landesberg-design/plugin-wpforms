@@ -160,8 +160,58 @@ class WPForms_Process {
 			return;
 		}
 
-		// Formatted form data for hooks.
-		$this->form_data = apply_filters( 'wpforms_process_before_form_data', wpforms_decode( $form->post_content ), $entry );
+		/**
+		 * Filter form data obtained during form process.
+		 *
+		 * @since 1.5.3
+		 *
+		 * @param array $form_data Form data.
+		 * @param array $entry     Form entry.
+		 */
+		$this->form_data = (array) apply_filters( 'wpforms_process_before_form_data', wpforms_decode( $form->post_content ), $entry );
+
+		if ( ! isset( $this->form_data['fields'], $this->form_data['id'] ) ) {
+			$error_id = uniqid();
+
+			// Logs missing form data.
+			wpforms_log(
+				/* translators: %s - error unique ID. */
+				sprintf( esc_html__( 'Missing form data on form submission process %s', 'wpforms-lite' ), $error_id ),
+				esc_html__( 'Form data is not an array in `\WPForms_Process::process()`. It might be caused by incorrect data returned by `wpforms_process_before_form_data` filter. Verify whether you have a custom code using this filter and debug value it is returning.', 'wpforms-lite' ),
+				[
+					'type'    => [ 'error', 'entry' ],
+					'form_id' => $form_id,
+				]
+			);
+
+			$error_messages[] = esc_html__( 'Your form has not been submitted because data is missing from the entry.', 'wpforms-lite' );
+
+			if ( wpforms_setting( 'logs-enable' ) && wpforms_current_user_can( wpforms_get_capability_manage_options() ) ) {
+				$error_messages[] = sprintf(
+					wp_kses( /* translators: %s - URL to the WForms Logs admin page. */
+						__( 'Check the WPForms &raquo; Tools &raquo; <a href="%s">Logs</a> for more details.', 'wpforms-lite' ),
+						[ 'a' => [ 'href' => [] ] ]
+					),
+					esc_url(
+						add_query_arg(
+							[
+								'page' => 'wpforms-tool',
+								'view' => 'logs',
+							],
+							admin_url( 'admin.php' )
+						)
+					)
+				);
+
+				/* translators: %s - error unique ID. */
+				$error_messages[] = sprintf( esc_html__( 'Error ID: %s.', 'wpforms-lite' ), $error_id );
+			}
+
+			$errors[ $form_id ]['header'] = implode( '<br>', $error_messages );
+			$this->errors                 = $errors;
+
+			return;
+		}
 
 		// Pre-process/validate hooks and filter.
 		// Data is not validated or cleaned yet so use with caution.

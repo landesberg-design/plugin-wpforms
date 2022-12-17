@@ -31,6 +31,48 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 	};
 
 	/**
+	 * ChoicesJS config for File Upload attachment field.
+	 *
+	 * @since 1.7.8
+	 *
+	 * @type {object}
+	 */
+	let choicesJSConfigFileUpload;
+
+	/**
+	 * Advanced Notification sections.
+	 *
+	 * @since 1.7.8
+	 *
+	 * @type {Array}
+	 */
+	const advancedNotificationSections = [
+		{ // File Upload Attachments.
+			toggle: {
+				className: '.notifications_enable_file_upload_attachment_toggle',
+				actionElements: [ 'file_upload_attachment_fields' ],
+			},
+			choicesJS: {
+				fieldName: 'file_upload_attachment_fields',
+				choices: 'fileUpload',
+			},
+		},
+		{ // Entry CSV Attachment.
+			toggle: {
+				className: '.notifications_enable_entry_csv_attachment_toggle',
+				actionElements: [
+					'entry_csv_attachment_entry_information',
+					'entry_csv_attachment_file_name',
+				],
+			},
+			choicesJS: {
+				fieldName: 'entry_csv_attachment_entry_information',
+				choices: 'entryInformation',
+			},
+		},
+	];
+
+	/**
 	 * Public functions and properties.
 	 *
 	 * @since 1.7.7
@@ -46,6 +88,9 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 		 */
 		init: function() {
 
+			choicesJSConfigFileUpload = Object.assign( {}, choicesJSConfig );
+			choicesJSConfigFileUpload.noChoicesText = wpforms_builder.notifications_file_upload.no_choices_text;
+
 			$( app.ready );
 		},
 
@@ -55,6 +100,10 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 		 * @since 1.7.7
 		 */
 		ready: function() {
+
+			if ( typeof window.Choices !== 'function' ) {
+				return;
+			}
 
 			app.setup();
 			app.bindEvents();
@@ -68,29 +117,22 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 		 */
 		setup: function() {
 
-			app.choicesJSHelperMethods.extendChoicesJS();
-
 			// Cache DOM elements.
 			el = {
 				$builder: $( '#wpforms-builder' ),
 			};
-
-			$( '.wpforms-notification.wpforms-builder-settings-block' ).each( function( index, block ) {
-				app.initEntryCSVSection( $( block ) );
-			} );
 		},
 
 		/**
-		 * Initialized the Entry CSV-related fields.
+		 * Initialized the Advanced section fields.
 		 *
-		 * @since 1.7.7
+		 * @since 1.7.8
 		 *
 		 * @param {object}  $block             jQuery element of the block.
 		 * @param {boolean} isDynamicallyAdded Whether this block is dynamically added or not.
 		 * @param {string}  originalId         Original notification block id if notification is cloned.
 		 */
-		// eslint-disable-next-line complexity
-		initEntryCSVSection: function( $block, isDynamicallyAdded = false, originalId = '' ) {
+		initBlock: function( $block, isDynamicallyAdded = false, originalId = '' ) {
 
 			const blockID = $block.data( 'blockId' );
 
@@ -98,48 +140,109 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 				return;
 			}
 
-			const $toggleEl = $block.find( '.notifications_enable_entry_csv_attachment_toggle' ).first();
-			if ( $toggleEl.length <= 0 ) {
-				return;
-			}
+			advancedNotificationSections.forEach( function( section ) {
 
-			app.setupEnableEntryCSVAttachmentConditional( $toggleEl, blockID );
+				app.initToggle(
+					$block,
+					blockID,
+					section.toggle.className,
+					section.toggle.actionElements
+				);
 
-			// Handle initial Entry Information field.
-			if ( ! isDynamicallyAdded ) {
-				const $entryInformationField = $block.find( '.entry_csv_attachment_entry_information' ).first();
-				if ( $entryInformationField.length <= 0 ) {
+				const $choicesJSField = $block.find( `.${section.choicesJS.fieldName}` ).first();
+
+				if ( $choicesJSField.length <= 0 ) {
 					return;
 				}
 
-				app.initChoicesJS( $entryInformationField );
-				return;
-			}
+				let choices;
+				let choicesConfig = choicesJSConfig;
 
-			/*
-			 We should clear existing choices for added notification block
-			 But not on cloned blocks.
-			 */
-			const shouldClearExistingChoices = ! originalId;
-			const preSelectedFileName = originalId ? $( `#wpforms-panel-field-notifications-${originalId}-entry_csv_attachment_file_name` ).val() : '';
+				if ( section.choicesJS.choices === 'fileUpload' ) {
+					choices = app.choicesJSHelperMethods.fileUploadFields.getAllChoices();
 
-			app.initDynamicallyAddedEntryInformationChoicesJS( $block, shouldClearExistingChoices );
-			app.setDynamicallyAddedEntryInformationFileNameFieldValue( $block, preSelectedFileName );
+					if ( choices[0].choices.length === 0 ) {
+						choicesConfig = choicesJSConfigFileUpload;
+					}
+				} else {
+					choices = app.choicesJSHelperMethods.entryInformation.getAllChoices();
+				}
+
+				// Handle initial ChoicesJS field.
+				if ( isDynamicallyAdded ) {
+
+					/*
+					 We should clear existing choices for added notification block
+					 But not on cloned blocks.
+					 */
+					const shouldClearExistingChoices = ! originalId;
+
+					app.initDynamicallyAddedChoicesJS(
+						$block,
+						section.choicesJS.fieldName,
+						shouldClearExistingChoices
+					);
+
+					app.setDynamicallyAddedEntryInformationFileNameFieldValue( $block, originalId );
+				}
+
+				app.initChoicesJS( $choicesJSField, choices, choicesConfig );
+
+				if ( section.choicesJS.choices === 'fileUpload' ) {
+
+					// Initially compute the File Upload Attachment Size.
+					app.computeForFileUploadAttachmentSize( $choicesJSField );
+
+					$choicesJSField.on( 'change', app.fileUploadFieldChange );
+				}
+			} );
 		},
 
 		/**
-		 * Setup conditional for "Enable Entry CSV Attachment" toggle.
+		 * Initialize toggle.
 		 *
-		 * @since 1.7.7
+		 * @since 1.7.8
 		 *
-		 * @param {object} $toggleEl jQuery element of the "Enable Entry CSV Attachment" toggle.
-		 * @param {number} blockID   Block ID.
+		 * @param {object} $block         jQuery element of the block.
+		 * @param {number} blockID        The block ID.
+		 * @param {string} toggleElClass  Class name of the toggle element.
+		 * @param {Array}  actionElements Elements that are controlled by the toggle.
+		 *
+		 * @returns {boolean} Whether or not the toggle has been initialized.
 		 */
-		setupEnableEntryCSVAttachmentConditional: function( $toggleEl, blockID ) {
+		initToggle: function( $block, blockID, toggleElClass, actionElements ) {
 
-			const entryInformationWrapId = `#wpforms-panel-field-notifications-${blockID}-entry_csv_attachment_entry_information-wrap`;
-			const entryFileNameId = `#wpforms-panel-field-notifications-${blockID}-entry_csv_attachment_file_name-wrap`;
-			const actionElement = entryInformationWrapId + ',' + entryFileNameId;
+			const $toggleEl = $block.find( toggleElClass ).first();
+
+			if ( $toggleEl.length <= 0 ) {
+				return false;
+			}
+
+			return app.setupToggleConditional( $toggleEl, blockID, actionElements );
+		},
+
+		/**
+		 * Setup the conditional for the toggle and its action elements.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param {object} $toggleEl      jQuery element of the toggle.
+		 * @param {number} blockID        The block ID.
+		 * @param {Array}  actionElements Elements that are controlled by the toggle.
+		 *
+		 * @returns {boolean} Returns `false` if there are no action elements found. Otherwise, returns `true`.
+		 */
+		setupToggleConditional: function( $toggleEl, blockID, actionElements ) {
+
+			const actionElementIds = actionElements.map( function( element ) {
+				return `#wpforms-panel-field-notifications-${blockID}-${element}-wrap`;
+			} );
+
+			if ( actionElementIds.length <= 0 ) {
+				return false;
+			}
+
+			const actionElement = actionElementIds.join( ',' );
 
 			$toggleEl.conditions( [
 				{
@@ -162,155 +265,57 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 					effect: 'appear',
 				},
 			] );
+
+			return true;
 		},
 
 		/**
 		 * Initialize ChoicesJS in a given select field.
 		 *
 		 * @since 1.7.7
+		 * @since 1.7.8 Added `choices` and `choicesConfig` parameters.
 		 *
-		 * @param {object}  $selectEl jQuery element of the select field.
+		 * @param {object} $selectEl     jQuery element of the select field.
+		 * @param {Array}  choices       Array containing the choices for the ChoicesJS instance.
+		 * @param {object} choicesConfig ChoicesJS config.
 		 *
 		 * @returns {false|Choices} ChoicesJS instance.
 		 */
-		initChoicesJS: function( $selectEl ) {
+		initChoicesJS: function( $selectEl, choices, choicesConfig ) {
 
 			const fieldName = $selectEl.attr( 'name' );
 
-			if ( ! fieldName || typeof window.Choices !== 'function' ) {
+			if ( ! fieldName ) {
 				return false;
 			}
 
 			// Original val.
-			const originalVal = $selectEl.val();
+			const originalVal = $selectEl.val(),
+				choiceJSInstance = $selectEl.data( 'choicesjs' );
 
-			const choicesJS = new Choices( $selectEl[0], choicesJSConfig );
+			if ( typeof choiceJSInstance !== 'undefined' ) {
+				choiceJSInstance.destroy();
+			}
+
+			const choicesJS = new Choices( $selectEl[0], choicesConfig );
 
 			// Init and cache the ChoicesJS init.
 			$selectEl.data( 'choicesjs', choicesJS );
 
-			const hiddenField = $( `<input type="hidden" name="${fieldName}[hidden]">` );
-
-			if ( originalVal ) {
-				hiddenField.val( JSON.stringify( originalVal ) );
-			}
-
 			$selectEl
-				.closest( '.wpforms-panel-field' )
-				.append( hiddenField );
+				.on( 'change', app.changeChoicesJS );
 
-			$selectEl
-				.on( 'change', app.changeEntryCSVAttachment );
-
-			app.choicesJSHelperMethods.populateInstance( choicesJS, originalVal );
+			app.choicesJSHelperMethods.populateInstance( choicesJS, choices, originalVal );
 
 			return choicesJS;
 		},
 
 		/**
-		 * Bind events.
+		 * ChoicesJS field change event handler.
 		 *
-		 * @since 1.7.7
+		 * @since 1.7.8
 		 */
-		bindEvents: function() {
-
-			el.$builder
-				.on( 'wpformsSettingsBlockAdded', app.notificationBlockAdded )
-				.on( 'wpformsFieldAdd', app.newFieldAdded )
-				.on( 'wpformsFieldDelete', app.fieldDeleted )
-				.on( 'wpformsSettingsBlockCloned', app.notificationsBlockCloned );
-		},
-
-		/**
-		 * Resetting fields when we add a new webhook.
-		 *
-		 * @since 1.7.7
-		 *
-		 * @param {object} event  Event object.
-		 * @param {object} $block New Webhook block.
-		 */
-		notificationBlockAdded: function( event, $block ) {
-
-			app.initEntryCSVSection( $block, true );
-		},
-
-		/**
-		 * Initialized ChoicesJS in Entry Information field in the newly added notifications block.
-		 *
-		 * @since 1.7.7
-		 *
-		 * @param {object}  $block                     jQuery element of the newly added notifications block.
-		 * @param {boolean} shouldClearExistingChoices Whether to clear existing selected choices or not.
-		 */
-		initDynamicallyAddedEntryInformationChoicesJS: function( $block, shouldClearExistingChoices ) {
-
-			const blockID = $block.data( 'blockId' );
-
-			// Find the Entry CSV Attachment Entry Information wrapper.
-			const $divWrapper = $block.find( `#wpforms-panel-field-notifications-${blockID}-entry_csv_attachment_entry_information-wrap` );
-
-			if ( $divWrapper.length <= 0 ) {
-				return;
-			}
-
-			// Find the ChoicesJS Wrapper inside the newly added notification.
-			const $choicesWrapper = $divWrapper.find( '.choices' );
-
-			if ( $choicesWrapper.length <= 0 ) {
-				return;
-			}
-
-			const $newEntryCSVAttachmentInformationEntry = $choicesWrapper.find( '.entry_csv_attachment_entry_information' ).first();
-
-			if ( $newEntryCSVAttachmentInformationEntry.length <= 0 ) {
-				return;
-			}
-
-			// Remove the ChoicesJS artifact.
-			$newEntryCSVAttachmentInformationEntry
-				.removeClass( 'choices__input' )
-				.removeAttr( 'hidden' )
-				.removeAttr( 'data-choice' )
-				.removeData( 'choice' )
-				.appendTo( $divWrapper.first() );
-
-			// Delete the ChoicesJS wrapper DOM.
-			$choicesWrapper.first().remove();
-
-			// Make sure nothing is pre-selected for
-			if ( shouldClearExistingChoices ) {
-				$newEntryCSVAttachmentInformationEntry.val( [] );
-			}
-
-			app.initChoicesJS( $newEntryCSVAttachmentInformationEntry );
-		},
-
-		/**
-		 * Insert the default value in File Name field for dynamically added
-		 * notification block.
-		 *
-		 * @since 1.7.7
-		 *
-		 * @param {object} $block jQuery element of the newly added notifications block.
-		 * @param {string} preSelectedFileName Pre-selected filename.
-		 */
-		setDynamicallyAddedEntryInformationFileNameFieldValue: function( $block, preSelectedFileName ) {
-
-			const $entryInformationFileNameField = $block.find( '.entry_csv_attachment_file_name' );
-
-			if ( $entryInformationFileNameField.length <= 0 ) {
-				return;
-			}
-
-			$entryInformationFileNameField.val( preSelectedFileName ? preSelectedFileName : wpforms_builder.entry_information.default_file_name );
-		},
-
-		/**
-		 * Entry CSV Attachment field change event handler.
-		 *
-		 * @since 1.7.7
-		 */
-		changeEntryCSVAttachment: function() {
+		changeChoicesJS: function() {
 
 			const $this = $( this );
 			const currentVal = $this.data( 'choicesjs' ).getValue();
@@ -321,8 +326,8 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 			}
 
 			// Find the closest hidden field designated to this field.
-			const hiddenFieldName = fieldName + '[hidden]';
-			const hiddenField = $this.closest( '.wpforms-panel-field' ).find( `input[name="${hiddenFieldName}"]` );
+			const hiddenFieldName = fieldName + '[hidden]',
+				hiddenField = $this.closest( '.wpforms-panel-field' ).find( `input[name="${hiddenFieldName}"]` );
 
 			if ( hiddenField.length <= 0 ) {
 				return;
@@ -338,69 +343,155 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 		},
 
 		/**
-		 * Trigger when a new field is added.
+		 * Change event handler for "File Upload Fields" select/ChoicesJS field.
 		 *
-		 * @since 1.7.7
-		 *
-		 * @param {Event}  event Event object.
-		 * @param {number} id    Field ID.
-		 * @param {string} type  Field type.
+		 * @since 1.7.8
 		 */
-		newFieldAdded: function( event, id, type ) {
+		fileUploadFieldChange: function() {
 
-			if ( wpforms_builder.entry_information.excluded_field_types.includes( type ) ) {
-				return;
-			}
-
-			const newField = wpf.getField( id );
-
-			if ( ! newField ) {
-				return;
-			}
-
-			app.updateChoicesJSFields( newField.id, newField.label, false );
+			app.computeForFileUploadAttachmentSize( $( this ) );
 		},
 
 		/**
-		 * Trigger when a field is deleted.
+		 * Compute and display the file upload size in MB.
 		 *
-		 * @since 1.7.7
+		 * @since 1.7.8
 		 *
-		 * @param {Event}  event     Event object.
-		 * @param {number} deletedId Field ID.
-		 * @param {string} type      Field type.
+		 * @param {object} $choicesJSField jQuery element of the ChoicesJS field.
 		 */
-		fieldDeleted: function( event, deletedId, type ) {
+		computeForFileUploadAttachmentSize: function( $choicesJSField ) {
 
-			app.updateChoicesJSFields( deletedId, '', true );
+			const currentVal = $choicesJSField.data( 'choicesjs' ).getValue();
+			const $fileSizeDom = $choicesJSField.parents( '.wpforms-panel-field' ).find( '.notifications-file-upload-attachment-size' );
+
+			if ( $fileSizeDom.length <= 0 ) {
+				return;
+			}
+
+			if ( currentVal.length <= 0 ) {
+				$fileSizeDom.text( 0 );
+				return;
+			}
+
+			const defaultMaxSize = Number( wpforms_builder.notifications_file_upload.wp_max_upload_size );
+			let fileUploadSize = 0;
+
+			for ( let counter = 0; counter < currentVal.length; counter++ ) {
+				const field = wpf.getField( currentVal[ counter ].value );
+
+				if ( field.type !== 'file-upload' ) {
+					continue;
+				}
+
+				const maxSize = app.utils.convertToNumber( field.max_size, defaultMaxSize );
+				const maxFileNumber = app.utils.convertToNumber( field.max_file_number, 1 );
+
+				fileUploadSize += maxSize * maxFileNumber;
+			}
+
+			$fileSizeDom.text( +wpf.numberFormat( fileUploadSize, 2, '.', ',' ).replace( ',', '' ) );
 		},
 
 		/**
-		 * Update the ChoicesJS fields.
+		 * Initialized ChoicesJS in Entry Information field in the newly added notifications block.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param {object}  $block                     jQuery element of the newly added notifications block.
+		 * @param {string}  fieldName                  Field name.
+		 * @param {boolean} shouldClearExistingChoices Whether to clear existing selected choices or not.
+		 */
+		initDynamicallyAddedChoicesJS: function( $block, fieldName, shouldClearExistingChoices ) {
+
+			const blockID = $block.data( 'blockId' );
+
+			// Find the ChoicesJS Field wrapper.
+			const $divWrapper = $block.find( `#wpforms-panel-field-notifications-${blockID}-${fieldName}-wrap` );
+
+			if ( $divWrapper.length <= 0 ) {
+				return;
+			}
+
+			// Find the ChoicesJS Wrapper inside the newly added notification.
+			const $choicesWrapper = $divWrapper.find( '.choices' );
+
+			if ( $choicesWrapper.length <= 0 ) {
+				return;
+			}
+
+			const $choicesJSField = $choicesWrapper.find( `.${fieldName}` ).first();
+
+			if ( $choicesJSField.length <= 0 ) {
+				return;
+			}
+
+			// Remove the ChoicesJS artifact.
+			$choicesJSField
+				.removeClass( 'choices__input' )
+				.removeAttr( 'hidden' )
+				.removeAttr( 'data-choice' )
+				.removeData( 'choice' )
+				.prependTo( $divWrapper.first() );
+
+			$divWrapper.find( 'label:first' ).prependTo( $divWrapper.first() );
+
+			// Delete the ChoicesJS wrapper DOM.
+			$choicesWrapper.first().remove();
+
+			// Make sure nothing is pre-selected for.
+			if ( shouldClearExistingChoices ) {
+				$choicesJSField.val( [] );
+			}
+		},
+
+		/**
+		 * Bind events.
 		 *
 		 * @since 1.7.7
-		 *
-		 * @param {number}  fieldId   ID of the field that was added or deleted.
-		 * @param {string}  fieldName Name of the field that was added.
-		 * @param {boolean} isDelete  Whether or not the field is added or deleted. Set `true` if deleted.
 		 */
-		updateChoicesJSFields: function( fieldId, fieldName, isDelete ) {
+		bindEvents: function() {
 
-			$( '.entry_csv_attachment_entry_information' ).each( function() {
+			el.$builder
+				.on( 'wpformsSettingsBlockAdded', app.notificationBlockAdded )
+				.on( 'wpformsSettingsBlockCloned', app.notificationsBlockCloned )
+				.on( 'wpformsPanelSwitch', app.panelSwitch )
+				.on( 'wpformsPanelSectionSwitch', app.panelSectionSwitch );
+		},
 
-				const choicesJS = $( this ).data( 'choicesjs' );
+		/**
+		 * Resetting fields when we add a new webhook.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param {object} event  Event object.
+		 * @param {object} $block New Webhook block.
+		 */
+		notificationBlockAdded: function( event, $block ) {
 
-				if ( ! choicesJS ) {
-					return;
-				}
+			app.initBlock( $block, true );
+		},
 
-				if ( isDelete ) {
-					app.choicesJSHelperMethods.deleteChoices( choicesJS, fieldId );
-					return;
-				}
+		/**
+		 * Insert the default value in File Name field for dynamically added
+		 * notification block.
+		 *
+		 * @since 1.7.7
+		 * @since 1.7.8 Replaced the second parameter from preselected file name to `originalId`.
+		 *
+		 * @param {object} $block     jQuery element of the newly added notifications block.
+		 * @param {string} originalId Original notification block id if notification is cloned.
+		 */
+		setDynamicallyAddedEntryInformationFileNameFieldValue: function( $block, originalId ) {
 
-				app.choicesJSHelperMethods.addNewFieldsInAvailableFieldsGroup( choicesJS, fieldId, fieldName );
-			} );
+			const $entryInformationFileNameField = $block.find( '.entry_csv_attachment_file_name' );
+
+			if ( $entryInformationFileNameField.length <= 0 ) {
+				return;
+			}
+
+			const preSelectedFileName = originalId ? $( `#wpforms-panel-field-notifications-${originalId}-entry_csv_attachment_file_name` ).val() : '';
+
+			$entryInformationFileNameField.val( preSelectedFileName.length === 0 ? wpforms_builder.entry_information.default_file_name : preSelectedFileName );
 		},
 
 		/**
@@ -414,7 +505,77 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 		 */
 		notificationsBlockCloned: function( ev, $clone, originalId ) {
 
-			app.initEntryCSVSection( $clone, true, originalId );
+			app.initBlock( $clone, true, originalId );
+		},
+
+		/**
+		 * Event handler for panel switch.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param {object} event Event object.
+		 * @param {string} panel Active panel.
+		 */
+		panelSwitch: function( event, panel ) {
+
+			if ( panel !== 'settings' ) {
+				return;
+			}
+
+			// Find the active section.
+			const activeSection = $( '#wpforms-panel-settings .wpforms-panel-sidebar' ).find( '.wpforms-panel-sidebar-section.active' ).data( 'section' );
+
+			if ( activeSection !== 'notifications' ) {
+				return;
+			}
+
+			app.loopAllNotificationsBlock( function( $block, blockID ) {
+				app.initBlock( $block );
+			} );
+		},
+
+		/**
+		 * Loop through all notifications block and invoke the passed callback function.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param {Function} callback Callback function.
+		 */
+		loopAllNotificationsBlock: function( callback ) {
+
+			$( '.wpforms-notification.wpforms-builder-settings-block' ).each( function( index, block ) {
+
+				const $block = $( block );
+				const blockID = $block.data( 'blockId' );
+
+				if ( $block.data( 'blockType' ) !== 'notification' || ! blockID ) {
+					return;
+				}
+
+				callback( $block, blockID );
+			} );
+
+			// Re-save the form state since DOM has been changed.
+			app.maybeSaveFormState();
+		},
+
+		/**
+		 * Event handler for panel section switch.
+		 *
+		 * @since 1.7.8
+		 *
+		 * @param {object} event   Event object.
+		 * @param {string} section Active section.
+		 */
+		panelSectionSwitch: function( event, section ) {
+
+			if ( section !== 'notifications' ) {
+				return;
+			}
+
+			app.loopAllNotificationsBlock( function( $block, blockID ) {
+				app.initBlock( $block );
+			} );
 		},
 
 		/**
@@ -442,126 +603,125 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 		choicesJSHelperMethods: {
 
 			/**
-			 * Extends ChoicesJS.
+			 * Choices for "File Upload Fields" field.
 			 *
-			 * @since 1.7.7
+			 * @since 1.7.8
 			 */
-			extendChoicesJS: function() {
+			fileUploadFields: {
 
 				/**
-				 * Use to re-render ChoicesJS after removing a choice.
+				 * Get all choices.
 				 *
-				 * @since 1.7.7
+				 * @since 1.7.8
+				 *
+				 * @returns {Array} Array of all the choices.
 				 */
-				Choices.prototype.renderAfterRemoveChoice = function() {
+				getAllChoices: function() {
 
-					if ( this._store.isLoading() ) {
-						return;
-					}
-
-					this._currentState = this._store.state;
-					this._renderChoices();
-					this._prevState = this._currentState;
-				};
+					return [
+						{
+							label: 'hidden',
+							choices: app.choicesJSHelperMethods.getFormFields( [ 'file-upload' ] ),
+						},
+					];
+				},
 			},
 
 			/**
-			 * Add newly added fields under "Available Fields" in ChoicesJS instance.
+			 * Choices for "Entry Information" field.
 			 *
-			 * @since 1.7.7
-			 *
-			 * @param {Choices} choicesJS    ChoicesJS instance.
-			 * @param {number}  newFieldId   ID of the new field.
-			 * @param {string}  newFieldName Name of the new field.
+			 * @since 1.7.8
 			 */
-			addNewFieldsInAvailableFieldsGroup: function( choicesJS, newFieldId, newFieldName ) {
+			entryInformation: {
 
-				const availableFieldsGroupId = app.choicesJSHelperMethods.findAvailableFieldsGroupId( choicesJS );
-
-				if ( ! availableFieldsGroupId ) {
-					return;
-				}
-
-				/*
-				 * We are currently using an internal method to add a new choice because there
-				 * are currently no public method to add a new choice to an existing group.
+				/**
+				 * Get all choices.
+				 *
+				 * @since 1.7.8
+				 *
+				 * @returns {Array} Array of all the choices.
 				 */
-				choicesJS._addChoice( {
-					value: newFieldId,
-					label: newFieldName,
-					groupId: availableFieldsGroupId,
-				} );
+				getAllChoices: function() {
 
-				choicesJS.renderAfterRemoveChoice();
-			},
+					return [
+						{
+							label: 'hidden',
+							choices: [
+								{
+									value: 'all_fields',
+									label: wpforms_builder.entry_information.localized.all_fields,
+								},
+							],
+						},
+						{
+							label: wpforms_builder.fields_available,
+							choices: app.choicesJSHelperMethods.getFormFields( false, wpforms_builder.entry_information.excluded_field_types ),
+						},
+						{
+							label: wpforms_builder.other,
+							choices: app.choicesJSHelperMethods.entryInformation.getOtherChoices(),
+						},
+					];
+				},
 
-			/**
-			 * Find the group ID of 'Available Fields' group.
-			 *
-			 * @since 1.7.7
-			 * @param {Choices} choicesJS ChoicesJS instance.
-			 *
-			 * @returns {false|number} Returns the group ID of 'Available Fields' group. Otherwise, return `false`.
-			 */
-			findAvailableFieldsGroupId: function( choicesJS ) {
+				/**
+				 * Get "Other" options.
+				 *
+				 * @since 1.7.8
+				 *
+				 * @returns {*[]} Returns an array of objects containing the label and value (field key).
+				 */
+				getOtherChoices: function() {
 
-				for ( const group of choicesJS._currentState.groups ) {
-					if ( group.value === 'Available Fields' ) {
-						return group.id;
+					let otherFields = [];
+
+					// Get "Others".
+					for ( const smartTagKey in wpforms_builder.smart_tags ) {
+
+						if ( wpforms_builder.entry_information.excluded_tags.includes( smartTagKey ) ) {
+							continue;
+						}
+
+						// Replace the value if necessary.
+						let value = Object.hasOwn( wpforms_builder.entry_information.replacement_tags, smartTagKey ) ? wpforms_builder.entry_information.replacement_tags[ smartTagKey ] : smartTagKey;
+
+						otherFields.push( {
+							label: wpf.encodeHTMLEntities( wpforms_builder.smart_tags[ smartTagKey ] ),
+							value: wpf.sanitizeHTML( value ),
+						} );
 					}
-				}
 
-				return false;
+					return otherFields;
+				},
 			},
 
 			/**
-			 * Remove deleted fields in ChoicesJS instance.
+			 * Get current form fields.
 			 *
-			 * @since 1.7.7
+			 * @since 1.7.8
 			 *
-			 * @param {Choices} choicesJS ChoicesJS instance.
-			 * @param {number}  deletedId Deleted ID field.
+			 * @param {Array|false} allowed Field types to return. Pass `false` to return all fields.
+			 * @param {Array}       exclude Field types to exclude.
+			 *
+			 * @returns {Array} Array containing fields in `object` with `label` and `value` properties.
 			 */
-			deleteChoices: function( choicesJS, deletedId ) {
-
-				for ( let i = choicesJS._currentState.choices.length - 1; i >= 0; i-- ) {
-					const choice = choicesJS._currentState.choices[ i ];
-
-					if ( deletedId.toString() !== choice.value.toString() ) {
-						continue;
-					}
-
-					choicesJS.removeActiveItemsByValue( choice.value );
-					choicesJS._currentState.choices.splice( i, 1 );
-				}
-
-				choicesJS.renderAfterRemoveChoice();
-			},
-
-			/**
-			 * Get Available field options.
-			 *
-			 * @since 1.7.7
-			 *
-			 * @returns {*[]} Returns an array of objects containing the label and value (field key).
-			 */
-			getAvailableChoices: function() {
+			getFormFields: function( allowed, exclude = [] ) {
 
 				let availableFields = [];
 
-				const fields = wpf.getFields( false, true );
+				const fields = wpf.getFields( allowed, true );
 
 				for ( const fieldKey of wpf.orders.fields ) {
 
 					const field = fields[ fieldKey ];
 
-					if ( ! field || wpforms_builder.entry_information.excluded_field_types.includes( field.type ) ) {
+					if ( ! field || field.label === undefined || app.choicesJSHelperMethods.isFieldExcluded( field, exclude ) ) {
 						continue;
 					}
 
 					availableFields.push( {
-						label: field.label,
-						value: field.id.toString(),
+						label: wpf.encodeHTMLEntities( app.choicesJSHelperMethods.getFieldLabel( field ) ),
+						value: wpf.sanitizeHTML( field.id.toString() ),
 					} );
 				}
 
@@ -569,33 +729,35 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 			},
 
 			/**
-			 * Get "Other" options.
+			 * Check whether the given `field` is excluded based on the passed `exclude`.
 			 *
-			 * @since 1.7.7
+			 * @since 1.7.8
 			 *
-			 * @returns {*[]} Returns an array of objects containing the label and value (field key).
+			 * @param {object} field   Field to check.
+			 * @param {Array}  exclude Array of fields that should be excluded.
+			 *
+			 * @returns {boolean} Whether the given `field` is excluded.
 			 */
-			getOtherChoices: function() {
+			isFieldExcluded: function( field, exclude ) {
 
-				let otherFields = [];
+				return Array.isArray( exclude ) && exclude.length > 0 && exclude.includes( field.type );
+			},
 
-				// Get "Others".
-				for ( const smartTagKey in wpforms_builder.smart_tags ) {
+			/**
+			 * Returns the label of a field.
+			 *
+			 * If the field doesn't have a label, it will use `wpforms_builder.empty_label_alternative_text`
+			 * instead.
+			 *
+			 * @since 1.7.8
+			 *
+			 * @param {object} field Field object.
+			 *
+			 * @returns {string} Label of the field.
+			 */
+			getFieldLabel: function( field ) {
 
-					if ( wpforms_builder.entry_information.excluded_tags.includes( smartTagKey ) ) {
-						continue;
-					}
-
-					// Replace the value if necessary.
-					let value = Object.hasOwn( wpforms_builder.entry_information.replacement_tags, smartTagKey ) ? wpforms_builder.entry_information.replacement_tags[ smartTagKey ] : smartTagKey;
-
-					otherFields.push( {
-						label: wpforms_builder.smart_tags[ smartTagKey ],
-						value: value,
-					} );
-				}
-
-				return otherFields;
+				return field.label.length === 0 ? `${wpforms_builder.empty_label_alternative_text}${field.id}` : field.label;
 			},
 
 			/**
@@ -604,9 +766,10 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 			 * @since 1.7.7
 			 *
 			 * @param {Choices} choicesJS   ChoicesJS instance.
+			 * @param {Array}   choices     Array containing the choices for the ChoicesJS instance.
 			 * @param {Array}   preSelected Array of pre-selected choices.
 			 */
-			populateInstance: function( choicesJS, preSelected = [] ) {
+			populateInstance: function( choicesJS, choices, preSelected = [] ) {
 
 				if ( ! choicesJS ) {
 					return;
@@ -614,25 +777,7 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 
 				choicesJS.clearStore();
 
-				choicesJS.setChoices( [
-					{
-						label: 'hidden',
-						choices: [
-							{
-								value: 'all_fields',
-								label: wpforms_builder.entry_information.localized.all_fields,
-							},
-						],
-					},
-					{
-						label: wpforms_builder.fields_available,
-						choices: app.choicesJSHelperMethods.getAvailableChoices(),
-					},
-					{
-						label: wpforms_builder.other,
-						choices: app.choicesJSHelperMethods.getOtherChoices(),
-					},
-				] );
+				choicesJS.setChoices( choices );
 
 				if ( ! Array.isArray( preSelected ) ) {
 					return;
@@ -641,6 +786,33 @@ WPForms.Admin.Builder.Notifications = WPForms.Admin.Builder.Notifications || ( f
 				preSelected.forEach( function( item ) {
 					choicesJS.setChoiceByValue( item );
 				} );
+			},
+		},
+
+		/**
+		 * Other utils.
+		 *
+		 * @since 1.7.8
+		 */
+		utils: {
+
+			/**
+			 * Converts a given value to a number.
+			 *
+			 * If the converted value is less than or equal to 0, return the default value instead.
+			 *
+			 * @since 1.7.8
+			 *
+			 * @param {any}    value        Value to be converted.
+			 * @param {number} defaultValue Default value.
+			 *
+			 * @returns {number} The value converted to a number or the default value.
+			 */
+			convertToNumber: function( value, defaultValue ) {
+
+				const convertValue = Number( value );
+
+				return ( convertValue <= 0 ) ? defaultValue : convertValue;
 			},
 		},
 	};

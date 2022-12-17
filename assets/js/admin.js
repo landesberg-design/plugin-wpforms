@@ -322,7 +322,7 @@
 							keys: [ 'enter' ],
 							action: function() {
 
-								$form.submit();
+								$form.trigger( 'submit' );
 							},
 						},
 						cancel: {
@@ -678,7 +678,8 @@
 		 */
 		entryHotkeys: function() {
 
-			$( document ).keydown( function( event ) {
+			// eslint-disable-next-line complexity
+			$( document ).on( 'keydown', function( event ) {
 				if ( 74 === event.keyCode && ! WPFormsAdmin.isFormTypeNode( event.target.nodeName ) ) {
 
 					// j key has been pressed outside a form element, go to the previous entry.
@@ -740,7 +741,7 @@
 						btnClass: 'btn-confirm',
 						keys: [ 'enter' ],
 						action: function() {
-							this.$content.find( 'form' ).submit();
+							this.$content.find( 'form' ).trigger( 'submit' );
 						},
 					},
 					cancel: {
@@ -1606,7 +1607,7 @@
 			} ).fail( function() {
 
 				WPFormsAdmin.integrationError( errorMessage );
-			} ).complete( function() {
+			} ).always( function() {
 
 				$btn.html( buttonLabel ).css( 'width', 'auto' ).prop( 'disabled', false );
 			} );

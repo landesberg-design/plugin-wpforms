@@ -34,6 +34,7 @@ class Export {
 			'html',
 			'pagebreak',
 			'internal-information',
+			'content',
 			'layout',
 		],
 	];

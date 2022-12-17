@@ -320,8 +320,11 @@ WPForms.Admin.Builder.Help = WPForms.Admin.Builder.Help || ( function( document,
 				return;
 			}
 
-			$el.css( 'display', '' );
-			$el.css( 'transition', 'opacity ' + ui.config.speed + 'ms ease-in 0s' );
+			$el.css( {
+				display: '',
+				transition: `opacity ${ui.config.speed}ms ease-in 0s`,
+			} );
+
 			setTimeout( function() {
 				$el.css( 'opacity', '1' );
 			}, 0 );
@@ -340,8 +343,11 @@ WPForms.Admin.Builder.Help = WPForms.Admin.Builder.Help || ( function( document,
 				return;
 			}
 
-			$el.css( 'opacity', '0' );
-			$el.css( 'transition', 'opacity ' + ui.config.speed + 'ms ease-in 0s' );
+			$el.css( {
+				opacity: '0',
+				transition: `opacity ${ui.config.speed}ms ease-in 0s`,
+			} );
+
 			setTimeout( function() {
 				$el.css( 'display', 'none' );
 			}, ui.config.speed );
@@ -379,7 +385,7 @@ WPForms.Admin.Builder.Help = WPForms.Admin.Builder.Help || ( function( document,
 				builderContextTerm = app.getBuilderContextTerm();
 
 			if ( builderContextTerm === '' && ! $firstCategory.hasClass( 'opened' ) ) {
-				$firstCategory.find( 'header' ).first().click();
+				$firstCategory.find( 'header' ).first().trigger( 'click' );
 			} else {
 				ui.collapseAllCategories();
 			}

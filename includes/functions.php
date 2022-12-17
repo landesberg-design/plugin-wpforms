@@ -270,6 +270,18 @@ function wpforms_setting( $key, $default = false, $option = 'wpforms_settings' )
 	$options = get_option( $option, false );
 	$value   = is_array( $options ) && ! empty( $options[ $key ] ) ? wp_unslash( $options[ $key ] ) : $default;
 
+	/**
+	 * Allows plugin setting to be modified.
+	 *
+	 * @since 1.7.8
+	 *
+	 * @param mixed  $value   Setting value.
+	 * @param string $key     Setting key.
+	 * @param mixed  $default Setting default value.
+	 * @param string $option  Settings option name.
+	 */
+	$value = apply_filters( 'wpforms_setting', $value, $key, $default, $option );
+
 	return $value;
 }
 
@@ -1520,6 +1532,8 @@ function wpforms_get_allowed_html_tags_for_richtext_field() {
 			'span',
 			'small',
 			'table',
+			'thead',
+			'tbody',
 			'th',
 			'tr',
 			'td',
@@ -1533,7 +1547,7 @@ function wpforms_get_allowed_html_tags_for_richtext_field() {
 			'div',
 		],
 		array_fill_keys(
-			[ 'align', 'class', 'id', 'style', 'src', 'rel', 'href', 'target', 'width', 'height', 'title', 'cite', 'start', 'reversed', 'datetime' ],
+			[ 'align', 'class', 'id', 'style', 'src', 'rel', 'alt', 'href', 'target', 'width', 'height', 'title', 'cite', 'start', 'reversed', 'datetime' ],
 			[]
 		)
 	);
@@ -1997,7 +2011,7 @@ function wpforms_debug_data( $data, $echo = true ) {
 			.wpforms-debug {
 				line-height: 0;
 			}
-			.wpforms-debug textarea { 
+			.wpforms-debug textarea {
 				background: #f6f7f7 !important;
 				margin: 20px 0 0 0;
 				width: 100%%;
@@ -3523,9 +3537,9 @@ function wpforms_doing_wp_cli() {
  */
 function wpforms_get_default_user_agent() {
 
-	$wpforms_type = wpforms()->is_pro() ? 'Paid' : 'Lite';
+	$license_type = wpforms()->is_pro() ? ucwords( (string) wpforms_get_license_type() ) : 'Lite';
 
-	return 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) . '; WPForms/' . $wpforms_type;
+	return 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) . '; WPForms/' . $license_type . '-' . WPFORMS_VERSION;
 }
 
 /**

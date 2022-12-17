@@ -106,7 +106,7 @@
 			$form.find( '.wpforms-submit-container' )
 				.before(
 					`<div class="wpforms-error-alert wpforms-uploading-in-progress-alert">
-						${window.wpforms_file_upload.loading_message} 
+						${window.wpforms_file_upload.loading_message}
 					</div>`
 				);
 		};
@@ -172,8 +172,10 @@
 			if ( ! $form.find( '.wpforms-submit-overlay' ).length ) {
 				$btn.parent().addClass( 'wpforms-submit-overlay-container' );
 				$btn.parent().append( '<div class="wpforms-submit-overlay"></div>' );
-				$form.find( '.wpforms-submit-overlay' ).css( 'width', $btn.outerWidth() + 'px' );
-				$form.find( '.wpforms-submit-overlay' ).css( 'height', $btn.parent().outerHeight() + 'px' );
+				$form.find( '.wpforms-submit-overlay' ).css( {
+					width: `${$btn.outerWidth()}px`,
+					height: `${$btn.parent().outerHeight()}px`,
+				} );
 				$form.find( '.wpforms-submit-overlay' ).on( 'click', handler );
 			}
 

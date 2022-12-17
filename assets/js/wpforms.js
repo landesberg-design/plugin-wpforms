@@ -116,7 +116,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				} );
 
 				// Prepend URL field contents with https:// if user input doesn't contain a schema.
-				$( '.wpforms-validate input[type=url]' ).change( function() {
+				$( document ).on( 'change', '.wpforms-validate input[type=url]', function() {
 					var url = $( this ).val();
 					if ( ! url ) {
 						return false;
@@ -781,7 +781,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				return;
 			}
 
-			$( '.wpforms-masked-input' ).inputmask();
+			// This setting has no effect when switching to the "RTL" mode.
+			$( '.wpforms-masked-input' ).inputmask( { rightAlign: false } );
 		},
 
 		/**
@@ -1110,16 +1111,13 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			} );
 
 			// Rating field: hover effect.
-			$( '.wpforms-field-rating-item' ).hover(
-				function() {
-					$( this ).parent().find( '.wpforms-field-rating-item' ).removeClass( 'selected hover' );
-					$( this ).prevAll().addBack().addClass( 'hover' );
-				},
-				function() {
-					$( this ).parent().find( '.wpforms-field-rating-item' ).removeClass( 'selected hover' );
-					$( this ).parent().find( 'input:checked' ).parent().prevAll().addBack().addClass( 'selected' );
-				}
-			);
+			$( document ).on( 'mouseenter', '.wpforms-field-rating-item', function() {
+				$( this ).parent().find( '.wpforms-field-rating-item' ).removeClass( 'selected hover' );
+				$( this ).prevAll().addBack().addClass( 'hover' );
+			} ).on( 'mouseleave', '.wpforms-field-rating-item', function() {
+				$( this ).parent().find( '.wpforms-field-rating-item' ).removeClass( 'selected hover' );
+				$( this ).parent().find( 'input:checked' ).parent().prevAll().addBack().addClass( 'selected' );
+			} );
 
 			// Rating field: toggle selected state.
 			$( document ).on( 'change', '.wpforms-field-rating-item input', function() {
@@ -1134,7 +1132,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 			// Rating field: preselect the selected rating (from dynamic/fallback population).
 			$( function() {
-				$( '.wpforms-field-rating-item input:checked' ).change();
+				$( '.wpforms-field-rating-item input:checked' ).trigger( 'change' );
 			} );
 
 			// Checkbox/Radio/Payment checkbox: make labels keyboard-accessible.
@@ -1149,7 +1147,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 				// Cause the input to be clicked when clicking the label.
 				if ( 13 === event.which ) {
-					$( '#' + $this.attr( 'for' ) ).click();
+					$( '#' + $this.attr( 'for' ) ).trigger( 'click' );
 				}
 			} );
 
@@ -1157,7 +1155,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			if ( window.document.documentMode ) {
 				$( document ).on( 'click', '.wpforms-image-choices-item img', function() {
 
-					$( this ).closest( 'label' ).find( 'input' ).click();
+					$( this ).closest( 'label' ).find( 'input' ).trigger( 'click' );
 				} );
 			}
 
@@ -1274,11 +1272,11 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				e.preventDefault();
 
 				if ( $page.hasClass( 'last' ) ) {
-					$page.closest( '.wpforms-form' ).find( '.wpforms-submit' ).click();
+					$page.closest( '.wpforms-form' ).find( '.wpforms-submit' ).trigger( 'click' );
 					return;
 				}
 
-				$page.find( '.wpforms-page-next' ).click();
+				$page.find( '.wpforms-page-next' ).trigger( 'click' );
 			} );
 
 			// Allow only numbers, minus and decimal point to be entered into the Numbers field.
@@ -1353,7 +1351,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			app.animateScrollTop( offset.top - 75, 750 ).done( function() {
 				var $error = $field.find( '.wpforms-error' ).first();
 				if ( typeof $error.focus === 'function' ) {
-					$error.focus();
+					$error.trigger( 'focus' );
 				}
 			} );
 		},

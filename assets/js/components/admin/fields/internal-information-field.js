@@ -243,7 +243,7 @@ var WPFormsInternalInformationField = window.WPFormsInternalInformationField || 
 							btnClass: 'btn-confirm',
 							keys: [ 'enter' ],
 							action: function() {
-								$field.focus();
+								$field.trigger( 'focus' );
 							},
 						},
 					},

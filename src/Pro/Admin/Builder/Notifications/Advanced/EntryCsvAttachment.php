@@ -179,6 +179,7 @@ class EntryCsvAttachment {
 			'divider',
 			'entry-preview',
 			'html',
+			'content',
 			'internal-information',
 			'layout',
 			'pagebreak',
@@ -245,84 +246,24 @@ class EntryCsvAttachment {
 	 */
 	private function entry_information_panel_field( $form_data, $notification_id ) {
 
+		$field  = 'entry_csv_attachment_entry_information';
+		$values = Settings::get_array_value_from_field( $form_data, $notification_id, $field );
+
 		// We use "+" instead of `array_merge()` preserve numeric keys.
-		$options = $this->get_all_fields_string() + $this->get_entry_csv_attachment_field_options( $form_data ) + $this->get_entry_information_other_tags();
+		$options = $this->get_all_fields_string() +
+			Settings::get_fields_from_form_data( $form_data, $values, $this->get_entry_information_excluded_field_types() ) +
+			$this->get_entry_information_other_tags();
 
-		if ( empty( $options ) ) {
-			return '';
-		}
-
-		$values = isset( $form_data['settings']['notifications'][ $notification_id ]['entry_csv_attachment_entry_information'] ) ? $form_data['settings']['notifications'][ $notification_id ]['entry_csv_attachment_entry_information'] : [];
-
-		$output = sprintf(
-			'<div id="wpforms-panel-field-notifications-%d-entry_csv_attachment_entry_information-wrap" class="wpforms-panel-field">',
-			$notification_id
-		);
-
-		$output .= sprintf(
-			'<label for="wpforms-panel-field-notifications-%d-entry_csv_attachment_entry_information">%s<i class="fa fa-question-circle-o wpforms-help-tooltip" title="%s"></i></label>',
+		return Settings::get_choicesjs_field(
 			$notification_id,
-			esc_html__( 'Entry Information', 'wpforms' ),
-			esc_attr__( 'At least one item must be selected for inclusion in the CSV file.', 'wpforms' )
+			$field,
+			$values,
+			$options,
+			__( 'Entry Information', 'wpforms' ),
+			[
+				'tooltip' => __( 'At least one item must be selected for inclusion in the CSV file.', 'wpforms' ),
+			]
 		);
-
-		$output .= sprintf(
-			'<select id="wpforms-panel-field-notifications-%1$d-entry_csv_attachment_entry_information" name="settings[notifications][%1$d][entry_csv_attachment_entry_information]" class="entry_csv_attachment_entry_information" multiple>',
-			$notification_id
-		);
-
-		foreach ( $values as $value ) {
-
-			if ( ! isset( $options[ $value ] ) ) {
-				continue;
-			}
-
-			$output .= sprintf(
-				'<option value="%s" selected>%s</option>',
-				esc_attr( $value ),
-				esc_html( $options[ $value ] )
-			);
-		}
-
-		$output .= '</select>';
-		$output .= '</div>';
-
-		return $output;
-	}
-
-	/**
-	 * Get the options for Entry CSV Attachment field.
-	 *
-	 * @since 1.7.7
-	 *
-	 * @param array $form_data Form data.
-	 *
-	 * @return array
-	 */
-	private function get_entry_csv_attachment_field_options( $form_data ) {
-
-		if ( empty( $form_data['fields'] ) ) {
-			return [];
-		}
-
-		$excluded_field_types = $this->get_entry_information_excluded_field_types();
-		$available_fields     = [];
-
-		foreach ( $form_data['fields'] as $field_id => $field ) {
-
-			if ( in_array( $field['type'], $excluded_field_types, true ) ) {
-				continue;
-			}
-
-			$available_fields[ $field_id ] = ! empty( $field['label'] )
-				? esc_html( $field['label'] )
-				: sprintf( /* translators: %d - field ID. */
-					esc_html__( 'Field #%d', 'wpforms' ),
-					absint( $field['id'] )
-				);
-		}
-
-		return $available_fields;
 	}
 
 	/**
@@ -366,31 +307,7 @@ class EntryCsvAttachment {
 	 */
 	public function format_data_on_save( $form, $data, $args ) {
 
-		$new_entry_csv_attachments = $this->get_entry_information( $data );
-
-		if ( empty( $new_entry_csv_attachments ) ) {
-			return $form;
-		}
-
-		// Get a filtered form content.
-		$form_data = json_decode( stripslashes( $form['post_content'] ), true );
-
-		foreach ( $new_entry_csv_attachments as $id => $entry_csv_attachment ) {
-
-			if ( empty( $form_data['settings']['notifications'][ $id ] ) ) {
-				continue;
-			}
-
-			$form_data['settings']['notifications'][ $id ] = array_merge(
-				$form_data['settings']['notifications'][ $id ],
-				$entry_csv_attachment
-			);
-		}
-
-		// Save the modified version back to form.
-		$form['post_content'] = wpforms_encode( $form_data );
-
-		return $form;
+		return Settings::attach_notification_data_in_form_data( $form, $this->get_entry_information( $data ) );
 	}
 
 	/**

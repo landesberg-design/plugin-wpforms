@@ -195,7 +195,7 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 			}
 
 			if ( view === 'setup' ) {
-				el.$formName.focus();
+				el.$formName.trigger( 'focus' );
 			}
 		},
 
@@ -746,7 +746,7 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 				return;
 			}
 
-			el.$panel.find( '.wpforms-template .wpforms-btn[data-template="' + templateId + '"]' ).click();
+			el.$panel.find( '.wpforms-template .wpforms-btn[data-template="' + templateId + '"]' ).trigger( 'click' );
 		},
 	};
 

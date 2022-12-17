@@ -10,6 +10,7 @@
  * @var string $status_label Status label.
  * @var string $url          Addon page URL.
  * @var string $button       Button HTML.
+ * @var bool   $recommended  Flag for recommended addons.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,11 +23,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="details wpforms-clear">
 			<img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $addon['title'] ); ?> <?php esc_attr_e( 'logo', 'wpforms' ); ?>">
 			<h5 class="addon-name">
-				<a target="_blank" rel="noopener noreferrer" class="addon-link"
-					href="<?php echo esc_url( $url ); ?>"
-					title="<?php echo esc_attr__( 'Learn more', 'wpforms' ); ?>">
-					<?php echo esc_html( $addon['title'] ); ?>
-				</a>
+				<a class="addon-link" href="<?php echo esc_url( $url ); ?>" title="<?php echo esc_attr__( 'Learn more', 'wpforms' ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $addon['title'] ); ?></a>
+				<?php if ( ! empty( $recommended ) ) : ?>
+					<span class="wpforms-addon-recommended">
+						<i class="fa fa-star" aria-hidden="true"></i>
+						<?php esc_html_e( 'Recommended', 'wpforms' ); ?>
+					</span>
+				<?php endif; ?>
 			</h5>
 			<p class="addon-desc"><?php echo esc_html( $addon['excerpt'] ); ?></p>
 		</div>

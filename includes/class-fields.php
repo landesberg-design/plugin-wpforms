@@ -47,7 +47,6 @@ class WPForms_Fields {
 	 */
 	public function load() {
 
-		// Default field types.
 		$fields = [
 			'text',
 			'textarea',
@@ -60,6 +59,7 @@ class WPForms_Fields {
 			'url',
 			'hidden',
 			'html',
+			'content',
 			'name',
 			'password',
 			'address',

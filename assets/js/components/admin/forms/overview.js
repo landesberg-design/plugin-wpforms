@@ -196,7 +196,7 @@ WPFormsForms.Overview = WPFormsForms.Overview || ( function( document, window, $
 							}
 
 							if ( args.bulk ) {
-								args.form.submit();
+								args.form.trigger( 'submit' );
 							}
 						},
 					},
@@ -248,7 +248,7 @@ WPFormsForms.Overview = WPFormsForms.Overview || ( function( document, window, $
 			$( '#wpforms-overview-search-term' ).val( '' );
 
 			// Submit the form.
-			$( this ).closest( 'form' ).submit();
+			$( this ).closest( 'form' ).trigger( 'submit' );
 		},
 
 		/**

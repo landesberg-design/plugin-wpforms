@@ -17,7 +17,8 @@ class WPForms_Admin_Menu {
 		// Let's make some menus.
 		add_action( 'admin_menu', [ $this, 'register_menus' ], 9 );
 		add_action( 'admin_head', [ $this, 'hide_wpforms_submenu_items' ] );
-		add_action( 'admin_head', [ $this, 'style_upgrade_pro_link' ] );
+		add_action( 'admin_head', [ $this, 'adjust_pro_menu_item_class' ] );
+		add_action( 'admin_head', [ $this, 'admin_menu_styles' ], 11 );
 
 		// Plugins page settings link.
 		add_filter( 'plugin_action_links_' . plugin_basename( WPFORMS_PLUGIN_DIR . 'wpforms.php' ), [ $this, 'settings_link' ], 10, 4 );
@@ -90,7 +91,7 @@ class WPForms_Admin_Menu {
 		add_submenu_page(
 			'wpforms-overview',
 			esc_html__( 'WPForms Templates', 'wpforms-lite' ),
-			esc_html__( 'Form Templates', 'wpforms-lite' ),
+			esc_html__( 'Form Templates', 'wpforms-lite' ) . $this->get_new_badge_html(),
 			$access->get_menu_cap( 'create_forms' ),
 			'wpforms-templates',
 			[ $this, 'admin_page' ]
@@ -238,13 +239,24 @@ class WPForms_Admin_Menu {
 	}
 
 	/**
-	 * Define inline styles for "Upgrade to Pro" left sidebar menu item.
+	 * Alias method for backward compatibility.
 	 *
 	 * @since 1.7.4
-	 *
-	 * @return void
+	 * @deprecated 1.7.8
 	 */
 	public function style_upgrade_pro_link() {
+
+		_deprecated_function( __METHOD__, '1.7.8 of the WPForms plugin', __CLASS__ . '::add_pro_badge()' );
+
+		$this->adjust_pro_menu_item_class();
+	}
+
+	/**
+	 * Add the PRO badge to left sidebar menu item.
+	 *
+	 * @since 1.7.8
+	 */
+	public function adjust_pro_menu_item_class() {
 
 		global $submenu;
 
@@ -256,7 +268,8 @@ class WPForms_Admin_Menu {
 		$upgrade_link_position = key(
 			array_filter(
 				$submenu['wpforms-overview'],
-				function ( $item ) {
+				static function( $item ) {
+
 					return strpos( $item[2], 'https://wpforms.com/lite-upgrade' ) !== false;
 				}
 			)
@@ -275,9 +288,6 @@ class WPForms_Admin_Menu {
 			$submenu['wpforms-overview'][ $upgrade_link_position ][] = 'wpforms-sidebar-upgrade-pro';
 		}
 		// phpcs:enable WordPress.WP.GlobalVariablesOverride.Prohibited
-
-		// Output inline styles.
-		echo '<style>a.wpforms-sidebar-upgrade-pro { background-color: #00a32a !important; color: #fff !important; font-weight: 600 !important; }</style>';
 	}
 
 	/**
@@ -354,6 +364,35 @@ class WPForms_Admin_Menu {
 		);
 
 		return array_merge( $custom, (array) $links );
+	}
+
+	/**
+	 * Get the HTML for the "NEW!" badge.
+	 *
+	 * @since 1.7.8
+	 *
+	 * @return string
+	 */
+	private function get_new_badge_html() {
+
+		return '<span class="wpforms-menu-new">&nbsp;NEW!</span>';
+	}
+
+	/**
+	 * Output inline styles for the admin menu.
+	 *
+	 * @since 1.7.8
+	 */
+	public function admin_menu_styles() {
+
+		$styles = '#adminmenu .wpforms-menu-new { color: #f18500; vertical-align: super; font-size: 9px; font-weight: 600; padding-left: 2px; }';
+
+		if ( ! wpforms()->is_pro() ) {
+			$styles .= 'a.wpforms-sidebar-upgrade-pro { background-color: #00a32a !important; color: #fff !important; font-weight: 600 !important; }';
+		}
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		printf( '<style>%s</style>', $styles );
 	}
 }
 

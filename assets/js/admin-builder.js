@@ -1025,7 +1025,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						keys: [ 'enter' ],
 						action: function() {
 
-							$input.val( '' ).focus();
+							$input.val( '' ).trigger( 'focus' );
 						},
 					},
 				},
@@ -2241,7 +2241,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			/*
 			 * Pagebreak field.
 			 */
-			app.fieldPageBreakInitDisplayPrevious( $builder.find( '.wpforms-field-pagebreak.wpforms-pagebreak-normal:first' ) );
+			app.fieldPageBreakInitDisplayPrevious( $builder.find( '.wpforms-field-pagebreak.wpforms-pagebreak-normal' ).first() );
 
 			$builder
 				.on( 'input', '.wpforms-field-option-row-next input', function( e ) {
@@ -4330,7 +4330,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				$label.after( importOptions );
 				$label.next( '.bulk-add-display' ).slideDown( 400, function() {
-					$( this ).find( 'textarea' ).focus();
+					$( this ).find( 'textarea' ).trigger( 'focus' );
 				} );
 				$this.find( 'span' ).text( wpforms_builder.bulk_add_hide );
 			}
@@ -4626,7 +4626,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					wpf.initTooltips();
 
 					// Trigger Dynamic source updates.
-					$( '#wpforms-field-option-' + id + '-dynamic_' + value ).find( 'option:first' ).prop( 'selected', true );
+					$( '#wpforms-field-option-' + id + '-dynamic_' + value ).find( 'option' ).first().prop( 'selected', true );
 					$( '#wpforms-field-option-' + id + '-dynamic_' + value ).trigger( 'change' );
 
 				} ).fail( function( xhr, textStatus, e ) {
@@ -5199,7 +5199,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				app.panelSwitch( 'settings' );
 				if ( $( this ).hasClass( 'wpforms-center-form-name' ) || $( this ).hasClass( 'wpforms-title-desc' ) ) {
 					setTimeout( function() {
-						$( '#wpforms-panel-field-settings-form_title' ).focus();
+						$( '#wpforms-panel-field-settings-form_title' ).trigger( 'focus' );
 					}, 300 );
 				}
 			} );
@@ -5209,18 +5209,39 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				e.preventDefault();
 
 				app.panelSwitch( 'settings' );
-				$( '#wpforms-panel-field-settings-pagebreak_prev' ).focus();
+				$( '#wpforms-panel-field-settings-pagebreak_prev' ).trigger( 'focus' );
+			} );
+
+			// Trigger Custom Captcha adding when clicking on its block in the Also Available section.
+			$builder.on( 'click', '.wpforms-panel-content-also-available-item-add-captcha', function( e ) {
+
+				e.preventDefault();
+
+				const customCaptcha = $builder.find( '#wpforms-add-fields-captcha' );
+
+				// Show educational modal if Custom Captcha is not installed or activated.
+				if ( customCaptcha.data( 'action' ) ) {
+					customCaptcha.trigger( 'click' );
+
+					return;
+				}
+
+				app.fieldAdd( 'captcha', {} ).done( function() {
+
+					app.panelSwitch( 'fields' );
+				} );
 			} );
 
 			// Clicking form last page break button.
 			$builder.on( 'input', '#wpforms-panel-field-settings-pagebreak_prev', function() {
+
 				$( '.wpforms-field-pagebreak-last button' ).text( $( this ).val() );
 			} );
 
 			// Real-time updates for editing the form title.
 			$builder.on( 'input', '#wpforms-panel-field-settings-form_title, #wpforms-setup-name', function() {
 
-				var title = $.trim( $( this ).val() );
+				var title = $( this ).val().toString().trim();
 
 				$( '.wpforms-preview .wpforms-form-name' ).text( title );
 				$( '.wpforms-center-form-name.wpforms-form-name' ).text( title );
@@ -5382,7 +5403,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				// Show the error modal and focus the field.
 				app.confirmationRedirectValidationError( function() {
 
-					$field.focus();
+					$field.trigger( 'focus' );
 				} );
 			} );
 
@@ -5410,7 +5431,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 					app.confirmationRedirectValidationError( function() {
 
-						$urlField.focus();
+						$urlField.trigger( 'focus' );
 					} );
 
 					event.stopImmediatePropagation();
@@ -5582,7 +5603,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						keys: [ 'enter' ],
 						action: function() {
 
-							var settingsBlockName = $.trim( this.$content.find( 'input#settings-block-name' ).val() ),
+							var settingsBlockName = this.$content.find( 'input#settings-block-name' ).val().toString().trim(),
 								error = this.$content.find( '.error' );
 
 							if ( settingsBlockName === '' ) {
@@ -5606,7 +5627,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 										$this.val( '' ).attr( 'name', $this.attr( 'name' ).replace( /\[(\d+)\]/, '[' + nextID + ']' ) );
 										if ( $this.is( 'select' ) ) {
 											$this.find( 'option' ).prop( 'selected', false ).attr( 'selected', false );
-											$this.find( 'option:first' ).prop( 'selected', true ).attr( 'selected', 'selected' );
+											$this.find( 'option' ).first().prop( 'selected', true ).attr( 'selected', 'selected' );
 										} else if ( $this.attr( 'type' ) === 'checkbox' ) {
 											$this.prop( 'checked', false ).attr( 'checked', false ).val( '1' );
 										} else {
@@ -6654,11 +6675,27 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				app.validateEmailSmartTags( $( this ) );
 			} );
 
-			// Mobile notice button click.
-			$builder.on( 'click', '.wpforms-fullscreen-notice-go-back', app.exitBack );
+			// Mobile notice primary button / close icon click.
+			$builder.on( 'click', '#wpforms-builder-mobile-notice .wpforms-fullscreen-notice-button-primary, #wpforms-builder-mobile-notice .close', function() {
+				window.location.href = wpforms_builder.exit_url;
+			} );
+
+			// Mobile notice secondary button click.
+			$builder.on( 'click', '#wpforms-builder-mobile-notice .wpforms-fullscreen-notice-button-secondary', function() {
+				window.location.href = wpf.updateQueryString( 'force_desktop_view', 1, window.location.href );
+			} );
 
 			// License Alert close button click.
-			$( '#wpforms-builder-license-alert .close' ).on( 'click', app.exitBack );
+			$( '#wpforms-builder-license-alert .close' ).on( 'click', function() {
+				window.location.href = wpforms_builder.exit_url;
+			} );
+
+			// License Alert dismiss button click.
+			$( '#wpforms-builder-license-alert .dismiss' ).on( 'click', function( event ) {
+				event.preventDefault();
+				$( '#wpforms-builder-license-alert' ).remove();
+				wpCookies.set( 'wpforms-builder-license-alert', 'true', 3600 );
+			} );
 
 			// Don't allow the Akismet setting to be enabled if the Akismet plugin isn't available.
 			$builder.on( 'change', '#wpforms-panel-field-settings-akismet.wpforms-akismet-disabled', function( event ) {
@@ -7093,7 +7130,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				// Remove redundant spaces after wrapping smartTag into spaces.
 				$input.val( $input.val().trim().replace( '  ', ' ' ) );
-				$input.focus().trigger( 'input' );
+				$input.trigger( 'focus' ).trigger( 'input' );
 			}
 
 			// remove list, all done!
@@ -7291,7 +7328,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			var $title = $( '.wpforms-center-form-name' );
 			if ( $title.text().length > 38 ) {
-				var shortTitle = $.trim( $title.text() ).substring( 0, 38 ).split( ' ' ).slice( 0, -1 ).join( ' ' ) + '...';
+				var shortTitle = $title.text().trim().substring( 0, 38 ).split( ' ' ).slice( 0, -1 ).join( ' ' ) + '...';
 				$title.text( shortTitle );
 			}
 		},
@@ -7319,7 +7356,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 */
 		builderHotkeys: function() {
 
-			$( document ).keydown( function( e ) {
+			$( document ).on( 'keydown', function( e ) {
 
 				if ( ! e.ctrlKey ) {
 					return;
@@ -7327,7 +7364,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				switch ( e.keyCode ) {
 					case 72: // Open Help screen on Ctrl+H.
-						$( elements.$helpButton, $builder ).click();
+						$( elements.$helpButton, $builder ).trigger( 'click' );
 						break;
 
 					case 80: // Open Form Preview tab on Ctrl+P.
@@ -7335,7 +7372,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						break;
 
 					case 66: // Trigger the Embed modal on Ctrl+B.
-						$( elements.$embedButton, $builder ).click();
+						$( elements.$embedButton, $builder ).trigger( 'click' );
 						break;
 
 					case 69: // Open Entries tab on Ctrl+E.
@@ -7343,11 +7380,11 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						break;
 
 					case 83: // Trigger the Builder save on Ctrl+S.
-						$( elements.$saveButton, $builder ).click();
+						$( elements.$saveButton, $builder ).trigger( 'click' );
 						break;
 
 					case 81: // Trigger the Exit on Ctrl+Q.
-						$( elements.$exitButton, $builder ).click();
+						$( elements.$exitButton, $builder ).trigger( 'click' );
 						break;
 
 					case 191: // Keyboard shortcuts modal on Ctrl+/.
@@ -7417,14 +7454,11 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * Exit builder.
 		 *
 		 * @since 1.5.7
+		 * @since 1.7.8 Deprecated.
 		 */
 		exitBack: function() {
 
-			if ( 1 < window.history.length && document.referrer ) {
-				window.history.back();
-			} else {
-				window.location.href = wpforms_builder.exit_url;
-			}
+			console.warn( 'WARNING! Function "WPFormsBuilder.exitBack()" has been deprecated.' );
 		},
 	};
 

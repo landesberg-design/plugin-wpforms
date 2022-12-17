@@ -139,7 +139,7 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 		}
 
 		// Processing value and value_compare.
-		if ( ! empty( $args['value'] ) ) {
+		if ( isset( $args['value'] ) && ! wpforms_is_empty_string( $args['value'] ) ) {
 
 			$escaped_value   = esc_sql( $args['value'] );
 			$condition_value = '';

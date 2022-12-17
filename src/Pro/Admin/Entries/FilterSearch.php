@@ -49,7 +49,8 @@ trait FilterSearch {
 		 * and can't filter those with empty values.
 		 * The current workaround - display all entries (instead of none at all).
 		 */
-		if ( empty( $term ) && empty( $_REQUEST['search']['term'] ) ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+		if ( wpforms_is_empty_string( $term ) && wpforms_is_empty_string( $_REQUEST['search']['term'] ) ) {
 			return;
 		}
 

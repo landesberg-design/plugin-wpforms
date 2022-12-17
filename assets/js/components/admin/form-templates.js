@@ -223,7 +223,7 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 		},
 
 		/**
-		 * Search template.
+		 * Search template callback.
 		 *
 		 * @since 1.7.7
 		 *
@@ -231,11 +231,22 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 		 */
 		searchTemplate: function( e ) {
 
-			let searchResult = vars.templateList.search( $( this ).val() );
+			app.performSearch( $( this ).val() );
+			app.showUpgradeBanner();
+		},
+
+		/**
+		 * Perform search value.
+		 *
+		 * @since 1.7.7.2
+		 *
+		 * @param {string} query Value to search.
+		 */
+		performSearch( query ) {
+
+			let searchResult = vars.templateList.search( query );
 
 			$( '.wpforms-templates-no-results' ).toggle( ! searchResult.length );
-
-			app.showUpgradeBanner();
 		},
 
 		/**
@@ -249,9 +260,10 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 
 			e.preventDefault();
 
-			let $item = $( this ),
-				$active = $item.closest( 'ul' ).find( '.active' ),
-				category = $item.data( 'category' );
+			let $item       = $( this ),
+				$active     = $item.closest( 'ul' ).find( '.active' ),
+				category    = $item.data( 'category' ),
+				searchQuery = $( '#wpforms-setup-template-search' ).val();
 
 			$active.removeClass( 'active' );
 			$item.addClass( 'active' );
@@ -268,6 +280,10 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 
 				return category === 'all' || item.values().categories.split( ',' ).indexOf( category ) > -1;
 			} );
+
+			if ( searchQuery !== '' ) {
+				app.performSearch( searchQuery );
+			}
 
 			app.showUpgradeBanner();
 		},
@@ -303,18 +319,15 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 				return;
 			}
 
-			let $templatesList = $( '#wpforms-setup-templates-list' ),
-				$listProItem = $templatesList.find( '.pro' ).first();
+			const $templates = $( '#wpforms-setup-templates-list .wpforms-template' );
 
-			if ( $listProItem.length ) {
-				$listProItem.before( template() );
+			if ( $templates.length > 5 ) {
+				$templates.eq( 5 ).after( template() );
 
 				return;
 			}
 
-			if ( $( '.wpforms-setup-templates-categories .active' ).data( 'category' ) === 'available' ) {
-				$templatesList.find( '.wpforms-template' ).last().after( template() );
-			}
+			$templates.last().after( template() );
 		},
 	};
 

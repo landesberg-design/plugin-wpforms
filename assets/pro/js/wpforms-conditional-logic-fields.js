@@ -102,7 +102,7 @@
 				} );
 			} );
 
-			$( '.wpforms-form' ).submit( function() {
+			$( '.wpforms-form' ).on( 'submit', function() {
 				WPFormsConditionals.resetHiddenFields( $( this ) );
 			} );
 		},
@@ -429,8 +429,8 @@
 							val = '';
 						}
 
-						left  = $.trim( val ).toString().toLowerCase();
-						right = $.trim( rule.value ).toString().toLowerCase();
+						left  = val.toString().trim().toLowerCase();
+						right = rule.value.toString().trim().toLowerCase();
 
 						switch ( rule.operator ) {
 							case '==' :
@@ -536,7 +536,7 @@
 
 			// If we have the modern select enabled, we trim the rule value to match the trim that happens.
 			if ( field.data( 'choicesjs' ) ) {
-				rule.value = $.trim( rule.value );
+				rule.value = rule.value.toString().trim();
 			}
 
 			if ( rule.operator === 'e' || rule.operator === '!e' ) {

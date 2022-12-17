@@ -121,7 +121,7 @@ var WPFormsPagesEntries = window.WPFormsPagesEntries || ( function( document, wi
 				} );
 
 				// Submit the form
-				$form.submit();
+				$form.trigger( 'submit' );
 			} );
 		},
 	};

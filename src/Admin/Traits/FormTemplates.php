@@ -124,7 +124,8 @@ trait FormTemplates {
 			$generic_categories['available'] = esc_html__( 'Available Templates', 'wpforms-lite' );
 		}
 
-		$generic_categories['favorites'] = esc_html__( 'Favorites', 'wpforms-lite' );
+		$generic_categories['favorites'] = esc_html__( 'Favorite Templates', 'wpforms-lite' );
+		$generic_categories['new']       = esc_html__( 'New Templates', 'wpforms-lite' );
 
 		$this->output_categories( $generic_categories, $templates_count );
 
@@ -394,6 +395,10 @@ trait FormTemplates {
 
 		if ( $source === 'wpforms-custom' ) {
 			$categories[] = 'custom';
+		}
+
+		if ( isset( $template['created_at'] ) && strtotime( $template['created_at'] ) > strtotime( '-3 Months' ) ) {
+			$categories[] = 'new';
 		}
 
 		return implode( ',', $categories );

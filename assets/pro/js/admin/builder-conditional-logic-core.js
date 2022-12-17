@@ -739,7 +739,7 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 				$groupLast = $this.parent().find( '.wpforms-conditional-group' ).last(),
 				$newGroup  = $groupLast.clone();
 
-			$newGroup.find( 'tr' ).not( ':first' ).remove();
+			$newGroup.find( 'tr' ).slice( 1 ).remove();
 
 			var $field    = $newGroup.find( '.wpforms-conditional-field' ),
 				$operator = $newGroup.find( '.wpforms-conditional-operator' ),

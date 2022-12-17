@@ -171,6 +171,9 @@ class WPForms_Builder {
 		// Load builder panels.
 		$this->load_panels();
 
+		// Modify meta viewport tag if desktop view is forced.
+		add_filter( 'admin_viewport_meta', [ $this, 'viewport_meta' ] );
+
 		add_action( 'admin_head', [ $this, 'admin_head' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ], PHP_INT_MAX );
 		add_action( 'admin_print_footer_scripts', [ $this, 'footer_scripts' ] );
@@ -440,7 +443,7 @@ class WPForms_Builder {
 			'dom-purify',
 			WPFORMS_PLUGIN_URL . 'assets/lib/purify.min.js',
 			[],
-			'2.3.10'
+			'2.4.0'
 		);
 
 		if ( wp_is_mobile() ) {
@@ -892,37 +895,16 @@ class WPForms_Builder {
 
 		<div id="wpforms-builder" class="<?php echo wpforms_sanitize_classes( $builder_classes, true ); ?>">
 
-			<div id="wpforms-builder-ie-notice" class="wpforms-fullscreen-notice">
-				<img src="<?php echo esc_url( WPFORMS_PLUGIN_URL . 'assets/images/builder/ie-logo.svg' ); ?>" alt="Internet Explorer &reg;">
-				<h3><?php esc_html_e( 'You are using an outdated browser!', 'wpforms-lite' ); ?></h3>
-				<p>
-				<?php
-				printf(
-					wp_kses( /* translators: %1$s - Link to the update Internet Explorer page, %2$s - link to the browse happy page. */
-						__( 'The Internet Explorer browser no more supported.<br>Our form builder is optimized for modern browsers.<br>Please <a href="%1$s" target="_blank" rel="nofollow noopener">install Microsoft Edge</a> or learn<br>how to <a href="%2$s" target="_blank" rel="nofollow noopener">browse happy</a>.', 'wpforms-lite' ),
-						[
-							'a'  => [
-								'href'   => [],
-								'target' => [],
-								'rel'    => [],
-							],
-							'br' => [],
-						]
-					),
-					'https://www.microsoft.com/en-us/edge',
-					'https://browsehappy.com/'
-				);
-				?>
-				</p>
-				<button type="button" class="wpforms-fullscreen-notice-go-back"><?php esc_html_e( 'Go back', 'wpforms-lite' ); ?></button>
-			</div>
+			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wpforms_render( 'builder/fullscreen/ie-notice' );
 
-			<div id="wpforms-builder-mobile-notice" class="wpforms-fullscreen-notice">
-				<img src="<?php echo esc_url( WPFORMS_PLUGIN_URL . 'assets/images/sullie-builder-mobile.png' ); ?>" alt="<?php esc_attr_e( 'Sullie the WPForms mascot', 'wpforms-lite' ); ?>">
-				<h3><?php esc_html_e( 'Oh, hi there!', 'wpforms-lite' ); ?></h3>
-				<p><?php esc_html_e( 'Our form builder is optimized for desktop computers and tablets. Please manage your forms on a different device, or if you\'re on a tablet, try rotating it.', 'wpforms-lite' ); ?></p>
-				<button type="button" class="wpforms-fullscreen-notice-go-back"><?php esc_html_e( 'Go back', 'wpforms-lite' ); ?></button>
-			</div>
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if ( empty( $_GET['force_desktop_view'] ) ) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo wpforms_render( 'builder/fullscreen/mobile-notice' );
+			}
+			?>
 
 			<div id="wpforms-builder-overlay">
 				<div class="wpforms-builder-overlay-content">
@@ -1060,12 +1042,32 @@ class WPForms_Builder {
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo wpforms_render(
-			'builder/abort-message',
+			'builder/fullscreen/abort-message',
 			[
 				'message' => $this->abort_message,
 			],
 			true
 		);
+	}
+
+	/**
+	 * Change default admin meta viewport tag upon request to force scrollable
+	 * desktop view on small screens.
+	 *
+	 * @since 1.7.8
+	 *
+	 * @param string $value Default meta viewport tag value.
+	 *
+	 * @return string
+	 */
+	public function viewport_meta( $value ) {
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $_GET['force_desktop_view'] ) ) {
+			return 'width=1024, initial-scale=1';
+		}
+
+		return $value;
 	}
 }
 

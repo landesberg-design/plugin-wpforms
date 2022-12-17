@@ -514,7 +514,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 */
 		chartEvents: function() {
 
-			el.$DaysSelect.change( function() {
+			el.$DaysSelect.on( 'change', function() {
 				chart.events.daysChanged();
 			} );
 		},
@@ -526,7 +526,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 */
 		formsListEvents: function() {
 
-			el.$DaysSelect.change( function() {
+			el.$DaysSelect.on( 'change', function() {
 				app.updateFormsList( $( this ).val() );
 			} );
 
@@ -557,7 +557,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 */
 		miscEvents: function() {
 
-			el.$recomBlockDismissBtn.click( function() {
+			el.$recomBlockDismissBtn.on( 'click', function() {
 				app.dismissRecommendedBlock();
 			} );
 		},

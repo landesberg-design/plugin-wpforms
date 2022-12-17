@@ -199,7 +199,7 @@ var WPFormsFormEmbedWizard = window.WPFormsFormEmbedWizard || ( function( docume
 			// Set focus to the field that is currently displayed.
 			$.each( [ el.$selectPage, el.$newPageTitle ], function() {
 				if ( this.is( ':visible' ) ) {
-					this.focus();
+					this.trigger( 'focus' );
 				}
 			} );
 

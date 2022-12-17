@@ -639,7 +639,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return absint(
 				// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->get_var(
-					"SELECT COUNT({$this->table_name}.{$this->primary_key}) 
+					"SELECT COUNT({$this->table_name}.{$this->primary_key})
 					FROM {$sql_from}
 					WHERE {$where_sql};"
 				)
@@ -648,10 +648,10 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		}
 
 		$sql = "
-			SELECT {$select} 
+			SELECT {$select}
 			FROM {$sql_from}
-			WHERE {$where_sql} 
-			ORDER BY {$args['orderby']} {$args['order']} 
+			WHERE {$where_sql}
+			ORDER BY {$args['orderby']} {$args['order']}
 			LIMIT {$args['offset']}, {$args['number']}
 		";
 
@@ -689,7 +689,10 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		if (
 			empty( $args['advanced_search'] ) &&
 			! empty( $args['value_compare'] ) &&
-			( ! empty( $args['value'] ) || ! empty( $args['field_id'] ) )
+			(
+				( isset( $args['value'] ) && ! wpforms_is_empty_string( $args['value'] ) ) ||
+				! empty( $args['field_id'] )
+			)
 		) {
 			$fields_table     = wpforms()->get( 'entry_fields' )->table_name;
 			$second_sql_from .= " JOIN {$fields_table} ON {$this->table_name}.`entry_id` = {$fields_table}.`entry_id`";
@@ -761,7 +764,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			$second_where['arg_field_id'] = "{$fields_table}.field_id = '{$args['field_id']}'";
 		}
 
-		if ( empty( $args['value'] ) || in_array( $args['value_compare'], [ 'is', 'contains' ], true ) ) {
+		if ( ! isset( $args['value'] ) || wpforms_is_empty_string( $args['value'] ) || in_array( $args['value_compare'], [ 'is', 'contains' ], true ) ) {
 			return $second_where;
 		}
 
@@ -779,7 +782,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			$form_ids        = implode( ',', array_map( 'intval', (array) $args['form_id'] ) );
 			$form_ids_where  = ! empty( $form_ids ) ? "AND `form_id` IN ( $form_ids )" : '';
 
-			if ( empty( $escaped_value ) ) {
+			if ( wpforms_is_empty_string( $escaped_value ) ) {
 
 				$second_where['fields_entry_not_in'] = "{$this->table_name}.`entry_id` NOT IN ( 0 )";
 
@@ -790,7 +793,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 					FROM {$fields_table}
 					WHERE
 						`value` {$condition_value}
-						{$form_ids_where}    
+						{$form_ids_where}
 				)";
 
 			}
@@ -823,7 +826,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return '';
 		}
 
-		if ( ! empty( $args['value'] ) ) {
+		if ( isset( $args['value'] ) && ! wpforms_is_empty_string( $args['value'] ) ) {
 			return $this->second_query_where_arg_value_not_empty( $args );
 		}
 

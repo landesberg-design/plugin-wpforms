@@ -140,7 +140,7 @@ var WPFormsSettingsAccess = window.WPFormsSettingsAccess || ( function( document
 		 */
 		events: function() {
 
-			$( '.wpforms-admin-settings-access select' ).change( app.selectChangeEvent );
+			$( '.wpforms-admin-settings-access select' ).on( 'change', app.selectChangeEvent );
 		},
 
 		/**
