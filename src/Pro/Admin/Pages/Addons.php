@@ -215,7 +215,7 @@ class Addons {
      */
 	public function notices() {
 
-		$errors = wpforms()->license->get_errors();
+		$errors = wpforms()->get( 'license' )->get_errors();
 
 		if ( empty( $this->addons ) ) {
 			\WPForms\Admin\Notice::error( esc_html__( 'There was an issue retrieving Addons for this site. Please click on the button above to refresh.', 'wpforms' ) );

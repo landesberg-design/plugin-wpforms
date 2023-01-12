@@ -19,7 +19,7 @@ const WPFormsUtils = window.WPFormsUtils || ( function( document, window, $ ) {
 		 *
 		 * @param {jQuery} $element  Element to trigger event on.
 		 * @param {string} eventName Event name to trigger (custom or native).
-		 * @param {Array}  args      Trigger arguments .
+		 * @param {Array}  args      Trigger arguments.
 		 *
 		 * @returns {Event} Event object.
 		 */

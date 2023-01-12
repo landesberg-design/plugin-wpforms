@@ -34,6 +34,8 @@ class WPForms_Field_Content extends WPForms_Field {
 	private function hooks() {
 
 		add_filter( 'wpforms_entries_table_fields_disallow', [ $this, 'hide_column_in_entries_table' ] );
+		add_filter( 'wpforms_pro_admin_entries_print_preview_field_value', [ $this, 'print_preview_field_value' ], 10, 2 );
+		add_filter( 'wpforms_pro_admin_entries_print_preview_field_value_use_nl2br', [ $this, 'print_preview_use_nl2br' ], 10, 2 );
 		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
 		add_action( 'wpforms_frontend_css', [ $this, 'frontend_css' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_css' ] );
@@ -125,6 +127,40 @@ class WPForms_Field_Content extends WPForms_Field {
 		$disallowed[] = $this->type;
 
 		return $disallowed;
+	}
+
+	/**
+	 * Do caption shortcode for entry print preview and add clearing div.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @param string $value Field value.
+	 * @param array  $field Field data.
+	 *
+	 * @return string
+	 */
+	public function print_preview_field_value( $value, $field ) {
+
+		if ( $field['type'] !== $this->type ) {
+			return $value;
+		}
+
+		return wp_kses( sprintf( '%s<div class="wpforms-field-content-preview-end"></div>', $this->do_caption_shortcode( $value ) ), $this->get_allowed_html_tags() );
+	}
+
+	/**
+	 * Do not use nl2br on content field's value.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @param bool  $use   Boolean value flagging if field should use nl2br function.
+	 * @param array $field Field data.
+	 *
+	 * @return bool
+	 */
+	public function print_preview_use_nl2br( $use, $field ) {
+
+		return $field['type'] === $this->type ? false : $use;
 	}
 
 	/**

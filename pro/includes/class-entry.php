@@ -341,8 +341,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	/**
 	 * Get previous entries count.
 	 *
-	 * @since 1.5.0 Changed return type to always be an integer.
 	 * @since 1.1.5
+	 * @since 1.5.0 Changed return type to always be an integer.
 	 *
 	 * @param int $entry_id Entry ID.
 	 * @param int $form_id  Form ID.
@@ -441,7 +441,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		 *                                  Format: `Y-m-d H:i:s`.
 		 *     @type string  $date_modified Modified date. See details for `date`.
 		 *     @type string  $ip_address    IP address.
-		 *     @type string  $notes_count   Notes count.
+		 *     @type string  $notes_count   Notes' count.
 		 *     @type string  $orderby       Order by.
 		 *     @type string  $order         Order: 'ASC' or 'DESC', Default: 'DESC'.
 		 * }
@@ -588,7 +588,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		$sql_from = $this->table_name;
 
-		// Add a LEFT OUTER JOIN for retrieve a notes count.
+		// Add a LEFT OUTER JOIN for retrieve a notes' count.
 		if ( $args['notes_count'] ) {
 			$sql_from .= ' LEFT JOIN';
 			$sql_from .= " ( SELECT {$meta_table}.entry_id AS meta_entry_id, COUNT({$meta_table}.id) AS notes_count";
@@ -597,7 +597,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			$sql_from .= ' GROUP BY meta_entry_id )';
 			$sql_from .= " notes_counts ON notes_counts.meta_entry_id = {$this->table_name}.entry_id";
 
-			// Changed the ORDER BY - notes count sorting support.
+			// Changed the ORDER BY - notes' count sorting support.
 			if ( $args['orderby'] === "{$this->table_name}.notes_count" ) {
 				$args['orderby'] = 'notes_counts.notes_count';
 			}
@@ -629,7 +629,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		 *
 		 * @since 1.4.4
 		 *
-		 * @param array $where The array of the chunks of the WHERE clause. Each chunk will be added to the SQL query using AND logical operator.
+		 * @param array $where The array of the WHERE clause chunks. Each chunk will be added to the SQL query using AND logical operator.
 		 * @param array $args  Entries query arguments (arguments of the \WPForms_Entry_Handler::`get_entries( $args )` method).
 		 */
 		$where     = (array) apply_filters( 'wpforms_entry_handler_get_entries_where', $where, $args );
@@ -666,7 +666,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 *
 	 * @since 1.6.9
 	 *
-	 * @param array $args  Arguments of main `get_entries()` method.
+	 * @param array $args  Arguments of the main `get_entries()` method.
 	 * @param array $where Main `get_entries()` query WHERE array.
 	 *
 	 * @return array Updated WHERE array needed to perform main get_entries() query.
@@ -747,7 +747,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 *
 	 * @since 1.6.9
 	 *
-	 * @param array $args Arguments of main `get_entries()` method.
+	 * @param array $args Arguments of the main `get_entries()` method.
 	 *
 	 * @return array Updated WHERE array.
 	 */
@@ -830,7 +830,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return $this->second_query_where_arg_value_not_empty( $args );
 		}
 
-		// If the sanitized search term is empty we should return nothing in the case of direct logic.
+		// If the sanitized search term is empty, we should return nothing in the case of direct logic.
 		if ( in_array( $args['value_compare'], [ 'is', 'contains' ], true ) ) {
 			return "{$this->table_name}.`entry_id` IN ( 0 )";
 		}
@@ -874,7 +874,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 *
 	 * @since 1.6.9
 	 *
-	 * @param array  $args            Arguments of main `get_entries()` method.
+	 * @param array  $args            Arguments of the main `get_entries()` method.
 	 * @param string $condition_value Condition with escaped value.
 	 *
 	 * @return string
@@ -918,7 +918,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 *
 	 * @since 1.6.9
 	 *
-	 * @param array $args Arguments of main `get_entries()` method.
+	 * @param array $args Arguments of the main `get_entries()` method.
 	 *
 	 * @return string
 	 */
@@ -1131,7 +1131,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	}
 
 	/**
-	 * Get entries count per page.
+	 * Get entries' count per page.
 	 *
 	 * @since 1.6.5
 	 *

@@ -147,15 +147,18 @@ class PrintPreview {
 			<meta name="description" content="">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
 			<meta name="robots" content="noindex,nofollow,noarchive">
-			<link rel="stylesheet" href="<?php echo esc_url( WPFORMS_PLUGIN_URL ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet ?>assets/lib/font-awesome/font-awesome.min.css" type="text/css">
-			<link rel="stylesheet" href="<?php echo esc_url( WPFORMS_PLUGIN_URL );// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet ?>assets/pro/css/entry-print<?php echo esc_attr( $min ); ?>.css" type="text/css">
-			<script type="text/javascript" src="<?php echo esc_url( includes_url( 'js/utils.js' ) ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>"></script>
-			<script type="text/javascript" src="<?php echo esc_url( includes_url( 'js/jquery/jquery.js' ) );// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>"></script>
+			<?php // phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet, WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>
+			<link rel="stylesheet" href="<?php echo esc_url( WPFORMS_PLUGIN_URL ); ?>assets/lib/font-awesome/font-awesome.min.css" type="text/css">
+			<link rel="stylesheet" href="<?php echo esc_url( WPFORMS_PLUGIN_URL ); ?>assets/pro/css/entry-print<?php echo esc_attr( $min ); ?>.css" type="text/css">
+			<script type="text/javascript" src="<?php echo esc_url( includes_url( 'js/utils.js' ) ); ?>"></script>
+			<script type="text/javascript" src="<?php echo esc_url( includes_url( 'js/jquery/jquery.js' ) ); ?>"></script>
+			<?php // phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet, WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>
 			<script type="text/javascript">
-				jQuery( function( $ ){
-					var showEmpty    = wpCookies.get( 'wpforms_entry_hide_empty' ) !== 'true';
+				jQuery( function( $ ) {
+					var showEmpty = wpCookies.get( 'wpforms_entry_hide_empty' ) !== 'true';
+
 					function toggle( $this, $elem = '', $additional = '' ) {
-						$this.find('.switch').toggleClass('active');
+						$this.find( '.switch' ).toggleClass( 'active' );
 						$( $elem ).toggleClass( $additional );
 					}
 					// Print page.
@@ -169,28 +172,28 @@ class PrintPreview {
 						window.close();
 					} );
 					// Settings button toggle.
-					$( document ).on('click', '.button-settings', function( event ) {
+					$( document ).on( 'click', '.button-settings', function( event ) {
 						event.preventDefault();
-						$(this).find('i').toggleClass('active');
-						$('.actions').toggleClass('active');
-					});
+						$( this ).find( 'i' ).toggleClass( 'active' );
+						$( '.actions' ).toggleClass( 'active' );
+					} );
 					// Init empty fields.
-					if (  showEmpty ) {
+					if ( showEmpty ) {
 						$( '.field.empty' ).show();
-						$( '.toggle-empty' ).find('.switch').addClass('active');
+						$( '.toggle-empty' ).find( '.switch' ).addClass( 'active' );
 					} else {
 						$( '.field.empty' ).hide();
-						$( '.toggle-empty' ).find('.switch').removeClass('active');
+						$( '.toggle-empty' ).find( '.switch' ).removeClass( 'active' );
 					}
 					// Toggle empty fields.
 					$( document ).on( 'click', '.toggle-empty', function( event ) {
 						event.preventDefault();
 						if ( ! showEmpty ) {
 							wpCookies.set( 'wpforms_entry_hide_empty', 'true', 2592000 );
-							$( this ).find('.switch').addClass('active');
+							$( this ).find( '.switch' ).addClass( 'active' );
 						} else {
 							wpCookies.remove( 'wpforms_entry_hide_empty' );
-							$( this ).find('.switch').removeClass('active');
+							$( this ).find( '.switch' ).removeClass( 'active' );
 						}
 						$( '.field.empty' ).toggle();
 						showEmpty = !showEmpty;
@@ -198,23 +201,23 @@ class PrintPreview {
 					// Toggle HTML fields.
 					$( document ).on( 'click', '.toggle-html', function( event ) {
 						event.preventDefault();
-						toggle( $( this ),'.wpforms-field-html, .wpforms-field-content', 'wpforms-hidden');
+						toggle( $( this ), '.wpforms-field-html, .wpforms-field-content', 'wpforms-hidden' );
 					} );
 					// Toggle section dividers.
 					$( document ).on( 'click', '.toggle-dividers', function( event ) {
 						event.preventDefault();
-						toggle( $( this ),'.wpforms-field-divider, .wpforms-field-pagebreak', 'wpforms-hidden')
-					});
+						toggle( $( this ), '.wpforms-field-divider, .wpforms-field-pagebreak', 'wpforms-hidden' )
+					} );
 					// Toggle notes.
 					$( document ).on( 'click', '.toggle-notes', function( event ) {
 						event.preventDefault();
-						$( this ).find('.switch').toggleClass('active');
+						$( this ).find( '.switch' ).toggleClass( 'active' );
 						$( '.notes, .notes-head' ).toggle();
-					});
+					} );
 					// Toggle compact view.
 					$( document ).on( 'click', '.toggle-view', function( event ) {
 						event.preventDefault();
-						toggle( $( this ), '#print', 'compact')
+						toggle( $( this ), '#print', 'compact' )
 					} );
 
 					/**
@@ -347,6 +350,26 @@ class PrintPreview {
 							$field_class = sanitize_html_class( 'wpforms-field-' . $field['type'] ) . ' wpforms-hidden';
 							$field_label = esc_html__( 'Content Field', 'wpforms' );
 						}
+
+						/**
+						 * Filter print preview value.
+						 *
+						 * @since 1.7.9
+						 *
+						 * @param string $field_value Field value.
+						 * @param array  $field       Field data.
+						 */
+						$field_value = make_clickable( apply_filters( 'wpforms_pro_admin_entries_print_preview_field_value', $field_value, $field ) );
+
+						/**
+						 * Decide if field value should use nl2br.
+						 *
+						 * @since 1.7.9
+						 *
+						 * @param bool  $use   Boolean value flagging if field should use nl2br function.
+						 * @param array $field Field data.
+						 */
+						$field_value = apply_filters( 'wpforms_pro_admin_entries_print_preview_field_value_use_nl2br', true, $field ) ? nl2br( $field_value ) : $field_value;
 						?>
 						<?php if ( $field['type'] === 'divider' ) : ?>
 							<div class="field <?php echo esc_attr( $field_class ); ?>">
@@ -364,7 +387,7 @@ class PrintPreview {
 								?>
 							</p>
 							<div class="field-value">
-								<?php echo ! wpforms_is_empty_string( $field_value ) ? nl2br( make_clickable( $field_value ) ) : esc_html__( 'Empty', 'wpforms' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								<?php echo ! wpforms_is_empty_string( $field_value ) ? $field_value : esc_html__( 'Empty', 'wpforms' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</div>
 						</div>
 						<?php endif; ?>

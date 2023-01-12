@@ -139,12 +139,11 @@ class Notifications implements IntegrationInterface {
 			return true;
 		}
 
-		$email_domain    = substr( strrchr( $email, '@' ), 1 );
-		$site_domain     = preg_replace( '/^www.(.*)$/', '$1', wp_parse_url( get_bloginfo( 'wpurl' ) )['host'] );
-		$site_domain_len = strlen( $site_domain );
+		$email_domain = substr( strrchr( $email, '@' ), 1 );
+		$site_domain  = wp_parse_url( get_bloginfo( 'wpurl' ) )['host'];
 
 		// Check if From email domain ends with site domain.
-		return 0 === substr_compare( $email_domain, $site_domain, -$site_domain_len, $site_domain_len );
+		return ! empty( $email_domain ) && preg_match( "/\b{$email_domain}$/", $site_domain ) === 1;
 	}
 
 	/**

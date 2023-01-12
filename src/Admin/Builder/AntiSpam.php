@@ -219,7 +219,7 @@ class AntiSpam {
 		$get_started_button_text = __( 'Get Started &rarr;', 'wpforms-lite' );
 		$upgrade_to_pro_text     = __( 'Upgrade to Pro', 'wpforms-lite' );
 		$captcha_settings        = wpforms_get_captcha_settings();
-		$upgrade_url             = add_query_arg( 'discount', 'LITEUPGRADE', 'https://wpforms.com/lite-upgrade/' );
+		$upgrade_url             = 'https://wpforms.com/lite-upgrade/';
 		$utm_medium              = 'Builder Settings';
 
 		$blocks = [

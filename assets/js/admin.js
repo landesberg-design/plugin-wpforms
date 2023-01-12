@@ -76,7 +76,14 @@
 			WPFormsAdmin.initCheckboxMultiselectColumns();
 
 			// Init color pickers via minicolors.js.
-			$( '.wpforms-color-picker' ).minicolors();
+			$( '.wpforms-color-picker' ).each( function() {
+
+				const $this = $( this );
+
+				$this.minicolors( {
+					defaultValue: $this.data( 'fallback-color' ) || '',
+				} );
+			} );
 
 			// Init fancy File Uploads.
 			$( '.wpforms-file-upload' ).each( function() {
@@ -1400,10 +1407,15 @@
 
 				if ( res.success ) {
 					msg = res.data.msg;
+					$el.hide();
+					$row.find( '#wpforms-setting-license-key-info-message' ).empty().hide();
 					$row.find( '.type, .desc, #wpforms-setting-license-key-deactivate' ).show();
 					$row.find( '.type strong' ).text( res.data.type );
 					$( '.wpforms-license-notice' ).remove();
-					$keyField.prop( 'disabled', true );
+					$keyField
+						.prop( 'disabled', true )
+						.addClass( 'wpforms-setting-license-is-valid' )
+						.attr( 'value', $keyField.val() );
 				} else {
 					icon  = 'fa fa-exclamation-circle';
 					color = 'orange';
@@ -1480,11 +1492,14 @@
 
 				var icon  = 'fa fa-info-circle',
 					color = 'blue',
-					msg   = res.data,
+					data  = res.data,
 					title = wpforms_admin.success;
 
 				if ( res.success ) {
-					$row.find( '#wpforms-setting-license-key' ).val( '' ).prop( 'disabled', false );
+					$row.find( '#wpforms-setting-license-key' ).val( '' ).attr( 'value', '' ).prop( { readonly: false, disabled: false } );
+					$row.find( '.wpforms-license-key-deactivate-remove' ).remove();
+					$row.find( '#wpforms-setting-license-key-info-message' ).html( res.data.info ).show();
+					$row.find( '#wpforms-setting-license-key-verify' ).prop( 'disabled', false ).show();
 					$row.find( '.type, .desc, #wpforms-setting-license-key-deactivate' ).hide();
 				} else {
 					icon = 'fa fa-exclamation-circle';
@@ -1494,7 +1509,7 @@
 
 				$.alert( {
 					title: title,
-					content: msg,
+					content: data?.msg || data,
 					icon: icon,
 					type: color,
 					buttons: {
@@ -1522,10 +1537,11 @@
 
 			var $this       = $( el ),
 				$row        = $this.closest( '.wpforms-setting-row' ),
+				$input      = $( '#wpforms-setting-license-key' ),
 				data        = {
 					action: 'wpforms_refresh_license',
 					nonce:   wpforms_admin.nonce,
-					license: $( '#wpforms-setting-license-key' ).val(),
+					license: $input.val(),
 				};
 
 			$.post( wpforms_admin.ajax_url, data, function( res ) {
@@ -1541,7 +1557,8 @@
 					icon  = 'fa fa-exclamation-circle';
 					color = 'orange';
 					msg   = res.data;
-					$row.find( '.type, .desc, #wpforms-setting-license-key-deactivate' ).hide();
+					$row.find( '.type, .desc' ).hide();
+					$input.removeClass( 'wpforms-setting-license-is-valid' ).addClass( 'wpforms-setting-license-is-invalid' );
 				}
 
 				$.alert( {

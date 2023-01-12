@@ -19,26 +19,32 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 		$this->type     = 'checkbox';
 		$this->icon     = 'fa-check-square-o';
 		$this->order    = 110;
-		$this->defaults = array(
-			1 => array(
-				'label'   => esc_html__( 'First Choice', 'wpforms-lite' ),
-				'value'   => '',
-				'image'   => '',
-				'default' => '',
-			),
-			2 => array(
-				'label'   => esc_html__( 'Second Choice', 'wpforms-lite' ),
-				'value'   => '',
-				'image'   => '',
-				'default' => '',
-			),
-			3 => array(
-				'label'   => esc_html__( 'Third Choice', 'wpforms-lite' ),
-				'value'   => '',
-				'image'   => '',
-				'default' => '',
-			),
-		);
+		$this->defaults = [
+			1 => [
+				'label'      => esc_html__( 'First Choice', 'wpforms-lite' ),
+				'value'      => '',
+				'image'      => '',
+				'icon'       => '',
+				'icon_style' => '',
+				'default'    => '',
+			],
+			2 => [
+				'label'      => esc_html__( 'Second Choice', 'wpforms-lite' ),
+				'value'      => '',
+				'image'      => '',
+				'icon'       => '',
+				'icon_style' => '',
+				'default'    => '',
+			],
+			3 => [
+				'label'      => esc_html__( 'Third Choice', 'wpforms-lite' ),
+				'value'      => '',
+				'image'      => '',
+				'icon'       => '',
+				'icon_style' => '',
+				'default'    => '',
+			],
+		];
 
 		// Customize HTML field values.
 		add_filter( 'wpforms_html_field_value', array( $this, 'field_html_value' ), 10, 4 );
@@ -154,33 +160,35 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 				}
 			}
 
-			$properties['inputs'][ $key ] = array(
-				'container' => array(
-					'attr'  => array(),
-					'class' => array( "choice-{$key}", "depth-{$depth}" ),
-					'data'  => array(),
+			$properties['inputs'][ $key ] = [
+				'container'  => [
+					'attr'  => [],
+					'class' => [ "choice-{$key}", "depth-{$depth}" ],
+					'data'  => [],
 					'id'    => '',
-				),
-				'label'     => array(
-					'attr'  => array(
+				],
+				'label'      => [
+					'attr'  => [
 						'for' => "wpforms-{$form_id}-field_{$field_id}_{$key}",
-					),
-					'class' => array( 'wpforms-field-label-inline' ),
-					'data'  => array(),
+					],
+					'class' => [ 'wpforms-field-label-inline' ],
+					'data'  => [],
 					'id'    => '',
 					'text'  => $label,
-				),
-				'attr'      => array(
+				],
+				'attr'       => [
 					'name'  => "wpforms[fields][{$field_id}][]",
 					'value' => $value,
-				),
-				'class'     => array(),
-				'data'      => array(),
-				'id'        => "wpforms-{$form_id}-field_{$field_id}_{$key}",
-				'image'     => isset( $choice['image'] ) ? $choice['image'] : '',
-				'required'  => ! empty( $field['required'] ) ? 'required' : '',
-				'default'   => isset( $choice['default'] ),
-			);
+				],
+				'class'      => [],
+				'data'       => [],
+				'id'         => "wpforms-{$form_id}-field_{$field_id}_{$key}",
+				'icon'       => isset( $choice['icon'] ) ? $choice['icon'] : '',
+				'icon_style' => isset( $choice['icon_style'] ) ? $choice['icon_style'] : '',
+				'image'      => isset( $choice['image'] ) ? $choice['image'] : '',
+				'required'   => ! empty( $field['required'] ) ? 'required' : '',
+				'default'    => isset( $choice['default'] ),
+			];
 
 			// Rule for validator only if needed.
 			if ( $field['choice_limit'] > 0 ) {
@@ -206,6 +214,8 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 					$properties['inputs'][ $key ]['class'][] = 'wpforms-screen-reader-element';
 				}
 			}
+		} elseif ( ! $dynamic && ! empty( $field['choices_icons'] ) ) {
+			$properties = wpforms()->get( 'icon_choices' )->field_properties( $properties, $field );
 		}
 
 		// Custom properties for disclaimer format display.
@@ -254,6 +264,21 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 
 		// Choices Images.
 		$this->field_option( 'choices_images', $field );
+
+		// Choices Images Style (theme).
+		$this->field_option( 'choices_images_style', $field );
+
+		// Choices Icons.
+		$this->field_option( 'choices_icons', $field );
+
+		// Choices Icons Color.
+		$this->field_option( 'choices_icons_color', $field );
+
+		// Choices Icons Size.
+		$this->field_option( 'choices_icons_size', $field );
+
+		// Choices Icons Style.
+		$this->field_option( 'choices_icons_style', $field );
 
 		// Description.
 		$this->field_option( 'description', $field );
@@ -325,9 +350,6 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 				)
 			);
 		}
-
-		// Choices Images Style (theme).
-		$this->field_option( 'choices_images_style', $field );
 
 		// Display format.
 		$this->field_option( 'input_columns', $field );
@@ -439,16 +461,20 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 	 * @param array $form_data  Form data and settings.
 	 */
 	public function field_display( $field, $deprecated, $form_data ) {
+
 		$using_image_choices = empty( $field['dynamic_choices'] ) && ! empty( $field['choices_images'] );
+		$using_icon_choices  = empty( $field['dynamic_choices'] ) && empty( $field['choices_images'] ) && ! empty( $field['choices_icons'] );
 
 		// Define data.
 		$container = $field['properties']['input_container'];
 		$choices   = $field['properties']['inputs'];
 
 		$amp_state_id = '';
-		if ( wpforms_is_amp() && $using_image_choices ) {
+
+		if ( wpforms_is_amp() && ( $using_image_choices || $using_icon_choices ) ) {
 			$amp_state_id = str_replace( '-', '_', sanitize_key( $container['id'] ) ) . '_state';
-			$state        = array();
+			$state        = [];
+
 			foreach ( $choices as $key => $choice ) {
 				$state[ $choice['id'] ] = ! empty( $choice['default'] );
 			}
@@ -466,7 +492,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 
 			foreach ( $choices as $key => $choice ) {
 
-				if ( wpforms_is_amp() && $using_image_choices ) {
+				if ( wpforms_is_amp() && ( $using_image_choices || $using_icon_choices ) ) {
 					$choice['container']['attr']['[class]'] = sprintf(
 						'%s + ( %s[%s] ? " wpforms-selected" : "")',
 						wp_json_encode( implode( ' ', $choice['container']['class'] ) ),
@@ -479,6 +505,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 				// disclaimer mode enabled, so the required status in choice
 				// label.
 				$required = '';
+
 				if ( ! empty( $field['disclaimer_format'] ) && ! empty( $choice['required'] ) && ! empty( $field['label_hide'] ) ) {
 					$required = wpforms_get_field_required_label();
 				}
@@ -522,7 +549,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 								);
 							}
 
-							if ( 'none' === $field['choices_images_style'] ) {
+							if ( $field['choices_images_style'] === 'none' ) {
 								echo '<br>';
 							}
 
@@ -547,6 +574,22 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 
 						echo '</label>';
 
+					} elseif ( $using_icon_choices ) {
+
+						if ( wpforms_is_amp() ) {
+							$choice['label']['attr']['on']   = sprintf(
+								'tap:AMP.setState({ %s: { %s: ! %s[%s] } })',
+								wp_json_encode( $amp_state_id ),
+								wp_json_encode( $choice['id'] ),
+								$amp_state_id,
+								wp_json_encode( $choice['id'] )
+							);
+							$choice['label']['attr']['role'] = 'button';
+						}
+
+						// Icon Choices.
+						wpforms()->get( 'icon_choices' )->field_display( $field, $choice, 'checkbox' );
+
 					} else {
 
 						// Normal display.
@@ -561,8 +604,15 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 							'<label %s>%s%s</label>',
 							wpforms_html_attributes( $choice['label']['id'], $choice['label']['class'], $choice['label']['data'], $choice['label']['attr'] ),
 							wp_kses_post( $choice['label']['text'] ),
-							$required
-						); // phpcs:ignore
+							wp_kses(
+								$required,
+								[
+									'span' => [
+										'class' => true,
+									],
+								]
+							)
+						);
 					}
 
 				echo '</li>';

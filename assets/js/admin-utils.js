@@ -772,11 +772,15 @@ var wpf = {
 			string = string.toString();
 		}
 
-		if ( typeof allowed === 'undefined' ) {
-			return purify.sanitize( string );
+		const purifyOptions = {
+			ADD_ATTR: [ 'target' ],
+		};
+
+		if ( typeof allowed !== 'undefined' ) {
+			purifyOptions.ALLOWED_TAGS = allowed;
 		}
 
-		return purify.sanitize( string, { ALLOWED_TAGS: allowed, ADD_ATTR: [ 'target' ] } ).trim();
+		return purify.sanitize( string, purifyOptions ).trim();
 	},
 
 	/**

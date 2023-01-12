@@ -84,6 +84,11 @@ class Loader {
 			'name' => 'Forms\Locator',
 			'id'   => 'locator',
 		];
+
+		$this->classes[] = [
+			'name' => 'Forms\IconChoices',
+			'id'   => 'icon_choices',
+		];
 	}
 
 	/**

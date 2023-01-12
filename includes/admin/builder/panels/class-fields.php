@@ -617,6 +617,27 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 				</li>
 				<# }) #>
 			</ul>
+			<# } else if ( data.settings.choices_icons ) { #>
+			<ul class='primary-input wpforms-icon-choices wpforms-icon-choices-{{ data.settings.choices_icons_style }} wpforms-icon-choices-{{ data.settings.choices_icons_size }}' style="--wpforms-icon-choices-color: {{ data.settings.choices_icons_color }};">
+				<# _.each( data.order, function( choiceID, key ) { #>
+				<li class="wpforms-icon-choices-item<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' wpforms-selected' ); } #>">
+					<label>
+						<span class="wpforms-icon-choices-icon">
+							<i class="ic-fa-{{ data.settings.choices[choiceID].icon_style }} ic-fa-{{ data.settings.choices[choiceID].icon }}"></i>
+							<span class="wpforms-icon-choices-icon-bg"></span>
+						</span>
+						<# if ( 'none' === data.settings.choices_icons_style ) { #>
+							<input type='{{ data.type }}' readonly<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' checked' ); } #>>
+						<# } else { #>
+							<input class='wpforms-screen-reader-element' type='{{ data.type }}' readonly<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' checked' ); } #>>
+						<# } #>
+						<span class='wpforms-icon-choices-label'>
+							{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}
+						</span>
+					</label>
+				</li>
+				<# }) #>
+			</ul>
 			<# } else { #>
 			<ul class="primary-input">
 				<# _.each( data.order, function( choiceID, key ) {  #>

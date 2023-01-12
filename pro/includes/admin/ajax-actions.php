@@ -165,7 +165,7 @@ function wpforms_verify_license() {
 		wp_send_json_error( esc_html__( 'Please enter a license key.', 'wpforms' ) );
 	}
 
-	wpforms()->license->verify_key( sanitize_text_field( wp_unslash( $_POST['license'] ) ), true );
+	wpforms()->get( 'license' )->verify_key( sanitize_text_field( wp_unslash( $_POST['license'] ) ), true );
 }
 add_action( 'wp_ajax_wpforms_verify_license', 'wpforms_verify_license' );
 
@@ -184,7 +184,7 @@ function wpforms_deactivate_license() {
 		wp_send_json_error();
 	}
 
-	wpforms()->license->deactivate_key( true );
+	wpforms()->get( 'license' )->deactivate_key( true );
 }
 
 add_action( 'wp_ajax_wpforms_deactivate_license', 'wpforms_deactivate_license' );
@@ -209,7 +209,8 @@ function wpforms_refresh_license() {
 		wp_send_json_error( esc_html__( 'Please enter a license key.', 'wpforms' ) );
 	}
 
-	wpforms()->license->validate_key( $_POST['license'], true, true );
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+	wpforms()->get( 'license' )->validate_key( $_POST['license'], true, true );
 }
 
 add_action( 'wp_ajax_wpforms_refresh_license', 'wpforms_refresh_license' );

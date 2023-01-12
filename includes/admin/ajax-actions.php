@@ -736,3 +736,31 @@ function wpforms_install_addon() {
 	wp_send_json_error( $result );
 }
 add_action( 'wp_ajax_wpforms_install_addon', 'wpforms_install_addon' );
+
+/**
+ * Search pages for dropdown.
+ *
+ * @since 1.7.9
+ */
+function wpforms_ajax_search_pages_for_dropdown() {
+
+	// Run a security check.
+	if ( ! check_ajax_referer( 'wpforms-builder', 'nonce', false ) ) {
+		wp_send_json_error( esc_html__( 'Your session expired. Please reload the builder.', 'wpforms-lite' ) );
+	}
+
+	if ( ! array_key_exists( 'search', $_GET ) ) {
+		wp_send_json_error( esc_html__( 'Incorrect usage of this operation.', 'wpforms-lite' ) );
+	}
+
+	$result_pages = wpforms_search_pages_for_dropdown(
+		sanitize_text_field( wp_unslash( $_GET['search'] ) )
+	);
+
+	if ( empty( $result_pages ) ) {
+		wp_send_json_success( [] );
+	}
+
+	wp_send_json_success( $result_pages );
+}
+add_action( 'wp_ajax_wpforms_ajax_search_pages_for_dropdown', 'wpforms_ajax_search_pages_for_dropdown' );

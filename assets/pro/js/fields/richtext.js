@@ -81,9 +81,9 @@ var WPFormsRichTextField = window.WPFormsRichTextField || ( function( document, 
 			} );
 
 			// Re-initialize tinyMCE in Elementor's popups.
-			$document.on( 'elementor/popup/show', function( event, id, instance ) {
+			window.addEventListener( 'elementor/popup/show', function( event ) {
 
-				app.reInitRichTextFields( instance.$element );
+				app.reInitRichTextFields( event.detail.instance.$element );
 			} );
 
 			// Set `required` property for each of the hidden editor textarea.

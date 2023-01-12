@@ -38,9 +38,18 @@ class WPForms_WP_Emails {
 	 *
 	 * @since 1.1.3
 	 *
-	 * @var string
+	 * @var bool|string
 	 */
 	private $reply_to = false;
+
+	/**
+	 * Store the reply-to name.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @var bool|string
+	 */
+	private $reply_to_name = false;
 
 	/**
 	 * Store the carbon copy addresses.
@@ -198,10 +207,25 @@ class WPForms_WP_Emails {
 
 		if ( ! empty( $this->reply_to ) ) {
 
-			$this->reply_to = $this->process_tag( $this->reply_to );
+			$email = $this->reply_to;
+
+			// Optional custom format with a Reply-to Name specified: John Doe <john@doe.com>
+			// - starts with anything,
+			// - followed by space,
+			// - ends with <anything> (expected to be an email, validated later).
+			$regex   = '/^(.+) (<.+>)$/';
+			$matches = [];
+
+			if ( preg_match( $regex, $this->reply_to, $matches ) ) {
+				$this->reply_to_name = wpforms_decode_string( $this->process_tag( $matches[1] ) );
+				$email               = trim( $matches[2], '<> ' );
+			}
+
+			$this->reply_to = $this->process_tag( $email );
 
 			if ( ! is_email( $this->reply_to ) ) {
-				$this->reply_to = false;
+				$this->reply_to      = false;
+				$this->reply_to_name = false;
 			}
 		}
 
@@ -264,12 +288,17 @@ class WPForms_WP_Emails {
 
 		if ( ! $this->headers ) {
 			$this->headers = "From: {$this->get_from_name()} <{$this->get_from_address()}>\r\n";
+
 			if ( $this->get_reply_to() ) {
-				$this->headers .= "Reply-To: {$this->get_reply_to()}\r\n";
+				$this->headers .= $this->reply_to_name ?
+					"Reply-To: {$this->reply_to_name} <{$this->get_reply_to()}>\r\n" :
+					"Reply-To: {$this->get_reply_to()}\r\n";
 			}
+
 			if ( $this->get_cc() ) {
 				$this->headers .= "Cc: {$this->get_cc()}\r\n";
 			}
+
 			$this->headers .= "Content-Type: {$this->get_content_type()}; charset=utf-8\r\n";
 		}
 
@@ -557,13 +586,20 @@ class WPForms_WP_Emails {
 						$field_name = str_repeat( '&mdash;', 6 ) . ' ' . $title . ' ' . str_repeat( '&mdash;', 6 );
 					} elseif ( $field['type'] === 'html' ) {
 
-						// If CL is enabled and the field is conditionally hidden, hide it from message.
-						if ( ! empty( $this->form_data['fields'][ $field['id'] ]['conditionals'] ) && ! wpforms_conditional_logic_fields()->field_is_visible( $this->form_data, $field['id'] ) ) {
+						if ( $this->is_field_conditionally_hidden( $field['id'] ) ) {
 							continue;
 						}
 
 						$field_name = ! empty( $field['name'] ) ? $field['name'] : esc_html__( 'HTML / Code Block', 'wpforms-lite' );
 						$field_val  = $field['code'];
+					} elseif ( $field['type'] === 'content' ) {
+
+						if ( $this->is_field_conditionally_hidden( $field['id'] ) ) {
+							continue;
+						}
+
+						$field_name = esc_html__( 'Content', 'wpforms-lite' );
+						$field_val  = $field['content'];
 					}
 				} else {
 
@@ -793,5 +829,19 @@ class WPForms_WP_Emails {
 		$subject = trim( str_replace( [ "\r\n", "\r", "\n" ], ' ', $subject ) );
 
 		return wpforms_decode_string( $subject );
+	}
+
+	/**
+	 * If CL is enabled and the field is conditionally hidden, hide it from message.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @param int $field_id Field ID.
+	 *
+	 * @return bool
+	 */
+	private function is_field_conditionally_hidden( $field_id ) {
+
+		return ! empty( $this->form_data['fields'][ $field_id ]['conditionals'] ) && ! wpforms_conditional_logic_fields()->field_is_visible( $this->form_data, $field_id );
 	}
 }

@@ -165,11 +165,16 @@ class WPForms_Frontend {
 		}
 
 		// Basic information.
+		/**
+		 * Filter frontend form data.
+		 *
+		 * @since 1.4.3
+		 *
+		 * @param array $form_data Form data.
+		 */
 		$form_data   = apply_filters( 'wpforms_frontend_form_data', wpforms_decode( $form->post_content ) );
 		$form_id     = absint( $form->ID );
-		$settings    = $form_data['settings'];
 		$action      = esc_url_raw( remove_query_arg( 'wpforms' ) );
-		$classes     = (int) wpforms_setting( 'disable-css', '1' ) === 1 ? [ 'wpforms-container-full' ] : [];
 		$errors      = empty( wpforms()->process->errors[ $form_id ] ) ? [] : wpforms()->process->errors[ $form_id ];
 		$title       = filter_var( $title, FILTER_VALIDATE_BOOLEAN );
 		$description = filter_var( $description, FILTER_VALIDATE_BOOLEAN );
@@ -251,7 +256,14 @@ class WPForms_Frontend {
 			$action = add_query_arg( 'wpforms_form_id', $form_id, $action );
 		}
 
-		// Before output hook.
+		/**
+		 * Fires before frontend output.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array   $form_data Form data and settings.
+		 * @param WP_Post $form      Form post type.
+		 */
 		do_action( 'wpforms_frontend_output_before', $form_data, $form );
 
 		// Check for return hash.
@@ -261,10 +273,14 @@ class WPForms_Frontend {
 			wpforms()->process->valid_hash &&
 			absint( wpforms()->process->form_data['id'] ) === $form_id
 		) {
+			$this->form_container_open( $form_data, $form );
+
 			do_action( 'wpforms_frontend_output_success', wpforms()->process->form_data, wpforms()->process->fields, wpforms()->process->entry_id );
 
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			wpforms_debug_data( $_POST );
+
+			$this->form_container_close( $form_data, $form );
 
 			return;
 		}
@@ -276,15 +292,32 @@ class WPForms_Frontend {
 			! empty( $_POST['wpforms']['id'] ) &&
 			absint( $_POST['wpforms']['id'] ) === $form_id
 		) {
+			$is_ajax = wp_doing_ajax();
+
+			// There is no need for a container wrapper when a form is submitted through AJAX.
+			if ( ! $is_ajax ) {
+				$this->form_container_open( $form_data, $form );
+			}
+
 			do_action( 'wpforms_frontend_output_success', $form_data, false, false );
-			wpforms_debug_data( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+			if ( ! $is_ajax ) {
+				$this->form_container_close( $form_data, $form );
+			}
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing
+			wpforms_debug_data( $_POST );
 
 			return;
 		}
 
 		// Allow filter to return early if some condition is not met.
 		if ( ! apply_filters( 'wpforms_frontend_load', true, $form_data, null ) ) {
+			$this->form_container_open( $form_data, $form );
+
 			do_action( 'wpforms_frontend_not_loaded', $form_data, $form );
+
+			$this->form_container_close( $form_data, $form );
 
 			return;
 		}
@@ -298,16 +331,16 @@ class WPForms_Frontend {
 			$this->pages = false;
 		}
 
-		// Allow final action to be customized - 3rd param ($form) has been deprecated.
+		/**
+		 * Allow modifying a form action attribute.
+		 *
+		 * @since 1.1.2
+		 *
+		 * @param string $action     Action attribute.
+		 * @param array  $form_data  Form data and settings.
+		 * @param null   $deprecated A deprecated argument.
+		 */
 		$action = apply_filters( 'wpforms_frontend_form_action', $action, $form_data, null );
-
-		// Allow form container classes to be filtered and user defined classes.
-		$classes = apply_filters( 'wpforms_frontend_container_class', $classes, $form_data );
-
-		if ( ! empty( $settings['form_class'] ) ) {
-			$classes = array_merge( $classes, explode( ' ', $settings['form_class'] ) );
-		}
-		$classes = wpforms_sanitize_classes( $classes, true );
 
 		$form_classes = [ 'wpforms-validate', 'wpforms-form' ];
 
@@ -360,12 +393,17 @@ class WPForms_Frontend {
 			}
 		}
 
+		/**
+		 * Allow modifying form attributes.
+		 *
+		 * @since 1.4.5
+		 *
+		 * @param array $form_atts Form attributes.
+		 * @param array $form_data Form data and settings.
+		 */
 		$form_atts = apply_filters( 'wpforms_frontend_form_atts', $form_atts, $form_data );
 
-		// Begin to build the output.
-		do_action( 'wpforms_frontend_output_container_before', $form_data, $form );
-
-		printf( '<div class="wpforms-container %s" id="wpforms-%d">', esc_attr( $classes ), absint( $form_id ) );
+		$this->form_container_open( $form_data, $form );
 
 		do_action( 'wpforms_frontend_output_form_before', $form_data, $form );
 
@@ -384,16 +422,21 @@ class WPForms_Frontend {
 			);
 		}
 
-
 		do_action( 'wpforms_frontend_output', $form_data, null, $title, $description, $errors );
 
 		echo '</form>';
 
+		/**
+		 * Allow adding content after a form.
+		 *
+		 * @since 1.5.4.2
+		 *
+		 * @param array   $form_data Form data and settings.
+		 * @param WP_Post $form      Form post type.
+		 */
 		do_action( 'wpforms_frontend_output_form_after', $form_data, $form );
 
-		echo '</div>  <!-- .wpforms-container -->';
-
-		do_action( 'wpforms_frontend_output_container_after', $form_data, $form );
+		$this->form_container_close( $form_data, $form );
 
 		// Add form to class property that tracks all forms in a page.
 		$this->forms[ $form_id ] = $form_data;
@@ -401,7 +444,14 @@ class WPForms_Frontend {
 		// Optional debug information if WPFORMS_DEBUG is defined.
 		wpforms_debug_data( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-		// After output hook.
+		/**
+		 * Fires after frontend output.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array   $form_data Form data and settings.
+		 * @param WP_Post $form      Form post type.
+		 */
 		do_action( 'wpforms_frontend_output_after', $form_data, $form );
 	}
 
@@ -420,7 +470,7 @@ class WPForms_Frontend {
 
 		// In AMP, just print template.
 		if ( wpforms_is_amp() ) {
-			$this->assets_confirmation();
+			$this->assets_confirmation( $form_data );
 			printf( '<div submit-success><template type="amp-mustache"><div class="%s {{#redirecting}}wpforms-redirection-message{{/redirecting}}">{{{message}}}</div></template></div>', esc_attr( $class ) );
 
 			return;
@@ -443,7 +493,7 @@ class WPForms_Frontend {
 		}
 
 		// Load confirmation specific assets.
-		$this->assets_confirmation();
+		$this->assets_confirmation( $form_data );
 
 		/**
 		 * Fires once before the confirmation message.
@@ -478,6 +528,84 @@ class WPForms_Frontend {
 		 * @param int   $entry_id     Entry id.
 		 */
 		do_action( 'wpforms_frontend_confirmation_message_after', $confirmation, $form_data, $fields, $entry_id );
+	}
+
+	/**
+	 * Form container classes.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @param array $form_data Form data and settings.
+	 *
+	 * @return array
+	 */
+	private function get_container_classes( $form_data ) {
+
+		$classes = (int) wpforms_setting( 'disable-css', '1' ) === 1 ? [ 'wpforms-container-full' ] : [];
+
+		/**
+		 * Allow form container classes to be filtered and user defined classes.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $classes   Classes.
+		 * @param array $form_data Form data and settings.
+		 */
+		$classes = apply_filters( 'wpforms_frontend_container_class', $classes, $form_data );
+
+		if ( ! empty( $form_data['settings']['form_class'] ) ) {
+			$classes = array_merge( $classes, explode( ' ', $form_data['settings']['form_class'] ) );
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * Display the opening container markup for a form.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @param array   $form_data Form data and settings.
+	 * @param WP_Post $form      Form post type.
+	 */
+	private function form_container_open( $form_data, $form ) {
+
+		/**
+		 * Fires before container open tag.
+		 *
+		 * @since 1.5.4.2
+		 *
+		 * @param array   $form_data Form data and settings.
+		 * @param WP_Post $form      Form post type.
+		 */
+		do_action( 'wpforms_frontend_output_container_before', $form_data, $form );
+
+		$classes = $this->get_container_classes( $form_data );
+
+		printf( '<div class="wpforms-container %s" id="wpforms-%d">', wpforms_sanitize_classes( $classes, true ), absint( $form->ID ) );
+	}
+
+	/**
+	 * Display the closing container markup for a form.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @param array   $form_data Form data and settings.
+	 * @param WP_Post $form      Form post type.
+	 */
+	private function form_container_close( $form_data, $form ) {
+
+		echo '</div>  <!-- .wpforms-container -->';
+
+		/**
+		 * Fires after container close tag.
+		 *
+		 * @since 1.5.4.2
+		 *
+		 * @param array   $form_data Form data and settings.
+		 * @param WP_Post $form      Form post type.
+		 */
+		do_action( 'wpforms_frontend_output_container_after', $form_data, $form );
 	}
 
 	/**
@@ -1634,10 +1762,14 @@ class WPForms_Frontend {
 	 * Load the necessary assets for the confirmation message.
 	 *
 	 * @since 1.1.2
+	 * @since 1.7.9 Added $form_data argument.
+	 *
+	 * @param array $form_data Form data and settings.
 	 */
-	public function assets_confirmation() {
+	public function assets_confirmation( $form_data = [] ) {
 
-		$min = wpforms_get_min_suffix();
+		$form_data = (array) $form_data;
+		$min       = wpforms_get_min_suffix();
 
 		// Base CSS only.
 		if ( (int) wpforms_setting( 'disable-css', '1' ) === 1 ) {
@@ -1660,7 +1792,15 @@ class WPForms_Frontend {
 			);
 		}
 
-		do_action( 'wpforms_frontend_confirmation' );
+		/**
+		 * Fires after enqueueing assets on confirmation page have been enqueued.
+		 *
+		 * @since 1.1.2
+		 * @since 1.7.9 Added $form_data argument.
+		 *
+		 * @param array $form_data Form data and settings.
+		 */
+		do_action( 'wpforms_frontend_confirmation', $form_data );
 	}
 
 	/**

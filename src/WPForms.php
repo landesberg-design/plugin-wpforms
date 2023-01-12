@@ -2,6 +2,7 @@
 
 namespace WPForms {
 
+	use AllowDynamicProperties;
 	use stdClass;
 
 	/**
@@ -9,6 +10,7 @@ namespace WPForms {
 	 *
 	 * @since 1.0.0
 	 */
+	#[AllowDynamicProperties]
 	final class WPForms {
 
 		/**

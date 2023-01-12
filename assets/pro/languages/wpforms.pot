@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms 1.7.8\n"
+"Project-Id-Version: WPForms 1.7.9.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-11-08T19:23:39+00:00\n"
+"POT-Creation-Date: 2023-01-11T13:39:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.6.0\n"
+"X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: wpforms\n"
 
 #. Plugin Name of the plugin
@@ -61,63 +61,80 @@ msgstr ""
 msgid "Please enter a license key."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:119
-#: pro/includes/admin/class-license.php:232
-#: pro/includes/admin/class-license.php:328
+#: pro/includes/admin/class-license.php:121
+#: pro/includes/admin/class-license.php:237
+#: pro/includes/admin/class-license.php:333
 msgid "There was an error connecting to the remote key API. Please try again later."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:141
+#: pro/includes/admin/class-license.php:143
 msgid "Congratulations! This site is now receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:251
-#: pro/includes/admin/class-license.php:471
+#: pro/includes/admin/class-license.php:256
+#: pro/includes/admin/class-license.php:534
 msgid "Your license key for WPForms is invalid. The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:264
+#: pro/includes/admin/class-license.php:269
 msgid "Your license key for WPForms has expired. Please renew your license key on WPForms.com to continue receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:277
-#: pro/includes/admin/class-license.php:463
+#: pro/includes/admin/class-license.php:282
+#: pro/includes/admin/class-license.php:526
 msgid "Your license key for WPForms has been disabled. Please use a different key to continue receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:292
+#: pro/includes/admin/class-license.php:297
 msgid "Your key has been refreshed successfully."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:351
+#: pro/includes/admin/class-license.php:356
 msgid "You have deactivated the key from this site successfully."
 msgstr ""
 
+#. translators: %1$s - WPForms.com Account dashboard URL; %2$s - WPForms.com pricing URL.
+#: pro/includes/admin/class-license.php:399
+msgid "Your license key can be found in your <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WPForms Account Dashboard</a>. Don’t have a license? <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">Sign up today!</a>"
+msgstr ""
+
+#: pro/includes/admin/class-license.php:415
+msgid "<strong>Your license has expired.</strong> An active license is needed to create new forms and edit existing forms. It also provides access to new features & addons, plugin updates (including security improvements), and our world class support!"
+msgstr ""
+
+#: pro/includes/admin/class-license.php:422
+msgid "<strong>Your license key has been disabled.</strong> Please use a different key to continue receiving automatic updates."
+msgstr ""
+
+#: pro/includes/admin/class-license.php:429
+msgid "<strong>Your license key is invalid.</strong> The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates."
+msgstr ""
+
 #. translators: %s - plugin settings page URL.
-#: pro/includes/admin/class-license.php:395
+#: pro/includes/admin/class-license.php:456
 msgid "Please <a href=\"%s\">enter and activate</a> your license key for WPForms to enable automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:443
+#: pro/includes/admin/class-license.php:506
 #: src/Pro/Admin/Builder/LicenseAlert.php:130
 msgid "Heads up! Your WPForms license has expired."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:444
+#: pro/includes/admin/class-license.php:507
 msgid "An active license is needed to create new forms and edit existing forms. It also provides access to new features & addons, plugin updates (including security improvements), and our world class support!"
 msgstr ""
 
-#: pro/includes/admin/class-license.php:446
+#: pro/includes/admin/class-license.php:509
 #: src/Pro/Admin/Builder/LicenseAlert.php:132
-#: src/Pro/Admin/Education/Core.php:101
+#: src/Pro/Admin/Education/Core.php:103
 msgid "Renew Now"
 msgstr ""
 
-#: pro/includes/admin/class-license.php:448
+#: pro/includes/admin/class-license.php:511
 #: pro/templates/education/admin/did-you-know.php:31
 #: src/Pro/Admin/Builder/LicenseAlert.php:133
 #: src/Pro/Admin/DashboardWidget.php:297
-#: src/Pro/Admin/DashboardWidget.php:608
+#: src/Pro/Admin/DashboardWidget.php:610
 #: src/Pro/Forms/Fields/Layout/Builder.php:245
 msgid "Learn More"
 msgstr ""
@@ -262,8 +279,8 @@ msgid "Edit Form Entry"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-list-table.php:574
-#: pro/wpforms-pro.php:814
-#: pro/wpforms-pro.php:1107
+#: pro/wpforms-pro.php:890
+#: pro/wpforms-pro.php:1191
 #: src/Pro/Admin/Entries/Edit.php:515
 msgid "Edit"
 msgstr ""
@@ -274,8 +291,8 @@ msgstr ""
 
 #: pro/includes/admin/entries/class-entries-list-table.php:596
 #: pro/includes/admin/entries/class-entries-list-table.php:647
-#: pro/wpforms-pro.php:801
-#: pro/wpforms-pro.php:1095
+#: pro/wpforms-pro.php:877
+#: pro/wpforms-pro.php:1179
 msgid "Delete"
 msgstr ""
 
@@ -418,7 +435,7 @@ msgstr ""
 
 #: pro/includes/admin/entries/class-entries-list.php:725
 #: pro/includes/admin/entries/class-entries-list.php:840
-#: pro/wpforms-pro.php:610
+#: pro/wpforms-pro.php:686
 #: src/Pro/Admin/AdminBarMenu.php:96
 #: src/Pro/Admin/DashboardWidget.php:210
 #: src/Pro/Admin/Entries/DefaultScreen.php:97
@@ -589,7 +606,7 @@ msgstr ""
 
 #: pro/includes/admin/entries/class-entries-single.php:762
 #: src/Pro/Admin/Entries/Edit.php:662
-#: src/Pro/Admin/Entries/PrintPreview.php:318
+#: src/Pro/Admin/Entries/PrintPreview.php:321
 msgid "This entry does not have any fields"
 msgstr ""
 
@@ -597,7 +614,7 @@ msgstr ""
 #: pro/includes/admin/entries/class-entries-single.php:796
 #: pro/includes/fields/class-entry-preview.php:512
 #: src/Pro/Admin/Entries/Edit.php:745
-#: src/Pro/Admin/Entries/PrintPreview.php:363
+#: src/Pro/Admin/Entries/PrintPreview.php:386
 msgid "Field ID #%d"
 msgstr ""
 
@@ -605,13 +622,13 @@ msgstr ""
 #: pro/includes/fields/class-entry-preview.php:605
 #: src/Pro/Admin/Entries/Edit.php:371
 #: src/Pro/Admin/Entries/Edit.php:821
-#: src/Pro/Admin/Entries/PrintPreview.php:367
+#: src/Pro/Admin/Entries/PrintPreview.php:390
 msgid "Empty"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-single.php:870
-#: src/Pro/Admin/Entries/PrintPreview.php:296
-#: src/Pro/Admin/Entries/PrintPreview.php:387
+#: src/Pro/Admin/Entries/PrintPreview.php:299
+#: src/Pro/Admin/Entries/PrintPreview.php:410
 msgid "Notes"
 msgstr ""
 
@@ -634,7 +651,7 @@ msgstr ""
 #. translators: %1$s - user name; %2$s - date
 #: pro/includes/admin/entries/class-entries-single.php:945
 #: pro/includes/admin/entries/class-entries-single.php:1019
-#: src/Pro/Admin/Entries/PrintPreview.php:399
+#: src/Pro/Admin/Entries/PrintPreview.php:422
 msgid "Added by %1$s on %2$s"
 msgstr ""
 
@@ -753,7 +770,7 @@ msgid "Note:"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-single.php:1472
-#: src/Pro/Admin/Entries/PrintPreview.php:281
+#: src/Pro/Admin/Entries/PrintPreview.php:284
 msgid "Print"
 msgstr ""
 
@@ -1101,7 +1118,7 @@ msgid "Check this option to prevent any previous date from being selected."
 msgstr ""
 
 #: pro/includes/fields/class-date-time.php:721
-#: pro/wpforms-pro.php:426
+#: pro/wpforms-pro.php:498
 msgid "Limit Hours"
 msgstr ""
 
@@ -1135,13 +1152,13 @@ msgid "YYYY"
 msgstr ""
 
 #: pro/includes/fields/class-date-time.php:1341
-#: pro/wpforms-pro.php:428
-#: pro/wpforms-pro.php:1291
+#: pro/wpforms-pro.php:500
+#: pro/wpforms-pro.php:1380
 msgid "Please enter time between {minTime} and {maxTime}."
 msgstr ""
 
 #: pro/includes/fields/class-divider.php:18
-#: src/Pro/Admin/Entries/PrintPreview.php:336
+#: src/Pro/Admin/Entries/PrintPreview.php:339
 msgid "Section Divider"
 msgstr ""
 
@@ -1252,15 +1269,15 @@ msgstr ""
 #. translators: %s - max number of files allowed.
 #: pro/includes/fields/class-file-upload.php:206
 #: pro/includes/fields/class-file-upload.php:1152
-#: pro/wpforms-pro.php:408
+#: pro/wpforms-pro.php:480
 msgid "File uploads exceed the maximum number allowed (%s)."
 msgstr ""
 
 #: pro/includes/fields/class-file-upload.php:210
 #: pro/includes/fields/class-file-upload.php:1909
 #: pro/includes/fields/class-file-upload.php:1937
-#: pro/wpforms-pro.php:395
-#: pro/wpforms-pro.php:1297
+#: pro/wpforms-pro.php:467
+#: pro/wpforms-pro.php:1386
 msgid "File type is not allowed."
 msgstr ""
 
@@ -1421,7 +1438,7 @@ msgid "Layout"
 msgstr ""
 
 #: pro/includes/fields/class-page-break.php:27
-#: pro/includes/fields/class-page-break.php:679
+#: pro/includes/fields/class-page-break.php:686
 msgid "Page Break"
 msgstr ""
 
@@ -1431,7 +1448,7 @@ msgid "Step %1$s of %2$d"
 msgstr ""
 
 #: pro/includes/fields/class-page-break.php:298
-#: pro/includes/fields/class-page-break.php:672
+#: pro/includes/fields/class-page-break.php:679
 msgid "Previous"
 msgstr ""
 
@@ -1467,76 +1484,76 @@ msgstr ""
 msgid "Select the primary color for the Page Indicator theme."
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:480
+#: pro/includes/fields/class-page-break.php:487
 msgid "Page Title"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:481
+#: pro/includes/fields/class-page-break.php:488
 msgid "Enter text for the page title."
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:507
+#: pro/includes/fields/class-page-break.php:514
 msgid "Next Label"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:508
+#: pro/includes/fields/class-page-break.php:515
 msgid "Enter text for Next page navigation button."
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:517
-#: pro/includes/fields/class-page-break.php:674
+#: pro/includes/fields/class-page-break.php:524
+#: pro/includes/fields/class-page-break.php:681
 msgid "Next"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:538
+#: pro/includes/fields/class-page-break.php:545
 msgid "Display Previous"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:539
+#: pro/includes/fields/class-page-break.php:546
 msgid "Toggle displaying the Previous page navigation button."
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:559
+#: pro/includes/fields/class-page-break.php:566
 msgid "Previous Label"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:560
+#: pro/includes/fields/class-page-break.php:567
 msgid "Enter text for Previous page navigation button."
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:605
+#: pro/includes/fields/class-page-break.php:612
 msgid "Page Navigation Alignment"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:606
+#: pro/includes/fields/class-page-break.php:613
 msgid "Select the alignment for the Next/Previous page navigation buttons"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:616
+#: pro/includes/fields/class-page-break.php:623
 msgid "Left"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:617
+#: pro/includes/fields/class-page-break.php:624
 msgid "Right"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:618
+#: pro/includes/fields/class-page-break.php:625
 msgid "Center"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:619
+#: pro/includes/fields/class-page-break.php:626
 msgid "Split"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:636
+#: pro/includes/fields/class-page-break.php:643
 msgid "Disable Scroll Animation"
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:637
+#: pro/includes/fields/class-page-break.php:644
 msgid "By default, a user's view is pulled to the top of each form page. Set to ON to disable this animation."
 msgstr ""
 
-#: pro/includes/fields/class-page-break.php:678
+#: pro/includes/fields/class-page-break.php:685
 msgid "First Page / Progress Indicator"
 msgstr ""
 
@@ -1601,7 +1618,7 @@ msgid "Field values do not match."
 msgstr ""
 
 #: pro/includes/fields/class-password.php:634
-#: pro/wpforms-pro.php:456
+#: pro/wpforms-pro.php:528
 msgid "A stronger password is required. Consider using upper and lower case letters, numbers, and symbols."
 msgstr ""
 
@@ -1615,50 +1632,50 @@ msgstr ""
 msgid "First Item"
 msgstr ""
 
-#: pro/includes/fields/class-payment-checkbox.php:31
+#: pro/includes/fields/class-payment-checkbox.php:33
 #: pro/includes/fields/class-payment-dropdown.php:49
-#: pro/includes/fields/class-payment-multiple.php:31
+#: pro/includes/fields/class-payment-multiple.php:33
 msgid "Second Item"
 msgstr ""
 
-#: pro/includes/fields/class-payment-checkbox.php:37
+#: pro/includes/fields/class-payment-checkbox.php:41
 #: pro/includes/fields/class-payment-dropdown.php:54
-#: pro/includes/fields/class-payment-multiple.php:37
+#: pro/includes/fields/class-payment-multiple.php:41
 msgid "Third Item"
 msgstr ""
 
-#: pro/includes/fields/class-payment-checkbox.php:135
+#: pro/includes/fields/class-payment-checkbox.php:141
 msgid "Checked"
 msgstr ""
 
 #. translators: %s - item number.
 #. translators: %s - Choice item number.
-#: pro/includes/fields/class-payment-checkbox.php:138
-#: pro/includes/fields/class-payment-checkbox.php:388
+#: pro/includes/fields/class-payment-checkbox.php:144
+#: pro/includes/fields/class-payment-checkbox.php:410
 #: pro/includes/fields/class-payment-dropdown.php:419
-#: pro/includes/fields/class-payment-multiple.php:364
+#: pro/includes/fields/class-payment-multiple.php:386
 msgid "Item %s"
 msgstr ""
 
-#: pro/includes/fields/class-payment-checkbox.php:280
+#: pro/includes/fields/class-payment-checkbox.php:290
 #: pro/includes/fields/class-payment-dropdown.php:228
-#: pro/includes/fields/class-payment-multiple.php:256
+#: pro/includes/fields/class-payment-multiple.php:266
 msgid "Show price after item labels"
 msgstr ""
 
-#: pro/includes/fields/class-payment-checkbox.php:281
+#: pro/includes/fields/class-payment-checkbox.php:291
 #: pro/includes/fields/class-payment-dropdown.php:229
-#: pro/includes/fields/class-payment-multiple.php:257
+#: pro/includes/fields/class-payment-multiple.php:267
 msgid "Check this option to show price of the item after the label."
 msgstr ""
 
-#: pro/includes/fields/class-payment-checkbox.php:473
-#: pro/includes/fields/class-payment-multiple.php:446
+#: pro/includes/fields/class-payment-checkbox.php:500
+#: pro/includes/fields/class-payment-multiple.php:473
 msgid "Invalid payment option."
 msgstr ""
 
 #: pro/includes/fields/class-payment-credit-card.php:18
-#: pro/wpforms-pro.php:438
+#: pro/wpforms-pro.php:510
 msgid "Credit Card"
 msgstr ""
 
@@ -1758,19 +1775,19 @@ msgid "Amount mismatch"
 msgstr ""
 
 #: pro/includes/fields/class-payment-total.php:226
-#: pro/wpforms-pro.php:434
-#: pro/wpforms-pro.php:1277
+#: pro/wpforms-pro.php:506
+#: pro/wpforms-pro.php:1366
 msgid "Payment is required."
 msgstr ""
 
 #: pro/includes/fields/class-phone.php:25
-#: pro/wpforms-pro.php:387
+#: pro/wpforms-pro.php:459
 msgid "Phone"
 msgstr ""
 
 #: pro/includes/fields/class-phone.php:163
 #: pro/includes/fields/class-phone.php:353
-#: pro/wpforms-pro.php:389
+#: pro/wpforms-pro.php:461
 msgid "Please enter a valid phone number."
 msgstr ""
 
@@ -1839,7 +1856,7 @@ msgid "Select the color for the rating icon"
 msgstr ""
 
 #. translators: %1$s - rating value; %2$s - rating scale.
-#: pro/includes/fields/class-rating.php:449
+#: pro/includes/fields/class-rating.php:456
 msgid "Rate %1$d out of %2$d"
 msgstr ""
 
@@ -1892,8 +1909,8 @@ msgid "Website / URL"
 msgstr ""
 
 #: pro/includes/fields/class-url.php:156
-#: pro/wpforms-pro.php:383
-#: pro/wpforms-pro.php:1294
+#: pro/wpforms-pro.php:455
+#: pro/wpforms-pro.php:1383
 msgid "Please enter a valid URL."
 msgstr ""
 
@@ -2111,7 +2128,7 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #: pro/templates/education/admin/did-you-know.php:37
-#: pro/wpforms-pro.php:702
+#: pro/wpforms-pro.php:778
 #: src/Pro/Forms/Fields/Layout/Builder.php:246
 msgid "Dismiss this message."
 msgstr ""
@@ -2226,298 +2243,325 @@ msgstr ""
 msgid "View Entry &gt; Rich Text field"
 msgstr ""
 
-#: pro/wpforms-pro.php:288
+#: pro/wpforms-pro.php:289
 msgid "Go to WPForms.com Support page"
 msgstr ""
 
-#: pro/wpforms-pro.php:289
+#: pro/wpforms-pro.php:290
 msgid "Support"
 msgstr ""
 
-#: pro/wpforms-pro.php:305
+#: pro/wpforms-pro.php:306
 msgid "Read the documentation"
 msgstr ""
 
-#: pro/wpforms-pro.php:306
+#: pro/wpforms-pro.php:307
 msgid "Docs"
 msgstr ""
 
-#: pro/wpforms-pro.php:326
-#: pro/wpforms-pro.php:462
+#: pro/wpforms-pro.php:346
+msgid "Verify Key"
+msgstr ""
+
+#: pro/wpforms-pro.php:352
+msgid "Renew License"
+msgstr ""
+
+#: pro/wpforms-pro.php:358
+msgid "Remove Key"
+msgstr ""
+
+#. translators: $s - license type.
+#: pro/wpforms-pro.php:368
+msgid "Your license key level is %s."
+msgstr ""
+
+#. translators: %s - Refresh link.
+#: pro/wpforms-pro.php:375
+msgid "If your license has been upgraded or is incorrect, then please %1$sforce a refresh%2$s."
+msgstr ""
+
+#: pro/wpforms-pro.php:398
+#: pro/wpforms-pro.php:534
 msgid "Payments"
 msgstr ""
 
-#: pro/wpforms-pro.php:328
+#: pro/wpforms-pro.php:400
 #: src/Pro/Admin/Settings/Access.php:197
 msgid "Save Settings"
 msgstr ""
 
-#: pro/wpforms-pro.php:381
+#: pro/wpforms-pro.php:453
 msgid "Website URL"
 msgstr ""
 
-#: pro/wpforms-pro.php:393
+#: pro/wpforms-pro.php:465
 msgid "File Extension"
 msgstr ""
 
-#: pro/wpforms-pro.php:399
+#: pro/wpforms-pro.php:471
 msgid "File Size"
 msgstr ""
 
-#: pro/wpforms-pro.php:401
-#: pro/wpforms-pro.php:1298
+#: pro/wpforms-pro.php:473
+#: pro/wpforms-pro.php:1387
 msgid "File exceeds max size allowed. File was not uploaded."
 msgstr ""
 
-#: pro/wpforms-pro.php:405
+#: pro/wpforms-pro.php:477
 msgid "File Uploads"
 msgstr ""
 
-#: pro/wpforms-pro.php:414
+#: pro/wpforms-pro.php:486
 msgid "Time (12 hour)"
 msgstr ""
 
-#: pro/wpforms-pro.php:416
-#: pro/wpforms-pro.php:1289
+#: pro/wpforms-pro.php:488
+#: pro/wpforms-pro.php:1378
 msgid "Please enter time in 12-hour AM/PM format (eg 8:45 AM)."
 msgstr ""
 
-#: pro/wpforms-pro.php:420
+#: pro/wpforms-pro.php:492
 msgid "Time (24 hour)"
 msgstr ""
 
-#: pro/wpforms-pro.php:422
-#: pro/wpforms-pro.php:1290
+#: pro/wpforms-pro.php:494
+#: pro/wpforms-pro.php:1379
 msgid "Please enter time in 24-hour format (eg 22:45)."
 msgstr ""
 
-#: pro/wpforms-pro.php:432
+#: pro/wpforms-pro.php:504
 msgid "Payment Required"
 msgstr ""
 
-#: pro/wpforms-pro.php:440
-#: pro/wpforms-pro.php:1278
+#: pro/wpforms-pro.php:512
+#: pro/wpforms-pro.php:1367
 msgid "Please enter a valid credit card number."
 msgstr ""
 
-#: pro/wpforms-pro.php:444
+#: pro/wpforms-pro.php:516
 msgid "File Upload Total Size"
 msgstr ""
 
 #. translators: %1$s - total size of the selected files in megabytes, %2$s - allowed file upload limit in megabytes.
-#: pro/wpforms-pro.php:447
-#: pro/wpforms-pro.php:1282
+#: pro/wpforms-pro.php:519
+#: pro/wpforms-pro.php:1371
 msgid "The total size of the selected files %1$s MB exceeds the allowed limit %2$s MB."
 msgstr ""
 
-#: pro/wpforms-pro.php:454
+#: pro/wpforms-pro.php:526
 msgid "Password Strength"
 msgstr ""
 
-#: pro/wpforms-pro.php:469
+#: pro/wpforms-pro.php:541
 #: src/Pro/Admin/Entries/Export/Ajax.php:692
 msgid "Currency"
 msgstr ""
 
-#: pro/wpforms-pro.php:483
+#: pro/wpforms-pro.php:555
 msgid "Disable User Cookies"
 msgstr ""
 
-#: pro/wpforms-pro.php:484
+#: pro/wpforms-pro.php:556
 msgid "Check this option to disable user tracking cookies. This will disable the Related Entries feature and the Form Abandonment addon."
 msgstr ""
 
-#: pro/wpforms-pro.php:489
+#: pro/wpforms-pro.php:561
 msgid "Disable User Details"
 msgstr ""
 
-#: pro/wpforms-pro.php:490
+#: pro/wpforms-pro.php:562
 msgid "Check this option to prevent the storage of IP addresses and User Agent on all forms. If unchecked, then this can be managed on a form-by-form basis inside the form builder under Settings → General"
 msgstr ""
 
-#: pro/wpforms-pro.php:578
+#: pro/wpforms-pro.php:650
 msgid "Disable storing entry information in WordPress"
 msgstr ""
 
-#: pro/wpforms-pro.php:590
+#: pro/wpforms-pro.php:662
 msgid "Disable storing user details (IP address and user agent)"
 msgstr ""
 
 #. translators: %s - form name.
-#: pro/wpforms-pro.php:678
+#: pro/wpforms-pro.php:754
 msgid "New %s Entry"
 msgstr ""
 
-#: pro/wpforms-pro.php:693
+#: pro/wpforms-pro.php:769
 msgid "Notifications"
 msgstr ""
 
-#: pro/wpforms-pro.php:695
+#: pro/wpforms-pro.php:771
 msgid "Add New Notification"
 msgstr ""
 
 #. translators: %s - Link to the WPForms.com doc article.
-#: pro/wpforms-pro.php:706
+#: pro/wpforms-pro.php:782
 msgid "Notifications are emails sent when a form is submitted. By default, these emails include entry details. For setup and customization options, including a video overview, please <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">see our tutorial</a>."
 msgstr ""
 
 #. translators: 1$s, %2$s - Links to the WPForms.com doc articles.
-#: pro/wpforms-pro.php:721
+#: pro/wpforms-pro.php:797
 msgid "After saving these settings, be sure to <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">test a form submission</a>. This lets you see how emails will look, and to ensure that they <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">are delivered successfully</a>."
 msgstr ""
 
-#: pro/wpforms-pro.php:743
+#: pro/wpforms-pro.php:819
 msgid "Enable Notifications"
 msgstr ""
 
-#: pro/wpforms-pro.php:751
+#: pro/wpforms-pro.php:827
 msgid "Default Notification"
 msgstr ""
 
-#: pro/wpforms-pro.php:800
+#: pro/wpforms-pro.php:876
 msgid "Clone"
 msgstr ""
 
-#: pro/wpforms-pro.php:802
-#: pro/wpforms-pro.php:1096
+#: pro/wpforms-pro.php:878
+#: pro/wpforms-pro.php:1180
 msgid "Open / Close"
 msgstr ""
 
-#: pro/wpforms-pro.php:827
+#: pro/wpforms-pro.php:903
 msgid "Send To Email Address"
 msgstr ""
 
-#: pro/wpforms-pro.php:830
+#: pro/wpforms-pro.php:906
 msgid "Enter the email address to receive form entry notifications. For multiple notifications, separate email addresses with a comma."
 msgstr ""
 
-#: pro/wpforms-pro.php:847
+#: pro/wpforms-pro.php:923
 msgid "CC"
 msgstr ""
 
-#: pro/wpforms-pro.php:864
+#: pro/wpforms-pro.php:940
 msgid "Email Subject Line"
 msgstr ""
 
 #. translators: %s - form name.
-#: pro/wpforms-pro.php:867
+#: pro/wpforms-pro.php:943
 msgid "New Entry: %s"
 msgstr ""
 
-#: pro/wpforms-pro.php:881
+#: pro/wpforms-pro.php:957
 msgid "From Name"
 msgstr ""
 
-#: pro/wpforms-pro.php:917
+#: pro/wpforms-pro.php:993
 msgid "From Email"
 msgstr ""
 
-#: pro/wpforms-pro.php:953
-msgid "Reply-To Email Address"
+#: pro/wpforms-pro.php:1029
+msgid "Reply-To"
 msgstr ""
 
-#: pro/wpforms-pro.php:969
+#. translators: %s - <email@example.com>.
+#: pro/wpforms-pro.php:1033
+msgid "Enter the email address or email address with recipient's name in \"First Last %s\" format."
+msgstr ""
+
+#: pro/wpforms-pro.php:1053
 msgid "Email Message"
 msgstr ""
 
 #. translators: %s - all fields smart tag.
-#: pro/wpforms-pro.php:981
+#: pro/wpforms-pro.php:1065
 msgid "To display all form fields, use the %s Smart Tag."
 msgstr ""
 
-#: pro/wpforms-pro.php:993
+#: pro/wpforms-pro.php:1077
 msgid "Send"
 msgstr ""
 
-#: pro/wpforms-pro.php:994
+#: pro/wpforms-pro.php:1078
 msgid "Don't send"
 msgstr ""
 
-#: pro/wpforms-pro.php:996
+#: pro/wpforms-pro.php:1080
 msgid "this notification if"
 msgstr ""
 
-#: pro/wpforms-pro.php:997
+#: pro/wpforms-pro.php:1081
 msgid "Email notifications"
 msgstr ""
 
-#: pro/wpforms-pro.php:1045
-#: pro/wpforms-pro.php:1143
+#: pro/wpforms-pro.php:1129
+#: pro/wpforms-pro.php:1227
 msgid "Thanks for contacting us! We will be in touch with you shortly."
 msgstr ""
 
-#: pro/wpforms-pro.php:1058
+#: pro/wpforms-pro.php:1142
 msgid "Confirmations"
 msgstr ""
 
-#: pro/wpforms-pro.php:1059
+#: pro/wpforms-pro.php:1143
 msgid "Add New Confirmation"
 msgstr ""
 
-#: pro/wpforms-pro.php:1064
+#: pro/wpforms-pro.php:1148
 msgid "Default Confirmation"
 msgstr ""
 
-#: pro/wpforms-pro.php:1120
+#: pro/wpforms-pro.php:1204
 msgid "Confirmation Type"
 msgstr ""
 
-#: pro/wpforms-pro.php:1124
+#: pro/wpforms-pro.php:1208
 msgid "Message"
 msgstr ""
 
-#: pro/wpforms-pro.php:1125
+#: pro/wpforms-pro.php:1209
 msgid "Show Page"
 msgstr ""
 
-#: pro/wpforms-pro.php:1126
+#: pro/wpforms-pro.php:1210
 msgid "Go to URL (Redirect)"
 msgstr ""
 
-#: pro/wpforms-pro.php:1141
+#: pro/wpforms-pro.php:1225
 #: src/Pro/Admin/Builder/Builder.php:105
 msgid "Confirmation Message"
 msgstr ""
 
-#: pro/wpforms-pro.php:1163
+#: pro/wpforms-pro.php:1247
 msgid "Automatically scroll to the confirmation message"
 msgstr ""
 
-#: pro/wpforms-pro.php:1177
+#: pro/wpforms-pro.php:1261
 msgid "Confirmation Page"
 msgstr ""
 
-#: pro/wpforms-pro.php:1192
+#: pro/wpforms-pro.php:1281
 msgid "Confirmation Redirect URL"
 msgstr ""
 
-#: pro/wpforms-pro.php:1209
+#: pro/wpforms-pro.php:1298
 msgid "Use"
 msgstr ""
 
-#: pro/wpforms-pro.php:1210
+#: pro/wpforms-pro.php:1299
 msgid "Don't use"
 msgstr ""
 
-#: pro/wpforms-pro.php:1212
+#: pro/wpforms-pro.php:1301
 msgid "this confirmation if"
 msgstr ""
 
-#: pro/wpforms-pro.php:1213
+#: pro/wpforms-pro.php:1302
 msgid "Form confirmations"
 msgstr ""
 
 #. translators: %s - WPForms.com announcement page URL.
-#: pro/wpforms-pro.php:1315
+#: pro/wpforms-pro.php:1404
 msgid "Conditional logic functionality is now included in the core WPForms plugin! The WPForms Conditional Logic addon can be removed without affecting your forms. For more details <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">read our announcement</a>."
 msgstr ""
 
 #. translators: %s - WPForms.com Account dashboard URL.
-#: pro/wpforms-pro.php:1368
+#: pro/wpforms-pro.php:1457
 msgid "Your WPForms license key has expired. In order to continue receiving support and plugin updates you must renew your license key. Please log in to <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">your WPForms.com account</a> to renew your license."
 msgstr ""
 
-#: pro/wpforms-pro.php:1534
+#: pro/wpforms-pro.php:1623
 msgid "Addon auto-updates controlled by WPForms"
 msgstr ""
 
@@ -2621,7 +2665,7 @@ msgid "Get WPForms pro"
 msgstr ""
 
 #: src/Pro/Admin/Builder/LicenseAlert.php:162
-#: src/Pro/Admin/Entries/PrintPreview.php:280
+#: src/Pro/Admin/Entries/PrintPreview.php:283
 msgid "Close"
 msgstr ""
 
@@ -2738,19 +2782,19 @@ msgstr ""
 msgid "Recommended Plugin:"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:606
+#: src/Pro/Admin/DashboardWidget.php:607
 msgid "Install"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:611
+#: src/Pro/Admin/DashboardWidget.php:613
 msgid "Dismiss recommended plugin"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:630
+#: src/Pro/Admin/DashboardWidget.php:632
 msgid "No entries for selected period"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:631
+#: src/Pro/Admin/DashboardWidget.php:633
 msgid "Please select a different period or check back later."
 msgstr ""
 
@@ -2971,19 +3015,19 @@ msgstr ""
 msgid "Activate License"
 msgstr ""
 
-#: src/Pro/Admin/Education/Core.php:100
+#: src/Pro/Admin/Education/Core.php:102
 msgid "Your WPForms license is expired. To access the %name%, please renew your license."
 msgstr ""
 
-#: src/Pro/Admin/Education/Core.php:106
+#: src/Pro/Admin/Education/Core.php:108
 msgid "Your WPForms license is not active. To access the %name%, please contact support for more details."
 msgstr ""
 
-#: src/Pro/Admin/Education/Core.php:107
+#: src/Pro/Admin/Education/Core.php:109
 msgid "Contact Support"
 msgstr ""
 
-#: src/Pro/Admin/Education/Core.php:114
+#: src/Pro/Admin/Education/Core.php:116
 msgid "The %name% is not installed. Please install and activate it to use this feature."
 msgstr ""
 
@@ -3279,31 +3323,31 @@ msgid "IP Address"
 msgstr ""
 
 #. translators: %d - entry ID.
-#: src/Pro/Admin/Entries/PrintPreview.php:276
+#: src/Pro/Admin/Entries/PrintPreview.php:279
 msgid "Entry #%d"
 msgstr ""
 
-#: src/Pro/Admin/Entries/PrintPreview.php:279
+#: src/Pro/Admin/Entries/PrintPreview.php:282
 msgid "Cog"
 msgstr ""
 
-#: src/Pro/Admin/Entries/PrintPreview.php:286
+#: src/Pro/Admin/Entries/PrintPreview.php:289
 msgid "Empty fields"
 msgstr ""
 
-#: src/Pro/Admin/Entries/PrintPreview.php:289
+#: src/Pro/Admin/Entries/PrintPreview.php:292
 msgid "HTML/Content fields"
 msgstr ""
 
-#: src/Pro/Admin/Entries/PrintPreview.php:292
+#: src/Pro/Admin/Entries/PrintPreview.php:295
 msgid "Section Dividers"
 msgstr ""
 
-#: src/Pro/Admin/Entries/PrintPreview.php:300
+#: src/Pro/Admin/Entries/PrintPreview.php:303
 msgid "Compact view"
 msgstr ""
 
-#: src/Pro/Admin/Entries/PrintPreview.php:348
+#: src/Pro/Admin/Entries/PrintPreview.php:351
 msgid "Content Field"
 msgstr ""
 

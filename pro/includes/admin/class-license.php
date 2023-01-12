@@ -40,9 +40,7 @@ class WPForms_License {
 		}
 
 		// Periodic background license check.
-		if ( $this->get() ) {
-			$this->maybe_validate_key();
-		}
+		$this->maybe_validate_key();
 	}
 
 	/**
@@ -58,7 +56,7 @@ class WPForms_License {
 		$key = wpforms_setting( 'key', '', 'wpforms_license' );
 
 		// Allow wp-config constant to pass key.
-		if ( empty( $key ) && defined( 'WPFORMS_LICENSE_KEY' ) ) {
+		if ( empty( $key ) && defined( 'WPFORMS_LICENSE_KEY' ) && WPFORMS_LICENSE_KEY ) {
 			$key = WPFORMS_LICENSE_KEY;
 		}
 
@@ -74,13 +72,17 @@ class WPForms_License {
 	 */
 	public function get_key_location() {
 
-		if ( defined( 'WPFORMS_LICENSE_KEY' ) ) {
+		$key = wpforms_setting( 'key', '', 'wpforms_license' );
+
+		if ( ! empty( $key ) ) {
+			return 'option';
+		}
+
+		if ( defined( 'WPFORMS_LICENSE_KEY' ) && WPFORMS_LICENSE_KEY ) {
 			return 'constant';
 		}
 
-		$key = wpforms_setting( 'key', '', 'wpforms_license' );
-
-		return ! empty( $key ) ? 'option' : 'missing';
+		return 'missing';
 	}
 
 	/**
@@ -188,6 +190,9 @@ class WPForms_License {
 		$key = $this->get();
 
 		if ( ! $key ) {
+			// Flush timestamp interval when key is missing or not available.
+			delete_option( 'wpforms_license_updates' );
+
 			return;
 		}
 
@@ -287,7 +292,7 @@ class WPForms_License {
 		$option['is_invalid']  = false;
 		update_option( 'wpforms_license', $option );
 
-		// If forced, set contextual success message.
+		// If forced, set a contextual success message.
 		if ( $forced ) {
 			$msg             = esc_html__( 'Your key has been refreshed successfully.', 'wpforms' );
 			$this->success[] = $msg;
@@ -356,7 +361,12 @@ class WPForms_License {
 		$this->clear_cache();
 
 		if ( $ajax ) {
-			wp_send_json_success( $success );
+			wp_send_json_success(
+				[
+					'info' => $this->get_info_message_escaped(),
+					'msg'  => $success,
+				]
+			);
 		}
 	}
 
@@ -364,6 +374,7 @@ class WPForms_License {
 	 * Return possible license key error flag.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @return bool True if there are license key errors, false otherwise.
 	 */
 	public function get_errors() {
@@ -371,6 +382,56 @@ class WPForms_License {
 		$option = get_option( 'wpforms_license' );
 
 		return ! empty( $option['is_expired'] ) || ! empty( $option['is_disabled'] ) || ! empty( $option['is_invalid'] );
+	}
+
+	/**
+	 * Return license key message if applicable.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @return string Returns proper info (error) message depending on the state of the license.
+	 */
+	public function get_info_message_escaped() {
+
+		if ( ! $this->get() ) {
+			return sprintf(
+				wp_kses( /* translators: %1$s - WPForms.com Account dashboard URL; %2$s - WPForms.com pricing URL. */
+					__( 'Your license key can be found in your <a href="%1$s" target="_blank" rel="noopener noreferrer">WPForms Account Dashboard</a>. Don’t have a license? <a href="%2$s" target="_blank" rel="noopener noreferrer">Sign up today!</a>', 'wpforms' ),
+					[
+						'a' => [
+							'href'   => [],
+							'target' => [],
+							'rel'    => [],
+						],
+					]
+				),
+				wpforms_utm_link( 'https://wpforms.com/account/', 'settings-license', 'Account Dashboard' ),
+				wpforms_utm_link( 'https://wpforms.com/pricing/', 'settings-license', 'License Key Sign Up' )
+			);
+		}
+
+		if ( $this->is_expired() ) {
+			return wp_kses(
+				__( '<strong>Your license has expired.</strong> An active license is needed to create new forms and edit existing forms. It also provides access to new features & addons, plugin updates (including security improvements), and our world class support!', 'wpforms' ),
+				[ 'strong' => [] ]
+			);
+		}
+
+		if ( $this->is_disabled() ) {
+			return wp_kses(
+				__( '<strong>Your license key has been disabled.</strong> Please use a different key to continue receiving automatic updates.', 'wpforms' ),
+				[ 'strong' => [] ]
+			);
+		}
+
+		if ( $this->is_invalid() ) {
+			return wp_kses(
+				__( '<strong>Your license key is invalid.</strong> The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates.', 'wpforms' ),
+				[ 'strong' => [] ]
+			);
+		}
+
+		return '';
 	}
 
 	/**
@@ -406,6 +467,8 @@ class WPForms_License {
 				$notice,
 				[ 'class' => $class ]
 			);
+
+			return; // Bail early, there is no point in going through the rest of the conditional statements, as the key is already missing.
 		}
 
 		// If a key has expired, output nag about renewing the key.

@@ -467,7 +467,7 @@ class File {
 		return $columns_row;
 	}
 
-	/*
+	/**
 	 * Put file contents using WP Filesystem.
 	 *
 	 * @since 1.7.3
@@ -508,7 +508,20 @@ class File {
 			return null;
 		}
 
-		if ( $wp_filesystem->method !== 'direct' ) {
+		/**
+		 * Filter methods which need credentials.
+		 *
+		 * @since 1.7.9
+		 *
+		 * @param array $cred_methods Methods requesting credentials.
+		 */
+		$cred_methods = (array) apply_filters(
+			'wpforms_pro_admin_entries_export_file_cred_methods',
+			[ 'ssh2', 'ftpext', 'ftpsockets' ]
+		);
+
+		if ( in_array( $wp_filesystem->method, $cred_methods, true ) ) {
+			// We cannot get credentials properly during the ajax call.
 			return null;
 		}
 

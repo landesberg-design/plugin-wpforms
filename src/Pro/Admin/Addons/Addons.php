@@ -179,7 +179,7 @@ class Addons extends \WPForms\Admin\Addons\Addons {
 	 */
 	protected function get_remote_urls() {
 
-		$addons = wpforms()->license->perform_remote_request( 'get-addons-data', [ 'tgm-updater-key' => $this->license['key'] ] );
+		$addons = wpforms()->get( 'license' )->perform_remote_request( 'get-addons-data', [ 'tgm-updater-key' => $this->license['key'] ] );
 
 		// If there was an API error, set transient for only 10 minutes.
 		if ( ! $addons || isset( $addons->error ) ) {

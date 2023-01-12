@@ -20,26 +20,32 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 		$this->icon     = 'fa-check-square-o';
 		$this->order    = 50;
 		$this->group    = 'payment';
-		$this->defaults = array(
-			1 => array(
-				'label'   => esc_html__( 'First Item', 'wpforms' ),
-				'value'   => wpforms_format_amount( '10.00' ),
-				'image'   => '',
-				'default' => '',
-			),
-			2 => array(
-				'label'   => esc_html__( 'Second Item', 'wpforms' ),
-				'value'   => wpforms_format_amount( '25.00' ),
-				'image'   => '',
-				'default' => '',
-			),
-			3 => array(
-				'label'   => esc_html__( 'Third Item', 'wpforms' ),
-				'value'   => wpforms_format_amount( '50.00' ),
-				'image'   => '',
-				'default' => '',
-			),
-		);
+		$this->defaults = [
+			1 => [
+				'label'      => esc_html__( 'First Item', 'wpforms' ),
+				'value'      => wpforms_format_amount( '10.00' ),
+				'image'      => '',
+				'icon'       => '',
+				'icon_style' => '',
+				'default'    => '',
+			],
+			2 => [
+				'label'      => esc_html__( 'Second Item', 'wpforms' ),
+				'value'      => wpforms_format_amount( '25.00' ),
+				'image'      => '',
+				'icon'       => '',
+				'icon_style' => '',
+				'default'    => '',
+			],
+			3 => [
+				'label'      => esc_html__( 'Third Item', 'wpforms' ),
+				'value'      => wpforms_format_amount( '50.00' ),
+				'image'      => '',
+				'icon'       => '',
+				'icon_style' => '',
+				'default'    => '',
+			],
+		];
 
 		// Customize HTML field values.
 		add_filter( 'wpforms_html_field_value', array( $this, 'field_html_value' ), 10, 4 );
@@ -139,35 +145,37 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 				}
 			}
 
-			$properties['inputs'][ $key ] = array(
-				'container' => array(
-					'attr'  => array(),
-					'class' => array( "choice-{$key}" ),
-					'data'  => array(),
+			$properties['inputs'][ $key ] = [
+				'container'  => [
+					'attr'  => [],
+					'class' => [ "choice-{$key}" ],
+					'data'  => [],
 					'id'    => '',
-				),
-				'label'     => array(
-					'attr'  => array(
+				],
+				'label'      => [
+					'attr'  => [
 						'for' => "wpforms-{$form_id}-field_{$field_id}_{$key}",
-					),
-					'class' => array( 'wpforms-field-label-inline' ),
-					'data'  => array(),
+					],
+					'class' => [ 'wpforms-field-label-inline' ],
+					'data'  => [],
 					'id'    => '',
 					'text'  => $label,
-				),
-				'attr'      => array(
+				],
+				'attr'       => [
 					'name'  => "wpforms[fields][{$field_id}][]",
 					'value' => $key,
-				),
-				'class'     => array( 'wpforms-payment-price' ),
-				'data'      => array(
+				],
+				'class'      => [ 'wpforms-payment-price' ],
+				'data'       => [
 					'amount' => wpforms_format_amount( wpforms_sanitize_amount( $choice['value'] ) ),
-				),
-				'id'        => "wpforms-{$form_id}-field_{$field_id}_{$key}",
-				'image'     => isset( $choice['image'] ) ? $choice['image'] : '',
-				'required'  => ! empty( $field['required'] ) ? 'required' : '',
-				'default'   => isset( $choice['default'] ),
-			);
+				],
+				'id'         => "wpforms-{$form_id}-field_{$field_id}_{$key}",
+				'icon'       => isset( $choice['icon'] ) ? $choice['icon'] : '',
+				'icon_style' => isset( $choice['icon_style'] ) ? $choice['icon_style'] : '',
+				'image'      => isset( $choice['image'] ) ? $choice['image'] : '',
+				'required'   => ! empty( $field['required'] ) ? 'required' : '',
+				'default'    => isset( $choice['default'] ),
+			];
 		}
 
 		// Required class for pagebreak validation.
@@ -188,6 +196,8 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 					$properties['inputs'][ $key ]['class'][] = 'wpforms-screen-reader-element';
 				}
 			}
+		} elseif ( ! empty( $field['choices_icons'] ) ) {
+			$properties = wpforms()->get( 'icon_choices' )->field_properties( $properties, $field );
 		}
 
 		// Add selected class for choices with defaults.
@@ -292,6 +302,21 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 		// Choices Images.
 		$this->field_option( 'choices_images', $field );
 
+		// Choices Images Style (theme).
+		$this->field_option( 'choices_images_style', $field );
+
+		// Choices Icons.
+		$this->field_option( 'choices_icons', $field );
+
+		// Choices Icons Color.
+		$this->field_option( 'choices_icons_color', $field );
+
+		// Choices Icons Size.
+		$this->field_option( 'choices_icons_size', $field );
+
+		// Choices Icons Style.
+		$this->field_option( 'choices_icons_style', $field );
+
 		// Description.
 		$this->field_option( 'description', $field );
 
@@ -319,9 +344,6 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 				'markup' => 'open',
 			)
 		);
-
-		// Choices Images Style (theme).
-		$this->field_option( 'choices_images_style', $field );
 
 		// Input columns.
 		$this->field_option( 'input_columns', $field );
@@ -424,6 +446,11 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 							echo '<span class="wpforms-image-choices-label">' . wp_kses_post( $label ) . '</span>';
 
 						echo '</label>';
+
+					} elseif ( empty( $field['dynamic_choices'] ) && ! empty( $field['choices_icons'] ) ) {
+
+						// Icon Choices.
+						wpforms()->get( 'icon_choices' )->field_display( $field, $choice, 'checkbox', $label );
 
 					} else {
 

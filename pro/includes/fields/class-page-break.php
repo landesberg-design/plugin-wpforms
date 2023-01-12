@@ -263,7 +263,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 
 		$css = ! empty( $field['css'] ) ? $field['css'] : '';
 
-		echo '<div class="wpforms-page wpforms-page-1 ' . wpforms_sanitize_classes( $css ) . '">';
+		echo '<div class="wpforms-page wpforms-page-1 ' . wpforms_sanitize_classes( $css ) . '" data-page="1">';
 
 		/**
 		 * Fires before all fields on the page.
@@ -356,7 +356,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 			do_action( 'wpforms_field_page_break_page_fields_after', $field, $form_data );
 
 			printf(
-				'</div><div class="wpforms-page wpforms-page-%s %s %s" style="display:none;">',
+				'</div><div class="wpforms-page wpforms-page-%1$d %2$s %3$s" data-page="%1$d" style="display:none;">',
 				absint( $next ),
 				esc_html( $last ),
 				wpforms_sanitize_classes( $css )
@@ -453,16 +453,23 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 				),
 				false
 			);
+
+			$indicator_color = isset( $field['indicator_color'] ) ? wpforms_sanitize_hex_color( $field['indicator_color'] ) : '';
+			$indicator_color = empty( $indicator_color ) ? '#72b239' : $indicator_color;
+
 			$fld = $this->field_element(
-				'text',
+				'color',
 				$field,
-				array(
+				[
 					'slug'  => 'indicator_color',
-					'value' => ! empty( $field['indicator_color'] ) ? esc_attr( $field['indicator_color'] ) : '#72b239',
-					'class' => 'wpforms-color-picker',
-				),
+					'value' => $indicator_color,
+					'data'  => [
+						'fallback-color' => $indicator_color,
+					],
+				],
 				false
 			);
+
 			$this->field_element( 'row', $field, array(
 				'slug'    => 'indicator_color',
 				'content' => $lbl . $fld,
@@ -674,9 +681,19 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		$next       = ! empty( $field['next'] ) ? $field['next'] : esc_html__( 'Next', 'wpforms' );
 		$next_class = empty( $next ) ? 'wpforms-hidden' : '';
 		$position   = ! empty( $field['position'] ) ? $field['position'] : 'normal';
-		$title      = ! empty( $field['title'] ) ? '(' . $field['title'] . ')' : '';
+		$title      = ! empty( $field['title'] ) ? $field['title'] : '';
 		$label      = $position === 'top' ? esc_html__( 'First Page / Progress Indicator', 'wpforms' ) : '';
 		$label      = $position === 'normal' && empty( $label ) ? esc_html__( 'Page Break', 'wpforms' ) : $label;
+
+		/**
+		 * Fires before page break is displayed on the preview.
+		 *
+		 * @since 1.7.9
+		 *
+		 * @param array $form_data  Form data and settings.
+		 * @param array $field      Field data.
+		 */
+		do_action( 'wpforms_field_page_break_field_preview_before', $this->form_data, $field );
 
 		if ( 'top' !== $position ) {
 			if ( empty( $this->form_data ) ) {
@@ -727,6 +744,16 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 			}
 			echo '<span class="line"></span>';
 		echo '</div>';
+
+		/**
+		 * Fires after page break is displayed on the preview.
+		 *
+		 * @since 1.7.9
+		 *
+		 * @param array $form_data  Form data and settings.
+		 * @param array $field      Field data.
+		 */
+		do_action( 'wpforms_field_page_break_field_preview_after', $this->form_data, $field );
 	}
 
 	/**

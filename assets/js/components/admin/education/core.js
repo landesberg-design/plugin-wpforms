@@ -225,6 +225,11 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 			// Test if the base URL already contains `?`.
 			var appendChar = /(\?)/.test( baseURL ) ? '&' : '?';
 
+			// If the upgrade link is changed by partners, appendChar has to be encoded.
+			if ( baseURL.indexOf( 'https://wpforms.com' ) === -1 ) {
+				appendChar = encodeURIComponent( appendChar );
+			}
+
 			return baseURL + appendChar + 'utm_content=' + encodeURIComponent( utmContent.trim() );
 		},
 

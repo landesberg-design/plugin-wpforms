@@ -55,11 +55,11 @@ class Core extends \WPForms\Admin\Education\Core {
 			esc_url( wpforms_utm_link( 'https://wpforms.com/docs/how-to-manually-install-addons-in-wpforms/', 'builder-modal', 'Addon Install Failure' ) )
 		);
 
-		$license = (array) get_option( 'wpforms_license', [] );
+		$license_key = wpforms_get_license_key();
 
-		if ( ! empty( $license['key'] ) ) {
+		if ( ! empty( $license_key ) ) {
 			$strings['upgrade']['pro']['url'] = add_query_arg(
-				[ 'license_key' => sanitize_text_field( $license['key'] ) ],
+				[ 'license_key' => sanitize_text_field( $license_key ) ],
 				$strings['upgrade']['pro']['url']
 			);
 		}
@@ -69,7 +69,7 @@ class Core extends \WPForms\Admin\Education\Core {
 			'prompt'   => esc_html__( 'To access the %name%, please enter and activate your WPForms license key in the plugin settings.', 'wpforms' ),
 			'button'   => esc_html__( 'Enter License Key', 'wpforms' ),
 			'url'      => admin_url( 'admin.php?page=wpforms-settings' ),
-			'is_empty' => empty( $license['key'] ),
+			'is_empty' => empty( $license_key ),
 		];
 
 		$strings['activate_license'] = [
@@ -95,6 +95,8 @@ class Core extends \WPForms\Admin\Education\Core {
 			'button'        => esc_html__( 'Activate License', 'wpforms' ),
 			'enter_key'     => esc_html__( 'Please enter a license key.', 'wpforms' ),
 		];
+
+		$license = (array) get_option( 'wpforms_license', [] );
 
 		if ( ! empty( $license['is_expired'] ) ) {
 			$strings['license']['prompt'] = esc_html__( 'Your WPForms license is expired. To access the %name%, please renew your license.', 'wpforms' );

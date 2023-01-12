@@ -1441,6 +1441,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		 * @param {jQuery} $page  Current page element object in page break context.
 		 */
 		navigateToPage: function( $this, action, page, $form, $page ) {
+
 			let nextPage = page;
 
 			if ( 'next' === action ) {
@@ -1456,7 +1457,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				return;
 			}
 
-			$page.hide();
+			$( '.wpforms-page' ).hide();
 
 			let $destinationPage = $form.find( '.wpforms-page-' + nextPage );
 			$destinationPage.show();
@@ -2414,6 +2415,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					app.resetFormRecaptcha( $form );
 					app.displayFormAjaxErrors( $form, json.data );
 					$form.trigger( 'wpformsAjaxSubmitFailed', json );
+					app.setCurrentPage( $form, json.data );
 					return;
 				}
 
@@ -2480,6 +2482,54 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			}
 
 			return $.ajax( args );
+		},
+
+		/**
+		 * Display page with error for multiple page form.
+		 *
+		 * @since 1.7.9
+		 *
+		 * @param {jQuery} $form Form element.
+		 * @param {object} $json Error json.
+		 */
+		setCurrentPage: function( $form, $json ) {
+
+			// Return for one-page forms.
+			if ( $form.find( '.wpforms-page-indicator' ).length === 0 ) {
+				return;
+			}
+
+			let $errorPages = [];
+
+			$form.find( '.wpforms-page' ).each( function( index, el ) {
+
+				if ( $( el ).find( '.wpforms-has-error' ).length >= 1 ) {
+
+					return $errorPages.push( $( el ) );
+				}
+			} );
+
+			// Get first page with error.
+			const $currentPage = $errorPages.length > 0 ? $errorPages[0] : $form.find( '.wpforms-page-1' );
+			const currentPage = $currentPage.data( 'page' );
+
+			let $page,
+				action = 'prev';
+
+			// If error is on the first page, or we have general errors among others, go to first page.
+			if ( currentPage === 1 || $json.errors.general.footer !== undefined ) {
+				$page = $form.find( '.wpforms-page-1' ).next();
+			} else {
+				$page  = $currentPage.next().length !== 0 ? $currentPage.next() : $currentPage.prev();
+				action = $currentPage.next().length !== 0 ? 'prev' : 'next';
+			}
+
+			// Take the page from which navigate to error.
+			const $nextBtn = $page.find( '.wpforms-page-next' ),
+				page = $page.data( 'page' );
+
+			// Imitate navigation to the page with error.
+			app.navigateToPage( $nextBtn, action, page, $form, $( '.wpforms-page-' + page ) );
 		},
 
 		/**

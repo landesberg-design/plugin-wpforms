@@ -1,4 +1,7 @@
 <?php
+
+use WPForms\Forms\IconChoices;
+
 /**
  * Base field template.
  *
@@ -785,6 +788,13 @@ abstract class WPForms_Field {
 				}
 				$output .= '</select>';
 				break;
+
+			// Color.
+			case 'color':
+				$args['class'][] = 'wpforms-color-picker';
+
+				$output = $this->field_element( 'text', $field, $args, $echo );
+				break;
 		}
 
 		if ( ! $echo ) {
@@ -971,10 +981,11 @@ abstract class WPForms_Field {
 			 * Choices.
 			 */
 			case 'choices':
-				$values     = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
-				$label      = ! empty( $args['label'] ) ? esc_html( $args['label'] ) : esc_html__( 'Choices', 'wpforms-lite' );
-				$class      = array();
-				$field_type = $this->type;
+				$values       = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
+				$label        = ! empty( $args['label'] ) ? esc_html( $args['label'] ) : esc_html__( 'Choices', 'wpforms-lite' );
+				$class        = [];
+				$field_type   = $this->type;
+				$inline_style = '';
 
 				if ( ! empty( $field['multiple'] ) ) {
 					$field_type = 'checkbox';
@@ -988,6 +999,12 @@ abstract class WPForms_Field {
 				}
 				if ( ! empty( $field['choices_images'] ) ) {
 					$class[] = 'show-images';
+				}
+				if ( ! empty( $field['choices_icons'] ) ) {
+					$class[]      = 'show-icons';
+					$icon_color   = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
+					$icon_color   = empty( $icon_color ) ? IconChoices::DEFAULT_COLOR : $icon_color;
+					$inline_style = "--wpforms-icon-choices-color: {$icon_color};";
 				}
 
 				// Field label.
@@ -1005,11 +1022,12 @@ abstract class WPForms_Field {
 
 				// Field contents.
 				$fld = sprintf(
-					'<ul data-next-id="%s" class="choices-list %s" data-field-id="%d" data-field-type="%s">',
+					'<ul data-next-id="%s" class="choices-list %s" data-field-id="%d" data-field-type="%s" style="%s">',
 					max( array_keys( $values ) ) + 1,
 					wpforms_sanitize_classes( $class, true ),
 					absint( $field['id'] ),
-					esc_attr( $this->type )
+					esc_attr( $this->type ),
+					esc_attr( $inline_style )
 				);
 				foreach ( $values as $key => $value ) {
 					$default        = ! empty( $value['default'] ) ? $value['default'] : '';
@@ -1017,8 +1035,11 @@ abstract class WPForms_Field {
 					$label          = isset( $value['label'] ) ? $value['label'] : '';
 					$image          = ! empty( $value['image'] ) ? $value['image'] : '';
 					$hide_image_btn = false;
+					$icon           = isset( $value['icon'] ) && ! wpforms_is_empty_string( $value['icon'] ) ? $value['icon'] : IconChoices::DEFAULT_ICON;
+					$icon_style     = ! empty( $value['icon_style'] ) ? $value['icon_style'] : IconChoices::DEFAULT_ICON_STYLE;
 
 					$fld .= '<li data-key="' . absint( $key ) . '">';
+
 					$fld .= sprintf(
 						'<input type="%s" name="%s[default]" class="default" value="1" %s>',
 						$field_type === 'checkbox' ? 'checkbox' : 'radio',
@@ -1061,6 +1082,20 @@ abstract class WPForms_Field {
 						esc_url_raw( $image )
 					);
 					$fld .= '</div>';
+
+					$fld .= sprintf(
+						'<div class="wpforms-icon-select">
+							<i class="ic-fa-preview ic-fa-%1$s ic-fa-%2$s"></i>
+							<span>%2$s</span>
+							<i class="fa fa-edit"></i>
+							<input type="hidden" name="%3$s[icon]" value="%2$s" class="source-icon">
+							<input type="hidden" name="%3$s[icon_style]" value="%1$s" class="source-icon-style">
+						</div>',
+						esc_attr( $icon_style ),
+						esc_attr( $icon ),
+						esc_attr( $base )
+					);
+
 					$fld .= '</li>';
 				}
 				$fld .= '</ul>';
@@ -1117,12 +1152,19 @@ abstract class WPForms_Field {
 			 * Choices for payments.
 			 */
 			case 'choices_payments':
-				$values     = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
-				$class      = array();
-				$input_type = in_array( $field['type'], array( 'payment-multiple', 'payment-select' ), true ) ? 'radio' : 'checkbox';
+				$values       = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
+				$class        = [];
+				$input_type   = in_array( $field['type'], [ 'payment-multiple', 'payment-select' ], true ) ? 'radio' : 'checkbox';
+				$inline_style = '';
 
 				if ( ! empty( $field['choices_images'] ) ) {
 					$class[] = 'show-images';
+				}
+				if ( ! empty( $field['choices_icons'] ) ) {
+					$class[]      = 'show-icons';
+					$icon_color   = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
+					$icon_color   = empty( $icon_color ) ? IconChoices::DEFAULT_COLOR : $icon_color;
+					$inline_style = "--wpforms-icon-choices-color: {$icon_color};";
 				}
 
 				// Field label.
@@ -1139,17 +1181,20 @@ abstract class WPForms_Field {
 
 				// Field contents.
 				$fld = sprintf(
-					'<ul data-next-id="%s" class="choices-list %s" data-field-id="%d" data-field-type="%s">',
+					'<ul data-next-id="%s" class="choices-list %s" data-field-id="%d" data-field-type="%s" style="%s">',
 					max( array_keys( $values ) ) + 1,
 					wpforms_sanitize_classes( $class, true ),
 					absint( $field['id'] ),
-					esc_attr( $this->type )
+					esc_attr( $this->type ),
+					esc_attr( $inline_style )
 				);
 				foreach ( $values as $key => $value ) {
 					$default        = ! empty( $value['default'] ) ? $value['default'] : '';
 					$base           = sprintf( 'fields[%d][choices][%d]', absint( $field['id'] ), absint( $key ) );
 					$image          = ! empty( $value['image'] ) ? $value['image'] : '';
 					$hide_image_btn = false;
+					$icon           = isset( $value['icon'] ) && ! wpforms_is_empty_string( $value['icon'] ) ? $value['icon'] : IconChoices::DEFAULT_ICON;
+					$icon_style     = ! empty( $value['icon_style'] ) ? $value['icon_style'] : IconChoices::DEFAULT_ICON_STYLE;
 
 					$fld .= '<li data-key="' . absint( $key ) . '">';
 					$fld .= sprintf(
@@ -1195,6 +1240,20 @@ abstract class WPForms_Field {
 						esc_url_raw( $image )
 					);
 					$fld .= '</div>';
+
+					$fld .= sprintf(
+						'<div class="wpforms-icon-select">
+							<i class="ic-fa-preview ic-fa-%1$s ic-fa-%2$s""></i>
+							<span>%2$s</span>
+							<i class="fa fa-edit"></i>
+							<input type="hidden" name="%3$s[icon]" value="%2$s" class="source-icon">
+							<input type="hidden" name="%3$s[icon_style]" value="%1$s" class="source-icon-style">
+						</div>',
+						esc_attr( $icon_style ),
+						esc_attr( $icon ),
+						esc_attr( $base )
+					);
+
 					$fld .= '</li>';
 				}
 				$fld .= '</ul>';
@@ -1263,11 +1322,11 @@ abstract class WPForms_Field {
 				$lbl = $this->field_element(
 					'label',
 					$field,
-					array(
+					[
 						'slug'    => 'choices_images_style',
 						'value'   => esc_html__( 'Image Choice Style', 'wpforms-lite' ),
 						'tooltip' => esc_html__( 'Select the style for the image choices.', 'wpforms-lite' ),
-					),
+					],
 					false
 				);
 
@@ -1275,15 +1334,15 @@ abstract class WPForms_Field {
 				$fld = $this->field_element(
 					'select',
 					$field,
-					array(
+					[
 						'slug'    => 'choices_images_style',
 						'value'   => ! empty( $field['choices_images_style'] ) ? esc_attr( $field['choices_images_style'] ) : 'modern',
-						'options' => array(
+						'options' => [
 							'modern'  => esc_html__( 'Modern', 'wpforms-lite' ),
 							'classic' => esc_html__( 'Classic', 'wpforms-lite' ),
 							'none'    => esc_html__( 'None', 'wpforms-lite' ),
-						),
-					),
+						],
+					],
 					false
 				);
 
@@ -1291,12 +1350,168 @@ abstract class WPForms_Field {
 				$output = $this->field_element(
 					'row',
 					$field,
-					array(
+					[
 						'slug'    => 'choices_images_style',
 						'content' => $lbl . $fld,
 						'class'   => ! empty( $field['choices_images'] ) ? '' : 'wpforms-hidden',
-					),
+					],
 					false
+				);
+				break;
+
+			/*
+			 * Choices Icons.
+			 */
+			case 'choices_icons':
+				// Field contents.
+				$fld = $this->field_element(
+					'toggle',
+					$field,
+					[
+						'slug'    => 'choices_icons',
+						'value'   => isset( $field['choices_icons'] ) ? '1' : '0',
+						'desc'    => esc_html__( 'Use icon choices', 'wpforms-lite' ),
+						'tooltip' => esc_html__( 'Enable this option to use icons with the choices.', 'wpforms-lite' ),
+					],
+					false
+				);
+
+				// Final field output.
+				$output = $this->field_element(
+					'row',
+					$field,
+					[
+						'slug'    => 'choices_icons',
+						'class'   => ! empty( $field['dynamic_choices'] ) ? 'wpforms-hidden' : '',
+						'content' => $fld,
+					],
+					false
+				);
+				break;
+
+			case 'choices_icons_color':
+				// Color picker.
+				$lbl = $this->field_element(
+					'label',
+					$field,
+					[
+						'slug'    => 'choices_icons_color',
+						'value'   => esc_html__( 'Icon Color', 'wpforms-lite' ),
+						'tooltip' => esc_html__( 'Select an accent color for the icon choices.', 'wpforms-lite' ),
+					],
+					false
+				);
+
+				$icon_color = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
+				$icon_color = empty( $icon_color ) ? IconChoices::DEFAULT_COLOR : $icon_color;
+
+				$fld = $this->field_element(
+					'color',
+					$field,
+					[
+						'slug'  => 'choices_icons_color',
+						'value' => $icon_color,
+						'data'  => [
+							'fallback-color' => $icon_color,
+						],
+					],
+					false
+				);
+
+				$this->field_element(
+					'row',
+					$field,
+					[
+						'slug'    => 'choices_icons_color',
+						'content' => $lbl . $fld,
+						'class'   => ! empty( $field['choices_icons'] ) ? [ 'color-picker-row' ] : [ 'color-picker-row', 'wpforms-hidden' ],
+					]
+				);
+				break;
+
+			case 'choices_icons_size':
+				// Field abel.
+				$lbl = $this->field_element(
+					'label',
+					$field,
+					[
+						'slug'    => 'choices_icons_size',
+						'value'   => esc_html__( 'Icon Size', 'wpforms-lite' ),
+						'tooltip' => esc_html__( 'Select icon size.', 'wpforms-lite' ),
+					],
+					false
+				);
+
+				$raw_icon_sizes = wpforms()->get( 'icon_choices' )->get_icon_sizes();
+				$icon_sizes     = [];
+
+				foreach ( $raw_icon_sizes as $key => $data ) {
+					$icon_sizes[ $key ] = $data['label'];
+				}
+
+				// Field contents.
+				$fld = $this->field_element(
+					'select',
+					$field,
+					[
+						'slug'    => 'choices_icons_size',
+						'value'   => ! empty( $field['choices_icons_size'] ) ? esc_attr( $field['choices_icons_size'] ) : 'large',
+						'options' => $icon_sizes,
+					],
+					false
+				);
+
+				// Final field output.
+				$this->field_element(
+					'row',
+					$field,
+					[
+						'slug'    => 'choices_icons_size',
+						'content' => $lbl . $fld,
+						'class'   => ! empty( $field['choices_icons'] ) ? '' : 'wpforms-hidden',
+					]
+				);
+				break;
+
+			case 'choices_icons_style':
+				// Field label.
+				$lbl = $this->field_element(
+					'label',
+					$field,
+					[
+						'slug'    => 'choices_icons_style',
+						'value'   => esc_html__( 'Icon Choice Style', 'wpforms-lite' ),
+						'tooltip' => esc_html__( 'Select the style for the icon choices.', 'wpforms-lite' ),
+					],
+					false
+				);
+
+				// Field contents.
+				$fld = $this->field_element(
+					'select',
+					$field,
+					[
+						'slug'    => 'choices_icons_style',
+						'value'   => ! empty( $field['choices_icons_style'] ) ? esc_attr( $field['choices_icons_style'] ) : 'default',
+						'options' => [
+							'default' => esc_html__( 'Default', 'wpforms-lite' ),
+							'modern'  => esc_html__( 'Modern', 'wpforms-lite' ),
+							'classic' => esc_html__( 'Classic', 'wpforms-lite' ),
+							'none'    => esc_html__( 'None', 'wpforms-lite' ),
+						],
+					],
+					false
+				);
+
+				// Final field output.
+				$this->field_element(
+					'row',
+					$field,
+					[
+						'slug'    => 'choices_icons_style',
+						'content' => $lbl . $fld,
+						'class'   => ! empty( $field['choices_icons'] ) ? '' : 'wpforms-hidden',
+					]
 				);
 				break;
 
@@ -1495,7 +1710,7 @@ abstract class WPForms_Field {
 					$field,
 					[
 						'slug'    => 'dynamic_choices',
-						'class'   => ! empty( $field['choices_images'] ) ? 'wpforms-hidden' : '',
+						'class'   => ! empty( $field['choices_images'] ) || ! empty( $field['choices_icons'] ) ? 'wpforms-hidden' : '',
 						'content' => $output,
 					],
 					false
@@ -1662,10 +1877,11 @@ abstract class WPForms_Field {
 			case 'choices':
 				$fields_w_choices = [ 'checkbox', 'gdpr-checkbox', 'select', 'payment-select', 'radio', 'payment-multiple', 'payment-checkbox' ];
 
-				$values  = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
-				$dynamic = ! empty( $field['dynamic_choices'] ) ? $field['dynamic_choices'] : false;
-				$total   = count( $values );
-				$values  = array_slice( $values, 0, 20 );
+				$values       = ! empty( $field['choices'] ) ? $field['choices'] : $this->defaults;
+				$dynamic      = ! empty( $field['dynamic_choices'] ) ? $field['dynamic_choices'] : false;
+				$total        = count( $values );
+				$values       = array_slice( $values, 0, 20 );
+				$inline_style = '';
 
 				/*
 				 * Check to see if this field is configured for Dynamic Choices,
@@ -1751,11 +1967,21 @@ abstract class WPForms_Field {
 				}
 
 				$list_class  = [ 'primary-input' ];
-				$with_images = empty( $field['dynamic_choices'] ) && ! empty( $field['choices_images'] );
+				$with_images = empty( $field['dynamic_choices'] ) && empty( $field['choices_icons'] ) && ! empty( $field['choices_images'] );
+				$with_icons  = empty( $field['dynamic_choices'] ) && empty( $field['choices_images'] ) && ! empty( $field['choices_icons'] );
 
 				if ( $with_images ) {
 					$list_class[] = 'wpforms-image-choices';
 					$list_class[] = 'wpforms-image-choices-' . sanitize_html_class( $field['choices_images_style'] );
+				}
+
+				if ( $with_icons ) {
+					$list_class[] = 'wpforms-icon-choices';
+					$list_class[] = sanitize_html_class( 'wpforms-icon-choices-' . $field['choices_icons_style'] );
+					$list_class[] = sanitize_html_class( 'wpforms-icon-choices-' . $field['choices_icons_size'] );
+					$icon_color   = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
+					$icon_color   = empty( $icon_color ) ? IconChoices::DEFAULT_COLOR : $icon_color;
+					$inline_style = "--wpforms-icon-choices-color: {$icon_color};";
 				}
 
 				if ( ! empty( $class ) ) {
@@ -1808,8 +2034,9 @@ abstract class WPForms_Field {
 				} else {
 					// Normal checkbox/radio-based fields.
 					$output = sprintf(
-						'<ul class="%s">',
-						wpforms_sanitize_classes( $list_class, true )
+						'<ul class="%s" style="%s">',
+						wpforms_sanitize_classes( $list_class, true ),
+						esc_attr( $inline_style )
 					);
 
 					foreach ( $values as $key => $value ) {
@@ -1825,6 +2052,10 @@ abstract class WPForms_Field {
 
 						if ( $with_images ) {
 							$item_class[] = 'wpforms-image-choices-item';
+						}
+
+						if ( $with_icons ) {
+							$item_class[] = 'wpforms-icon-choices-item';
 						}
 
 						$output .= sprintf(
@@ -1865,6 +2096,40 @@ abstract class WPForms_Field {
 							);
 
 							$output .= '<span class="wpforms-image-choices-label">' . wp_kses( $label, $allowed_tags ) . '</span>';
+
+							$output .= '</label>';
+
+						} elseif ( $with_icons ) {
+
+							$icon       = isset( $value['icon'] ) && ! wpforms_is_empty_string( $value['icon'] ) ? $value['icon'] : IconChoices::DEFAULT_ICON;
+							$icon_style = ! empty( $value['icon_style'] ) ? $value['icon_style'] : IconChoices::DEFAULT_ICON_STYLE;
+
+							if ( in_array( $field['choices_icons_style'], [ 'default', 'modern', 'classic' ], true ) ) {
+								$input_class[] = 'wpforms-screen-reader-element';
+							}
+
+							$output .= '<label>';
+
+							$output .= sprintf(
+								'<span class="wpforms-icon-choices-icon">
+									<i class="ic-fa-%s ic-fa-%s"></i>
+									<span class="wpforms-icon-choices-icon-bg"></span>
+								</span>',
+								esc_attr( $icon_style ),
+								esc_attr( $icon )
+							);
+
+							$output .= '<span class="wpforms-icon-choices-label">';
+
+							$output .= sprintf(
+								'<input type="%s" class="%s" %s readonly> %s',
+								$type,
+								wpforms_sanitize_classes( $input_class, true ),
+								$selected,
+								wp_kses( $label, $allowed_tags )
+							);
+
+							$output .= '</span>';
 
 							$output .= '</label>';
 

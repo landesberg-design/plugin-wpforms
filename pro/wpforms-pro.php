@@ -82,6 +82,7 @@ class WPForms_Pro {
 		add_action( 'wpforms_loaded', [ $this, 'objects' ], 1 );
 		add_action( 'wpforms_loaded', [ $this, 'updater' ], 30 );
 		add_action( 'wpforms_install', [ $this, 'install' ], 10 );
+		add_filter( 'wpforms_settings_license_output', [ $this, 'settings_license_callback' ] );
 		add_filter( 'wpforms_settings_tabs', [ $this, 'register_settings_tabs' ], 5, 1 );
 		add_filter( 'wpforms_settings_defaults', [ $this, 'register_settings_fields' ], 5, 1 );
 		add_action( 'wpforms_settings_init', [ $this, 'reinstall_custom_tables' ] );
@@ -307,6 +308,77 @@ class WPForms_Pro {
 		);
 
 		return array_merge( $custom, (array) $links );
+	}
+
+	/**
+	 * Override the Settings license field callback.
+	 *
+	 * @since 1.7.9
+	 *
+	 * @param string $html HTML markup for the "Lite" plugin’s license settings section.
+	 *
+	 * @return string
+	 */
+	public function settings_license_callback( $html ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity
+
+		$license      = wpforms()->get( 'license' );
+		$key          = $license->get();
+		$type         = $license->type();
+		$is_constant  = $license->get_key_location() === 'constant';
+		$has_key      = ! empty( $key );
+		$has_errors   = $has_key && $license->get_errors();
+		$is_valid_key = $has_key && ! empty( $type ) && ! $has_errors;
+		$no_refresh   = ! $has_key || $license->is_invalid() || $license->is_disabled();
+
+		// Block ui when license key used as a constant.
+		$class  = $is_constant ? 'wpforms-setting-license-block-ui' : '';
+		$output = '<span class="wpforms-setting-license-wrapper ' . $class . '">'; // Reset the original output from the Lite version.
+
+		$class   = $is_valid_key ? 'wpforms-setting-license-is-valid' : 'wpforms-setting-license-is-invalid';
+        $class   = $has_key ? $class : '';
+		$output .= '<input type="password" id="wpforms-setting-license-key" class="' . $class . '" value="' . esc_attr( $key ) . '"' . disabled( true, $has_key, false ) . '>';
+		$output .= '<i></i>';
+		$output .= '</span>';
+
+		// Offer interactions when license is not defined as a constant.
+		if ( ! $is_constant ) {
+			$class   = $has_key ? 'wpforms-hide' : '';
+			$output .= '<button id="wpforms-setting-license-key-verify" class="wpforms-btn wpforms-btn-md wpforms-btn-orange ' . $class . '">' . esc_html__( 'Verify Key', 'wpforms' ) . '</button>';
+		}
+
+		// Skip, in case license did not expire.
+		if ( $has_errors && $license->is_expired() ) {
+			$renew_url = wpforms_utm_link( 'https://wpforms.com/account/licenses/', 'settings-license', 'Renew License CTA' );
+			$output   .= '<a href="' . esc_url( $renew_url ) . '" id="wpforms-setting-license-key-renew" class="wpforms-btn wpforms-btn-md wpforms-btn-red wpforms-license-key-deactivate-remove" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Renew License', 'wpforms' ) . '</a>';
+		}
+
+		// Offer interactions when license is not defined as a constant.
+		if ( ! $is_constant ) {
+			$class   = ! $has_key ? 'wpforms-hide' : '';
+			$output .= '<button id="wpforms-setting-license-key-deactivate" class="wpforms-btn wpforms-btn-md wpforms-btn-light-grey ' . $class . '">' . esc_html__( 'Remove Key', 'wpforms' ) . '</button>';
+		}
+
+		$class   = $is_valid_key ? 'wpforms-hide' : '';
+		$output .= '<p id="wpforms-setting-license-key-info-message" class="' . $class . '">' . $license->get_info_message_escaped() . '</p>';
+
+		// If we have previously looked up the license type, display it.
+		$class   = ! $is_valid_key ? 'wpforms-hide' : '';
+		$output .= '<p class="type ' . $class . '">' .
+					sprintf( /* translators: $s - license type. */
+						esc_html__( 'Your license key level is %s.', 'wpforms' ),
+						'<strong>' . esc_html( ucwords( $type ) ) . '</strong>'
+					) .
+					'</p>';
+		$class   = $no_refresh ? 'wpforms-hide' : '';
+		$output .= '<p class="desc ' . $class . '">' .
+					sprintf( /* translators: %s - Refresh link. */
+						esc_html__( 'If your license has been upgraded or is incorrect, then please %1$sforce a refresh%2$s.', 'wpforms' ),
+						'<a href="#" id="wpforms-setting-license-key-refresh">',
+						'</a>'
+					)
+					. '</p>';
+
+		return $output;
 	}
 
 	/**
@@ -604,9 +676,13 @@ class WPForms_Pro {
 	public function form_table_columns( $columns ) {
 
 		if ( ! wpforms_current_user_can( 'view_entries' ) ) {
+			unset( $columns['entries'] );
+
 			return $columns;
 		}
 
+		// The label for the "Entries" column is already defined in the "Lite" version.
+		// The primary reason for leaving this here is to continue loading the translation equivalent associated with the PRO version text-domain.
 		$columns['entries'] = esc_html__( 'Entries', 'wpforms' );
 
 		return $columns;
@@ -950,11 +1026,19 @@ class WPForms_Pro {
 						'notifications',
 						'replyto',
 						$settings->form_data,
-						esc_html__( 'Reply-To Email Address', 'wpforms' ),
+						esc_html__( 'Reply-To', 'wpforms' ),
 						[
+							'tooltip'    => esc_html(
+								sprintf( /* translators: %s - <email@example.com>. */
+									__( 'Enter the email address or email address with recipient\'s name in "First Last %s" format.', 'wpforms' ),
+									// &#8203 is a zero-width space character. Without it, Tooltipster thinks it's an HTML tag
+									// and closes it at the end of the string, hiding everything after this value.
+									'<&#8203;email@example.com&#8203;>'
+								)
+							),
 							'smarttags'  => [
 								'type'   => 'fields',
-								'fields' => 'email',
+								'fields' => 'email,name',
 							],
 							'parent'     => 'settings',
 							'subsection' => $id,
@@ -1176,11 +1260,16 @@ class WPForms_Pro {
 						$settings->form_data,
 						esc_html__( 'Confirmation Page', 'wpforms' ),
 						[
-							'options'     => wpforms_get_pages_list(),
+							'class'       => 'wpforms-panel-field-confirmations-page-choicesjs-unflippable',
+							'options'     => wpforms_builder_form_settings_confirmation_get_pages( $settings->form_data, $field_id ),
 							'input_id'    => 'wpforms-panel-field-confirmations-page-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-page',
 							'parent'      => 'settings',
 							'subsection'  => $field_id,
+							'choicesjs'   => [
+								'use_ajax'    => true,
+								'callback_fn' => 'select_pages',
+							],
 						]
 					);
 

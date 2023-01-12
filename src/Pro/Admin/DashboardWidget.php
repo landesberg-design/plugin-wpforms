@@ -600,10 +600,12 @@ class DashboardWidget extends Widget {
 		<div class="wpforms-dash-widget-recommended-plugin-block">
 			<span class="wpforms-dash-widget-recommended-plugin">
 				<span class="recommended"><?php esc_html_e( 'Recommended Plugin:', 'wpforms' ); ?></span>
-				<span>
-					<strong><?php echo esc_html( $plugin['name'] ); ?></strong> <span class="sep">-</span>
+				<strong><?php echo esc_html( $plugin['name'] ); ?></strong>
+				<span class="sep">-</span>
+				<span class="action-links">
 					<?php if ( wpforms_can_install( 'plugin' ) ) { ?>
-						<a href="<?php echo esc_url( $install_url ); ?>"><?php esc_html_e( 'Install', 'wpforms' ); ?></a> <span class="sep sep-vertical">&vert;</span>
+						<a href="<?php echo esc_url( $install_url ); ?>"><?php esc_html_e( 'Install', 'wpforms' ); ?></a>
+						<span class="sep sep-vertical">&vert;</span>
 					<?php } ?>
 					<a href="<?php echo esc_url( $plugin['more'] ); ?>?utm_source=wpformsplugin&utm_medium=link&utm_campaign=wpformsdashboardwidget"><?php esc_html_e( 'Learn More', 'wpforms' ); ?></a>
 				</span>

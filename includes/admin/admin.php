@@ -5,6 +5,8 @@
  * @since 1.3.9
  */
 
+use WPForms\Admin\Notice;
+
 /**
  * Load styles for all WPForms-related admin screens.
  *
@@ -23,7 +25,7 @@ function wpforms_admin_styles() {
 		'jquery-confirm',
 		WPFORMS_PLUGIN_URL . 'assets/lib/jquery.confirm/jquery-confirm.min.css',
 		array(),
-		'3.3.2'
+		'3.3.4'
 	);
 
 	// Minicolors (color picker).
@@ -85,7 +87,7 @@ function wpforms_admin_scripts() {
 		'jquery-confirm',
 		WPFORMS_PLUGIN_URL . 'assets/lib/jquery.confirm/jquery-confirm.min.js',
 		[ 'jquery' ],
-		'3.3.2',
+		'3.3.4',
 		false
 	);
 
@@ -247,7 +249,7 @@ function wpforms_admin_scripts() {
 		'choicesjs_no_choices'            => $default_choicesjs_no_choices_text,
 		'choicesjs_item_select'           => $default_choicesjs_item_select_text,
 		'debug'                           => wpforms_debug(),
-		'edit_license'                    => esc_html__( 'To edit the License Key, please first click the Deactivate Key button. Please note that deactivating this key will remove access to updates, addons, and support.', 'wpforms-lite' ),
+		'edit_license'                    => esc_html__( 'To edit the License Key, please first click the Remove Key button. Please note that removing this key will remove access to updates, addons, and support.', 'wpforms-lite' ),
 		'something_went_wrong'            => esc_html__( 'Something went wrong', 'wpforms-lite' ),
 		'success'                         => esc_html__( 'Success', 'wpforms-lite' ),
 		'loading'                         => esc_html__( 'Loading...', 'wpforms-lite' ),
@@ -478,7 +480,6 @@ function wpforms_admin_upgrade_link( $medium = 'link', $content = '' ) {
 	} else {
 		$upgrade = add_query_arg(
 			[
-				'discount'     => 'LITEUPGRADE',
 				'utm_source'   => 'WordPress',
 				'utm_campaign' => 'liteplugin',
 				'utm_medium'   => $medium,
@@ -493,6 +494,60 @@ function wpforms_admin_upgrade_link( $medium = 'link', $content = '' ) {
 
 	return apply_filters( 'wpforms_upgrade_link', $upgrade );
 }
+
+/**
+ * Check the current PHP version and display a notice if on unsupported PHP.
+ *
+ * @since 1.4.0.1
+ * @since 1.5.0 Raising this awareness of old PHP version message from 5.2 to 5.3.
+ * @since 1.7.9 Raising this awareness of old PHP version message to 7.1.
+ */
+function wpforms_check_php_version() {
+
+	// Display for PHP below 7.2.
+	if ( PHP_VERSION_ID >= 70200 ) {
+		return;
+	}
+
+	// Display for admins only.
+	if ( ! is_super_admin() ) {
+		return;
+	}
+
+	// Display on Dashboard page only.
+	if ( isset( $GLOBALS['pagenow'] ) && $GLOBALS['pagenow'] !== 'index.php' ) {
+		return;
+	}
+
+	// Display the notice, finally.
+	Notice::error(
+		'<p>' .
+		sprintf(
+			wp_kses( /* translators: %1$s - WPForms plugin name; %2$s - WPForms.com URL to a related doc. */
+				__( 'Your site is running an outdated version of PHP that is no longer supported and may cause issues with %1$s. <a href="%2$s" target="_blank" rel="noopener noreferrer">Read more</a> for additional information.', 'wpforms-lite' ),
+				[
+					'a' => [
+						'href'   => [],
+						'target' => [],
+						'rel'    => [],
+					],
+				]
+			),
+			'<strong>WPForms</strong>',
+			'https://wpforms.com/docs/supported-php-version/'
+		) .
+		'<br><br><em>' .
+		wp_kses(
+			__( '<strong>Please Note:</strong> Support for PHP 7.1 and below will be discontinued soon. After this, if no further action is taken, WPForms functionality will be disabled.', 'wpforms-lite' ),
+			[
+				'strong' => [],
+				'em'     => [],
+			]
+		) .
+		'</em></p>'
+	);
+}
+add_action( 'admin_init', 'wpforms_check_php_version' );
 
 /**
  * Get an upgrade modal text.

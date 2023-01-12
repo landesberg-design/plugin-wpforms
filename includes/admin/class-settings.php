@@ -378,6 +378,9 @@ class WPForms_Settings {
 					'desc'    => esc_html__( 'Customize the background color of the HTML email template.', 'wpforms-lite' ),
 					'type'    => 'color',
 					'default' => '#e9eaec',
+					'data'    => [
+						'fallback-color' => wpforms_setting( 'email-background-color', '#e9eaec' ),
+					],
 				],
 				'email-carbon-copy'      => [
 					'id'   => 'email-carbon-copy',
@@ -583,7 +586,7 @@ class WPForms_Settings {
 
 			<?php
 			if ( wpforms()->is_pro() && class_exists( 'WPForms_License', false ) ) {
-				wpforms()->license->notices( true );
+				wpforms()->get( 'license' )->notices( true );
 			}
 			?>
 

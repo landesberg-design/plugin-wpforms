@@ -46,7 +46,7 @@ class Fields extends Education\Builder\Fields {
 		// License data.
 		$license = (array) get_option( 'wpforms_license', [] );
 
-		$is_valid = ! empty( $license['key'] )
+		$is_valid = ! empty( wpforms_get_license_key() )
 			&& ! empty( $license['type'] )
 			&& empty( $license['is_expired'] )
 			&& empty( $license['is_disabled'] )
