@@ -22,7 +22,7 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 		$this->group = 'payment';
 
 		// Define additional field properties.
-		add_filter( 'wpforms_field_properties_' . $this->type, array( $this, 'field_properties' ), 5, 3 );
+		add_filter( 'wpforms_field_properties_' . $this->type, [ $this, 'field_properties' ], 5, 3 );
 	}
 
 	/**
@@ -132,47 +132,94 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 		 * Basic field options.
 		 */
 
-		$this->field_option( 'basic-options', $field, array( 'markup' => 'open' ) );
+		$this->field_option( 'basic-options', $field, [ 'markup' => 'open' ] );
 		$this->field_option( 'label', $field );
 		$this->field_option( 'description', $field );
 
 		// Item Price.
 		$price   = ! empty( $field['price'] ) ? wpforms_format_amount( wpforms_sanitize_amount( $field['price'] ) ) : '';
 		$tooltip = esc_html__( 'Enter the price of the item, without a currency symbol.', 'wpforms' );
-		$output  = $this->field_element( 'label', $field, array( 'slug' => 'price', 'value' => esc_html__( 'Item Price', 'wpforms' ), 'tooltip' => $tooltip ), false );
+
+		$output = $this->field_element(
+			'label',
+			$field,
+			[
+				'slug'    => 'price',
+				'value'   => esc_html__( 'Item Price', 'wpforms' ),
+				'tooltip' => $tooltip,
+			],
+			false
+		);
+
 		$output .= $this->field_element(
 			'text',
 			$field,
-			array(
+			[
 				'slug'        => 'price',
 				'value'       => $price,
 				'class'       => 'wpforms-money-input',
 				'placeholder' => wpforms_format_amount( 0 ),
-			),
+			],
 			false
 		);
-		$this->field_element( 'row', $field, array( 'slug' => 'price', 'content' => $output ) );
+
+		$this->field_element(
+			'row',
+			$field,
+			[
+				'slug'    => 'price',
+				'content' => $output,
+			]
+		);
 
 		// Item Format option.
 		$format  = ! empty( $field['format'] ) ? esc_attr( $field['format'] ) : 'date-time';
 		$tooltip = esc_html__( 'Select the item type.', 'wpforms' );
-		$options = array(
+		$options = [
 			'single' => esc_html__( 'Single Item', 'wpforms' ),
 			'user'   => esc_html__( 'User Defined', 'wpforms' ),
 			'hidden' => esc_html__( 'Hidden', 'wpforms' ),
+		];
+
+		$output = $this->field_element(
+			'label',
+			$field,
+			[
+				'slug'    => 'format',
+				'value'   => esc_html__( 'Item Type', 'wpforms' ),
+				'tooltip' => $tooltip,
+			],
+			false
 		);
-		$output  = $this->field_element( 'label', $field, array( 'slug' => 'format', 'value' => esc_html__( 'Item Type', 'wpforms' ), 'tooltip' => $tooltip ), false );
-		$output .= $this->field_element( 'select', $field, array( 'slug' => 'format', 'value' => $format, 'options' => $options ), false );
-		$this->field_element( 'row', $field, array( 'slug' => 'format', 'content' => $output ) );
+
+		$output .= $this->field_element(
+			'select',
+			$field,
+			[
+				'slug'    => 'format',
+				'value'   => $format,
+				'options' => $options,
+			],
+			false
+		);
+
+		$this->field_element(
+			'row',
+			$field,
+			[
+				'slug'    => 'format',
+				'content' => $output,
+			]
+		);
 
 		$this->field_option( 'required', $field );
-		$this->field_option( 'basic-options', $field, array( 'markup' => 'close' ) );
+		$this->field_option( 'basic-options', $field, [ 'markup' => 'close' ] );
 
 		/*
 		 * Advanced field options.
 		 */
 
-		$this->field_option( 'advanced-options', $field, array( 'markup' => 'open' ) );
+		$this->field_option( 'advanced-options', $field, [ 'markup' => 'open' ] );
 		$this->field_option( 'size', $field );
 
 		$visibility = ! empty( $field['format'] ) && $field['format'] === 'user' ? '' : 'wpforms-hidden';
@@ -180,7 +227,7 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 
 		$this->field_option( 'css', $field );
 		$this->field_option( 'label_hide', $field );
-		$this->field_option( 'advanced-options', $field, array( 'markup' => 'close' ) );
+		$this->field_option( 'advanced-options', $field, [ 'markup' => 'close' ] );
 	}
 
 	/**
@@ -293,7 +340,7 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 			empty( $field_submit ) &&
 			! empty( $form_data['fields'][ $field_id ]['required'] )
 		) {
-			wpforms()->process->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
+			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
 
 			return;
 		}
@@ -301,13 +348,25 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 		// If field format is not user provided, validate the amount posted.
 		if (
 			! empty( $field_submit ) &&
-			'user' !== $form_data['fields'][ $field_id ]['format']
+			$form_data['fields'][ $field_id ]['format'] !== 'user'
 		) {
 
 			$price  = wpforms_sanitize_amount( $form_data['fields'][ $field_id ]['price'] );
 			$submit = wpforms_sanitize_amount( $field_submit );
+
 			if ( $price !== $submit ) {
-				wpforms()->process->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount mismatch', 'wpforms' );
+				wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount mismatch', 'wpforms' );
+			}
+		}
+
+		if (
+			! empty( $field_submit ) &&
+			$form_data['fields'][ $field_id ]['format'] === 'user'
+		) {
+			$submit = wpforms_sanitize_amount( $field_submit );
+
+			if ( $submit < 0 ) {
+				wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount can\'t be negative' , 'wpforms' );
 			}
 		}
 	}
@@ -333,7 +392,7 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 			$amount = wpforms_sanitize_amount( $field['price'] );
 		}
 
-		wpforms()->process->fields[ $field_id ] = array(
+		wpforms()->process->fields[ $field_id ] = [
 			'name'       => $name,
 			'value'      => wpforms_format_amount( $amount, true ),
 			'amount'     => wpforms_format_amount( $amount ),
@@ -341,7 +400,7 @@ class WPForms_Field_Payment_Single extends WPForms_Field {
 			'currency'   => wpforms_get_currency(),
 			'id'         => absint( $field_id ),
 			'type'       => $this->type,
-		);
+		];
 	}
 }
 

@@ -39,6 +39,15 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	const STYLE_MODERN = 'modern';
 
 	/**
+	 * Maximum file number.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @var int
+	 */
+	const MAX_FILE_NUM = 100;
+
+	/**
 	 * Replaceable (either in PHP or JS) template for a maximum file number.
 	 *
 	 * @since 1.5.8
@@ -63,7 +72,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 *
 	 * @var array
 	 */
-	private $denylist = array( 'ade', 'adp', 'app', 'asp', 'bas', 'bat', 'cer', 'cgi', 'chm', 'cmd', 'com', 'cpl', 'crt', 'csh', 'csr', 'dll', 'drv', 'exe', 'fxp', 'flv', 'hlp', 'hta', 'htaccess', 'htm', 'html', 'htpasswd', 'inf', 'ins', 'isp', 'jar', 'js', 'jse', 'jsp', 'ksh', 'lnk', 'mdb', 'mde', 'mdt', 'mdw', 'msc', 'msi', 'msp', 'mst', 'ops', 'pcd', 'php', 'pif', 'pl', 'prg', 'ps1', 'ps2', 'py', 'rb', 'reg', 'scr', 'sct', 'sh', 'shb', 'shs', 'sys', 'swf', 'tmp', 'torrent', 'url', 'vb', 'vbe', 'vbs', 'vbscript', 'wsc', 'wsf', 'wsf', 'wsh', 'dfxp', 'onetmp' );
+	private $denylist = [ 'ade', 'adp', 'app', 'asp', 'bas', 'bat', 'cer', 'cgi', 'chm', 'cmd', 'com', 'cpl', 'crt', 'csh', 'csr', 'dll', 'drv', 'exe', 'fxp', 'flv', 'hlp', 'hta', 'htaccess', 'htm', 'html', 'htpasswd', 'inf', 'ins', 'isp', 'jar', 'js', 'jse', 'jsp', 'ksh', 'lnk', 'mdb', 'mde', 'mdt', 'mdw', 'msc', 'msi', 'msp', 'mst', 'ops', 'pcd', 'php', 'pif', 'pl', 'prg', 'ps1', 'ps2', 'py', 'rb', 'reg', 'scr', 'sct', 'sh', 'shb', 'shs', 'sys', 'swf', 'tmp', 'torrent', 'url', 'vb', 'vbe', 'vbs', 'vbscript', 'wsc', 'wsf', 'wsf', 'wsh', 'dfxp', 'onetmp' ];
 
 	/**
 	 * Upload files helper.
@@ -562,7 +571,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		 */
 
 		// Options open markup.
-		$this->field_option( 'basic-options', $field, array( 'markup' => 'open' ) );
+		$this->field_option( 'basic-options', $field, [ 'markup' => 'open' ] );
 
 		// Label.
 		$this->field_option( 'label', $field );
@@ -574,7 +583,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$lbl = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'          => 'extensions',
 				'value'         => esc_html__( 'Allowed File Extensions', 'wpforms' ),
 				'tooltip'       => esc_html__( 'Enter the extensions you would like to allow, comma separated.', 'wpforms' ),
@@ -583,92 +592,93 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 					esc_url( wpforms_utm_link( 'https://wpforms.com/docs/a-complete-guide-to-the-file-upload-field/#file-types', 'Field Options', 'File Upload Extensions Documentation' ) ),
 					esc_html__( 'See More Details', 'wpforms' )
 				),
-			),
+			],
 			false
 		);
 		$fld = $this->field_element(
 			'text',
 			$field,
-			array(
+			[
 				'slug'  => 'extensions',
 				'value' => ! empty( $field['extensions'] ) ? $field['extensions'] : '',
-			),
+			],
 			false
 		);
 		$this->field_element(
 			'row',
 			$field,
-			array(
+			[
 				'slug'    => 'extensions',
 				'content' => $lbl . $fld,
-			)
+			]
 		);
 
 		// Max file size.
 		$lbl = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'    => 'max_size',
 				'value'   => esc_html__( 'Max File Size', 'wpforms' ),
 				/* translators: %s - max upload size. */
 				'tooltip' => sprintf( esc_html__( 'Enter the max size of each file, in megabytes, to allow. If left blank, the value defaults to the maximum size the server allows which is %s.', 'wpforms' ), wpforms_max_upload() ),
-			),
+			],
 			false
 		);
 		$fld = $this->field_element(
 			'text',
 			$field,
-			array(
+			[
 				'slug'  => 'max_size',
 				'type'  => 'number',
-				'attrs' => array(
+				'attrs' => [
 					'min'     => 1,
 					'max'     => 512,
 					'step'    => 1,
 					'pattern' => '[0-9]',
-				),
+				],
 				'value' => ! empty( $field['max_size'] ) ? abs( $field['max_size'] ) : '',
-			),
+			],
 			false
 		);
 		$this->field_element(
 			'row',
 			$field,
-			array(
+			[
 				'slug'    => 'max_size',
 				'content' => $lbl . $fld,
-			)
+			]
 		);
 
 		// Max file number.
 		$lbl = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'    => 'max_file_number',
 				'value'   => esc_html__( 'Max File Uploads', 'wpforms' ),
 				'tooltip' => esc_html__( 'Enter the max number of files to allow. If left blank, the value defaults to 1.', 'wpforms' ),
-			),
+			],
 			false
 		);
 
 		$fld = $this->field_element(
 			'text',
 			$field,
-			array(
+			[
 				'slug'  => 'max_file_number',
 				'type'  => 'number',
-				'attrs' => array(
+				'attrs' => [
 					'min'     => 1,
-					'max'     => 100,
+					'max'     => self::MAX_FILE_NUM,
 					'step'    => 1,
 					'pattern' => '[0-9]',
-				),
-				'value' => ! empty( $field['max_file_number'] ) ? absint( $field['max_file_number'] ) : 1,
-			),
+				],
+				'value' => $this->get_max_file_number( $field ),
+			],
 			false
 		);
+
 		$this->field_element(
 			'row',
 			$field,
@@ -683,38 +693,38 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$this->field_option( 'required', $field );
 
 		// Options close markup.
-		$this->field_option( 'basic-options', $field, array( 'markup' => 'close' ) );
+		$this->field_option( 'basic-options', $field, [ 'markup' => 'close' ] );
 
 		/*
 		 * Advanced field options.
 		 */
 
 		// Options open markup.
-		$this->field_option( 'advanced-options', $field, array( 'markup' => 'open' ) );
+		$this->field_option( 'advanced-options', $field, [ 'markup' => 'open' ] );
 
 		// Style.
 		$lbl = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'    => 'style',
 				'value'   => esc_html__( 'Style', 'wpforms' ),
 				'tooltip' => esc_html__( 'Modern Style supports multiple file uploads, displays a drag-and-drop upload box, and uses AJAX. Classic Style supports single file upload and displays a traditional upload button.', 'wpforms' ),
-			),
+			],
 			false
 		);
 
 		$fld = $this->field_element(
 			'select',
 			$field,
-			array(
+			[
 				'slug'    => 'style',
 				'value'   => $style,
-				'options' => array(
+				'options' => [
 					self::STYLE_MODERN  => esc_html__( 'Modern', 'wpforms' ),
 					self::STYLE_CLASSIC => esc_html__( 'Classic', 'wpforms' ),
-				),
-			),
+				],
+			],
 			false
 		);
 
@@ -778,26 +788,27 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		// Label.
 		$this->field_preview_option( 'label', $field );
 
-		$modern_classes  = array( 'wpforms-file-upload-builder-modern' );
-		$classic_classes = array( 'wpforms-file-upload-builder-classic' );
-		if ( empty( $field['style'] ) || self::STYLE_CLASSIC !== $field['style'] ) {
+		$modern_classes  = [ 'wpforms-file-upload-builder-modern' ];
+		$classic_classes = [ 'wpforms-file-upload-builder-classic' ];
+
+		if ( empty( $field['style'] ) || $field['style'] !== self::STYLE_CLASSIC ) {
 			$classic_classes[] = 'wpforms-hide';
 		} else {
 			$modern_classes[] = 'wpforms-hide';
 		}
 
 		$strings         = $this->get_strings();
-		$max_file_number = ! empty( $field['max_file_number'] ) ? max( 1, absint( $field['max_file_number'] ) ) : 1;
+		$max_file_number = $this->get_max_file_number( $field );
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo wpforms_render(
 			'fields/file-upload-backend',
-			array(
+			[
 				'max_file_number' => $max_file_number,
 				'preview_hint'    => str_replace( self::TEMPLATE_MAXFILENUM, $max_file_number, $strings['preview_hint'] ),
 				'modern_classes'  => implode( ' ', $modern_classes ),
 				'classic_classes' => implode( ' ', $classic_classes ),
-			),
+			],
 			true
 		);
 
@@ -845,7 +856,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		if ( self::is_modern_upload( $field ) ) {
 
 			$strings         = $this->get_strings();
-			$max_file_number = ! empty( $field['max_file_number'] ) ? max( 1, absint( $field['max_file_number'] ) ) : 1;
+			$max_file_number = $this->get_max_file_number( $field );
 			$input_name      = $this->get_input_name();
 			$files           = $this->sanitize_modern_files_input();
 			$value           = ! empty( $files ) ? wp_json_encode( $files ) : '';
@@ -1140,7 +1151,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			return;
 		}
 
-		$max_file_number = ! empty( $this->field_data['max_file_number'] ) ? absint( $this->field_data['max_file_number'] ) : 0;
+		$max_file_number = $this->get_max_file_number( $this->field_data );
 
 		if ( count( $files ) > $max_file_number ) {
 			wpforms()->get( 'process' )->errors[ $this->form_id ][ $this->field_id ] = str_replace(
@@ -1195,6 +1206,34 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Getting max file number.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param array $field Field data.
+	 *
+	 * @return int
+	 */
+	private function get_max_file_number( $field ) {
+
+		if ( empty( $field['max_file_number'] ) ) {
+			return 1;
+		}
+
+		$max_file_number = absint( $field['max_file_number'] );
+
+		if ( $max_file_number < 1 ) {
+			return 1;
+		}
+
+		if ( $max_file_number > self::MAX_FILE_NUM ) {
+			return self::MAX_FILE_NUM;
+		}
+
+		return $max_file_number;
 	}
 
 	/**
@@ -1569,7 +1608,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$file_user_name = sanitize_text_field( wp_unslash( $_FILES['file']['name'] ) );
 		$path           = $_FILES['file']['tmp_name']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$extension      = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
-		$errors         = wpforms_chain( array() )
+		$errors         = wpforms_chain( [] )
 			->array_merge( (array) $this->validate_basic( $error ) )
 			->array_merge( (array) $this->validate_size() )
 			->array_merge( (array) $this->validate_extension( $extension ) )
@@ -1593,11 +1632,11 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$this->clean_tmp_files();
 
 		wp_send_json_success(
-			array(
+			[
 				'name'           => $name,
 				'file'           => pathinfo( $tmp, PATHINFO_FILENAME ) . '.' . pathinfo( $tmp, PATHINFO_EXTENSION ),
 				'file_user_name' => $file_user_name,
-			)
+			]
 		);
 	}
 
@@ -1631,7 +1670,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$error     = 0;
 		$name      = sanitize_file_name( wp_unslash( $handler->get_file_name() ) );
 		$extension = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
-		$errors    = wpforms_chain( array() )
+		$errors    = wpforms_chain( [] )
 			->array_merge( (array) $this->validate_basic( $error ) )
 			->array_merge( (array) $this->validate_size( [ $handler->get_file_size() ] ) )
 			->array_merge( (array) $this->validate_extension( $extension ) )
@@ -1952,10 +1991,10 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$upload_dir = wpforms_upload_dir();
 		$folder     = absint( $this->form_data['id'] ) . '-' . wp_hash( $this->form_data['created'] . $this->form_data['id'] );
 
-		return array(
+		return [
 			'path' => trailingslashit( $upload_dir['path'] ) . $folder,
 			'url'  => trailingslashit( $upload_dir['url'] ) . $folder,
-		);
+		];
 	}
 
 	/**
@@ -2047,9 +2086,9 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wpforms_log(
 				'Upload Error, could not upload file',
 				$path_from,
-				array(
-					'type' => array( 'entry', 'error' ),
-				)
+				[
+					'type' => [ 'entry', 'error' ],
+				]
 			);
 
 			return false;

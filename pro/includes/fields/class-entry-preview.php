@@ -873,7 +873,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 
 		$is_new_field = wp_doing_ajax();
 		$notice       = ! empty( $field['preview-notice-enable'] ) && isset( $field['preview-notice'] ) && ! wpforms_is_empty_string( $field['preview-notice'] )
-			? $field['preview-notice'] : '';
+			? force_balance_tags( $field['preview-notice'] ) : '';
 		$notice       = $is_new_field || wpforms_is_empty_string( $notice ) ? self::get_default_notice() : $notice;
 		$is_disabled  = $is_new_field || ! empty( $field['preview-notice-enable'] );
 

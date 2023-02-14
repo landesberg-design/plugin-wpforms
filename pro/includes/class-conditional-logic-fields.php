@@ -39,7 +39,7 @@ class WPForms_Conditional_Logic_Fields {
 
 		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof WPForms_Conditional_Logic_Fields ) ) {
 			self::$instance = new WPForms_Conditional_Logic_Fields;
-			add_action( 'wpforms_loaded', array( self::$instance, 'init' ), 10 );
+			add_action( 'wpforms_loaded', [ self::$instance, 'init' ], 10 );
 		}
 
 		return self::$instance;
@@ -53,17 +53,17 @@ class WPForms_Conditional_Logic_Fields {
 	public function init() {
 
 		// Form builder.
-		add_action( 'wpforms_field_options_after_advanced-options', array( $this, 'builder_field_conditionals' ), 10, 2 );
+		add_action( 'wpforms_field_options_after_advanced-options', [ $this, 'builder_field_conditionals' ], 10, 2 );
 		// Site frontend.
-		add_action( 'wpforms_frontend_js', array( $this, 'frontend_assets' ) );
-		add_filter( 'wpforms_field_atts', array( $this, 'frontend_field_attributes' ), 10, 3 );
-		add_action( 'wpforms_wp_footer_end', array( $this, 'frontend_conditional_rules' ) );
+		add_action( 'wpforms_frontend_js', [ $this, 'frontend_assets' ] );
+		add_filter( 'wpforms_field_atts', [ $this, 'frontend_field_attributes' ], 10, 3 );
+		add_action( 'wpforms_wp_footer_end', [ $this, 'frontend_conditional_rules' ] );
 		// Processing.
-		add_filter( 'wpforms_process_before_form_data',             array( $this, 'process_before_form_data'          ), 10, 2 );
-		add_filter( 'wpforms_process_initial_errors',               array( $this, 'process_initial_errors'            ), 10, 2 );
-		add_action( 'wpforms_process_format_after',                 array( $this, 'process_field_visibility'          ),  5, 1 );
-		add_filter( 'wpforms_entry_email_process',                  array( $this, 'process_notification_conditionals' ), 10, 4 );
-		add_filter( 'wpforms_entry_confirmation_process',           array( $this, 'process_confirmation_conditionals' ), 10, 4 );
+		add_filter( 'wpforms_process_before_form_data',             [ $this, 'process_before_form_data' ], 10, 2 );
+		add_filter( 'wpforms_process_initial_errors',               [ $this, 'process_initial_errors' ], 10, 2 );
+		add_action( 'wpforms_process_format_after',                 [ $this, 'process_field_visibility' ],  5, 1 );
+		add_filter( 'wpforms_entry_email_process',                  [ $this, 'process_notification_conditionals' ], 10, 4 );
+		add_filter( 'wpforms_entry_confirmation_process',           [ $this, 'process_confirmation_conditionals' ], 10, 4 );
 	}
 
 	/****************************************************************
@@ -237,7 +237,7 @@ class WPForms_Conditional_Logic_Fields {
 	 */
 	public function process_before_form_data( $form_data, $entry ) {
 
-		$form_data['conditional_fields'] = array();
+		$form_data['conditional_fields'] = [];
 
 		foreach ( $form_data['fields'] as $id => $field ) {
 			if ( $this->field_is_conditional( $field ) && ! in_array( $field['type'], [ 'html', 'divider' ], true ) ) {
@@ -318,7 +318,7 @@ class WPForms_Conditional_Logic_Fields {
 					unset( wpforms()->process->errors[ $form_data['id'] ][ $field_id ] );
 				}
 
-				$allowed_keys = array( 'name', 'id', 'type' );
+				$allowed_keys = [ 'name', 'id', 'type' ];
 
 				$fields = ! empty( wpforms()->process->fields[ $field_id ] ) ? wpforms()->process->fields[ $field_id ] : false;
 
@@ -383,11 +383,11 @@ class WPForms_Conditional_Logic_Fields {
 			wpforms_log(
 				esc_html__( 'Entry Notification stopped by conditional logic.', 'wpforms' ),
 				$settings['notifications'][ $id ],
-				array(
-					'type'    => array( 'entry', 'conditional_logic' ),
+				[
+					'type'    => [ 'entry', 'conditional_logic' ],
 					'parent'  => wpforms()->process->entry_id,
 					'form_id' => $form_data['id'],
-				)
+				]
 			);
 		}
 
@@ -439,11 +439,11 @@ class WPForms_Conditional_Logic_Fields {
 			wpforms_log(
 				esc_html__( 'Entry Confirmation stopped by conditional logic.', 'wpforms' ),
 				$settings['confirmations'][ $id ],
-				array(
-					'type'    => array( 'entry', 'conditional_logic' ),
+				[
+					'type'    => [ 'entry', 'conditional_logic' ],
 					'parent'  => wpforms()->process->entry_id,
 					'form_id' => $form_data['id'],
-				)
+				]
 			);
 		}
 
@@ -488,7 +488,7 @@ class WPForms_Conditional_Logic_Fields {
 				}
 
 				if (
-					( in_array( $rule['operator'], array( 'e', '!e' ), true ) ) ||
+					( in_array( $rule['operator'], [ 'e', '!e' ], true ) ) ||
 					( isset( $rule['value'] ) && '' !== trim( $rule['value'] ) )
 				) {
 					$this->conditional_logic = true;
@@ -590,15 +590,15 @@ class WPForms_Conditional_Logic_Fields {
 		// If this boolean is not true we know there is no valid conditional
 		// logic rule so we can avoid processing all the fields again.
 		if ( ! $this->conditional_logic ) {
-			return array();
+			return [];
 		}
 
-		$conditionals = array();
+		$conditionals = [];
 
 		// Detect if an array of forms is being passed, or the form data from a
 		// single form.
 		if ( ! empty( $forms['fields'] ) ) {
-			$forms = array( $forms );
+			$forms = [ $forms ];
 		}
 
 		// Let's loop through each form on the page.
@@ -640,7 +640,7 @@ class WPForms_Conditional_Logic_Fields {
 						}
 
 						if (
-							( in_array( $rule['operator'], array( 'e', '!e' ), true ) ) ||
+							( in_array( $rule['operator'], [ 'e', '!e' ], true ) ) ||
 							( isset( $rule['value'] ) && '' !== trim( $rule['value'] ) )
 						) {
 							// Valid conditional!
@@ -650,22 +650,22 @@ class WPForms_Conditional_Logic_Fields {
 							// This special value processing is only required for
 							// non-text based fields that are not using empty checks.
 							if (
-								( ! in_array( $rule['operator'], array( 'e', '!e' ), true ) ) &&
+								( ! in_array( $rule['operator'], [ 'e', '!e' ], true ) ) &&
 								in_array(
 									$form['fields'][ $rule_field ]['type'],
-									array(
+									[
 										'select',
 										'checkbox',
 										'radio',
 										'payment-multiple',
 										'payment-checkbox',
 										'payment-select',
-									),
+									],
 									true
 								)
 							) {
 
-								if ( in_array( $form['fields'][ $rule_field ]['type'], array( 'payment-multiple', 'payment-checkbox', 'payment-select' ), true ) ) {
+								if ( in_array( $form['fields'][ $rule_field ]['type'], [ 'payment-multiple', 'payment-checkbox', 'payment-select' ], true ) ) {
 
 									// Payment items values are different, they are the actual IDs.
 									$val = $rule['value'];
@@ -714,7 +714,7 @@ class WPForms_Conditional_Logic_Fields {
 	public function clear_empty_rules( $conditionals ) {
 
 		if ( empty( $conditionals ) || ! is_array( $conditionals ) ) {
-			return array();
+			return [];
 		}
 
 		foreach ( $conditionals as $group_id => $group ) {

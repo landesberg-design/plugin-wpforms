@@ -111,7 +111,7 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 	 */
 	public function get_timespan_options() {
 
-		$default = array( 7, 30 );
+		$default = [ 7, 30 ];
 
 		$options = \apply_filters( 'wpforms_pro_admin_entries_defaultscreen_timespan_options', $default );
 		if ( ! \is_array( $options ) ) {
@@ -197,19 +197,19 @@ class DefaultScreen extends \WPForms\Pro\Admin\DashboardWidget {
 		$form_item['total_url']    = $form_item['edit_url'];
 
 		$form_item['total'] = wpforms()->entry->get_entries(
-			array(
+			[
 				'form_id' => $form_item['form_id'],
-			),
+			],
 			true
 		);
 
 		$dates = $this->get_days_interval();
 		if ( ! ( empty( $dates['start'] ) || empty( $dates['end'] ) ) ) {
 			$form_item['edit_url'] = add_query_arg(
-				array(
+				[
 					'action' => 'filter_date',
 					'date'   => $dates['start']->format( 'Y-m-d' ) . ' - ' . $dates['end']->format( 'Y-m-d' ),
-				),
+				],
 				$form_item['edit_url']
 			);
 		}

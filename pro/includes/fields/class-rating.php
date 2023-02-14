@@ -22,10 +22,10 @@ class WPForms_Rating_Text extends WPForms_Field {
 		$this->group = 'fancy';
 
 		// Define additional field properties.
-		add_filter( 'wpforms_field_properties_rating', array( $this, 'field_properties' ), 5, 3 );
+		add_filter( 'wpforms_field_properties_rating', [ $this, 'field_properties' ], 5, 3 );
 
 		// Customize value format for HTML emails.
-		add_filter( 'wpforms_html_field_value', array( $this, 'html_email_value' ), 10, 4 );
+		add_filter( 'wpforms_html_field_value', [ $this, 'html_email_value' ], 10, 4 );
 	}
 
 	/**
@@ -85,7 +85,7 @@ class WPForms_Rating_Text extends WPForms_Field {
 	 *
 	 * @return string
 	 */
-	public function html_email_value( $val, $field, $form_data = array(), $context = '' ) {
+	public function html_email_value( $val, $field, $form_data = [], $context = '' ) {
 
 		if ( ! empty( $field['value'] ) && 'rating' === $field['type'] && apply_filters( 'wpforms_rating_field_emoji', true ) ) {
 
@@ -145,9 +145,9 @@ class WPForms_Rating_Text extends WPForms_Field {
 		$this->field_option(
 			'basic-options',
 			$field,
-			array(
+			[
 				'markup' => 'open',
-			)
+			]
 		);
 
 		// Label.
@@ -160,20 +160,20 @@ class WPForms_Rating_Text extends WPForms_Field {
 		$lbl = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'    => 'scale',
 				'value'   => esc_html__( 'Scale', 'wpforms' ),
 				'tooltip' => esc_html__( 'Select rating scale', 'wpforms' ),
-			),
+			],
 			false
 		);
 		$fld = $this->field_element(
 			'select',
 			$field,
-			array(
+			[
 				'slug'    => 'scale',
 				'value'   => ! empty( $field['scale'] ) ? esc_attr( $field['scale'] ) : '5',
-				'options' => array(
+				'options' => [
 					'2'  => '2',
 					'3'  => '3',
 					'4'  => '4',
@@ -183,17 +183,17 @@ class WPForms_Rating_Text extends WPForms_Field {
 					'8'  => '8',
 					'9'  => '9',
 					'10' => '10',
-				),
-			),
+				],
+			],
 			false
 		);
 		$this->field_element(
 			'row',
 			$field,
-			array(
+			[
 				'slug'    => 'scale',
 				'content' => $lbl . $fld,
-			)
+			]
 		);
 
 		// Required toggle.
@@ -203,9 +203,9 @@ class WPForms_Rating_Text extends WPForms_Field {
 		$this->field_option(
 			'basic-options',
 			$field,
-			array(
+			[
 				'markup' => 'close',
-			)
+			]
 		);
 
 		/*
@@ -216,89 +216,89 @@ class WPForms_Rating_Text extends WPForms_Field {
 		$this->field_option(
 			'advanced-options',
 			$field,
-			array(
+			[
 				'markup' => 'open',
-			)
+			]
 		);
 
 		// Icon.
 		$lbl = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'    => 'icon',
 				'value'   => esc_html__( 'Icon', 'wpforms' ),
 				'tooltip' => esc_html__( 'Select icon to display', 'wpforms' ),
-			),
+			],
 			false
 		);
 		$fld = $this->field_element(
 			'select',
 			$field,
-			array(
+			[
 				'slug'    => 'icon',
 				'value'   => ! empty( $field['icon'] ) ? esc_attr( $field['icon'] ) : 'star',
-				'options' => array(
+				'options' => [
 					'star'   => esc_html__( 'Star', 'wpforms' ),
 					'heart'  => esc_html__( 'Heart', 'wpforms' ),
 					'thumb'  => esc_html__( 'Thumb', 'wpforms' ),
 					'smiley' => esc_html__( 'Smiley Face', 'wpforms' ),
-				),
-			),
+				],
+			],
 			false
 		);
 		$this->field_element(
 			'row',
 			$field,
-			array(
+			[
 				'slug'    => 'icon',
 				'content' => $lbl . $fld,
-			)
+			]
 		);
 
 		// Icon size.
 		$lbl = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'    => 'icon_size',
 				'value'   => esc_html__( 'Icon Size', 'wpforms' ),
 				'tooltip' => esc_html__( 'Select the size of the rating icon', 'wpforms' ),
-			),
+			],
 			false
 		);
 		$fld = $this->field_element(
 			'select',
 			$field,
-			array(
+			[
 				'slug'    => 'icon_size',
 				'value'   => ! empty( $field['icon_size'] ) ? esc_attr( $field['icon_size'] ) : 'medium',
-				'options' => array(
+				'options' => [
 					'small'  => esc_html__( 'Small', 'wpforms' ),
 					'medium' => esc_html__( 'Medium', 'wpforms' ),
 					'large'  => esc_html__( 'Large', 'wpforms' ),
-				),
-			),
+				],
+			],
 			false
 		);
 		$this->field_element(
 			'row',
 			$field,
-			array(
+			[
 				'slug'    => 'icon_size',
 				'content' => $lbl . $fld,
-			)
+			]
 		);
 
 		// Icon color picker.
 		$lbl = $this->field_element(
 			'label',
 			$field,
-			array(
+			[
 				'slug'    => 'icon_color',
 				'value'   => esc_html__( 'Icon Color', 'wpforms' ),
 				'tooltip' => esc_html__( 'Select the color for the rating icon', 'wpforms' ),
-			),
+			],
 			false
 		);
 
@@ -321,11 +321,11 @@ class WPForms_Rating_Text extends WPForms_Field {
 		$this->field_element(
 			'row',
 			$field,
-			array(
+			[
 				'slug'    => 'icon_color',
 				'content' => $lbl . $fld,
 				'class'   => 'color-picker-row',
-			)
+			]
 		);
 
 		// Custom CSS classes.
@@ -522,14 +522,14 @@ class WPForms_Rating_Text extends WPForms_Field {
 		}
 
 		// Set final field details.
-		wpforms()->process->fields[ $field_id ] = array(
+		wpforms()->process->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $value ),
 			'id'    => absint( $field_id ),
 			'type'  => $this->type,
 			'scale' => sanitize_text_field( $scale ),
 			'icon'  => sanitize_text_field( $form_data['fields'][ $field_id ]['icon'] ),
-		);
+		];
 	}
 }
 

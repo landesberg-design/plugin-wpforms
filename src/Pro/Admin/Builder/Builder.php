@@ -96,7 +96,7 @@ class Builder {
 	 */
 	public function builder_templates() {
 
-		$conditional_logic_tooltip = '<a href="https://wpforms.com/docs/how-to-use-conditional-logic-with-wpforms/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to use Conditional Logic', 'wpforms' ) . '</a>';
+		$conditional_logic_tooltip = '<a href="' . esc_url( wpforms_utm_link( 'https://wpforms.com/docs/how-to-use-conditional-logic-with-wpforms/', 'Field Options', 'Conditional Logic Documentation' ) ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to use Conditional Logic', 'wpforms' ) . '</a>';
 		?>
 
 		<!-- Confirmation block 'message' field template -->

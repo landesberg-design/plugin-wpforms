@@ -197,7 +197,7 @@ class CountryFilter {
 
 		if ( ! $this->$method( $form_data ) ) {
 			$form_id                      = ! empty( $form_data['id'] ) ? $form_data['id'] : 0;
-			$errors[ $form_id ]['header'] = $this->get_error_message( $form_data );
+			$errors[ $form_id ]['footer'] = $this->get_error_message( $form_data );
 		}
 
 		return $errors;

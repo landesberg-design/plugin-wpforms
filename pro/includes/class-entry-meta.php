@@ -28,7 +28,7 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 	 */
 	public function get_columns() {
 
-		return array(
+		return [
 			'id'       => '%d',
 			'entry_id' => '%d',
 			'form_id'  => '%d',
@@ -37,7 +37,7 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 			'status'   => '%s',
 			'data'     => '%s',
 			'date'     => '%s',
-		);
+		];
 	}
 
 	/**
@@ -47,7 +47,7 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 	 */
 	public function get_column_defaults() {
 
-		return array(
+		return [
 			'entry_id' => '',
 			'form_id'  => '',
 			'user_id'  => '',
@@ -55,7 +55,7 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 			'status'   => '',
 			'data'     => '',
 			'date'     => date( 'Y-m-d H:i:s' ),
-		);
+		];
 	}
 
 	/**
@@ -68,11 +68,11 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 	 *
 	 * @return array|int
 	 */
-	public function get_meta( $args = array(), $count = false ) {
+	public function get_meta( $args = [], $count = false ) {
 
 		global $wpdb;
 
-		$defaults = array(
+		$defaults = [
 			'number'   => 30,
 			'offset'   => 0,
 			'id'       => 0,
@@ -84,7 +84,7 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 			//'date'          => '', @todo
 			'orderby'  => 'id',
 			'order'    => 'DESC',
-		);
+		];
 
 		$args = wp_parse_args( $args, $defaults );
 

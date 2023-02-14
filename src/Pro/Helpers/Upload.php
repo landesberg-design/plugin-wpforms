@@ -208,6 +208,7 @@ class Upload {
 		$attachment_id = wp_insert_attachment(
 			[
 				'post_title'     => $this->get_wp_media_file_title( $file, $field_data ),
+				'post_name'      => isset( $file['name'] ) ? $file['name'] : '',
 				'post_content'   => $this->get_wp_media_file_desc( $file, $field_data ),
 				'post_status'    => 'publish',
 				'post_mime_type' => $file['type'],
@@ -255,9 +256,11 @@ class Upload {
 	}
 
 	/**
-	 * Generate an attachment title used in WordPress Media Library for an uploaded file.
+	 * Generate an attachment Title of a file uploaded to WordPress Media Library.
 	 *
 	 * @since 1.7.0
+	 * @since 1.8.0 Added `wpforms_pro_helpers_upload_get_wp_media_file_title`
+	 *                  and `wpforms_pro_helpers_upload_get_wp_media_file_title_{$field_type}` filters.
 	 *
 	 * @param array $file       File data.
 	 * @param array $field_data Field data.
@@ -266,20 +269,59 @@ class Upload {
 	 */
 	private function get_wp_media_file_title( $file, $field_data ) {
 
-		$field_type = $file['type'];
+		$mime_type  = $file['type'];
+		$field_type = $field_data['type'];
+		$title      = sprintf(
+			'%s: %s',
+			isset( $field_data['label'] ) ? $field_data['label'] : '',
+			sanitize_file_name( pathinfo( $file['name'], PATHINFO_FILENAME ) )
+		);
 
 		/**
-		 * Allow filtering attachment title used in WordPress Media Library for an uploaded file.
+		 * Allow filtering attachment Title of a file uploaded to WordPress Media Library.
 		 *
-		 * @since 1.6.1
+		 * @since 1.8.0
 		 *
-		 * @param string $desc       Label text.
+		 * @param string $desc       Field label text.
 		 * @param array  $file       File data.
 		 * @param array  $field_data Field data.
 		 */
 		$title = apply_filters(
-			"wpforms_field_{$field_type}_media_file_title",
-			isset( $field_data['label'] ) ? $field_data['label'] : '',
+			'wpforms_pro_helpers_upload_get_wp_media_file_title',
+			$title,
+			$file,
+			$field_data
+		);
+
+		/**
+		 * Allow filtering attachment Title of a file uploaded to WordPress Media Library.
+		 *
+		 * @since 1.6.1
+		 * @deprecated 1.8.0
+		 *
+		 * @param string $desc       Field label text.
+		 * @param array  $file       File data.
+		 * @param array  $field_data Field data.
+		 */
+		$title = apply_filters_deprecated(
+			"wpforms_field_{$mime_type}_media_file_title",
+			[ $title, $file, $field_data ],
+			'1.8.0 of the WPForms plugin',
+			'wpforms_pro_helpers_upload_get_wp_media_file_title'
+		);
+
+		/**
+		 * Allow filtering attachment Title of a file uploaded to WordPress Media Library through specific field type.
+		 *
+		 * @since 1.6.1
+		 *
+		 * @param string $desc       Field label text.
+		 * @param array  $file       File data.
+		 * @param array  $field_data Field data.
+		 */
+		$title = apply_filters(
+			"wpforms_pro_helpers_upload_get_wp_media_file_title_{$field_type}",
+			$title,
 			$file,
 			$field_data
 		);
@@ -288,9 +330,11 @@ class Upload {
 	}
 
 	/**
-	 * Generate an attachment description used in WordPress Media Library for an uploaded file.
+	 * Generate an attachment Description of a file uploaded to WordPress Media Library.
 	 *
 	 * @since 1.7.0
+	 * @since 1.8.0 Added `wpforms_pro_helpers_upload_get_wp_media_file_desc`
+	 *                  and `wpforms_pro_helpers_upload_get_wp_media_file_desc_{$field_type}` filters.
 	 *
 	 * @param array $file       File data.
 	 * @param array $field_data Field data.
@@ -299,20 +343,54 @@ class Upload {
 	 */
 	private function get_wp_media_file_desc( $file, $field_data ) {
 
-		$field_type = $file['type'];
+		$mime_type  = $file['type'];
+		$field_type = $field_data['type'];
 
 		/**
-		 * Allow filtering attachment description used in WordPress Media Library for an uploaded file.
+		 * Allow filtering attachment Description of a file uploaded to WordPress Media Library.
 		 *
-		 * @since 1.6.1
+		 * @since 1.8.0
 		 *
 		 * @param string $desc       Description text.
 		 * @param array  $file       File data.
 		 * @param array  $field_data Field data.
 		 */
 		$desc = apply_filters(
-			"wpforms_field_{$field_type}_media_file_desc",
+			'wpforms_pro_helpers_upload_get_wp_media_file_desc',
 			isset( $field_data['description'] ) ? $field_data['description'] : '',
+			$file,
+			$field_data
+		);
+
+		/**
+		 * Allow filtering attachment Description of a file uploaded to WordPress Media Library.
+		 *
+		 * @since 1.6.1
+		 * @deprecated 1.8.0
+		 *
+		 * @param string $desc       Description text.
+		 * @param array  $file       File data.
+		 * @param array  $field_data Field data.
+		 */
+		$desc = apply_filters_deprecated(
+			"wpforms_field_{$mime_type}_media_file_desc",
+			[ $desc, $file, $field_data ],
+			'1.8.0 of the WPForms plugin',
+			'wpforms_pro_helpers_upload_get_wp_media_file_desc'
+		);
+
+		/**
+		 * Allow filtering attachment Description of a file uploaded to WordPress Media Library through specific field type.
+		 *
+		 * @since 1.8.0
+		 *
+		 * @param string $desc       Description text.
+		 * @param array  $file       File data.
+		 * @param array  $field_data Field data.
+		 */
+		$desc = apply_filters(
+			"wpforms_pro_helpers_upload_get_wp_media_file_desc_{$field_type}",
+			$desc,
 			$file,
 			$field_data
 		);

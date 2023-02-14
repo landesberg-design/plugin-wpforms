@@ -47,10 +47,10 @@ class WPForms_Field_Radio extends WPForms_Field {
 		];
 
 		// Customize HTML field values.
-		add_filter( 'wpforms_html_field_value', array( $this, 'field_html_value' ), 10, 4 );
+		add_filter( 'wpforms_html_field_value', [ $this, 'field_html_value' ], 10, 4 );
 
 		// Define additional field properties.
-		add_filter( 'wpforms_field_properties_radio', array( $this, 'field_properties' ), 5, 3 );
+		add_filter( 'wpforms_field_properties_radio', [ $this, 'field_properties' ], 5, 3 );
 	}
 
 	/**
@@ -65,7 +65,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 	 *
 	 * @return string
 	 */
-	public function field_html_value( $value, $field, $form_data = array(), $context = '' ) {
+	public function field_html_value( $value, $field, $form_data = [], $context = '' ) {
 
 		// Only use HTML formatting for radio fields, with image choices
 		// enabled, and exclude the entry table display. Lastly, provides a
@@ -118,12 +118,12 @@ class WPForms_Field_Radio extends WPForms_Field {
 		}
 
 		// Set input container (ul) properties.
-		$properties['input_container'] = array(
-			'class' => array( ! empty( $field['random'] ) ? 'wpforms-randomize' : '' ),
-			'data'  => array(),
-			'attr'  => array(),
+		$properties['input_container'] = [
+			'class' => [ ! empty( $field['random'] ) ? 'wpforms-randomize' : '' ],
+			'data'  => [],
+			'attr'  => [],
 			'id'    => "wpforms-{$form_id}-field_{$field_id}",
-		);
+		];
 
 		// Set input properties.
 		foreach ( $choices as $key => $choice ) {
@@ -180,7 +180,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 			foreach ( $properties['inputs'] as $key => $inputs ) {
 				$properties['inputs'][ $key ]['container']['class'][] = 'wpforms-image-choices-item';
 
-				if ( in_array( $field['choices_images_style'], array( 'modern', 'classic' ), true ) ) {
+				if ( in_array( $field['choices_images_style'], [ 'modern', 'classic' ], true ) ) {
 					$properties['inputs'][ $key ]['class'][] = 'wpforms-screen-reader-element';
 				}
 			}
@@ -214,9 +214,9 @@ class WPForms_Field_Radio extends WPForms_Field {
 		$this->field_option(
 			'basic-options',
 			$field,
-			array(
+			[
 				'markup' => 'open',
-			)
+			]
 		);
 
 		// Label.
@@ -253,9 +253,9 @@ class WPForms_Field_Radio extends WPForms_Field {
 		$this->field_option(
 			'basic-options',
 			$field,
-			array(
+			[
 				'markup' => 'close',
-			)
+			]
 		);
 
 		/*
@@ -266,29 +266,29 @@ class WPForms_Field_Radio extends WPForms_Field {
 		$this->field_option(
 			'advanced-options',
 			$field,
-			array(
+			[
 				'markup' => 'open',
-			)
+			]
 		);
 
 		// Randomize order of choices.
 		$this->field_element(
 			'row',
 			$field,
-			array(
+			[
 				'slug'    => 'random',
 				'content' => $this->field_element(
 					'toggle',
 					$field,
-					array(
+					[
 						'slug'    => 'random',
 						'value'   => isset( $field['random'] ) ? '1' : '0',
 						'desc'    => esc_html__( 'Randomize Choices', 'wpforms-lite' ),
 						'tooltip' => esc_html__( 'Check this option to randomize the order of the choices.', 'wpforms-lite' ),
-					),
+					],
 					false
 				),
-			)
+			]
 		);
 
 		// Show Values toggle option. This option will only show if already used
@@ -297,20 +297,20 @@ class WPForms_Field_Radio extends WPForms_Field {
 			$this->field_element(
 				'row',
 				$field,
-				array(
+				[
 					'slug'    => 'show_values',
 					'content' => $this->field_element(
 						'toggle',
 						$field,
-						array(
+						[
 							'slug'    => 'show_values',
 							'value'   => isset( $field['show_values'] ) ? $field['show_values'] : '0',
 							'desc'    => esc_html__( 'Show Values', 'wpforms-lite' ),
 							'tooltip' => esc_html__( 'Check this option to manually set form field values.', 'wpforms-lite' ),
-						),
+						],
 						false
 					),
-				)
+				]
 			);
 		}
 
@@ -523,13 +523,13 @@ class WPForms_Field_Radio extends WPForms_Field {
 		$name      = sanitize_text_field( $field['label'] );
 		$value_raw = sanitize_text_field( $field_submit );
 
-		$data = array(
+		$data = [
 			'name'      => $name,
 			'value'     => '',
 			'value_raw' => $value_raw,
 			'id'        => absint( $field_id ),
 			'type'      => $this->type,
-		);
+		];
 
 		if ( 'post_type' === $dynamic && ! empty( $field['dynamic_post_type'] ) ) {
 
@@ -576,7 +576,7 @@ class WPForms_Field_Radio extends WPForms_Field {
 				// Determine choice key, this is needed for image choices.
 				foreach ( $field['choices'] as $key => $choice ) {
 					/* translators: %s - choice number. */
-					if ( $value_raw === $choice['label'] || $value_raw === sprintf( esc_html__( 'Choice %s', 'wpforms-lite' ), $key ) ) {
+					if ( $field_submit === $choice['label'] || $value_raw === sprintf( esc_html__( 'Choice %s', 'wpforms-lite' ), $key ) ) {
 						$choice_key = $key;
 						break;
 					}

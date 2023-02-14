@@ -86,7 +86,7 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 							app.licenseModal(
 								$this.data( 'name' ),
 								$this.data( 'field-name' ),
-								$this.data( 'utm-content' )
+								WPFormsEducation.core.getUTMContentValue( $this )
 							);
 							break;
 					}

@@ -48,10 +48,10 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 		];
 
 		// Customize HTML field values.
-		add_filter( 'wpforms_html_field_value', array( $this, 'field_html_value' ), 10, 4 );
+		add_filter( 'wpforms_html_field_value', [ $this, 'field_html_value' ], 10, 4 );
 
 		// Define additional field properties.
-		add_filter( 'wpforms_field_properties_payment-multiple', array( $this, 'field_properties' ), 5, 3 );
+		add_filter( 'wpforms_field_properties_payment-multiple', [ $this, 'field_properties' ], 5, 3 );
 	}
 
 	/**
@@ -66,7 +66,7 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 	 *
 	 * @return string
 	 */
-	public function field_html_value( $value, $field, $form_data = array(), $context = '' ) {
+	public function field_html_value( $value, $field, $form_data = [], $context = '' ) {
 
 		// Only use HTML formatting for payment multiple fields, with image
 		// choices enabled, and exclude the entry table display. Lastly,
@@ -111,12 +111,12 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 		unset( $properties['inputs']['primary'] );
 
 		// Set input container (ul) properties.
-		$properties['input_container'] = array(
-			'class' => array(),
-			'data'  => array(),
-			'attr'  => array(),
+		$properties['input_container'] = [
+			'class' => [],
+			'data'  => [],
+			'attr'  => [],
 			'id'    => "wpforms-{$form_id}-field_{$field_id}",
-		);
+		];
 
 		// Set input properties.
 		foreach ( $choices as $key => $choice ) {
@@ -168,7 +168,7 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 			foreach ( $properties['inputs'] as $key => $inputs ) {
 				$properties['inputs'][ $key ]['container']['class'][] = 'wpforms-image-choices-item';
 
-				if ( in_array( $field['choices_images_style'], array( 'modern', 'classic' ), true ) ) {
+				if ( in_array( $field['choices_images_style'], [ 'modern', 'classic' ], true ) ) {
 					$properties['inputs'][ $key ]['class'][] = 'wpforms-screen-reader-element';
 				}
 			}
@@ -245,9 +245,9 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 		$this->field_option(
 			'basic-options',
 			$field,
-			array(
+			[
 				'markup' => 'open',
-			)
+			]
 		);
 
 		// Label.
@@ -303,9 +303,9 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 		$this->field_option(
 			'basic-options',
 			$field,
-			array(
+			[
 				'markup' => 'close',
-			)
+			]
 		);
 
 		/*
@@ -316,9 +316,9 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 		$this->field_option(
 			'advanced-options',
 			$field,
-			array(
+			[
 				'markup' => 'open',
-			)
+			]
 		);
 
 		// Input columns.
@@ -507,7 +507,7 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 			}
 		}
 
-		wpforms()->process->fields[ $field_id ] = array(
+		wpforms()->process->fields[ $field_id ] = [
 			'name'         => $name,
 			'value'        => $value,
 			'value_choice' => $choice_label,
@@ -518,7 +518,7 @@ class WPForms_Field_Payment_Multiple extends WPForms_Field {
 			'image'        => $image,
 			'id'           => absint( $field_id ),
 			'type'         => $this->type,
-		);
+		];
 	}
 }
 

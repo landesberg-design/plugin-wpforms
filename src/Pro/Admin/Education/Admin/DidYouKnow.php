@@ -60,7 +60,7 @@ class DidYouKnow implements EducationInterface {
 
 		$this->license = wpforms_get_license_type();
 		$page          = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$page          = is_null( $page ) ? '' : $page;
+		$page          = $page === null ? '' : $page;
 		$this->page    = str_replace( 'wpforms-', '', $page );
 
 		if ( ! $this->allow_load() ) {

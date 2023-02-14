@@ -137,7 +137,7 @@ class WPForms_Pro {
 
 		// Go ahead and initialize the updater.
 		new \WPForms_Updater(
-			array(
+			[
 				'plugin_name' => 'WPForms',
 				'plugin_slug' => 'wpforms',
 				'plugin_path' => plugin_basename( WPFORMS_PLUGIN_FILE ),
@@ -145,7 +145,7 @@ class WPForms_Pro {
 				'remote_url'  => WPFORMS_UPDATER_API,
 				'version'     => WPFORMS_VERSION,
 				'key'         => $key,
-			)
+			]
 		);
 
 		// Fire a hook for Addons to register their updater since we know the key is present.
@@ -208,7 +208,7 @@ class WPForms_Pro {
 		include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 		require_once ABSPATH . 'wp-admin/includes/class-automatic-upgrader-skin.php';
 
-		$locales = array_unique( array( get_locale(), get_user_locale() ) );
+		$locales = array_unique( [ get_locale(), get_user_locale() ] );
 
 		if ( 1 === count( $locales ) && 'en_US' === $locales[0] ) {
 			return;
@@ -217,14 +217,14 @@ class WPForms_Pro {
 		$to_update = [];
 
 		foreach ( $locales as $locale ) {
-			$to_update[] = (object) array(
+			$to_update[] = (object) [
 				'type'       => 'plugin',
 				'slug'       => 'wpforms-lite',
 				'language'   => $locale,
 				'version'    => WPFORMS_VERSION,
 				'package'    => 'https://downloads.wordpress.org/translation/plugin/wpforms-lite/' . WPFORMS_VERSION . '/' . $locale . '.zip',
 				'autoupdate' => true,
-			);
+			];
 		}
 
 		$upgrader = new Language_Pack_Upgrader( new Automatic_Upgrader_Skin() );
@@ -393,13 +393,13 @@ class WPForms_Pro {
 	public function register_settings_tabs( $tabs ) {
 
 		// Add Payments tab.
-		$payments = array(
-			'payments' => array(
+		$payments = [
+			'payments' => [
 				'name'   => esc_html__( 'Payments', 'wpforms' ),
 				'form'   => true,
 				'submit' => esc_html__( 'Save Settings', 'wpforms' ),
-			),
-		);
+			],
+		];
 
 		$tabs = wpforms_array_insert( $tabs, $payments, 'validation' );
 
@@ -423,7 +423,7 @@ class WPForms_Pro {
 		wp_enqueue_style(
 			'wpforms-pro-admin',
 			WPFORMS_PLUGIN_URL . "assets/pro/css/admin{$min}.css",
-			array(),
+			[],
 			WPFORMS_VERSION
 		);
 	}
@@ -710,19 +710,19 @@ class WPForms_Pro {
 		}
 
 		$count = wpforms()->entry->get_entries(
-			array(
+			[
 				'form_id' => $form->ID,
-			),
+			],
 			true
 		);
 
 		$value = sprintf(
 			'<a href="%s">%d</a>',
 			add_query_arg(
-				array(
+				[
 					'view'    => 'list',
 					'form_id' => $form->ID,
-				),
+				],
 				admin_url( 'admin.php?page=wpforms-entries' )
 			),
 			$count
@@ -1441,7 +1441,7 @@ class WPForms_Pro {
 	 */
 	public function form_notification_footer( $text ) {
 
-		$license = get_option( 'wpforms_license', array() );
+		$license = get_option( 'wpforms_license', [] );
 
 		if (
 			empty( $license['is_expired'] ) &&
@@ -1455,13 +1455,13 @@ class WPForms_Pro {
 			wp_kses(
 				/* translators: %s - WPForms.com Account dashboard URL. */
 				__( 'Your WPForms license key has expired. In order to continue receiving support and plugin updates you must renew your license key. Please log in to <a href="%s" target="_blank" rel="noopener noreferrer">your WPForms.com account</a> to renew your license.', 'wpforms' ),
-				array(
-					'a'      => array(
-						'href'   => array(),
-						'target' => array(),
-						'rel'    => array(),
-					),
-				)
+				[
+					'a' => [
+						'href'   => [],
+						'target' => [],
+						'rel'    => [],
+					],
+				]
 			),
 			'https://wpforms.com/account/'
 		);
@@ -1493,11 +1493,11 @@ class WPForms_Pro {
 
 		global $wpdb;
 
-		$custom_tables = array(
+		$custom_tables = [
 			'wpforms_entries',
 			'wpforms_entry_fields',
 			'wpforms_entry_meta',
-		);
+		];
 
 		$tables = wpforms()->get_existing_custom_tables();
 
@@ -1580,8 +1580,8 @@ class WPForms_Pro {
 			return;
 		}
 
-		add_filter( 'plugin_auto_update_setting_html', array( $this, 'auto_update_setting_html' ), 100, 3 );
-		add_filter( 'pre_update_site_option_auto_update_plugins', array( $this, 'update_auto_update_plugins_option' ), 100, 4 );
+		add_filter( 'plugin_auto_update_setting_html', [ $this, 'auto_update_setting_html' ], 100, 3 );
+		add_filter( 'pre_update_site_option_auto_update_plugins', [ $this, 'update_auto_update_plugins_option' ], 100, 4 );
 	}
 
 	/**

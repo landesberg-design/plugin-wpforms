@@ -53,7 +53,7 @@ class LicenseAlert {
 		$this->license_type       = wpforms_get_license_type();
 		$this->license_is_expired = (bool) wpforms_setting( 'is_expired', false, 'wpforms_license' );
 
-		add_action( 'wpforms_admin_page', array( $this, 'output' ), 1 );
+		add_action( 'wpforms_admin_page', [ $this, 'output' ], 1 );
 	}
 
 	/**
@@ -71,7 +71,7 @@ class LicenseAlert {
 
 		printf(
 			'<div id="wpforms-builder-license-alert" class="wpforms-fullscreen-notice">
-				<img src="%1$s" class="sullie-icon" />
+				<img src="%1$s" class="sullie-icon" alt="WPForms Logo" />
 				<h3>%2$s</h3>
 				<p>%3$s</p>
 				<div class="wpforms-fullscreen-notice-buttons">
@@ -97,11 +97,11 @@ class LicenseAlert {
 	 *
 	 * @since 1.5.7
 	 *
-	 * @return false|array Data for output in the alert overlay.
+	 * @return array Data for output in the alert overlay.
 	 */
 	public function get_alert_data() {
 
-		$data = array();
+		$data = [];
 
 		if ( ! empty( $this->license_type ) && empty( $this->license_is_expired ) ) {
 			return $data;
@@ -109,22 +109,23 @@ class LicenseAlert {
 
 		// License is expired.
 		if ( $this->license_is_expired && ! empty( $this->license_type ) ) {
-			$data['button-primary-url']  = add_query_arg(
-				array(
+
+			$data['button-primary-url']   = add_query_arg(
+				[
 					'utm_source'   => 'WordPress',
 					'utm_medium'   => 'Form Builder Overlay',
 					'utm_campaign' => 'plugin',
 					'utm_content'  => 'Renew Now',
-				),
+				],
 				'https://wpforms.com/account/licenses/'
 			);
 			$data['button-secondary-url'] = add_query_arg(
-				array(
+				[
 					'utm_source'   => 'WordPress',
 					'utm_medium'   => 'Form Builder Overlay',
 					'utm_campaign' => 'plugin',
 					'utm_content'  => 'Learn More',
-				),
+				],
 				'https://wpforms.com/docs/how-to-renew-your-wpforms-license/'
 			);
 			$data['heading']              = __( 'Heads up! Your WPForms license has expired.', 'wpforms' );
@@ -141,18 +142,20 @@ class LicenseAlert {
 		if (
 			empty( $this->license_type ) &&
 			wp_count_posts( 'wpforms' )->publish >= 1 &&
-			isset( $_GET['view'] ) &&
-			$_GET['view'] === 'setup'
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			( ! isset( $_GET['view'] ) || $_GET['view'] === 'setup' )
 		) {
-			$query_vars['utm_content']    = 'Get WPForms Pro';
+
+			$query_vars['utm_content'] = 'Get WPForms Pro';
+
 			$data['button-primary-url']   = admin_url( 'admin.php?page=wpforms-settings' );
 			$data['button-secondary-url'] = add_query_arg(
-				array(
+				[
 					'utm_source'   => 'WordPress',
 					'utm_medium'   => 'Form Builder Overlay',
 					'utm_campaign' => 'plugin',
 					'utm_content'  => 'Learn More',
-				),
+				],
 				'https://wpforms.com/pricing/'
 			);
 			$data['heading']              = __( 'Heads up! A WPForms license key is required.', 'wpforms' );

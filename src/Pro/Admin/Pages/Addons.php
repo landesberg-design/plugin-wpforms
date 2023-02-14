@@ -310,7 +310,7 @@ class Addons {
 							],
 						]
 					),
-					'https://wpforms.com/account/'
+					esc_url( wpforms_utm_link( 'https://wpforms.com/account/', 'addons', 'Upgrade For More Addons' ) )
 				) .
 			'</p>';
 		echo '</div>';

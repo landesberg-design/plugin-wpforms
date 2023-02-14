@@ -72,12 +72,12 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		// Utilize the parent constructor to build the main class properties.
 		parent::__construct(
-			array(
+			[
 				'singular' => 'entry',
 				'plural'   => 'entries',
 				'ajax'     => false,
 				'screen'   => 'entries',
-			)
+			]
 		);
 
 		// Default number of forms to show per page.
@@ -173,7 +173,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$has_gateway   = wpforms_has_payment_gateway( $this->form_data );
 		$field_columns = $has_payments ? 2 : 3;
 
-		$columns               = array();
+		$columns               = [];
 		$columns['cb']         = '<input type="checkbox" />';
 		$columns['indicators'] = '';
 		$columns               = $this->get_columns_form_fields( $columns, $field_columns );
@@ -208,14 +208,14 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function get_sortable_columns() {
 
-		$sortable = array(
-			'entry_id'      => array( 'id', false ),
-			'notes_count'   => array( 'notes_count', false ),
-			'id'            => array( 'title', false ),
-			'date'          => array( 'date', false ),
-			'status'        => array( 'status', false ),
-			'payment_total' => array( 'payment_total', false ),
-		);
+		$sortable = [
+			'entry_id'      => [ 'id', false ],
+			'notes_count'   => [ 'notes_count', false ],
+			'id'            => [ 'title', false ],
+			'date'          => [ 'date', false ],
+			'status'        => [ 'status', false ],
+			'payment_total' => [ 'payment_total', false ],
+		];
 
 		return apply_filters( 'wpforms_entries_table_sortable', $sortable, $this->form_data );
 	}
@@ -250,13 +250,13 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 *
 	 * @return array
 	 */
-	public function get_columns_form_fields( $columns = array(), $display = 3 ) {
+	public function get_columns_form_fields( $columns = [], $display = 3 ) {
 
 		if ( empty( $this->form_data['fields'] ) ) {
-			return array();
+			return [];
 		}
 
-		$entry_columns = wpforms()->form->get_meta( $this->form_id, 'entry_columns', array( 'cap' => 'view_entries_form_single' ) );
+		$entry_columns = wpforms()->form->get_meta( $this->form_id, 'entry_columns', [ 'cap' => 'view_entries_form_single' ] );
 
 		/*
 		 * Display those columns that were selected by a user.
@@ -638,14 +638,14 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 
-		return array(
+		return [
 			'read'   => esc_html__( 'Mark Read', 'wpforms' ),
 			'unread' => esc_html__( 'Mark Unread', 'wpforms' ),
 			'star'   => esc_html__( 'Star', 'wpforms' ),
 			'unstar' => esc_html__( 'Unstar', 'wpforms' ),
 			'null'   => esc_html__( '----------', 'wpforms' ),
 			'delete' => esc_html__( 'Delete', 'wpforms' ),
-		);
+		];
 	}
 
 	/**
@@ -686,7 +686,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$ids = isset( $_GET['entry_id'] ) ? wp_unslash( $_GET['entry_id'] ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( ! is_array( $ids ) ) {
-			$ids = array( $ids );
+			$ids = [ $ids ];
 		}
 
 		$ids = array_map( 'absint', $ids );
@@ -697,14 +697,14 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		// Get entries, that would be affected.
 		$entries_list = wpforms()->entry->get_entries(
-			array(
+			[
 				'entry_id'    => $ids,
 				'is_filtered' => true,
 				'number'      => $this->get_items_per_page( 'wpforms_entries_per_page', $this->per_page ),
-			)
+			]
 		);
 
-		$sendback = remove_query_arg( array( 'read', 'unread', 'starred', 'unstarred', 'deleted' ) );
+		$sendback = remove_query_arg( [ 'read', 'unread', 'starred', 'unstarred', 'deleted' ] );
 
 		switch ( $doaction ) {
 			// Mark as read.
@@ -733,7 +733,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 				break;
 		}
 
-		$sendback = remove_query_arg( array( 'action', 'action2', 'entry_id' ), $sendback );
+		$sendback = remove_query_arg( [ 'action', 'action2', 'entry_id' ], $sendback );
 
 		wp_safe_redirect( $sendback );
 		exit();
@@ -774,21 +774,21 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 			$success = wpforms()->entry->update(
 				$id,
-				array(
+				[
 					'viewed' => '1',
-				)
+				]
 			);
 
 			if ( $success ) {
 
 				wpforms()->entry_meta->add(
-					array(
+					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
 						'user_id'  => $user_id,
 						'type'     => 'log',
 						'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry read.', 'wpforms' ) ) ),
-					),
+					],
 					'entry_meta'
 				);
 
@@ -834,20 +834,20 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 			$success = wpforms()->entry->update(
 				$id,
-				array(
+				[
 					'viewed' => '0',
-				)
+				]
 			);
 
 			if ( $success ) {
 				wpforms()->entry_meta->add(
-					array(
+					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
 						'user_id'  => $user_id,
 						'type'     => 'log',
 						'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry unread.', 'wpforms' ) ) ),
-					),
+					],
 					'entry_meta'
 				);
 
@@ -893,20 +893,20 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 			$success = wpforms()->entry->update(
 				$id,
-				array(
+				[
 					'starred' => '1',
-				)
+				]
 			);
 
 			if ( $success ) {
 				wpforms()->entry_meta->add(
-					array(
+					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
 						'user_id'  => $user_id,
 						'type'     => 'log',
 						'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry starred.', 'wpforms' ) ) ),
-					),
+					],
 					'entry_meta'
 				);
 
@@ -952,20 +952,20 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 			$success = wpforms()->entry->update(
 				$id,
-				array(
+				[
 					'starred' => '0',
-				)
+				]
 			);
 
 			if ( $success ) {
 				wpforms()->entry_meta->add(
-					array(
+					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
 						'user_id'  => $user_id,
 						'type'     => 'log',
 						'data'     => wpautop( sprintf( '<em>%s</em>', esc_html__( 'Entry unstarred.', 'wpforms' ) ) ),
-					),
+					],
 					'entry_meta'
 				);
 
@@ -1007,16 +1007,16 @@ class WPForms_Entries_Table extends WP_List_Table {
 	protected function display_bulk_action_message() {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$bulk_counts = array(
+		$bulk_counts = [
 			'read'      => isset( $_REQUEST['read'] ) ? absint( $_REQUEST['read'] ) : 0,
 			'unread'    => isset( $_REQUEST['unread'] ) ? absint( $_REQUEST['unread'] ) : 0,
 			'starred'   => isset( $_REQUEST['starred'] ) ? absint( $_REQUEST['starred'] ) : 0,
 			'unstarred' => isset( $_REQUEST['unstarred'] ) ? absint( $_REQUEST['unstarred'] ) : 0,
 			'deleted'   => isset( $_REQUEST['deleted'] ) ? (int) $_REQUEST['deleted'] : 0,
-		);
+		];
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-		$bulk_messages = array(
+		$bulk_messages = [
 			/* translators: %d - number of processed entries. */
 			'read'      => _n( '%d entry was successfully marked as read.', '%d entries were successfully marked as read.', $bulk_counts['read'] ),
 			/* translators: %d - number of processed entries. */
@@ -1027,9 +1027,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 			'unstarred' => _n( '%d entry was successfully unstarred.', '%d entries were successfully unstarred.', $bulk_counts['unstarred'] ),
 			/* translators: %d - number of processed entries. */
 			'deleted'   => _n( '%d entry was successfully deleted.', '%d entries were successfully deleted.', $bulk_counts['deleted'] ),
-		);
+		];
 
-		if ( -1 === $bulk_counts['deleted'] ) {
+		if ( $bulk_counts['deleted'] === -1 ) {
 			$bulk_messages['deleted'] = esc_html__( 'All entries for the currently selected form were successfully deleted.', 'wpforms' );
 		}
 
@@ -1037,7 +1037,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$bulk_counts = array_filter( $bulk_counts );
 
 		// If we have bulk messages to display.
-		$messages = array();
+		$messages = [];
+
 		foreach ( $bulk_counts as $type => $count ) {
 			if ( isset( $bulk_messages[ $type ] ) ) {
 				$messages[] = sprintf( $bulk_messages[ $type ], $count );

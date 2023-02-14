@@ -399,7 +399,7 @@ class WPForms_Field_Password extends WPForms_Field {
 		// Define data.
 		$confirmation = ! empty( $field['confirmation'] );
 		$primary      = $field['properties']['inputs']['primary'];
-		$secondary    = ! empty( $field['properties']['inputs']['secondary'] ) ? $field['properties']['inputs']['secondary'] : array();
+		$secondary    = ! empty( $field['properties']['inputs']['secondary'] ) ? $field['properties']['inputs']['secondary'] : [];
 
 		// Standard password field.
 		if ( ! $confirmation ) {
@@ -524,12 +524,12 @@ class WPForms_Field_Password extends WPForms_Field {
 		$name = ! empty( $form_data['fields'][ $field_id ] ['label'] ) ? $form_data['fields'][ $field_id ]['label'] : '';
 
 		// Set final field details.
-		wpforms()->process->fields[ $field_id ] = array(
+		wpforms()->process->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $value ),
 			'id'    => absint( $field_id ),
 			'type'  => $this->type,
-		);
+		];
 	}
 
 	/**

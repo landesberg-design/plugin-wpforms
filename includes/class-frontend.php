@@ -84,6 +84,7 @@ class WPForms_Frontend {
 
 		// Filters.
 		add_filter( 'amp_skip_post', [ $this, 'amp_skip_post' ] );
+		add_filter( 'script_loader_tag',  [ $this, 'set_defer_attribute' ], 10, 3 );
 
 		// Actions.
 		add_action( 'wpforms_frontend_output_success', [ $this, 'confirmation' ], 10, 3 );
@@ -464,7 +465,7 @@ class WPForms_Frontend {
 	 * @param array $fields    Sanitized field data.
 	 * @param int   $entry_id  Entry id.
 	 */
-	public function confirmation( $form_data, $fields = array(), $entry_id = 0 ) {
+	public function confirmation( $form_data, $fields = [], $entry_id = 0 ) {
 
 		$class = intval( wpforms_setting( 'disable-css', '1' ) ) === 1 ? 'wpforms-confirmation-container-full' : 'wpforms-confirmation-container';
 
@@ -477,7 +478,7 @@ class WPForms_Frontend {
 		}
 
 		if ( empty( $fields ) ) {
-			$fields = ! empty( $_POST['wpforms']['complete'] ) ? $_POST['wpforms']['complete'] : array();
+			$fields = ! empty( $_POST['wpforms']['complete'] ) ? $_POST['wpforms']['complete'] : [];
 		}
 
 		if ( empty( $entry_id ) ) {
@@ -795,7 +796,7 @@ class WPForms_Frontend {
 	 *
 	 * @return array
 	 */
-	public function get_field_properties( $field, $form_data, $attributes = array() ) {
+	public function get_field_properties( $field, $form_data, $attributes = [] ) {
 
 		if ( empty( $attributes ) ) {
 			$attributes = $this->get_field_attributes( $field, $form_data );
@@ -1127,6 +1128,26 @@ class WPForms_Frontend {
 			$data['size'] = 'invisible';
 		}
 
+		if ( $captcha_settings['provider'] === 'turnstile' ) {
+
+			/**
+			 * Filter Turnstile action value.
+			 *
+			 * @since 1.8.0
+			 *
+			 * @param string $action    Action value. Can only contain up to 32 alphanumeric characters including _ and -.
+			 * @param array  $form_data Form data and settings.
+			 */
+			$data['action'] = apply_filters(
+				'wpforms_frontend_recaptcha_turnstile_action',
+				sprintf( /* translators: %d - Current Form ID. */
+					esc_html__( 'FormID-%d', 'wpforms-lite' ),
+					$form_data['id']
+				),
+				$form_data
+			);
+		}
+
 		printf(
 			'<div class="wpforms-recaptcha-container wpforms-is-%s"%s>',
 			sanitize_html_class( $captcha_settings['provider'] ),
@@ -1135,7 +1156,7 @@ class WPForms_Frontend {
 
 		echo '<div ' . wpforms_html_attributes( '', [ 'g-recaptcha' ], $data ) . '></div>';
 
-		if ( $captcha_settings['provider'] === 'hcaptcha' || $captcha_settings['recaptcha_type'] !== 'invisible' ) {
+		if ( ! ( $captcha_settings['provider'] === 'gcaptcha' && $captcha_settings['recaptcha_type'] === 'invisible' ) ) {
 			echo '<input type="text" name="g-recaptcha-hidden" class="wpforms-recaptcha-hidden" style="position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;" required>';
 		}
 
@@ -1579,8 +1600,22 @@ class WPForms_Frontend {
 		}
 
 		$is_recaptcha_v3 = $captcha_settings['provider'] === 'recaptcha' && $captcha_settings['recaptcha_type'] === 'v3';
-		$captcha_api     = 'hcaptcha' === $captcha_settings['provider'] ? 'https://hcaptcha.com/1/api.js?onload=wpformsRecaptchaLoad&render=explicit' : apply_filters( 'wpforms_frontend_recaptcha_url', 'https://www.google.com/recaptcha/api.js?onload=wpformsRecaptchaLoad&render=explicit' ); // BC: reCAPTCHA v3 don't filtered.
-		$captcha_api     = $is_recaptcha_v3 ? 'https://www.google.com/recaptcha/api.js?render=' . $captcha_settings['site_key'] : $captcha_api;
+		$recaptcha_url   = $is_recaptcha_v3 ?
+			'https://www.google.com/recaptcha/api.js?render=' . $captcha_settings['site_key'] :
+			/**
+			 * For backward compatibility reason we have to filter only the v2 reCAPTCHA.
+			 *
+			 * @since 1.4.0
+			 *
+			 * @param string $url The reCaptcha v2 URL.
+			 */
+			apply_filters( 'wpforms_frontend_recaptcha_url', 'https://www.google.com/recaptcha/api.js?onload=wpformsRecaptchaLoad&render=explicit' );
+
+		$captcha_api_array = [
+			'hcaptcha'  => 'https://hcaptcha.com/1/api.js?onload=wpformsRecaptchaLoad&render=explicit',
+			'recaptcha' => $recaptcha_url,
+			'turnstile' => 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=wpformsRecaptchaLoad&render=explicit',
+		];
 
 		/**
 		 * Filter the CAPTCHA API URL.
@@ -1589,7 +1624,7 @@ class WPForms_Frontend {
 		 *
 		 * @param string $captcha_api The CAPTCHA API URL.
 		 */
-		$captcha_api = apply_filters( 'wpforms_frontend_captcha_api', $captcha_api );
+		$captcha_api = apply_filters( 'wpforms_frontend_captcha_api', $captcha_api_array[ $captcha_settings['provider'] ] );
 
 		wp_enqueue_script(
 			'wpforms-recaptcha',
@@ -1648,6 +1683,18 @@ class WPForms_Frontend {
 			};
 		';
 
+		// Update container class after changing Turnstile type.
+		$turnstile_update_class = /** @lang JavaScript */
+			'var turnstileUpdateContainer = function (el) {
+				let form = el.closest( "form" ),
+				iframeHeight = el.getElementsByTagName("iframe")[0].style.height;
+				
+				parseInt(iframeHeight) === 0 ? 
+					form.querySelector(".wpforms-is-turnstile").classList.add( "wpforms-is-turnstile-invisible" ) :
+					form.querySelector(".wpforms-is-turnstile").classList.remove( "wpforms-is-turnstile-invisible" );
+			};
+		';
+
 		// Captcha callback, used by hCaptcha and checkbox reCaptcha v2.
 		$callback = /** @lang JavaScript */
 			'var wpformsRecaptchaCallback = function (el) {
@@ -1676,6 +1723,37 @@ class WPForms_Frontend {
 						el.setAttribute("data-recaptcha-id", captchaID);
 					});
 					wpformsDispatchEvent(document, "wpformsRecaptchaLoaded", true);
+				};
+			';
+
+			return $data;
+		}
+
+		if ( $captcha_settings['provider'] === 'turnstile' ) {
+
+			$data  = $dispatch;
+			$data .= $callback;
+			$data .= $turnstile_update_class;
+
+			$data .= /** @lang JavaScript */
+				'var wpformsRecaptchaLoad = function () {
+					Array.prototype.forEach.call(document.querySelectorAll(".g-recaptcha"), function (el) {
+						let form = el.closest( "form" ),
+						formId = form.dataset.formid,
+						captchaID = turnstile.render(el, {
+							theme: "' . $captcha_settings['theme'] . '",
+							callback: function () {
+								turnstileUpdateContainer(el);
+								wpformsRecaptchaCallback(el);
+							},
+							"timeout-callback": function() {
+								turnstileUpdateContainer(el);
+							}
+						});
+						el.setAttribute("data-recaptcha-id", captchaID);
+					});
+					
+					wpformsDispatchEvent( document, "wpformsRecaptchaLoaded", true );
 				};
 			';
 
@@ -1756,6 +1834,32 @@ class WPForms_Frontend {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Cloudflare Turnstile captcha requires defer attribute.
+	 *
+	 * @since 1.8.0
+	 *
+	 * @param string $tag    HTML for the script tag.
+	 * @param string $handle Handle of script.
+	 * @param string $src    Src of script.
+	 *
+	 * @return string
+	 */
+	public function set_defer_attribute( $tag, $handle, $src ) {
+
+		$captcha_settings = wpforms_get_captcha_settings();
+
+		if ( $captcha_settings['provider'] !== 'turnstile' ) {
+			return $tag;
+		}
+
+		if ( $handle !== 'wpforms-recaptcha' ) {
+			return $tag;
+		}
+
+		return str_replace( ' src', ' defer src', $tag );
 	}
 
 	/**
@@ -1870,8 +1974,8 @@ class WPForms_Frontend {
 			'gdpr'                       => wpforms_setting( 'gdpr' ),
 			'ajaxurl'                    => admin_url( 'admin-ajax.php' ),
 			'mailcheck_enabled'          => (bool) apply_filters( 'wpforms_mailcheck_enabled', true ),
-			'mailcheck_domains'          => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_domains', array() ) ),
-			'mailcheck_toplevel_domains' => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_toplevel_domains', array( 'dev' ) ) ),
+			'mailcheck_domains'          => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_domains', [] ) ),
+			'mailcheck_toplevel_domains' => array_map( 'sanitize_text_field', (array) apply_filters( 'wpforms_mailcheck_toplevel_domains', [ 'dev' ] ) ),
 			'is_ssl'                     => is_ssl(),
 			'page_title'                 => wpforms_process_smart_tags( '{page_title}', [], [], '' ),
 			'page_id'                    => wpforms_process_smart_tags( '{page_id}', [], [], '' ),

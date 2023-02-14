@@ -60,7 +60,7 @@ class ImportEntriesTask {
 			->once( time() + 15 )
 			->register();
 
-		if ( is_null( $action_id ) ) {
+		if ( $action_id === null ) {
 			wpforms_log(
 				'Lite Connect: error creating the AS task',
 				[

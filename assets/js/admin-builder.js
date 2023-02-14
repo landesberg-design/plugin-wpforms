@@ -2008,9 +2008,11 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			// Real-time updates for "Size" field option
 			$builder.on( 'change', '.wpforms-field-option-row-size select', function( e ) {
+
 				var $this = $( this ),
 					value = $this.val(),
 					id = $this.parent().data( 'field-id' );
+
 				$( '#wpforms-field-' + id ).removeClass( 'size-small size-medium size-large' ).addClass( 'size-' + value );
 			} );
 
@@ -2072,13 +2074,66 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				}
 			} );
 
+			// Real-time updates for "Confirmation Placeholder" field option
+			$builder.on( 'input', '.wpforms-field-option-row-confirmation_placeholder input', function( e ) {
+
+				const $this = $( this );
+				const value = $this.val();
+				const id = $this.parent().data( 'field-id' );
+
+				$( '#wpforms-field-' + id ).find( '.secondary-input' ).attr( 'placeholder', value );
+			} );
+
+			// Real-time updates for Date/Time, and Name "Placeholder" field options
+			$builder.on( 'input', '.wpforms-field-option .format-selected input.placeholder', function() {
+
+				const $this           = $( this );
+				const value           = $this.val();
+				const $fieldOptionRow = $this.closest( '.wpforms-field-option-row' );
+				const id              = $fieldOptionRow.data( 'field-id' );
+				const subfield        = $fieldOptionRow.data( 'subfield' );
+
+				$( '#wpforms-field-' + id ).find( '.wpforms-' + subfield + ' input' ).attr( 'placeholder', value );
+			} );
+
+			// Real-time updates for Address field "Placeholder" field options.
+			$builder.on( 'input', '.wpforms-field-option-address input.placeholder', function() {
+
+				const $this            = $( this );
+				const $fieldOptionRow  = $this.closest( '.wpforms-field-option-row' );
+				const id               = $fieldOptionRow.data( 'field-id' );
+				const subfield         = $fieldOptionRow.data( 'subfield' );
+				const $fieldPreviews   = $( '#wpforms-field-' + id + ' .wpforms-' + subfield ).find( 'input, select' );
+				const $default         = $fieldOptionRow.find( '#wpforms-field-option-' + id + '-' + subfield + '_default' );
+				const defaultValue     = $default.val();
+				const defaultText      = $default.find( 'option:selected' ).text();
+
+				let placeholderValue = $this.val();
+
+				$fieldPreviews.each( function() {
+
+					const $fieldPreview = $( this );
+
+					if ( $fieldPreview.is( 'select' ) ) {
+						const $option = $fieldPreview.find( '.placeholder' );
+						const value   = defaultValue === '' && placeholderValue !== '' ? placeholderValue : defaultText;
+
+						$option.text( value );
+
+						return;
+					}
+
+					$fieldPreview.attr( 'placeholder', placeholderValue );
+				} );
+			} );
+
 			// Real-time updates for "Default" field option.
 			$builder.on( 'input', '.wpforms-field-option-row-default_value input', function() {
 
-				const $this = $( this ),
-					value = wpf.sanitizeHTML( $this.val() ),
-					id = $this.closest( '.wpforms-field-option-row' ).data( 'field-id' ),
-					$preview = $( `#wpforms-field-${id} .primary-input` );
+				const $this  = $( this );
+				const value    = wpf.sanitizeHTML( $this.val() );
+				const id       = $this.closest( '.wpforms-field-option-row' ).data( 'field-id' );
+				const $preview = $( '#wpforms-field-' + id + ' .primary-input' );
 
 				$preview.val( value );
 			} );
@@ -2086,14 +2141,33 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			// Real-time updates for "Default" field option of the Name and Address fields.
 			$builder.on( 'input', '.wpforms-field-options-column input.default', function() {
 
-				const $this = $( this ),
-					value = wpf.sanitizeHTML( $this.val() ),
-					$row = $this.closest( '.wpforms-field-option-row' ),
-					id = $row.data( 'field-id' ),
-					subfield = $row.data( 'subfield' ),
-					$preview = $( `#wpforms-field-${id} .wpforms-${subfield} input` );
+				const $this           = $( this );
+				const value           = wpf.sanitizeHTML( $this.val() );
+				const $fieldOptionRow = $this.closest( '.wpforms-field-option-row' );
+				const id              = $fieldOptionRow.data( 'field-id' );
+				const subfield        = $fieldOptionRow.data( 'subfield' );
+				const $fieldPreview   = $( '#wpforms-field-' + id + ' .wpforms-' + subfield + ' input' );
 
-				$preview.val( value );
+				$fieldPreview.val( value );
+			} );
+
+			// Real-time updates for "Default" select field option of the Address field.
+			$builder.on( 'change', '.wpforms-field-option-address select.default', function() {
+
+				const $this            = $( this );
+				const value            = $this.val();
+				const textValue        = $this.find( 'option:selected' ).text();
+				const $fieldOptionRow  = $this.closest( '.wpforms-field-option-row' );
+				const id               = $fieldOptionRow.data( 'field-id' );
+				const subfield         = $fieldOptionRow.data( 'subfield' );
+				const scheme           = $( '#wpforms-field-option-' + id + '-scheme' ).val();
+				const $placeholder     = $fieldOptionRow.find( '#wpforms-field-option-' + id + '-' + subfield + '_placeholder' );
+				const placeholderValue = $placeholder.val();
+				const $fieldPreview    = $( '#wpforms-field-' + id + ' .wpforms-address-scheme-' + scheme + ' .wpforms-' + subfield + ' .placeholder' );
+
+				value === '' && placeholderValue.trim().length > 0 ?
+					$fieldPreview.text( placeholderValue ) :
+					$fieldPreview.text( textValue );
 			} );
 
 			// Real-time updates for "Confirmation Placeholder" field option
@@ -2107,12 +2181,14 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			// Real-time updates for "Hide Label" field option.
 			$builder.on( 'change', '.wpforms-field-option-row-label_hide input', function( e ) {
 				var id = $( this ).closest( '.wpforms-field-option-row' ).data( 'field-id' );
+
 				$( '#wpforms-field-' + id ).toggleClass( 'label_hide' );
 			} );
 
 			// Real-time updates for Sub Label visibility field option.
 			$builder.on( 'change', '.wpforms-field-option-row-sublabel_hide input', function( e ) {
 				var id = $( this ).closest( '.wpforms-field-option-row' ).data( 'field-id' );
+
 				$( '#wpforms-field-' + id ).toggleClass( 'sublabel_hide' );
 			} );
 
@@ -2145,31 +2221,37 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			// Real-time updates specific for Address "Scheme" option
 			$builder.on( 'change', '.wpforms-field-option-row-scheme select', function( e ) {
-				var $this = $( this ),
-					value = $this.val(),
-					id = $this.parent().data( 'field-id' ),
-					$field = $( '#wpforms-field-' + id );
 
-				$field.find( '.wpforms-address-scheme' ).addClass( 'wpforms-hide' );
-				$field.find( '.wpforms-address-scheme-' + value ).removeClass( 'wpforms-hide' );
+				const $this   = $( this );
+				const value   = $this.val();
+				const fieldId = $this.parent().data( 'field-id' );
 
-				if ( $field.find( '.wpforms-address-scheme-' + value + ' .wpforms-country' ).children().length == 0 ) {
-					$( '#wpforms-field-option-' + id ).find( '.wpforms-field-option-row-country' ).addClass( 'wpforms-hidden' );
-				} else {
-					$( '#wpforms-field-option-' + id ).find( '.wpforms-field-option-row-country' ).removeClass( 'wpforms-hidden' );
-				}
-			} );
+				const $fieldPreview  = $( `#wpforms-field-${fieldId}` );
+				const $stateOption   = $( `#wpforms-field-option-row-${fieldId}-state` );
+				const $countryOption = $( `#wpforms-field-option-row-${fieldId}-country` );
 
-			// Real-time updates for Address, Date/Time, and Name "Placeholder" field options
-			$builder.on( 'input', '.wpforms-field-option .format-selected input.placeholder, .wpforms-field-option-address input.placeholder', function( e ) {
+				// Switch the scheme in Preview panel.
+				$fieldPreview.find( '.wpforms-address-scheme' ).addClass( 'wpforms-hide' );
+				$fieldPreview.find( `.wpforms-address-scheme-${value}` ).removeClass( 'wpforms-hide' );
 
-				var $this = $( this ),
-					value = $this.val(),
-					$fieldOptionRow = $this.closest( '.wpforms-field-option-row' ),
-					id = $fieldOptionRow.data( 'field-id' ),
-					subfield = $fieldOptionRow.data( 'subfield' );
+				// Show or hide country option depending on the scheme.
+				const $countryPreviewField = $fieldPreview.find( `.wpforms-address-scheme-${value} .wpforms-country select, .wpforms-address-scheme-${value} .wpforms-country input` );
 
-				$( '#wpforms-field-' + id ).find( '.wpforms-' + subfield + ' input' ).attr( 'placeholder', value );
+				$countryPreviewField.length === 0 ?
+					$countryOption.addClass( 'wpforms-hidden' ) :
+					$countryOption.removeClass( 'wpforms-hidden' );
+
+				// Inputs/selects for currently selected scheme and the one that we're changing to.
+				const $currentState   = $stateOption.find( '.default .default' ).not( '.wpforms-hidden-strict' );
+				const $newState       = $stateOption.find( `.default [data-scheme="${value}"]` );
+				const $currentCountry = $countryOption.find( '.default .default' ).not( '.wpforms-hidden-strict' );
+				const $newCountry     = $countryOption.find( `.default [data-scheme="${value}"]` );
+
+				// Switch the state field type in options to match the scheme.
+				$newState.attr( {id: $currentState.attr( 'id' ), name: $currentState.attr( 'name' ) } ).removeClass( 'wpforms-hidden-strict' );
+				$currentState.attr( { id: '', name: '' } ).addClass( 'wpforms-hidden-strict' );
+				$newCountry.attr( {id: $currentCountry.attr( 'id' ), name: $currentCountry.attr( 'name' ) } ).removeClass( 'wpforms-hidden-strict' );
+				$currentCountry.attr( { id: '', name: '' } ).addClass( 'wpforms-hidden-strict' );
 			} );
 
 			// Real-time updates for Date/Time date type
@@ -3316,6 +3398,9 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			const $field          = $( `#wpforms-field-${id}` ),
 				$fieldOptions     = $( `#wpforms-field-option-${id}` ),
+				$fieldActive      = elements.$sortableFieldsWrap.find( '>.active' ),
+				$visibleOptions   = elements.$fieldOptions.find( '>:visible' ),
+				$visibleTab       = $visibleOptions.find( '>.active' ),
 				type              = $field.data( 'field-type' ),
 				fieldOptionsClass = $fieldOptions.attr( 'class' ),
 				isModernDropdown  = app.dropdownField.helpers.isModernSelect( $field.find( '> .choices .primary-input' ) );
@@ -3349,7 +3434,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			// Toggle visibility states.
 			$field.after( $newField );
-			$field.removeClass( 'active' );
+			$fieldActive.removeClass( 'active' );
 			$newField.addClass( 'active' ).attr( {
 				'id'           : `wpforms-field-${newFieldID}`,
 				'data-field-id': newFieldID,
@@ -3367,10 +3452,25 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			newFieldOptions = newFieldOptions.replace( regex.elementID, regex.elementIdReplace );
 
 			// Add new field options panel.
-			$fieldOptions.hide()
-				.after( `<div class="${fieldOptionsClass}" id="wpforms-field-option-${newFieldID}" data-field-id="${newFieldID}">${newFieldOptions}</div>` );
+			$visibleOptions.hide();
+			$fieldOptions.after( `<div class="${fieldOptionsClass}" id="wpforms-field-option-${newFieldID}" data-field-id="${newFieldID}">${newFieldOptions}</div>` );
 
 			const $newFieldOptions = $( `#wpforms-field-option-${newFieldID}` );
+
+			// Maintain the state of the currently active options tab when applicable during duplication.
+			if ( $visibleTab.length ) {
+
+				// The following will help identify which tab from the sidebar panel settings is currently being viewed. i.e., "General," "Advanced," "Smart Logic," etc.
+				const visibleTabClassName = $visibleTab.attr( 'class' ).match( /wpforms-field-option-group-\S*/i )[0];
+				const $newFieldOptionsTab = $newFieldOptions.find( `>.${visibleTabClassName}` );
+
+				if ( $newFieldOptionsTab.length ) {
+
+					// Remove any left-over state from previously duplicated options.
+					$newFieldOptions.find( '>' ).removeClass( 'active' );
+					$newFieldOptionsTab.addClass( 'active' );
+				}
+			}
 
 			// Copy over values.
 			$fieldOptions.find( ':input' ).each( function( index, el ) { // eslint-disable-line complexity
@@ -3602,7 +3702,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				return;
 			}
 
-			if ( [ 'captcha_hcaptcha', 'captcha_recaptcha', 'captcha_none' ].includes( type ) ) {
+			if ( [ 'captcha_turnstile', 'captcha_hcaptcha', 'captcha_recaptcha', 'captcha_none' ].includes( type ) ) {
 				app.captchaUpdate();
 
 				return;
@@ -3737,7 +3837,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		fieldAddToBaseLevel: function( options, $newField, $newOptions ) { // eslint-disable-line complexity
 
 			const $baseFieldsContainer = elements.$sortableFieldsWrap,
-				$baseFields = $baseFieldsContainer.find( '> .wpforms-field' ),
+				$baseFields = $baseFieldsContainer.find( '> :not(.wpforms-field-drag-pending)' ),
 				$lastBaseField = $baseFields.last(),
 				totalBaseFields = $baseFields.length;
 
@@ -3771,9 +3871,6 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				options.position = totalBaseFields;
 			}
 
-			// Numeric position.
-			$fieldInPosition = $baseFieldsContainer.children( '.wpforms-field' ).eq( options.position );
-
 			if (
 				options.position === totalBaseFields &&
 				$lastBaseField.length && $lastBaseField.hasClass( 'wpforms-field-stick' )
@@ -3789,9 +3886,11 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				return;
 			}
 
+			$fieldInPosition = $baseFieldsContainer.children( ':not(.wpforms-field-drag-pending)' ).eq( options.position );
+
 			if ( $fieldInPosition.length ) {
 
-				let fieldInPositionId = $fieldInPosition.data( 'field-id' );
+				const fieldInPositionId = $fieldInPosition.data( 'field-id' );
 
 				// Add field to a specific location.
 				$fieldInPosition.before( $newField );

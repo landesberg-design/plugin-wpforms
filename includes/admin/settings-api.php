@@ -119,7 +119,7 @@ function wpforms_settings_license_callback( $args ) {
 					'strong' => [],
 				]
 			),
-			esc_url( wpforms_admin_upgrade_link( 'settings-license' ) )
+			esc_url( wpforms_admin_upgrade_link( 'settings-license', 'Upgrade to WPForms Pro text Link' ) )
 		) .
 		'</p>';
 	$output .=
@@ -185,11 +185,11 @@ function wpforms_settings_number_callback( $args ) {
 
 	$default = isset( $args['default'] ) ? esc_html( $args['default'] ) : '';
 	$id      = 'wpforms-setting-' . wpforms_sanitize_key( $args['id'] );
-	$attr    =  array(
+	$attr    =  [
 		'value' => wpforms_setting( $args['id'], $default ),
 		'name'  => wpforms_sanitize_key( $args['id'] ),
-	);
-	$data    = ! empty( $args['data'] ) ? $args['data'] : array();
+	];
+	$data    = ! empty( $args['data'] ) ? $args['data'] : [];
 
 	if ( ! empty( $args['attr'] ) ) {
 		$attr = array_merge( $attr, $args['attr'] );
@@ -197,7 +197,7 @@ function wpforms_settings_number_callback( $args ) {
 
 	$output = sprintf(
 		'<input type="number" %s>',
-		wpforms_html_attributes( $id, array(), $data, $attr )
+		wpforms_html_attributes( $id, [], $data, $attr )
 	);
 
 	if ( ! empty( $args['desc'] ) ) {
@@ -224,8 +224,8 @@ function wpforms_settings_select_callback( $args ) {
 	$select_name = $id;
 	$class       = ! empty( $args['choicesjs'] ) ? 'choicesjs-select' : '';
 	$choices     = ! empty( $args['choicesjs'] ) ? true : false;
-	$data        = isset( $args['data'] ) ? (array) $args['data'] : array();
-	$attr        = isset( $args['attr'] ) ? (array) $args['attr'] : array();
+	$data        = isset( $args['data'] ) ? (array) $args['data'] : [];
+	$attr        = isset( $args['attr'] ) ? (array) $args['attr'] : [];
 
 	if ( $choices && ! empty( $args['search'] ) ) {
 		$data['search'] = 'true';

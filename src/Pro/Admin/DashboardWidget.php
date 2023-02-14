@@ -225,17 +225,19 @@ class DashboardWidget extends Widget {
 
 		$widget_key = 'wpforms_reports_widget_pro';
 
-		\wp_add_dashboard_widget(
+		wp_add_dashboard_widget(
 			$widget_key,
-			\esc_html__( 'WPForms', 'wpforms' ),
-			array( $this, 'widget_content' )
+			esc_html__( 'WPForms', 'wpforms' ),
+			[ $this, 'widget_content' ]
 		);
 
 		// Attempt to place the widget at the top.
 		$normal_dashboard = $wp_meta_boxes['dashboard']['normal']['core'];
-		$widget_instance  = array( $widget_key => $normal_dashboard[ $widget_key ] );
+		$widget_instance  = [ $widget_key => $normal_dashboard[ $widget_key ] ];
+
 		unset( $normal_dashboard[ $widget_key ] );
-		$sorted_dashboard = \array_merge( $widget_instance, $normal_dashboard );
+
+		$sorted_dashboard = array_merge( $widget_instance, $normal_dashboard );
 
 		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
 	}
@@ -517,13 +519,22 @@ class DashboardWidget extends Widget {
 					);
 					?>
 					<td>
-						<a href="<?php echo esc_url( $form['edit_url'] ); ?>" class="entry-list-link">
-							<?php echo absint( $form['count'] ); ?>
-						</a>
+						<?php
+						// Ensure the current user has enough permission to view entries of this form.
+						if ( wpforms_current_user_can( 'view_entries_form_single', $form['form_id'] ) ) {
+							printf(
+								'<a href="%s" class="entry-list-link">%d</a>',
+								esc_url( $form['edit_url'] ),
+								absint( $form['count'] )
+							);
+						} else {
+							echo absint( $form['count'] );
+						}
+						?>
 					</td>
 					<td class="graph">
 						<?php if ( absint( $form['count'] ) > 0 ) : ?>
-							<button type="button" class="wpforms-dash-widget-single-chart-btn chart dashicons dashicons-chart-line" title="<?php esc_attr_e( 'Display only this form data in the graph', 'wpforms' ); ?>"></button>
+							<button type="button" class="wpforms-dash-widget-single-chart-btn chart dashicons dashicons-chart-bar" title="<?php esc_attr_e( 'Display only this form data in the graph', 'wpforms' ); ?>"></button>
 							<?php
 								if ( $is_active_form ) {
 									?>
@@ -734,10 +745,10 @@ class DashboardWidget extends Widget {
 	public function get_entries_count_by( $param, $days = 0, $form_id = 0 ) {
 
 		$widget_slug    = static::SLUG;
-		$allowed_params = array( 'date', 'form' );
+		$allowed_params = [ 'date', 'form' ];
 
 		if ( ! \in_array( $param, $allowed_params, true ) ) {
-			return array();
+			return [];
 		}
 
 		$dates = $this->get_days_interval( $days );
@@ -771,7 +782,7 @@ class DashboardWidget extends Widget {
 				break;
 
 			default:
-				$result = array();
+				$result = [];
 		}
 
 		if ( $allow_caching ) {
@@ -889,7 +900,7 @@ class DashboardWidget extends Widget {
 	public function fill_chart_empty_entries( $results, $date_start, $date_end ) {
 
 		if ( ! \is_array( $results ) ) {
-			return array();
+			return [];
 		}
 
 		$period = new \DatePeriod(
@@ -902,10 +913,11 @@ class DashboardWidget extends Widget {
 			/* @var \DateTime $value */
 			$date = $value->format( 'Y-m-d' );
 			if ( ! \array_key_exists( $date, $results ) ) {
-				$results[ $date ] = array(
+				$results[ $date ] = [
 					'day'   => $date,
 					'count' => 0,
-				);
+				];
+
 				continue;
 			}
 
@@ -930,10 +942,10 @@ class DashboardWidget extends Widget {
 	public function fill_forms_list_form_data( $results ) {
 
 		if ( ! \is_array( $results ) ) {
-			return array();
+			return [];
 		}
 
-		$processed = array();
+		$processed = [];
 
 		foreach ( $results as $form_id => $result ) {
 
@@ -966,16 +978,16 @@ class DashboardWidget extends Widget {
 	public function fill_forms_list_empty_entries_form_data( $results ) {
 
 		if ( ! \is_array( $results ) ) {
-			return array();
+			return [];
 		}
 
 		$forms = \wpforms()->form->get();
 
 		if ( empty( $forms ) ) {
-			return array();
+			return [];
 		}
 
-		$processed = array();
+		$processed = [];
 
 		foreach ( $forms as $form ) {
 
@@ -1002,26 +1014,26 @@ class DashboardWidget extends Widget {
 	public function get_formatted_forms_list_form_data( $form, $results ) {
 
 		if ( ! ( $form instanceof \WP_Post ) ) {
-			return array();
+			return [];
 		}
 
 		$widget_slug = static::SLUG;
 
 		$edit_url = \add_query_arg(
-			array(
+			[
 				'page'    => 'wpforms-entries',
 				'view'    => 'list',
 				'form_id' => \absint( $form->ID ),
-			),
+			],
 			\admin_url( 'admin.php' )
 		);
 
-		$form_data = array(
+		$form_data = [
 			'form_id'  => $form->ID,
 			'count'    => isset( $results[ $form->ID ]->count ) ? \absint( $results[ $form->ID ]->count ) : 0,
 			'title'    => $form->post_title,
 			'edit_url' => $edit_url,
-		);
+		];
 
 		// phpcs:ignore WPForms.Comments.PHPDocHooks.RequiredHookDocumentation, WPForms.PHP.ValidateHooks.InvalidHookName
 		return (array) apply_filters( "wpforms_{$widget_slug}_form_item_fields", $form_data, $form );

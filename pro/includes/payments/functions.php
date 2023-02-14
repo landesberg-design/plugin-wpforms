@@ -14,200 +14,200 @@
  */
 function wpforms_get_currencies() {
 
-	$currencies = array(
-		'USD' => array(
+	$currencies = [
+		'USD' => [
 			'name'                => esc_html__( 'U.S. Dollar', 'wpforms' ),
 			'symbol'              => '&#36;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'GBP' => array(
+		],
+		'GBP' => [
 			'name'                => esc_html__( 'Pound Sterling', 'wpforms' ),
 			'symbol'              => '&pound;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'EUR' => array(
+		],
+		'EUR' => [
 			'name'                => esc_html__( 'Euro', 'wpforms' ),
 			'symbol'              => '&euro;',
 			'symbol_pos'          => 'right',
 			'thousands_separator' => '.',
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
-		),
-		'AUD' => array(
+		],
+		'AUD' => [
 			'name'                => esc_html__( 'Australian Dollar', 'wpforms' ),
 			'symbol'              => '&#36;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'BRL' => array(
+		],
+		'BRL' => [
 			'name'                => esc_html__( 'Brazilian Real', 'wpforms' ),
 			'symbol'              => 'R$',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => '.',
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
-		),
-		'CAD' => array(
+		],
+		'CAD' => [
 			'name'                => esc_html__( 'Canadian Dollar', 'wpforms' ),
 			'symbol'              => '&#36;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'CZK' => array(
+		],
+		'CZK' => [
 			'name'                => esc_html__( 'Czech Koruna', 'wpforms' ),
 			'symbol'              => '&#75;&#269;',
 			'symbol_pos'          => 'right',
 			'thousands_separator' => '.',
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
-		),
-		'DKK' => array(
+		],
+		'DKK' => [
 			'name'                => esc_html__( 'Danish Krone', 'wpforms' ),
 			'symbol'              => 'kr.',
 			'symbol_pos'          => 'right',
 			'thousands_separator' => '.',
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
-		),
-		'HKD' => array(
+		],
+		'HKD' => [
 			'name'                => esc_html__( 'Hong Kong Dollar', 'wpforms' ),
 			'symbol'              => '&#36;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'HUF' => array(
+		],
+		'HUF' => [
 			'name'                => esc_html__( 'Hungarian Forint', 'wpforms' ),
 			'symbol'              => 'Ft',
 			'symbol_pos'          => 'right',
 			'thousands_separator' => '.',
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
-		),
-		'ILS' => array(
+		],
+		'ILS' => [
 			'name'                => esc_html__( 'Israeli New Sheqel', 'wpforms' ),
 			'symbol'              => '&#8362;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'MYR' => array(
+		],
+		'MYR' => [
 			'name'                => esc_html__( 'Malaysian Ringgit', 'wpforms' ),
 			'symbol'              => '&#82;&#77;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'MXN' => array(
+		],
+		'MXN' => [
 			'name'                => esc_html__( 'Mexican Peso', 'wpforms' ),
 			'symbol'              => '&#36;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'NOK' => array(
+		],
+		'NOK' => [
 			'name'                => esc_html__( 'Norwegian Krone', 'wpforms' ),
 			'symbol'              => 'Kr',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => '.',
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
-		),
-		'NZD' => array(
+		],
+		'NZD' => [
 			'name'                => esc_html__( 'New Zealand Dollar', 'wpforms' ),
 			'symbol'              => '&#36;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'PHP' => array(
+		],
+		'PHP' => [
 			'name'                => esc_html__( 'Philippine Peso', 'wpforms' ),
 			'symbol'              => 'Php',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'PLN' => array(
+		],
+		'PLN' => [
 			'name'                => esc_html__( 'Polish Zloty', 'wpforms' ),
 			'symbol'              => '&#122;&#322;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => '.',
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
-		),
-		'RUB' => array(
+		],
+		'RUB' => [
 			'name'                => esc_html__( 'Russian Ruble', 'wpforms' ),
 			'symbol'              => 'pyб',
 			'symbol_pos'          => 'right',
 			'thousands_separator' => ' ',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'SGD' => array(
+		],
+		'SGD' => [
 			'name'                => esc_html__( 'Singapore Dollar', 'wpforms' ),
 			'symbol'              => '&#36;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'ZAR' => array(
+		],
+		'ZAR' => [
 			'name'                => esc_html__( 'South African Rand', 'wpforms' ),
 			'symbol'              => 'R',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'SEK' => array(
+		],
+		'SEK' => [
 			'name'                => esc_html__( 'Swedish Krona', 'wpforms' ),
 			'symbol'              => 'Kr',
 			'symbol_pos'          => 'right',
 			'thousands_separator' => '.',
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
-		),
-		'CHF' => array(
+		],
+		'CHF' => [
 			'name'                => esc_html__( 'Swiss Franc', 'wpforms' ),
 			'symbol'              => 'CHF',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'TWD' => array(
+		],
+		'TWD' => [
 			'name'                => esc_html__( 'Taiwan New Dollar', 'wpforms' ),
 			'symbol'              => '&#36;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-		'THB' => array(
+		],
+		'THB' => [
 			'name'                => esc_html__( 'Thai Baht', 'wpforms' ),
 			'symbol'              => '&#3647;',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
-		),
-	);
+		],
+	];
 
 	return array_change_key_case( apply_filters( 'wpforms_currencies', $currencies ), CASE_UPPER );
 }
@@ -419,7 +419,7 @@ function wpforms_payment_fields() {
  *
  * @return bool
  */
-function wpforms_has_payment( $type = 'entry', $data = array() ) {
+function wpforms_has_payment( $type = 'entry', $data = [] ) {
 
 	$payment        = false;
 	$payment_fields = wpforms_payment_fields();
@@ -523,7 +523,7 @@ function wpforms_get_total_payment( $fields ) {
  *
  * @return array|bool False if no fields provided, otherwise array.
  */
-function wpforms_get_payment_items( $fields = array() ) {
+function wpforms_get_payment_items( $fields = [] ) {
 
 	if ( empty( $fields ) ) {
 		return false;

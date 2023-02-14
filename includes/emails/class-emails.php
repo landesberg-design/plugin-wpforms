@@ -103,7 +103,7 @@ class WPForms_WP_Emails {
 	 *
 	 * @var array
 	 */
-	public $form_data = array();
+	public $form_data = [];
 
 	/**
 	 * Fields, formatted, and sanitized.
@@ -112,7 +112,7 @@ class WPForms_WP_Emails {
 	 *
 	 * @var array
 	 */
-	public $fields = array();
+	public $fields = [];
 
 	/**
 	 * Entry ID.
@@ -143,8 +143,8 @@ class WPForms_WP_Emails {
 			$this->html = false;
 		}
 
-		add_action( 'wpforms_email_send_before', array( $this, 'send_before' ) );
-		add_action( 'wpforms_email_send_after', array( $this, 'send_after' ) );
+		add_action( 'wpforms_email_send_before', [ $this, 'send_before' ] );
+		add_action( 'wpforms_email_send_after', [ $this, 'send_after' ] );
 	}
 
 	/**
@@ -369,7 +369,7 @@ class WPForms_WP_Emails {
 	 *
 	 * @return bool
 	 */
-	public function send( $to, $subject, $message, $attachments = array() ) {
+	public function send( $to, $subject, $message, $attachments = [] ) {
 
 		if ( ! did_action( 'init' ) && ! did_action( 'admin_init' ) ) {
 			_doing_it_wrong( __FUNCTION__, esc_html__( 'You cannot send emails with WPForms_WP_Emails() until init/admin_init has been reached.', 'wpforms-lite' ), null );
@@ -393,7 +393,7 @@ class WPForms_WP_Emails {
 		// Deprecated filter for $attachments.
 		$attachments = apply_filters_deprecated(
 			'wpforms_email_attachments',
-			array( $attachments, $this ),
+			[ $attachments, $this ],
 			'1.5.7 of the WPForms plugin',
 			'wpforms_emails_send_email_data'
 		);
@@ -405,13 +405,13 @@ class WPForms_WP_Emails {
 		 */
 		$data = apply_filters(
 			'wpforms_emails_send_email_data',
-			array(
+			[
 				'to'          => $to,
 				'subject'     => $subject,
 				'message'     => $message,
 				'headers'     => $this->get_headers(),
 				'attachments' => $attachments,
-			),
+			],
 			$this
 		);
 
@@ -469,9 +469,9 @@ class WPForms_WP_Emails {
 	 */
 	public function send_before() {
 
-		add_filter( 'wp_mail_from', array( $this, 'get_from_address' ) );
-		add_filter( 'wp_mail_from_name', array( $this, 'get_from_name' ) );
-		add_filter( 'wp_mail_content_type', array( $this, 'get_content_type' ) );
+		add_filter( 'wp_mail_from', [ $this, 'get_from_address' ] );
+		add_filter( 'wp_mail_from_name', [ $this, 'get_from_name' ] );
+		add_filter( 'wp_mail_content_type', [ $this, 'get_content_type' ] );
 	}
 
 	/**
@@ -481,9 +481,9 @@ class WPForms_WP_Emails {
 	 */
 	public function send_after() {
 
-		remove_filter( 'wp_mail_from', array( $this, 'get_from_address' ) );
-		remove_filter( 'wp_mail_from_name', array( $this, 'get_from_name' ) );
-		remove_filter( 'wp_mail_content_type', array( $this, 'get_content_type' ) );
+		remove_filter( 'wp_mail_from', [ $this, 'get_from_address' ] );
+		remove_filter( 'wp_mail_from_name', [ $this, 'get_from_name' ] );
+		remove_filter( 'wp_mail_content_type', [ $this, 'get_content_type' ] );
 	}
 
 	/**
@@ -558,7 +558,7 @@ class WPForms_WP_Emails {
 			$field_template = ob_get_clean();
 
 			// Check to see if user has added support for field type.
-			$other_fields = apply_filters( 'wpforms_email_display_other_fields', array(), $this );
+			$other_fields = apply_filters( 'wpforms_email_display_other_fields', [], $this );
 
 			$x = 1;
 
@@ -722,10 +722,12 @@ class WPForms_WP_Emails {
 	public function get_template_part( $slug, $name = null, $load = true ) {
 
 		// Setup possible parts.
-		$templates = array();
+		$templates = [];
+
 		if ( isset( $name ) ) {
 			$templates[] = $slug . '-' . $name . '.php';
 		}
+
 		$templates[] = $slug . '.php';
 
 		// Return the part that is found.
@@ -799,11 +801,11 @@ class WPForms_WP_Emails {
 
 		$template_dir = 'wpforms-email';
 
-		$file_paths = array(
+		$file_paths = [
 			1   => trailingslashit( get_stylesheet_directory() ) . $template_dir,
 			10  => trailingslashit( get_template_directory() ) . $template_dir,
 			100 => WPFORMS_PLUGIN_DIR . 'includes/emails/templates',
-		);
+		];
 
 		$file_paths = apply_filters( 'wpforms_email_template_paths', $file_paths );
 

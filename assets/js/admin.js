@@ -1108,7 +1108,7 @@
 									action: 'show',
 								},
 								{
-									element: '.wpforms-setting-recaptcha, #wpforms-setting-row-captcha-provider .desc, #wpforms-setting-row-recaptcha-site-key, #wpforms-setting-row-recaptcha-secret-key, #wpforms-setting-row-recaptcha-fail-msg',
+									element: '.wpforms-setting-recaptcha, #wpforms-setting-row-captcha-provider .desc, #wpforms-setting-row-recaptcha-site-key, #wpforms-setting-row-recaptcha-secret-key, #wpforms-setting-row-recaptcha-fail-msg, .wpforms-setting-turnstile, #wpforms-setting-row-captcha-provider .desc, #wpforms-setting-row-turnstile-heading, #wpforms-setting-row-turnstile-site-key, #wpforms-setting-row-turnstile-secret-key, #wpforms-setting-row-turnstile-theme, #wpforms-setting-row-turnstile-fail-msg',
 									action: 'hide',
 								},
 							],
@@ -1129,7 +1129,28 @@
 									action: 'show',
 								},
 								{
-									element: '#wpforms-setting-row-captcha-provider .desc, #wpforms-setting-row-hcaptcha-heading, #wpforms-setting-row-hcaptcha-site-key, #wpforms-setting-row-hcaptcha-secret-key, #wpforms-setting-row-hcaptcha-fail-msg',
+									element: '#wpforms-setting-row-captcha-provider .desc, #wpforms-setting-row-hcaptcha-heading, #wpforms-setting-row-hcaptcha-site-key, #wpforms-setting-row-hcaptcha-secret-key, #wpforms-setting-row-hcaptcha-fail-msg, #wpforms-setting-row-captcha-provider .desc, #wpforms-setting-row-turnstile-heading, #wpforms-setting-row-turnstile-site-key, #wpforms-setting-row-turnstile-secret-key, #wpforms-setting-row-turnstile-theme, #wpforms-setting-row-turnstile-fail-msg',
+									action: 'hide',
+								},
+							],
+						},
+						effect: 'appear',
+					},
+					{
+						conditions: {
+							element:   'input[name=captcha-provider]:checked',
+							type:      'value',
+							operator:  '=',
+							condition: 'turnstile',
+						},
+						actions: {
+							if: [
+								{
+									element: '.wpforms-setting-row',
+									action: 'show',
+								},
+								{
+									element: '#wpforms-setting-row-captcha-provider .desc, #wpforms-setting-row-hcaptcha-heading, #wpforms-setting-row-hcaptcha-site-key, #wpforms-setting-row-hcaptcha-secret-key, #wpforms-setting-row-hcaptcha-fail-msg, .wpforms-setting-recaptcha, #wpforms-setting-row-captcha-provider .desc, #wpforms-setting-row-recaptcha-site-key, #wpforms-setting-row-recaptcha-secret-key, #wpforms-setting-row-recaptcha-fail-msg',
 									action: 'hide',
 								},
 							],
@@ -1269,9 +1290,9 @@
 
 				var $preview = $( '#wpforms-setting-row-captcha-preview' );
 
-				if ( 'hcaptcha' === this.value ) {
+				if ( this.value === 'hcaptcha' || this.value === 'turnstile' ) {
 					$preview.removeClass( 'wpforms-hidden' );
-				} else if ( 'none' === this.value ) {
+				} else if ( this.value === 'none' ) {
 					$preview.addClass( 'wpforms-hidden' );
 				} else {
 					$( '#wpforms-setting-row-recaptcha-type input:checked' ).trigger( 'change' );
@@ -1469,7 +1490,7 @@
 		},
 
 		/**
-		 * Verify a license key.
+		 * Deactivate a license key.
 		 *
 		 * @since 1.3.9
 		 *
@@ -1477,39 +1498,43 @@
 		 */
 		licenseDeactivate: function( el ) {
 
-			var $this = $( el ),
-				$row = $this.closest( '.wpforms-setting-row' ),
-				buttonWidth = $this.outerWidth(),
-				buttonLabel = $this.text(),
-				data = {
-					action: 'wpforms_deactivate_license',
-					nonce: wpforms_admin.nonce,
-				};
+			const $this = $( el );
+			const $row  = $this.closest( '.wpforms-setting-row' );
+
+			const buttonWidth = $this.outerWidth();
+			const buttonLabel = $this.text();
+
+			const data = {
+				action: 'wpforms_deactivate_license',
+				nonce: wpforms_admin.nonce,
+			};
 
 			$this.html( s.iconSpinner ).css( 'width', buttonWidth ).prop( 'disabled', true );
 
 			$.post( wpforms_admin.ajax_url, data, function( res ) {
 
-				var icon  = 'fa fa-info-circle',
-					color = 'blue',
-					data  = res.data,
-					title = wpforms_admin.success;
+				let icon  = 'fa fa-info-circle';
+				let color = 'blue';
+				let title = wpforms_admin.success;
+
+				const data = res.data;
+				const msg  = ! data.msg || typeof data.msg !== 'string' ? wpforms_admin.something_went_wrong : data.msg;
 
 				if ( res.success ) {
 					$row.find( '#wpforms-setting-license-key' ).val( '' ).attr( 'value', '' ).prop( { readonly: false, disabled: false } );
 					$row.find( '.wpforms-license-key-deactivate-remove' ).remove();
-					$row.find( '#wpforms-setting-license-key-info-message' ).html( res.data.info ).show();
+					$row.find( '#wpforms-setting-license-key-info-message' ).html( data.info ).show();
 					$row.find( '#wpforms-setting-license-key-verify' ).prop( 'disabled', false ).show();
 					$row.find( '.type, .desc, #wpforms-setting-license-key-deactivate' ).hide();
 				} else {
-					icon = 'fa fa-exclamation-circle';
+					icon  = 'fa fa-exclamation-circle';
 					color = 'orange';
 					title = wpforms_admin.oops;
 				}
 
 				$.alert( {
 					title: title,
-					content: data?.msg || data,
+					content: msg,
 					icon: icon,
 					type: color,
 					buttons: {

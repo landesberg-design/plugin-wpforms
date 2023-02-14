@@ -48,10 +48,10 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 		];
 
 		// Customize HTML field values.
-		add_filter( 'wpforms_html_field_value', array( $this, 'field_html_value' ), 10, 4 );
+		add_filter( 'wpforms_html_field_value', [ $this, 'field_html_value' ], 10, 4 );
 
 		// Define additional field properties.
-		add_filter( 'wpforms_field_properties_payment-checkbox', array( $this, 'field_properties' ), 5, 3 );
+		add_filter( 'wpforms_field_properties_payment-checkbox', [ $this, 'field_properties' ], 5, 3 );
 	}
 
 	/**
@@ -66,7 +66,7 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 	 *
 	 * @return string
 	 */
-	public function field_html_value( $value, $field, $form_data = array(), $context = '' ) {
+	public function field_html_value( $value, $field, $form_data = [], $context = '' ) {
 
 		// Only use HTML formatting for checkbox fields, with image choices
 		// enabled, and exclude the entry table display. Lastly, provides a
@@ -79,7 +79,7 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 			apply_filters( 'wpforms_payment-checkbox_field_html_value_images', true, $context )
 		) {
 
-			$items  = array();
+			$items  = [];
 			$values = explode( "\n", $field['value'] );
 
 			foreach ( $values as $key => $val ) {
@@ -123,12 +123,12 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 		unset( $properties['inputs']['primary'] );
 
 		// Set input container (ul) properties.
-		$properties['input_container'] = array(
-			'class' => array(),
-			'data'  => array(),
-			'attr'  => array(),
+		$properties['input_container'] = [
+			'class' => [],
+			'data'  => [],
+			'attr'  => [],
 			'id'    => "wpforms-{$form_id}-field_{$field_id}",
-		);
+		];
 
 		// Set input properties.
 		foreach ( $choices as $key => $choice ) {
@@ -192,7 +192,7 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 			foreach ( $properties['inputs'] as $key => $inputs ) {
 				$properties['inputs'][ $key ]['container']['class'][] = 'wpforms-image-choices-item';
 
-				if ( in_array( $field['choices_images_style'], array( 'modern', 'classic' ), true ) ) {
+				if ( in_array( $field['choices_images_style'], [ 'modern', 'classic' ], true ) ) {
 					$properties['inputs'][ $key ]['class'][] = 'wpforms-screen-reader-element';
 				}
 			}
@@ -269,9 +269,9 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 		$this->field_option(
 			'basic-options',
 			$field,
-			array(
+			[
 				'markup' => 'open',
-			)
+			]
 		);
 
 		// Label.
@@ -327,9 +327,9 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 		$this->field_option(
 			'basic-options',
 			$field,
-			array(
+			[
 				'markup' => 'close',
-			)
+			]
 		);
 
 		/*
@@ -340,9 +340,9 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 		$this->field_option(
 			'advanced-options',
 			$field,
-			array(
+			[
 				'markup' => 'open',
-			)
+			]
 		);
 
 		// Input columns.
@@ -523,10 +523,10 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 		$field         = $form_data['fields'][ $field_id ];
 		$name          = sanitize_text_field( $field['label'] );
 		$amount        = 0;
-		$images        = array();
-		$choice_values = array();
-		$choice_labels = array();
-		$choice_keys   = array();
+		$images        = [];
+		$choice_values = [];
+		$choice_labels = [];
+		$choice_keys   = [];
 
 		if ( ! empty( $field_submit ) ) {
 			foreach ( $field_submit as $choice_checked ) {
@@ -562,7 +562,7 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 			}
 		}
 
-		wpforms()->process->fields[ $field_id ] = array(
+		wpforms()->process->fields[ $field_id ] = [
 			'name'         => $name,
 			'value'        => implode( "\r\n", $choice_values ),
 			'value_choice' => implode( "\r\n", $choice_labels ),
@@ -573,7 +573,7 @@ class WPForms_Field_Payment_Checkbox extends WPForms_Field {
 			'images'       => $images,
 			'id'           => absint( $field_id ),
 			'type'         => $this->type,
-		);
+		];
 	}
 }
 

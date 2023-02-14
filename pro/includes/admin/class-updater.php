@@ -98,7 +98,7 @@ class WPForms_Updater {
 	public function __construct( array $config ) {
 
 		// Set class properties.
-		$accepted_args = array(
+		$accepted_args = [
 			'plugin_name',
 			'plugin_slug',
 			'plugin_path',
@@ -106,7 +106,7 @@ class WPForms_Updater {
 			'remote_url',
 			'version',
 			'key',
-		);
+		];
 
 		foreach ( $accepted_args as $arg ) {
 			$this->$arg = $config[ $arg ];
@@ -119,9 +119,9 @@ class WPForms_Updater {
 		}
 
 		// Load the updater hooks and filters.
-		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'update_plugins_filter' ) );
-		add_filter( 'http_request_args', array( $this, 'http_request_args' ), 10, 2 );
-		add_filter( 'plugins_api', array( $this, 'plugins_api' ), 10, 3 );
+		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'update_plugins_filter' ] );
+		add_filter( 'http_request_args', [ $this, 'http_request_args' ], 10, 2 );
+		add_filter( 'plugins_api', [ $this, 'plugins_api' ], 10, 3 );
 	}
 
 	/**
@@ -219,7 +219,8 @@ class WPForms_Updater {
 
 		// Perform the remote request to retrieve our plugin information. If it fails, return the default object.
 		if ( ! $this->info ) {
-			$this->info = $this->perform_remote_request( 'get-plugin-info', array( 'tgm-updater-plugin' => $this->plugin_slug ) );
+			$this->info = $this->perform_remote_request( 'get-plugin-info', [ 'tgm-updater-plugin' => $this->plugin_slug ] );
+
 			if ( ! $this->info || ! empty( $this->info->error ) ) {
 				$this->info = false;
 

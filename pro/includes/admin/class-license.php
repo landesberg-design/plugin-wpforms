@@ -52,15 +52,7 @@ class WPForms_License {
 	 */
 	public function get() {
 
-		// Check for license key.
-		$key = wpforms_setting( 'key', '', 'wpforms_license' );
-
-		// Allow wp-config constant to pass key.
-		if ( empty( $key ) && defined( 'WPFORMS_LICENSE_KEY' ) && WPFORMS_LICENSE_KEY ) {
-			$key = WPFORMS_LICENSE_KEY;
-		}
-
-		return $key;
+		return wpforms_get_license_key();
 	}
 
 	/**
@@ -228,7 +220,7 @@ class WPForms_License {
 	 */
 	public function validate_key( $key = '', $forced = false, $ajax = false, $return_status = false ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
-		$validate = $this->perform_remote_request( 'validate-key', array( 'tgm-updater-key' => $key ) );
+		$validate = $this->perform_remote_request( 'validate-key', [ 'tgm-updater-key' => $key ] );
 
 		// If there was a basic API error in validation, only set the transient for 10 minutes before retrying.
 		if ( ! $validate ) {
@@ -298,10 +290,10 @@ class WPForms_License {
 			$this->success[] = $msg;
 			if ( $ajax ) {
 				wp_send_json_success(
-					array(
+					[
 						'type' => $option['type'],
 						'msg'  => $msg,
-					)
+					]
 				);
 			}
 		}
@@ -333,32 +325,59 @@ class WPForms_License {
 			$msg = esc_html__( 'There was an error connecting to the remote key API. Please try again later.', 'wpforms' );
 
 			if ( $ajax ) {
-				wp_send_json_error( $msg );
-			} else {
-				$this->errors[] = $msg;
-
-				return;
+				wp_send_json_error(
+					[
+						'msg' => $msg,
+					]
+				);
 			}
+
+			$this->errors[] = $msg;
+
+			return;
 		}
+
+		$success_message = esc_html__( 'You have deactivated the key from this site successfully.', 'wpforms' );
 
 		// If an error is returned, set the error and return.
 		if ( ! empty( $deactivate->error ) ) {
-			if ( $ajax ) {
-				wp_send_json_error( $deactivate->error );
-			} else {
-				$this->errors[] = $deactivate->error;
 
-				return;
+			// If the license key is invalid, delete the option to ensure the user doesn't get stuck with a filled input.
+			// Doing this here will ensure that the connection to the server is already established successfully.
+			if ( $this->get_errors() ) {
+				$this->remove_key();
 			}
+
+			if ( $ajax ) {
+				$has_key = ! empty( $this->get() );
+
+				if ( $has_key ) {
+					wp_send_json_error(
+						[
+							'info' => $this->get_info_message_escaped(),
+							'msg'  => $deactivate->error,
+						]
+					);
+				}
+
+				wp_send_json_success(
+					[
+						'info' => $this->get_info_message_escaped(),
+						'msg'  => $success_message,
+					]
+				);
+			}
+
+			$this->errors[] = $deactivate->error;
+
+			return;
 		}
 
 		// Otherwise, user's license has been deactivated successfully, reset the option and set the success message.
-		$success         = isset( $deactivate->success ) ? $deactivate->success : esc_html__( 'You have deactivated the key from this site successfully.', 'wpforms' );
+		$success         = isset( $deactivate->success ) ? $deactivate->success : $success_message;
 		$this->success[] = $success;
 
-		update_option( 'wpforms_license', '' );
-
-		$this->clear_cache();
+		$this->remove_key();
 
 		if ( $ajax ) {
 			wp_send_json_success(
@@ -368,6 +387,17 @@ class WPForms_License {
 				]
 			);
 		}
+	}
+
+	/**
+	 * Empty out the license key option and flush the cache.
+	 *
+	 * @since 1.8.0
+	 */
+	private function remove_key() {
+
+		update_option( 'wpforms_license', '' );
+		$this->clear_cache();
 	}
 
 	/**
@@ -516,6 +546,7 @@ class WPForms_License {
 				[
 					'class' => $class,
 					'autop' => false,
+					'slug'  => 'license-expired',
 				]
 			);
 		endif;
@@ -524,7 +555,10 @@ class WPForms_License {
 		if ( isset( $option['is_disabled'] ) && $option['is_disabled'] ) {
 			\WPForms\Admin\Notice::error(
 				esc_html__( 'Your license key for WPForms has been disabled. Please use a different key to continue receiving automatic updates.', 'wpforms' ),
-				[ 'class' => $class ]
+				[
+					'class' => $class,
+					'slug'  => 'license-disabled',
+				]
 			);
 		}
 
@@ -532,7 +566,10 @@ class WPForms_License {
 		if ( isset( $option['is_invalid'] ) && $option['is_invalid'] ) {
 			\WPForms\Admin\Notice::error(
 				esc_html__( 'Your license key for WPForms is invalid. The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates.', 'wpforms' ),
-				[ 'class' => $class ]
+				[
+					'class' => $class,
+					'slug'  => 'license-invalid',
+				]
 			);
 		}
 
@@ -557,55 +594,54 @@ class WPForms_License {
 	 * Retrieve addons from the stored transient or remote server.
 	 *
 	 * @since 1.0.0
+	 * @deprecated 1.8.0
 	 *
 	 * @param bool $force Whether to force the addons retrieval or re-use transient cache.
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public function addons( $force = false ) {
 
-		$key = $this->get();
+		_deprecated_function( __METHOD__, '1.8.0 of the WPForms plugin', __CLASS__ . '::get_addons()' );
 
-		if ( ! $key ) {
-			return false;
+		if ( $force ) {
+			Transient::delete( 'addons' );
 		}
 
-		$addons = Transient::get( 'addons' );
-
-		if ( $force || false === $addons ) {
-			$addons = $this->get_addons();
-		}
-
-		return $addons;
+		return $this->get_addons();
 	}
 
 	/**
 	 * Ping the remote server for addons data.
 	 *
 	 * @since 1.0.0
+	 * @since 1.8.0 Added transient cache check and license validation.
 	 *
-	 * @return bool|array False if no key or failure, array of addon data otherwise.
+	 * @return array Addons data, maybe an empty array if an error occurred.
 	 */
 	public function get_addons() {
 
-		$key    = $this->get();
-		$addons = $this->perform_remote_request( 'get-addons-data', array( 'tgm-updater-key' => $key ) );
+		$key = $this->get();
 
-		// If there was an API error, set transient for only 10 minutes.
-		if ( ! $addons ) {
-			Transient::set( 'addons', false, 10 * MINUTE_IN_SECONDS );
-
-			return false;
+		if ( empty( $key ) || ! $this->is_active() ) {
+			return [];
 		}
 
-		// If there was an error retrieving the addons, set the error.
-		if ( isset( $addons->error ) ) {
-			Transient::set( 'addons', false, 10 * MINUTE_IN_SECONDS );
+		$addons = Transient::get( 'addons' );
 
-			return false;
+		// We store an empty array if the request isn't valid to prevent spam requests.
+		if ( is_array( $addons ) ) {
+			return $addons;
 		}
 
-		// Otherwise, our request worked. Save the data and return it.
+		$addons = $this->perform_remote_request( 'get-addons-data', [ 'tgm-updater-key' => $key ] );
+
+		if ( empty( $addons ) || isset( $addons->error ) ) {
+			Transient::set( 'addons', [], 10 * MINUTE_IN_SECONDS );
+
+			return [];
+		}
+
 		Transient::set( 'addons', $addons, DAY_IN_SECONDS );
 
 		return $addons;

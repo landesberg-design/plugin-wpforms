@@ -153,7 +153,7 @@ class Loader {
 				'hook' => 'admin_init',
 			],
 			[
-				'name' => 'Admin\Settings\Captcha',
+				'name' => 'Admin\Settings\Captcha\Page',
 				'hook' => 'admin_init',
 			],
 			[

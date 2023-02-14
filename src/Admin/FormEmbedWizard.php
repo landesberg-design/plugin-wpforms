@@ -161,7 +161,7 @@ class FormEmbedWizard {
 
 		static $challenge_active = null;
 
-		if ( is_null( $challenge_active ) ) {
+		if ( $challenge_active === null ) {
 			$challenge        = wpforms()->get( 'challenge' );
 			$challenge_active = method_exists( $challenge, 'challenge_active' ) ? $challenge->challenge_active() : false;
 		}

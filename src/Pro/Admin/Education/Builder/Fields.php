@@ -39,7 +39,7 @@ class Fields extends Education\Builder\Fields {
 		// Avoid multiple calculations.
 		static $is_valid = null;
 
-		if ( ! is_null( $is_valid ) ) {
+		if ( $is_valid !== null ) {
 			return $is_valid;
 		}
 

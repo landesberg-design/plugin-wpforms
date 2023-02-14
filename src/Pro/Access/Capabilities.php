@@ -50,10 +50,10 @@ class Capabilities {
 	 */
 	public function hooks() {
 
-		\add_filter( 'map_meta_cap', array( $this, 'filter_map_meta_cap' ), 10, 4 );
-		\add_filter( 'wpforms_get_multiple_forms_args', array( $this, 'filter_wpforms_get_multiple_forms_args' ) );
-		\add_filter( 'wpforms_entry_fields_get_fields_where', array( $this, 'filter_get_fields_where' ), 10, 2 );
-		\add_filter( 'wpforms_entry_handler_get_entries_where', array( $this, 'filter_get_entries_where' ), 10, 2 );
+		add_filter( 'map_meta_cap', [ $this, 'filter_map_meta_cap' ], 10, 4 );
+		add_filter( 'wpforms_get_multiple_forms_args', [ $this, 'filter_wpforms_get_multiple_forms_args' ] );
+		add_filter( 'wpforms_entry_fields_get_fields_where', [ $this, 'filter_get_fields_where' ], 10, 2 );
+		add_filter( 'wpforms_entry_handler_get_entries_where', [ $this, 'filter_get_entries_where' ], 10, 2 );
 	}
 
 	/**
@@ -97,47 +97,47 @@ class Capabilities {
 	 */
 	public function get_meta_caps( $meta_cap = '' ) {
 
-		$meta_caps = array(
+		$meta_caps = [
 			// Form meta caps.
-			'view_form_single'           => array(
+			'view_form_single'           => [
 				'own'    => 'wpforms_view_own_forms',
 				'others' => 'wpforms_view_others_forms',
-			),
-			'edit_form_single'           => array(
+			],
+			'edit_form_single'           => [
 				'own'    => 'wpforms_edit_own_forms',
 				'others' => 'wpforms_edit_others_forms',
-			),
-			'delete_form_single'         => array(
+			],
+			'delete_form_single'         => [
 				'own'    => 'wpforms_delete_own_forms',
 				'others' => 'wpforms_delete_others_forms',
-			),
+			],
 			// Form entries meta caps.
-			'view_entries_form_single'   => array(
+			'view_entries_form_single'   => [
 				'own'    => 'wpforms_view_entries_own_forms',
 				'others' => 'wpforms_view_entries_others_forms',
-			),
-			'edit_entries_form_single'   => array(
+			],
+			'edit_entries_form_single'   => [
 				'own'    => 'wpforms_edit_entries_own_forms',
 				'others' => 'wpforms_edit_entries_others_forms',
-			),
-			'delete_entries_form_single' => array(
+			],
+			'delete_entries_form_single' => [
 				'own'    => 'wpforms_delete_entries_own_forms',
 				'others' => 'wpforms_delete_entries_others_forms',
-			),
+			],
 			// Form single entry meta caps. Use these only if Form ID is not available.
-			'view_entry_single'          => array(
+			'view_entry_single'          => [
 				'own'    => 'wpforms_view_entries_own_forms',
 				'others' => 'wpforms_view_entries_others_forms',
-			),
-			'edit_entry_single'          => array(
+			],
+			'edit_entry_single'          => [
 				'own'    => 'wpforms_edit_entries_own_forms',
 				'others' => 'wpforms_edit_entries_others_forms',
-			),
-			'delete_entry_single'        => array(
+			],
+			'delete_entry_single'        => [
 				'own'    => 'wpforms_delete_entries_own_forms',
 				'others' => 'wpforms_delete_entries_others_forms',
-			),
-		);
+			],
+		];
 
 		$meta_caps = \apply_filters( 'wpforms_access_capabilities_get_meta_caps', $meta_caps );
 
@@ -149,7 +149,7 @@ class Capabilities {
 			return $meta_caps[ $meta_cap ];
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -163,34 +163,34 @@ class Capabilities {
 	 */
 	public function get_category_caps( $category = '' ) {
 
-		$categories = array(
+		$categories = [
 			// Form categories.
-			'view_forms'     => array(
+			'view_forms'     => [
 				'own'    => 'wpforms_view_own_forms',
 				'others' => 'wpforms_view_others_forms',
-			),
-			'edit_forms'     => array(
+			],
+			'edit_forms'     => [
 				'own'    => 'wpforms_edit_own_forms',
 				'others' => 'wpforms_edit_others_forms',
-			),
-			'delete_forms'   => array(
+			],
+			'delete_forms'   => [
 				'own'    => 'wpforms_delete_own_forms',
 				'others' => 'wpforms_delete_others_forms',
-			),
+			],
 			// Entry categories.
-			'view_entries'   => array(
+			'view_entries'   => [
 				'own'    => 'wpforms_view_entries_own_forms',
 				'others' => 'wpforms_view_entries_others_forms',
-			),
-			'edit_entries'   => array(
+			],
+			'edit_entries'   => [
 				'own'    => 'wpforms_edit_entries_own_forms',
 				'others' => 'wpforms_edit_entries_others_forms',
-			),
-			'delete_entries' => array(
+			],
+			'delete_entries' => [
 				'own'    => 'wpforms_delete_entries_own_forms',
 				'others' => 'wpforms_delete_entries_others_forms',
-			),
-		);
+			],
+		];
 
 		$categories = \apply_filters( 'wpforms_access_capabilities_get_category_caps', $categories );
 
@@ -202,7 +202,7 @@ class Capabilities {
 			return $categories[ $category ];
 		}
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -228,7 +228,7 @@ class Capabilities {
 		$form_id = isset( $args[0] ) ? \absint( $args[0] ) : 0;
 		$form_id = $this->map_meta_cap_id( $form_id, $cap );
 
-		$form = wpforms()->form->get( $form_id, array( 'cap' => false ) );
+		$form = wpforms()->form->get( $form_id, [ 'cap' => false ] );
 
 		if ( ! $form ) {
 			return $caps;
@@ -249,7 +249,7 @@ class Capabilities {
 		}
 
 		// Return the capabilities required by the user.
-		return empty( $mapped_cap ) ? $caps : array( $mapped_cap );
+		return empty( $mapped_cap ) ? $caps : [ $mapped_cap ];
 	}
 
 	/**
@@ -264,11 +264,11 @@ class Capabilities {
 	 */
 	protected function map_meta_cap_id( $id, $cap ) {
 
-		if ( ! \in_array( $cap, array( 'view_entry_single', 'edit_entry_single', 'delete_entry_single' ), true ) ) {
+		if ( ! in_array( $cap, [ 'view_entry_single', 'edit_entry_single', 'delete_entry_single' ], true ) ) {
 			return $id;
 		}
 
-		$entry = wpforms()->entry->get( $id, array( 'cap' => false ) );
+		$entry = wpforms()->entry->get( $id, [ 'cap' => false ] );
 
 		return empty( $entry->form_id ) ? $id : $entry->form_id;
 	}
@@ -321,7 +321,7 @@ class Capabilities {
 	protected function change_wp_query_args_by_user_can( $args, $can_own, $can_others ) {
 
 		if ( ! \is_array( $args ) ) {
-			$args = array();
+			$args = [];
 		}
 
 		$user_id = \get_current_user_id();
@@ -336,7 +336,7 @@ class Capabilities {
 
 		// Make sure that WP_Query returns nothing if a user has none of the capabilities.
 		if ( ! $can_others && ! $can_own ) {
-			$args['post__in'] = array( 0 );
+			$args['post__in'] = [ 0 ];
 		}
 
 		return $args;
@@ -398,7 +398,7 @@ class Capabilities {
 			return $where;
 		}
 
-		$empty_where = array( 'return_empty' => '1=0' );
+		$empty_where = [ 'return_empty' => '1=0' ];
 
 		if ( ! empty( $args['form_id'] ) ) {
 			return $this->current_user_can( $args['cap'], \absint( $args['form_id'] ) ) ? $where : $empty_where;
@@ -412,10 +412,10 @@ class Capabilities {
 
 		$allowed_forms = \wpforms()->form->get(
 			'',
-			array(
+			[
 				'fields' => 'ids',
 				'cap'    => $args['cap'],
-			)
+			]
 		);
 
 		if ( empty( $allowed_forms ) ) {

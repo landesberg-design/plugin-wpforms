@@ -234,11 +234,11 @@ class WPForms_Entries_List {
 
 		add_screen_option(
 			'per_page',
-			array(
+			[
 				'label'   => esc_html__( 'Number of entries per page:', 'wpforms' ),
 				'option'  => 'wpforms_entries_per_page',
 				'default' => wpforms()->entry->get_count_per_page(),
-			)
+			]
 		);
 	}
 
@@ -346,11 +346,11 @@ class WPForms_Entries_List {
 
 		wpforms()->entry->mark_all_read( $form_id );
 
-		$this->alerts[] = array(
+		$this->alerts[] = [
 			'type'    => 'success',
 			'message' => esc_html__( 'All entries marked as read.', 'wpforms' ),
 			'dismiss' => true,
-		);
+		];
 	}
 
 	/**
@@ -655,28 +655,28 @@ class WPForms_Entries_List {
 		// Check that the user has created at least one form.
 		if ( empty( $this->forms ) ) {
 
-			$this->alerts[] = array(
+			$this->alerts[] = [
 				'type'    => 'info',
 				'message' =>
 					sprintf(
 						wp_kses(
 							/* translators: %s - WPForms Builder page. */
 							__( 'Whoops, you haven\'t created a form yet. Want to <a href="%s">give it a go</a>?', 'wpforms' ),
-							array(
-								'a' => array(
-									'href' => array(),
-								),
-							)
+							[
+								'a' => [
+									'href' => [],
+								],
+							]
 						),
 						admin_url( 'admin.php?page=wpforms-builder' )
 					),
 				'abort'   => true,
-			);
+			];
 
 		} else {
 			$form_id       = $this->get_filtered_form_id();
 			$this->form_id = $form_id ? $form_id : apply_filters( 'wpforms_entry_list_default_form_id', absint( $this->forms[0]->ID ) );
-			$this->form    = wpforms()->form->get( $this->form_id, array( 'cap' => 'view_entries_form_single' ) );
+			$this->form    = wpforms()->form->get( $this->form_id, [ 'cap' => 'view_entries_form_single' ] );
 		}
 	}
 
@@ -962,21 +962,21 @@ class WPForms_Entries_List {
 	public function list_form_actions( $form_data ) {
 
 		$base = add_query_arg(
-			array(
+			[
 				'page'    => 'wpforms-entries',
 				'view'    => 'list',
 				'form_id' => absint( $this->form_id ),
-			),
+			],
 			admin_url( 'admin.php' )
 		);
 
 		// Edit Form URL.
 		$edit_url = add_query_arg(
-			array(
+			[
 				'page'    => 'wpforms-builder',
 				'view'    => 'fields',
 				'form_id' => absint( $this->form_id ),
-			),
+			],
 			admin_url( 'admin.php' )
 		);
 
@@ -1000,9 +1000,9 @@ class WPForms_Entries_List {
 		// Mark Read URL.
 		$read_url = wp_nonce_url(
 			add_query_arg(
-				array(
+				[
 					'action' => 'markread',
-				),
+				],
 				$base
 			),
 			'wpforms_entry_list_markread'
@@ -1107,11 +1107,11 @@ class WPForms_Entries_List {
 					<?php
 					foreach ( $this->forms as $key => $form ) {
 						$form_url = add_query_arg(
-							array(
+							[
 								'page'    => 'wpforms-entries',
 								'view'    => 'list',
 								'form_id' => absint( $form->ID ),
-							),
+							],
 							admin_url( 'admin.php' )
 						);
 						echo '<li><a href="' . esc_url( $form_url ) . '">' . esc_html( $form->post_title ) . '</a></li>';
@@ -1167,7 +1167,7 @@ class WPForms_Entries_List {
 		} else {
 
 			if ( empty( $display ) ) {
-				$display = array( 'error', 'info', 'warning', 'success' );
+				$display = [ 'error', 'info', 'warning', 'success' ];
 			} else {
 				$display = (array) $display;
 			}

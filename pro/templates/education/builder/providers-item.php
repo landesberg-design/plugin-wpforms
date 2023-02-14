@@ -14,6 +14,7 @@
  * @var string $url           Download URL.
  * @var string $icon          Addon icon.
  * @var string $video         Video URL.
+ * @var string $utm_conten    UTM content.
  * @var bool   $recommended   Flag for recommended providers.
  */
 
@@ -30,7 +31,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	data-url="<?php echo esc_attr( $url ); ?>"
 	data-nonce="<?php echo esc_attr( $nonce ); ?>"
 	data-video="<?php echo esc_url( $video ); ?>"
-	data-license="<?php echo esc_attr( $license_level ); ?>">
+	data-license="<?php echo esc_attr( $license_level ); ?>"
+	data-utm-content="<?php echo esc_attr( $utm_content ); ?>">
 		<img src="<?php echo esc_url( WPFORMS_PLUGIN_URL . 'assets/images/' . $icon ); ?>" alt="<?php echo esc_attr( $modal_name ); ?>">
 		<?php echo esc_html( $name ); ?>
 		<?php if ( ! empty( $recommended ) ) : ?>

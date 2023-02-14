@@ -101,7 +101,7 @@ class Notifications implements IntegrationInterface {
 					],
 				]
 			),
-			esc_url( wpforms_utm_link( 'https://wpforms.com/docs/how-to-fix-wordpress-contact-form-not-sending-email-with-smtp/', 'Block Settings', 'Fixing Email Delivery Issues' ) )
+			esc_url( wpforms_utm_link( 'https://wpforms.com/docs/how-to-fix-wordpress-contact-form-not-sending-email-with-smtp/', 'Builder Notifications', 'Delivery Issues Documentation' ) )
 		);
 
 		$from_email_after = sprintf(

@@ -1,4 +1,4 @@
-/* global wpforms_settings, grecaptcha, hcaptcha, wpformsRecaptchaCallback, wpformsRecaptchaV3Execute, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices, WPFormsPasswordField, WPFormsEntryPreview, punycode, tinyMCE, WPFormsUtils */
+/* global wpforms_settings, grecaptcha, hcaptcha, turnstile, wpformsRecaptchaCallback, wpformsRecaptchaV3Execute, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices, WPFormsPasswordField, WPFormsEntryPreview, punycode, tinyMCE, WPFormsUtils */
 
 'use strict';
 
@@ -169,6 +169,28 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 					}
 					return true;
 				}, wpforms_settings.val_filesize );
+
+				$.validator.addMethod( 'step', function( value, element, param ) {
+
+					const decimalPlaces = function( num ) {
+
+						if ( Math.floor( num ) === num ) {
+							return 0;
+						}
+
+						return num.toString().split( '.' )[1].length || 0;
+					};
+					const decimals = decimalPlaces( param );
+					const decimalToInt = function( num ) {
+
+						return Math.round( num * Math.pow( 10, decimals ) );
+					};
+					const min = decimalToInt( $( element ).attr( 'min' ) );
+
+					value = decimalToInt( value ) - min;
+
+					return this.optional( element ) || decimalToInt( value ) % decimalToInt( param ) === 0;
+				} );
 
 				// Validate email addresses.
 				$.validator.methods.email = function( value, element ) {
@@ -507,21 +529,24 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 									app.scrollToError( $( validator.errorList[0].element ) );
 								}
 							},
-							onkeyup: function( element, event ) {
+							onkeyup: WPFormsUtils.debounce( // eslint-disable-next-line complexity
+								function( element, event ) {
 
-								// This code is copied from JQuery Validate 'onkeyup' method with only one change: 'wpforms-novalidate-onkeyup' class check.
-								var excludedKeys = [ 16, 17, 18, 20, 35, 36, 37, 38, 39, 40, 45, 144, 225 ];
+									// This code is copied from JQuery Validate 'onkeyup' method with only one change: 'wpforms-novalidate-onkeyup' class check.
+									const excludedKeys = [ 16, 17, 18, 20, 35, 36, 37, 38, 39, 40, 45, 144, 225 ];
 
-								if ( $( element ).hasClass( 'wpforms-novalidate-onkeyup' ) ) {
-									return; // Disable onkeyup validation for some elements (e.g. remote calls).
-								}
+									if ( $( element ).hasClass( 'wpforms-novalidate-onkeyup' ) ) {
+										return; // Disable onkeyup validation for some elements (e.g. remote calls).
+									}
 
-								if ( 9 === event.which && '' === this.elementValue( element ) || $.inArray( event.keyCode, excludedKeys ) !== -1 ) {
-									return;
-								} else if ( element.name in this.submitted || element.name in this.invalid ) {
-									this.element( element );
-								}
-							},
+									if ( event.which === 9 && this.elementValue( element ) === '' || $.inArray( event.keyCode, excludedKeys ) !== -1 ) {
+										return;
+									} else if ( element.name in this.submitted || element.name in this.invalid ) {
+										this.element( element );
+									}
+								},
+								1000
+							),
 							onfocusout: function( element ) {
 
 								// This code is copied from JQuery Validate 'onfocusout' method with only one change: 'wpforms-novalidate-onkeyup' class check.
@@ -1450,7 +1475,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				nextPage -= 1;
 			}
 
-			let event = WPFormsUtils.triggerEvent( $this, 'wpformsBeforePageChange', [ nextPage, $form ] );
+			let event = WPFormsUtils.triggerEvent( $this, 'wpformsBeforePageChange', [ nextPage, $form, action ] );
 
 			// Allow callbacks on `wpformsBeforePageChange` to cancel page changing by triggering `event.preventDefault()`.
 			if ( event.isDefaultPrevented() ) {
@@ -1469,7 +1494,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				app.animateScrollTop( $form.offset().top - pageScroll, 750, null );
 			}
 
-			$this.trigger( 'wpformsPageChange', [ nextPage, $form ] );
+			$this.trigger( 'wpformsPageChange', [ nextPage, $form, action ] );
 
 			app.manipulateIndicator( nextPage, $form );
 		},
@@ -2185,7 +2210,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				return false;
 			}
 
-			if ( typeof hcaptcha === 'undefined' && typeof grecaptcha === 'undefined' ) {
+			if ( typeof hcaptcha === 'undefined' && typeof grecaptcha === 'undefined' && typeof turnstile === 'undefined' ) {
 				return false;
 			}
 
@@ -2209,8 +2234,16 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			}
 
 			var $captchaContainer = $form.find( '.wpforms-recaptcha-container' ),
-				apiVar = $captchaContainer.hasClass( 'wpforms-is-hcaptcha' ) ? hcaptcha : grecaptcha,
+				apiVar,
 				recaptchaID;
+
+			if ( $captchaContainer.hasClass( 'wpforms-is-hcaptcha' ) ) {
+				apiVar = hcaptcha;
+			} else if ( $captchaContainer.hasClass( 'wpforms-is-turnstile' ) ) {
+				apiVar = turnstile;
+			} else {
+				apiVar = 'grecaptcha';
+			}
 
 			// Check for invisible recaptcha first.
 			recaptchaID = $form.find( '.wpforms-submit' ).get( 0 ).recaptchaID;

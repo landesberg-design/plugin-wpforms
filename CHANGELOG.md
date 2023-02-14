@@ -1,6 +1,49 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.0] - 2023-02-14
+### Added
+- Prevent spam submissions using the new Cloudflare Turnstile anti-spam integration. You can find it on the Settings > CAPTCHA page.
+
+### Changed
+- Custom Captcha and Section Divider fields are now excluded from custom fields mapping in marketing addons.
+- Filter by country and filter by keyword error messages are now displayed above the Submit button.
+- Non-public taxonomies should not be displayed in Dynamic Choices' available sources.
+- The "Resend Notifications" link on the Entry page is disabled instead of being hidden if any addon blocks this functionality.
+- External usage of removed PHP classes is now handled gracefully without generating fatal errors.
+- Redundant Transaction IDs are not displayed for recurring subscription payments in the View Entry > Payment section.
+- The performance of the Email field validation is improved when using an allowlist or denylist.
+- Files uploaded through Modern File Upload and Rich Text fields to the Media Library now have attachment titles in the "Field label: Original file name" format.
+- State and Country subfields of the Address field now allow selecting the default value from the dropdown if it contains choices.
+- State and Country subfields of the Address field now allow unsetting the default value.
+- Updated DOMPurify library to 2.4.3.
+
+### Fixed
+- The Dropdown field text indentation was incorrect in the Form Builder in Firefox.
+- Various notification modals' titles had inconsistent sizes in the Form Builder.
+- Users without permission to view Entries should not see links for entry counts in the Dashboard widget.
+- The header column background did not fill the entire column height in the Compact view of the Entry print preview.
+- Validation errors in various modals were inconsistent in the Form Builder.
+- When duplicating an inactive field, the settings of the active field are now removed properly.
+- Malformed HTML in the Entry Preview Notice field could brake the Form Builder markup.
+- It was impossible to remove an expired license key after upgrading to WPForms Pro if it was initially set in WPForms Lite.
+- The expired, disabled and invalid license notices were shown twice after entering the key in the WPForms Lite, then installing and activating WPForms Pro.
+- The Page Break field was inserted in the incorrect position if the form contained a notice about a certain field being not available under the current license.
+- Some cache files were unnecessarily re-downloaded on the front end.
+- The Single Item field with a User Defined type could be submitted with a negative amount.
+- Prevent other plugins from adding custom buttons to the Content Field TinyMCE editor to prevent functionality breakage.
+- Images in the Rich Text field were ignoring alignment settings in the entry notification email.
+- Users with roles other than Administrator could not add the reCAPTCHA/hCaptcha field and dismiss notices even if they had sufficient permissions.
+- Number Slider field validation failed if a maximum value was not a multiple of steps.
+- Buttons inside of notices inside of 4-column layout fields were formatted incorrectly.
+- Max File Uploads could have been set to 0 or an empty value, causing File Upload field validation to fail.
+- The Previous page of the Page Break field could not be opened without filling in the Credit Card Number field.
+- Entries export was not working on non-direct file systems, e.g. SSH2, FTP, etc. (including Pantheon.io using Git).
+- Image Choices in Multiple Choice fields were not displaying the image in the entry preview when the choice label contained HTML.
+- HTML markup in the Default Text of Paragraph Text fields was not being displayed on the front end and in the Form Builder preview.
+- Placeholders and Default values of various subfields of the Address field are now consistent in the Form Builder preview.
+- Admin bar icons were broken after submitting a form with the Rich Text field.
+
 ## [1.7.9.1] - 2023-01-11
 ### Fixed
 - Layout fields were not shown when they were on any page other than the first page of a multi-page form and conditional logic was enabled on at least one field within the Layout field.

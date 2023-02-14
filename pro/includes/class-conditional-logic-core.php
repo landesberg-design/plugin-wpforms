@@ -182,7 +182,7 @@ class WPForms_Conditional_Logic_Core {
 	 *
 	 * @return string
 	 */
-	public function builder_block( $args = array(), $echo = true ) {
+	public function builder_block( $args = [], $echo = true ) {
 
 		if ( ! empty( $args['form'] ) ) {
 			$form_fields = wpforms_get_form_fields( $args['form'], wpforms_get_conditional_logic_form_fields_supported() );

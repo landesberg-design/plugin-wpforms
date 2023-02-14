@@ -22,10 +22,10 @@ class WPForms_Field_Payment_Total extends WPForms_Field {
 		$this->group = 'payment';
 
 		// Define additional field properties.
-		add_filter( 'wpforms_field_properties_payment-total', array( $this, 'field_properties' ), 5, 3 );
+		add_filter( 'wpforms_field_properties_payment-total', [ $this, 'field_properties' ], 5, 3 );
 
 		// Recalculate total for a form.
-		add_filter( 'wpforms_process_filter', array( $this, 'calculate_total' ), 10, 3 );
+		add_filter( 'wpforms_process_filter', [ $this, 'calculate_total' ], 10, 3 );
 	}
 
 	/**
@@ -115,9 +115,10 @@ class WPForms_Field_Payment_Total extends WPForms_Field {
 		 */
 
 		// Options open markup.
-		$args = array(
+		$args = [
 			'markup' => 'open',
-		);
+		];
+
 		$this->field_option( 'basic-options', $field, $args );
 
 		// Label.
@@ -130,9 +131,10 @@ class WPForms_Field_Payment_Total extends WPForms_Field {
 		$this->field_option( 'required', $field );
 
 		// Options close markup.
-		$args = array(
+		$args = [
 			'markup' => 'close',
-		);
+		];
+
 		$this->field_option( 'basic-options', $field, $args );
 
 		/*
@@ -243,14 +245,14 @@ class WPForms_Field_Payment_Total extends WPForms_Field {
 		$amount = wpforms_sanitize_amount( $field_submit );
 
 		// Set final field details.
-		wpforms()->process->fields[ $field_id ] = array(
+		wpforms()->process->fields[ $field_id ] = [
 			'name'       => sanitize_text_field( $name ),
 			'value'      => wpforms_format_amount( $amount, true ),
 			'amount'     => wpforms_format_amount( $amount ),
 			'amount_raw' => $amount,
 			'id'         => absint( $field_id ),
 			'type'       => $this->type,
-		);
+		];
 	}
 }
 

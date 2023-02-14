@@ -35,9 +35,9 @@ function wpforms_entry_list_star() {
 	if ( 'star' === $task ) {
 		$is_success = wpforms()->entry->update(
 			$entry_id,
-			array(
+			[
 				'starred' => '1',
-			)
+			]
 		);
 
 		$note_data = esc_html__( 'Entry starred.', 'wpforms' );
@@ -45,9 +45,9 @@ function wpforms_entry_list_star() {
 	} elseif ( 'unstar' === $task ) {
 		$is_success = wpforms()->entry->update(
 			$entry_id,
-			array(
+			[
 				'starred' => '0',
-			)
+			]
 		);
 
 		$note_data = esc_html__( 'Entry unstarred.', 'wpforms' );
@@ -57,13 +57,13 @@ function wpforms_entry_list_star() {
 
 		// Add an entry note about Star/Unstar action.
 		wpforms()->entry_meta->add(
-			array(
+			[
 				'entry_id' => $entry_id,
 				'form_id'  => $form_id,
 				'user_id'  => $user_id,
 				'type'     => 'log',
 				'data'     => wpautop( sprintf( '<em>%s</em>', $note_data ) ),
-			),
+			],
 			'entry_meta'
 		);
 
@@ -105,9 +105,9 @@ function wpforms_entry_list_read() {
 	if ( 'read' === $task ) {
 		$is_success = wpforms()->entry->update(
 			$entry_id,
-			array(
+			[
 				'viewed' => '1',
-			)
+			]
 		);
 
 		$note_data = esc_html__( 'Entry read.', 'wpforms' );
@@ -115,9 +115,9 @@ function wpforms_entry_list_read() {
 	} elseif ( 'unread' === $task ) {
 		$is_success = wpforms()->entry->update(
 			$entry_id,
-			array(
+			[
 				'viewed' => '0',
-			)
+			]
 		);
 
 		$note_data = esc_html__( 'Entry unread.', 'wpforms' );
@@ -127,13 +127,13 @@ function wpforms_entry_list_read() {
 
 		// Add an entry note about Star/Unstar action.
 		wpforms()->entry_meta->add(
-			array(
+			[
 				'entry_id' => $entry_id,
 				'form_id'  => $form_id,
 				'user_id'  => $user_id,
 				'type'     => 'log',
 				'data'     => wpautop( sprintf( '<em>%s</em>', $note_data ) ),
-			),
+			],
 			'entry_meta'
 		);
 
@@ -263,7 +263,7 @@ function wpforms_builder_settings_block_state_save() {
 		empty( $form_id ) ||
 		empty( $block_id ) ||
 		empty( $block_type ) ||
-		( empty( $state ) || ! in_array( $state, array( 'opened', 'closed' ), true ) )
+		( empty( $state ) || ! in_array( $state, [ 'opened', 'closed' ], true ) )
 	) {
 		wp_send_json_error();
 	}

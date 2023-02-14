@@ -65,7 +65,7 @@ class Core extends \WPForms\Admin\Education\Core {
 		}
 
 		$strings['license'] = [
-			'title'    => esc_html__( 'Heads Up!', 'wpforms' ),
+			'title'    => esc_html__( 'Heads up!', 'wpforms' ),
 			'prompt'   => esc_html__( 'To access the %name%, please enter and activate your WPForms license key in the plugin settings.', 'wpforms' ),
 			'button'   => esc_html__( 'Enter License Key', 'wpforms' ),
 			'url'      => admin_url( 'admin.php?page=wpforms-settings' ),
@@ -101,13 +101,13 @@ class Core extends \WPForms\Admin\Education\Core {
 		if ( ! empty( $license['is_expired'] ) ) {
 			$strings['license']['prompt'] = esc_html__( 'Your WPForms license is expired. To access the %name%, please renew your license.', 'wpforms' );
 			$strings['license']['button'] = esc_html__( 'Renew Now', 'wpforms' );
-			$strings['license']['url']    = esc_url_raw( wpforms_utm_link( 'https://wpforms.com/account/licenses/', 'Builder Modal Expired License', '~utm-content~ Field' ) );
+			$strings['license']['url']    = esc_url_raw( wpforms_utm_link( 'https://wpforms.com/account/licenses/', 'Builder Modal Expired License', '~utm-content~' ) );
 		}
 
 		if ( ! empty( $license['is_disabled'] ) || ! empty( $license['is_invalid'] ) ) {
 			$strings['license']['prompt'] = esc_html__( 'Your WPForms license is not active. To access the %name%, please contact support for more details.', 'wpforms' );
 			$strings['license']['button'] = esc_html__( 'Contact Support', 'wpforms' );
-			$strings['license']['url']    = esc_url_raw( wpforms_utm_link( 'https://wpforms.com/account/support/', 'Builder Modal Disabled License', '~utm-content~ Field' ) );
+			$strings['license']['url']    = esc_url_raw( wpforms_utm_link( 'https://wpforms.com/account/support/', 'Builder Modal Disabled License', '~utm-content~' ) );
 		}
 
 		$strings['can_install_addons'] = wpforms_can_install( 'addon' );

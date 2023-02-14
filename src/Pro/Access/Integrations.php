@@ -27,15 +27,15 @@ class Integrations {
 	public function hooks() {
 
 		// Members plugin.
-		\add_action( 'admin_enqueue_scripts', array( $this, 'members_enqueue_scripts' ) );
-		\add_action( 'members_register_cap_groups', array( $this, 'members_register_cap_group' ) );
-		\add_action( 'members_register_caps', array( $this, 'members_register_caps' ) );
-		\add_filter( 'members_get_capabilities', array( $this, 'members_get_capabilities' ) );
+		add_action( 'admin_enqueue_scripts', [ $this, 'members_enqueue_scripts' ] );
+		add_action( 'members_register_cap_groups', [ $this, 'members_register_cap_group' ] );
+		add_action( 'members_register_caps', [ $this, 'members_register_caps' ] );
+		add_filter( 'members_get_capabilities', [ $this, 'members_get_capabilities' ] );
 
 		// User Role Editor plugin.
-		\add_filter( 'ure_capabilities_groups_tree', array( $this, 'ure_capabilities_groups_tree' ) );
-		\add_filter( 'ure_custom_capability_groups', array( $this, 'ure_custom_capability_groups' ), 10, 2 );
-		\add_filter( 'ure_full_capabilites', array( $this, 'ure_full_capabilities' ), 10, 2 );
+		add_filter( 'ure_capabilities_groups_tree', [ $this, 'ure_capabilities_groups_tree' ] );
+		add_filter( 'ure_custom_capability_groups', [ $this, 'ure_custom_capability_groups' ], 10, 2 );
+		add_filter( 'ure_full_capabilites', [ $this, 'ure_full_capabilities' ], 10, 2 );
 	}
 
 	/**
@@ -47,8 +47,8 @@ class Integrations {
 	 */
 	public function get_remove_caps() {
 
-		$remove_caps   = array();
-		$remove_groups = array( 'wpforms_forms', 'wpforms_logs', 'wpforms_announcements', 'wpforms-lite_announcements' );
+		$remove_caps   = [];
+		$remove_groups = [ 'wpforms_forms', 'wpforms_logs', 'wpforms_announcements', 'wpforms-lite_announcements' ];
 
 		foreach ( $remove_groups as $remove_group ) {
 			\array_push( $remove_caps, 'edit_' . $remove_group, 'edit_others_' . $remove_group, 'publish_' . $remove_group, 'read_private_' . $remove_group );
@@ -97,14 +97,14 @@ class Integrations {
 
 		members_register_cap_group(
 			'wpforms',
-			array(
+			[
 				'label' => esc_html__( 'WPForms', 'wpforms' ),
 				'icon'  => 'dashicons-wpforms',
-				'caps'  => array(),
-			)
+				'caps'  => [],
+			]
 		);
 
-		\array_map( 'members_unregister_cap_group', array( 'type-wpforms', 'type-wpforms_log', 'type-amn_wpforms', 'type-amn_wpforms-lite' ) );
+		array_map( 'members_unregister_cap_group', [ 'type-wpforms', 'type-wpforms_log', 'type-amn_wpforms', 'type-amn_wpforms-lite' ] );
 	}
 
 	/**
@@ -135,10 +135,10 @@ class Integrations {
 		foreach ( $caps as $cap => $label ) {
 			members_register_cap(
 				$cap,
-				array(
+				[
 					'label' => $label,
 					'group' => 'wpforms',
-				)
+				]
 			);
 		}
 	}
@@ -152,18 +152,18 @@ class Integrations {
 	 *
 	 * @return array
 	 */
-	public function ure_capabilities_groups_tree( $groups = array() ) {
+	public function ure_capabilities_groups_tree( $groups = [] ) {
 
-		$groups['wpforms_caps'] = array(
+		$groups['wpforms_caps'] = [
 			'caption' => esc_html__( 'WPForms', 'wpforms' ),
 			'parent'  => 'custom',
 			'level'   => 2,
-		);
+		];
 
-		$remove_groups = \wpforms_list_only( $groups, array( 'wpforms', 'wpforms_log', 'amn_wpforms' ) );
+		$remove_groups = wpforms_list_only( $groups, [ 'wpforms', 'wpforms_log', 'amn_wpforms' ] );
 
 		foreach ( $remove_groups as $key => $data ) {
-			if ( isset( $groups[ $key ]['parent'] ) && 'custom_post_types' === $groups[ $key ]['parent'] ) {
+			if ( isset( $groups[ $key ]['parent'] ) && $groups[ $key ]['parent'] === 'custom_post_types' ) {
 				unset( $groups[ $key ] );
 			}
 		}
@@ -181,7 +181,7 @@ class Integrations {
 	 *
 	 * @return array
 	 */
-	public function ure_custom_capability_groups( $groups = array(), $cap_id = '' ) {
+	public function ure_custom_capability_groups( $groups = [], $cap_id = '' ) {
 
 		// Get WPForms capabilities.
 		$caps = \array_keys( \wpforms()->get( 'access' )->get_caps() );
@@ -208,11 +208,11 @@ class Integrations {
 		$caps = \wpforms()->get( 'access' )->get_caps();
 
 		foreach ( $caps as $cap_id => $cap_name ) {
-			$list[ $cap_id ] = array(
+			$list[ $cap_id ] = [
 				'inner'   => $cap_id,
 				'human'   => $cap_name,
 				'wp_core' => false,
-			);
+			];
 		}
 
 		$list = \array_diff_key( $list, \array_flip( $this->get_remove_caps() ) );

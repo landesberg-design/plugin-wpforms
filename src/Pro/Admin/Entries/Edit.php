@@ -833,11 +833,11 @@ class Edit {
 
 		if ( \wpforms_current_user_can( 'edit_form_single', $this->form_data['id'] ) ) {
 			$edit_url = add_query_arg(
-				array(
+				[
 					'page'    => 'wpforms-builder',
 					'view'    => 'fields',
 					'form_id' => absint( $this->form_data['id'] ),
-				),
+				],
 				admin_url( 'admin.php' )
 			);
 			printf(
