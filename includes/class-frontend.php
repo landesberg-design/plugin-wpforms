@@ -1156,7 +1156,7 @@ class WPForms_Frontend {
 
 		echo '<div ' . wpforms_html_attributes( '', [ 'g-recaptcha' ], $data ) . '></div>';
 
-		if ( ! ( $captcha_settings['provider'] === 'gcaptcha' && $captcha_settings['recaptcha_type'] === 'invisible' ) ) {
+		if ( ! ( $captcha_settings['provider'] === 'recaptcha' && $captcha_settings['recaptcha_type'] === 'invisible' ) ) {
 			echo '<input type="text" name="g-recaptcha-hidden" class="wpforms-recaptcha-hidden" style="position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;" required>';
 		}
 

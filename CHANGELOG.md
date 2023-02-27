@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.0.1] - 2023-02-15
+### Fixed 
+- Invisible reCaptcha was incorrectly processed resulting in failed form submissions with a wrong error message.
+
 ## [1.8.0] - 2023-02-14
 ### Added
 - Prevent spam submissions using the new Cloudflare Turnstile anti-spam integration. You can find it on the Settings > CAPTCHA page.
