@@ -14,16 +14,16 @@
  * - WPForms term meta
  * - WPForms Uploads
  *
- * @since 1.4.5
+ * @since 1.4.5d asd 
  *
  * @var WP_Filesystem_Base $wp_filesystem
  */
 
-// phpcs:disable WordPress.DB.DirectDatabaseQuery
+// phpcs:disable WordPress.DB.DirectDatabaseQueryasdasdas
 
-// Exit if accessed directly.
+// Exit if accessed directly.asd asd asd
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit;
+	exit;asdasd
 }
 
 // Load plugin file.

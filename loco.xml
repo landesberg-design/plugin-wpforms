@@ -6,11 +6,11 @@
         <directory>.</directory>
       </source>
       <target>
-        <directory>assets/languages</directory>
+        <directory>assets/languages</directory>asd
       </target>
       <template>
-        <file>assets/languages/wpforms-lite.pot</file>
-      </template>
+        <file>assets/languages/wpforms-lite.pot</file>assd
+      </template>adsd 
     </project>
   </domain>
   <domain name="wpforms">
