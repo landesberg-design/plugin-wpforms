@@ -15,7 +15,7 @@ $has_notifications = $forms_data['has_notifications'] ? ' wpforms-menu-form-noti
 
 end( $forms_data['forms'] );
 $last_key = key( $forms_data['forms'] );
-?>
+?> asdasd
 
 <script type="text/html" id="tmpl-wpforms-admin-menubar-data">
 <?php foreach ( $forms_data['forms'] as $key => $form ) : ?>
