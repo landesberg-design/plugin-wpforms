@@ -134,7 +134,7 @@ function wpforms_settings_license_callback( $args ) {
 
 	$output .= '<hr><p>' . esc_html__( 'Already purchased? Simply enter your license key below to enable WPForms PRO!', 'wpforms-lite' ) . '</p>';
 	$output .= '<p>';
-	$output .= '<input type="password" id="wpforms-settings-upgrade-license-key" placeholder="' . esc_attr__( 'Paste license key here', 'wpforms-lite' ) . '" value="">';
+	$output .= '<input type="password" spellcheck="false" id="wpforms-settings-upgrade-license-key" placeholder="' . esc_attr__( 'Paste license key here', 'wpforms-lite' ) . '" value="">';
 	$output .= '<button type="button" class="wpforms-btn wpforms-btn-md wpforms-btn-orange" id="wpforms-settings-connect-btn">' . esc_html__( 'Verify Key', 'wpforms-lite' ) . '</button>';
 	$output .= '</p>';
 
@@ -280,14 +280,19 @@ function wpforms_settings_select_callback( $args ) {
  */
 function wpforms_settings_checkbox_callback( $args ) {
 
-	$value   = wpforms_setting( $args['id'] );
-	$id      = wpforms_sanitize_key( $args['id'] );
-	$checked = ! empty( $value ) ? checked( 1, $value, false ) : '';
+	$value    = wpforms_setting( $args['id'] );
+	$id       = wpforms_sanitize_key( $args['id'] );
+	$checked  = ! empty( $value ) ? checked( 1, $value, false ) : '';
+	$disabled = ! empty( $args['disabled'] ) ? ' disabled' : '';
 
-	$output = '<input type="checkbox" id="wpforms-setting-' . $id . '" name="' . $id . '" ' . $checked . '>';
+	$output = '<input type="checkbox" id="wpforms-setting-' . $id . '" name="' . $id . '" ' . $checked . $disabled . '>';
 
 	if ( ! empty( $args['desc'] ) ) {
 		$output .= '<p class="desc">' . wp_kses_post( $args['desc'] ) . '</p>';
+	}
+
+	if ( ! empty( $args['disabled_desc'] ) ) {
+		$output .= '<p class="disabled-desc">' . wp_kses_post( $args['disabled_desc'] ) . '</p>';
 	}
 
 	return $output;

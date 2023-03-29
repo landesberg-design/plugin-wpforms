@@ -45,8 +45,10 @@ class Addons {
 	 */
 	public function allow_load() {
 
-		// Load only in the Admin area or Form Builder.
-		return wpforms_current_user_can( [ 'create_forms', 'edit_forms' ] ) && ( wpforms_is_admin_ajax() || wpforms_is_admin_page() || wpforms_is_admin_page( 'builder' ) );
+		$has_permissions  = wpforms_current_user_can( [ 'create_forms', 'edit_forms' ] );
+		$allowed_requests = wpforms_is_admin_ajax() || wpforms_is_admin_page() || wpforms_is_admin_page( 'builder' );
+
+		return $has_permissions && $allowed_requests;
 	}
 
 	/**

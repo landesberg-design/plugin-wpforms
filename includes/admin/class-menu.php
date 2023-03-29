@@ -17,7 +17,7 @@ class WPForms_Admin_Menu {
 		// Let's make some menus.
 		add_action( 'admin_menu', [ $this, 'register_menus' ], 9 );
 		add_action( 'admin_head', [ $this, 'hide_wpforms_submenu_items' ] );
-		add_action( 'admin_head', [ $this, 'adjust_pro_menu_item_class' ] );
+		add_action( 'admin_head', [ $this, 'adjust_pro_menu_item' ] );
 		add_action( 'admin_head', [ $this, 'admin_menu_styles' ], 11 );
 
 		// Plugins page settings link.
@@ -183,7 +183,7 @@ class WPForms_Admin_Menu {
 				esc_html__( 'Upgrade to Pro', 'wpforms-lite' ),
 				esc_html__( 'Upgrade to Pro', 'wpforms-lite' ),
 				$manage_cap,
-				esc_url( 'https://wpforms.com/lite-upgrade/?utm_campaign=liteplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro' )
+				wpforms_admin_upgrade_link( 'admin-menu' )
 			);
 		}
 	}
@@ -246,17 +246,30 @@ class WPForms_Admin_Menu {
 	 */
 	public function style_upgrade_pro_link() {
 
-		_deprecated_function( __METHOD__, '1.7.8 of the WPForms plugin', __CLASS__ . '::add_pro_badge()' );
+		_deprecated_function( __METHOD__, '1.7.8 of the WPForms plugin', __CLASS__ . '::adjust_pro_menu_item()' );
 
-		$this->adjust_pro_menu_item_class();
+		$this->adjust_pro_menu_item();
 	}
 
 	/**
 	 * Add the PRO badge to left sidebar menu item.
 	 *
 	 * @since 1.7.8
+	 * @deprecated 1.8.1
 	 */
 	public function adjust_pro_menu_item_class() {
+
+		_deprecated_function( __METHOD__, '1.8.1 of the WPForms plugin', __CLASS__ . '::adjust_pro_menu_item()' );
+
+		$this->adjust_pro_menu_item();
+	}
+
+	/**
+	 * Make changes to the PRO menu item.
+	 *
+	 * @since 1.8.1
+	 */
+	public function adjust_pro_menu_item() {
 
 		global $submenu;
 
@@ -280,13 +293,27 @@ class WPForms_Admin_Menu {
 			return;
 		}
 
-		// Prepare a HTML class.
+		// Add the PRO badge to the menu item.
 		// phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited
 		if ( isset( $submenu['wpforms-overview'][ $upgrade_link_position ][4] ) ) {
 			$submenu['wpforms-overview'][ $upgrade_link_position ][4] .= ' wpforms-sidebar-upgrade-pro';
 		} else {
 			$submenu['wpforms-overview'][ $upgrade_link_position ][] = 'wpforms-sidebar-upgrade-pro';
 		}
+
+		$current_screen      = get_current_screen();
+		$upgrade_utm_content = $current_screen === null ? 'Upgrade to Pro' : 'Upgrade to Pro - ' . $current_screen->base;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$upgrade_utm_content = empty( $_GET['view'] ) ? $upgrade_utm_content : $upgrade_utm_content . ': ' . sanitize_key( $_GET['view'] );
+
+		// Add utm_content to the menu item.
+		$submenu['wpforms-overview'][ $upgrade_link_position ][2] = esc_url(
+			add_query_arg(
+				'utm_content',
+				$upgrade_utm_content,
+				$submenu['wpforms-overview'][ $upgrade_link_position ][2]
+			)
+		);
 		// phpcs:enable WordPress.WP.GlobalVariablesOverride.Prohibited
 	}
 
@@ -326,6 +353,7 @@ class WPForms_Admin_Menu {
 						'utm_campaign' => 'liteplugin',
 						'utm_medium'   => 'all-plugins',
 						'utm_source'   => 'WordPress',
+						'utm_locale'   => wpforms_sanitize_key( get_locale() ),
 					],
 					'https://wpforms.com/lite-upgrade/'
 				)

@@ -241,19 +241,32 @@ class WPForms_Review {
 	}
 
 	/**
-	 * Pre-footer promotion block.
+	 * Pre-footer promotion block, displayed on all WPForms admin pages except Form Builder.
 	 *
 	 * @since 1.8.0
 	 */
 	public function promote_wpforms() {
 
-		global $current_screen;
+		// Some 3rd-party addons may use page slugs that start with `wpforms-` (e.g. WPForms Views),
+		// so we should define exact pages we want the footer to be displayed on instead
+		// of targeting any page that looks like a WPForms page.
+		$plugin_pages = [
+			'wpforms-about',
+			'wpforms-addons',
+			'wpforms-analytics',
+			'wpforms-community',
+			'wpforms-entries',
+			'wpforms-overview',
+			'wpforms-settings',
+			'wpforms-smtp',
+			'wpforms-templates',
+			'wpforms-tools',
+		];
 
-		if ( empty( $current_screen->id ) || strpos( $current_screen->id, 'wpforms' ) === false ) {
-			return;
-		}
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$current_page = isset( $_REQUEST['page'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) : '';
 
-		if ( wpforms_is_admin_page( 'builder' ) ) {
+		if ( ! in_array( $current_page, $plugin_pages, true ) ) {
 			return;
 		}
 

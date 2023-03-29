@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 									],
 								]
 							),
-							'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade'
+							'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade&utm_locale=' . wpforms_sanitize_key( get_locale() )
 						);
 						?>
 					</p>
@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php
 							printf(
 								'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
-								'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade',
+								'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade&utm_locale=' . wpforms_sanitize_key( get_locale() ),
 								esc_html__( 'Check out what else you’ll get with your Pro license.', 'wpforms-lite' )
 							);
 						?>
@@ -94,7 +94,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 										],
 									]
 								),
-								'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade'
+								'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade&utm_locale=' . wpforms_sanitize_key( get_locale() )
 							);
 							?>
 						</p>

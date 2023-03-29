@@ -1,6 +1,34 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.1] - 2023-03-28
+### Added
+- Modern Form Styles - easily control the appearance of form fields, labels, and buttons without writing code, right inside the Block Editor.
+- The new filter `wpforms_frontend_assets_header_force_load` allows forcing load assets in the header which is useful when the form is in the sidebar widget and similar locations.
+- The new filter `wpforms_entry_preview_get_start_page_break_id_force_first` allows showing all fields from the beginning of the form to the current entry preview page.
+
+### Changed
+- Tooltips design is improved.
+- Entry Print Settings design is revised to provide better UX.
+
+### Fixed
+- The form preview page was incorrectly shown in some themes.
+- CF turnstile form ID was translated creating problems with analysis in Cloudflare Dashboard.
+- Country list style was adjusted for the Phone field, specifically on dark themes.
+- Notifications Settings styles were looking bad on a small screen in the Form Builder.
+- An "active column" state was stuck for a duplicated Layout field inside the Form Builder preview panel.
+
+## [1.8.0.2] - 2023-02-28
+### Changed
+- Updated DOMPurify library to 3.0.1.
+
+### Fixed
+- An error occurred when the DreamHost Panel Login plugin and WPForms Lite were both active and WPForms Pro was activated.
+- Some dropdown fields in the Marketing settings area of the Form Builder were rendered incorrectly in Safari after making a selection.
+- Form template block in the Form Builder could overflow the container on smaller screen sizes.
+- Long links in the HTML email messages did not wrap and caused overflow issues.
+- Google reCAPTCHA v2 could not be reset on server-side validation failure.
+
 ## [1.8.0.1] - 2023-02-15
 ### Fixed 
 - Invisible reCaptcha was incorrectly processed resulting in failed form submissions with a wrong error message.

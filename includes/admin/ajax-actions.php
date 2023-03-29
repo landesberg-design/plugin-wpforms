@@ -152,7 +152,18 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 		);
 	}
 
-	$title_exists = get_page_by_title( $form_title, 'OBJECT', 'wpforms' );
+	$title_query  = new WP_Query(
+		[
+			'post_type'              => 'wpforms',
+			'title'                  => $form_title,
+			'posts_per_page'         => 1,
+			'fields'                 => 'ids',
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'no_found_rows'          => true,
+		]
+	);
+	$title_exists = $title_query->post_count > 0;
 	$form_id      = wpforms()->get( 'form' )->add(
 		$form_title,
 		[],
@@ -161,7 +172,7 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 		]
 	);
 
-	if ( $title_exists !== null ) {
+	if ( $title_exists ) {
 
 		// Skip creating a revision for this action.
 		remove_action( 'post_updated', 'wp_save_post_revision' );

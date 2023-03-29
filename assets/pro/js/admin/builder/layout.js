@@ -710,8 +710,11 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			// Duplicate preset option value.
 			$newLayoutFieldOptions.find( `#wpforms-field-option-${newLayoutFieldID}-preset-${preset}` ).prop( 'checked', true );
 
-			// Delete the fields from the columns
+			// Delete the fields from the columns.
 			$newLayoutField.find( '.wpforms-layout-column .wpforms-field' ).remove();
+
+			// Reset "active column" state.
+			$newLayoutField.find( '.wpforms-fields-sortable-default' ).removeClass( 'wpforms-fields-sortable-default' );
 
 			columnsData.forEach( function( column, index ) {
 
@@ -740,6 +743,9 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 
 			app.updateFieldColumnsData( newLayoutFieldID, newColumnsData );
 			app.reorderLayoutFieldsOptions( $newLayoutField );
+
+			// Activate duplicate field to keep consistent behavior with other fields.
+			$newLayoutField.trigger( 'click' );
 
 			WPFormsUtils.triggerEvent( el.$builder, 'wpformsFieldDuplicated', [ layoutFieldId, $field, newLayoutFieldID, $newLayoutField ]  );
 		},

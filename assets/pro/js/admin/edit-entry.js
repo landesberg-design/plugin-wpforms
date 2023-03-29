@@ -267,7 +267,7 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 
 			el.$editForm.find( '.wpforms-field.wpforms-has-error' ).removeClass( 'wpforms-has-error' );
 			el.$editForm.find( '.wpforms-error:not(label)' ).removeClass( 'wpforms-error' );
-			el.$editForm.find( 'label.wpforms-error' ).addClass( 'wpforms-hidden' );
+			el.$editForm.find( 'label.wpforms-error, em.wpforms-error' ).addClass( 'wpforms-hidden' );
 		},
 
 		/**

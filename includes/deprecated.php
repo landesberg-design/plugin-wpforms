@@ -124,6 +124,13 @@ namespace WPForms {
 	}
 }
 
+namespace WPForms\Forms {
+
+	use WPForms\Removed;
+
+	class Loader extends Removed {}
+}
+
 namespace {
 	/**
 	 * To be compatible with both WP 4.9 (that can run on PHP 5.2+) and WP 5.3+ (PHP 5.6+)
@@ -187,6 +194,14 @@ namespace {
 		 */
 		class_alias( '\WPForms\Pro\Migrations\Migrations', '\WPForms\Pro\Migrations' );
 	}
+
+	/**
+	 * Legacy `\WPForms_Frontend` class was refactored and moved to the new `\WPForms\Frontend\Frontend` class.
+	 * This alias is a safeguard to those developers who use our internal class \WPForms_Frontend, which we deleted.
+	 *
+	 * @since 1.8.1
+	 */
+	class_alias( '\WPForms\Frontend\Frontend', '\WPForms_Frontend' );
 
 	/**
 	 * Get notification state, whether it's opened or closed.

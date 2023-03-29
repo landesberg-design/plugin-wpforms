@@ -229,7 +229,7 @@ function wpforms_has_field_type( $type, $form, $multiple = false ) {
 	}
 
 	foreach ( $form_data['fields'] as $single_field ) {
-		if ( in_array( $single_field['type'], $type, true ) ) {
+		if ( ! empty( $single_field['type'] ) && in_array( $single_field['type'], $type, true ) ) {
 			$field = true;
 
 			break;

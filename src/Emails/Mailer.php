@@ -428,17 +428,27 @@ class Mailer {
 		$errors = [];
 
 		foreach ( (array) $this->to_email as $email ) {
-			if ( ! \is_email( $email ) ) {
-				$errors[] = sprintf( /* translators: %s - invalid email. */ esc_html__( '[WPForms\Emails\Mailer] Invalid email address %s.', 'wpforms-lite' ), $email );
+			if ( ! is_email( $email ) ) {
+				$errors[] = sprintf( /* translators: %1$s - namespaced class name, %2$s - invalid email. */
+					esc_html__( '%1$s Invalid email address %2$s.', 'wpforms-lite' ),
+					'[WPForms\Emails\Mailer]',
+					$email
+				);
 			}
 		}
 
 		if ( empty( $this->subject ) ) {
-			$errors[] = \esc_html__( '[WPForms\Emails\Mailer] Empty subject line.', 'wpforms-lite' );
+			$errors[] = sprintf( /* translators: %s - namespaced class name. */
+				esc_html__( '%s Empty subject line.', 'wpforms-lite' ),
+				'[WPForms\Emails\Mailer]'
+			);
 		}
 
 		if ( empty( $this->get_message() ) ) {
-			$errors[] = \esc_html__( '[WPForms\Emails\Mailer] Empty message.', 'wpforms-lite' );
+			$errors[] = sprintf( /* translators: %s - namespaced class name. */
+				esc_html__( '%s Empty message.', 'wpforms-lite' ),
+				'[WPForms\Emails\Mailer]'
+			);
 		}
 
 		return $errors;

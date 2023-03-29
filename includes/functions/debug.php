@@ -64,6 +64,7 @@ function wpforms_debug_data( $data, $echo = true ) {
 				padding: 10px;
 				border-radius: 0;
 				border-color: #c3c4c7;
+				box-sizing: border-box;
 			}
 			.postbox .wpforms-debug {
 				padding-top: 12px;

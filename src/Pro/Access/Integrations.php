@@ -84,7 +84,7 @@ class Integrations {
 
 		wp_enqueue_style(
 			'wpforms-dashicons',
-			WPFORMS_PLUGIN_URL . "assets/css/wpforms-dashicons{$min}.css"
+			WPFORMS_PLUGIN_URL . "assets/css/frontend/wpforms-dashicons{$min}.css"
 		);
 	}
 

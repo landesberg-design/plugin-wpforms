@@ -105,6 +105,10 @@ class DefaultThemes implements IntegrationInterface {
 	 */
 	private function tt1_hooks() { // phpcs:disable WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
+		if ( wpforms_get_render_engine() === 'modern' ) {
+			return;
+		}
+
 		$form_styling = wpforms_setting( 'disable-css', '1' );
 
 		if ( $form_styling === '1' ) {

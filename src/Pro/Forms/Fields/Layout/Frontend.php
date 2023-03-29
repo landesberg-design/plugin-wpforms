@@ -2,7 +2,7 @@
 
 namespace WPForms\Pro\Forms\Fields\Layout;
 
-use WPForms_Frontend;
+use WPForms\Frontend\Frontend as WPForms_Frontend;
 use WPForms_Field_Layout;
 
 /**
@@ -22,7 +22,7 @@ class Frontend {
 	private $field_obj;
 
 	/**
-	 * Instance of the WPForms_Frontend class.
+	 * Instance of the WPForms\Frontend\Frontend class.
 	 *
 	 * @since 1.7.7
 	 *

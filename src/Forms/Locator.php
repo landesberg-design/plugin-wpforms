@@ -1114,10 +1114,10 @@ class Locator {
 				 * Extract id from conventional wpforms shortcode or wpforms block.
 				 * Examples:
 				 * [wpforms id="32" title="true" description="true"]
-				 * <!-- wp:wpforms/form-selector {"formId":"32","displayTitle":true,"displayDesc":true} /-->
+				 * <!-- wp:wpforms/form-selector {"clientId":"b5f8e16a-fc28-435d-a43e-7c77719f074c", "formId":"32","displayTitle":true,"displayDesc":true} /-->
 				 * In both, we should find 32.
 				 */
-				'#\[\s*wpforms.+id\s*=\s*"(\d+?)".*]|<!-- wp:wpforms/form-selector {"formId":"(\d+?)".*?} /-->#',
+				'#\[\s*wpforms.+id\s*=\s*"(\d+?)".*]|<!-- wp:wpforms/form-selector {.*?"formId":"(\d+?)".*?} /-->#',
 				$content,
 				$matches
 			)

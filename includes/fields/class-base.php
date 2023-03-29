@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:ignore WPForms.PHP.UseStatement.UnusedUseStatement
+use \WPForms\Forms\Fields\Base\Frontend as FrontendBase;
 use WPForms\Forms\IconChoices;
 
 /**
@@ -100,6 +102,15 @@ abstract class WPForms_Field {
 	public $field_data;
 
 	/**
+	 * Instance of the Frontend class.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @var FrontendBase
+	 */
+	protected $frontend_obj;
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 1.0.0
@@ -117,6 +128,9 @@ abstract class WPForms_Field {
 
 		// Bootstrap.
 		$this->init();
+
+		// Initialize field's Frontend class.
+		$this->frontend_obj = $this->get_object( 'Frontend' );
 
 		// Temporary solution to get an object of the field class.
 		add_filter(
@@ -140,7 +154,7 @@ abstract class WPForms_Field {
 		add_action( "wp_ajax_wpforms_new_field_{$this->type}", [ $this, 'field_new' ] );
 
 		// Display field input elements on front-end.
-		add_action( "wpforms_display_field_{$this->type}", [ $this, 'field_display' ], 10, 3 );
+		add_action( "wpforms_display_field_{$this->type}", [ $this, 'field_display_proxy' ], 10, 3 );
 
 		// Display field on back-end.
 		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_true', 9 );
@@ -1092,7 +1106,7 @@ abstract class WPForms_Field {
 				if ( ! empty( $field['choices_icons'] ) ) {
 					$class[]      = 'show-icons';
 					$icon_color   = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
-					$icon_color   = empty( $icon_color ) ? IconChoices::DEFAULT_COLOR : $icon_color;
+					$icon_color   = empty( $icon_color ) ? IconChoices::get_default_color() : $icon_color;
 					$inline_style = "--wpforms-icon-choices-color: {$icon_color};";
 				}
 
@@ -1257,7 +1271,7 @@ abstract class WPForms_Field {
 				if ( ! empty( $field['choices_icons'] ) ) {
 					$class[]      = 'show-icons';
 					$icon_color   = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
-					$icon_color   = empty( $icon_color ) ? IconChoices::DEFAULT_COLOR : $icon_color;
+					$icon_color   = empty( $icon_color ) ? IconChoices::get_default_color() : $icon_color;
 					$inline_style = "--wpforms-icon-choices-color: {$icon_color};";
 				}
 
@@ -1499,7 +1513,7 @@ abstract class WPForms_Field {
 				);
 
 				$icon_color = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
-				$icon_color = empty( $icon_color ) ? IconChoices::DEFAULT_COLOR : $icon_color;
+				$icon_color = empty( $icon_color ) ? IconChoices::get_default_color() : $icon_color;
 
 				$fld = $this->field_element(
 					'color',
@@ -2238,7 +2252,7 @@ abstract class WPForms_Field {
 					$list_class[] = sanitize_html_class( 'wpforms-icon-choices-' . $field['choices_icons_style'] );
 					$list_class[] = sanitize_html_class( 'wpforms-icon-choices-' . $field['choices_icons_size'] );
 					$icon_color   = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
-					$icon_color   = empty( $icon_color ) ? IconChoices::DEFAULT_COLOR : $icon_color;
+					$icon_color   = empty( $icon_color ) ? IconChoices::get_default_color() : $icon_color;
 					$inline_style = "--wpforms-icon-choices-color: {$icon_color};";
 				}
 
@@ -2554,16 +2568,81 @@ abstract class WPForms_Field {
 	}
 
 	/**
-	 * Display the field input elements on the frontend.
+	 * Display the field input elements on the frontend
+	 * according to the render engine setting.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @param array $field      Field data and settings.
+	 * @param array $field_atts Field attributes (deprecated).
+	 * @param array $form_data  Form data and settings.
+	 *
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function field_display_proxy( $field, $field_atts, $form_data ) {
+
+		$render_engine = wpforms_get_render_engine();
+		$method        = "field_display_{$render_engine}";
+
+		if ( ! method_exists( $this, $method ) ) {
+
+			// Something is wrong, this should never occur.
+			// Let's display classic field in this case.
+			$method = 'fields_display_classic';
+		}
+
+		$this->$method( $field, $form_data );
+	}
+
+	/**
+	 * Display the field using classic rendering.
 	 *
 	 * @since 1.0.0
 	 * @since 1.5.0 Converted to abstract method, as it's required for all fields.
 	 *
 	 * @param array $field      Field data and settings.
-	 * @param array $field_atts Field attributes.
+	 * @param array $field_atts Field attributes (deprecated).
 	 * @param array $form_data  Form data and settings.
 	 */
 	abstract public function field_display( $field, $field_atts, $form_data );
+
+	/**
+	 * Display the field using classic rendering.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @param array $field     Field data and settings.
+	 * @param array $form_data Form data and settings.
+	 */
+	protected function field_display_classic( $field, $form_data ) {
+
+		// The classic view is the same good old `field_display`.
+		$this->field_display( $field, [], $form_data );
+	}
+
+	/**
+	 * Display the field using modern rendering.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @param array $field     Field data and settings.
+	 * @param array $form_data Form data and settings.
+	 */
+	protected function field_display_modern( $field, $form_data ) {
+
+		// Maybe call the method from the field's modern frontend class.
+		if ( ! empty( $this->frontend_obj ) && method_exists( $this->frontend_obj, 'field_display_modern' ) ) {
+			$this->frontend_obj->field_display_modern( $field, $form_data );
+
+			return;
+		}
+
+		// By default, the modern view is the same as the classic.
+		// In this way, we will implement modern only for the fields,
+		// where it is needed.
+		$this->field_display_classic( $field, $form_data );
+	}
+
 
 	/**
 	 * Display field input errors if present.
@@ -2757,5 +2836,32 @@ abstract class WPForms_Field {
 
 		// We should auto hide/remove search, if less than 8 choices.
 		return $choices_count >= (int) apply_filters( 'wpforms_field_choicesjs_search_enabled_items_min', 8 );
+	}
+
+	/**
+	 * Get instance of the class connected to the current field,
+	 * and located in the `src/Forms/[Pro/]Fields/FieldType/Class.php` file.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @param string $class Class name, for example `Frontend`.
+	 *
+	 * @return object
+	 */
+	private function get_object( $class ) {
+
+		$property = strtolower( $class ) . '_obj';
+
+		if ( ! is_null( $this->$property ) ) {
+			return $this->$property;
+		}
+
+		$pro        = $this->group === 'standard' ? '' : 'Pro\\';
+		$class_dir  = implode( '', array_map( 'ucfirst', explode( '-', $this->type ) ) );
+		$fqdn_class = 'WPForms\\' . $pro . 'Forms\Fields\\' . $class_dir . '\\' . $class;
+
+		$this->$property = class_exists( $fqdn_class ) ? new $fqdn_class( $this ) : false;
+
+		return $this->$property;
 	}
 }

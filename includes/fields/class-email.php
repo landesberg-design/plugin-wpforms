@@ -41,6 +41,16 @@ class WPForms_Field_Email extends WPForms_Field {
 		$this->icon  = 'fa-envelope-o';
 		$this->order = 170;
 
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.8.1
+	 */
+	private function hooks() {
+
 		// Define additional field properties.
 		add_filter( 'wpforms_field_properties_email', [ $this, 'field_properties' ], 5, 3 );
 
@@ -59,6 +69,9 @@ class WPForms_Field_Email extends WPForms_Field {
 		add_filter( 'wpforms_save_form_args', [ $this, 'save_form_args' ], 11, 3 );
 
 		add_filter( 'wpforms_builder_strings', [ $this, 'add_builder_strings' ], 10, 2 );
+
+		// This field requires fieldset+legend instead of the field label.
+		add_filter( "wpforms_frontend_modern_is_field_requires_fieldset_{$this->type}", [ $this, 'is_field_requires_fieldset' ], PHP_INT_MAX, 2 );
 	}
 
 	/**
@@ -73,6 +86,9 @@ class WPForms_Field_Email extends WPForms_Field {
 	 * @return array
 	 */
 	public function field_properties( $properties, $field, $form_data ) {
+
+		// Prevent "spell-jacking" of email addresses.
+		$properties['inputs']['primary']['attr']['spellcheck'] = 'false';
 
 		if ( ! empty( $field['confirmation'] ) ) {
 			$properties = $this->confirmation_field_properties( $properties, $field, $form_data );
@@ -121,6 +137,7 @@ class WPForms_Field_Email extends WPForms_Field {
 						'name'        => "wpforms[fields][{$field_id}][secondary]",
 						'value'       => '',
 						'placeholder' => ! empty( $field['confirmation_placeholder'] ) ? $field['confirmation_placeholder'] : '',
+						'spellcheck'  => 'false',
 					],
 					'block'    => [
 						'wpforms-field-row-block',
@@ -1285,5 +1302,22 @@ class WPForms_Field_Email extends WPForms_Field {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Determine if the field requires fieldset instead of the regular field label.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @param bool  $requires_fieldset True if requires fieldset.
+	 * @param array $field             Field data.
+	 *
+	 * @return bool
+	 *
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function is_field_requires_fieldset( $requires_fieldset, $field ) {
+
+		return ! empty( $field['confirmation'] );
 	}
 }

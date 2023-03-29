@@ -195,7 +195,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 			wp_enqueue_script(
 				'wpforms-file-upload',
-				WPFORMS_PLUGIN_URL . "assets/pro/js/wpforms-file-upload{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/pro/js/wpforms-file-upload.es5{$min}.js",
 				[ 'wpforms', 'wp-util', self::HANDLE ],
 				WPFORMS_VERSION,
 				true

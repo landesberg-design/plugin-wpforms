@@ -23,7 +23,7 @@ if ( wpforms()->is_pro() ) {
 	echo esc_html__( 'Below is the total number of submissions for each form, however actual entries are not stored in WPForms Lite.', 'wpforms-lite' ) . "\n\n";
 	echo esc_html__( 'To view future entries inside your WordPress dashboard, and get more detailed reports, consider upgrading to Pro:', 'wpforms-lite' );
 	echo '&nbsp;';
-	echo 'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade';
+	echo 'https://wpforms.com/lite-upgrade/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Upgrade&utm_locale=' . wpforms_sanitize_key( get_locale() );
     echo "\n\n\n";
 }
 

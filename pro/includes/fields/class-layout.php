@@ -35,15 +35,6 @@ class WPForms_Field_Layout extends WPForms_Field {
 	private $builder_obj;
 
 	/**
-	 * Instance of the Frontend class for Layout Field.
-	 *
-	 * @since 1.7.7
-	 *
-	 * @var Frontend
-	 */
-	private $frontend_obj;
-
-	/**
 	 * Layout presets.
 	 *
 	 * @since 1.7.7
@@ -122,7 +113,7 @@ class WPForms_Field_Layout extends WPForms_Field {
 	private function hooks() {
 
 		add_filter( 'wpforms_field_new_default', [ $this, 'field_new_default' ] );
-		add_filter( 'wpforms_entry_single_data', [ $this, 'filter_fields_remove_layout' ], PHP_INT_MAX, 3 );
+		add_filter( 'wpforms_entry_single_data', [ $this, 'filter_fields_remove_layout' ], 1000, 3 );
 		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'gutenberg_enqueues' ] );
 		add_filter( 'register_block_type_args', [ $this, 'register_block_type_args' ], 20, 2 );

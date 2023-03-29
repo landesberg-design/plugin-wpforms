@@ -2,6 +2,8 @@
 
 namespace WPForms\Admin\Builder;
 
+use WP_Query;
+
 /**
  * Templates class.
  *
@@ -63,8 +65,9 @@ class Templates {
 	 */
 	private function allow_load() {
 
-		// Load for certain places only.
-		$allow = wpforms_current_user_can( [ 'create_forms', 'edit_forms' ] ) && ( wpforms_is_admin_ajax() || wpforms_is_admin_page( 'builder' ) || wpforms_is_admin_page( 'templates' ) );
+		$has_permissions  = wpforms_current_user_can( [ 'create_forms', 'edit_forms' ] );
+		$allowed_requests = wpforms_is_admin_ajax() || wpforms_is_admin_page( 'builder' ) || wpforms_is_admin_page( 'templates' );
+		$allow            = $has_permissions && $allowed_requests;
 
 		/**
 		 * Whether to allow the form templates functionality to load.
@@ -673,10 +676,20 @@ class Templates {
 		}
 
 		// Set form title equal to the template's name.
-		$form_title = ! empty( $template['name'] ) ? $template['name'] : esc_html__( 'New form', 'wpforms-lite' );
-
-		$title_exists = get_page_by_title( $form_title, 'OBJECT', 'wpforms' );
-		$form_id      = wpforms()->form->add(
+		$form_title   = ! empty( $template['name'] ) ? $template['name'] : esc_html__( 'New form', 'wpforms-lite' );
+		$title_query  = new WP_Query(
+			[
+				'post_type'              => 'wpforms',
+				'title'                  => $form_title,
+				'posts_per_page'         => 1,
+				'fields'                 => 'ids',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'no_found_rows'          => true,
+			]
+		);
+		$title_exists = $title_query->post_count > 0;
+		$form_id      = wpforms()->get( 'form' )->add(
 			$form_title,
 			[],
 			[
@@ -690,8 +703,8 @@ class Templates {
 		}
 
 		// Update form title if duplicated.
-		if ( ! empty( $title_exists ) ) {
-			wpforms()->form->update(
+		if ( $title_exists ) {
+			wpforms()->get( 'form' )->update(
 				$form_id,
 				[
 					'settings' => [

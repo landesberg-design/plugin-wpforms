@@ -332,7 +332,7 @@ class WPForms_Settings {
 			'email'        => [
 				'email-heading'          => [
 					'id'       => 'email-heading',
-					'content'  => '<h4>' . esc_html__( 'Email', 'wpforms-lite' ) . '</h4>',
+					'content'  => '<h4>' . esc_html__( 'Email', 'wpforms-lite' ) . '</h4>' . wpforms()->get( 'education_smtp_notice' )->get_template(),
 					'type'     => 'content',
 					'no_label' => true,
 					'class'    => [ 'section-heading', 'no-desc' ],

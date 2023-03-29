@@ -96,7 +96,7 @@ function wpforms_visual_composer_shortcode_css() {
 	if ( wpforms_setting( 'disable-css', '1' ) === '1' ) {
 		wp_enqueue_style(
 			'wpforms-full',
-			WPFORMS_PLUGIN_URL . 'assets/css/wpforms-full.css',
+			WPFORMS_PLUGIN_URL . 'assets/css/frontend/classic/wpforms-full.css',
 			[],
 			WPFORMS_VERSION
 		);

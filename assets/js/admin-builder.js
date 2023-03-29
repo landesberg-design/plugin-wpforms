@@ -2967,6 +2967,30 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		},
 
 		/**
+		 * Error alert displayed for invalid From Email Notification field.
+		 *
+		 * @since 1.8.1
+		 *
+		 * @param {string} $msg Message.
+		 */
+		validationErrorNotificationPopup: function( $msg ) {
+
+			$.alert( {
+				title: wpforms_builder.heads_up,
+				content: $msg,
+				icon: 'fa fa-exclamation-circle',
+				type: 'red',
+				buttons: {
+					confirm: {
+						text: wpforms_builder.close,
+						btnClass: 'btn-confirm',
+						keys: [ 'enter' ],
+					},
+				},
+			} );
+		},
+
+		/**
 		 * Show the confirmation popup before the field deletion.
 		 *
 		 * @param {int} id Field ID.
@@ -5630,7 +5654,6 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					return false;
 				} );
 			} );
-
 		},
 
 		/**
@@ -6907,6 +6930,9 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				app.validateEmailSmartTags( $( this ) );
 			} );
 
+			// Validate From Email in Notification settings.
+			$builder.on( 'focusout', '.wpforms-notification .wpforms-panel-field.js-wpforms-from-email-validation input', app.validateFromEmail );
+
 			// Mobile notice primary button / close icon click.
 			$builder.on( 'click', '#wpforms-builder-mobile-notice .wpforms-fullscreen-notice-button-primary, #wpforms-builder-mobile-notice .close', function() {
 				window.location.href = wpforms_builder.exit_url;
@@ -7517,6 +7543,63 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			} );
 			$el.val( val );
 		},
+
+		/**
+		 * Validate From Email in Notification block.
+		 *
+		 * @since 1.8.1
+		 */
+		validateFromEmail: function(  ) {
+
+			const $field        = $( this );
+			const value         = $field.val().trim();
+			const $fieldWrapper = $field.parent();
+			const $warning      = $fieldWrapper.find( '.wpforms-alert-warning-wide' );
+			const warningClass  = 'wpforms-panel-field-warning';
+
+			const blockedSymbolsRegex = /[\s,;]/g;
+
+			if ( blockedSymbolsRegex.test( value ) ) {
+				$warning.remove();
+				$fieldWrapper.addClass( warningClass );
+				app.validationErrorNotificationPopup( wpforms_builder.allow_only_one_email );
+
+				return;
+			}
+
+			const data = {
+				form_id: s.formID, // eslint-disable-line camelcase
+				email:   $field.val(),
+				nonce:   wpforms_builder.nonce,
+				action:  'wpforms_builder_notification_from_email_validate',
+			};
+
+			$.post(
+				wpforms_builder.ajax_url, data, function( res ) {
+
+					if ( res.success ) {
+						$warning.remove();
+						$fieldWrapper.removeClass( warningClass );
+
+						return;
+					}
+
+					$fieldWrapper.addClass( warningClass );
+
+					if ( $warning.length ) {
+						$warning.replaceWith( res.data );
+
+						return;
+					}
+
+					$fieldWrapper.append( res.data );
+				} )
+				.fail( function( xhr, textStatus, e ) {
+
+					console.log( xhr.responseText );
+				} );
+		},
+
 
 		//--------------------------------------------------------------------//
 		// Icon Choices

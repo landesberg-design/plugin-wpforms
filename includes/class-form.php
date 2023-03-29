@@ -355,6 +355,16 @@ class WPForms_Form_Handler {
 			]
 		);
 
+		/**
+		 * Allow developers to execute some code after changing form status.
+		 *
+		 * @since 1.8.1
+		 *
+		 * @param string $form_id Form ID.
+		 * @param string $status  New form status, `publish` or `trash`.
+		 */
+		do_action( 'wpforms_form_handler_update_status', $form_id, $status );
+
 		return $result !== 0;
 	}
 

@@ -77,6 +77,7 @@ class Preview {
 	 */
 	public function hooks() {
 
+		add_filter( 'wpforms_frontend_assets_header_force_load', '__return_true' );
 		add_action( 'pre_get_posts', [ $this, 'pre_get_posts' ] );
 		add_filter( 'the_title', [ $this, 'the_title' ], 100, 1 );
 		add_filter( 'the_content', [ $this, 'the_content' ], 999 );
@@ -105,6 +106,12 @@ class Preview {
 		$query->set( 'post_type', 'wpforms' );
 		$query->set( 'post__in', empty( $this->form_data['id'] ) ? [] : [ (int) $this->form_data['id'] ] );
 		$query->set( 'posts_per_page', 1 );
+
+		// The preview page reads as the home page and as an non-singular posts page, neither of which are actually the case.
+		// So we hardcode the correct values for those properties in the query.
+		$query->is_home     = false;
+		$query->is_singular = true;
+		$query->is_single   = true;
 	}
 
 	/**

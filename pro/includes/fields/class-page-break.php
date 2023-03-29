@@ -8,6 +8,16 @@
 class WPForms_Field_Page_Break extends WPForms_Field {
 
 	/**
+	 * Default indicator color.
+	 *
+	 * @since 1.8.1
+	 */
+	const DEFAULT_INDICATOR_COLOR = [
+		'classic' => '#72b239',
+		'modern'  => '#066aab',
+	];
+
+	/**
 	 * Pages information.
 	 *
 	 * @since 1.3.7
@@ -142,13 +152,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		];
 		$p         = 1;
 
-		printf(
-			'<div class="wpforms-page-indicator %s" data-indicator="%s" data-indicator-color="%s" data-scroll="%d">',
-			esc_attr( $pagebreak['indicator'] ),
-			esc_attr( $pagebreak['indicator'] ),
-			esc_attr( $pagebreak['color'] ),
-			(int) $pagebreak['scroll']
-		);
+		$this->frontend_obj->open_page_indicator_container( $pagebreak );
 
 		if ( 'circles' === $pagebreak['indicator'] ) {
 
@@ -455,7 +459,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 			);
 
 			$indicator_color = isset( $field['indicator_color'] ) ? wpforms_sanitize_hex_color( $field['indicator_color'] ) : '';
-			$indicator_color = empty( $indicator_color ) ? '#72b239' : $indicator_color;
+			$indicator_color = empty( $indicator_color ) ? $this->get_default_indicator_color() : $indicator_color;
 
 			$fld = $this->field_element(
 				'color',
@@ -848,6 +852,20 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function format( $field_id, $field_submit, $form_data ) {
+	}
+
+	/**
+	 * Get default indicator color.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @return string
+	 */
+	public function get_default_indicator_color() {
+
+		$render_engine = wpforms_get_render_engine();
+
+		return array_key_exists( $render_engine, self::DEFAULT_INDICATOR_COLOR ) ? self::DEFAULT_INDICATOR_COLOR[ $render_engine ] : self::DEFAULT_INDICATOR_COLOR['modern'];
 	}
 }
 

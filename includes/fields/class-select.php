@@ -70,6 +70,8 @@ class WPForms_Field_Select extends WPForms_Field {
 
 		// Form frontend JS enqueues.
 		add_action( 'wpforms_frontend_js', [ $this, 'enqueue_frontend_js' ] );
+
+		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_block_editor_assets' ] );
 	}
 
 	/**
@@ -595,7 +597,7 @@ class WPForms_Field_Select extends WPForms_Field {
 		}
 
 		if ( $has_modern_select || wpforms()->frontend->assets_global() ) {
-			$min = \wpforms_get_min_suffix();
+			$min = wpforms_get_min_suffix();
 
 			wp_enqueue_style(
 				'wpforms-choicesjs',
@@ -628,6 +630,25 @@ class WPForms_Field_Select extends WPForms_Field {
 		if ( $has_modern_select || wpforms()->frontend->assets_global() ) {
 			$this->enqueue_choicesjs_once( $forms );
 		}
+	}
+
+	/**
+	 * Load WPForms Gutenberg block scripts.
+	 *
+	 * @since 1.8.1
+	 */
+	public function enqueue_block_editor_assets() {
+
+		$min = wpforms_get_min_suffix();
+
+		wp_enqueue_style(
+			'wpforms-choicesjs',
+			WPFORMS_PLUGIN_URL . "assets/css/choices{$min}.css",
+			[],
+			self::CHOICES_VERSION
+		);
+
+		$this->enqueue_choicesjs_once( [] );
 	}
 
 	/**

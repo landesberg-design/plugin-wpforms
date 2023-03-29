@@ -228,6 +228,22 @@ class WPForms_Entry_Preview extends WPForms_Field {
 
 		$is_current_range   = false;
 		$is_next_page_break = false;
+		$first_field        = reset( $form_data['fields'] );
+		$first_field_id     = absint( $first_field['id'] );
+
+		/**
+		 * Force showing all fields from the beginning of the form instead of
+		 * the fields between current and previous Entry Preview fields.
+		 *
+		 * @since 1.8.1
+		 *
+		 * @param bool  $force_all_fields       Whether to force all fields instead of a range between current and previous Entry Preview fields.
+		 * @param array $form_data              Form data and settings.
+		 * @param int   $end_with_page_break_id Last Page Break field ID.
+		 */
+		if ( apply_filters( 'wpforms_entry_preview_get_start_page_break_id_force_first', false, $form_data, $end_with_page_break_id ) ) {
+			return $first_field_id;
+		}
 
 		foreach ( array_reverse( (array) $form_data['fields'] ) as $field_properties ) {
 			$field_id   = absint( $field_properties['id'] );
@@ -250,9 +266,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 			}
 		}
 
-		$field = reset( $form_data['fields'] );
-
-		return absint( $field['id'] );
+		return $first_field_id;
 	}
 
 	/**

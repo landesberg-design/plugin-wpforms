@@ -1087,7 +1087,7 @@ class WPForms_Process {
 
 		foreach ( $general_errors as $key => $error ) {
 			ob_start();
-			wpforms()->frontend->form_error( $key, $error );
+			wpforms()->get( 'frontend' )->form_error( $key, $error, $form_data );
 			$general_errors[ $key ] = ob_get_clean();
 		}
 

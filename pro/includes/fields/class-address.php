@@ -61,13 +61,26 @@ class WPForms_Field_Address extends WPForms_Field {
 		 *
 		 * @param array $schemes Address schemes.
 		 */
-		$this->schemes = apply_filters( 'wpforms_address_schemes', $default_schemes );
+		$this->schemes = apply_filters( 'wpforms_address_schemes', $default_schemes ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.8.1
+	 */
+	private function hooks() {
 
 		// Define additional field properties.
 		add_filter( 'wpforms_field_properties_address', [ $this, 'field_properties' ], 5, 3 );
 
 		// Customize value format.
 		add_filter( 'wpforms_html_field_value', [ $this, 'html_field_value' ], 10, 4 );
+
+		// This field requires fieldset+legend instead of the field label.
+		add_filter( "wpforms_frontend_modern_is_field_requires_fieldset_{$this->type}", '__return_true', PHP_INT_MAX, 2 );
 	}
 
 	/**

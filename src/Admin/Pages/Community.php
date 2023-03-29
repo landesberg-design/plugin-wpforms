@@ -101,16 +101,6 @@ class Community {
 			'cover_img2x'    => 'wpbeginner@2x.png',
 		];
 
-		$data['translators'] = [
-			'title'          => esc_html__( 'WPForms Translators Community', 'wpforms-lite' ),
-			'description'    => esc_html__( 'We\'re building a community of translators and i18n experts to translate WPForms. Sign up to our translator community newsletter to learn more and get information on how you can contribute!', 'wpforms-lite' ),
-			'button_text'    => esc_html__( 'Join Translators Community', 'wpforms-lite' ),
-			'button_link'    => 'https://wpforms.com/translate/?utm_source=WordPress&amp;utm_medium=Community&amp;utm_campaign=' . esc_attr( $type ) . '&amp;utm_content=Translators',
-			'cover_bg_color' => '#F2FAED',
-			'cover_img'      => 'translators.png',
-			'cover_img2x'    => 'translators@2x.png',
-		];
-
 		$data['suggest'] = [
 			'title'          => esc_html__( 'Suggest a Feature', 'wpforms-lite' ),
 			'description'    => esc_html__( 'Do you have an idea or suggestion for WPForms? If you have thoughts on features, integrations, addons, or improvements - we want to hear it! We appreciate all feedback and insight from our users.', 'wpforms-lite' ),

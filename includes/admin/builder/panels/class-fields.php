@@ -519,7 +519,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 		$field_id = isset( $field['id'] ) ? $field['id'] : 0;
 
 		printf(
-			'<div class="wpforms-alert wpforms-alert-warning wpforms-alert-dismissible wpforms-alert-field-not-available" data-field-id="%d">',
+			'<div class="wpforms-alert wpforms-alert-warning wpforms-alert-dismissible wpforms-alert-field-not-available" data-field-id="%d" data-field-type="unavailable">',
 			absint( $field_id )
 		);
 

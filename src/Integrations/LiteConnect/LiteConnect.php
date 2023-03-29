@@ -121,13 +121,6 @@ abstract class LiteConnect implements IntegrationInterface {
 	 */
 	private static function is_localhost() {
 
-		// Check for local IPs.
-		$ip = wpforms_get_ip();
-
-		if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
-			return true;
-		}
-
 		// Check for local TLDs.
 		if ( ! empty( $_SERVER['HTTP_HOST'] ) ) {
 			$host = sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) );

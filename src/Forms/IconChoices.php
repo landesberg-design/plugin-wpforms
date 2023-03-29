@@ -56,7 +56,10 @@ class IconChoices {
 	 *
 	 * @var string
 	 */
-	const DEFAULT_COLOR = '#0399ed';
+	const DEFAULT_COLOR = [
+		'classic' => '#0399ed',
+		'modern'  => '#066aab',
+	];
 
 	/**
 	 * How many icons to display initially and paginate in the Icon Picker.
@@ -295,7 +298,7 @@ class IconChoices {
 		$properties['input_container']['class'][] = sanitize_html_class( 'wpforms-icon-choices-' . $field['choices_icons_size'] );
 
 		$icon_color = isset( $field['choices_icons_color'] ) ? wpforms_sanitize_hex_color( $field['choices_icons_color'] ) : '';
-		$icon_color = empty( $icon_color ) ? self::DEFAULT_COLOR : $icon_color;
+		$icon_color = empty( $icon_color ) ? self::get_default_color() : $icon_color;
 
 		$properties['input_container']['attr']['style'] = "--wpforms-icon-choices-color: {$icon_color};";
 
@@ -456,7 +459,7 @@ class IconChoices {
 			'is_active'          => $this->is_active(),
 			'default_icon'       => self::DEFAULT_ICON,
 			'default_icon_style' => self::DEFAULT_ICON_STYLE,
-			'default_color'      => self::DEFAULT_COLOR,
+			'default_color'      => self::get_default_color(),
 			'icons'              => [],
 			'icons_per_page'     => self::DEFAULT_ICONS_PER_PAGE,
 			'strings'            => [
@@ -555,5 +558,19 @@ class IconChoices {
 		}
 
 		return (array) json_decode( $icons, false );
+	}
+
+	/**
+	 * Get default accent color.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @return string
+	 */
+	public static function get_default_color() {
+
+		$render_engine = wpforms_get_render_engine();
+
+		return array_key_exists( $render_engine, self::DEFAULT_COLOR ) ? self::DEFAULT_COLOR[ $render_engine ] : self::DEFAULT_COLOR['modern'];
 	}
 }

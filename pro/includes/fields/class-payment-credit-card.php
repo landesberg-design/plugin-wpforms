@@ -21,6 +21,16 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 		$this->order = 90;
 		$this->group = 'payment';
 
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.8.1
+	 */
+	private function hooks() {
+
 		// Define additional field properties.
 		add_filter( 'wpforms_field_properties_credit-card', [ $this, 'field_properties' ], 5, 3 );
 
@@ -32,6 +42,9 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 
 		// Load required scripts.
 		add_action( 'wpforms_frontend_js', [ $this, 'load_js' ], 10 );
+
+		// This field requires fieldset+legend instead of the field label.
+		add_filter( "wpforms_frontend_modern_is_field_requires_fieldset_{$this->type}", '__return_true', PHP_INT_MAX, 2 );
 	}
 
 	/**
@@ -75,6 +88,7 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 
 		$form_id  = absint( $form_data['id'] );
 		$field_id = absint( $field['id'] );
+		$position = wpforms_get_render_engine() === 'classic' ? 'before' : 'after';
 
 		$props      = [
 			'inputs' => [
@@ -99,7 +113,7 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 					'sublabel' => [
 						'hidden'   => ! empty( $field['sublabel_hide'] ),
 						'value'    => esc_html__( 'Card Number', 'wpforms' ),
-						'position' => 'before',
+						'position' => $position,
 					],
 				],
 				'cvc'    => [
@@ -122,7 +136,7 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 					'sublabel' => [
 						'hidden'   => ! empty( $field['sublabel_hide'] ),
 						'value'    => esc_html__( 'Security Code', 'wpforms' ),
-						'position' => 'before',
+						'position' => $position,
 					],
 				],
 				'name'   => [
@@ -143,7 +157,7 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 					'sublabel' => [
 						'hidden'   => ! empty( $field['sublabel_hide'] ),
 						'value'    => esc_html__( 'Name on Card', 'wpforms' ),
-						'position' => 'before',
+						'position' => $position,
 					],
 				],
 				'month'  => [
@@ -157,7 +171,7 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 					'sublabel' => [
 						'hidden'   => ! empty( $field['sublabel_hide'] ),
 						'value'    => esc_html__( 'Expiration', 'wpforms' ),
-						'position' => 'before',
+						'position' => $position,
 					],
 				],
 				'year'   => [

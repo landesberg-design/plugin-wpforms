@@ -249,7 +249,7 @@ class Edit {
 		// Frontend form base styles.
 		wp_enqueue_style(
 			'wpforms-base',
-			WPFORMS_PLUGIN_URL . 'assets/css/wpforms-base.css',
+			WPFORMS_PLUGIN_URL . 'assets/css/frontend/classic/wpforms-base.css',
 			[],
 			WPFORMS_VERSION
 		);
@@ -797,7 +797,7 @@ class Edit {
 	 */
 	private function display_edit_form_field_editable( $entry_field, $field, $form_data ) {
 
-		wpforms()->frontend->field_container_open( $field, $form_data );
+		wpforms()->get( 'frontend' )->field_container_open( $field, $form_data );
 
 		$field_object = $this->get_entries_edit_field_object( $field['type'] );
 

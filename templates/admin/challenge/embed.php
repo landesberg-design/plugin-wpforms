@@ -104,9 +104,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					?>
 				</p>
 				<textarea class="wpforms-challenge-contact-message"></textarea>
-				<label>
-					<input type="checkbox" class="wpforms-challenge-contact-permission"><?php esc_html_e( 'Yes, I give WPForms permission to contact me for any follow up questions.', 'wpforms-lite' ); ?>
-				</label>
+				<?php if ( ! wpforms()->is_pro() ) { ?>
+					<label>
+						<input type="checkbox" class="wpforms-challenge-contact-permission"><?php esc_html_e( 'Yes, I give WPForms permission to contact me for any follow up questions.', 'wpforms-lite' ); ?>
+					</label>
+				<?php } ?>
 				<button type="submit" class="wpforms-challenge-popup-btn wpforms-challenge-popup-contact-btn"><?php esc_html_e( 'Submit Feedback', 'wpforms-lite' ); ?></button>
 			</form>
 		</div>

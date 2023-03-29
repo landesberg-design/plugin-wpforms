@@ -20,11 +20,24 @@ class WPForms_Field_Name extends WPForms_Field {
 		$this->icon  = 'fa-user';
 		$this->order = 150;
 
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.8.1
+	 */
+	private function hooks() {
+
 		// Define additional field properties.
 		add_filter( 'wpforms_field_properties_name', [ $this, 'field_properties' ], 5, 3 );
 
 		// Set field to default to required.
 		add_filter( 'wpforms_field_new_required', [ $this, 'default_required' ], 10, 2 );
+
+		// This field requires fieldset+legend instead of the field label.
+		add_filter( "wpforms_frontend_modern_is_field_requires_fieldset_{$this->type}", [ $this, 'is_field_requires_fieldset' ], PHP_INT_MAX, 2 );
 	}
 
 	/**
@@ -553,6 +566,23 @@ class WPForms_Field_Name extends WPForms_Field {
 			'middle' => sanitize_text_field( $middle ),
 			'last'   => sanitize_text_field( $last ),
 		];
+	}
+
+	/**
+	 * Determine if the field requires fieldset+legend instead of the regular field label.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @param bool  $requires_fieldset True if requires fieldset.
+	 * @param array $field             Field data.
+	 *
+	 * @return bool
+	 *
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function is_field_requires_fieldset( $requires_fieldset, $field ) {
+
+		return isset( $field['format'] ) && $field['format'] !== 'simple';
 	}
 }
 

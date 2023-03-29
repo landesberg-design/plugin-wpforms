@@ -336,7 +336,7 @@ class WPForms_Pro {
 
 		$class   = $is_valid_key ? 'wpforms-setting-license-is-valid' : 'wpforms-setting-license-is-invalid';
         $class   = $has_key ? $class : '';
-		$output .= '<input type="password" id="wpforms-setting-license-key" class="' . $class . '" value="' . esc_attr( $key ) . '"' . disabled( true, $has_key, false ) . '>';
+		$output .= '<input type="password" spellcheck="false" id="wpforms-setting-license-key" class="' . $class . '" value="' . esc_attr( $key ) . '"' . disabled( true, $has_key, false ) . '>';
 		$output .= '<i></i>';
 		$output .= '</span>';
 
@@ -1012,9 +1012,6 @@ class WPForms_Pro {
 								'parent'     => 'settings',
 								'subsection' => $id,
 								'input_id'   => 'wpforms-panel-field-notifications-sender_address-' . $id,
-								'readonly'   => ! empty( $from_email_after ),
-								'after'      => ! empty( $from_email_after ) ? '<div class="wpforms-alert wpforms-alert-warning">' . $from_email_after . '</div>' : '',
-								'class'      => ! empty( $from_email_after ) ? 'from-email wpforms-panel-field-warning' : 'from-email',
 							],
 							$settings->form_data,
 							$id

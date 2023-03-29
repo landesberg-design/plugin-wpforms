@@ -90,7 +90,7 @@ class Logs extends View {
 		<form action="<?php echo esc_url( $this->get_link() ); ?>" method="POST">
 			<?php $this->nonce_field(); ?>
 			<div class="wpforms-setting-row tools">
-				<h3><?php esc_html_e( 'Logs', 'wpforms-lite' ); ?></h3>
+				<h4><?php esc_html_e( 'Logs', 'wpforms-lite' ); ?></h4>
 				<p><?php esc_html_e( 'On this page, you can enable and configure the logging functionality while debugging behavior of various parts of the plugin, including forms and entries processing.', 'wpforms-lite' ); ?></p>
 			</div>
 			<div class="wpforms-setting-row tools wpforms-setting-row-checkbox wpforms-clear"

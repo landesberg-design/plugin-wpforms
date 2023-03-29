@@ -466,8 +466,15 @@ class WPForms_Field_Text extends WPForms_Field {
 		);
 
 		if ( count( $fields ) ) {
-			$min = \wpforms_get_min_suffix();
-			wp_enqueue_script( 'wpforms-text-limit', WPFORMS_PLUGIN_URL . "assets/js/text-limit{$min}.js", [], WPFORMS_VERSION, true );
+			$min = wpforms_get_min_suffix();
+
+			wp_enqueue_script(
+				'wpforms-text-limit',
+				WPFORMS_PLUGIN_URL . "assets/js/text-limit.es5{$min}.js",
+				[],
+				WPFORMS_VERSION,
+				true
+			);
 		}
 	}
 

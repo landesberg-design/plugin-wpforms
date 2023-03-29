@@ -674,7 +674,10 @@ class Challenge {
 		$message = ! empty( $_POST['contact_data']['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['contact_data']['message'] ) ) : '';
 		$email   = '';
 
-		if ( ! empty( $_POST['contact_data']['contact_me'] ) && $_POST['contact_data']['contact_me'] === 'true' ) {
+		if (
+			( ! empty( $_POST['contact_data']['contact_me'] ) && $_POST['contact_data']['contact_me'] === 'true' )
+			|| wpforms()->is_pro()
+		) {
 			$current_user = wp_get_current_user();
 			$email        = $current_user->user_email;
 			$this->set_challenge_option( [ 'feedback_contact_me' => true ] );
@@ -692,8 +695,9 @@ class Challenge {
 					'fields' => [
 						2 => $message,
 						3 => $email,
-						4 => ucfirst( wpforms_get_license_type() ),
+						4 => $this->get_challenge_license_type(),
 						5 => wpforms()->version,
+						6 => wpforms_get_license_key(),
 					],
 				],
 			],
@@ -707,6 +711,24 @@ class Challenge {
 
 		$this->set_challenge_option( [ 'feedback_sent' => true ] );
 		wp_send_json_success();
+	}
+
+	/**
+	 * Get the current WPForms license type as it pertains to the challenge feedback form.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @return string The currently active license type.
+	 */
+	private function get_challenge_license_type() {
+
+		$license_type = wpforms_get_license_type();
+
+		if ( $license_type === false ) {
+			$license_type = wpforms()->is_pro() ? 'Unknown' : 'Lite';
+		}
+
+		return ucfirst( $license_type );
 	}
 
 	/**

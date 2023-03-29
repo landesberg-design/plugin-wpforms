@@ -464,15 +464,7 @@ add_action( 'admin_print_scripts', 'wpforms_admin_hide_unrelated_notices' );
  */
 function wpforms_admin_upgrade_link( $medium = 'link', $content = '' ) {
 
-	/**
-	 * Modify utm_medium tag for the upgrade plugin link.
-	 *
-	 * @since 1.5.1
-	 *
-	 * @param string $medium The utm_medium tag value.
-	 */
-	$medium = apply_filters( 'wpforms_upgrade_link_medium', $medium );
-	$url    = 'https://wpforms.com/lite-upgrade/';
+	$url = 'https://wpforms.com/lite-upgrade/';
 
 	if ( wpforms()->is_pro() ) {
 		$license_key = wpforms_get_license_key();
@@ -483,7 +475,8 @@ function wpforms_admin_upgrade_link( $medium = 'link', $content = '' ) {
 		);
 	}
 
-	$upgrade = wpforms_utm_link( $url, $medium, $content );
+	// phpcs:ignore WPForms.Comments.PHPDocHooks.RequiredHookDocumentation
+	$upgrade = wpforms_utm_link( $url, apply_filters( 'wpforms_upgrade_link_medium', $medium ), $content );
 
 	/**
 	 * Modify upgrade link.

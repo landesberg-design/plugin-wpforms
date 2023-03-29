@@ -220,6 +220,7 @@ function wpforms_utm_link( $link, $medium, $content = '', $term = '' ) {
 				'utm_medium'   => rawurlencode( $medium ),
 				'utm_content'  => rawurlencode( $content ),
 				'utm_term'     => rawurlencode( $term ),
+				'utm_locale'   => wpforms_sanitize_key( get_locale() ),
 			]
 		),
 		$link
@@ -293,4 +294,28 @@ function wpforms_wpdb_prepare_in( $items, $format = '%s' ) {
 
 	// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	return $wpdb->prepare( $prepared_format, $items );
+}
+
+/**
+ * Get the render engine slug according to the Modern Markup setting value and corresponding filter.
+ *
+ * @since 1.8.1
+ *
+ * @return string
+ */
+function wpforms_get_render_engine() {
+
+	$render_engine = empty( wpforms_setting( 'modern-markup', false ) ) ? 'classic' : 'modern';
+
+	/**
+	 * Filter current render engine slug.
+	 * Allows addons to use their own frontend rendering engine.
+	 *
+	 * @since 1.8.1
+	 *
+	 * @param string $render_engine Render engine slug.
+	 */
+	$render_engine = apply_filters( 'wpforms_get_render_engine', $render_engine );
+
+	return $render_engine;
 }

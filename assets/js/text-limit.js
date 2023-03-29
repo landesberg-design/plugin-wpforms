@@ -35,6 +35,7 @@
 		var hint = document.createElement( 'div' );
 		hint.classList.add( 'wpforms-field-limit-text' );
 		hint.id = 'wpforms-field-limit-text-' + formId + '-' + fieldId;
+		hint.setAttribute( 'aria-live', 'polite' );
 		hint.textContent = text;
 
 		return hint;

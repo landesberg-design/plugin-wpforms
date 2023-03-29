@@ -18,8 +18,14 @@ class AddonsCache extends \WPForms\Helpers\CacheBase {
 	 */
 	protected function allow_load() {
 
-		// Load only in the Admin area or Form Builder.
-		return wpforms_current_user_can( [ 'create_forms', 'edit_forms' ] ) && ( wpforms_is_admin_ajax() || wpforms_is_admin_page() || wpforms_is_admin_page( 'builder' ) );
+		if ( wp_doing_cron() || wpforms_doing_wp_cli() ) {
+			return true;
+		}
+
+		$has_permissions  = wpforms_current_user_can( [ 'create_forms', 'edit_forms' ] );
+		$allowed_requests = wpforms_is_admin_ajax() || wpforms_is_admin_page() || wpforms_is_admin_page( 'builder' );
+
+		return $has_permissions && $allowed_requests;
 	}
 
 	/**

@@ -300,7 +300,7 @@ class ListTable extends WP_List_Table {
 
 		?>
 		<div class="wpforms-admin-content-header">
-			<h3 class="wp-heading-inline"><?php esc_html_e( 'View Logs', 'wpforms-lite' ); ?>
+			<h4 class="wp-heading-inline"><?php esc_html_e( 'View Logs', 'wpforms-lite' ); ?>
 				<?php if ( $this->get_request_search_query() ) { ?>
 					<span class="subtitle">
 				<?php
@@ -311,7 +311,7 @@ class ListTable extends WP_List_Table {
 				?>
 			</span>
 				<?php } ?>
-			</h3>
+			</h4>
 			<?php
 			$this->hidden_fields();
 			$this->search_box( esc_html__( 'Search Logs', 'wpforms-lite' ), 'plugin' );

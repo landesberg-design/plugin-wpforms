@@ -1181,6 +1181,9 @@
 				] );
 			} );
 
+			// Render engine setting.
+			$( document ).on( 'change', '#wpforms-setting-row-render-engine input', WPFormsAdmin.settingsRenderEngineChange );
+
 			// Form styles plugin setting.
 			$( document ).on( 'change', '#wpforms-setting-disable-css', function() {
 
@@ -1324,6 +1327,22 @@
 				$descOn.toggleClass( 'wpforms-hidden', ! checked && isDoubleDesc );
 				$descOff.toggleClass( 'wpforms-hidden', checked && isDoubleDesc );
 			} );
+		},
+
+		/**
+		 * Render engine setting change event handler.
+		 *
+		 * @since 1.8.1
+		 *
+		 * @param {object} e Event object.
+		 */
+		settingsRenderEngineChange: function( e ) {
+
+			// noinspection JSUnusedLocalSymbols
+			// eslint-disable-next-line
+			const renderEngine = $( this ).val();
+
+			// TODO: Add corresponding code that need to be executed on change render engine setting.
 		},
 
 		/**
