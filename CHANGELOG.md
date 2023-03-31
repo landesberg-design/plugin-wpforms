@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.1.1] - 2023-03-30
+### Fixed
+- Limit Length functionality was broken in the Paragraph Text field.
+
 ## [1.8.1] - 2023-03-28
 ### Added
 - Modern Form Styles - easily control the appearance of form fields, labels, and buttons without writing code, right inside the Block Editor.

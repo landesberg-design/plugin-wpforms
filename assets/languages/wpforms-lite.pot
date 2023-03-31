@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms Lite 1.8.1\n"
+"Project-Id-Version: WPForms Lite 1.8.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms-lite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-03-28T14:25:54+03:00\n"
+"POT-Creation-Date: 2023-03-29T18:28:05+03:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: wpforms-lite\n"
@@ -3659,7 +3659,7 @@ msgstr ""
 
 #. translators: %s - limit characters number.
 #: includes/fields/class-text.php:531
-#: includes/fields/class-textarea.php:352
+#: includes/fields/class-textarea.php:353
 msgid "Text can't exceed %d character."
 msgid_plural "Text can't exceed %d characters."
 msgstr[0] ""
@@ -3667,7 +3667,7 @@ msgstr[1] ""
 
 #. translators: %s - limit words number.
 #: includes/fields/class-text.php:537
-#: includes/fields/class-textarea.php:358
+#: includes/fields/class-textarea.php:359
 msgid "Text can't exceed %d word."
 msgid_plural "Text can't exceed %d words."
 msgstr[0] ""
