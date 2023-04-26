@@ -34,10 +34,18 @@ class WPForms_License {
 	 */
 	public function __construct() {
 
+		$this->hooks();
+	}
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 1.8.1.2
+	 */
+	public function hooks() {
+
 		// Admin notices.
-		if ( wpforms()->is_pro() && ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'wpforms-settings' ) ) { // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			add_action( 'admin_notices', [ $this, 'notices' ] );
-		}
+		add_action( 'admin_notices', [ $this, 'notices' ] );
 
 		// Periodic background license check.
 		$this->maybe_validate_key();
@@ -472,6 +480,11 @@ class WPForms_License {
 	 * @param bool $below_h2 Whether to display a notice below H2.
 	 */
 	public function notices( $below_h2 = false ) {
+
+		// Do not display notices if the user does not have permission or is on the settings page.
+		if ( ! wpforms_current_user_can() || wpforms_is_admin_page( 'settings' ) ) {
+			return;
+		}
 
 		// Grab the option and output any nag dealing with license keys.
 		$key    = $this->get();

@@ -161,8 +161,14 @@
 
 		var $form    = jQuery( dz.element ).closest( 'form' ),
 			$btn     = $form.find( '.wpforms-submit' ),
+			$btnNext = $form.find( '.wpforms-page-next:visible' ),
 			handler  = toggleLoadingMessage( $form ),
 			disabled = uploadInProgress( dz );
+
+		// For multi-pages layout.
+		if ( $form.find( '.wpforms-page-indicator' ).length !== 0 && $btnNext.length !== 0 ) {
+			$btn = $btnNext;
+		}
 
 		if ( disabled === Boolean( $btn.prop( 'disabled' ) ) ) {
 			return;
@@ -170,7 +176,7 @@
 
 		if ( disabled ) {
 			$btn.prop( 'disabled', true );
-			if ( ! $form.find( '.wpforms-submit-overlay' ).length ) {
+			if ( ! $form.find( '.wpforms-submit-overlay' ).length && $btn.attr( 'type' ) === 'submit' ) {
 				$btn.parent().addClass( 'wpforms-submit-overlay-container' );
 				$btn.parent().append( '<div class="wpforms-submit-overlay"></div>' );
 				$form.find( '.wpforms-submit-overlay' ).css( {

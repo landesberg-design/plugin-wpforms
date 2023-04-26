@@ -307,6 +307,16 @@ class Widget extends Widget_Base {
 	 */
 	protected function render_frontend() {
 
+		static $is_root_vars_displayed = false;
+
+		$css_vars_obj = wpforms()->get( 'css_vars' );
+
+		if ( ! empty( $css_vars_obj ) && wpforms_get_render_engine() === 'modern' && ! $is_root_vars_displayed ) {
+			$css_vars_obj->output_root( true );
+
+			$is_root_vars_displayed = true;
+		}
+
 		// Render selected form.
 		echo do_shortcode( $this->render_shortcode() );
 	}

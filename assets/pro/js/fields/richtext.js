@@ -374,16 +374,16 @@ var WPFormsRichTextField = window.WPFormsRichTextField || ( function( document, 
 		 */
 		initEditorModernMarkupMode: function( editor ) {
 
-			if ( ! wpforms.isModernMarkupEnabled() || window.WPFormsEditEntry ) {
+			if ( ! wpforms.isModernMarkupEnabled() || window.WPFormsEditEntry || ! window.WPForms.FrontendModern ) {
 				return;
 			}
 
 			const docStyle    = editor.getDoc().body.style;
-			const $body       = $( 'body' );
 			const $el         = $( editor.getElement() );
 			const $field      = $el.closest( '.wpforms-field' );
 			const $form       = $el.closest( '.wpforms-form' );
-			const inputHeight = $form.css( '--wpforms-field-size-input-height' ).replace( 'px', '' );
+			const cssVars     = window.WPForms.FrontendModern.getCssVars( $form );
+			const inputHeight = cssVars['field-size-input-height'] ? cssVars['field-size-input-height'].replace( 'px', '' ) : 43;
 			const sizeK      = {
 				'small' : 1.80,
 				'medium': 2.79,
@@ -398,11 +398,8 @@ var WPFormsRichTextField = window.WPFormsRichTextField || ( function( document, 
 			const height = inputHeight * sizeK[ fieldSize ];
 			editor.theme.resizeTo( width, height );
 
-			const textColor = $form.css( '--wpforms-field-text-color' );
-			docStyle.color = textColor ? textColor : $body.css( 'color' );
-
-			const fontSize = $form.css( '--wpforms-field-size-font-size' );
-			docStyle.fontSize = fontSize ? fontSize : $body.css( 'font-size' );
+			docStyle.color    = cssVars['field-text-color'];
+			docStyle.fontSize = cssVars['field-size-font-size'];
 		},
 	};
 

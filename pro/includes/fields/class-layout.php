@@ -115,6 +115,7 @@ class WPForms_Field_Layout extends WPForms_Field {
 		add_filter( 'wpforms_field_new_default', [ $this, 'field_new_default' ] );
 		add_filter( 'wpforms_entry_single_data', [ $this, 'filter_fields_remove_layout' ], 1000, 3 );
 		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
+		add_filter( 'wpforms_pro_admin_entries_print_preview_fields', [ $this, 'filter_entries_print_preview_fields' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'gutenberg_enqueues' ] );
 		add_filter( 'register_block_type_args', [ $this, 'register_block_type_args' ], 20, 2 );
 		add_filter( 'wpforms_conversational_form_detected', [ $this, 'cf_frontend_hooks' ], 10, 2 );
@@ -292,6 +293,39 @@ class WPForms_Field_Layout extends WPForms_Field {
 			}
 
 			unset( $fields[ $id ] );
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Filter fields data. Add the fields from the columns to the fields list.
+	 *
+	 * @since 1.8.1.2
+	 *
+	 * @param array $fields Fields data.
+	 *
+	 * @return array
+	 */
+	public function filter_entries_print_preview_fields( $fields ) { // phpcs:ignore Generic.Metrics.NestingLevel.MaxExceeded
+
+		foreach ( $fields as $key => $field ) {
+			if ( $field['type'] !== $this->type ) {
+				continue;
+			}
+
+			foreach ( $field['columns'] as $column_index => $column ) {
+				foreach ( $column['fields'] as $layout_field_index => $layout_field_id ) {
+					if ( empty( $fields[ $layout_field_id ] ) ) {
+						unset( $column['fields'][ $layout_field_index ] );
+						continue;
+					}
+
+					$fields[ $key ]['columns'][ $column_index ]['fields'][ $layout_field_index ] = $fields[ $layout_field_id ];
+
+					unset( $fields[ $layout_field_id ] );
+				}
+			}
 		}
 
 		return $fields;

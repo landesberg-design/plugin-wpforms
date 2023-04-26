@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms 1.8.1.1\n"
+"Project-Id-Version: WPForms 1.8.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-03-29T18:28:14+03:00\n"
+"POT-Creation-Date: 2023-04-12T12:12:22+03:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: wpforms\n"
@@ -61,76 +61,76 @@ msgstr ""
 msgid "Please enter a license key."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:113
-#: pro/includes/admin/class-license.php:229
-#: pro/includes/admin/class-license.php:325
+#: pro/includes/admin/class-license.php:121
+#: pro/includes/admin/class-license.php:237
+#: pro/includes/admin/class-license.php:333
 msgid "There was an error connecting to the remote key API. Please try again later."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:135
+#: pro/includes/admin/class-license.php:143
 msgid "Congratulations! This site is now receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:248
-#: pro/includes/admin/class-license.php:568
+#: pro/includes/admin/class-license.php:256
+#: pro/includes/admin/class-license.php:581
 msgid "Your license key for WPForms is invalid. The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:261
+#: pro/includes/admin/class-license.php:269
 msgid "Your license key for WPForms has expired. Please renew your license key on WPForms.com to continue receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:274
-#: pro/includes/admin/class-license.php:557
+#: pro/includes/admin/class-license.php:282
+#: pro/includes/admin/class-license.php:570
 msgid "Your license key for WPForms has been disabled. Please use a different key to continue receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:289
+#: pro/includes/admin/class-license.php:297
 msgid "Your key has been refreshed successfully."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:340
+#: pro/includes/admin/class-license.php:348
 msgid "You have deactivated the key from this site successfully."
 msgstr ""
 
 #. translators: %1$s - WPForms.com Account dashboard URL; %2$s - WPForms.com pricing URL.
-#: pro/includes/admin/class-license.php:429
+#: pro/includes/admin/class-license.php:437
 msgid "Your license key can be found in your <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WPForms Account Dashboard</a>. Don’t have a license? <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">Sign up today!</a>"
 msgstr ""
 
-#: pro/includes/admin/class-license.php:445
+#: pro/includes/admin/class-license.php:453
 msgid "<strong>Your license has expired.</strong> An active license is needed to create new forms and edit existing forms. It also provides access to new features & addons, plugin updates (including security improvements), and our world class support!"
 msgstr ""
 
-#: pro/includes/admin/class-license.php:452
+#: pro/includes/admin/class-license.php:460
 msgid "<strong>Your license key has been disabled.</strong> Please use a different key to continue receiving automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:459
+#: pro/includes/admin/class-license.php:467
 msgid "<strong>Your license key is invalid.</strong> The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates."
 msgstr ""
 
 #. translators: %s - plugin settings page URL.
-#: pro/includes/admin/class-license.php:486
+#: pro/includes/admin/class-license.php:499
 msgid "Please <a href=\"%s\">enter and activate</a> your license key for WPForms to enable automatic updates."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:536
+#: pro/includes/admin/class-license.php:549
 #: src/Pro/Admin/Builder/LicenseAlert.php:131
 msgid "Heads up! Your WPForms license has expired."
 msgstr ""
 
-#: pro/includes/admin/class-license.php:537
+#: pro/includes/admin/class-license.php:550
 msgid "An active license is needed to create new forms and edit existing forms. It also provides access to new features & addons, plugin updates (including security improvements), and our world class support!"
 msgstr ""
 
-#: pro/includes/admin/class-license.php:539
+#: pro/includes/admin/class-license.php:552
 #: src/Pro/Admin/Builder/LicenseAlert.php:133
 #: src/Pro/Admin/Education/Core.php:103
 msgid "Renew Now"
 msgstr ""
 
-#: pro/includes/admin/class-license.php:541
+#: pro/includes/admin/class-license.php:554
 #: pro/templates/education/admin/did-you-know.php:31
 #: src/Pro/Admin/Builder/LicenseAlert.php:134
 #: src/Pro/Admin/DashboardWidget.php:299
@@ -613,16 +613,17 @@ msgstr ""
 #. translators: %d - field ID.
 #: pro/includes/admin/entries/class-entries-single.php:796
 #: pro/includes/fields/class-entry-preview.php:526
-#: pro/templates/admin/entry-print/field.php:29
+#: pro/templates/admin/entry-print/field.php:30
 #: src/Pro/Admin/Entries/Edit.php:745
 msgid "Field ID #%d"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-single.php:805
 #: pro/includes/fields/class-entry-preview.php:619
-#: pro/templates/admin/entry-print/field.php:40
+#: pro/templates/admin/entry-print/field.php:41
 #: src/Pro/Admin/Entries/Edit.php:371
 #: src/Pro/Admin/Entries/Edit.php:821
+#: src/Pro/Admin/Entries/PrintPreview.php:420
 msgid "Empty"
 msgstr ""
 
@@ -1174,7 +1175,7 @@ msgid "Please enter time between {minTime} and {maxTime}."
 msgstr ""
 
 #: pro/includes/fields/class-divider.php:18
-#: src/Pro/Admin/Entries/PrintPreview.php:370
+#: src/Pro/Admin/Entries/PrintPreview.php:357
 msgid "Section Divider"
 msgstr ""
 
@@ -1455,7 +1456,7 @@ msgstr ""
 
 #: pro/includes/fields/class-page-break.php:37
 #: pro/includes/fields/class-page-break.php:690
-#: src/Pro/Admin/Entries/PrintPreview.php:374
+#: src/Pro/Admin/Entries/PrintPreview.php:361
 msgid "Page Break"
 msgstr ""
 
@@ -1671,6 +1672,7 @@ msgstr ""
 #: pro/includes/fields/class-payment-checkbox.php:423
 #: pro/includes/fields/class-payment-dropdown.php:419
 #: pro/includes/fields/class-payment-multiple.php:399
+#: src/Pro/Admin/Entries/PrintPreview.php:449
 msgid "Item %s"
 msgstr ""
 
@@ -3388,8 +3390,14 @@ msgstr ""
 msgid "IP Address"
 msgstr ""
 
-#: src/Pro/Admin/Entries/PrintPreview.php:378
+#: src/Pro/Admin/Entries/PrintPreview.php:365
 msgid "Content Field"
+msgstr ""
+
+#. translators: %s - choice number.
+#: src/Pro/Admin/Entries/PrintPreview.php:443
+#: src/Pro/Admin/Entries/PrintPreview.php:493
+msgid "Choice %s"
 msgstr ""
 
 #: src/Pro/Admin/Pages/Addons.php:161

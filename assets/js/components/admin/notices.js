@@ -62,11 +62,22 @@ var WPFormsAdminNotices = window.WPFormsAdminNotices || ( function( document, wi
 		 * */
 		dismissNotice: function( e ) {
 
-			$.post( wpforms_admin_notices.ajax_url, {
-				action: 'wpforms_notice_dismiss',
-				nonce:   wpforms_admin_notices.nonce,
-				id: 	 ( $( this ).closest( '.wpforms-notice' ).attr( 'id' ) || '' ).replace( 'wpforms-notice-', '' ),
-			} );
+			const $element = $( e.target );
+
+			if ( ! $element.hasClass( 'wpforms-review-out' ) ) {
+				e.preventDefault();
+			}
+
+			$element.closest( '.wpforms-notice' ).remove();
+
+			$.post(
+				wpforms_admin_notices.ajax_url,
+				{
+					action: 'wpforms_notice_dismiss',
+					nonce:   wpforms_admin_notices.nonce,
+					id: 	 ( $element.closest( '.wpforms-notice' ).attr( 'id' ) || '' ).replace( 'wpforms-notice-', '' ),
+				}
+			);
 		},
 	};
 

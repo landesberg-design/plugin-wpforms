@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.1.2] - 2023-04-12
+### Fixed
+- Checkboxes were shifting when the limit choices rule was triggered.
+- "Ask for a review" admin notice links improperly opened new tab.
+- Empty checkboxes and radio fields were not hidden when printing entries.
+- The Next button was not blocked when the File upload field triggered any error.
+- The message design has been adjusted for a valid license notification after upgrading to Pro with an invalid/expired license.
+- The "Unselected Choices" option worked incorrectly for Dynamic choices in the Entry Print functionality.
+- Rich text field was generating an error in a browser console during form submission on WordPress 5.2.
+- There was a fatal error when settings were incorrectly reset by a 3rd-party plugin.
+
 ## [1.8.1.1] - 2023-03-30
 ### Fixed
 - Limit Length functionality was broken in the Paragraph Text field.

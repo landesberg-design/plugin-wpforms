@@ -162,7 +162,7 @@ class Frontend {
 			return;
 		}
 
-		$settings    = get_option( 'wpforms_settings', false );
+		$settings    = (array) get_option( 'wpforms_settings', [] );
 		$count_posts = wp_count_posts( 'wpforms' );
 
 		// Set the Modern markup checkbox to the checked state for all new users.

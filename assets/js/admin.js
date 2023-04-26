@@ -1540,7 +1540,11 @@
 				const msg  = ! data.msg || typeof data.msg !== 'string' ? wpforms_admin.something_went_wrong : data.msg;
 
 				if ( res.success ) {
-					$row.find( '#wpforms-setting-license-key' ).val( '' ).attr( 'value', '' ).prop( { readonly: false, disabled: false } );
+					$row.find( '#wpforms-setting-license-key' )
+						.val( '' )
+						.attr( 'value', '' )
+						.prop( { readonly: false, disabled: false } )
+						.removeClass();
 					$row.find( '.wpforms-license-key-deactivate-remove' ).remove();
 					$row.find( '#wpforms-setting-license-key-info-message' ).html( data.info ).show();
 					$row.find( '#wpforms-setting-license-key-verify' ).prop( 'disabled', false ).show();

@@ -237,6 +237,14 @@ class PrintPreview {
 		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
 		foreach ( $fields as $key => $field ) {
+
+			$is_field_allowed = $this->is_field_allowed( $field );
+
+			if ( ! $is_field_allowed ) {
+				unset( $fields[ $key ] );
+				continue;
+			}
+
 			if ( ! isset( $field['id'], $field['type'] ) ) {
 				unset( $fields[ $key ] );
 				continue;
@@ -250,38 +258,17 @@ class PrintPreview {
 
 			if ( empty( $field['columns'] ) ) {
 				unset( $fields[ $key ] );
-				continue;
-			}
-
-			$this->collapse_columns( $field, $key, $fields );
-		}
-
-		return $fields;
-	}
-
-	/**
-	 * Collapse columns.
-	 *
-	 * @since 1.8.1
-	 *
-	 * @param array $field  Field data.
-	 * @param int   $key    Current field ID.
-	 * @param array $fields Fields.
-	 */
-	private function collapse_columns( $field, $key, &$fields ) {
-
-		foreach ( $field['columns'] as $column_index => $column ) {
-			foreach ( $column['fields'] as $layout_field_index => $layout_field_id ) {
-				if ( empty( $fields[ $layout_field_id ] ) ) {
-					unset( $column['fields'][ $layout_field_index ] );
-					continue;
-				}
-
-				$fields[ $key ]['columns'][ $column_index ]['fields'][ $layout_field_index ] = $this->add_formatted_data( $fields[ $layout_field_id ] );
-
-				unset( $fields[ $layout_field_id ] );
 			}
 		}
+
+		/**
+		 * Modify entry fields data for the print page.
+		 *
+		 * @since 1.8.1.2
+		 *
+		 * @param array $fields Entry fields.
+		 */
+		return apply_filters( 'wpforms_pro_admin_entries_print_preview_fields', $fields );
 	}
 
 	/**
@@ -367,11 +354,11 @@ class PrintPreview {
 		$field_label = isset( $field['name'] ) ? $field['name'] : '';
 
 		if ( $field['type'] === 'divider' ) {
-			$field_label = isset( $field['label'] ) && ! empty( $field['label'] ) ? $field['label'] : esc_html__( 'Section Divider', 'wpforms' );
+			$field_label = isset( $field['label'] ) && ! wpforms_is_empty_string( $field['label'] ) ? $field['label'] : esc_html__( 'Section Divider', 'wpforms' );
 		}
 
 		if ( $field['type'] === 'pagebreak' ) {
-			$field_label = isset( $field['title'] ) && ! empty( $field['title'] ) ? $field['title'] : esc_html__( 'Page Break', 'wpforms' );
+			$field_label = isset( $field['title'] ) && ! wpforms_is_empty_string( $field['title'] ) ? $field['title'] : esc_html__( 'Page Break', 'wpforms' );
 		}
 
 		if ( $field['type'] === 'content' ) {
@@ -391,25 +378,30 @@ class PrintPreview {
 	 *
 	 * @return string
 	 */
-	private function get_choices_field_value( $field, $field_value ) {
+	private function get_choices_field_value( $field, $field_value ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$is_payment      = strpos( $field['type'], 'payment-' ) === 0;
-		$separator       = $is_payment ? ',' : PHP_EOL;
-		$active_choices  = explode( $separator, $field['value_raw'] );
-		$choices         = '';
+		$choices_html    = '';
+		$choices         = $this->form_data['fields'][ $field['id'] ]['choices'];
 		$type            = in_array( $field['type'], [ 'radio', 'payment-multiple' ], true ) ? 'radio' : 'checkbox';
 		$is_image_choice = ! empty( $this->form_data['fields'][ $field['id'] ]['choices_images'] );
 		$template_name   = $is_image_choice ? 'image-choice' : 'choice';
+		$is_dynamic      = ! empty( $field['dynamic'] );
 
-		if ( $is_payment ) {
-			$active_choices = array_map( 'absint', $active_choices );
+		if ( $is_dynamic ) {
+			$field_id   = $field['id'];
+			$form_id    = $this->form_data['id'];
+			$field_data = $this->form_data['fields'][ $field_id ];
+			$choices    = wpforms_get_field_dynamic_choices( $field_data, $form_id, $this->form_data );
 		}
 
-		foreach ( $this->form_data['fields'][ $field['id'] ]['choices'] as $key => $choice ) {
-			$is_checked = in_array( $choice['label'], $active_choices, true ) ||
-						  ( $is_payment && in_array( $key, $active_choices, true ) );
+		foreach ( $choices as $key => $choice ) {
+			$is_checked = $this->is_checked_choice( $field, $choice, $key, $is_dynamic );
 
-			$choices .= wpforms_render(
+			if ( ! $is_dynamic ) {
+				$choice['label'] = $this->get_choice_label( $field, $choice, $key );
+			}
+
+			$choices_html .= wpforms_render(
 				'admin/entry-print/' . $template_name,
 				[
 					'entry'       => $this->entry,
@@ -425,9 +417,83 @@ class PrintPreview {
 
 		return sprintf(
 			'<div class="field-value-default-mode">%1$s</div><div class="field-value-choices-mode">%2$s</div>',
-			$field_value,
-			$choices
+			wpforms_is_empty_string( $field_value ) ? esc_html__( 'Empty', 'wpforms' ) : $field_value,
+			$choices_html
 		);
+	}
+
+	/**
+	 * Get value for a choice item.
+	 *
+	 * @since 1.8.1.2
+	 *
+	 * @param array $field  Entry field.
+	 * @param array $choice Choice settings.
+	 * @param int   $key    Choice number.
+	 *
+	 * @return string
+	 */
+	private function get_choice_label( $field, $choice, $key ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		$is_payment = strpos( $field['type'], 'payment-' ) === 0;
+
+		if ( ! $is_payment ) {
+			return ! isset( $choice['label'] ) || wpforms_is_empty_string( $choice['label'] )
+				/* translators: %s - choice number. */
+				? sprintf( esc_html__( 'Choice %s', 'wpforms' ), $key )
+				: $choice['label'];
+		}
+
+		$label = isset( $choice['label']['text'] ) ? $choice['label']['text'] : '';
+		/* translators: %s - Choice item number. */
+		$label = $label !== '' ? $label : sprintf( esc_html__( 'Item %s', 'wpforms' ), $key );
+
+		if ( empty( $this->form_data['fields'][ $field['id'] ]['show_price_after_labels'] ) ) {
+			return $label;
+		}
+
+		$value  = ! empty( $choice['value'] ) ? $choice['value'] : 0;
+		$amount = wpforms_format_amount( wpforms_sanitize_amount( $value ), true );
+
+		return $amount ? $label . ' - ' . $amount : $label;
+	}
+
+	/**
+	 * Is the choice item checked?
+	 *
+	 * @since 1.8.1.2
+	 *
+	 * @param array $field      Entry field.
+	 * @param array $choice     Choice settings.
+	 * @param int   $key        Choice number.
+	 * @param bool  $is_dynamic Is dynamic field.
+	 *
+	 * @return bool
+	 */
+	private function is_checked_choice( $field, $choice, $key, $is_dynamic ) {
+
+		$is_payment     = strpos( $field['type'], 'payment-' ) === 0;
+		$separator      = $is_payment || $is_dynamic ? ',' : PHP_EOL;
+		$active_choices = explode( $separator, $field['value_raw'] );
+
+		if ( $is_dynamic ) {
+			$active_choices = array_map( 'absint', $active_choices );
+
+			return in_array( $choice['value'], $active_choices, true );
+		}
+
+		if ( $is_payment ) {
+			$active_choices = array_map( 'absint', $active_choices );
+
+			return in_array( $key, $active_choices, true );
+		}
+
+		$label = ! isset( $choice['label'] ) || wpforms_is_empty_string( $choice['label'] )
+			/* translators: %s - choice number. */
+			? sprintf( esc_html__( 'Choice %s', 'wpforms' ), $key )
+			: $choice['label'];
+
+		return in_array( $label, $active_choices, true );
 	}
 
 	/**
@@ -479,5 +545,33 @@ class PrintPreview {
 		}
 
 		return $settings;
+	}
+
+	/**
+	 * Check if field is allowed to be displayed.
+	 *
+	 * @since 1.8.1.2
+	 *
+	 * @param array $field Field data.
+	 *
+	 * @return bool
+	 */
+	public function is_field_allowed( $field ) {
+
+		$is_dynamic = ! empty( $field['dynamic'] );
+
+		// If field is not dynamic, it is allowed.
+		if ( ! $is_dynamic ) {
+			return true;
+		}
+
+		$form_data       = $this->form_data;
+		$fields          = $form_data['fields'];
+		$field_id        = $field['id'];
+		$field_data      = $fields[ $field_id ];
+		$dynamic_choices = wpforms_get_field_dynamic_choices( $field_data, $form_data['id'], $form_data );
+
+		// If field is dynamic and has choices, it is allowed.
+		return ! empty( $dynamic_choices );
 	}
 }

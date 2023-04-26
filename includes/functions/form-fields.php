@@ -348,7 +348,7 @@ function wpforms_get_post_title( $post ) {
 function wpforms_get_term_name( $term ) {
 
 	/* translators: %d - a taxonomy term ID. */
-	return wpforms_is_empty_string( trim( $term->name ) ) ? sprintf( __( '#%d (no name)', 'wpforms-lite' ), absint( $term->term_id ) ) : $term->name;
+	return wpforms_is_empty_string( trim( $term->name ) ) ? sprintf( __( '#%d (no name)', 'wpforms-lite' ), absint( $term->term_id ) ) : trim( $term->name );
 }
 
 /**

@@ -191,6 +191,7 @@ class Loader {
 			[
 				'name' => 'Admin\FormEmbedWizard',
 				'hook' => 'admin_init',
+				'id'   => 'form_embed_wizard',
 			],
 			[
 				'name' => 'Admin\SiteHealth',
