@@ -1,0 +1,18 @@
+{
+  "name": "landesberg-design/wpforms",
+  "type": "wordpress-plugin",
+  "description": "",
+  "require": {
+      "php": ">=5.6"
+  },
+  "authors": [
+      {
+          "name": "WPForms"
+      }
+  ],
+  "autoload": {
+      "psr-4": {
+          "WPForms\\" : "src/"
+      }
+  }
+}
