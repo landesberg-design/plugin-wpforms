@@ -203,6 +203,11 @@ class Integration extends \WPForms\Integrations\LiteConnect\Integration {
 			return false;
 		}
 
+		// Update the Entry ID for a corresponding payment.
+		if ( isset( $entry_args['payment_id'] ) ) {
+			wpforms()->get( 'payment' )->update( $entry_args['payment_id'], [ 'entry_id' => $entry_id ], '', '', [ 'cap' => false ] );
+		}
+
 		$fields     = json_decode( $entry_args['fields'], true );
 		$submission = wpforms()->get( 'submission' );
 

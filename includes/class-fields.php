@@ -17,14 +17,12 @@ class WPForms_Fields {
 	}
 
 	/**
-	 * Load and init the base field class.
+	 * Initialize hooks.
 	 *
 	 * @since 1.2.8
+	 * @since 1.8.2 Moved base class loading to \WPForms\WPForms::includes.
 	 */
 	public function init() {
-
-		// Parent class template.
-		require_once WPFORMS_PLUGIN_DIR . 'includes/fields/class-base.php';
 
 		$this->hooks();
 	}
@@ -69,12 +67,7 @@ class WPForms_Fields {
 			'page-break',
 			'rating',
 			'file-upload',
-			'payment-single',
-			'payment-multiple',
-			'payment-checkbox',
-			'payment-dropdown',
 			'payment-credit-card',
-			'payment-total',
 			'number-slider',
 			'richtext',
 			'internal-information',

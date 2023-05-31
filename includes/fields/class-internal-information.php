@@ -629,7 +629,7 @@ class WPForms_Field_Internal_Information extends WPForms_Field {
 		wp_enqueue_script(
 			'wpforms-internal-information-field',
 			WPFORMS_PLUGIN_URL . "assets/js/components/admin/fields/internal-information-field{$min}.js",
-			[ 'wpforms-builder', 'wpforms-md5-hash' ],
+			[ 'wpforms-builder', 'wpforms-md5-hash', 'wpforms-builder-drag-fields' ],
 			WPFORMS_VERSION
 		);
 	}

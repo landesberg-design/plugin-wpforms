@@ -55,6 +55,15 @@ class WPForms_Field_Content extends WPForms_Field {
 
 		$this->field_option_content( $field );
 
+		// Set label to disabled.
+		$args = [
+			'type'  => 'hidden',
+			'slug'  => 'label_disable',
+			'value' => '1',
+		];
+
+		$this->field_element( 'text', $field, $args );
+
 		// Options close markup.
 		$this->field_option( 'basic-options', $field, [ 'markup' => 'close' ] );
 

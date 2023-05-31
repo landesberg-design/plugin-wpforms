@@ -383,6 +383,11 @@ class Migration175Task extends Task {
 			}
 		}
 
+		// Bail out if there are no found payment meta.
+		if ( empty( $values ) ) {
+			return;
+		}
+
 		$values = implode( ', ', $values );
 
 		// The following query length is about 500 chars for 1 entry (7 metas).

@@ -1,4 +1,4 @@
-/* global List, wpforms_form_templates */
+/* global List, wpforms_form_templates, wpforms_addons, wpf */
 
 /**
  * Form Templates function.
@@ -328,6 +328,275 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 			}
 
 			$templates.last().after( template() );
+		},
+
+		/**
+		 * Select template.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param {string}   formName Name of the form.
+		 * @param {string}   template Template slug.
+		 * @param {jQuery}   $button  Use template button object.
+		 * @param {Function} callback The function to set the template.
+		 */
+		selectTemplateProcess: function( formName, template, $button, callback ) {
+
+			if ( $button.data( 'addons' ) ) {
+				app.addonsModal( formName, template, $button, callback );
+
+				return;
+			}
+
+			callback( formName, template );
+		},
+
+		/**
+		 * Open required addons alert.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param {string}   formName Name of the form.
+		 * @param {string}   template Template slug.
+		 * @param {jQuery}   $button  Use template button object.
+		 * @param {Function} callback The function to set the template.
+		 */
+		addonsModal: function( formName, template, $button, callback ) {
+
+			const templateName = $button.data( 'template-name-raw' );
+			const addonsNames = $button.data( 'addons-names' );
+			const addonsSlugs = $button.data( 'addons' );
+			const addons = addonsSlugs.split( ',' );
+			let prompt = addons.length > 1 ? wpforms_form_templates.template_addons_prompt : wpforms_form_templates.template_addon_prompt;
+
+			prompt = prompt.replace( /%template%/g, templateName ).replace( /%addons%/g, addonsNames );
+
+			if ( ! addons.length ) {
+				return;
+			}
+
+			if ( ! wpforms_form_templates.can_install_addons ) {
+				app.userCannotInstallAddonsModal( prompt );
+
+				return;
+			}
+
+			app.userCanInstallAddonsModal( formName, template, addons, prompt, callback );
+		},
+
+		/**
+		 * Open the template addon alert for admins.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param {string}   formName Name of the form.
+		 * @param {string}   template Template slug.
+		 * @param {Array}    addons   Array of addon slugs.
+		 * @param {string}   prompt   Modal content.
+		 * @param {Function} callback The function to set the template.
+		 */
+		userCanInstallAddonsModal: function( formName, template, addons, prompt, callback ) {
+
+			const spinner = '<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
+
+			$.confirm( {
+				title: wpforms_form_templates.heads_up,
+				content: prompt,
+				icon: 'fa fa-exclamation-circle',
+				type: 'orange',
+				buttons: {
+					confirm: {
+						text: wpforms_form_templates.install_confirm,
+						btnClass: 'btn-confirm',
+						keys: [ 'enter' ],
+						action: function() {
+
+							this.$$confirm
+								.prop( 'disabled', true )
+								.html( spinner + wpforms_form_templates.activating );
+
+							this.$$cancel
+								.prop( 'disabled', true );
+
+							app.installActivateAddons( addons, this, formName, template, callback );
+
+							return false;
+						},
+					},
+					cancel: {
+						text: wpforms_form_templates.cancel,
+						action: function() {
+
+							WPFormsFormTemplates.selectTemplateCancel();
+						},
+					},
+				},
+			} );
+		},
+
+		/**
+		 * Open the template addon alert for non-admins.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param {string} prompt Modal content.
+		 */
+		userCannotInstallAddonsModal: function( prompt ) {
+
+			$.alert( {
+				title: wpforms_form_templates.heads_up,
+				content: prompt,
+				icon: 'fa fa-exclamation-circle',
+				type: 'orange',
+				buttons: {
+					ok: {
+						text: wpforms_form_templates.ok,
+						btnClass: 'btn-confirm',
+						keys: [ 'enter' ],
+						action: function() {
+
+							WPFormsFormTemplates.selectTemplateCancel();
+						},
+					},
+				},
+			} );
+		},
+
+		/**
+		 * Install & Activate addons via AJAX.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param {Array}  addons        Addons slugs.
+		 * @param {object} previousModal Previous modal instance.
+		 * @param {string} formName      Name of the form.
+		 * @param {string} template      Template slug.
+		 * @param {Function} callback    The function to set the template.
+		 */
+		installActivateAddons: function( addons, previousModal, formName, template, callback ) {
+
+			const ajaxResults = [];
+			const ajaxErrors = [];
+			let promiseChain = false;
+
+			// Put each of the ajax call promise to the chain.
+			addons.forEach( function( addon ) {
+
+				if ( typeof promiseChain.done !== 'function' ) {
+					promiseChain = app.installActivateAddonAjax( addon );
+
+					return;
+				}
+
+				promiseChain = promiseChain
+					.done( function( value ) {
+
+						ajaxResults.push( value );
+
+						return app.installActivateAddonAjax( addon );
+					} )
+					.fail( function( error ) {
+						ajaxErrors.push( error );
+					} );
+			} );
+
+			promiseChain
+
+				// Latest promise result and error.
+				.done( function( value ) {
+					ajaxResults.push( value );
+				} )
+				.fail( function( error ) {
+					ajaxErrors.push( error );
+				} )
+
+				// Finally, resolve all the promises.
+				.always( function() {
+
+					previousModal.close();
+
+					if (
+						ajaxResults.length > 0 &&
+						wpf.listPluck( ajaxResults, 'success' ).every( Boolean ) && // Check if every `success` is true.
+						ajaxErrors.length === 0
+					) {
+						callback( formName, template );
+
+						return;
+					}
+
+					app.installActivateAddonsError( formName, template, callback );
+				} );
+		},
+
+		/**
+		 * Install & Activate addons error modal.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param {string} formName Name of the form.
+		 * @param {string} template Template slug.
+		 * @param {Function} callback The function to set the template.
+		 */
+		installActivateAddonsError: function( formName, template, callback ) {
+
+			$.confirm( {
+				title: wpforms_form_templates.heads_up,
+				content: wpforms_form_templates.template_addons_error,
+				icon: 'fa fa-exclamation-circle',
+				type: 'orange',
+				buttons: {
+					confirm: {
+						text: wpforms_form_templates.use_template,
+						btnClass: 'btn-confirm',
+						keys: [ 'enter' ],
+						action: function() {
+
+							callback( formName, template );
+						},
+					},
+					cancel: {
+						text: wpforms_form_templates.cancel,
+						action: function() {
+
+							app.selectTemplateCancel();
+						},
+					},
+				},
+			} );
+		},
+
+		/**
+		 * Install & Activate single addon via AJAX.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param {string} addon Addon slug.
+		 *
+		 * @returns {Promise} jQuery ajax call promise.
+		 */
+		installActivateAddonAjax: function( addon ) {
+
+			const addonData = wpforms_addons[ addon ];
+			const deferred = new $.Deferred();
+
+			if (
+				! addonData ||
+				[ 'activate', 'install' ].indexOf( addonData.action ) < 0
+			) {
+				deferred.resolve( false );
+
+				return deferred.promise();
+			}
+
+			return $.post(
+				wpforms_form_templates.ajaxurl,
+				{
+					action: 'wpforms_' + addonData.action + '_addon',
+					nonce: wpforms_form_templates.admin_nonce,
+					plugin: addonData.action === 'activate' ? addon + '/' + addon + '.php' : addonData.url,
+				}
+			);
 		},
 	};
 

@@ -228,18 +228,27 @@ class WPForms_Entries_List {
 
 		$screen = get_current_screen();
 
-		if ( 'wpforms_page_wpforms-entries' !== $screen->id ) {
+		if ( $screen === null || $screen->id !== 'wpforms_page_wpforms-entries' ) {
 			return;
 		}
 
-		add_screen_option(
-			'per_page',
+		/**
+		 * Filter admin screen option arguments.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param array $args Option-dependent arguments.
+		 */
+		$args = (array) apply_filters(
+			'wpforms_entries_list_default_screen_option_args',
 			[
 				'label'   => esc_html__( 'Number of entries per page:', 'wpforms' ),
 				'option'  => 'wpforms_entries_per_page',
-				'default' => wpforms()->entry->get_count_per_page(),
+				'default' => wpforms()->get( 'entry' )->get_count_per_page(),
 			]
 		);
+
+		add_screen_option( 'per_page', $args );
 	}
 
 	/**
@@ -450,7 +459,6 @@ class WPForms_Entries_List {
 		$redirect_url = ! empty( $_GET['url'] ) ? add_query_arg( 'deleted', $deleted, esc_url_raw( wp_unslash( $_GET['url'] ) ) ) : '';
 
 		WPForms\Pro\Admin\DashboardWidget::clear_widget_cache();
-		WPForms\Pro\Admin\Entries\DefaultScreen::clear_widget_cache();
 
 		wp_send_json_success( $redirect_url );
 	}
@@ -1026,7 +1034,7 @@ class WPForms_Entries_List {
 		}
 		?>
 
-		<div class="form-details wpforms-clear">
+		<div class="form-details">
 
 			<span class="form-details-sub"><?php esc_html_e( 'Select Form', 'wpforms' ); ?></span>
 

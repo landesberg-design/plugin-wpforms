@@ -399,12 +399,27 @@ class Export {
 	 */
 	protected function init_form_data() {
 
-		$this->data['form_data'] = wpforms()->form->get(
-			$this->data['get_args']['form_id'],
-			[
-				'content_only' => true,
-				'cap'          => 'view_entries_form_single',
-			]
+		$form = wpforms()->get( 'form' );
+		$data = $form ?
+			$form->get(
+				$this->data['get_args']['form_id'],
+				[
+					'content_only' => true,
+					'cap'          => 'view_entries_form_single',
+				]
+			) :
+			[];
+
+		/**
+		 * Filter entries during form data init.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param array $form_data Form data.
+		 */
+		$this->data['form_data'] = apply_filters(
+			'wpforms_pro_admin_entries_export_form_data',
+			$data
 		);
 	}
 

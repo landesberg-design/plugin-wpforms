@@ -1,4 +1,7 @@
 <?php
+
+use WPForms\Admin\Payments\Views\Overview\Helpers;
+use WPForms\Db\Payments\ValueValidator;
 /**
  * Display information about a single form entry.
  *
@@ -649,8 +652,8 @@ class WPForms_Entries_Single {
 
 				<a href="<?php echo esc_url( $this->form->form_url ); ?>" class="add-new-h2 wpforms-btn-orange"><?php esc_html_e( 'Back to All Entries', 'wpforms' ); ?></a>
 
-				<div class="wpforms-entry-navigation">
-					<div class="wpforms-entry-navigation-text">
+				<div class="wpforms-admin-single-navigation">
+					<div class="wpforms-admin-single-navigation-text">
 						<?php
 						printf(
 							/* translators: %1$d - current number of entry; %2$d - total number of entries. */
@@ -660,17 +663,17 @@ class WPForms_Entries_Single {
 						);
 						?>
 					</div>
-					<div class="wpforms-entry-navigation-buttons">
+					<div class="wpforms-admin-single-navigation-buttons">
 						<a
 								href="<?php echo esc_url( $entry->entry_prev_url ); ?>"
 								title="<?php esc_attr_e( 'Previous form entry', 'wpforms' ); ?>"
-								id="wpforms-entry-prev-link"
-								class="add-new-h2 wpforms-btn-grey <?php echo sanitize_html_class( $entry->entry_prev_class ); ?>">
+								id="wpforms-admin-single-navigation-prev-link"
+								class="wpforms-btn-grey <?php echo sanitize_html_class( $entry->entry_prev_class ); ?>">
 							<span class="dashicons dashicons-arrow-left-alt2"></span>
 						</a>
 
 						<span
-								class="wpforms-entry-current"
+								class="wpforms-admin-single-navigation-current"
 								title="<?php esc_attr_e( 'Current form entry', 'wpforms' ); ?>">
 								<?php echo (int) $entry->entry_prev_count + 1; ?>
 						</span>
@@ -678,8 +681,8 @@ class WPForms_Entries_Single {
 						<a
 								href="<?php echo esc_url( $entry->entry_next_url ); ?>"
 								title="<?php esc_attr_e( 'Next form entry', 'wpforms' ); ?>"
-								id="wpforms-entry-next-link"
-								class=" add-new-h2 wpforms-btn-grey <?php echo sanitize_html_class( $entry->entry_next_class ); ?>">
+								id="wpforms-admin-single-navigation-next-link"
+								class="wpforms-btn-grey <?php echo sanitize_html_class( $entry->entry_next_class ); ?>">
 							<span class="dashicons dashicons-arrow-right-alt2"></span>
 						</a>
 					</div>
@@ -1245,154 +1248,55 @@ class WPForms_Entries_Single {
 	 * Entry Payment Details metabox.
 	 *
 	 * @since 1.2.6
+	 * @since 1.8.2 Use payment info from payment tables.
 	 *
 	 * @param object $entry     Submitted entry values.
 	 * @param array  $form_data Form data and settings.
 	 */
 	public function details_payment( $entry, $form_data ) {
 
-		if ( empty( $entry->type ) || 'payment' !== $entry->type ) {
+		if ( empty( $entry->type ) || $entry->type !== 'payment' ) {
 			return;
 		}
 
-		$entry_meta   = json_decode( $entry->meta, true );
-		$status       = ! empty( $entry->status ) ? $entry->status : esc_html__( 'Unknown', 'wpforms' );
-		$currency     = ! empty( $entry_meta['payment_currency'] ) ? $entry_meta['payment_currency'] : wpforms_get_currency();
-		$total        = isset( $entry_meta['payment_total'] ) ? wpforms_format_amount( wpforms_sanitize_amount( $entry_meta['payment_total'], $currency ), true, $currency ) : '-';
-		$total        = apply_filters( 'wpforms_entry_details_payment_total', $total, $entry_meta, $entry, $form_data );
-		$note         = ! empty( $entry_meta['payment_note'] ) ? esc_html( $entry_meta['payment_note'] ) : '';
-		$gateway      = apply_filters( 'wpforms_entry_details_payment_gateway', '-', $entry_meta, $entry, $form_data );
-		$transaction  = apply_filters( 'wpforms_entry_details_payment_transaction', '-', $entry_meta, $entry, $form_data );
-		$subscription = apply_filters( 'wpforms_entry_details_payment_subscription', '', $entry_meta, $entry, $form_data );
-		$customer     = apply_filters( 'wpforms_entry_details_payment_customer', '', $entry_meta, $entry, $form_data );
-		$mode         = ! empty( $entry_meta['payment_mode'] ) && 'test' === $entry_meta['payment_mode'] ? 'test' : 'production';
+		$payment = wpforms()->get( 'payment' )->get_by( 'entry_id', $entry->entry_id );
 
-		switch ( $entry_meta['payment_type'] ) {
-			case 'stripe':
-				$gateway       = esc_html__( 'Stripe', 'wpforms' );
-				$dashboard_url = ! empty( $entry_meta['payment_mode'] ) && $entry_meta['payment_mode'] === 'test' ? 'https://dashboard.stripe.com/test/' : 'https://dashboard.stripe.com/';
-
-				if ( ! empty( $entry_meta['payment_transaction'] ) ) {
-					$transaction = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc_url( $dashboard_url . 'payments/' . $entry_meta['payment_transaction'] ), $entry_meta['payment_transaction'] );
-				}
-				if ( ! empty( $entry_meta['payment_subscription'] ) ) {
-					$subscription = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc_url( $dashboard_url . 'subscriptions/' . $entry_meta['payment_subscription'] ), $entry_meta['payment_subscription'] );
-				}
-				if ( ! empty( $entry_meta['payment_customer'] ) ) {
-					$customer = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc_url( $dashboard_url . 'customers/' . $entry_meta['payment_customer'] ), $entry_meta['payment_customer'] );
-				}
-				if ( ! empty( $entry_meta['payment_period'] ) ) {
-					$total .= ' <span style="font-weight:400; color:#999; display:inline-block;margin-left:4px;"><i class="fa fa-refresh" aria-hidden="true"></i> ' . $entry_meta['payment_period'] . '</span>';
-				}
-				break;
-
-			case 'paypal_standard':
-				$gateway = esc_html__( 'PayPal Standard', 'wpforms' );
-				if ( ! empty( $entry_meta['payment_transaction'] ) ) {
-					$type = 'production' === $mode ? '' : 'sandbox.';
-					$transaction = sprintf( '<a href="https://www.%spaypal.com/activity/payment/%s" target="_blank" rel="noopener noreferrer">%s</a>', $type, $entry_meta['payment_transaction'], $entry_meta['payment_transaction'] );
-				}
-				break;
+		if ( ! $payment ) {
+			return;
 		}
 
-		?>
+		$allowed_types    = ValueValidator::get_allowed_types();
+		$allowed_gateways = ValueValidator::get_allowed_gateways();
+		$placeholder      = __( 'N/A', 'wpforms' );
 
-		<!-- Entry Payment details metabox -->
-		<div id="wpforms-entry-payment" class="postbox">
+		$payment_type         = isset( $payment->type, $allowed_types[ $payment->type ] ) ? $allowed_types[ $payment->type ] : $placeholder;
+		$payment_gateway      = isset( $payment->gateway, $allowed_gateways[ $payment->gateway ] ) ? $allowed_gateways[ $payment->gateway ] : $placeholder;
+		$payment_total        = ! empty( $payment->total_amount ) ? wpforms_format_amount( wpforms_sanitize_amount( $payment->total_amount ), $payment->currency ) : $placeholder;
+		$payment_subscription = Helpers::get_subscription_description( $payment->id, $payment_total );
 
-			<div class="postbox-header">
-				<h2 class="hndle">
-					<span><?php esc_html_e( 'Payment Details', 'wpforms' ); ?></span>
-				</h2>
-			</div>
-
-			<div class="inside">
-
-				<div class="wpforms-entry-payment-meta">
-
-					<p class="wpforms-entry-payment-status">
-						<?php
-						printf(
-							/* translators: %s - entry payment status. */
-							esc_html__( 'Status: %s', 'wpforms' ),
-							'<strong>' . esc_html( ucwords( $status ) ) . '</strong>'
-						);
-						?>
-					</p>
-
-					<p class="wpforms-entry-payment-total">
-						<?php
-						printf(
-							/* translators: %s - entry payment total. */
-							esc_html__( 'Total: %s', 'wpforms' ),
-							'<strong>' . wp_kses_post( $total ) . '</strong>'
-						);
-						?>
-					</p>
-
-					<p class="wpforms-entry-payment-gateway">
-						<?php
-						printf(
-							/* translators: %s - entry payment gateway. */
-							esc_html__( 'Gateway: %s', 'wpforms' ),
-							'<strong>' . wp_kses_post( $gateway ) . '</strong>'
-						);
-						if ( 'test' === $mode ) {
-							printf( ' (%s)', esc_html( _x( 'Test', 'Gateway mode', 'wpforms' ) ) );
-						}
-						?>
-					</p>
-
-					<?php if ( $transaction !== '-' ) : ?>
-					<p class="wpforms-entry-payment-transaction">
-						<?php
-						printf(
-							/* translators: %s - entry payment transaction. */
-							esc_html__( 'Transaction ID: %s', 'wpforms' ),
-							'<strong>' . wp_kses_post( $transaction ) . '</strong>'
-						);
-						?>
-					</p>
-					<?php endif; ?>
-
-					<?php if ( ! empty( $subscription ) ) : ?>
-					<p class="wpforms-entry-payment-subscription">
-						<?php
-						printf(
-							/* translators: %s - entry payment subscription. */
-							esc_html__( 'Subscription ID: %s', 'wpforms' ),
-							'<strong>' . wp_kses_post( $subscription ) . '</strong>'
-						);
-						?>
-					</p>
-					<?php endif; ?>
-
-					<?php if ( ! empty( $customer ) ) : ?>
-					<p class="wpforms-entry-payment-customer">
-						<?php
-						printf(
-							/* translators: %s - entry payment customer. */
-							esc_html__( 'Customer ID: %s', 'wpforms' ),
-							'<strong>' . wp_kses_post( $customer ) . '</strong>'
-						);
-						?>
-					</p>
-					<?php endif; ?>
-
-					<?php if ( ! empty( $note ) ) : ?>
-						<p class="wpforms-entry-payment-note">
-							<?php echo esc_html__( 'Note:', 'wpforms' ) . '<br>' . esc_html( $note ); ?>
-						</p>
-					<?php endif; ?>
-
-					<?php do_action( 'wpforms_entry_payment_sidebar_actions', $entry, $form_data ); ?>
-
-				</div>
-
-			</div>
-
-		</div>
-		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wpforms_render(
+			'admin/entries/single-entry/payment-details',
+			[
+				'payment'              => $payment,
+				'payment_type'         => $payment_type,
+				'payment_gateway'      => $payment_gateway,
+				'payment_total'        => $payment_total,
+				'payment_subscription' => $payment_subscription,
+				'payment_url'          => add_query_arg(
+					[
+						'page'       => 'wpforms-payments',
+						'view'       => 'single',
+						'payment_id' => absint( $payment->id ),
+					],
+					admin_url( 'admin.php' )
+				),
+				'entry'                => $entry,
+				'form_data'            => $form_data,
+				'show_button'          => wpforms_current_user_can(),
+			],
+			true
+		);
 	}
 
 	/**

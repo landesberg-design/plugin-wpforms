@@ -59,7 +59,7 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 		openModalButtonClick: function() {
 
 			$( document ).on(
-				'mousedown',
+				'click',
 				'.education-modal',
 				function( event ) {
 

@@ -317,7 +317,7 @@ class WPForms_Field_Layout extends WPForms_Field {
 			foreach ( $field['columns'] as $column_index => $column ) {
 				foreach ( $column['fields'] as $layout_field_index => $layout_field_id ) {
 					if ( empty( $fields[ $layout_field_id ] ) ) {
-						unset( $column['fields'][ $layout_field_index ] );
+						unset( $fields[ $key ]['columns'][ $column_index ]['fields'][ $layout_field_index ] );
 						continue;
 					}
 

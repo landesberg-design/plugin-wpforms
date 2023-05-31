@@ -13,6 +13,17 @@
 abstract class WPForms_DB {
 
 	/**
+	 * Maximum length of index key.
+	 *
+	 * Indexes have a maximum size of 767 bytes. Historically, we haven't need to be concerned about that.
+	 * As of WP 4.2, however, WP moved to utf8mb4, which uses 4 bytes per character. This means that an index which
+	 * used to have room for floor(767/3) = 255 characters, now only has room for floor(767/4) = 191 characters.
+	 *
+	 * @since 1.8.2
+	 */
+	const MAX_INDEX_LENGTH = 191;
+
+	/**
 	 * Database table name.
 	 *
 	 * @since 1.1.6
@@ -112,7 +123,7 @@ abstract class WPForms_DB {
 
 		if (
 			empty( $value ) ||
-		    ! array_key_exists( $column, $this->get_columns() )
+			! array_key_exists( $column, $this->get_columns() )
 		) {
 			return null;
 		}

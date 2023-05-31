@@ -49,7 +49,6 @@ class WPForms_Pro {
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/class-conditional-logic-core.php';
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/class-conditional-logic-fields.php';
 		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/payments/class-payment.php';
-		require_once WPFORMS_PLUGIN_DIR . 'pro/includes/payments/functions.php';
 
 		if ( is_admin() || wp_doing_cron() || wpforms_doing_wp_cli() ) {
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/ajax-actions.php';
@@ -83,7 +82,6 @@ class WPForms_Pro {
 		add_action( 'wpforms_loaded', [ $this, 'updater' ], 30 );
 		add_action( 'wpforms_install', [ $this, 'install' ], 10 );
 		add_filter( 'wpforms_settings_license_output', [ $this, 'settings_license_callback' ] );
-		add_filter( 'wpforms_settings_tabs', [ $this, 'register_settings_tabs' ], 5, 1 );
 		add_filter( 'wpforms_settings_defaults', [ $this, 'register_settings_fields' ], 5, 1 );
 		add_action( 'wpforms_settings_init', [ $this, 'reinstall_custom_tables' ] );
 		add_filter( 'wpforms_update_settings', [ $this, 'maybe_unset_gdpr_sub_settings' ] );
@@ -382,31 +380,6 @@ class WPForms_Pro {
 	}
 
 	/**
-	 * Register Pro settings tabs.
-	 *
-	 * @since 1.3.9
-	 *
-	 * @param array $tabs Admin area tabs list.
-	 *
-	 * @return array
-	 */
-	public function register_settings_tabs( $tabs ) {
-
-		// Add Payments tab.
-		$payments = [
-			'payments' => [
-				'name'   => esc_html__( 'Payments', 'wpforms' ),
-				'form'   => true,
-				'submit' => esc_html__( 'Save Settings', 'wpforms' ),
-			],
-		];
-
-		$tabs = wpforms_array_insert( $tabs, $payments, 'validation' );
-
-		return $tabs;
-	}
-
-	/**
 	 * Pro admin scripts and styles.
 	 *
 	 * @since 1.5.5
@@ -438,14 +411,6 @@ class WPForms_Pro {
 	 * @return array
 	 */
 	public function register_settings_fields( $settings ) {
-
-		$currencies      = wpforms_get_currencies();
-		$currency_option = [];
-
-		// Format currencies for select element.
-		foreach ( $currencies as $code => $currency ) {
-			$currency_option[ $code ] = sprintf( '%s (%s %s)', $currency['name'], $code, $currency['symbol'] );
-		}
 
 		// Validation settings for fields only available in Pro.
 		$settings['validation']['validation-url']              = [
@@ -526,24 +491,6 @@ class WPForms_Pro {
 			'name'    => esc_html__( 'Password Strength', 'wpforms' ),
 			'type'    => 'text',
 			'default' => esc_html__( 'A stronger password is required. Consider using upper and lower case letters, numbers, and symbols.', 'wpforms' ),
-		];
-
-		// Payment settings.
-		$settings['payments']['payments-heading'] = [
-			'id'       => 'payments-heading',
-			'content'  => '<h4>' . esc_html__( 'Payments', 'wpforms' ) . '</h4>',
-			'type'     => 'content',
-			'no_label' => true,
-			'class'    => [ 'section-heading', 'no-desc' ],
-		];
-		$settings['payments']['currency']         = [
-			'id'        => 'currency',
-			'name'      => esc_html__( 'Currency', 'wpforms' ),
-			'type'      => 'select',
-			'choicesjs' => true,
-			'search'    => true,
-			'default'   => 'USD',
-			'options'   => $currency_option,
 		];
 
 		// Additional GDPR related options.

@@ -42,7 +42,6 @@ class Loader {
 			'Pages\SMTP',
 			'Pages\Analytics',
 			'Entries\PrintPreview',
-			'Entries\DefaultScreen',
 		];
 
 		$class_names = \apply_filters( 'wpforms_admin_classes_available', $core_class_names );

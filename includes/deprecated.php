@@ -18,7 +18,9 @@ namespace WPForms {
 		 *
 		 * @since 1.8.0
 		 */
-		const CLASSES = [];
+		const CLASSES = [
+			'WPForms\Pro\Admin\Entries\DefaultScreen' => '1.8.2'
+		];
 
 		/**
 		 * Inform clients that the class is removed.
@@ -178,6 +180,51 @@ namespace {
 	class_alias( '\WPForms\Admin\Notifications\Notifications', '\WPForms\Admin\Notifications' );
 
 	/**
+	 * Legacy `\WPForms_Field_Payment_Checkbox` class was refactored and moved to the new `\WPForms\Forms\Fields\PaymentCheckbox\Field` class.
+	 * This alias is a safeguard to those developers who use our internal class \WPForms_Field_Payment_Checkbox,
+	 * which we deleted.
+	 *
+	 * @since 1.8.2
+	 */
+	class_alias( '\WPForms\Forms\Fields\PaymentCheckbox\Field', '\WPForms_Field_Payment_Checkbox' );
+
+	/**
+	 * Legacy `\WPForms_Field_Payment_Multiple` class was refactored and moved to the new `\WPForms\Forms\Fields\PaymentMultiple\Field` class.
+	 * This alias is a safeguard to those developers who use our internal class \WPForms_Field_Payment_Multiple,
+	 * which we deleted.
+	 *
+	 * @since 1.8.2
+	 */
+	class_alias( '\WPForms\Forms\Fields\PaymentMultiple\Field', '\WPForms_Field_Payment_Multiple' );
+
+	/**
+	 * Legacy `\WPForms_Field_Payment_Single` class was refactored and moved to the new `\WPForms\Forms\Fields\PaymentSingle\Field` class.
+	 * This alias is a safeguard to those developers who use our internal class \WPForms_Field_Payment_Single,
+	 * which we deleted.
+	 *
+	 * @since 1.8.2
+	 */
+	class_alias( '\WPForms\Forms\Fields\PaymentSingle\Field', '\WPForms_Field_Payment_Single' );
+
+	/**
+	 * Legacy `\WPForms_Field_Payment_Total` class was refactored and moved to the new `\WPForms\Forms\Fields\PaymentTotal\Field` class.
+	 * This alias is a safeguard to those developers who use our internal class \WPForms_Field_Payment_Total,
+	 * which we deleted.
+	 *
+	 * @since 1.8.2
+	 */
+	class_alias( '\WPForms\Forms\Fields\PaymentTotal\Field', '\WPForms_Field_Payment_Total' );
+
+	/**
+	 * Legacy `\WPForms_Field_Payment_Select` class was refactored and moved to the new `\WPForms\Forms\Fields\PaymentSelect\Field` class.
+	 * This alias is a safeguard to those developers who use our internal class \WPForms_Field_Payment_Select,
+	 * which we deleted.
+	 *
+	 * @since 1.8.2
+	 */
+	class_alias( '\WPForms\Forms\Fields\PaymentSelect\Field', '\WPForms_Field_Payment_Select' );
+
+	/**
 	 * Legacy `\WPForms\Migrations` class was refactored and moved to the new `\WPForms\Migrations\Migrations` class.
 	 * This alias is a safeguard to those developers who use our internal class \WPForms\Migrations, which we deleted.
 	 *
@@ -238,4 +285,16 @@ namespace {
 
 		return size_format( $bytes );
 	}
+}
+
+namespace WPForms\Pro\Admin\Entries {
+
+	/**
+	 * Default Entries screen showed a chart and the form entries stats.
+	 * Replaced with "WPForms\Pro\Admin\Entries\Overview".
+	 *
+	 * @since 1.5.5
+	 * @deprecated 1.8.2
+	 */
+	class DefaultScreen extends \WPForms\Removed {}
 }

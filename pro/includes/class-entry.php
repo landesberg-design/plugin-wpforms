@@ -189,7 +189,6 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$fields = wpforms()->entry_fields->delete_by( 'entry_id', $entry_id );
 
 		WPForms\Pro\Admin\DashboardWidget::clear_widget_cache();
-		WPForms\Pro\Admin\Entries\DefaultScreen::clear_widget_cache();
 
 		return ( $entry && $meta && $fields );
 	}
@@ -1224,6 +1223,9 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		$values = [];
 
+		// @todo: Remove after deprecate this method and all payment addons updated to be compatible with 1.8.2.
+		$this->insert_legacy_payment( $wpforms_entry, $payment_data );
+
 		foreach ( $payment_data as $meta_key => $meta_value ) {
 			// If meta_key doesn't begin with `payment_`, prefix it.
 			$meta_key = strpos( $meta_key, 'payment_' ) === 0 ? $meta_key : "payment_$meta_key";
@@ -1253,6 +1255,73 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			VALUES {$values}"
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+	}
+
+	/**
+	 * Create payment when legacy payment addon is used.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param object $entry        Entry.
+	 * @param array  $payment_meta Payment meta.
+	 */
+	private function insert_legacy_payment( $entry, $payment_meta ) {  // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+
+		$required_keys = [ 'payment_total', 'payment_currency', 'payment_type' ];
+
+		if ( 0 !== count( array_diff( $required_keys, array_keys( $payment_meta ) ) ) ) {
+			return;
+		}
+
+		$is_subscription = ! empty( $payment_meta['payment_subscription'] );
+
+		$payment_data = [
+			'form_id'             => absint( $entry->form_id ),
+			'status'              => strtolower( $entry->status ),
+			'subtotal_amount'     => $payment_meta['payment_total'],
+			'total_amount'        => $payment_meta['payment_total'],
+			'currency'            => $payment_meta['payment_currency'],
+			'entry_id'            => absint( $entry->entry_id ),
+			'gateway'             => $payment_meta['payment_type'],
+			'type'                => $is_subscription ? 'subscription' : 'one-time',
+			'mode'                => isset( $payment_meta['payment_mode'] ) && $payment_meta['payment_mode'] !== 'test' ? 'live' : 'test',
+			'transaction_id'      => isset( $payment_meta['payment_transaction'] ) ? substr( $payment_meta['payment_transaction'], 0, 40 ) : '',
+			'customer_id'         => isset( $payment_meta['payment_customer'] ) ? substr( $payment_meta['payment_customer'], 0, 40 ) : '',
+			'subscription_id'     => $is_subscription ? substr( $payment_meta['payment_subscription'], 0, 40 ) : '',
+			'subscription_status' => $is_subscription ? strtolower( $entry->status ) : '',
+			'date_created_gmt'    => $entry->date,
+			'date_updated_gmt'    => $entry->date_modified,
+		];
+
+		if ( strtolower( $payment_data['status'] ) === 'completed' ) {
+			$payment_data['status'] = 'processed';
+		}
+
+		if ( in_array( strtolower( $payment_data['subscription_status'] ), [ 'active', 'completed' ], true ) ) {
+			$payment_data['subscription_status'] = 'not-synced';
+			$payment_data['status']              = 'processed';
+		}
+
+		// Create payment.
+		$payment_id = wpforms()->get( 'payment' )->add( $payment_data );
+
+		if ( ! $payment_id ) {
+			return;
+		}
+
+		$payment_meta = [
+			'subscription_period' => $is_subscription ? $payment_meta['payment_period'] : '',
+			'payment_note'        => isset( $payment_meta['payment_note'] ) ? $payment_meta['payment_note'] : '',
+			'payment_recipient'   => isset( $payment_meta['payment_recipient'] ) ? $payment_meta['payment_recipient'] : '',
+			'receipt_number'      => isset( $payment_meta['receipt_number'] ) ? $payment_meta['receipt_number'] : '',
+			'user_id'             => $entry->user_id,
+			'user_agent'          => $entry->user_agent,
+			'user_uuid'           => $entry->user_uuid,
+			'ip_address'          => $entry->ip_address,
+		];
+
+		// Insert payment meta.
+		wpforms()->get( 'payment_meta' )->bulk_add( $payment_id, $payment_meta );
 	}
 
 	/**

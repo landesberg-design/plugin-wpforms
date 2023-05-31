@@ -687,17 +687,17 @@
 
 			// eslint-disable-next-line complexity
 			$( document ).on( 'keydown', function( event ) {
-				if ( 74 === event.keyCode && ! WPFormsAdmin.isFormTypeNode( event.target.nodeName ) ) {
+				if ( 74 === event.keyCode && ! event.metaKey && ! WPFormsAdmin.isFormTypeNode( event.target.nodeName ) ) {
 
 					// j key has been pressed outside a form element, go to the previous entry.
-					var prevEntry = $( '#wpforms-entry-prev-link' ).attr( 'href' );
+					var prevEntry = $( '#wpforms-admin-single-navigation-prev-link' ).attr( 'href' );
 					if ( '#' !== prevEntry ) {
 						window.location.href = prevEntry;
 					}
-				} else if ( 75 === event.keyCode && ! WPFormsAdmin.isFormTypeNode( event.target.nodeName ) ) {
+				} else if ( 75 === event.keyCode && ! event.metaKey && ! WPFormsAdmin.isFormTypeNode( event.target.nodeName ) ) {
 
 					// k key has been pressed outside a form element, go to the previous entry.
-					var nextEntry = $( '#wpforms-entry-next-link' ).attr( 'href' );
+					var nextEntry = $( '#wpforms-admin-single-navigation-next-link' ).attr( 'href' );
 					if ( '#' !== nextEntry ) {
 						window.location.href = nextEntry;
 					}

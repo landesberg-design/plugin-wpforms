@@ -410,12 +410,12 @@ class File {
 	 */
 	public function remove_old_export_files() {
 
-		clearstatcache();
-
 		$files = glob( $this->get_tmpdir() . '/*' );
 		$now   = time();
 
 		foreach ( $files as $file ) {
+			clearstatcache( true, $file );
+
 			if (
 				is_file( $file ) &&
 				pathinfo( $file, PATHINFO_BASENAME ) !== 'index.html' &&

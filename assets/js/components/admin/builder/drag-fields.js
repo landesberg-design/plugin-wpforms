@@ -483,7 +483,6 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 						.append( WPFormsBuilder.settings.spinnerInline )
 						.css( 'width', '100%' );
 
-					el.$builder.find( '.wpforms-add-fields .wpforms-add-fields-button' ).prop( 'disabled', true );
 					el.$builder.find( '.no-fields-preview' ).remove();
 
 					WPFormsBuilder.fieldAdd(

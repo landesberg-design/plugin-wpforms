@@ -293,6 +293,7 @@ abstract class Base {
 	 * @param string $class Upgrade class name.
 	 *
 	 * @return string
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	protected function get_plugin_name( $class ) {
 
@@ -305,8 +306,6 @@ abstract class Base {
 	 * @since 1.7.5
 	 *
 	 * @param string $message The error message that should be logged.
-	 *
-	 * @noinspection ForgottenDebugOutputInspection
 	 */
 	protected function log( $message ) {
 

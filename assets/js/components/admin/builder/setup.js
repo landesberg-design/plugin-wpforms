@@ -1,4 +1,4 @@
-/* global List, wpforms_builder, wpforms_addons, wpf, WPFormsBuilder, wpforms_education, WPFormsFormTemplates */
+/* global List, wpforms_builder, wpf, WPFormsBuilder, WPFormsFormTemplates */
 
 /**
  * Form Builder Setup Panel module.
@@ -325,7 +325,7 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 			} else {
 
 				// Create a new form.
-				app.selectTemplateProcess( formName, template, $button );
+				WPFormsFormTemplates.selectTemplateProcess( formName, template, $button, app.selectTemplateProcessAjax );
 
 			}
 		},
@@ -371,7 +371,7 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 						keys: [ 'enter' ],
 						action: function() {
 
-							app.selectTemplateProcess( formName, template, $button );
+							WPFormsFormTemplates.selectTemplateProcess( formName, template, $button, app.selectTemplateProcessAjax );
 						},
 					},
 					cancel: {
@@ -389,6 +389,9 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 		 * Select template.
 		 *
 		 * @since 1.6.8
+		 * @since 1.8.2 Deprecated.
+		 *
+		 * @deprecated Use `WPFormsFormTemplates.selectTemplateProcess` instead.
 		 *
 		 * @param {string}  formName  Name of the form.
 		 * @param {string}  template  Template slug.
@@ -396,11 +399,9 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 		 */
 		selectTemplateProcess: function( formName, template, $button ) {
 
-			if ( $button.data( 'addons' ) ) {
-				app.addonsModal( formName, template, $button );
-			} else {
-				app.selectTemplateProcessAjax( formName, template );
-			}
+			console.warn( 'WARNING! Function "WPForms.Admin.Builder.Setup.selectTemplateProcess( formName, template, $button )" has been deprecated, please use the new "WPFormsFormTemplates.selectTemplateProcess( formName, template, $button, callback )" function instead!' );
+
+			WPFormsFormTemplates.selectTemplateProcess( formName, template, $button, app.selectTemplateProcessAjax );
 		},
 
 		/**
@@ -544,6 +545,9 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 		 * Open required addons alert.
 		 *
 		 * @since 1.6.8
+		 * @since 1.8.2 Deprecated.
+		 *
+		 * @deprecated Use `WPFormsFormTemplates.addonsModal` instead.
 		 *
 		 * @param {string} formName Name of the form.
 		 * @param {string} template Template slug.
@@ -551,57 +555,18 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 		 */
 		addonsModal: function( formName, template, $button ) {
 
-			var templateName = $button.data( 'template-name-raw' ),
-				addonsNames = $button.data( 'addons-names' ),
-				addonsSlugs = $button.data( 'addons' ),
-				addons = addonsSlugs.split( ',' ),
-				prompt = addons.length > 1 ? wpforms_builder.template_addons_prompt : wpforms_builder.template_addon_prompt;
+			console.warn( 'WARNING! Function "WPForms.Admin.Builder.Setup.addonsModal( formName, template, $button )" has been deprecated, please use the new "WPFormsFormTemplates.addonsModal( formName, template, $button, callback )" function instead!' );
 
-			if ( ! addons.length ) {
-				return;
-			}
-
-			$.confirm( {
-				title: wpforms_builder.heads_up,
-				content: prompt
-					.replace( /%template%/g, templateName )
-					.replace( /%addons%/g, addonsNames ),
-				icon: 'fa fa-exclamation-circle',
-				type: 'orange',
-				buttons: {
-					confirm: {
-						text: wpforms_education.install_confirm,
-						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
-						action: function() {
-
-							this.$$confirm
-								.prop( 'disabled', true )
-								.html( vars.spinner + wpforms_education.activating );
-
-							this.$$cancel
-								.prop( 'disabled', true );
-
-							app.installActivateAddons( addons, this, formName, template );
-
-							return false;
-						},
-					},
-					cancel: {
-						text: wpforms_education.cancel,
-						action: function() {
-
-							WPFormsFormTemplates.selectTemplateCancel();
-						},
-					},
-				},
-			} );
+			WPFormsFormTemplates.addonsModal( formName, template, $button, app.selectTemplateProcessAjax );
 		},
 
 		/**
 		 * Install & Activate addons via AJAX.
 		 *
 		 * @since 1.6.8
+		 * @since 1.8.2 Deprecated.
+		 *
+		 * @deprecated Use `WPFormsFormTemplates.installActivateAddons` instead.
 		 *
 		 * @param {Array}  addons        Addons slugs.
 		 * @param {object} previousModal Previous modal instance.
@@ -610,98 +575,36 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 		 */
 		installActivateAddons: function( addons, previousModal, formName, template ) {
 
-			var ajaxResults = [],
-				ajaxErrors = [],
-				promiseChain = false;
+			console.warn( 'WARNING! Function "WPForms.Admin.Builder.Setup.installActivateAddons( addons, previousModal, formName, template )" has been deprecated, please use the new "WPFormsFormTemplates.installActivateAddons( addons, previousModal, formName, template, callback )" function instead!' );
 
-			// Put each of the ajax call promise to the chain.
-			addons.forEach( function( addon ) {
-
-				if ( typeof promiseChain.done !== 'function' ) {
-					promiseChain = app.installActivateAddonAjax( addon );
-
-					return;
-				}
-
-				promiseChain = promiseChain
-					.done( function( value ) {
-
-						ajaxResults.push( value );
-
-						return app.installActivateAddonAjax( addon );
-					} )
-					.fail( function( error ) {
-						ajaxErrors.push( error );
-					} );
-			} );
-
-			promiseChain
-
-				// Latest promise result and error.
-				.done( function( value ) {
-					ajaxResults.push( value );
-				} )
-				.fail( function( error ) {
-					ajaxErrors.push( error );
-				} )
-
-				// Finally, resolve all the promises.
-				.always( function() {
-
-					previousModal.close();
-
-					if (
-						ajaxResults.length > 0 &&
-						wpf.listPluck( ajaxResults, 'success' ).every( Boolean ) && // Check if every `success` is true.
-						ajaxErrors.length === 0
-					) {
-						app.selectTemplateProcessAjax( formName, template );
-					} else {
-						app.installActivateAddonsError( formName, template );
-					}
-				} );
+			WPFormsFormTemplates.installActivateAddons( addons, previousModal, formName, template, app.selectTemplateProcessAjax );
 		},
 
 		/**
 		 * Install & Activate addons error modal.
 		 *
 		 * @since 1.6.8
+		 * @since 1.8.2 Deprecated.
+		 *
+		 * @deprecated Use `WPFormsFormTemplates.installActivateAddonsError` instead.
 		 *
 		 * @param {string} formName Name of the form.
 		 * @param {string} template Template slug.
 		 */
 		installActivateAddonsError: function( formName, template ) {
 
-			$.confirm( {
-				title: wpforms_builder.heads_up,
-				content: wpforms_builder.template_addons_error,
-				icon: 'fa fa-exclamation-circle',
-				type: 'orange',
-				buttons: {
-					confirm: {
-						text: wpforms_builder.use_template,
-						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
-						action: function() {
+			console.warn( 'WARNING! Function "WPForms.Admin.Builder.Setup.installActivateAddonsError( formName, template )" has been deprecated, please use the new "WPFormsFormTemplates.installActivateAddonsError( formName, template, callback )" function instead!' );
 
-							app.selectTemplateProcessAjax( formName, template );
-						},
-					},
-					cancel: {
-						text: wpforms_builder.cancel,
-						action: function() {
-
-							WPFormsFormTemplates.selectTemplateCancel();
-						},
-					},
-				},
-			} );
+			WPFormsFormTemplates.installActivateAddonsError( formName, template, app.selectTemplateProcessAjax );
 		},
 
 		/**
 		 * Install & Activate single addon via AJAX.
 		 *
 		 * @since 1.6.8
+		 * @since 1.8.2 Deprecated.
+		 *
+		 * @deprecated Use `WPFormsFormTemplates.installActivateAddonAjax` instead.
 		 *
 		 * @param {string} addon Addon slug.
 		 *
@@ -709,26 +612,9 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 		 */
 		installActivateAddonAjax: function( addon ) {
 
-			var addonData = wpforms_addons[ addon ],
-				deferred = new $.Deferred();
+			console.warn( 'WARNING! Function "WPForms.Admin.Builder.Setup.installActivateAddonAjax( addon )" has been deprecated, please use the new "WPFormsFormTemplates.installActivateAddonAjax( addon )" function instead!' );
 
-			if (
-				! addonData ||
-				[ 'activate', 'install' ].indexOf( addonData.action ) < 0
-			) {
-				deferred.resolve( false );
-
-				return deferred.promise();
-			}
-
-			return $.post(
-				wpforms_education.ajax_url,
-				{
-					action: 'wpforms_' + addonData.action + '_addon',
-					nonce: wpforms_builder.admin_nonce,
-					plugin: addonData.action === 'activate' ? addon + '/' + addon + '.php' : addonData.url,
-				}
-			);
+			return WPFormsFormTemplates.installActivateAddonAjax( addon );
 		},
 
 		/**

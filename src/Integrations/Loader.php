@@ -40,6 +40,7 @@ class Loader {
 			'Gutenberg\FormSelector',
 			'WPMailSMTP\Notifications',
 			'WPorg\Translations',
+			'Stripe\Stripe',
 			'UncannyAutomator\UncannyAutomator',
 			'UsageTracking\UsageTracking',
 			'DefaultThemes\DefaultThemes',

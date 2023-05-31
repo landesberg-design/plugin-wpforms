@@ -2,12 +2,14 @@
 
 namespace WPForms\Admin\Builder;
 
+use WPForms\Helpers\CacheBase;
+
 /**
  * Form templates cache handler.
  *
  * @since 1.6.8
  */
-class TemplatesCache extends \WPForms\Helpers\CacheBase {
+class TemplatesCache extends CacheBase {
 
 	/**
 	 * Determine if the class is allowed to load.

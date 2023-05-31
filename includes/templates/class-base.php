@@ -80,6 +80,15 @@ abstract class WPForms_Template {
 	public $url = '';
 
 	/**
+	 * Form template thumbnail url.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @var string
+	 */
+	public $thumbnail = '';
+
+	/**
 	 * Array of data that is assigned to the post_content on form creation.
 	 *
 	 * @since 1.0.0
@@ -161,6 +170,7 @@ abstract class WPForms_Template {
 			'icon'        => $this->icon,
 			'url'         => ! empty( $this->url ) ? $this->url : '',
 			'plugin_dir'  => $this->get_plugin_dir(),
+			'thumbnail'   => ! empty( $this->thumbnail ) ? $this->thumbnail : '',
 		];
 
 		return $templates;

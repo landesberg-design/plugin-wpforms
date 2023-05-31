@@ -28,6 +28,15 @@ class PrintPreview {
 	public $form_data;
 
 	/**
+	 * The array of bulk entries.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @var array
+	 */
+	private $entries;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.5.1
@@ -85,27 +94,36 @@ class PrintPreview {
 			return false;
 		}
 
-		$entry_id = absint( $_GET['entry_id'] );
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$entry_ids = array_map( 'absint', explode( ',', wp_unslash( $_GET['entry_id'] ) ) );
 
-		if ( empty( $entry_id ) || (string) $entry_id !== $_GET['entry_id'] ) {
+		foreach ( $entry_ids as $entry_id ) {
+			$_entry = wpforms()->get( 'entry' )->get( $entry_id );
+
+			// Filter entries to ensure the current user can access their details.
+			if ( ! is_object( $_entry ) ) {
+				continue;
+			}
+
+			$_entry->entry_notes = wpforms()->get( 'entry_meta' )->get_meta(
+				[
+					'type'     => 'note',
+					'entry_id' => $entry_id,
+				]
+			);
+			$this->entries[]     = $_entry; // Assign data extracted from each entry.
+		}
+
+		// Bail early, in case we have no entry to print.
+		if ( empty( $this->entries ) ) {
 			return false;
 		}
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-		// Check for user with correct capabilities.
-		if ( ! wpforms_current_user_can( 'view_entry_single', $entry_id ) ) {
-			return false;
-		}
+		// Continue store a first entry for backward compatibility.
+		$this->entry = $this->entries[0];
 
-		// Fetch the entry.
-		$this->entry = wpforms()->get( 'entry' )->get( $entry_id );
-
-		// Check if valid entry was found.
-		if ( empty( $this->entry ) ) {
-			return false;
-		}
-
-		// Fetch form details for the entry.
+		// Fetch the current form data with "content_only" flag.
+		// Note that form-id and data will be the same across all entries.
 		$this->form_data = wpforms()->get( 'form' )->get(
 			$this->entry->form_id,
 			[
@@ -113,18 +131,10 @@ class PrintPreview {
 			]
 		);
 
-		// Check if valid form was found.
+		// Bail early, in case form-data is not valid or can not be processed.
 		if ( empty( $this->form_data ) ) {
 			return false;
 		}
-
-		// Everything passed, fetch entry notes.
-		$this->entry->entry_notes = wpforms()->get( 'entry_meta' )->get_meta(
-			[
-				'entry_id' => $this->entry->entry_id,
-				'type'     => 'note',
-			]
-		);
 
 		/**
 		 * Allow adding entry properties on the print page.
@@ -157,50 +167,81 @@ class PrintPreview {
 			true
 		);
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo wpforms_render(
-			'admin/entry-print/fields',
-			[
-				'entry'     => $this->entry,
-				'form_data' => $this->form_data,
-				'fields'    => $this->get_fields(),
-			],
-			true
-		);
+		$last_entry_index = count( $this->entries ) - 1;
 
-		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
-		/**
-		 * Fires on entry print page before after all fields.
-		 *
-		 * @since 1.5.4.2
-		 *
-		 * @param object $entry     Entry.
-		 * @param array  $form_data Form data and settings.
-		 */
-		do_action( 'wpforms_pro_admin_entries_printpreview_print_html_fields_after', $this->entry, $this->form_data );
-		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+		// Loop through all entries.
+		foreach ( $this->entries as $entry_index => $entry ) {
+			$this->entry        = $entry;
+			$is_first_iteration = $entry_index === 0; // Is this the first iteration?
+			$is_last_iteration  = $entry_index === $last_entry_index; // Is this the last iteration?
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo wpforms_render(
-			'admin/entry-print/notes',
-			[
-				'entry'     => $this->entry,
-				'form_data' => $this->form_data,
-			],
-			true
-		);
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wpforms_render(
+				'admin/entry-print/legend-start',
+				[
+					'has_header' => $is_first_iteration,
+					'entry'      => $this->entry,
+					'form_data'  => $this->form_data,
+				],
+				true
+			);
 
-		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
-		/**
-		 * Fires on entry print page before after notes.
-		 *
-		 * @since 1.5.4.2
-		 *
-		 * @param object $entry     Entry.
-		 * @param array  $form_data Form data and settings.
-		 */
-		do_action( 'wpforms_pro_admin_entries_printpreview_print_html_notes_after', $this->entry, $this->form_data );
-		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wpforms_render(
+				'admin/entry-print/fields',
+				[
+					'entry'     => $this->entry,
+					'form_data' => $this->form_data,
+					'fields'    => $this->get_fields(),
+				],
+				true
+			);
+
+			// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+			/**
+			 * Fires on entry print page before after all fields.
+			 *
+			 * @param object $entry     Entry.
+			 * @param array  $form_data Form data and settings.
+			 *
+			 * @since 1.5.4.2
+			 */
+			do_action( 'wpforms_pro_admin_entries_printpreview_print_html_fields_after', $this->entry, $this->form_data );
+			// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wpforms_render(
+				'admin/entry-print/notes',
+				[
+					'entry'     => $this->entry,
+					'form_data' => $this->form_data,
+				],
+				true
+			);
+
+			// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+			/**
+			 * Fires on entry print page before after notes.
+			 *
+			 * @param object $entry     Entry.
+			 * @param array  $form_data Form data and settings.
+			 *
+			 * @since 1.5.4.2
+			 */
+			do_action( 'wpforms_pro_admin_entries_printpreview_print_html_notes_after', $this->entry, $this->form_data );
+			// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wpforms_render(
+				'admin/entry-print/legend-end',
+				[
+					'has_page_break' => ! $is_last_iteration,
+					'entry'          => $this->entry,
+					'form_data'      => $this->form_data,
+				],
+				true
+			);
+		}
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo wpforms_render(

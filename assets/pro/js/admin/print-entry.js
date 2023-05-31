@@ -89,7 +89,7 @@ const WPFormsPrintEntryPage = window.WPFormsPrintEntryPage || ( function( docume
 
 			app.vars = {
 				$body: $( 'body' ),
-				$page: $( '#print' ),
+				$page: $( '.print-preview' ),
 				$modeToggles: $( '.toggle-mode' ),
 				$richTextFields: $( '.wpforms-entry-field-value-richtext' ),
 				printButtonSelector: '.print',

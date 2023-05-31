@@ -39,8 +39,10 @@ class Loader {
 
 		$this->populate_frontend();
 		$this->populate_admin();
+		$this->populate_fields();
 		$this->populate_forms_overview();
 		$this->populate_builder();
+		$this->populate_db();
 		$this->populate_migrations();
 		$this->populate_capabilities();
 		$this->populate_tasks();
@@ -173,6 +175,16 @@ class Loader {
 				'name' => 'Admin\Notifications\EventDriven',
 			],
 			[
+				'name' => 'Admin\Entries\Overview\Page',
+				'hook' => 'admin_init',
+			],
+			[
+				'name'      => 'Admin\Entries\Overview\Ajax',
+				'hook'      => 'admin_init',
+				'run'       => 'hooks',
+				'condition' => wpforms_is_admin_ajax(),
+			],
+			[
 				'name' => 'Admin\Entries\Edit',
 				'id'   => 'entries_edit',
 				'hook' => 'admin_init',
@@ -206,8 +218,22 @@ class Loader {
 				'hook' => 'admin_init',
 			],
 			[
+				'name' => 'Admin\Settings\Payments',
+				'hook' => 'admin_init',
+			],
+			[
 				'name' => 'Admin\Tools\Tools',
 				'hook' => 'current_screen',
+			],
+			[
+				'name' => 'Admin\Payments\Payments',
+				'hook' => 'init',
+			],
+			[
+				'name'      => 'Admin\Payments\Views\Overview\Ajax',
+				'hook'      => 'admin_init',
+				'run'       => 'hooks',
+				'condition' => wpforms_is_admin_ajax(),
 			],
 			[
 				'name'      => 'Admin\Tools\Importers',
@@ -227,6 +253,39 @@ class Loader {
 				'name' => 'Forms\Fields\Richtext\EntryViewContent',
 			]
 		);
+	}
+
+	/**
+	 * Populate Fields related classes.
+	 *
+	 * @since 1.8.2
+	 */
+	private function populate_fields() {
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\PaymentCheckbox\Field',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\PaymentMultiple\Field',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\PaymentSelect\Field',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\PaymentSingle\Field',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\PaymentTotal\Field',
+			'hook' => 'init',
+		];
 	}
 
 	/**
@@ -275,6 +334,10 @@ class Loader {
 		array_push(
 			$this->classes,
 			[
+				'name' => 'Admin\Builder\HelpCache',
+				'id'   => 'builder_help_cache',
+			],
+			[
 				'name' => 'Admin\Builder\Help',
 				'id'   => 'builder_help',
 			],
@@ -307,6 +370,35 @@ class Loader {
 				'name' => 'Admin\Builder\Notifications\Advanced\EntryCsvAttachment',
 			]
 		);
+	}
+
+	/**
+	 * Populate database classes.
+	 *
+	 * @since 1.8.2
+	 */
+	private function populate_db() {
+
+		$this->classes[] = [
+			'name' => 'Db\Payments\Payment',
+			'id'   => 'payment',
+			'hook' => false,
+			'run'  => false,
+		];
+
+		$this->classes[] = [
+			'name' => 'Db\Payments\Meta',
+			'id'   => 'payment_meta',
+			'hook' => false,
+			'run'  => false,
+		];
+
+		$this->classes[] = [
+			'name' => 'Db\Payments\Queries',
+			'id'   => 'payment_queries',
+			'hook' => false,
+			'run'  => false,
+		];
 	}
 
 	/**

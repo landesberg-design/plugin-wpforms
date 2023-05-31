@@ -451,6 +451,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 									element.parent().append( error );
 								} else if ( app.isLeadFormsSelect( element ) ) {
 									element.parent().parent().append( error );
+								} else if ( app.isCoupon( element ) ) {
+									element.parent().parent().append( error );
 								} else {
 									error.insertAfter( element );
 								}
@@ -738,6 +740,20 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		isLeadFormsSelect: function( element ) {
 
 			return element.parent().hasClass( 'wpforms-lead-forms-select' );
+		},
+
+		/**
+		 * Is Coupon field.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param {jQuery} element current form element.
+		 *
+		 * @returns {boolean} true/false.
+		 */
+		isCoupon: function( element ) {
+
+			return element.closest( '.wpforms-field' ).hasClass( 'wpforms-field-payment-coupon' );
 		},
 
 		/**
@@ -1166,6 +1182,24 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 				// Save choicesjs instance for future access.
 				$( el ).data( 'choicesjs', new Choices( el, args ) );
+			} );
+
+			// Add the ability to close the drop-down menu on the frontend.
+			$( document ).on( 'click', '.choices', function( e ) {
+
+				var $choices =  $( this ),
+					choicesObj = $choices.find( 'select' ).data( 'choicesjs' );
+
+				if (
+					choicesObj &&
+					$choices.hasClass( 'is-open' ) &&
+					(
+						e.target.classList.contains( 'choices__inner' ) ||
+						e.target.classList.contains( 'choices__arrow' )
+					)
+				) {
+					choicesObj.hideDropdown();
+				}
 			} );
 		},
 

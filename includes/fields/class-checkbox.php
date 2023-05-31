@@ -465,7 +465,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 	}
 
 	/**
-	 * Field display on the form front-end.
+	 * Field display on the form front-end and admin entry edit page.
 	 *
 	 * @since 1.0.0
 	 *
@@ -481,6 +481,18 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 		// Define data.
 		$container = $field['properties']['input_container'];
 		$choices   = $field['properties']['inputs'];
+
+		// Do not display the field with empty choices on the frontend.
+		if ( ! $choices && ! is_admin() ) {
+			return;
+		}
+
+		// Display a warning message on Entry Edit page.
+		if ( ! $choices && is_admin() ) {
+			$this->display_empty_dynamic_choices_message( $field );
+
+			return;
+		}
 
 		$amp_state_id = '';
 
@@ -639,11 +651,18 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 	 *
 	 * @since 1.5.2
 	 *
-	 * @param int   $field_id       field ID.
-	 * @param array $field_submit   submitted data.
-	 * @param array $form_data      form data.
+	 * @param int   $field_id     Field ID.
+	 * @param array $field_submit Submitted field value (selected option).
+	 * @param array $form_data    Form data.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
+
+		$field = $form_data['fields'][ $field_id ];
+
+		// Skip validation if field is dynamic and choices are empty.
+		if ( $this->is_dynamic_choices_empty( $field, $form_data ) ) {
+			return;
+		}
 
 		$field_submit  = (array) $field_submit;
 		$choice_limit  = empty( $form_data['fields'][ $field_id ]['choice_limit'] ) ? 0 : (int) $form_data['fields'][ $field_id ]['choice_limit'];

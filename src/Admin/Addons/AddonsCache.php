@@ -2,12 +2,14 @@
 
 namespace WPForms\Admin\Addons;
 
+use WPForms\Helpers\CacheBase;
+
 /**
  * Addons cache handler.
  *
  * @since 1.6.6
  */
-class AddonsCache extends \WPForms\Helpers\CacheBase {
+class AddonsCache extends CacheBase {
 
 	/**
 	 * Determine if the class is allowed to load.

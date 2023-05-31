@@ -152,6 +152,7 @@ class UsageTracking implements IntegrationInterface {
 			'server_version'                 => isset( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '',
 			'is_ssl'                         => is_ssl(),
 			'is_multisite'                   => is_multisite(),
+			'is_network_activated'           => $this->is_active_for_network(),
 			'is_wpcom'                       => defined( 'IS_WPCOM' ) && IS_WPCOM,
 			'is_wpcom_vip'                   => ( defined( 'WPCOM_IS_VIP_ENV' ) && WPCOM_IS_VIP_ENV ) || ( function_exists( 'wpcom_is_vip' ) && wpcom_is_vip() ),
 			'is_wp_cache'                    => defined( 'WP_CACHE' ) && WP_CACHE,
@@ -614,6 +615,33 @@ class UsageTracking implements IntegrationInterface {
 		$field_types    = array_column( $fields_flatten, 'type' );
 
 		return array_count_values( $field_types );
+	}
+
+	/**
+	 * Determines whether the plugin is active for the entire network.
+	 *
+	 * This is a copy of the WP core is_plugin_active_for_network() function.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return bool
+	 */
+	private function is_active_for_network() {
+
+		// Bail early, in case we are not in multisite.
+		if ( ! is_multisite() ) {
+			return false;
+		}
+
+		// Get all active plugins.
+		$plugins = get_site_option( 'active_sitewide_plugins' );
+
+		// Bail early, in case the plugin is active for the entire network.
+		if ( isset( $plugins[ plugin_basename( WPFORMS_PLUGIN_FILE ) ] ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

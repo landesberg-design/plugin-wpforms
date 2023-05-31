@@ -255,6 +255,7 @@ function wpforms_admin_scripts() {
 		'loading'                         => esc_html__( 'Loading...', 'wpforms-lite' ),
 		'use_simple_contact_form'         => esc_html__( 'Use Simple Contact Form Template', 'wpforms-lite' ),
 		'error_select_template'           => esc_html__( 'Something went wrong while applying the template.', 'wpforms-lite' ),
+		'payment_delete_confirm'          => esc_html__( 'Are you sure you want to delete this payment and all its information (details, notes, logs, etc.)?', 'wpforms-lite' ),
 	];
 
 	/**

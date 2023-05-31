@@ -1,6 +1,44 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.2] - 2023-05-31
+### Added
+- Payment fields are now available for everyone.
+- Users can connect their Stripe accounts and receive payments via their payment forms.
+- It's now possible to print entries in bulk.
+- Non-admin users are now notified about uninstalled or not activated addons when certain form templates are selected.
+- New filters are added so it's possible to dynamically modify form data before export.
+- There are new thumbnails displayed in all places where you see the list of available form templates (Form Builder and Form Templates page).
+- Plugin cache files are handled in a more performant way.
+
+### Changed
+- The Entries Overview graph and table can now be filtered by custom timeline.
+- An outdated version of the Moment.js library was removed from the plugin, and we switched to using the one bundled in WordPress.
+- Preview labels for choices with HTML tags were improved.
+- Empty dynamic choices in the Form Builder, on the front end, and the Entry Edit page are now more visually appealing.
+
+### Fixed
+- There were situations when the `{user_ip}` smart tag was returning a server IP address instead of the actual user's IP address.
+- The Content field label was visible in the Conversational Forms mode.
+- An unnecessary database query was run on all admin dashboard pages.
+- The Modern Multiple Dropdown couldn't be closed by clicking on the arrow.
+- The "Save" button wasn't fully clickable on the WPForms > Settings admin page.
+- Some UI elements didn't look correctly on the Form Builder page for non-English languages.
+- Some fields were non-responsive on mobile when using the Legacy Layout Classes.
+- Cron event `wpforms_email_summaries_cron` was not removed upon plugin deactivation.
+- Multiple Choice conditional logic wasn't operating reliably if the field value was empty.
+- It was possible to add disabled fields to the form again in the Form Builder.
+- The form was not displayed on the front end when the WPForms block was added to block templates.
+
+## [1.8.1.3] - 2023-05-25
+### Changed
+- The Uncanny Automator logo is updated.
+
+### Fixed
+- Debug information (controlled by a constant) is now properly escaped before being displayed on a page.
+- Turnstile Captcha verification message overlapped the captcha when the captcha type was changed from Invisible to Managed.
+- Fatal error with AMP plugin.
+
 ## [1.8.1.2] - 2023-04-12
 ### Fixed
 - Checkboxes were shifting when the limit choices rule was triggered.
@@ -45,7 +83,7 @@ All notable changes to this project will be documented in this file and formatte
 - Google reCAPTCHA v2 could not be reset on server-side validation failure.
 
 ## [1.8.0.1] - 2023-02-15
-### Fixed 
+### Fixed
 - Invisible reCaptcha was incorrectly processed resulting in failed form submissions with a wrong error message.
 
 ## [1.8.0] - 2023-02-14
@@ -525,10 +563,10 @@ All notable changes to this project will be documented in this file and formatte
 - Improved translations by removing confusion if non-translatable placeholders are used.
 - Improved support for WordPress Core UI colors and admin themes in admin bar menu.
 - Improved format and limits validation of modern File Upload field.
-- Improved display of empty and hidden field labels in Form Builder preview. 
+- Improved display of empty and hidden field labels in Form Builder preview.
 - Field helper notification in the Form Builder now can be dismissed.
 - Improved and standardized look of classic and modern Dropdown field across Form Builder, admin area and frontend.
-- Display "Save and Resume" link in Page Break field preview in Form Builder if Save and Resume is turned on. 
+- Display "Save and Resume" link in Page Break field preview in Form Builder if Save and Resume is turned on.
 
 ### Fixed
 - Empty fields are displayed on Entry details after editing an Entry with Page Break or Entry Preview fields.
@@ -648,7 +686,7 @@ All notable changes to this project will be documented in this file and formatte
 - Correctly change the HTML field label when the field is copied.
 - Form Builder performance issue with large number of choices added to option fields.
 - Missing down arrow in Dropdown field in Twenty Twenty-One theme.
-- Checkboxes and Multiple Choice input fields rendered incorrectly in Twenty Twenty-One theme.  
+- Checkboxes and Multiple Choice input fields rendered incorrectly in Twenty Twenty-One theme.
 - Breaking words when wrapping in Modern Dropdown field.
 - After upgrading the license, "Upgrade to Pro" popup is still displayed.
 - Download all relevant translations when initiating an upgrade from Lite to Pro on the plugin Settings page.

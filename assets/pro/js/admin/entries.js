@@ -31,6 +31,7 @@ var WPFormsPagesEntries = window.WPFormsPagesEntries || ( function( document, wi
 
 			app.initFlatpickr();
 			app.bindResetButtons();
+			app.handleOnPrint();
 		},
 
 		/**
@@ -123,6 +124,37 @@ var WPFormsPagesEntries = window.WPFormsPagesEntries || ( function( document, wi
 				// Submit the form
 				$form.trigger( 'submit' );
 			} );
+		},
+
+		/**
+		 * Handle bulk print requests.
+		 *
+		 * @since 1.8.2
+		 */
+		handleOnPrint: function() {
+
+			$( '#wpforms-entries-list' )
+				.on( 'submit', 'form[target="_blank"]', function( e ) {
+
+					e.preventDefault(); // don't submit multiple times.
+					this.submit(); // use the native submit method of the form element.
+					$( this ).removeAttr( 'target' ).trigger( 'reset' ); // blank the form fieldset.
+				} )
+				.on( 'change', '#bulk-action-selector-top', function() {
+
+					const value = this.value; // what is the selected action.
+					const $form = $( this ).closest( 'form' ); // look for the form element.
+
+					if ( value === 'print' ) { // are we printing? then, let’s open the form in a new tab.
+						$form.attr( 'target', '_blank' );
+
+						return;
+					}
+
+					if ( $form.attr( 'target' ) ) {
+						$form.removeAttr( 'target' ); // restore the original indication that where to display the response.
+					}
+				} );
 		},
 	};
 

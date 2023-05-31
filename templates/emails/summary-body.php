@@ -77,7 +77,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 										],
 									]
 								),
-								'https://wpforms.com/docs/how-to-use-lite-connect-for-wpforms/#backup-with-lite-connect/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Documentation'
+								'https://wpforms.com/docs/how-to-use-lite-connect-for-wpforms/?utm_source=WordPress&utm_medium=Weekly%20Summary%20Email&utm_campaign=liteplugin&utm_content=Documentation#backup-with-lite-connect'
 							);
 							?>
 						</p>

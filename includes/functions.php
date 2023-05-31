@@ -17,6 +17,7 @@ require_once __DIR__ . '/functions/filesystem-media.php';
 require_once __DIR__ . '/functions/form-fields.php';
 require_once __DIR__ . '/functions/forms.php';
 require_once __DIR__ . '/functions/list.php';
+require_once __DIR__ . '/functions/payments.php';
 require_once __DIR__ . '/functions/privacy.php';
 require_once __DIR__ . '/functions/providers.php';
 require_once __DIR__ . '/functions/unused.php';

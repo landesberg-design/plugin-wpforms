@@ -79,7 +79,7 @@ function wpforms_debug_data( $data, $echo = true ) {
 		<div class="wpforms-debug">
 			<textarea readonly>=================== WPFORMS DEBUG ===================%s</textarea>
 		</div>',
-		"\n\n" . $data
+		"\n\n" . esc_html( $data )
 	);
 
 	/**
@@ -147,6 +147,17 @@ function wpforms_log( $title = '', $message = '', $args = [] ) {
 	if ( empty( $types ) ) {
 		return;
 	}
+
+	/**
+	 * Filter log message.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param mixed  $message Log message.
+	 * @param string $title   Log title.
+	 * @param array  $args    Log arguments.
+	 */
+	$message = apply_filters( 'wpforms_log_message', $message, $title, $args );
 
 	// Make arrays and objects look nice.
 	if ( is_array( $message ) || is_object( $message ) ) {

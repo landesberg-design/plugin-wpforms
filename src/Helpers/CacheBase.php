@@ -30,6 +30,33 @@ abstract class CacheBase {
 	protected $settings;
 
 	/**
+	 * Cache key.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @var string
+	 */
+	private $cache_key;
+
+	/**
+	 * Cache dir.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @var string
+	 */
+	private $cache_dir;
+
+	/**
+	 * Cache file.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @var string
+	 */
+	private $cache_file;
+
+	/**
 	 * Determine if the class is allowed to load.
 	 *
 	 * @since 1.6.8
@@ -45,13 +72,18 @@ abstract class CacheBase {
 	 */
 	public function init() {
 
+		// Init settings before allow_load() as settings are used in get().
+		$this->update_settings();
+
+		$this->cache_key  = $this->settings['cache_file'];
+		$this->cache_dir  = $this->get_cache_dir(); // See comment in the method.
+		$this->cache_file = $this->cache_dir . $this->settings['cache_file'];
+
 		if ( ! $this->allow_load() ) {
 			return;
 		}
 
-		$this->update_settings();
-
-		// Quit if settings didn't provided.
+		// Quit if settings wasn't provided.
 		if (
 			empty( $this->settings['remote_source'] ) ||
 			empty( $this->settings['cache_file'] )
@@ -77,7 +109,7 @@ abstract class CacheBase {
 
 		// Schedule recurring updates.
 		add_action( 'admin_init', [ $this, 'schedule_update_cache' ] );
-		add_action( $this->settings['update_action'], [ $this, 'update_cache' ] );
+		add_action( $this->settings['update_action'], [ $this, 'update' ] );
 	}
 
 	/**
@@ -124,64 +156,187 @@ abstract class CacheBase {
 	 */
 	protected function get_cache_dir() {
 
+		static $cache_dir;
+
+		if ( $cache_dir ) {
+			/**
+			 * Since wpforms_upload_dir() relies on hooks, and hooks can be added unpredictably,
+			 * we need to cache the result of this method.
+			 * Otherwise, it is the risk to save cache file to one dir and try to get from another.
+			 */
+			return $cache_dir;
+		}
+
 		$upload_dir  = wpforms_upload_dir();
 		$upload_path = ! empty( $upload_dir['path'] )
 			? trailingslashit( wp_normalize_path( $upload_dir['path'] ) )
 			: trailingslashit( WP_CONTENT_DIR ) . 'uploads/wpforms/';
 
-		return $upload_path . 'cache/';
+		$cache_dir = $upload_path . 'cache/';
+
+		return $cache_dir;
+	}
+
+	/**
+	 * Get data from cache or from API call.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return array
+	 */
+	public function get() {
+
+		if ( $this->is_invalid_cache() || $this->is_expired_cache() ) {
+			$this->update();
+		}
+
+		return $this->get_from_cache();
+	}
+
+	/**
+	 * Determine if the cache is expired.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return bool
+	 */
+	private function is_expired_cache() {
+
+		return $this->cache_time() + $this->settings['cache_ttl'] < time();
+	}
+
+	/**
+	 * Determine if the cache is expired.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return bool
+	 */
+	private function is_invalid_cache() {
+
+		return empty( $this->get_from_cache() );
+	}
+
+	/**
+	 * Get cache creation time.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return int
+	 */
+	private function cache_time() {
+
+		return (int) Transient::get( $this->cache_key );
+	}
+
+	/**
+	 * Determine if the cache file exists.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return bool
+	 */
+	private function exists() {
+
+		return is_file( $this->cache_file ) && is_readable( $this->cache_file );
+	}
+
+	/**
+	 * Get cache from cache file.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return array
+	 */
+	private function get_from_cache() {
+
+		if ( ! $this->exists() ) {
+			return [];
+		}
+
+		return (array) json_decode( file_get_contents( $this->cache_file ), true );
+	}
+
+	/**
+	 * Update cache.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param bool $force Force update.
+	 *
+	 * @return bool
+	 */
+	public function update( $force = false ) {
+
+		if (
+			! $force &&
+			time() < $this->cache_time() + 15 * MINUTE_IN_SECONDS
+		) {
+			return false;
+		}
+
+		Transient::set( $this->cache_key, time(), $this->settings['cache_ttl'] );
+
+		if ( ! wp_mkdir_p( $this->cache_dir ) ) {
+			return false;
+		}
+
+		$data = $this->perform_remote_request();
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
+		if ( file_put_contents( $this->cache_file, wp_json_encode( $data ) ) === false ) {
+			return false;
+		}
+
+		self::$updated = true;
+
+		return true;
 	}
 
 	/**
 	 * Get cached data.
 	 *
 	 * @since 1.6.8
+	 * @deprecated 1.8.2
 	 *
 	 * @return array Cached data.
+	 * @noinspection PhpUnused
 	 */
 	public function get_cached() {
 
-		$cache_modified_time = 0;
-		$current_time        = time();
-		$cache_file          = $this->get_cache_dir() . $this->settings['cache_file'];
+		_deprecated_function( __METHOD__, '1.8.2 of the WPForms plugin', __CLASS__ . '::get()' );
 
-		if ( is_file( $cache_file ) && is_readable( $cache_file ) ) {
-			clearstatcache( true, $cache_file );
-			$cache_modified_time = (int) filemtime( $cache_file );
-			$data                = json_decode( file_get_contents( $cache_file ), true );
-		}
-
-		if (
-			! empty( $data ) &&
-			$cache_modified_time + $this->settings['cache_ttl'] > $current_time
-		) {
-			return $data;
-		}
-
-		// This code should execute when the method was called for the first time,
-		// Next update_cache() should be executed as scheduled.
-		// Also, we will try to update the cache only if the latest unsuccessful try has been 10 (or more) minutes ago.
-		if ( $cache_modified_time + 600 < $current_time ) {
-			return $this->update_cache();
-		}
-
-		return [];
+		return $this->get();
 	}
 
 	/**
 	 * Update cached data with actual data retrieved from the remote source.
 	 *
 	 * @since 1.6.8
+	 * @deprecated 1.8.2
 	 *
 	 * @return array
+	 * @noinspection PhpUnused
 	 */
 	public function update_cache() {
 
-		$wpforms_key = 'lite';
+		_deprecated_function( __METHOD__, '1.8.2 of the WPForms plugin' );
 
-		if ( wpforms()->is_pro() ) {
-			$wpforms_key = wpforms_get_license_key();
-		}
+		$this->update();
+
+		return $this->get();
+	}
+
+	/**
+	 * Get data from API.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return array
+	 */
+	private function perform_remote_request() {
+
+		$wpforms_key = wpforms()->is_pro() ? wpforms_get_license_key() : 'lite';
 
 		$request = wp_remote_get(
 			add_query_arg( 'tgm-updater-key', $wpforms_key, $this->settings['remote_source'] ),
@@ -201,23 +356,7 @@ abstract class CacheBase {
 			return [];
 		}
 
-		$data = $this->prepare_cache_data( json_decode( $json, true ) );
-		$dir  = $this->get_cache_dir();
-
-		// Just return the data if can't create the cache directory.
-		if ( ! wp_mkdir_p( $dir ) ) {
-			return $data;
-		}
-
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
-		file_put_contents(
-			$dir . $this->settings['cache_file'],
-			wp_json_encode( $data )
-		);
-
-		self::$updated = true;
-
-		return $data;
+		return $this->prepare_cache_data( json_decode( $json, true ) );
 	}
 
 	/**
@@ -256,7 +395,7 @@ abstract class CacheBase {
 		}
 
 		wpforms_create_upload_dir_htaccess_file();
-		wpforms_create_index_html_file( $this->get_cache_dir() );
+		wpforms_create_index_html_file( $this->cache_dir );
 	}
 
 	/**

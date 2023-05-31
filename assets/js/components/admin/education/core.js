@@ -262,11 +262,12 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 		 */
 		activateModal: function( $button  ) {
 
-			var feature = $button.data( 'name' );
+			var feature = $button.data( 'name' ),
+				message = $button.data( 'message' );
 
 			$.alert( {
 				title  : false,
-				content: wpforms_education.activate_prompt.replace( /%name%/g, feature ),
+				content: message ? message : wpforms_education.activate_prompt.replace( /%name%/g, feature ),
 				icon   : 'fa fa-info-circle',
 				type   : 'blue',
 				buttons: {
@@ -421,6 +422,7 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 		installModal: function( $button ) {
 
 			var feature = $button.data( 'name' ),
+				message = $button.data( 'message' ),
 				url = $button.data( 'url' ),
 				licenseType = $button.data( 'license' );
 
@@ -431,7 +433,7 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 
 			$.alert( {
 				title   : false,
-				content : wpforms_education.install_prompt.replace( /%name%/g, feature ),
+				content : message ? message : wpforms_education.install_prompt.replace( /%name%/g, feature ),
 				icon    : 'fa fa-info-circle',
 				type    : 'blue',
 				boxWidth: '425px',

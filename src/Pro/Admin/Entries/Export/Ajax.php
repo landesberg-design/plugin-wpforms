@@ -237,8 +237,6 @@ class Ajax {
 			$db_args['field_id']      = $args['search']['field'];
 		}
 
-		$db_args['select'] = 'entry_ids';
-
 		// Count total entries.
 		$count = wpforms()->get( 'entry' )->get_entries( $db_args, true );
 
@@ -252,6 +250,7 @@ class Ajax {
 
 		// Prepare get entries args for further steps.
 		unset( $db_args['select'] );
+
 		$db_args['number'] = $this->export->configuration['entries_per_step'];
 
 		$form_data['fields'] = empty( $form_data['fields'] ) ? [] : (array) $form_data['fields'];
@@ -268,6 +267,14 @@ class Ajax {
 			'type'            => ! empty( $args['export_options'] ) ? $args['export_options'][0] : 'csv',
 		];
 
+		/**
+		 * Filter $request_data during ajax request.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param array $request_data Request data array.
+		 */
+		$request_data                = apply_filters( 'wpforms_pro_admin_entries_export_ajax_request_data', $request_data );
 		$request_data['columns_row'] = $this->get_csv_cols( $request_data );
 
 		return $request_data;
@@ -645,17 +652,18 @@ class Ajax {
 			return '';
 		}
 
-		if ( ! empty( $entry['status'] ) ) {
-			$val = ucwords( sanitize_text_field( $entry['status'] ) );
-		} else {
-			$val = esc_html__( 'Unknown', 'wpforms' );
+		// Maybe get payment status from payments table.
+		$payment = wpforms()->get( 'payment' )->get_by( 'entry_id', $entry['entry_id'] );
+
+		if ( ! isset( $payment->status ) ) {
+			return esc_html__( 'N/A', 'wpforms' );
 		}
 
-		return $val;
+		return ucwords( sanitize_text_field( $payment->status ) );
 	}
 
 	/**
-	 * Get value of additional payment gateway information.
+	 * Get value of additional payment information.
 	 *
 	 * @since 1.5.5
 	 *
@@ -665,51 +673,14 @@ class Ajax {
 	 */
 	public function get_additional_info_pginfo_value( $entry ) {
 
-		$payment = wpforms()->entry_meta->get_meta(
-			[
-				'entry_id' => $entry['entry_id'],
-				'type'     => 'payment',
-				'number'   => 1,
-			]
-		);
+		// Maybe get payment status from payments table.
+		$payment_table_data = wpforms()->get( 'payment' )->get_by( 'entry_id', $entry['entry_id'] );
 
-		$val = '';
-
-		if ( empty( $payment[0]->data ) ) {
-			if ( empty( $entry['meta'] ) ) {
-				return $val;
-			}
-			$payment = json_decode( $entry['meta'], true );
-		} else {
-			$payment = json_decode( $payment[0]->data, true );
+		if ( empty( $payment_table_data ) ) {
+			return '';
 		}
 
-		$pginfo_labels = [
-			'payment_type'         => esc_html__( 'Payment gateway', 'wpforms' ),
-			'payment_recipient'    => esc_html__( 'Recipient', 'wpforms' ),
-			'payment_transaction'  => esc_html__( 'Transaction', 'wpforms' ),
-			'payment_total'        => esc_html__( 'Total', 'wpforms' ),
-			'payment_currency'     => esc_html__( 'Currency', 'wpforms' ),
-			'payment_mode'         => esc_html__( 'Mode', 'wpforms' ),
-			'payment_subscription' => esc_html__( 'Subscription', 'wpforms' ),
-			'payment_customer'     => esc_html__( 'Customer', 'wpforms' ),
-			'payment_period'       => esc_html__( 'Period', 'wpforms' ),
-		];
-
-		$val = '';
-
-		array_walk(
-			$payment,
-			static function( $item, $key ) use ( $pginfo_labels, &$val ) {
-				if ( strpos( $key, 'payment_' ) === false ) {
-					return;
-				}
-				$val .= ! empty( $pginfo_labels[ $key ] ) ? $pginfo_labels[ $key ] . ': ' : '';
-				$val .= $item . "\n";
-			}
-		);
-
-		return $val;
+		return $this->get_additional_info_from_payment_table( $payment_table_data );
 	}
 
 	/**
@@ -801,5 +772,72 @@ class Ajax {
 		$this->export->data['gmt_offset_sec'] = empty( $this->export->data['gmt_offset_sec'] ) ? get_option( 'gmt_offset' ) * 3600 : $this->export->data['gmt_offset_sec'];
 
 		return $this->export->data['gmt_offset_sec'];
+	}
+
+	/**
+	 * Get additional gateway info from payment table.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param array $payment_table_data Payment table data.
+	 *
+	 * @return string
+	 */
+	private function get_additional_info_from_payment_table( $payment_table_data ) {
+
+		$value         = '';
+		$ptinfo_labels = [
+			'total_amount'        => esc_html__( 'Total', 'wpforms' ),
+			'currency'            => esc_html__( 'Currency', 'wpforms' ),
+			'gateway'             => esc_html__( 'Gateway', 'wpforms' ),
+			'type'                => esc_html__( 'Type', 'wpforms' ),
+			'mode'                => esc_html__( 'Mode', 'wpforms' ),
+			'transaction_id'      => esc_html__( 'Transaction', 'wpforms' ),
+			'customer_id'         => esc_html__( 'Customer', 'wpforms' ),
+			'subscription_id'     => esc_html__( 'Subscription', 'wpforms' ),
+			'subscription_status' => esc_html__( 'Subscription Status', 'wpforms' ),
+		];
+
+		array_walk(
+			$payment_table_data,
+			static function( $item, $key ) use ( $ptinfo_labels, &$value ) {
+				if ( ! isset( $ptinfo_labels[ $key ] ) ) {
+					return;
+				}
+
+				if ( $key === 'total_amount' ) {
+					$item = wpforms_format_amount( $item );
+				}
+
+				$value .= $ptinfo_labels[ $key ] . ': ';
+				$value .= $item . "\n";
+			}
+		);
+
+		$meta_labels = [
+			'payment_note'        => esc_html__( 'Payment Note', 'wpforms' ),
+			'subscription_period' => esc_html__( 'Subscription Period', 'wpforms' ),
+		];
+
+		// Get meta data for payment.
+		$meta = wpforms()->get( 'payment_meta' )->get_all( $payment_table_data->id );
+
+		if ( empty( $meta ) ) {
+			return $value;
+		}
+
+		array_walk(
+			$meta,
+			static function( $item, $key ) use ( $meta_labels, &$value ) {
+				if ( ! isset( $meta_labels[ $key ] ) ) {
+					return;
+				}
+
+				$value .= $meta_labels[ $key ] . ': ';
+				$value .= $item->value . "\n";
+			}
+		);
+
+		return $value;
 	}
 }

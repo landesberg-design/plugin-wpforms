@@ -69,17 +69,7 @@ class WPForms_Builder_Panel_Payments extends WPForms_Builder_Panel {
 			return;
 		}
 
-		if ( ! wpforms()->is_pro() ) {
-
-			// WPForms Lite users.
-			echo '<div class="wpforms-panel-content-section wpforms-panel-content-section-info">
-				<div class="illustration illustration-payments"></div>
-				<h5>' . esc_html__( 'Payment integrations are not available on your plan.', 'wpforms-lite' ) . '</h5>
-				<p>' . esc_html__( 'Please upgrade to PRO to unlock all the payment integrations and more awesome features.', 'wpforms-lite' ) . '</p>
-				<a href="' . esc_url( wpforms_admin_upgrade_link( 'builder-payments' ) ) . '" class="wpforms-btn wpforms-btn-orange wpforms-btn-md" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Upgrade to PRO', 'wpforms-lite' ) . '</a>
-			</div>';
-
-		} elseif ( empty( $payments_active ) ) {
+		if ( empty( $payments_active ) ) {
 
 			// Check for active payment addons. When no payment addons are
 			// activated let the user know they need to install/activate an

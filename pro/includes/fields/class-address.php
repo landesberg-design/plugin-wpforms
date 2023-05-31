@@ -422,6 +422,8 @@ class WPForms_Field_Address extends WPForms_Field {
 			absint( $field['id'] )
 		);
 
+		echo '<div class="wpforms-field-header">';
+
 			$this->field_element(
 				'label',
 				$field,
@@ -446,6 +448,7 @@ class WPForms_Field_Address extends WPForms_Field {
 				true
 			);
 
+			echo '</div>';
 			echo '<div class="wpforms-field-options-columns-2 wpforms-field-options-columns">';
 				echo '<div class="placeholder wpforms-field-options-column">';
 					printf( '<input type="text" class="placeholder" id="wpforms-field-option-%1$d-address2_placeholder" name="fields[%1$d][address2_placeholder]" value="%2$s">', absint( $field['id'] ), esc_attr( $address2_placeholder ) );
@@ -538,6 +541,8 @@ class WPForms_Field_Address extends WPForms_Field {
 			absint( $field['id'] )
 		);
 
+		echo '<div class="wpforms-field-header">';
+
 			$this->field_element(
 				'label',
 				$field,
@@ -562,6 +567,7 @@ class WPForms_Field_Address extends WPForms_Field {
 				true
 			);
 
+			echo '</div>';
 			echo '<div class="wpforms-field-options-columns-2 wpforms-field-options-columns">';
 				echo '<div class="placeholder wpforms-field-options-column">';
 					printf( '<input type="text" class="placeholder" id="wpforms-field-option-%1$d-postal_placeholder" name="fields[%1$d][postal_placeholder]" value="%2$s">', absint( $field['id'] ), esc_attr( $postal_placeholder ) );

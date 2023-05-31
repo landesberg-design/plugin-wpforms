@@ -4,7 +4,6 @@ namespace WPForms\Pro\Integrations\LiteConnect;
 
 use WPForms\Tasks\Meta;
 use WPForms\Pro\Admin\DashboardWidget;
-use WPForms\Pro\Admin\Entries\DefaultScreen;
 
 /**
  * Class ImportEntriesTask.
@@ -102,7 +101,6 @@ class ImportEntriesTask {
 
 		// Clear Dashboard Widget And Entries Default screen cache.
 		DashboardWidget::clear_widget_cache();
-		DefaultScreen::clear_widget_cache();
 
 		// Recreate task if the import fail for any reasons.
 		if ( $import === false ) {

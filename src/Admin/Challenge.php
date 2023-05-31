@@ -477,6 +477,13 @@ class Challenge {
 			$can_start = false;
 		}
 
+		// Challenge is only available for WPForms admin pages.
+		if ( ! wpforms_is_admin_page() && ! wpforms_is_admin_page( 'builder' ) ) {
+			$can_start = false;
+
+			return $can_start;
+		}
+
 		if ( $this->challenge_force_start() && ! $this->is_builder_page() && ! $this->is_form_embed_page() ) {
 			$can_start = true;
 

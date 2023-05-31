@@ -19,22 +19,11 @@ class Amp {
 	private $is_amp_mode;
 
 	/**
-	 * Whether the current page is in AMP mode or not.
-	 *
-	 * @since 1.8.1
-	 *
-	 * @var Frontend
-	 */
-	private $frontend_obj;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 1.8.1
 	 */
 	public function __construct() {
-
-		$this->frontend_obj = wpforms()->get( 'frontend' );
 
 		$this->hooks();
 	}
@@ -263,9 +252,17 @@ class Amp {
 			return false;
 		}
 
-		$this->frontend_obj->assets_confirmation( $form_data );
+		$frontend = wpforms()->get( 'frontend' );
 
-		$class = (int) wpforms_setting( 'disable-css', '1' ) === 1 ? 'wpforms-confirmation-container-full' : 'wpforms-confirmation-container';
+		if ( ! $frontend ) {
+			return false;
+		}
+
+		$frontend->assets_confirmation( $form_data );
+
+		$class = (int) wpforms_setting( 'disable-css', '1' ) === 1 ?
+			'wpforms-confirmation-container-full' :
+			'wpforms-confirmation-container';
 
 		printf(
 			'<div submit-success><template type="amp-mustache"><div class="%s {{#redirecting}}wpforms-redirection-message{{/redirecting}}">{{{message}}}</div></template></div>',

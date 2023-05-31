@@ -193,7 +193,6 @@ class EntryEmailCSVCleanupTask extends Task {
 		 */
 		$ttl = (int) apply_filters( 'wpforms_pro_tasks_actions_entry_email_csv_cleanup_task_ttl', self::ENTRY_CSV_DEFAULT_TTL );
 
-		clearstatcache();
 		$now = time();
 
 		foreach ( $file_chunk as $file ) {
@@ -219,6 +218,8 @@ class EntryEmailCSVCleanupTask extends Task {
 	 * @param int    $ttl      TTL of the file.
 	 */
 	private function attempt_to_delete_csv( $file, $time_now, $ttl ) {
+
+		clearstatcache( true, $file );
 
 		if ( ! is_file( $file ) ) {
 			return;

@@ -95,6 +95,9 @@ class WPForms_Install {
 
 		// Unschedule all ActionScheduler actions by group.
 		wpforms()->get( 'tasks' )->cancel_all();
+
+		// Remove plugin cron jobs.
+		wp_clear_scheduled_hook( 'wpforms_email_summaries_cron' );
 	}
 
 	/**
@@ -126,12 +129,8 @@ class WPForms_Install {
 	 */
 	protected function run() {
 
-		$meta = new Meta();
-
-		// Create the table if it doesn't exist.
-		if ( ! $meta->table_exists() ) {
-			$meta->create_table();
-		}
+		// Create custom database tables.
+		$this->maybe_create_tables();
 
 		// Hook for Pro users.
 		do_action( 'wpforms_install' );
@@ -175,6 +174,35 @@ class WPForms_Install {
 			$this->run();
 			restore_current_blog();
 		}
+	}
+
+	/**
+	 * Create database tables if they do not exist.
+	 * It covers new installations.
+	 *
+	 * @since 1.8.2
+	 */
+	private function maybe_create_tables() {
+
+		array_map(
+			static function( $handler ) {
+
+				if ( ! method_exists( $handler, 'table_exists' ) ) {
+					return;
+				}
+
+				if ( $handler->table_exists() ) {
+					return;
+				}
+
+				$handler->create_table();
+			},
+			[
+				wpforms()->get( 'tasks_meta' ),
+				wpforms()->get( 'payment' ),
+				wpforms()->get( 'payment_meta' ),
+			]
+		);
 	}
 }
 

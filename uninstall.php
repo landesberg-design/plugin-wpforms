@@ -19,7 +19,7 @@
  * @var WP_Filesystem_Base $wp_filesystem
  */
 
-// phpcs:disable WordPress.DB.DirectDatabaseQuery
+// phpcs:disable WordPress.DB.DirectDatabaseQuery, WPForms.PHP.BackSlash.UseShortSyntax
 
 // Exit if accessed directly.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
@@ -52,6 +52,14 @@ $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpforms_entry_meta' );
 // Delete entry fields table.
 $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpforms_entry_fields' );
 
+// Delete payments table.
+// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+$wpdb->query( 'DROP TABLE IF EXISTS ' . \WPForms\Db\Payments\Payment::get_table_name() );
+
+// Delete payment meta table.
+// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+$wpdb->query( 'DROP TABLE IF EXISTS ' . \WPForms\Db\Payments\Meta::get_table_name() );
+
 // Delete tasks meta table.
 // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 $wpdb->query( 'DROP TABLE IF EXISTS ' . \WPForms\Tasks\Meta::get_table_name() );
@@ -65,9 +73,12 @@ $wpdb->query( 'DROP TABLE IF EXISTS ' . \WPForms\Logger\Repository::get_table_na
  *
  * 1. Form Locker.
  * 2. User Journey.
+ * 3. Coupons.
  */
 $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpforms_form_locker_email_verification' );
 $wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpforms_user_journey' );
+$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpforms_coupons' );
+$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->prefix . 'wpforms_coupons_forms' );
 
 // Delete Preview page.
 $preview_page = get_option( 'wpforms_preview_page', false );

@@ -10,8 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-			</div> <!-- Close the .print-body element. -->
-		</div> <!-- Close the #print element. -->
 		<p class="site"><a href="<?php echo esc_url( home_url() ); ?>"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></a></p>
 	</body>
 </html>

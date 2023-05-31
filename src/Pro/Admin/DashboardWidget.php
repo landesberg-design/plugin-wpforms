@@ -166,17 +166,9 @@ class DashboardWidget extends Widget {
 		);
 
 		wp_enqueue_script(
-			'wpforms-moment',
-			WPFORMS_PLUGIN_URL . 'assets/lib/moment/moment.min.js',
-			[],
-			'2.22.2',
-			true
-		);
-
-		wp_enqueue_script(
 			'wpforms-chart',
 			WPFORMS_PLUGIN_URL . 'assets/lib/chart.min.js',
-			[ 'wpforms-moment' ],
+			[ 'moment' ],
 			'2.7.2',
 			true
 		);

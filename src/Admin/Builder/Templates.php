@@ -135,14 +135,66 @@ class Templates {
 			true
 		);
 
+		$strings = [
+			'ajaxurl'               => admin_url( 'admin-ajax.php' ),
+			'admin_nonce'           => wp_create_nonce( 'wpforms-admin' ),
+			'nonce'                 => wp_create_nonce( 'wpforms-form-templates' ),
+			'can_install_addons'    => wpforms_can_install( 'addon' ),
+			'activating'            => esc_html__( 'Activating', 'wpforms-lite' ),
+			'cancel'                => esc_html__( 'Cancel', 'wpforms-lite' ),
+			'heads_up'              => esc_html__( 'Heads Up!', 'wpforms-lite' ),
+			'install_confirm'       => esc_html__( 'Yes, install and activate', 'wpforms-lite' ),
+			'ok'                    => esc_html__( 'Ok', 'wpforms-lite' ),
+			'template_addons_error' => esc_html__( 'Could not install OR activate all the required addons. Please download from wpforms.com and install them manually. Would you like to use the template anyway?', 'wpforms-lite' ),
+			'use_template'          => esc_html__( 'Yes, use template', 'wpforms-lite' ),
+		];
+
+		if ( $strings['can_install_addons'] ) {
+			/* translators: %1$s - template name, %2$s - addon name(s). */
+			$strings['template_addon_prompt'] = esc_html( sprintf( __( 'The %1$s template requires the %2$s. Would you like to install and activate it?', 'wpforms-lite' ), '%template%', '%addons%' ) );
+			/* translators: %1$s - template name, %2$s - addon name(s). */
+			$strings['template_addons_prompt'] = esc_html( sprintf( __( 'The %1$s template requires the %2$s. Would you like to install and activate all the required addons?', 'wpforms-lite' ), '%template%', '%addons%' ) );
+		} else {
+			/* translators: %s - addon name(s). */
+			$strings['template_addon_prompt'] = esc_html( sprintf( __( "To use all of the features in this template, you'll need the %s. Contact your site administrator to install it, then try opening this template again.", 'wpforms-lite' ), '%addons%' ) );
+			/* translators: %s - addon name(s). */
+			$strings['template_addons_prompt'] = esc_html( sprintf( __( "To use all of the features in this template, you'll need the %s. Contact your site administrator to install them, then try opening this template again.", 'wpforms-lite' ), '%addons%' ) );
+		}
+
 		wp_localize_script(
 			'wpforms-form-templates',
 			'wpforms_form_templates',
-			[
-				'ajaxurl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'wpforms-form-templates' ),
-			]
+			$strings
 		);
+
+		wp_localize_script(
+			'wpforms-form-templates',
+			'wpforms_addons',
+			$this->get_localized_addons()
+		);
+	}
+
+	/**
+	 * Get localized addons.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return array
+	 */
+	private function get_localized_addons() {
+
+		return wpforms_chain( wpforms()->get( 'addons' )->get_available() )
+			->map(
+				static function( $addon ) {
+
+					return [
+						'title'  => $addon['title'],
+						'action' => $addon['action'],
+						'url'    => $addon['url'],
+					];
+				}
+			)
+			->value();
 	}
 
 	/**
@@ -170,7 +222,7 @@ class Templates {
 	private function init_templates_data() {
 
 		// Get cached templates data.
-		$cache_data       = wpforms()->get( 'builder_templates_cache' )->get_cached();
+		$cache_data       = wpforms()->get( 'builder_templates_cache' )->get();
 		$templates_all    = ! empty( $cache_data['templates'] ) ? $cache_data['templates'] : [];
 		$this->categories = ! empty( $cache_data['categories'] ) ? $cache_data['categories'] : [];
 
@@ -356,7 +408,7 @@ class Templates {
 			return ! empty( $this->get_template_by_slug( $slug ) );
 		}
 
-		$has_cache = wpforms()->get( 'builder_template_single' )->instance( $template['id'], $this->license )->get_cached();
+		$has_cache = wpforms()->get( 'builder_template_single' )->instance( $template['id'], $this->license )->get();
 
 		return $this->has_access( $template ) && $has_cache;
 	}
@@ -475,7 +527,7 @@ class Templates {
 		$full_template = wpforms()
 			->get( 'builder_template_single' )
 			->instance( $template['id'], $this->license )
-			->get_cached();
+			->get();
 
 		if ( ! empty( $full_template['data'] ) ) {
 			return $full_template;

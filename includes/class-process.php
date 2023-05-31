@@ -442,17 +442,22 @@ class WPForms_Process {
 		// Success - add entry to database.
 		$this->entry_id = $this->entry_save( $this->fields, $entry, $this->form_data['id'], $this->form_data );
 
+		// Add payment to database.
+		$payment_id = $this->payment_save( $entry );
+
 		/**
 		 * Runs right after adding entry to the database.
 		 *
 		 * @since 1.7.7
+		 * @since 1.8.2 Added Payment ID param.
 		 *
-		 * @param array $fields    Fields data.
-		 * @param array $entry     User submitted data.
-		 * @param array $form_data Form data.
-		 * @param int   $entry_id  Entry ID.
+		 * @param array $fields     Fields data.
+		 * @param array $entry      User submitted data.
+		 * @param array $form_data  Form data.
+		 * @param int   $entry_id   Entry ID.
+		 * @param int   $payment_id Payment ID.
 		 */
-		do_action( 'wpforms_process_entry_saved', $this->fields, $entry, $this->form_data, $this->entry_id );
+		do_action( 'wpforms_process_entry_saved', $this->fields, $entry, $this->form_data, $this->entry_id, $payment_id );
 
 		// Fire the logic to send notification emails.
 		$this->entry_email( $this->fields, $entry, $this->form_data, $this->entry_id, 'entry' );
@@ -1007,6 +1012,58 @@ class WPForms_Process {
 		do_action( 'wpforms_process_entry_save', $fields, $entry, $form_id, $form_data );
 
 		return $this->entry_id;
+	}
+
+	/**
+	 * Save payment to the database.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param array $entry User submitted data.
+	 *
+	 * @return int Payment ID.
+	 */
+	private function payment_save( $entry ) {
+
+		if ( ! wpforms_has_payment( 'entry', $this->fields ) ) {
+			return 0;
+		}
+
+		$entry['entry_id'] = $this->entry_id;
+
+		$form_submission = wpforms()->get( 'submission' )->register( $this->fields, $entry, $this->form_data['id'], $this->form_data );
+
+		// Prepare the payment data.
+		$payment_data = $form_submission->prepare_payment_data();
+
+		// Bail early in case payment field exists,
+		// but no payment data was provided (e.g. old payment addon is used).
+		if ( empty( $payment_data['gateway'] ) ) {
+			return 0;
+		}
+
+		// Create payment.
+		$payment_id = wpforms()->get( 'payment' )->add( $payment_data );
+
+		if ( ! $payment_id ) {
+			return 0;
+		}
+
+		// Insert payment meta.
+		wpforms()->get( 'payment_meta' )->bulk_add( $payment_id, $form_submission->prepare_payment_meta() );
+
+		/**
+		 * Fire after payment was saved to database.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param int    $payment_id Payment id.
+		 * @param array  $fields     Form fields.
+		 * @param array  $form_data  Form data.
+		 */
+		do_action( 'wpforms_process_payment_saved', $payment_id, $this->fields, $this->form_data );
+
+		return $payment_id;
 	}
 
 	/**

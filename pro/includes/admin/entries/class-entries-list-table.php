@@ -1,6 +1,7 @@
 <?php
 
 use WPForms\Pro\Admin\Entries\Helpers;
+use WPForms\Db\Payments\ValueValidator;
 
 /**
  * Generate the table on the entries overview page.
@@ -116,6 +117,17 @@ class WPForms_Entries_Table extends WP_List_Table {
 			true
 		);
 
+		// Only show the payment view if the form has a payment field.
+		if ( wpforms_has_payment( 'form', $this->form_data ) ) {
+			$this->counts['payment'] = wpforms()->get( 'entry' )->get_entries(
+				[
+					'form_id' => $this->form_id,
+					'type'    => 'payment',
+				],
+				true
+			);
+		}
+
 		$this->counts = apply_filters( 'wpforms_entries_table_counts', $this->counts, $this->form_data );
 	}
 
@@ -137,25 +149,38 @@ class WPForms_Entries_Table extends WP_List_Table {
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		$views = [
-			'all'     => sprintf(
+			'all'    => sprintf(
 				'<a href="%s"%s>%s</a>',
 				esc_url( $base ),
 				$all,
 				esc_html__( 'All', 'wpforms' ) . $total
 			),
-			'unread'  => sprintf(
+			'unread' => sprintf(
 				'<a href="%s"%s>%s</a>',
 				esc_url( add_query_arg( 'type', 'unread', $base ) ),
 				$current === 'unread' ? ' class="current"' : '',
 				esc_html__( 'Unread', 'wpforms' ) . $unread
 			),
-			'starred' => sprintf(
-				'<a href="%s"%s>%s</a>',
-				esc_url( add_query_arg( 'type', 'starred', $base ) ),
-				$current === 'starred' ? ' class="current"' : '',
-				esc_html__( 'Starred', 'wpforms' ) . $starred
-			),
 		];
+
+		// Only show the payment view if the form has a payment field.
+		// Add the "payment" view after the "unread" view.
+		if ( isset( $this->counts['payment'] ) ) {
+			$payment          = '&nbsp;<span class="count">(<span class="payment-num">' . $this->counts['payment'] . '</span>)</span>';
+			$views['payment'] = sprintf(
+				'<a href="%s"%s>%s</a>',
+				esc_url( add_query_arg( 'type', 'payment', $base ) ),
+				$current === 'payment' ? ' class="current"' : '',
+				_n( 'Payment', 'Payments', $this->counts['payment'], 'wpforms' ) . $payment
+			);
+		}
+
+		$views['starred'] = sprintf(
+			'<a href="%s"%s>%s</a>',
+			esc_url( add_query_arg( 'type', 'starred', $base ) ),
+			$current === 'starred' ? ' class="current"' : '',
+			esc_html__( 'Starred', 'wpforms' ) . $starred
+		);
 
 		return apply_filters( 'wpforms_entries_table_views', $views, $this->form_data, $this->counts );
 	}
@@ -169,8 +194,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function get_columns() {
 
-		$has_payments  = wpforms_has_payment( 'form', $this->form_data );
-		$has_gateway   = wpforms_has_payment_gateway( $this->form_data );
+		$has_payments  = isset( $this->counts['payment'] );
 		$field_columns = $has_payments ? 2 : 3;
 
 		$columns               = [];
@@ -179,13 +203,22 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$columns               = $this->get_columns_form_fields( $columns, $field_columns );
 
 		// Additional columns for forms that contain payments.
-		if ( $has_payments && $has_gateway ) {
-			$columns['payment_total'] = esc_html__( 'Total', 'wpforms' );
+		if ( $has_payments ) {
+			$columns['payment'] = esc_html__( 'Payment', 'wpforms' );
 		}
 
-		// Show the status column if the form contains payments or if the
-		// filter is triggered by an addon.
-		if ( $has_payments || apply_filters( 'wpforms_entries_table_column_status', false, $this->form_data ) ) {
+		/**
+		 * Filters whether to show the status column in the entry table.
+		 * This filter is often used to trigger by add-ons to show the status column for forms.
+		 *
+		 * @since 1.6.0
+		 *
+		 * @param bool  $show_status Whether to show the status column. Default false.
+		 * @param array $form_data   Form data.
+		 *
+		 * @return bool
+		 */
+		if ( (bool) apply_filters( 'wpforms_entries_table_column_status', false, $this->form_data ) ) {
 			$columns['status'] = esc_html__( 'Status', 'wpforms' );
 		}
 
@@ -209,12 +242,11 @@ class WPForms_Entries_Table extends WP_List_Table {
 	public function get_sortable_columns() {
 
 		$sortable = [
-			'entry_id'      => [ 'id', false ],
-			'notes_count'   => [ 'notes_count', false ],
-			'id'            => [ 'title', false ],
-			'date'          => [ 'date', false ],
-			'status'        => [ 'status', false ],
-			'payment_total' => [ 'payment_total', false ],
+			'entry_id'    => [ 'id', false ],
+			'notes_count' => [ 'notes_count', false ],
+			'id'          => [ 'title', false ],
+			'status'      => [ 'status', false ],
+			'date'        => [ 'date', false ],
 		];
 
 		return apply_filters( 'wpforms_entries_table_sortable', $sortable, $this->form_data );
@@ -324,30 +356,27 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function column_status_field( $entry, $column_name ) {
 
-		if ( 'payment' === $entry->type ) {
-			// For payments, display dollar icon to easily indicate this
-			// status is related to a payment.
-			if ( ! empty( $entry->status ) ) {
-				$value = ucwords( sanitize_text_field( $entry->status ) );
-			} else {
-				$value = esc_html__( 'Unknown', 'wpforms' );
-			}
-			$value .= ' <i class="fa fa-money" aria-hidden="true" style="color:green;font-size: 16px;margin-left:4px;" title="' . esc_html__( 'Payment', 'wpforms' ) . '"></i>';
-		} else {
-			if ( ! empty( $entry->status ) ) {
-				$value = ucwords( sanitize_text_field( $entry->status ) );
-			} else {
-				$value = esc_html__( 'Completed', 'wpforms' );
-			}
+		// If the entry is a payment, show the payment status.
+		if ( $entry->type === 'payment' ) {
+			list( $status_label ) = $this->get_payment_status_by_entry_id( (int) $entry->entry_id );
+
+			return $status_label;
 		}
 
-		return $value;
+		// If the entry has a status, show it.
+		if ( ! empty( $entry->status ) ) {
+			return ucwords( sanitize_text_field( $entry->status ) );
+		}
+
+		// Otherwise, show "N/A" as a placeholder.
+		return esc_html__( 'N/A', 'wpforms' );
 	}
 
 	/**
 	 * Show `payment_total` value.
 	 *
 	 * @since 1.5.8
+	 * @deprecated 1.8.2
 	 *
 	 * @param object $entry       Current entry data.
 	 * @param string $column_name Current column name.
@@ -355,6 +384,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * @return string
 	 */
 	public function column_payment_total_field( $entry, $column_name ) {
+
+		_deprecated_function( __METHOD__, '1.8.2 of the WPForms plugin' );
 
 		$entry_meta = json_decode( $entry->meta, true );
 
@@ -371,6 +402,47 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Display payment status and total amount.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param object $entry Current entry data.
+	 *
+	 * @return string
+	 */
+	private function column_payment_field( $entry ) {
+
+		list( $status_label, $status_slug, $payment ) = $this->get_payment_status_by_entry_id( (int) $entry->entry_id );
+
+		// If payment data is not found, return customized N/A.
+		if ( ! $payment ) {
+			return sprintf(
+				'<span class="payment-status-%s">%s</span>',
+				$status_slug,
+				$status_label
+			);
+		}
+
+		// Generate the single payment URL.
+		$payment_url = add_query_arg(
+			[
+				'page'       => 'wpforms-payments',
+				'view'       => 'single',
+				'payment_id' => absint( $payment->id ),
+			],
+			admin_url( 'admin.php' )
+		);
+
+		return sprintf(
+			'<a href="%s" class="payment-status-%s" title="%s">%s</a>',
+			esc_url( $payment_url ),
+			sanitize_html_class( $status_slug ),
+			esc_html( $status_label ),
+			wpforms_format_amount( $payment->total_amount, true, $payment->currency )
+		);
 	}
 
 	/**
@@ -447,8 +519,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 				$value = $this->column_status_field( $entry, $column_name );
 				break;
 
-			case 'payment_total':
-				$value = $this->column_payment_total_field( $entry, $column_name );
+			case 'payment':
+				$value = $this->column_payment_field( $entry );
 				break;
 
 			default:
@@ -520,7 +592,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		// Viewed.
 		$read_action = ! empty( $entry->viewed ) ? 'unread' : 'read';
 		$read_title  = ! empty( $entry->viewed ) ? esc_html__( 'Mark entry unread', 'wpforms' ) : esc_html__( 'Mark entry read', 'wpforms' );
-		$read_icon   = '<a href="#" class="indicator-read ' . $read_action . '" data-id="' . absint( $entry->entry_id ) . '" data-form-id="' . absint( $entry->form_id ) . '" title="' . esc_attr( $read_title ) . '"><span class="dashicons dashicons-marker"></span></a>';
+		$read_icon   = '<a href="#" class="indicator-read ' . $read_action . '" data-id="' . absint( $entry->entry_id ) . '" data-form-id="' . absint( $entry->form_id ) . '" title="' . esc_attr( $read_title ) . '"></a>';
 
 		return $star_icon . $read_icon;
 	}
@@ -643,6 +715,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 			'unread' => esc_html__( 'Mark Unread', 'wpforms' ),
 			'star'   => esc_html__( 'Star', 'wpforms' ),
 			'unstar' => esc_html__( 'Unstar', 'wpforms' ),
+			'print'  => esc_html__( 'Print', 'wpforms' ),
 			'null'   => esc_html__( '----------', 'wpforms' ),
 			'delete' => esc_html__( 'Delete', 'wpforms' ),
 		];
@@ -704,7 +777,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 			]
 		);
 
-		$sendback = remove_query_arg( [ 'read', 'unread', 'starred', 'unstarred', 'deleted' ] );
+		$sendback = remove_query_arg( [ 'read', 'unread', 'starred', 'unstarred', 'print', 'deleted' ] );
 
 		switch ( $doaction ) {
 			// Mark as read.
@@ -725,6 +798,11 @@ class WPForms_Entries_Table extends WP_List_Table {
 			// Unstar entry.
 			case 'unstar':
 				$sendback = $this->process_bulk_action_single_unstar( $entries_list, $ids, $sendback );
+				break;
+
+			// Print entries.
+			case 'print':
+				$this->process_bulk_action_single_print( $ids );
 				break;
 
 			// Delete entries.
@@ -974,6 +1052,30 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 
 		return add_query_arg( 'unstarred', $unstarred, $sendback );
+	}
+
+	/**
+	 * Process the bulk action print.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param array $ids IDs to process.
+	 *
+	 * @return void
+	 */
+	private function process_bulk_action_single_print( $ids ) {
+
+		$print_url = add_query_arg(
+			[
+				'page'     => 'wpforms-entries',
+				'view'     => 'print',
+				'entry_id' => implode( ',', $ids ),
+			],
+			admin_url( 'admin.php' )
+		);
+
+		wp_safe_redirect( $print_url );
+		exit();
 	}
 
 	/**
@@ -1247,6 +1349,12 @@ class WPForms_Entries_Table extends WP_List_Table {
 			$data_args['viewed'] = '0';
 			$total_items         = $this->counts['unread'];
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $_GET['type'] ) && $_GET['type'] === 'payment' ) {
+			$data_args['type'] = 'payment';
+			$total_items       = $this->counts['payment'];
+		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! empty( $_GET['status'] ) ) {
 			$data_args['status'] = sanitize_text_field( $_GET['status'] ); // phpcs:ignore WordPress.Security
 			$total_items         = ! empty( $this->counts[ $data_args['status'] ] ) ? $this->counts[ $data_args['status'] ] : 0;
@@ -1344,5 +1452,40 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Returns payment status label, slug and payment object by given entry ID.
+	 * The returned data includes:
+	 * - label: payment status label.
+	 * - slug: payment status slug.
+	 * - payment: payment object.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param int $entry_id Entry ID.
+	 *
+	 * @return array
+	 */
+	private function get_payment_status_by_entry_id( $entry_id ) {
+
+		// Get payment data.
+		$payment = wpforms()->get( 'payment' )->get_by( 'entry_id', $entry_id );
+
+		// If payment data is not found, return N/A.
+		if ( ! $payment ) {
+			return [
+				__( 'N/A', 'wpforms' ),
+				'n-a',
+				null,
+			];
+		}
+
+		$allowed_statuses = ValueValidator::get_allowed_statuses();
+		$payment_status   = ! empty( $payment->subscription_id ) ? $payment->subscription_status : $payment->status;
+		$status_slug      = ! empty( $payment_status ) ? $payment_status : 'n-a';
+		$status_label     = isset( $allowed_statuses[ $payment_status ] ) ? $allowed_statuses[ $payment_status ] : __( 'N/A', 'wpforms' );
+
+		return [ $status_label, $status_slug, $payment ];
 	}
 }

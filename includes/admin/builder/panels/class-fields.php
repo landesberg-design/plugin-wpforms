@@ -29,6 +29,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 			// Template for form builder previews.
 			add_action( 'wpforms_builder_print_footer_scripts', [ $this, 'field_preview_templates' ] );
 			add_action( 'wpforms_builder_print_footer_scripts', [ $this, 'choices_limit_message_template' ] );
+			add_action( 'wpforms_builder_print_footer_scripts', [ $this, 'choices_empty_message_template' ] );
 		}
 	}
 
@@ -618,7 +619,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 							<input class="wpforms-screen-reader-element" type="{{ data.type }}" readonly<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' checked' ); } #>>
 						<# } #>
 						<span class="wpforms-image-choices-label">
-							{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}
+							{{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}}
 						</span>
 					</label>
 				</li>
@@ -639,7 +640,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 							<input class='wpforms-screen-reader-element' type='{{ data.type }}' readonly<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' checked' ); } #>>
 						<# } #>
 						<span class='wpforms-icon-choices-label'>
-							{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}
+							{{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}}
 						</span>
 					</label>
 				</li>
@@ -650,7 +651,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 				<# _.each( data.order, function( choiceID, key ) {  #>
 				<li>
 					<input type="{{ data.type }}" readonly<# if ( 1 === data.settings.choices[choiceID].default ) { print( ' checked' ); } #>>
-					{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}
+					{{{ WPFormsBuilder.fieldChoiceLabel( data, choiceID ) }}}
 				</li>
 				<# }) #>
 			</ul>
@@ -680,6 +681,24 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 					'{{ data.total }}'
 				);
 				?>
+			</div>
+		</script>
+		<?php
+	}
+
+	/**
+	 * Template for empty choices message.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @return void
+	 */
+	public function choices_empty_message_template() {
+
+		?>
+		<script type="text/html" id="tmpl-wpforms-empty-choice-message">
+			<div class="wpforms-notice-dynamic-empty wpforms-alert wpforms-alert-warning">
+				{{ data.message }}
 			</div>
 		</script>
 		<?php

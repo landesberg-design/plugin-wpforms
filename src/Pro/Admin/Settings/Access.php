@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Admin\Settings;
 
+use WPForms\Pro\Admin\DashboardWidget;
+
 /**
  * Access management settings panel.
  *
@@ -359,8 +361,7 @@ class Access {
 			return;
 		}
 
-		\WPForms\Pro\Admin\DashboardWidget::clear_widget_cache();
-		\WPForms\Pro\Admin\Entries\DefaultScreen::clear_widget_cache();
+		DashboardWidget::clear_widget_cache();
 
 		$roles = \get_editable_roles();
 

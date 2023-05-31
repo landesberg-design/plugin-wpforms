@@ -679,8 +679,8 @@ class WPForms_Conditional_Logic_Fields {
 									} elseif ( isset( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] ) && '' !== trim( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] ) ) {
 										$val = esc_attr( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] );
 									} else {
-										/* translators: %d - choice number. */
-										$val = sprintf( esc_html__( 'Choice %d', 'wpforms' ), (int) $rule_field );
+										/* translators: %d - choice value. */
+										$val = sprintf( esc_html__( 'Choice %d', 'wpforms' ), (string) $rule_value );
 									}
 								}
 

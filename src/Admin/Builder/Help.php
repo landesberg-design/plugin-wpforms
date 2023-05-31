@@ -10,15 +10,6 @@ namespace WPForms\Admin\Builder;
 class Help {
 
 	/**
-	 * Settings.
-	 *
-	 * @since 1.6.3
-	 *
-	 * @var array
-	 */
-	private $settings;
-
-	/**
 	 * Docs data.
 	 *
 	 * @since 1.6.4
@@ -32,54 +23,17 @@ class Help {
 	 *
 	 * @since 1.6.3
 	 */
-	public function init() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
-
-		// This should be here, otherwise scheduled task doesn't execute.
-		add_action( 'wpforms_builder_help_cache_update', [ $this, 'update_docs' ] );
+	public function init() {
 
 		// Terminate initialization if not in builder.
-		if ( ! wpforms_is_admin_page( 'builder' ) ) {
+		if ( ! wpforms_current_user_can( [ 'create_forms', 'edit_forms' ] ) || ! wpforms_is_admin_page( 'builder' ) ) {
 			return;
 		}
 
-		$this->setup();
+		$builder_help_cache = wpforms()->get( 'builder_help_cache' );
+		$this->docs         = $builder_help_cache ? $builder_help_cache->get() : [];
+
 		$this->hooks();
-	}
-
-	/**
-	 * Setup settings and other things.
-	 *
-	 * @since 1.6.3
-	 */
-	private function setup() {
-
-		$upload_dir  = wpforms_upload_dir();
-		$upload_path = ! empty( $upload_dir['path'] )
-			? trailingslashit( wp_normalize_path( $upload_dir['path'] ) )
-			: trailingslashit( WP_CONTENT_DIR ) . 'uploads/wpforms/';
-
-		$this->settings = [
-
-			// Remote source URL.
-			'docs_remote_source' => 'https://wpforms.com/wp-content/docs.json',
-
-			// Docs cache file (full path).
-			'cache_file'         => $upload_path . 'cache/docs.json',
-
-			/**
-			 * Allow modifying Help Docs cache TTL (time to live).
-			 *
-			 * @since 1.6.3
-			 *
-			 * @param int $cache_ttl Cache TTL in seconds. Defaults to 1 week.
-			 */
-			'cache_ttl'          => (int) apply_filters( 'wpforms_admin_builder_help_cache_ttl', WEEK_IN_SECONDS ),
-
-			// Static URLs.
-			'docs_url'           => 'https://wpforms.com/docs/',
-			'support_ticket_url' => 'https://wpforms.com/account/support/',
-			'upgrade_url'        => 'https://wpforms.com/pricing/',
-		];
 	}
 
 	/**
@@ -127,7 +81,7 @@ class Help {
 	public function get_localized_data() {
 
 		return [
-			'docs'       => $this->get_docs(),
+			'docs'       => $this->docs,
 			'categories' => $this->get_categories(),
 			'context'    => [
 				'terms' => $this->get_context_terms(),
@@ -139,109 +93,46 @@ class Help {
 	/**
 	 * Get docs from the cache.
 	 *
-	 * @since 1.6.3
+	 * @since      1.6.3
+	 * @deprecated 1.8.2
 	 *
 	 * @return array Docs data.
+	 * @noinspection PhpUnused, NullPointerExceptionInspection
 	 */
 	public function get_docs() {
 
-		if ( is_file( $this->settings['cache_file'] ) && is_readable( $this->settings['cache_file'] ) ) {
-			$docs = json_decode( file_get_contents( $this->settings['cache_file'] ), true );
-		}
+		_deprecated_function( __METHOD__, '1.8.2 of the WPForms plugin', 'wpforms()->get( \'builder_help_cache\' )->get()' );
 
-		clearstatcache();
-
-		if (
-			empty( $docs ) ||
-			(int) filemtime( $this->settings['cache_file'] ) + $this->settings['cache_ttl'] < time()
-		) {
-			// This code should execute once when the method called the first time,
-			// Next update_docs() should be executed by schedule.
-			$docs = $this->update_docs();
-		}
-
-		// Store in class private variable for further use.
-		$this->docs = ! empty( $docs ) ? $docs : [];
-
-		return $this->docs;
+		return wpforms()->get( 'builder_help_cache' )->get();
 	}
 
 	/**
 	 * Update docs cache with actual data retrieved from the remote source.
 	 *
-	 * @since 1.6.3
+	 * @since      1.6.3
+	 * @deprecated 1.8.2
 	 *
 	 * @return array|boolean Updated docs data. Or false on error.
+	 * @noinspection PhpUnused, NullPointerExceptionInspection
 	 */
 	public function update_docs() {
 
-		// Unfortunately, we need to call setup() here for properly scheduled execution.
-		$this->setup();
+		_deprecated_function( __METHOD__, '1.8.2 of the WPForms plugin', 'wpforms()->get( \'builder_help_cache\' )->get()' );
 
-		$wpforms_key = 'lite';
-
-		if ( wpforms()->is_pro() ) {
-			$wpforms_key = wpforms_get_license_key();
-		}
-
-		$request = wp_remote_get(
-			add_query_arg( 'tgm-updater-key', $wpforms_key, $this->settings['docs_remote_source'] ),
-			[
-				// Limit the processing time to half of the default PHP max execution time,
-				// so users will have a chance to see the Form Builder even without the docs data.
-				'timeout'    => 15,
-				'user-agent' => wpforms_get_default_user_agent(),
-			]
-		);
-
-		if ( is_wp_error( $request ) ) {
-			return false;
-		}
-
-		$content   = wp_remote_retrieve_body( $request );
-		$cache_dir = dirname( $this->settings['cache_file'] );
-
-		// Check cache directory and create it if needed.
-		if ( ! file_exists( $cache_dir ) || ! wp_is_writable( $cache_dir ) ) {
-			wp_mkdir_p( $cache_dir );
-			wpforms_create_upload_dir_htaccess_file();
-			wpforms_create_index_html_file( $cache_dir );
-		}
-
-		// Attempt to decode the json data.
-		$docs = json_decode( $content, true );
-
-		// If the data successfully decoded to array we caching the content.
-		if ( is_array( $docs ) ) {
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
-			file_put_contents( $this->settings['cache_file'], $content );
-		} else {
-			$docs = [];
-		}
-
-		// Schedule recurring updates.
-		$this->schedule_update_docs();
-
-		return $docs;
+		return wpforms()->get( 'builder_help_cache' )->get();
 	}
 
 	/**
 	 * Schedule docs updates.
 	 *
-	 * @since 1.6.3
+	 * @since      1.6.3
+	 * @deprecated 1.8.2
+	 *
+	 * @noinspection PhpUnused
 	 */
 	public function schedule_update_docs() {
 
-		$tasks = wpforms()->get( 'tasks' );
-
-		if ( $tasks->is_scheduled( 'wpforms_builder_help_cache_update' ) !== false ) {
-			return;
-		}
-
-		$tasks->create( 'wpforms_builder_help_cache_update' )
-			  ->recurring( time() + $this->settings['cache_ttl'], $this->settings['cache_ttl'] )
-			  ->params()
-			  ->register();
+		_deprecated_function( __METHOD__, '1.8.2 of the WPForms plugin' );
 	}
 
 	/**
@@ -907,6 +798,7 @@ class Help {
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
 			],
 			'payment'                   => [
+				'/docs/viewing-and-managing-payments/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/paypal-commerce-addon/',
 				'/docs/install-use-paypal-addon-wpforms/',
@@ -915,6 +807,7 @@ class Help {
 				'/docs/how-to-allow-users-to-choose-a-payment-method-on-your-form/',
 			],
 			'price'                     => [
+				'/docs/viewing-and-managing-payments/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/paypal-commerce-addon/',
 				'/docs/install-use-paypal-addon-wpforms/',
@@ -923,6 +816,7 @@ class Help {
 				'/docs/how-to-allow-users-to-choose-a-payment-method-on-your-form/',
 			],
 			'cost'                      => [
+				'/docs/viewing-and-managing-payments/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/paypal-commerce-addon/',
 				'/docs/install-use-paypal-addon-wpforms/',
@@ -931,6 +825,7 @@ class Help {
 				'/docs/how-to-allow-users-to-choose-a-payment-method-on-your-form/',
 			],
 			'single item'               => [
+				'/docs/viewing-and-managing-payments/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/paypal-commerce-addon/',
 				'/docs/install-use-paypal-addon-wpforms/',
@@ -942,6 +837,7 @@ class Help {
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
 			],
 			'multiple items'            => [
+				'/docs/viewing-and-managing-payments/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/paypal-commerce-addon/',
 				'/docs/install-use-paypal-addon-wpforms/',
@@ -955,6 +851,7 @@ class Help {
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
 			],
 			'checkbox items'            => [
+				'/docs/viewing-and-managing-payments/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/paypal-commerce-addon/',
 				'/docs/install-use-paypal-addon-wpforms/',
@@ -968,6 +865,7 @@ class Help {
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
 			],
 			'dropdown items'            => [
+				'/docs/viewing-and-managing-payments/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/paypal-commerce-addon/',
 				'/docs/install-use-paypal-addon-wpforms/',
@@ -979,6 +877,7 @@ class Help {
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
 			],
 			'total'                     => [
+				'/docs/viewing-and-managing-payments/',
 				'/docs/how-to-require-payment-total-with-a-wordpress-form/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/paypal-commerce-addon/',
@@ -995,23 +894,27 @@ class Help {
 				'/docs/testing-payments-with-the-paypal-commerce-addon/',
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
+				'/docs/viewing-and-managing-payments/',
 			],
 			'stripe credit card'        => [
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/how-to-test-stripe-payments-on-your-site/',
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
+				'/docs/viewing-and-managing-payments/',
 			],
 			'authorize.net credit card' => [
 				'/docs/how-to-install-and-use-the-authorize-net-addon-with-wpforms/',
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
+				'/docs/viewing-and-managing-payments/',
 			],
 			'square credit card'        => [
 				'/docs/how-to-install-and-use-the-square-addon-with-wpforms/',
 				'/docs/how-to-test-square-payments-on-your-site/',
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
+				'/docs/viewing-and-managing-payments/',
 			],
 			'settings'                  => [
 				'/docs/creating-first-form/',
@@ -1265,6 +1168,7 @@ class Help {
 				'/docs/how-to-allow-users-to-choose-a-payment-method-on-your-form/',
 			],
 			'stripe'                    => [
+				'/docs/using-stripe-with-wpforms-lite/',
 				'/docs/how-to-install-and-use-the-stripe-addon-with-wpforms/',
 				'/docs/how-to-test-stripe-payments-on-your-site/',
 			],
@@ -1330,7 +1234,7 @@ class Help {
 			}
 		);
 
-		return ! empty( $result ) && is_array( $result ) ? array_keys( $result ) : [];
+		return array_keys( $result );
 	}
 
 	/**
@@ -1351,10 +1255,10 @@ class Help {
 		$ids = [];
 
 		foreach ( $links as $link ) {
-			$ids = array_merge( $ids, $this->get_doc_id( $link ) );
+			$ids[] = $this->get_doc_id( $link );
 		}
 
-		return $ids;
+		return array_merge( [], ...$ids );
 	}
 
 	/**
@@ -1368,7 +1272,11 @@ class Help {
 		echo wpforms_render(
 			'builder/help',
 			[
-				'settings' => $this->settings,
+				'settings' => [
+					'docs_url'           => 'https://wpforms.com/docs/',
+					'support_ticket_url' => 'https://wpforms.com/account/support/',
+					'upgrade_url'        => 'https://wpforms.com/pricing/',
+				],
 			],
 			true
 		);

@@ -10,11 +10,53 @@ namespace WPForms\Admin\Addons;
 class Addons {
 
 	/**
+	 * Basic license.
+	 *
+	 * @since 1.8.2
+	 */
+	const BASIC = 'basic';
+
+	/**
+	 * Plus license.
+	 *
+	 * @since 1.8.2
+	 */
+	const PLUS = 'plus';
+
+	/**
+	 * Pro license.
+	 *
+	 * @since 1.8.2
+	 */
+	const PRO = 'pro';
+
+	/**
+	 * Elite license.
+	 *
+	 * @since 1.8.2
+	 */
+	const ELITE = 'elite';
+
+	/**
+	 * Agency license.
+	 *
+	 * @since 1.8.2
+	 */
+	const AGENCY = 'agency';
+
+	/**
+	 * Ultimate license.
+	 *
+	 * @since 1.8.2
+	 */
+	const ULTIMATE = 'ultimate';
+
+	/**
 	 * Addons cache object.
 	 *
 	 * @since 1.6.6
 	 *
-	 * @var \WPForms\Admin\Addons\AddonsCache
+	 * @var AddonsCache
 	 */
 	private $cache;
 
@@ -63,7 +105,7 @@ class Addons {
 		}
 
 		$this->cache  = wpforms()->get( 'addons_cache' );
-		$this->addons = $this->cache->get_cached();
+		$this->addons = $this->cache->get();
 
 		$this->hooks();
 	}
@@ -77,6 +119,11 @@ class Addons {
 
 		add_action( 'admin_init', [ $this, 'get_available' ] );
 
+		/**
+		 * Fire before admin addons init.
+		 *
+		 * @since 1.6.7
+		 */
 		do_action( 'wpforms_admin_addons_init' );
 	}
 
@@ -91,7 +138,13 @@ class Addons {
 	 */
 	public function get_all( $force_cache_update = false ) {
 
-		return (bool) $force_cache_update ? $this->cache->update_cache() : $this->addons;
+		if ( $force_cache_update ) {
+			$this->cache->update( true );
+
+			$this->addons = $this->cache->get();
+		}
+
+		return $this->addons;
 	}
 
 	/**
@@ -161,6 +214,7 @@ class Addons {
 	 * @param string $license Addon license.
 	 *
 	 * @return array.
+	 * @noinspection PhpUnused
 	 */
 	public function get_by_license( $license ) {
 
@@ -233,15 +287,12 @@ class Addons {
 			return '';
 		}
 
-		$addon            = is_string( $addon ) ? $this->get_addon( $addon ) : $addon;
-		$addon['license'] = empty( $addon['license'] ) ? [] : (array) $addon['license'];
-
-		// TODO: convert to a class constant when we will drop PHP 5.5.
-		$levels  = [ 'basic', 'plus', 'pro', 'elite', 'agency', 'ultimate' ];
-		$license = '';
+		$levels        = [ self::BASIC, self::PLUS, self::PRO, self::ELITE, self::AGENCY, self::ULTIMATE ];
+		$license       = '';
+		$addon_license = $this->get_addon_license( $addon );
 
 		foreach ( $levels as $level ) {
-			if ( in_array( $level, $addon['license'], true ) ) {
+			if ( in_array( $level, $addon_license, true ) ) {
 				$license = $level;
 
 				break;
@@ -252,7 +303,23 @@ class Addons {
 			return '';
 		}
 
-		return in_array( $license, [ 'basic', 'plus', 'pro' ], true ) ? 'pro' : 'elite';
+		return in_array( $license, [ self::BASIC, self::PLUS, self::PRO ], true ) ? self::PRO : self::ELITE;
+	}
+
+	/**
+	 * Get addon license.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param array|string $addon Addon data array OR addon slug.
+	 *
+	 * @return array
+	 */
+	private function get_addon_license( $addon ) {
+
+		$addon = is_string( $addon ) ? $this->get_addon( $addon ) : $addon;
+
+		return $this->default_data( $addon, 'license', [] );
 	}
 
 	/**
@@ -312,8 +379,8 @@ class Addons {
 			return [];
 		}
 
-		$addon['title'] = ! empty( $addon['title'] ) ? $addon['title'] : '';
-		$addon['slug']  = ! empty( $addon['slug'] ) ? $addon['slug'] : '';
+		$addon['title'] = $this->default_data( $addon, 'title', '' );
+		$addon['slug']  = $this->default_data( $addon, 'slug', '' );
 
 		// We need the cleared name of the addon, without the ' addon' suffix, for further use.
 		$addon['name'] = preg_replace( '/ addon$/i', '', $addon['title'] );
@@ -322,16 +389,16 @@ class Addons {
 		$addon['modal_name']    = sprintf( esc_html__( '%s addon', 'wpforms-lite' ), $addon['name'] );
 		$addon['clear_slug']    = str_replace( 'wpforms-', '', $addon['slug'] );
 		$addon['utm_content']   = ucwords( str_replace( '-', ' ', $addon['clear_slug'] ) );
-		$addon['license']       = empty( $addon['license'] ) ? [] : (array) $addon['license'];
+		$addon['license']       = $this->default_data( $addon, 'license', [] );
 		$addon['license_level'] = $this->get_license_level( $addon );
-		$addon['icon']          = ! empty( $addon['icon'] ) ? $addon['icon'] : '';
+		$addon['icon']          = $this->default_data( $addon, 'icon', '' );
 		$addon['path']          = sprintf( '%1$s/%1$s.php', $addon['slug'] );
-		$addon['video']         = ! empty( $addon['video'] ) ? $addon['video'] : '';
+		$addon['video']         = $this->default_data( $addon, 'video', '' );
 		$addon['plugin_allow']  = $this->has_access( $addon );
 		$addon['status']        = 'missing';
 		$addon['action']        = 'upgrade';
-		$addon['page_url']      = empty( $addon['url'] ) ? '' : $addon['url'];
-		$addon['doc_url']       = empty( $addon['doc'] ) ? '' : $addon['doc'];
+		$addon['page_url']      = $this->default_data( $addon, 'url', '' );
+		$addon['doc_url']       = $this->default_data( $addon, 'doc', '' );
 		$addon['url']           = '';
 
 		static $nonce   = '';
@@ -339,5 +406,29 @@ class Addons {
 		$addon['nonce'] = $nonce;
 
 		return $addon;
+	}
+
+	/**
+	 * Get default data.
+	 *
+	 * @since 1.8.2
+	 *
+	 * @param array  $addon   Addon data.
+	 * @param string $key     Key.
+	 * @param mixed  $default Default data.
+	 *
+	 * @return array|string|mixed
+	 */
+	private function default_data( $addon, $key, $default ) {
+
+		if ( is_string( $default ) ) {
+			return ! empty( $addon[ $key ] ) ? $addon[ $key ] : $default;
+		}
+
+		if ( is_array( $default ) ) {
+			return ! empty( $addon[ $key ] ) ? (array) $addon[ $key ] : $default;
+		}
+
+		return $addon[ $key ];
 	}
 }

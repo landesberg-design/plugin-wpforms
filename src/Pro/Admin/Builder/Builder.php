@@ -48,16 +48,6 @@ class Builder {
 	 */
 	public function form_builder_strings( $strings, $form ) {
 
-		$currency   = wpforms_get_currency();
-		$currencies = wpforms_get_currencies();
-
-		$strings['currency']            = sanitize_text_field( $currency );
-		$strings['currency_name']       = isset( $currencies[ $currency ]['name'] ) ? sanitize_text_field( $currencies[ $currency ]['name'] ) : '';
-		$strings['currency_decimals']   = wpforms_get_currency_decimals( $currencies[ $currency ] );
-		$strings['currency_decimal']    = isset( $currencies[ $currency ]['decimal_separator'] ) ? sanitize_text_field( $currencies[ $currency ]['decimal_separator'] ) : '.';
-		$strings['currency_thousands']  = isset( $currencies[ $currency ]['thousands_separator'] ) ? sanitize_text_field( $currencies[ $currency ]['thousands_separator'] ) : ',';
-		$strings['currency_symbol']     = isset( $currencies[ $currency ]['symbol'] ) ? sanitize_text_field( $currencies[ $currency ]['symbol'] ) : '$';
-		$strings['currency_symbol_pos'] = isset( $currencies[ $currency ]['symbol_pos'] ) ? sanitize_text_field( $currencies[ $currency ]['symbol_pos'] ) : 'left';
 		$strings['notification_clone']  = esc_html__( ' - clone', 'wpforms' );
 
 		$strings['notification_by_status_enable_alert'] = wp_kses( /* translators: %s: Payment provider completed payments. Example: `PayPal Standard completed payments`. */

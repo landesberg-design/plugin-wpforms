@@ -575,7 +575,7 @@ class WPForms_About {
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
-									<?php esc_html_e( 'Take payments with PayPal Commerce, Stripe, Square, Authorize.Net, and PayPal Standard', 'wpforms-lite' ); ?>
+									<?php esc_html_e( 'Take payments with PayPal Commerce, Stripe Pro, Square, Authorize.Net, and PayPal Standard', 'wpforms-lite' ); ?>
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
@@ -1150,28 +1150,28 @@ class WPForms_About {
 				'lite'  => [
 					'status' => 'partial',
 					'text'   => [
-						'<strong>' . esc_html__( 'Standard Fields Only', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, and Number Slider', 'wpforms-lite' ),
+						'<strong>' . esc_html__( 'Standard and Payment Fields', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, Number Slider, and Payment Fields (etc. Single Item, Total, etc.)', 'wpforms-lite' ),
 					],
 				],
 				'basic' => [
 					'status' => 'full',
 					'text'   => [
-						'<strong>' . esc_html__( 'Access to all Standard and Fancy Fields', 'wpforms-lite' ) . '</strong>',
+						'<strong>' . esc_html__( 'Access to all Standard, Fancy, and Payment Fields', 'wpforms-lite' ) . '</strong>',
 						esc_html__( 'Address, Phone, Website / URL, Date / Time, Password, File Upload, Layout, Rich Text, Content, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, and Hidden Field', 'wpforms-lite' ),
 					],
 				],
 				'plus'  => [
 					'status' => 'full',
 					'text'   => [
-						'<strong>' . esc_html__( 'Access to all Standard and Fancy Fields', 'wpforms-lite' ) . '</strong>',
+						'<strong>' . esc_html__( 'Access to all Standard, Fancy, and Payment Fields', 'wpforms-lite' ) . '</strong>',
 						esc_html__( 'Address, Phone, Website / URL, Date / Time, Password, File Upload, Layout, Rich Text, Content, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, and Hidden Field', 'wpforms-lite' ),
 					],
 				],
 				'pro'   => [
 					'status' => 'full',
 					'text'   => [
-						'<strong>' . esc_html__( 'Access to all Standard and Fancy Fields', 'wpforms-lite' ) . '</strong>',
+						'<strong>' . esc_html__( 'Access to all Standard, Fancy, and Payment Fields', 'wpforms-lite' ) . '</strong>',
 						esc_html__( 'Address, Phone, Website / URL, Date / Time, Password, File Upload, Layout, Rich Text, Content, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, and Hidden Field', 'wpforms-lite' ),
 					],
 				],
@@ -1339,25 +1339,28 @@ class WPForms_About {
 			],
 			'payments'     => [
 				'lite'     => [
-					'status' => 'none',
+					'status' => 'partial',
 					'text'   => [
-						'<strong>' . esc_html__( 'Not Available', 'wpforms-lite' ) . '</strong>',
+						'<strong>' . esc_html__( 'Limited Payment Forms', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'Accept payments using Stripe only', 'wpforms-lite' ),
 					],
 				],
 				'basic'    => [
-					'status' => 'none',
+					'status' => 'partial',
 					'text'   => [
-						'<strong>' . esc_html__( 'Not Available', 'wpforms-lite' ) . '</strong>',
+						'<strong>' . esc_html__( 'Limited Payment Forms', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'Accept payments using Stripe only', 'wpforms-lite' ),
 					],
 				],
 				'plus'     => [
-					'status' => 'none',
+					'status' => 'partial',
 					'text'   => [
-						'<strong>' . esc_html__( 'Not Available', 'wpforms-lite' ) . '</strong>',
+						'<strong>' . esc_html__( 'Limited Payment Forms', 'wpforms-lite' ) . '</strong>',
+						esc_html__( 'Accept payments using Stripe only', 'wpforms-lite' ),
 					],
 				],
 				'pro'      => [
-					'status' => 'full',
+					'status' => 'partial',
 					'text'   => [
 						'<strong>' . esc_html__( 'Create Payment Forms', 'wpforms-lite' ) . '</strong>',
 						esc_html__( 'Accept payments using PayPal Commerce, Stripe, Square, and PayPal Standard', 'wpforms-lite' ),

@@ -242,28 +242,17 @@ abstract class WPForms_Payment {
 	 */
 	public function builder_sidebar() {
 
-		$configured = $this->is_payments_enabled() ? 'configured' : '';
-
-		echo '<a href="#" class="wpforms-panel-sidebar-section icon ' . esc_attr( $configured ) . ' wpforms-panel-sidebar-section-' . esc_attr( $this->slug ) . '" data-section="' . esc_attr( $this->slug ) . '">';
-
-		echo '<img src="' . esc_url( $this->icon ) . '">';
-
-		echo esc_html( $this->name );
-
-		if ( ! empty( $this->recommended ) ) {
-			echo '<span class="wpforms-panel-sidebar-recommended">';
-				echo '<i class="fa fa-star" aria-hidden="true"></i>&nbsp;';
-				esc_html_e( 'Recommended', 'wpforms' );
-			echo '</span>';
-		}
-
-		echo '<i class="fa fa-angle-right wpforms-toggle-arrow"></i>';
-
-		if ( ! empty( $configured ) ) {
-			echo '<i class="fa fa-check-circle-o"></i>';
-		}
-
-		echo '</a>';
+		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'builder/payment/sidebar',
+			[
+				'configured'  => $this->is_payments_enabled() ? 'configured' : '',
+				'slug'        => $this->slug,
+				'icon'        => $this->icon,
+				'name'        => $this->name,
+				'recommended' => $this->recommended,
+			],
+			true
+		);
 	}
 
 	/**

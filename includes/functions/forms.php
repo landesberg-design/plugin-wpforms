@@ -16,7 +16,13 @@
  */
 function wpforms_display( $form_id = false, $title = false, $desc = false ) {
 
-	wpforms()->frontend->output( $form_id, $title, $desc );
+	$frontend = wpforms()->get( 'frontend' );
+
+	if ( empty( $frontend ) ) {
+		return;
+	}
+
+	$frontend->output( $form_id, $title, $desc );
 }
 
 /**
@@ -154,6 +160,10 @@ function wpforms_setting( $key, $default = false, $option = 'wpforms_settings' )
 
 /**
  * Update plugin settings option and allow it to be filterable.
+ *
+ * The purpose of this function is to save settings when the "Save Settings" button is clicked.
+ * If you are programmatically saving setting in the database in cases not triggered by user,
+ * use update_option() instead.
  *
  * @since 1.6.6
  *

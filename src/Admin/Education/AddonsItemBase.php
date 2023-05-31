@@ -83,7 +83,17 @@ abstract class AddonsItemBase implements EducationInterface {
 	 */
 	protected function display_single_addon( $addon ) {
 
-		if ( empty( $addon ) ) {
+		/**
+		 * Filter to disallow addons to be displayed in the Education feature.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @param bool   $display Whether to hide the addon.
+		 * @param array  $slug    Addon data.
+		 */
+		$is_disallowed = (bool) apply_filters( 'wpforms_admin_education_addons_item_base_display_single_addon_hide', false, $addon );
+
+		if ( empty( $addon ) || $is_disallowed ) {
 			return;
 		}
 

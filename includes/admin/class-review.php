@@ -257,6 +257,7 @@ class WPForms_Review {
 			'wpforms-community',
 			'wpforms-entries',
 			'wpforms-overview',
+			'wpforms-payments',
 			'wpforms-settings',
 			'wpforms-smtp',
 			'wpforms-templates',
@@ -291,7 +292,7 @@ class WPForms_Review {
 				'target' => '_blank',
 			],
 			[
-				'url'    => 'https://www.facebook.com/groups/461389447755778',
+				'url'    => 'https://www.facebook.com/groups/wpformsvip/',
 				'text'   => __( 'VIP Circle', 'wpforms-lite' ),
 				'target' => '_blank',
 			],
