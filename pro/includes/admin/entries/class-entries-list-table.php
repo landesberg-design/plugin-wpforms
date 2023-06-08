@@ -219,7 +219,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		 * @return bool
 		 */
 		if ( (bool) apply_filters( 'wpforms_entries_table_column_status', false, $this->form_data ) ) {
-			$columns['status'] = esc_html__( 'Status', 'wpforms' );
+			$columns['type'] = esc_html__( 'Type', 'wpforms' );
 		}
 
 		$columns['date'] = esc_html__( 'Date', 'wpforms' );
@@ -245,7 +245,6 @@ class WPForms_Entries_Table extends WP_List_Table {
 			'entry_id'    => [ 'id', false ],
 			'notes_count' => [ 'notes_count', false ],
 			'id'          => [ 'title', false ],
-			'status'      => [ 'status', false ],
 			'date'        => [ 'date', false ],
 		];
 
@@ -348,6 +347,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * Show `status` value.
 	 *
 	 * @since 1.5.8
+	 * @deprecated 1.8.2.1
 	 *
 	 * @param object $entry       Current entry data.
 	 * @param string $column_name Current column name.
@@ -355,6 +355,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * @return string
 	 */
 	public function column_status_field( $entry, $column_name ) {
+
+		_deprecated_function( __METHOD__, '1.8.2.1 of the WPForms plugin' );
 
 		// If the entry is a payment, show the payment status.
 		if ( $entry->type === 'payment' ) {
@@ -402,6 +404,27 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Display "Type" column.
+	 *
+	 * @since 1.8.2.1
+	 *
+	 * @param object $entry       Current entry data.
+	 * @param string $column_name Current column name.
+	 *
+	 * @return string
+	 */
+	public function column_type_field( $entry, $column_name ) {
+
+		// If the entry has a status, show it.
+		if ( ! empty( $entry->status ) && $entry->type !== 'payment' ) {
+			return ucwords( sanitize_text_field( $entry->status ) );
+		}
+
+		// Otherwise, show "Completed" as a placeholder.
+		return esc_html__( 'Completed', 'wpforms' );
 	}
 
 	/**
@@ -515,8 +538,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 				$value = wpforms_datetime_format( $entry->date, '', true );
 				break;
 
-			case 'status':
-				$value = $this->column_status_field( $entry, $column_name );
+			case 'type':
+				$value = $this->column_type_field( $entry, $column_name );
 				break;
 
 			case 'payment':

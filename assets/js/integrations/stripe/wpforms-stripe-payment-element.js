@@ -475,7 +475,8 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 
 			const $fieldRow = $form.find( '.wpforms-field-stripe-credit-card .wpforms-field-row' );
 
-			let	linkEmailMappedField = app.getMappedLinkEmailField( $form );
+			let	linkEmailMappedField = app.getMappedLinkEmailField( $form ),
+				formId = $form.data( 'formid' );
 
 			if ( ! linkEmailMappedField ) {
 
@@ -487,6 +488,8 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 			}
 
 			linkEmailMappedField.on( 'change', function() {
+
+				app.forms[ formId ].linkEmail = $( this ).val();
 
 				if ( $fieldRow.data( 'completed' ) ) {
 					return;

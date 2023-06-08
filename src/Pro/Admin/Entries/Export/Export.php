@@ -151,7 +151,7 @@ class Export {
 			'entry_id'   => esc_html__( 'Entry ID', 'wpforms' ),
 			'date'       => esc_html__( 'Entry Date', 'wpforms' ),
 			'notes'      => esc_html__( 'Entry Notes', 'wpforms' ),
-			'status'     => esc_html__( 'Entry Status', 'wpforms' ),
+			'status'     => esc_html__( 'Type', 'wpforms' ),
 			'viewed'     => esc_html__( 'Viewed', 'wpforms' ),
 			'starred'    => esc_html__( 'Starred', 'wpforms' ),
 			'user_agent' => esc_html__( 'User Agent', 'wpforms' ),

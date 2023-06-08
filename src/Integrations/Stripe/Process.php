@@ -191,7 +191,7 @@ class Process {
 
 		$charge_details = $this->api->get_charge_details( [ 'type', 'name', 'last4', 'brand', 'exp_month', 'exp_year' ] );
 
-		$payment_meta['method_type']    = sanitize_text_field( ! empty( $charge_details['type'] ) ? $charge_details['type'] : 'card' );
+		$payment_meta['method_type']    = $this->get_payment_type( $charge_details );
 		$payment_meta['customer_name']  = $this->get_customer_name();
 		$payment_meta['customer_email'] = $this->get_customer_email();
 
@@ -228,6 +228,28 @@ class Process {
 		$payment_meta['log'] = wp_json_encode( $log );
 
 		return $payment_meta;
+	}
+
+	/**
+	 * Get payment method type.
+	 *
+	 * @since 1.8.2.1
+	 *
+	 * @param array $charge_details Get details from a saved Charge object.
+	 *
+	 * @return string
+	 */
+	private function get_payment_type( $charge_details ) {
+
+		if ( empty( $charge_details['last4'] ) ) {
+			return 'link';
+		}
+
+		if ( ! empty( $charge_details['type'] ) ) {
+			return sanitize_text_field( $charge_details['type'] );
+		}
+
+		return 'card';
 	}
 
 	/**

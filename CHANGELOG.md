@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.2.1] - 2023-06-07
+### Changed
+- On the Form Entries page the "Status" column is renamed to "Type" to better reflect the actual value displayed there.
+
+### Fixed
+- On the Form Entries page the "N/A" entry status was displayed instead of the expected value "Completed".
+- On the Payments page for Stripe payments "N/A" was displayed as a payment title instead of the mapped email.
+- There were situations when PHP notices were generated on the Stripe Single Payment page.
+- Compatibility with the "AIOSEO - Local Business" plugin was improved.
+
 ## [1.8.2] - 2023-05-31
 ### Added
 - Payment fields are now available for everyone.

@@ -1193,10 +1193,10 @@ class WPForms_Entries_Single {
 					<?php endif; ?>
 
 					<?php if ( apply_filters( 'wpforms_entry_details_sidebar_details_status', false, $entry, $form_data ) ) : ?>
-						<p class="wpforms-entry-status">
+						<p class="wpforms-entry-type">
 							<span class="dashicons dashicons-category"></span>
-							<?php esc_html_e( 'Status:', 'wpforms' ); ?>
-							<strong><?php echo ! empty( $entry->status ) ? esc_html( ucwords( sanitize_text_field( $entry->status ) ) ) : esc_html__( 'Completed', 'wpforms' ); ?></strong>
+							<?php esc_html_e( 'Type:', 'wpforms' ); ?>
+							<strong><?php echo ! empty( $entry->status ) && $entry->type !== 'payment' ? esc_html( ucwords( sanitize_text_field( $entry->status ) ) ) : esc_html__( 'Completed', 'wpforms' ); ?></strong>
 						</p>
 					<?php endif; ?>
 

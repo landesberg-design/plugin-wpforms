@@ -166,12 +166,6 @@ class Frontend {
 	 */
 	public function register_block_type_args( $args, $block_type ) {
 
-		// Bail early if the form selector block is not registered.
-		// Block specific styles are enqueued only for the form selector block.
-		if ( ! wp_style_is( 'wpforms-gutenberg-form-selector' ) ) {
-			return $args;
-		}
-
 		if ( $block_type !== 'wpforms/form-selector' ) {
 			return $args;
 		}
@@ -182,7 +176,7 @@ class Frontend {
 			return $args;
 		}
 
-		wp_enqueue_style(
+		wp_register_style(
 			'wpforms-stripe',
 			$config['local_css_url'],
 			[ $args['editor_style'] ],

@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms 1.8.2\n"
+"Project-Id-Version: WPForms 1.8.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-05-30T19:36:48+00:00\n"
+"POT-Creation-Date: 2023-06-07T12:40:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: wpforms\n"
@@ -31,26 +31,26 @@ msgid "Beginner friendly WordPress contact form plugin. Use our Drag & Drop form
 msgstr ""
 
 #: pro/includes/admin/ajax-actions.php:43
-#: pro/includes/admin/entries/class-entries-list-table.php:986
+#: pro/includes/admin/entries/class-entries-list-table.php:1009
 #: pro/includes/admin/entries/class-entries-single.php:199
 msgid "Entry starred."
 msgstr ""
 
 #: pro/includes/admin/ajax-actions.php:53
-#: pro/includes/admin/entries/class-entries-list-table.php:1045
+#: pro/includes/admin/entries/class-entries-list-table.php:1068
 #: pro/includes/admin/entries/class-entries-single.php:231
 msgid "Entry unstarred."
 msgstr ""
 
 #: pro/includes/admin/ajax-actions.php:113
-#: pro/includes/admin/entries/class-entries-list-table.php:868
+#: pro/includes/admin/entries/class-entries-list-table.php:891
 #: pro/includes/admin/entries/class-entries-single.php:603
 #: src/Pro/Admin/Entries/Edit.php:468
 msgid "Entry read."
 msgstr ""
 
 #: pro/includes/admin/ajax-actions.php:123
-#: pro/includes/admin/entries/class-entries-list-table.php:927
+#: pro/includes/admin/entries/class-entries-list-table.php:950
 #: pro/includes/admin/entries/class-entries-single.php:297
 msgid "Entry unread."
 msgstr ""
@@ -186,7 +186,10 @@ msgid "Starred"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-list-table.php:222
-msgid "Status"
+#: pro/includes/fields/class-date-time.php:433
+#: src/Pro/Admin/Entries/Export/Ajax.php:793
+#: src/Pro/Admin/Entries/Export/Export.php:154
+msgid "Type"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-list-table.php:227
@@ -198,7 +201,7 @@ msgstr ""
 msgid "Change columns to display"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:301
+#: pro/includes/admin/entries/class-entries-list-table.php:300
 #: pro/includes/admin/entries/class-entries-list.php:903
 #: pro/includes/admin/entries/class-entries-list.php:930
 #: src/Pro/Admin/Entries/Export/Export.php:151
@@ -207,7 +210,7 @@ msgstr ""
 msgid "Entry ID"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:307
+#: pro/includes/admin/entries/class-entries-list-table.php:306
 #: pro/includes/admin/entries/class-entries-list.php:907
 #: pro/includes/admin/entries/class-entries-list.php:937
 #: src/Pro/Admin/Entries/Export/Export.php:153
@@ -217,8 +220,8 @@ msgstr ""
 
 #. translators: %d - field ID.
 #. translators: %d - Field ID.
-#: pro/includes/admin/entries/class-entries-list-table.php:316
-#: pro/includes/admin/entries/class-entries-list-table.php:325
+#: pro/includes/admin/entries/class-entries-list-table.php:315
+#: pro/includes/admin/entries/class-entries-list-table.php:324
 #: pro/includes/admin/entries/class-entries-list.php:914
 #: pro/includes/admin/entries/class-entries-list.php:950
 #: pro/includes/class-conditional-logic-core.php:445
@@ -230,152 +233,158 @@ msgstr ""
 msgid "Field #%d"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:372
-#: pro/includes/admin/entries/class-entries-list-table.php:1478
-#: pro/includes/admin/entries/class-entries-list-table.php:1487
+#: pro/includes/admin/entries/class-entries-list-table.php:374
+#: pro/includes/admin/entries/class-entries-list-table.php:1501
+#: pro/includes/admin/entries/class-entries-list-table.php:1510
 #: pro/includes/admin/entries/class-entries-single.php:1270
 #: src/Pro/Admin/Entries/Export/Ajax.php:659
 msgid "N/A"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:398
+#: pro/includes/admin/entries/class-entries-list-table.php:400
 msgid "Recurring"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:589
+#: pro/includes/admin/entries/class-entries-list-table.php:427
+#: pro/includes/admin/entries/class-entries-single.php:1199
+#: src/Pro/Admin/Entries/Export/Ajax.php:529
+msgid "Completed"
+msgstr ""
+
+#: pro/includes/admin/entries/class-entries-list-table.php:612
 msgid "Unstar entry"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:589
+#: pro/includes/admin/entries/class-entries-list-table.php:612
 msgid "Star entry"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:594
+#: pro/includes/admin/entries/class-entries-list-table.php:617
 msgid "Mark entry unread"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:594
+#: pro/includes/admin/entries/class-entries-list-table.php:617
 msgid "Mark entry read"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:625
+#: pro/includes/admin/entries/class-entries-list-table.php:648
 msgid "View Form Entry"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:626
+#: pro/includes/admin/entries/class-entries-list-table.php:649
 msgid "View"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:645
+#: pro/includes/admin/entries/class-entries-list-table.php:668
 msgid "Edit Form Entry"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:646
+#: pro/includes/admin/entries/class-entries-list-table.php:669
 #: pro/wpforms-pro.php:837
 #: pro/wpforms-pro.php:1135
 #: src/Pro/Admin/Entries/Edit.php:515
 msgid "Edit"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:667
+#: pro/includes/admin/entries/class-entries-list-table.php:690
 msgid "Delete Form Entry"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:668
-#: pro/includes/admin/entries/class-entries-list-table.php:720
+#: pro/includes/admin/entries/class-entries-list-table.php:691
+#: pro/includes/admin/entries/class-entries-list-table.php:743
 #: pro/wpforms-pro.php:824
 #: pro/wpforms-pro.php:1123
 msgid "Delete"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:692
+#: pro/includes/admin/entries/class-entries-list-table.php:715
 #: src/Pro/Admin/Entries/Export/Admin.php:93
 msgid "Select a date range"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:696
+#: pro/includes/admin/entries/class-entries-list-table.php:719
 msgid "Filter"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:714
+#: pro/includes/admin/entries/class-entries-list-table.php:737
 msgid "Mark Read"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:715
+#: pro/includes/admin/entries/class-entries-list-table.php:738
 #: pro/includes/admin/entries/class-entries-single.php:1400
 msgid "Mark Unread"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:716
+#: pro/includes/admin/entries/class-entries-list-table.php:739
 #: pro/includes/admin/entries/class-entries-single.php:1358
 #: pro/includes/fields/class-rating.php:248
 msgid "Star"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:717
+#: pro/includes/admin/entries/class-entries-list-table.php:740
 #: pro/includes/admin/entries/class-entries-single.php:1358
 msgid "Unstar"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:718
+#: pro/includes/admin/entries/class-entries-list-table.php:741
 #: pro/includes/admin/entries/class-entries-single.php:1378
 #: pro/templates/admin/entry-print/legend-start.php:96
 msgid "Print"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:719
+#: pro/includes/admin/entries/class-entries-list-table.php:742
 msgid "----------"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1135
+#: pro/includes/admin/entries/class-entries-list-table.php:1158
 msgid "All entries for the currently selected form were successfully deleted."
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1162
+#: pro/includes/admin/entries/class-entries-list-table.php:1185
 msgid "No entries found."
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1186
+#: pro/includes/admin/entries/class-entries-list-table.php:1209
 msgid "Field"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1248
+#: pro/includes/admin/entries/class-entries-list-table.php:1271
 #: src/Pro/Admin/Entries/Export/Admin.php:286
 msgid "Form fields"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1249
+#: pro/includes/admin/entries/class-entries-list-table.php:1272
 #: src/Pro/Admin/Entries/Export/Admin.php:287
 msgid "Any form field"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1264
+#: pro/includes/admin/entries/class-entries-list-table.php:1287
 #: src/Pro/Admin/Entries/Export/Admin.php:308
 msgid "Advanced Options"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1281
+#: pro/includes/admin/entries/class-entries-list-table.php:1304
 #: pro/includes/admin/entries/class-entries-list.php:509
 #: pro/includes/class-conditional-logic-core.php:488
 #: src/Pro/Admin/Entries/Export/Admin.php:323
 msgid "contains"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1284
+#: pro/includes/admin/entries/class-entries-list-table.php:1307
 #: pro/includes/admin/entries/class-entries-list.php:510
 #: pro/includes/class-conditional-logic-core.php:489
 #: src/Pro/Admin/Entries/Export/Admin.php:324
 msgid "does not contain"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1287
+#: pro/includes/admin/entries/class-entries-list-table.php:1310
 #: pro/includes/admin/entries/class-entries-list.php:511
 #: pro/includes/class-conditional-logic-core.php:475
 #: src/Pro/Admin/Entries/Export/Admin.php:325
 msgid "is"
 msgstr ""
 
-#: pro/includes/admin/entries/class-entries-list-table.php:1290
+#: pro/includes/admin/entries/class-entries-list-table.php:1313
 #: pro/includes/admin/entries/class-entries-list.php:512
 #: pro/includes/class-conditional-logic-core.php:476
 #: src/Pro/Admin/Entries/Export/Admin.php:326
@@ -708,12 +717,7 @@ msgid "User IP:"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-single.php:1198
-msgid "Status:"
-msgstr ""
-
-#: pro/includes/admin/entries/class-entries-single.php:1199
-#: src/Pro/Admin/Entries/Export/Ajax.php:529
-msgid "Completed"
+msgid "Type:"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-single.php:1233
@@ -1010,11 +1014,6 @@ msgstr ""
 
 #: pro/includes/fields/class-date-time.php:427
 msgid "Date Dropdown"
-msgstr ""
-
-#: pro/includes/fields/class-date-time.php:433
-#: src/Pro/Admin/Entries/Export/Ajax.php:793
-msgid "Type"
 msgstr ""
 
 #: pro/includes/fields/class-date-time.php:498
@@ -3029,10 +3028,6 @@ msgstr ""
 #: src/Pro/Admin/Entries/Export/Export.php:152
 #: src/Pro/SmartTags/SmartTags.php:27
 msgid "Entry Date"
-msgstr ""
-
-#: src/Pro/Admin/Entries/Export/Export.php:154
-msgid "Entry Status"
 msgstr ""
 
 #: src/Pro/Admin/Entries/Export/Export.php:155

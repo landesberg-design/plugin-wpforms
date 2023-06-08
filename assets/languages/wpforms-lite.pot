@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms Lite 1.8.2\n"
+"Project-Id-Version: WPForms Lite 1.8.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms-lite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-05-30T19:36:46+00:00\n"
+"POT-Creation-Date: 2023-06-07T12:40:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: wpforms-lite\n"
@@ -1857,7 +1857,7 @@ msgid "Standard and Payment Fields"
 msgstr ""
 
 #: includes/admin/class-about.php:1154
-msgid "Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, Number Slider, and Payment Fields (etc. Single Item, Total, etc.)"
+msgid "Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, Number Slider, and Payment Fields (Single Item, Total, etc.)"
 msgstr ""
 
 #: includes/admin/class-about.php:1160
@@ -8666,40 +8666,40 @@ msgstr ""
 msgid "Unable to process payment, please try again later."
 msgstr ""
 
-#: src/Integrations/Stripe/Process.php:495
+#: src/Integrations/Stripe/Process.php:517
 msgid "Stripe payment stopped, missing keys."
 msgstr ""
 
-#: src/Integrations/Stripe/Process.php:501
+#: src/Integrations/Stripe/Process.php:523
 msgid "Stripe payment stopped, missing payment fields."
 msgstr ""
 
-#: src/Integrations/Stripe/Process.php:506
+#: src/Integrations/Stripe/Process.php:528
 msgid "Stripe payment stopped, invalid/empty amount."
 msgstr ""
 
-#: src/Integrations/Stripe/Process.php:510
+#: src/Integrations/Stripe/Process.php:532
 msgid "Stripe payment stopped, amount less than minimum charge required."
 msgstr ""
 
-#: src/Integrations/Stripe/Process.php:599
+#: src/Integrations/Stripe/Process.php:621
 msgid "Stripe subscription payment stopped, missing form settings."
 msgstr ""
 
-#: src/Integrations/Stripe/Process.php:604
+#: src/Integrations/Stripe/Process.php:626
 msgid "Stripe subscription payment stopped, customer email not found."
 msgstr ""
 
 #. translators: %s - error message.
-#: src/Integrations/Stripe/Process.php:749
+#: src/Integrations/Stripe/Process.php:771
 msgid "Credit Card Payment Error: %s"
 msgstr ""
 
-#: src/Integrations/Stripe/Process.php:756
+#: src/Integrations/Stripe/Process.php:778
 msgid "Stripe subscription payment stopped by error"
 msgstr ""
 
-#: src/Integrations/Stripe/Process.php:758
+#: src/Integrations/Stripe/Process.php:780
 msgid "Stripe payment stopped by error"
 msgstr ""
 

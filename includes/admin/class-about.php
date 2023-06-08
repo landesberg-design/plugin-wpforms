@@ -1151,7 +1151,7 @@ class WPForms_About {
 					'status' => 'partial',
 					'text'   => [
 						'<strong>' . esc_html__( 'Standard and Payment Fields', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, Number Slider, and Payment Fields (etc. Single Item, Total, etc.)', 'wpforms-lite' ),
+						esc_html__( 'Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, Number Slider, and Payment Fields (Single Item, Total, etc.)', 'wpforms-lite' ),
 					],
 				],
 				'basic' => [
