@@ -1,6 +1,6 @@
 <?php
 
-namespace WPForms\Pro\Integrations\TranslationsPress;
+namespace WPForms\Pro\Integrations\Translations;
 
 use stdClass;
 use Language_Pack_Upgrader;
@@ -8,9 +8,10 @@ use Automatic_Upgrader_Skin;
 use WPForms\Integrations\IntegrationInterface;
 
 /**
- * Main TranslationsPress library.
+ * Main Translations library.
  *
  * @since 1.6.5
+ * @since 1.8.2.2 Renamed the class.
  */
 class Translations implements IntegrationInterface {
 
@@ -42,11 +43,12 @@ class Translations implements IntegrationInterface {
 	private $available_languages = [];
 
 	/**
-	 * Full TranslationsPress API URL for the plugin/addon.
+	 * Full URL for the plugin/addon handled by our redirection at WPForms.com.
 	 *
 	 * @since 1.6.5
+ 	 * @since 1.8.2.2 Updated the URL.
 	 */
-	const API_URL = 'https://packages.translationspress.com/wpforms/%s/packages.json';
+	const API_URL = 'https://translations.wpforms.com/%s/packages.json';
 
 	/**
 	 * The instance of the core class used for updating/installing language packs (translations).
@@ -355,7 +357,7 @@ class Translations implements IntegrationInterface {
 	}
 
 	/**
-	 * Register all translations from the TranslationsPress API.
+	 * Register all translations from our Translations endpoint.
 	 *
 	 * @since 1.6.5
 	 *

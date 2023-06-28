@@ -44,7 +44,7 @@ class Loader {
 			'UncannyAutomator\UncannyAutomator',
 			'UsageTracking\UsageTracking',
 			'DefaultThemes\DefaultThemes',
-			'TranslationsPress\Translations',
+			'Translations\Translations',
 			'DefaultContent\DefaultContent',
 			'PopupMaker\PopupMaker',
 		];

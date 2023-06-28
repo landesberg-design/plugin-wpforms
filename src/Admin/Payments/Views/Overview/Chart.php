@@ -214,13 +214,10 @@ class Chart {
 					'is-amount',
 				],
 			],
-			'total_coupons'            => [
+			'total_coupons'      => [
 				'label'          => esc_html__( 'Coupons', 'wpforms-lite' ),
-				'value'          => esc_html__( 'Coming Soon!', 'wpforms-lite' ),
 				'button_classes' => [
 					'total-coupons',
-					'upsell',
-					'disabled',
 				],
 			],
 		];

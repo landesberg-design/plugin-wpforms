@@ -1,6 +1,27 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.2.2] - 2023-06-28
+### Added
+- WPForms is now compatible with the WPForms Coupons addon.
+- Developers can now use a new hook that is fired when the form is duplicated.
+
+### Fixed
+- Stripe Integration: JavaScript error occurred when the user was asked to enter verification information for a payment form locked with the Form Locker addon.
+- A PHP deprecation notice was generated when enabling or disabling auto-updates of any plugin.
+- Form challenge items were not aligned correctly in various languages.
+- In Modern File Upload fields, long file names caused the upload progress bar to overlap with the file name.
+- Legacy Layout Classes didn't work when using the Modern Form Styles.
+- Custom Math Captcha was still large when the Lead Forms addon was disabled.
+- Long links on the Entry details page did not wrap and caused overflow issues.
+- Checkboxes and Multiple Choice fields with icons were cut on mobile devices.
+- Words in the Form Export dropdown on the Tools > Export admin page were split by letters.
+- Links were stripped in choices labels.
+- Block Editor kept showing the unsaved changes dialog even though there weren't any changes.
+- `wpforms_sanitize_amount()` function did not work properly with exponent numbers.
+- Compatibility with the Popup Maker plugin was improved - Stripe Credit Card field didn't load when a payment form was inserted into a popup.
+- There was no empty state when no forms created for the WPForms widget in the Elementor screen.
+
 ## [1.8.2.1] - 2023-06-07
 ### Changed
 - On the Form Entries page the "Status" column is renamed to "Type" to better reflect the actual value displayed there.

@@ -109,6 +109,8 @@ let WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( docu
 		 */
 		classNames: {
 			hide: 'wpforms-hide',
+			ready: 'is-ready',
+			fetching: 'doing-ajax',
 			selected: 'is-selected',
 			calculated: 'is-calculated',
 		},
@@ -223,6 +225,24 @@ let WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( docu
 		},
 
 		/**
+		 * Retrieves the previewed dataset label.
+		 *
+		 * @since 1.8.2.2
+		 *
+		 * @returns {string} The dataset tooltip label.
+		 */
+		get datasetLabel() {
+
+			const $statcard = $( `[data-stats=${this.report}]` );
+
+			if ( ! $statcard.length ) {
+				return this.i18n?.label;
+			}
+
+			return $statcard.find( '.statcard-label' ).text();
+		},
+
+		/**
 		 * Chart.js settings.
 		 *
 		 * @since 1.8.2
@@ -239,7 +259,7 @@ let WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( docu
 					datasets: [
 						{
 							data: [],
-							label: this.i18n?.label || '',
+							label: '',
 							borderWidth: 2,
 							pointRadius: 4,
 							pointBorderWidth: 1,
@@ -340,7 +360,7 @@ let WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( docu
 						callbacks: {
 							label: ( { yLabel: value } ) => {
 
-								let label = `${this.i18n?.label} `;
+								let label = `${this.datasetLabel} `;
 
 								// Update the scales if the dataset returned includes price amounts.
 								if ( this.isAmount ) {
@@ -745,6 +765,14 @@ let WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( docu
 				return { labels, datasets };
 			}
 
+			const { i18n: { no_dataset: placeholderText } } = vars;
+
+			// If there is a placeholder text for the current report, use it.
+			if ( placeholderText?.[vars.report] ) {
+				el.$notice.find( 'h2' ).text( placeholderText[vars.report] );
+			}
+
+
 			el.$notice.removeClass( vars.classNames.hide );
 
 			let date;
@@ -801,6 +829,10 @@ let WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( docu
 				return;
 			}
 
+			// Add a class name indicating that the chart is fetching data.
+			// This is mainly to avoid fast clicking on the stat cards to avoid multiple Ajax requests.
+			el.$reports.addClass( vars.classNames.fetching );
+
 			$.post(
 				ajaxurl,
 				$.extend(
@@ -823,7 +855,8 @@ let WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( docu
 			).done(
 				function() {
 
-					el.$reports.addClass( 'is-ready' );
+					el.$reports.addClass( vars.classNames.ready );
+					el.$reports.removeClass( vars.classNames.fetching );
 				}
 			);
 		},

@@ -234,7 +234,7 @@ class Settings {
 			'toggle',
 			'stripe',
 			'conditional_logic',
-			$this->form_data,
+			$this->maybe_reset_conditional_logic( $this->form_data ),
 			esc_html__( 'Enable Conditional Logic', 'wpforms-lite' ),
 			[
 				'input_class' => 'education-modal',
@@ -297,5 +297,37 @@ class Settings {
 			'utm-content' => 'Builder Stripe Conditional Logic',
 			'licence'     => 'pro',
 		];
+	}
+
+	/**
+	 * Maybe reset conditional logic.
+	 *
+	 * If Stripe Pro is disabled, reset conditional logic for Stripe settings.
+	 *
+	 * @since 1.8.2.2
+	 *
+	 * @param array $form_data Form data.
+	 *
+	 * @return array
+	 */
+	private function maybe_reset_conditional_logic( $form_data ) {
+
+		if ( Helpers::is_pro() ) {
+			return $form_data;
+		}
+
+		if (
+			! isset( $form_data['payments']['stripe']['conditional_logic'] ) &&
+			! isset( $form_data['payments']['stripe']['recurring']['conditional_logic'] )
+		) {
+			return $form_data;
+		}
+
+		unset(
+			$form_data['payments']['stripe']['conditional_logic'],
+			$form_data['payments']['stripe']['recurring']['conditional_logic']
+		);
+
+		return $form_data;
 	}
 }

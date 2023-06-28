@@ -56,4 +56,32 @@ class Helpers {
 
 		return $text;
 	}
+
+	/**
+	 * Get the default heading for the Payments pages.
+	 *
+	 * @since 1.8.2.2
+	 *
+	 * @param string $help_link Help link.
+	 */
+	public static function get_default_heading( $help_link = '' ) {
+
+		if ( ! $help_link ) {
+			$help_link = 'https://wpforms.com/docs/viewing-and-managing-payments/';
+		}
+
+		echo '<span class="wpforms-payments-overview-help">';
+		printf(
+			'<a href="%s" target="_blank"><i class="fa fa-question-circle-o"></i>%s</a>',
+			esc_url(
+				wpforms_utm_link(
+					$help_link,
+					'Payments Dashboard',
+					'Manage Payments Documentation'
+				)
+			),
+			esc_html__( 'Help', 'wpforms-lite' )
+		);
+		echo '</span>';
+	}
 }

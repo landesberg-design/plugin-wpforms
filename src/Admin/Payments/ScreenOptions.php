@@ -66,8 +66,12 @@ class ScreenOptions {
 
 		$screen = get_current_screen();
 
+		if ( ! isset( $screen->id ) || $screen->id !== self::SCREEN_ID ) {
+			return;
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! isset( $screen->id ) || $screen->id !== self::SCREEN_ID || ! empty( $_GET['view'] ) ) {
+		if ( ! empty( $_GET['view'] ) && $_GET['view'] !== 'overview' ) {
 			return;
 		}
 

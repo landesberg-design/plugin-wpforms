@@ -109,9 +109,12 @@ WPForms.FormSelector = WPForms.FormSelector || ( function( document, window, $ )
 					const handlers = app.getSettingsFieldsHandlers( props );
 
 					// Store block clientId in attributes.
-					props.setAttributes( {
-						clientId: props.clientId,
-					} );
+					if ( ! attributes.clientId ) {
+
+						// We just want client ID to update once.
+						// The block editor doesn't have a fixed block ID, so we need to get it on the initial load, but only once.
+						props.setAttributes( { clientId: props.clientId } );
+					}
 
 					// Main block settings.
 					let jsx = [

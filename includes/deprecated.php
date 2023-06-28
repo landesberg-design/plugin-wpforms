@@ -240,6 +240,15 @@ namespace {
 		 * @since 1.7.5
 		 */
 		class_alias( '\WPForms\Pro\Migrations\Migrations', '\WPForms\Pro\Migrations' );
+
+		/**
+		 * Legacy `\WPForms\Pro\Integrations\TranslationsPress\Translations` class was refactored and moved to the new
+		 * `\WPForms\Pro\Integrations\Translations\Translations` class.
+		 * This alias is a safeguard to those developers who use our internal class \WPForms\Pro\Integrations\TranslationsPress, which we deleted.
+		 *
+		 * @since 1.8.2.2
+		 */
+		class_alias( '\WPForms\Pro\Integrations\Translations\Translations', '\WPForms\Pro\Integrations\TranslationsPress\Translations' );
 	}
 
 	/**

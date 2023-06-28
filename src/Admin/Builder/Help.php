@@ -208,6 +208,7 @@ class Help {
 			'fields/field_options/square'             => 'square credit card',
 			'fields/field_options/signature'          => 'signature',
 			'fields/field_options/net_promoter_score' => 'net promoter score',
+			'fields/field_options/payment-coupon'     => 'coupon',
 			'settings/general'                        => 'settings',
 			'settings/anti_spam'                      => 'spam',
 			'settings/notifications'                  => 'notification emails',
@@ -796,6 +797,12 @@ class Help {
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
+			],
+			'coupon'                    => [
+				'/docs/coupons-addon/',
+			],
+			'discount'                  => [
+				'/docs/coupons-addon/',
 			],
 			'payment'                   => [
 				'/docs/viewing-and-managing-payments/',

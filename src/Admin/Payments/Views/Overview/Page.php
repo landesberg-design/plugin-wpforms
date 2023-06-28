@@ -63,6 +63,18 @@ class Page implements PaymentsViewsInterface {
 	}
 
 	/**
+	 * Get the tab label.
+	 *
+	 * @since 1.8.2.2
+	 *
+	 * @return string
+	 */
+	public function get_tab_label() {
+
+		return __( 'Overview', 'wpforms-lite' );
+	}
+
+	/**
 	 * Enqueue scripts and styles.
 	 *
 	 * @since 1.8.2
@@ -110,7 +122,13 @@ class Page implements PaymentsViewsInterface {
 			'report'    => Chart::ACTIVE_REPORT,
 			'currency'  => sanitize_text_field( wpforms_get_currency() ),
 			'i18n'      => [
-				'label' => esc_html__( 'Payments', 'wpforms-lite' ),
+				'label'      => esc_html__( 'Payments', 'wpforms-lite' ),
+				'no_dataset' => [
+					'total_payments'     => esc_html__( 'No payments for selected period', 'wpforms-lite' ),
+					'total_sales'        => esc_html__( 'No sales for selected period', 'wpforms-lite' ),
+					'total_subscription' => esc_html__( 'No new subscriptions or renewals for selected period', 'wpforms-lite' ),
+					'total_coupons'      => esc_html__( 'No coupons applied during the selected period', 'wpforms-lite' ),
+				],
 			],
 			'page_uri'  => $this->get_current_uri(),
 		];
@@ -158,19 +176,7 @@ class Page implements PaymentsViewsInterface {
 	 */
 	public function heading() {
 
-		echo '<span class="wpforms-payments-overview-help">';
-			printf(
-				'<a href="%s" target="_blank"><i class="fa fa-question-circle-o"></i>%s</a>',
-				esc_url(
-					wpforms_utm_link(
-						'https://wpforms.com/docs/viewing-and-managing-payments/',
-						'Payments Dashboard',
-						'Manage Payments Documentation'
-					)
-				),
-				esc_html__( 'Help', 'wpforms-lite' )
-			);
-		echo '</span>';
+		Helpers::get_default_heading();
 	}
 
 	/**

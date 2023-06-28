@@ -215,6 +215,15 @@ class Fields {
 				'addon'   => 'wpforms-authorize-net',
 				'order'   => '95',
 			],
+			[
+				'icon'    => 'fa-ticket',
+				'name'    => esc_html__( 'Coupon', 'wpforms-lite' ),
+				'name_en' => 'Coupon',
+				'type'    => 'payment-coupon',
+				'group'   => 'payment',
+				'addon'   => 'wpforms-coupons',
+				'order'   => '100',
+			],
 		];
 
 		$captcha = $this->get_captcha();

@@ -72,7 +72,6 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 
 			$( document )
 				.on( 'wpformsBeforePageChange', app.pageChange )
-				.on( 'wpformsPageChange', app.pageChangeAfter )
 				.on( 'wpformsAmountTotalCalculated', app.updateElementsTotalAmount )
 				.on( 'wpformsProcessConditionalsField', function( e, formID, fieldID, pass, action ) {
 					app.processConditionalsField( formID, fieldID, pass, action );
@@ -218,14 +217,11 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 
 			let	formId = $form.data( 'formid' );
 
-			if ( app.forms[ formId ].paymentElement ) {
-				return;
+			if ( $.isEmptyObject( app.forms ) ) {
+				app.initializeFormsDefaultObject();
 			}
 
-			const $stripeDiv = $form.find( '.wpforms-field-stripe-credit-card' );
-
-			// Don't setup Payment Element if it's not visible.
-			if ( ! $stripeDiv.is( ':visible' ) ) {
+			if ( app.forms[ formId ].paymentElement ) {
 				return;
 			}
 
@@ -635,21 +631,21 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 		 */
 		updateElementsTotalAmount: function( e, $form, total ) {
 
+			if ( ! total ) {
+				return;
+			}
+
 			let currency = wpforms.getCurrency(),
 				formId = $form.data( 'formid' );
 
-			if ( ! total || ! app.forms[ formId ].elements ) {
+			// Check if Stripe Elements exist on the form.
+			// Can be in a multiple-step form or when the field is hidden by conditional logic.
+			if ( ! app.forms[ formId ] || ! app.forms[ formId ].elements ) {
 				return;
 			}
 
 			// Save total to variable to avoid calling `amountTotalCalc` again in SubmitHandler.
 			app.forms[ formId ].total = total;
-
-			// Check if Stripe Elements exist on the form.
-			// Can be in a multiple-step form or when the field is hidden by conditional logic.
-			if ( ! app.forms[ formId ].elements ) {
-				return;
-			}
 
 			app.forms[ formId ].elements.update( { amount: parseInt( wpforms.numberFormat( total, currency.decimals, '', '' ), 10 ) } );
 		},
@@ -833,39 +829,6 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 
 			app.displayStripeFieldError( $form, wpforms_stripe.i18n.empty_details );
 			event.preventDefault();
-		},
-
-		/**
-		 * Callback for `wpformsPageChange`.
-		 *
-		 * @since 1.8.2
-		 *
-		 * @param {Event}  event       Event.
-		 * @param {int}    currentPage Current page.
-		 * @param {jQuery} $form       Current form.
-		 * @param {string} action      The navigation action.
-		 */
-		pageChangeAfter: function( event, currentPage, $form, action ) {
-
-			const formId = $form.data( 'formid' );
-			const $stripeDiv = $form.find( '.wpforms-field-stripe-credit-card .wpforms-field-row' );
-
-			if ( ! $stripeDiv.length ) {
-				return;
-			}
-
-			// Setup Payment Element only after page change.
-			// It's needed to correctly initialize the element styles.
-			if ( ! app.forms[ formId ].paymentType ) {
-				app.setupPaymentElement( $form );
-			}
-
-			let	linkElementEmailField = app.getMappedLinkEmailField( $form );
-
-			// Trigger a change action for linked email field to force link element to load.
-			if ( linkElementEmailField ) {
-				linkElementEmailField.trigger( 'change' );
-			}
 		},
 
 		/**

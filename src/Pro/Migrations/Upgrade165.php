@@ -3,7 +3,7 @@
 namespace WPForms\Pro\Migrations;
 
 use WPForms\Migrations\UpgradeBase;
-use WPForms\Pro\Integrations\TranslationsPress\Translations;
+use WPForms\Pro\Integrations\Translations\Translations;
 
 /**
  * Class v1.6.5 upgrade for Pro.
@@ -30,10 +30,10 @@ class Upgrade165 extends UpgradeBase {
 			return false;
 		}
 
-		$t15s = new Translations();
+		$t10s = new Translations();
 
-		if ( $t15s->allow_load() ) {
-			$t15s->download_plugins_translations();
+		if ( $t10s->allow_load() ) {
+			$t10s->download_plugins_translations();
 		}
 
 		return true;

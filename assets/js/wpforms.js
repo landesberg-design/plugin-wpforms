@@ -1886,7 +1886,29 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				}
 			} );
 
-			$( document ).trigger( 'wpformsAmountTotalCalculated', [ $form, total ] );
+			const $document = $( document );
+
+			/**
+			 * Trigger whe the total amount has been calculated.
+			 *
+			 * Allow addons to modify the total amount.
+			 *
+			 * @since 1.8.2.2
+			 *
+			 * @param {object} data Form element and total.
+			 */
+			const event = WPFormsUtils.triggerEvent( $document, 'wpformsAmountTotalCalculate', [ $form, total ] );
+
+			total = event.result !== undefined && event.result >= 0 ? event.result : total;
+
+			/**
+			 * Trigger on the end of the process of calculating the total amount.
+			 *
+			 * @since 1.8.0.2
+			 *
+			 * @param {object} data Form element and total.
+			 */
+			WPFormsUtils.triggerEvent( $document, 'wpformsAmountTotalCalculated', [ $form, total ] );
 
 			return total;
 		},

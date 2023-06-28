@@ -33,4 +33,11 @@ interface PaymentsViewsInterface {
 	 * @since 1.8.2
 	 */
 	public function display();
+
+	/**
+	 * Get the Tab label.
+	 *
+	 * @since 1.8.2.2
+	 */
+	public function get_tab_label();
 }

@@ -2936,6 +2936,7 @@ abstract class WPForms_Field {
 			'b',
 			'em',
 			'i',
+			'a',
 		];
 
 		/**

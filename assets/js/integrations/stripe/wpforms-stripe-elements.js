@@ -42,7 +42,9 @@ var WPFormsStripeElements = window.WPFormsStripeElements || ( function( document
 			);
 
 			$( document ).on( 'wpformsReady', function() {
-				$( '.wpforms-stripe form' ).each( app.setupStripeForm );
+				$( '.wpforms-stripe form' )
+					.filter( ( _, form ) => typeof $( form ).data( 'formid' ) === 'number' ) // filter out forms which are locked (formid changed to 'locked-...').
+					.each( app.setupStripeForm );
 			} );
 
 			$( document ).on( 'wpformsBeforePageChange', app.pageChange );

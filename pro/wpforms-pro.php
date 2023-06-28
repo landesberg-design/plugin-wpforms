@@ -1643,7 +1643,7 @@ class WPForms_Pro {
 			return $plugins;
 		}
 
-		$addons_data = $license->addons();
+		$addons_data = $license->get_addons();
 
 		if ( empty( $addons_data ) ) {
 			return $plugins;

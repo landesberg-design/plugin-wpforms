@@ -783,6 +783,17 @@ class WPForms_Form_Handler {
 					self::TAGS_TAXONOMY
 				);
 			}
+
+			/**
+			 * Fires after the form was duplicated.
+			 *
+			 * @since 1.8.2.2
+			 *
+			 * @param int   $id            Original form ID.
+			 * @param int   $new_form_id   New form ID.
+			 * @param array $new_form_data New form data.
+			 */
+			do_action( 'wpforms_form_handler_duplicate_form', $id, $new_form_id, $new_form_data );
 		}
 
 		return true;

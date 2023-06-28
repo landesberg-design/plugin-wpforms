@@ -282,6 +282,25 @@ class Process {
 		$payment->metadata['payment_id']  = $payment_id;
 		$payment->metadata['payment_url'] = esc_url_raw( $payment_url );
 
+		/**
+		 * Allow to add additional payment metadata to the Stripe payment.
+		 *
+		 * @since 1.8.2.2
+		 *
+		 * @param array $additional_meta Additional metadata.
+		 * @param int   $payment_id      Payment ID.
+		 * @param array $fields          Final/sanitized submitted field data.
+		 * @param array $form_data       Form data and settings.
+		 */
+		$additional_meta = (array) apply_filters( 'wpforms_integrations_stripe_process_additional_metadata', [], $payment_id, $fields, $form_data );
+
+		array_walk(
+			$additional_meta,
+			static function( $meta, $key ) use ( &$payment ) {
+				$payment->metadata[ $key ] = $meta;
+			}
+		);
+
 		$payment->save();
 
 		$subscription = $this->api->get_subscription();
@@ -665,7 +684,7 @@ class Process {
 
 		foreach ( $this->fields as $field_id => $field ) {
 
-			if ( $this->api->get_config( 'field_slug' ) !== $field['type'] ) {
+			if ( empty( $field['type'] ) || $this->api->get_config( 'field_slug' ) !== $field['type'] ) {
 				continue;
 			}
 

@@ -150,7 +150,7 @@ class Ajax {
 		}
 
 		// WHERE clauses for items query statement.
-		$where_clause = $this->get_stats_where_clause( $where_args );
+		$where_clause = $this->get_stats_where_clause( $report, $where_args );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return $wpdb->get_results(
@@ -249,9 +249,6 @@ class Ajax {
 
 		list( $prev_start_date, $prev_end_date ) = $prev_timespans;
 
-		// WHERE clauses for items query statement.
-		$where_clause = $this->get_stats_where_clause();
-
 		// Get the default number of decimals for the payment currency.
 		$current_currency  = wpforms_get_currency();
 		$currency_decimals = wpforms_get_currency_decimals( $current_currency );
@@ -270,14 +267,20 @@ class Ajax {
 			// Determine whether the number of rows has to be counted.
 			$has_count = isset( $attributes['has_count'] ) && $attributes['has_count'];
 
+			// Additional (optional) where clause query arguments.
+			$where_args = [];
+
 			// SELECT clause to construct the SQL statement.
 			$column_clause = $this->get_stats_column_clause( $report, $has_count );
 
 			// Update WHERE clauses for specific items in the query statement.
 			if ( isset( $attributes['type'] ) ) {
 				// If the report is a subscription report, use the subscription WHERE clause.
-				$where_clause = $this->get_stats_where_clause( [ 'type' => $attributes['type'] ] );
+				$where_args['type'] = $attributes['type'];
 			}
+
+			// WHERE clauses for items query statement.
+			$where_clause = $this->get_stats_where_clause( $report, $where_args );
 
 			// Get the current and previous values for the report.
 			$current_value = "TRUNCATE({$report},{$currency_decimals})";
@@ -322,11 +325,12 @@ class Ajax {
 	 *
 	 * @since 1.8.2
 	 *
-	 * @param array $args Array of arguments to filter the query.
+	 * @param string $report Payment summary stat card name. i.e. "total_payments".
+	 * @param array  $args   Array of arguments to filter the query.
 	 *
 	 * @return string
 	 */
-	private function get_stats_where_clause( $args = [] ) {
+	private function get_stats_where_clause( $report, $args = [] ) {
 
 		// Get the database instance.
 		global $wpdb;
@@ -337,6 +341,14 @@ class Ajax {
 		// If it's a valid type, add it to a WHERE clause.
 		if ( isset( $args['type'] ) && ValueValidator::is_valid( $args['type'], 'type' ) ) {
 			$clause .= $wpdb->prepare( ' AND type = %s', $args['type'] );
+		}
+
+		// If the coupon stats are being viewed, then add it to a WHERE clause.
+		if ( $report === 'total_coupons' ) {
+			$table_name = wpforms()->get( 'payment_meta' )->table_name;
+
+			// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
+			$clause .= $wpdb->prepare( ' AND id IN (SELECT payment_id FROM %1$s WHERE meta_key = "coupon_id")', $table_name );
 		}
 
 		return $clause;
@@ -371,6 +383,7 @@ class Ajax {
 				'total_payments'     => "FORMAT({$default},0)",
 				'total_sales'        => 'IFNULL(SUM(total_amount),0)',
 				'total_subscription' => 'IFNULL(SUM(total_amount),0)',
+				'total_coupons'      => "FORMAT({$default},0)",
 			]
 		);
 
