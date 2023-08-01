@@ -609,11 +609,14 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						isDynamicChoices = app.dropdownField.helpers.isDynamicChoices( fieldId ),
 						instance         = app.dropdownField.helpers.getInstance( $primary );
 
-					// Destroy the instance of Choices.js.
-					instance.destroy();
+					if ( instance && typeof instance.destroy === 'function' ) {
 
-					// Update a placeholder.
-					app.dropdownField.helpers.updatePlaceholderChoice( instance, fieldId );
+						// Destroy the instance of Choices.js.
+						instance.destroy();
+
+						// Update a placeholder.
+						app.dropdownField.helpers.updatePlaceholderChoice( instance, fieldId );
+					}
 
 					// Update choices.
 					if ( ! isDynamicChoices ) {
@@ -675,7 +678,10 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 						// If we had a `Modern` select before, then we need to make re-init - destroy() + init().
 						app.dropdownField.helpers.convertModernToClassic( fieldId );
-						app.dropdownField.events.choicesInit( $primary );
+
+						if ( ! isDynamicChoices ) {
+							app.dropdownField.events.choicesInit( $primary );
+						}
 
 					} else {
 
@@ -3678,25 +3684,37 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			newFieldOptions = newFieldOptions.replace( regex.referenceID, `data-reference="${newFieldID}"` );
 			newFieldOptions = newFieldOptions.replace( regex.elementID, regex.elementIdReplace );
 
-			// Add new field options panel.
+			// Hide all field options panels.
 			$visibleOptions.hide();
+
+			// Add new field options panel.
 			$fieldOptions.after( `<div class="${fieldOptionsClass}" id="wpforms-field-option-${newFieldID}" data-field-id="${newFieldID}">${newFieldOptions}</div>` );
 
+			// Get new field options panel.
 			const $newFieldOptions = $( `#wpforms-field-option-${newFieldID}` );
 
-			// Maintain the state of the currently active options tab when applicable during duplication.
-			if ( $visibleTab.length ) {
+			// If the user duplicates an active field.
+			if ( $fieldActive.data( 'field-id' ) === id && $visibleTab.length ) {
 
 				// The following will help identify which tab from the sidebar panel settings is currently being viewed. i.e., "General," "Advanced," "Smart Logic," etc.
 				const visibleTabClassName = $visibleTab.attr( 'class' ).match( /wpforms-field-option-group-\S*/i )[0];
 				const $newFieldOptionsTab = $newFieldOptions.find( `>.${visibleTabClassName}` );
 
-				if ( $newFieldOptionsTab.length ) {
+				// Remove any left-over state from previously duplicated options.
+				$newFieldOptions.find( '>' ).removeClass( 'active' );
 
-					// Remove any left-over state from previously duplicated options.
-					$newFieldOptions.find( '>' ).removeClass( 'active' );
-					$newFieldOptionsTab.addClass( 'active' );
-				}
+				// Set active tab to the same tab that was active before the duplication.
+				$newFieldOptionsTab.addClass( 'active' );
+			}
+
+			// If the user duplicates an inactive field.
+			if ( $fieldActive.data( 'field-id' ) !== id && $visibleTab.length ) {
+
+				// Remove active class from current active tab.
+				$newFieldOptions.find( '>' ).removeClass( 'active' );
+
+				// Set active tab to "General".
+				$newFieldOptions.find( '>.wpforms-field-option-group-basic' ).addClass( 'active' );
 			}
 
 			// Copy over values.
@@ -3740,14 +3758,15 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				const value = $this.val();
 
-				if ( value !== '' ) {
-					$newFieldOptions.find( `[name="${newName}"]` ).val( value );
-				}
-
 				if ( value === '' && $this.hasClass( 'wpforms-money-input' ) ) {
 					$newFieldOptions.find( `[name="${newName}"]` ).val(
 						wpf.numberFormat( '0', wpforms_builder.currency_decimals, wpforms_builder.currency_decimal, wpforms_builder.currency_thousands )
 					);
+				} else {
+
+					// We've removed the empty value check here.
+					// If we are duplicating a field with no value, we should respect that.
+					$newFieldOptions.find( `[name="${newName}"]` ).val( value );
 				}
 			} );
 
@@ -4645,7 +4664,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						case 'select':
 
 							if ( ! isModernSelect ) {
-								$choice.prop( 'selected', 'true' );
+								app.setClassicSelectedChoice( $choice );
 							} else {
 								modernSelectChoices[ modernSelectChoices.length - 1 ].selected = true;
 							}
@@ -4659,12 +4678,14 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			} );
 
 			if ( isModernSelect ) {
-				const placeholderClass = $primary.prop( 'multiple' ) ? 'input.choices__input' : '.choices__inner .choices__placeholder',
-					choicesInstance    = app.dropdownField.helpers.getInstance( $primary ),
-					isDynamicChoices   = $( '#wpforms-field-option-' + id + '-dynamic_choices' ).val();
+				const placeholderClass  = $primary.prop( 'multiple' ) ? 'input.choices__input' : '.choices__inner .choices__placeholder',
+					choicesjsInstance   = app.dropdownField.helpers.getInstance( $primary );
 
-				choicesInstance.removeActiveItems();
-				choicesInstance.setChoices( modernSelectChoices, 'value', 'label', true );
+				if ( ! isDynamicChoices ) {
+					choicesjsInstance.removeActiveItems();
+				}
+
+				choicesjsInstance.setChoices( modernSelectChoices, 'value', 'label', true );
 
 				// Re-initialize modern dropdown to properly determine and update placeholder.
 				app.dropdownField.helpers.update( id, isDynamicChoices );
@@ -4678,9 +4699,27 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		},
 
 		/**
+		 * Set classic selected choice.
+		 *
+		 * @since 1.8.2.3
+		 *
+		 * @param {jQuery|undefined} $choice Choice option.
+		 */
+		setClassicSelectedChoice: function( $choice ) {
+
+			if ( $choice === undefined ) {
+				return;
+			}
+
+			$choice.prop( 'selected', 'true' );
+		},
+
+		/**
 		 * Field choice bulk add toggling.
 		 *
 		 * @since 1.3.7
+		 *
+		 * @param {object} el jQuery object.
 		 */
 		fieldChoiceBulkAddToggle: function( el ) {
 
@@ -7173,6 +7212,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			// Validate From Email in Notification settings.
 			$builder.on( 'focusout', '.wpforms-notification .wpforms-panel-field.js-wpforms-from-email-validation input', app.validateFromEmail );
+			$builder.on( 'wpformsPanelSectionSwitch', app.notificationsPanelSectionSwitch );
 
 			// Mobile notice primary button / close icon click.
 			$builder.on( 'click', '#wpforms-builder-mobile-notice .wpforms-fullscreen-notice-button-primary, #wpforms-builder-mobile-notice .close', function() {
@@ -7222,6 +7262,23 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					} );
 				}
 			} );
+		},
+
+		/**
+		 * Notification section switch event handler.
+		 *
+		 * @since 1.8.2.3
+		 *
+		 * @param {object} e Event object.
+		 * @param {string} panel Panel name.
+		 */
+		notificationsPanelSectionSwitch: function( e, panel ) {
+
+			if ( panel !== 'notifications' ) {
+				return;
+			}
+
+			$( '.wpforms-notification .wpforms-panel-field.js-wpforms-from-email-validation input' ).trigger( 'focusout' );
 		},
 
 		/**

@@ -125,15 +125,6 @@ class Notifications implements IntegrationInterface {
 
 		$args = wp_parse_args( $args, $default );
 
-		$email = empty( $form_data['settings']['notifications'][ $id ]['sender_address'] ) ? '{admin_email}' : $form_data['settings']['notifications'][ $id ]['sender_address'];
-
-		if ( $this->email_domain_matches_site_domain( $email ) || $this->has_active_smtp_plugin() ) {
-			return $args;
-		}
-
-		$args['after']  = $this->get_warning_message();
-		$args['class'] .= ' wpforms-panel-field-warning';
-
 		return $args;
 	}
 

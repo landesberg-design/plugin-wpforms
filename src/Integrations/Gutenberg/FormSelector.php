@@ -36,7 +36,7 @@ class FormSelector implements IntegrationInterface {
 		'buttonBorderRadius'    => CSSVars::ROOT_VARS['button-border-radius'],
 		'buttonBackgroundColor' => CSSVars::ROOT_VARS['button-background-color'],
 		'buttonTextColor'       => CSSVars::ROOT_VARS['button-text-color'],
-		'copyPasteValue'        => '',
+		'copyPasteJsonValue'    => '',
 	];
 
 	/**
@@ -199,7 +199,7 @@ class FormSelector implements IntegrationInterface {
 			'buttonTextColor'       => [
 				'type' => 'string',
 			],
-			'copyPasteValue'        => [
+			'copyPasteJsonValue'        => [
 				'type' => 'string',
 			],
 		];

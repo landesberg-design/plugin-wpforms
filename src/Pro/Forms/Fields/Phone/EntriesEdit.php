@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Forms\Fields\Phone;
 
+use WPForms_Field_Phone;
+
 /**
  * Editing Address field entries.
  *
@@ -33,7 +35,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 			'wpforms-smart-phone-field',
 			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/phone/intl-tel-input{$min}.css",
 			[],
-			'17.0.17'
+			WPForms_Field_Phone::INTL_VERSION
 		);
 
 		// Load International Telephone Input library - https://github.com/jackocnr/intl-tel-input.
@@ -41,7 +43,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 			'wpforms-smart-phone-field',
 			WPFORMS_PLUGIN_URL . 'assets/pro/lib/intl-tel-input/jquery.intl-tel-input.min.js',
 			[ 'jquery' ],
-			'17.0.17',
+			WPForms_Field_Phone::INTL_VERSION,
 			true
 		);
 

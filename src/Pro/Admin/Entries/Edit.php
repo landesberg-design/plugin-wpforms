@@ -1442,7 +1442,7 @@ class Edit {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		$entries = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT `entry_id` FROM {$table_name} WHERE `fields` LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT `entry_id` FROM $table_name WHERE `fields` LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				'%"attachment_id":' . $wpdb->esc_like( $attachment_id ) . ',%'
 			),
 			ARRAY_N

@@ -43,17 +43,17 @@ class Field extends \WPForms_Field {
 		$this->defaults = [
 			1 => [
 				'label'   => esc_html__( 'First Item', 'wpforms-lite' ),
-				'value'   => wpforms_format_amount( '10.00' ),
+				'value'   => '10',
 				'default' => '',
 			],
 			2 => [
 				'label'   => esc_html__( 'Second Item', 'wpforms-lite' ),
-				'value'   => wpforms_format_amount( '25.00' ),
+				'value'   => '25',
 				'default' => '',
 			],
 			3 => [
 				'label'   => esc_html__( 'Third Item', 'wpforms-lite' ),
-				'value'   => wpforms_format_amount( '50.00' ),
+				'value'   => '50',
 				'default' => '',
 			],
 		];

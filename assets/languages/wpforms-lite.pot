@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms Lite 1.8.2.2\n"
+"Project-Id-Version: WPForms Lite 1.8.2.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms-lite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-06-28T11:04:19+00:00\n"
+"POT-Creation-Date: 2023-07-18T14:32:28+03:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.6.0\n"
+"X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wpforms-lite\n"
 
 #. Plugin Name of the plugin
@@ -65,19 +65,19 @@ msgstr ""
 
 #: includes/admin/admin.php:153
 #: includes/admin/admin.php:206
-#: includes/admin/class-about.php:411
+#: includes/admin/class-about.php:405
 #: includes/functions/education.php:30
 #: templates/education/admin/settings/geolocation/submit.php:24
 msgid "Activate"
 msgstr ""
 
 #: includes/admin/admin.php:154
-#: includes/admin/class-about.php:403
+#: includes/admin/class-about.php:397
 msgid "Activated"
 msgstr ""
 
 #: includes/admin/admin.php:155
-#: includes/admin/class-about.php:400
+#: includes/admin/class-about.php:394
 #: src/Db/Payments/ValueValidator.php:109
 msgid "Active"
 msgstr ""
@@ -87,7 +87,7 @@ msgid "Deactivate"
 msgstr ""
 
 #: includes/admin/admin.php:157
-#: includes/admin/class-about.php:408
+#: includes/admin/class-about.php:402
 msgid "Inactive"
 msgstr ""
 
@@ -97,7 +97,7 @@ msgstr ""
 
 #. translators: %1$s - An addon download URL, %2$s - Link to manual installation guide.
 #: includes/admin/admin.php:161
-#: includes/admin/ajax-actions.php:638
+#: includes/admin/ajax-actions.php:687
 msgid "Could not install the addon. Please <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">download it from wpforms.com</a> and <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">install it manually</a>."
 msgstr ""
 
@@ -199,7 +199,7 @@ msgstr ""
 #: src/Admin/Education/Builder/Captcha.php:161
 #: src/Admin/Tools/Views/Importer.php:223
 #: src/Integrations/Gutenberg/FormSelector.php:328
-#: wpforms.php:152
+#: wpforms.php:155
 msgid "Heads up!"
 msgstr ""
 
@@ -352,7 +352,7 @@ msgid "After purchasing a license, just <strong>enter your license key on the WP
 msgstr ""
 
 #: includes/admin/ajax-actions.php:17
-#: includes/admin/ajax-actions.php:760
+#: includes/admin/ajax-actions.php:809
 #: includes/fields/class-base.php:2487
 #: src/Admin/FormEmbedWizard.php:412
 msgid "Your session expired. Please reload the builder."
@@ -378,7 +378,7 @@ msgid "No form name provided."
 msgstr ""
 
 #: includes/admin/ajax-actions.php:150
-#: includes/admin/ajax-actions.php:252
+#: includes/admin/ajax-actions.php:254
 msgid "The template you selected is currently not available, but you can try again later. If you continue to have trouble, please reach out to support."
 msgstr ""
 
@@ -390,96 +390,96 @@ msgstr ""
 msgid "No form ID provided."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:294
+#: includes/admin/ajax-actions.php:343
 msgid "Error updating form template."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:411
+#: includes/admin/ajax-actions.php:460
 #: includes/fields/class-base.php:1243
 msgid "post type"
 msgstr ""
 
-#: includes/admin/ajax-actions.php:443
+#: includes/admin/ajax-actions.php:492
 #: includes/fields/class-base.php:1251
 msgid "taxonomy"
 msgstr ""
 
-#: includes/admin/ajax-actions.php:502
+#: includes/admin/ajax-actions.php:551
 msgid "You do not have permission to perform this operation."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:512
+#: includes/admin/ajax-actions.php:561
 msgid "Success! Your server can make SSL connections."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:519
+#: includes/admin/ajax-actions.php:568
 msgid "There was an error and the connection failed. Please contact your web host with the technical details below."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:539
+#: includes/admin/ajax-actions.php:588
 msgid "Plugin deactivation is disabled for you on this site."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:552
+#: includes/admin/ajax-actions.php:601
 msgid "Plugin deactivated."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:554
+#: includes/admin/ajax-actions.php:603
 msgid "Addon deactivated."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:558
+#: includes/admin/ajax-actions.php:607
 msgid "Could not deactivate the addon. Please deactivate from the Plugins page."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:575
+#: includes/admin/ajax-actions.php:624
 msgid "Plugin activation is disabled for you on this site."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:600
+#: includes/admin/ajax-actions.php:649
 msgid "Plugin activated."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:602
+#: includes/admin/ajax-actions.php:651
 msgid "Addon activated."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:608
+#: includes/admin/ajax-actions.php:657
 msgid "Could not activate the plugin. Please activate it on the Plugins page."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:611
+#: includes/admin/ajax-actions.php:660
 msgid "Could not activate the addon. Please activate it on the Plugins page."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:626
+#: includes/admin/ajax-actions.php:675
 msgid "There was an error while performing your request."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:635
+#: includes/admin/ajax-actions.php:684
 msgid "Could not install the plugin. Please download and install it manually."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:721
+#: includes/admin/ajax-actions.php:770
 msgid "Plugin installed."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:721
+#: includes/admin/ajax-actions.php:770
 msgid "Addon installed."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:741
-#: src/Lite/Admin/Connect.php:180
-#: src/Lite/Admin/Connect.php:193
-#: src/Lite/Admin/Connect.php:253
+#: includes/admin/ajax-actions.php:790
+#: src/Lite/Admin/Connect.php:186
+#: src/Lite/Admin/Connect.php:200
+#: src/Lite/Admin/Connect.php:261
 msgid "Plugin installed & activated."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:741
+#: includes/admin/ajax-actions.php:790
 msgid "Addon installed & activated."
 msgstr ""
 
-#: includes/admin/ajax-actions.php:764
+#: includes/admin/ajax-actions.php:813
 #: src/Admin/FormEmbedWizard.php:420
 msgid "Incorrect usage of this operation."
 msgstr ""
@@ -1072,10 +1072,10 @@ msgstr ""
 #: includes/fields/class-internal-information.php:414
 #: includes/fields/class-internal-information.php:604
 #: lite/templates/education/builder/did-you-know.php:27
-#: src/Admin/Notifications/EventDriven.php:563
-#: src/Admin/Notifications/EventDriven.php:629
-#: src/Admin/Notifications/EventDriven.php:682
-#: src/Admin/Pages/Analytics.php:475
+#: src/Admin/Notifications/EventDriven.php:566
+#: src/Admin/Notifications/EventDriven.php:632
+#: src/Admin/Notifications/EventDriven.php:685
+#: src/Admin/Pages/Analytics.php:479
 #: src/Integrations/UncannyAutomator/UncannyAutomator.php:174
 #: src/Lite/Admin/DashboardWidget.php:247
 #: src/Lite/Admin/DashboardWidget.php:413
@@ -1229,7 +1229,7 @@ msgid "General"
 msgstr ""
 
 #: includes/admin/builder/panels/class-settings.php:42
-#: includes/admin/class-about.php:76
+#: includes/admin/class-about.php:1635
 #: src/Admin/Builder/AntiSpam.php:57
 msgid "Spam Protection and Security"
 msgstr ""
@@ -1352,738 +1352,740 @@ msgstr ""
 msgid "To speed up the process you can select from one of our pre-made templates, start with a <a href=\"#\" class=\"wpforms-trigger-blank\">blank form</a> or <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">create your own</a>. Have a suggestion for a new template? <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">We’d love to hear it</a>!"
 msgstr ""
 
-#: includes/admin/class-about.php:73
+#: includes/admin/class-about.php:106
+#: includes/admin/class-menu.php:174
+msgid "About Us"
+msgstr ""
+
+#: includes/admin/class-about.php:107
+#: src/Admin/Builder/Help.php:148
+msgid "Getting Started"
+msgstr ""
+
+#. translators: %1$s - current license type; %2$s - suggested license type.
+#: includes/admin/class-about.php:121
+msgid "%1$s vs %2$s"
+msgstr ""
+
+#: includes/admin/class-about.php:237
+msgid "Hello and welcome to WPForms, the most beginner friendly drag & drop WordPress forms plugin. At WPForms, we build software that helps you create beautiful responsive online forms for your website in minutes."
+msgstr ""
+
+#: includes/admin/class-about.php:240
+msgid "Over the years, we found that most WordPress contact form plugins were bloated, buggy, slow, and very hard to use. So we started with a simple goal: build a WordPress forms plugin that’s both easy and powerful."
+msgstr ""
+
+#: includes/admin/class-about.php:243
+msgid "Our goal is to take the pain out of creating online forms and make it easy."
+msgstr ""
+
+#. translators: %1$s - WPBeginner URL; %2$s - OptinMonster URL; %3$s - MonsterInsights URL.
+#: includes/admin/class-about.php:250
+msgid "WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WPBeginner</a>, the most popular lead-generation software, <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">OptinMonster</a>, the best WordPress analytics plugin, <a href=\"%3$s\" target=\"_blank\" rel=\"noopener noreferrer\">MonsterInsights</a>, and more!"
+msgstr ""
+
+#: includes/admin/class-about.php:266
+msgid "Yup, we know a thing or two about building awesome products that customers love."
+msgstr ""
+
+#: includes/admin/class-about.php:272
+msgid "The WPForms Team photo"
+msgstr ""
+
+#: includes/admin/class-about.php:274
+msgid "The WPForms Team"
+msgstr ""
+
+#. translators: %s - addon status label.
+#: includes/admin/class-about.php:330
+msgid "Status: %s"
+msgstr ""
+
+#: includes/admin/class-about.php:343
+msgid "WordPress.org"
+msgstr ""
+
+#: includes/admin/class-about.php:416
+#: src/Admin/Tools/Views/Import.php:258
+msgid "Not Installed"
+msgstr ""
+
+#: includes/admin/class-about.php:419
+msgid "Install Plugin"
+msgstr ""
+
+#: includes/admin/class-about.php:454
+msgid "Creating Your First Form"
+msgstr ""
+
+#: includes/admin/class-about.php:458
+msgid "Want to get started creating your first form with WPForms? By following the step by step instructions in this walkthrough, you can easily publish your first form on your site."
+msgstr ""
+
+#: includes/admin/class-about.php:462
+msgid "To begin, you’ll need to be logged into the WordPress admin area. Once there, click on WPForms in the admin sidebar to go to the Forms Overview page."
+msgstr ""
+
+#: includes/admin/class-about.php:466
+msgid "In the Forms Overview page, the forms list will be empty because there are no forms yet. To create a new form, click on the Add New button, and this will launch the WPForms Form Builder."
+msgstr ""
+
+#: includes/admin/class-about.php:472
+msgid "How to Add a New Form"
+msgstr ""
+
+#: includes/admin/class-about.php:477
+msgid "How to Customize Form Fields"
+msgstr ""
+
+#: includes/admin/class-about.php:482
+msgid "How to Display Forms on Your Site"
+msgstr ""
+
+#: includes/admin/class-about.php:500
+#: lite/wpforms-lite.php:595
+msgid "Get WPForms Pro and Unlock all the Powerful Features"
+msgstr ""
+
+#: includes/admin/class-about.php:506
+msgid "Thanks for being a loyal WPForms Lite user. <strong>Upgrade to WPForms Pro</strong> to unlock all the awesome features and experience<br>why WPForms is consistently rated the best WordPress form builder."
+msgstr ""
+
+#. translators: %s - stars.
+#: includes/admin/class-about.php:519
+msgid "We know that you will truly love WPForms. It has over <strong>12,000+ five star ratings</strong> (%s) and is active on over 5 million websites."
+msgstr ""
+
+#. translators: %s - number of templates.
+#: includes/admin/class-about.php:542
+#: lite/wpforms-lite.php:619
+msgid "%s customizable form templates"
+msgstr ""
+
+#: includes/admin/class-about.php:549
+#: lite/wpforms-lite.php:624
+msgid "Store and manage form entries in WordPress"
+msgstr ""
+
+#: includes/admin/class-about.php:553
+#: lite/wpforms-lite.php:625
+msgid "Unlock all fields & features, including Rich Text & conditional logic"
+msgstr ""
+
+#: includes/admin/class-about.php:557
+#: lite/wpforms-lite.php:626
+msgid "Make Surveys and Polls and create reports"
+msgstr ""
+
+#: includes/admin/class-about.php:561
+#: lite/wpforms-lite.php:627
+msgid "Accept user-submitted content with the Post Submissions addon"
+msgstr ""
+
+#: includes/admin/class-about.php:569
+#: lite/wpforms-lite.php:630
+msgid "5000+ integrations with marketing and payment services"
+msgstr ""
+
+#: includes/admin/class-about.php:573
+#: lite/wpforms-lite.php:631
+msgid "Let users Save and Resume submissions to prevent abandonment"
+msgstr ""
+
+#: includes/admin/class-about.php:577
+#: lite/wpforms-lite.php:632
+msgid "Take payments with PayPal Commerce, Stripe Pro, Square, Authorize.Net, and PayPal Standard"
+msgstr ""
+
+#: includes/admin/class-about.php:581
+#: lite/wpforms-lite.php:633
+msgid "Collect signatures, geolocation data, and file uploads"
+msgstr ""
+
+#: includes/admin/class-about.php:585
+#: lite/wpforms-lite.php:634
+msgid "Create user registration and login forms"
+msgstr ""
+
+#: includes/admin/class-about.php:600
+msgid "Get WPForms Pro Today and Unlock all the Powerful Features"
+msgstr ""
+
+#: includes/admin/class-about.php:609
+#: includes/admin/class-about.php:831
+msgid "Bonus: WPForms Lite users get <span class=\"price-20-off\">50% off regular price</span>, automatically applied at checkout."
+msgstr ""
+
+#: includes/admin/class-about.php:630
+msgid "How to Choose the Right Form Field"
+msgstr ""
+
+#: includes/admin/class-about.php:634
+msgid "Are you wondering which form fields you have access to in WPForms and what each field does? WPForms has lots of field types to make creating and filling out forms easy. In this tutorial, we’ll cover all of the fields available in WPForms."
+msgstr ""
+
+#: includes/admin/class-about.php:638
+#: includes/admin/class-about.php:657
+#: includes/admin/class-about.php:676
+#: includes/admin/class-about.php:695
+msgid "Read Documentation"
+msgstr ""
+
+#: includes/admin/class-about.php:649
+msgid "A Complete Guide to WPForms Settings"
+msgstr ""
+
+#: includes/admin/class-about.php:653
+msgid "Would you like to learn more about all of the settings available in WPForms? In addition to tons of customization options within the form builder, WPForms has an extensive list of plugin-wide options available. This includes choosing your currency, adding GDPR enhancements, setting up integrations."
+msgstr ""
+
+#: includes/admin/class-about.php:668
+msgid "How to Create GDPR Compliant Forms"
+msgstr ""
+
+#: includes/admin/class-about.php:672
+msgid "Do you need to check that your forms are compliant with the European Union’s General Data Protection Regulation? The best way to ensure GDPR compliance for your specific site is always to consult legal counsel. In this guide, we’ll discuss general considerations for GDPR compliance in your WordPress forms."
+msgstr ""
+
+#: includes/admin/class-about.php:687
+msgid "How to Install and Activate WPForms Addons"
+msgstr ""
+
+#: includes/admin/class-about.php:691
+msgid "Would you like to access WPForms addons to extend the functionality of your forms? The first thing you need to do is install WPForms. Once that’s done, let’s go ahead and look at the process of activating addons."
+msgstr ""
+
+#: includes/admin/class-about.php:742
+msgid "Get the most out of WPForms by upgrading to Pro and unlocking all of the powerful features."
+msgstr ""
+
+#: includes/admin/class-about.php:751
+msgid "Feature"
+msgstr ""
+
+#. translators: %s - next license level.
+#: includes/admin/class-about.php:820
+msgid "Get WPForms %s Today and Unlock all the Powerful Features"
+msgstr ""
+
+#: includes/admin/class-about.php:862
+msgid "OptinMonster"
+msgstr ""
+
+#: includes/admin/class-about.php:863
+msgid "Instantly get more subscribers, leads, and sales with the #1 conversion optimization toolkit. Create high converting popups, announcement bars, spin a wheel, and more with smart targeting and personalization."
+msgstr ""
+
+#: includes/admin/class-about.php:870
+#: src/Admin/Dashboard/Widget.php:185
+#: src/Admin/Pages/Analytics.php:414
+msgid "MonsterInsights"
+msgstr ""
+
+#: includes/admin/class-about.php:871
+#: includes/admin/class-about.php:878
+msgid "The leading WordPress analytics plugin that shows you how people find and use your website, so you can make data driven decisions to grow your business. Properly set up Google Analytics without writing code."
+msgstr ""
+
+#: includes/admin/class-about.php:877
+msgid "MonsterInsights Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:886
+#: src/Admin/Dashboard/Widget.php:209
+#: src/Admin/Pages/SMTP.php:378
+msgid "WP Mail SMTP"
+msgstr ""
+
+#: includes/admin/class-about.php:887
+#: includes/admin/class-about.php:894
+msgid "Improve your WordPress email deliverability and make sure that your website emails reach user's inbox with the #1 SMTP plugin for WordPress. Over 3 million websites use it to fix WordPress email issues."
+msgstr ""
+
+#: includes/admin/class-about.php:893
+msgid "WP Mail SMTP Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:902
+#: src/Admin/Dashboard/Widget.php:193
+msgid "AIOSEO"
+msgstr ""
+
+#: includes/admin/class-about.php:903
+#: includes/admin/class-about.php:910
+msgid "The original WordPress SEO plugin and toolkit that improves your website's search rankings. Comes with all the SEO features like Local SEO, WooCommerce SEO, sitemaps, SEO optimizer, schema, and more."
+msgstr ""
+
+#: includes/admin/class-about.php:909
+msgid "AIOSEO Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:918
+#: src/Admin/Dashboard/Widget.php:201
+msgid "SeedProd"
+msgstr ""
+
+#: includes/admin/class-about.php:919
+#: includes/admin/class-about.php:926
+msgid "The fastest drag & drop landing page builder for WordPress. Create custom landing pages without writing code, connect them with your CRM, collect subscribers, and grow your audience. Trusted by 1 million sites."
+msgstr ""
+
+#: includes/admin/class-about.php:925
+msgid "SeedProd Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:934
+msgid "RafflePress"
+msgstr ""
+
+#: includes/admin/class-about.php:935
+#: includes/admin/class-about.php:942
+msgid "Turn your website visitors into brand ambassadors! Easily grow your email list, website traffic, and social media followers with the most powerful giveaways & contests plugin for WordPress."
+msgstr ""
+
+#: includes/admin/class-about.php:941
+msgid "RafflePress Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:950
+msgid "PushEngage"
+msgstr ""
+
+#: includes/admin/class-about.php:951
+msgid "Connect with your visitors after they leave your website with the leading web push notification software. Over 10,000+ businesses worldwide use PushEngage to send 15 billion notifications each month."
+msgstr ""
+
+#: includes/admin/class-about.php:958
+msgid "Smash Balloon Instagram Feeds"
+msgstr ""
+
+#: includes/admin/class-about.php:959
+#: includes/admin/class-about.php:966
+msgid "Easily display Instagram content on your WordPress site without writing any code. Comes with multiple templates, ability to show content from multiple accounts, hashtags, and more. Trusted by 1 million websites."
+msgstr ""
+
+#: includes/admin/class-about.php:965
+msgid "Smash Balloon Instagram Feeds Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:974
+msgid "Smash Balloon Facebook Feeds"
+msgstr ""
+
+#: includes/admin/class-about.php:975
+#: includes/admin/class-about.php:982
+msgid "Easily display Facebook content on your WordPress site without writing any code. Comes with multiple templates, ability to embed albums, group content, reviews, live videos, comments, and reactions."
+msgstr ""
+
+#: includes/admin/class-about.php:981
+msgid "Smash Balloon Facebook Feeds Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:990
+msgid "Smash Balloon YouTube Feeds"
+msgstr ""
+
+#: includes/admin/class-about.php:991
+#: includes/admin/class-about.php:998
+msgid "Easily display YouTube videos on your WordPress site without writing any code. Comes with multiple layouts, ability to embed live streams, video filtering, ability to combine multiple channel videos, and more."
+msgstr ""
+
+#: includes/admin/class-about.php:997
+msgid "Smash Balloon YouTube Feeds Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:1006
+msgid "Smash Balloon Twitter Feeds"
+msgstr ""
+
+#: includes/admin/class-about.php:1007
+#: includes/admin/class-about.php:1014
+msgid "Easily display Twitter content in WordPress without writing any code. Comes with multiple layouts, ability to combine multiple Twitter feeds, Twitter card support, tweet moderation, and more."
+msgstr ""
+
+#: includes/admin/class-about.php:1013
+msgid "Smash Balloon Twitter Feeds Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:1022
+msgid "TrustPulse"
+msgstr ""
+
+#: includes/admin/class-about.php:1023
+msgid "Boost your sales and conversions by up to 15% with real-time social proof notifications. TrustPulse helps you show live user activity and purchases to help convince other users to purchase."
+msgstr ""
+
+#: includes/admin/class-about.php:1030
+msgid "SearchWP"
+msgstr ""
+
+#: includes/admin/class-about.php:1031
+msgid "The most advanced WordPress search plugin. Customize your WordPress search algorithm, reorder search results, track search metrics, and everything you need to leverage search to grow your business."
+msgstr ""
+
+#: includes/admin/class-about.php:1039
+msgid "AffiliateWP"
+msgstr ""
+
+#: includes/admin/class-about.php:1040
+msgid "The #1 affiliate management plugin for WordPress. Easily create an affiliate program for your eCommerce store or membership site within minutes and start growing your sales with the power of referral marketing."
+msgstr ""
+
+#: includes/admin/class-about.php:1048
+msgid "WP Simple Pay"
+msgstr ""
+
+#: includes/admin/class-about.php:1049
+#: includes/admin/class-about.php:1056
+msgid "The #1 Stripe payments plugin for WordPress. Start accepting one-time and recurring payments on your WordPress site without setting up a shopping cart. No code required."
+msgstr ""
+
+#: includes/admin/class-about.php:1055
+msgid "WP Simple Pay Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:1064
+msgid "Easy Digital Downloads"
+msgstr ""
+
+#: includes/admin/class-about.php:1065
+msgid "The best WordPress eCommerce plugin for selling digital downloads. Start selling eBooks, software, music, digital art, and more within minutes. Accept payments, manage subscriptions, advanced access control, and more."
+msgstr ""
+
+#: includes/admin/class-about.php:1072
+msgid "Sugar Calendar"
+msgstr ""
+
+#: includes/admin/class-about.php:1073
+#: includes/admin/class-about.php:1080
+msgid "A simple & powerful event calendar plugin for WordPress that comes with all the event management features including payments, scheduling, timezones, ticketing, recurring events, and more."
+msgstr ""
+
+#: includes/admin/class-about.php:1079
+msgid "Sugar Calendar Pro"
+msgstr ""
+
+#: includes/admin/class-about.php:1087
+msgid "WP Charitable"
+msgstr ""
+
+#: includes/admin/class-about.php:1088
+msgid "Top-rated WordPress donation and fundraising plugin. Over 10,000+ non-profit organizations and website owners use Charitable to create fundraising campaigns and raise more money online."
+msgstr ""
+
+#: includes/admin/class-about.php:1094
+msgid "WPCode"
+msgstr ""
+
+#: includes/admin/class-about.php:1095
+msgid "Future proof your WordPress customizations with the most popular code snippet management plugin for WordPress. Trusted by over 1,500,000+ websites for easily adding code to WordPress right from the admin area."
+msgstr ""
+
+#: includes/admin/class-about.php:1101
+msgid "Duplicator"
+msgstr ""
+
+#: includes/admin/class-about.php:1102
+msgid "Leading WordPress backup & site migration plugin. Over 1,500,000+ smart website owners use Duplicator to make reliable and secure WordPress backups to protect their websites. It also makes website migration really easy."
+msgstr ""
+
+#: includes/admin/class-about.php:1126
+msgid "Entries via Email Only"
+msgstr ""
+
+#: includes/admin/class-about.php:1132
+#: includes/admin/class-about.php:1138
+#: includes/admin/class-about.php:1144
+msgid "Complete Entry Management inside WordPress"
+msgstr ""
+
+#: includes/admin/class-about.php:1152
+msgid "Standard and Payment Fields"
+msgstr ""
+
+#: includes/admin/class-about.php:1153
+msgid "Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, Number Slider, and Payment Fields (Single Item, Total, etc.)"
+msgstr ""
+
+#: includes/admin/class-about.php:1159
+#: includes/admin/class-about.php:1166
+#: includes/admin/class-about.php:1173
+msgid "Access to all Standard, Fancy, and Payment Fields"
+msgstr ""
+
+#: includes/admin/class-about.php:1160
+#: includes/admin/class-about.php:1167
+#: includes/admin/class-about.php:1174
+msgid "Address, Phone, Website / URL, Date / Time, Password, File Upload, Layout, Rich Text, Content, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, and Hidden Field"
+msgstr ""
+
+#: includes/admin/class-about.php:1182
+msgid "Not available"
+msgstr ""
+
+#: includes/admin/class-about.php:1188
+#: includes/admin/class-about.php:1194
+#: includes/admin/class-about.php:1200
+msgid "Powerful Form Logic for Building Smart Forms"
+msgstr ""
+
+#: includes/admin/class-about.php:1208
+#: includes/admin/class-about.php:1214
+#: includes/admin/class-about.php:1220
+msgid "Basic Form Templates"
+msgstr ""
+
+#. translators: %s - number of templates.
+#: includes/admin/class-about.php:1228
+msgid "All Form Templates including Bonus %s pre-made form templates"
+msgstr ""
+
+#: includes/admin/class-about.php:1239
+msgid "Basic Anti-Spam Settings"
+msgstr ""
+
+#: includes/admin/class-about.php:1240
+msgid "Basic Protection, reCAPTCHA, hCaptcha, Cloudflare Turnstile and Akismet"
+msgstr ""
+
+#: includes/admin/class-about.php:1246
+#: includes/admin/class-about.php:1253
+#: includes/admin/class-about.php:1260
+msgid "Additional Anti-Spam Settings"
+msgstr ""
+
+#: includes/admin/class-about.php:1247
+#: includes/admin/class-about.php:1254
+#: includes/admin/class-about.php:1261
+msgid "Basic Protection, reCAPTCHA, hCaptcha, Cloudflare Turnstile, Akismet, Country Filter, Keyword Filter, and Custom Captcha"
+msgstr ""
+
+#: includes/admin/class-about.php:1269
+#: includes/admin/class-about.php:1276
+msgid "Limited Marketing Integration"
+msgstr ""
+
+#: includes/admin/class-about.php:1270
+#: includes/admin/class-about.php:1277
+msgid "Constant Contact only"
+msgstr ""
+
+#: includes/admin/class-about.php:1283
+#: includes/admin/class-about.php:1290
+msgid "Additional Marketing Integrations"
+msgstr ""
+
+#: includes/admin/class-about.php:1284
+#: includes/admin/class-about.php:1291
+msgid "Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Sendinblue, HubSpot, Drip, and MailerLite"
+msgstr ""
+
+#: includes/admin/class-about.php:1294
+#: includes/admin/class-about.php:1308
+#: includes/admin/class-about.php:1322
+#: includes/admin/class-about.php:1336
+msgid "<strong>Bonus:</strong> 5000+ integrations with Zapier."
+msgstr ""
+
+#: includes/admin/class-about.php:1304
+#: includes/admin/class-about.php:1318
+#: includes/admin/class-about.php:1332
+msgid "All Marketing Integrations"
+msgstr ""
+
+#: includes/admin/class-about.php:1305
+#: includes/admin/class-about.php:1319
+#: includes/admin/class-about.php:1333
+msgid "ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Sendinblue, HubSpot, Drip, and MailerLite"
+msgstr ""
+
+#: includes/admin/class-about.php:1348
+#: includes/admin/class-about.php:1355
+#: includes/admin/class-about.php:1362
+msgid "Limited Payment Forms"
+msgstr ""
+
+#: includes/admin/class-about.php:1349
+#: includes/admin/class-about.php:1356
+#: includes/admin/class-about.php:1363
+msgid "Accept payments using Stripe only"
+msgstr ""
+
+#: includes/admin/class-about.php:1369
+#: includes/admin/class-about.php:1376
+#: includes/admin/class-about.php:1383
+#: includes/admin/class-about.php:1390
+msgid "Create Payment Forms"
+msgstr ""
+
+#: includes/admin/class-about.php:1370
+msgid "Accept payments using PayPal Commerce, Stripe, Square, and PayPal Standard"
+msgstr ""
+
+#: includes/admin/class-about.php:1377
+#: includes/admin/class-about.php:1384
+#: includes/admin/class-about.php:1391
+msgid "Accept payments using PayPal Commerce, Stripe, Square, PayPal Standard, and Authorize.Net"
+msgstr ""
+
+#: includes/admin/class-about.php:1399
+#: includes/admin/class-about.php:1405
+#: includes/admin/class-about.php:1411
+msgid "Not Available"
+msgstr ""
+
+#: includes/admin/class-about.php:1417
+msgid "Create interactive Surveys and Polls with beautiful reports"
+msgstr ""
+
+#: includes/admin/class-about.php:1425
+msgid "No Advanced Features"
+msgstr ""
+
+#: includes/admin/class-about.php:1431
+#: includes/admin/class-about.php:1438
+msgid "Limited Advanced Features"
+msgstr ""
+
+#: includes/admin/class-about.php:1432
+msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation"
+msgstr ""
+
+#: includes/admin/class-about.php:1439
+msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation, Save and Resume Form"
+msgstr ""
+
+#: includes/admin/class-about.php:1445
+msgid "All Advanced Features"
+msgstr ""
+
+#: includes/admin/class-about.php:1446
+msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation, Custom CAPTCHA, Offline Forms, Signature Forms, Save and Resume Form, Coupons"
+msgstr ""
+
+#: includes/admin/class-about.php:1454
+msgid "No Addons Included"
+msgstr ""
+
+#: includes/admin/class-about.php:1460
+msgid "Custom Captcha Addon included"
+msgstr ""
+
+#: includes/admin/class-about.php:1466
+msgid "Email Marketing Addons included"
+msgstr ""
+
+#: includes/admin/class-about.php:1472
+msgid "Pro Addons Included"
+msgstr ""
+
+#: includes/admin/class-about.php:1473
+msgid "Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Google Sheets, Coupons, and more (28 total)"
+msgstr ""
+
+#: includes/admin/class-about.php:1479
+#: includes/admin/class-about.php:1486
+#: includes/admin/class-about.php:1493
+msgid "All Addons Included"
+msgstr ""
+
+#: includes/admin/class-about.php:1480
+#: includes/admin/class-about.php:1487
+#: includes/admin/class-about.php:1494
+msgid "Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, Google Sheets, Coupons, and more (30+ total)"
+msgstr ""
+
+#: includes/admin/class-about.php:1502
+msgid "Limited Support"
+msgstr ""
+
+#: includes/admin/class-about.php:1508
+#: includes/admin/class-about.php:1514
+msgid "Standard Support"
+msgstr ""
+
+#: includes/admin/class-about.php:1520
+msgid "Priority Support"
+msgstr ""
+
+#: includes/admin/class-about.php:1526
+#: includes/admin/class-about.php:1532
+#: includes/admin/class-about.php:1538
+msgid "Premium Support"
+msgstr ""
+
+#: includes/admin/class-about.php:1546
+msgid "1 Site"
+msgstr ""
+
+#: includes/admin/class-about.php:1552
+msgid "3 Sites"
+msgstr ""
+
+#: includes/admin/class-about.php:1558
+msgid "5 Sites"
+msgstr ""
+
+#: includes/admin/class-about.php:1564
+#: includes/admin/class-about.php:1570
+#: includes/admin/class-about.php:1576
+msgid "Unlimited Sites"
+msgstr ""
+
+#: includes/admin/class-about.php:1632
 #: includes/admin/class-menu.php:75
 msgid "Form Entries"
 msgstr ""
 
-#: includes/admin/class-about.php:74
+#: includes/admin/class-about.php:1633
 msgid "Form Fields"
 msgstr ""
 
-#: includes/admin/class-about.php:75
+#: includes/admin/class-about.php:1634
 #: includes/admin/class-menu.php:104
 #: includes/admin/class-welcome.php:191
 #: src/Admin/Pages/Templates.php:95
 msgid "Form Templates"
 msgstr ""
 
-#: includes/admin/class-about.php:77
+#: includes/admin/class-about.php:1636
 #: includes/admin/class-welcome.php:203
 #: src/Integrations/Stripe/Admin/Builder/Settings.php:296
 #: src/Lite/Admin/Education/Builder/Fields.php:79
 msgid "Smart Conditional Logic"
 msgstr ""
 
-#: includes/admin/class-about.php:78
+#: includes/admin/class-about.php:1637
 #: includes/admin/class-welcome.php:274
 msgid "Marketing Integrations"
 msgstr ""
 
-#: includes/admin/class-about.php:79
+#: includes/admin/class-about.php:1638
 #: includes/admin/class-welcome.php:265
 msgid "Payment Forms"
 msgstr ""
 
-#: includes/admin/class-about.php:80
+#: includes/admin/class-about.php:1639
 #: includes/admin/class-welcome.php:266
 msgid "Surveys & Polls"
 msgstr ""
 
-#: includes/admin/class-about.php:81
+#: includes/admin/class-about.php:1640
 msgid "Advanced Form Features"
 msgstr ""
 
-#: includes/admin/class-about.php:82
+#: includes/admin/class-about.php:1641
 #: includes/admin/class-menu.php:143
 #: lite/templates/admin/addons.php:18
 msgid "WPForms Addons"
 msgstr ""
 
-#: includes/admin/class-about.php:83
+#: includes/admin/class-about.php:1642
 msgid "Customer Support"
 msgstr ""
 
-#: includes/admin/class-about.php:84
+#: includes/admin/class-about.php:1643
 msgid "Number of Sites"
-msgstr ""
-
-#: includes/admin/class-about.php:112
-#: includes/admin/class-menu.php:174
-msgid "About Us"
-msgstr ""
-
-#: includes/admin/class-about.php:113
-#: src/Admin/Builder/Help.php:148
-msgid "Getting Started"
-msgstr ""
-
-#. translators: %1$s - current license type; %2$s - suggested license type.
-#: includes/admin/class-about.php:127
-msgid "%1$s vs %2$s"
-msgstr ""
-
-#: includes/admin/class-about.php:243
-msgid "Hello and welcome to WPForms, the most beginner friendly drag & drop WordPress forms plugin. At WPForms, we build software that helps you create beautiful responsive online forms for your website in minutes."
-msgstr ""
-
-#: includes/admin/class-about.php:246
-msgid "Over the years, we found that most WordPress contact form plugins were bloated, buggy, slow, and very hard to use. So we started with a simple goal: build a WordPress forms plugin that’s both easy and powerful."
-msgstr ""
-
-#: includes/admin/class-about.php:249
-msgid "Our goal is to take the pain out of creating online forms and make it easy."
-msgstr ""
-
-#. translators: %1$s - WPBeginner URL; %2$s - OptinMonster URL; %3$s - MonsterInsights URL.
-#: includes/admin/class-about.php:256
-msgid "WPForms is brought to you by the same team that’s behind the largest WordPress resource site, <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WPBeginner</a>, the most popular lead-generation software, <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">OptinMonster</a>, the best WordPress analytics plugin, <a href=\"%3$s\" target=\"_blank\" rel=\"noopener noreferrer\">MonsterInsights</a>, and more!"
-msgstr ""
-
-#: includes/admin/class-about.php:272
-msgid "Yup, we know a thing or two about building awesome products that customers love."
-msgstr ""
-
-#: includes/admin/class-about.php:278
-msgid "The WPForms Team photo"
-msgstr ""
-
-#: includes/admin/class-about.php:280
-msgid "The WPForms Team"
-msgstr ""
-
-#. translators: %s - addon status label.
-#: includes/admin/class-about.php:336
-msgid "Status: %s"
-msgstr ""
-
-#: includes/admin/class-about.php:349
-msgid "WordPress.org"
-msgstr ""
-
-#: includes/admin/class-about.php:422
-#: src/Admin/Tools/Views/Import.php:258
-msgid "Not Installed"
-msgstr ""
-
-#: includes/admin/class-about.php:425
-msgid "Install Plugin"
-msgstr ""
-
-#: includes/admin/class-about.php:460
-msgid "Creating Your First Form"
-msgstr ""
-
-#: includes/admin/class-about.php:464
-msgid "Want to get started creating your first form with WPForms? By following the step by step instructions in this walkthrough, you can easily publish your first form on your site."
-msgstr ""
-
-#: includes/admin/class-about.php:468
-msgid "To begin, you’ll need to be logged into the WordPress admin area. Once there, click on WPForms in the admin sidebar to go to the Forms Overview page."
-msgstr ""
-
-#: includes/admin/class-about.php:472
-msgid "In the Forms Overview page, the forms list will be empty because there are no forms yet. To create a new form, click on the Add New button, and this will launch the WPForms Form Builder."
-msgstr ""
-
-#: includes/admin/class-about.php:478
-msgid "How to Add a New Form"
-msgstr ""
-
-#: includes/admin/class-about.php:483
-msgid "How to Customize Form Fields"
-msgstr ""
-
-#: includes/admin/class-about.php:488
-msgid "How to Display Forms on Your Site"
-msgstr ""
-
-#: includes/admin/class-about.php:506
-#: lite/wpforms-lite.php:595
-msgid "Get WPForms Pro and Unlock all the Powerful Features"
-msgstr ""
-
-#: includes/admin/class-about.php:512
-msgid "Thanks for being a loyal WPForms Lite user. <strong>Upgrade to WPForms Pro</strong> to unlock all the awesome features and experience<br>why WPForms is consistently rated the best WordPress form builder."
-msgstr ""
-
-#. translators: %s - stars.
-#: includes/admin/class-about.php:525
-msgid "We know that you will truly love WPForms. It has over <strong>12,000+ five star ratings</strong> (%s) and is active on over 5 million websites."
-msgstr ""
-
-#: includes/admin/class-about.php:546
-#: lite/wpforms-lite.php:616
-msgid "700+ customizable form templates"
-msgstr ""
-
-#: includes/admin/class-about.php:550
-#: lite/wpforms-lite.php:617
-msgid "Store and manage form entries in WordPress"
-msgstr ""
-
-#: includes/admin/class-about.php:554
-#: lite/wpforms-lite.php:618
-msgid "Unlock all fields & features, including Rich Text & conditional logic"
-msgstr ""
-
-#: includes/admin/class-about.php:558
-#: lite/wpforms-lite.php:619
-msgid "Make Surveys and Polls and create reports"
-msgstr ""
-
-#: includes/admin/class-about.php:562
-#: lite/wpforms-lite.php:620
-msgid "Accept user-submitted content with the Post Submissions addon"
-msgstr ""
-
-#: includes/admin/class-about.php:570
-#: lite/wpforms-lite.php:623
-msgid "5000+ integrations with marketing and payment services"
-msgstr ""
-
-#: includes/admin/class-about.php:574
-#: lite/wpforms-lite.php:624
-msgid "Let users Save and Resume submissions to prevent abandonment"
-msgstr ""
-
-#: includes/admin/class-about.php:578
-#: lite/wpforms-lite.php:625
-msgid "Take payments with PayPal Commerce, Stripe Pro, Square, Authorize.Net, and PayPal Standard"
-msgstr ""
-
-#: includes/admin/class-about.php:582
-#: lite/wpforms-lite.php:626
-msgid "Collect signatures, geolocation data, and file uploads"
-msgstr ""
-
-#: includes/admin/class-about.php:586
-#: lite/wpforms-lite.php:627
-msgid "Create user registration and login forms"
-msgstr ""
-
-#: includes/admin/class-about.php:601
-msgid "Get WPForms Pro Today and Unlock all the Powerful Features"
-msgstr ""
-
-#: includes/admin/class-about.php:610
-#: includes/admin/class-about.php:832
-msgid "Bonus: WPForms Lite users get <span class=\"price-20-off\">50% off regular price</span>, automatically applied at checkout."
-msgstr ""
-
-#: includes/admin/class-about.php:631
-msgid "How to Choose the Right Form Field"
-msgstr ""
-
-#: includes/admin/class-about.php:635
-msgid "Are you wondering which form fields you have access to in WPForms and what each field does? WPForms has lots of field types to make creating and filling out forms easy. In this tutorial, we’ll cover all of the fields available in WPForms."
-msgstr ""
-
-#: includes/admin/class-about.php:639
-#: includes/admin/class-about.php:658
-#: includes/admin/class-about.php:677
-#: includes/admin/class-about.php:696
-msgid "Read Documentation"
-msgstr ""
-
-#: includes/admin/class-about.php:650
-msgid "A Complete Guide to WPForms Settings"
-msgstr ""
-
-#: includes/admin/class-about.php:654
-msgid "Would you like to learn more about all of the settings available in WPForms? In addition to tons of customization options within the form builder, WPForms has an extensive list of plugin-wide options available. This includes choosing your currency, adding GDPR enhancements, setting up integrations."
-msgstr ""
-
-#: includes/admin/class-about.php:669
-msgid "How to Create GDPR Compliant Forms"
-msgstr ""
-
-#: includes/admin/class-about.php:673
-msgid "Do you need to check that your forms are compliant with the European Union’s General Data Protection Regulation? The best way to ensure GDPR compliance for your specific site is always to consult legal counsel. In this guide, we’ll discuss general considerations for GDPR compliance in your WordPress forms."
-msgstr ""
-
-#: includes/admin/class-about.php:688
-msgid "How to Install and Activate WPForms Addons"
-msgstr ""
-
-#: includes/admin/class-about.php:692
-msgid "Would you like to access WPForms addons to extend the functionality of your forms? The first thing you need to do is install WPForms. Once that’s done, let’s go ahead and look at the process of activating addons."
-msgstr ""
-
-#: includes/admin/class-about.php:743
-msgid "Get the most out of WPForms by upgrading to Pro and unlocking all of the powerful features."
-msgstr ""
-
-#: includes/admin/class-about.php:752
-msgid "Feature"
-msgstr ""
-
-#. translators: %s - next license level.
-#: includes/admin/class-about.php:821
-msgid "Get WPForms %s Today and Unlock all the Powerful Features"
-msgstr ""
-
-#: includes/admin/class-about.php:863
-msgid "OptinMonster"
-msgstr ""
-
-#: includes/admin/class-about.php:864
-msgid "Instantly get more subscribers, leads, and sales with the #1 conversion optimization toolkit. Create high converting popups, announcement bars, spin a wheel, and more with smart targeting and personalization."
-msgstr ""
-
-#: includes/admin/class-about.php:871
-#: src/Admin/Dashboard/Widget.php:185
-#: src/Admin/Pages/Analytics.php:413
-msgid "MonsterInsights"
-msgstr ""
-
-#: includes/admin/class-about.php:872
-#: includes/admin/class-about.php:879
-msgid "The leading WordPress analytics plugin that shows you how people find and use your website, so you can make data driven decisions to grow your business. Properly set up Google Analytics without writing code."
-msgstr ""
-
-#: includes/admin/class-about.php:878
-msgid "MonsterInsights Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:887
-#: src/Admin/Dashboard/Widget.php:209
-#: src/Admin/Pages/SMTP.php:378
-msgid "WP Mail SMTP"
-msgstr ""
-
-#: includes/admin/class-about.php:888
-#: includes/admin/class-about.php:895
-msgid "Improve your WordPress email deliverability and make sure that your website emails reach user's inbox with the #1 SMTP plugin for WordPress. Over 3 million websites use it to fix WordPress email issues."
-msgstr ""
-
-#: includes/admin/class-about.php:894
-msgid "WP Mail SMTP Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:903
-#: src/Admin/Dashboard/Widget.php:193
-msgid "AIOSEO"
-msgstr ""
-
-#: includes/admin/class-about.php:904
-#: includes/admin/class-about.php:911
-msgid "The original WordPress SEO plugin and toolkit that improves your website's search rankings. Comes with all the SEO features like Local SEO, WooCommerce SEO, sitemaps, SEO optimizer, schema, and more."
-msgstr ""
-
-#: includes/admin/class-about.php:910
-msgid "AIOSEO Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:919
-#: src/Admin/Dashboard/Widget.php:201
-msgid "SeedProd"
-msgstr ""
-
-#: includes/admin/class-about.php:920
-#: includes/admin/class-about.php:927
-msgid "The fastest drag & drop landing page builder for WordPress. Create custom landing pages without writing code, connect them with your CRM, collect subscribers, and grow your audience. Trusted by 1 million sites."
-msgstr ""
-
-#: includes/admin/class-about.php:926
-msgid "SeedProd Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:935
-msgid "RafflePress"
-msgstr ""
-
-#: includes/admin/class-about.php:936
-#: includes/admin/class-about.php:943
-msgid "Turn your website visitors into brand ambassadors! Easily grow your email list, website traffic, and social media followers with the most powerful giveaways & contests plugin for WordPress."
-msgstr ""
-
-#: includes/admin/class-about.php:942
-msgid "RafflePress Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:951
-msgid "PushEngage"
-msgstr ""
-
-#: includes/admin/class-about.php:952
-msgid "Connect with your visitors after they leave your website with the leading web push notification software. Over 10,000+ businesses worldwide use PushEngage to send 15 billion notifications each month."
-msgstr ""
-
-#: includes/admin/class-about.php:959
-msgid "Smash Balloon Instagram Feeds"
-msgstr ""
-
-#: includes/admin/class-about.php:960
-#: includes/admin/class-about.php:967
-msgid "Easily display Instagram content on your WordPress site without writing any code. Comes with multiple templates, ability to show content from multiple accounts, hashtags, and more. Trusted by 1 million websites."
-msgstr ""
-
-#: includes/admin/class-about.php:966
-msgid "Smash Balloon Instagram Feeds Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:975
-msgid "Smash Balloon Facebook Feeds"
-msgstr ""
-
-#: includes/admin/class-about.php:976
-#: includes/admin/class-about.php:983
-msgid "Easily display Facebook content on your WordPress site without writing any code. Comes with multiple templates, ability to embed albums, group content, reviews, live videos, comments, and reactions."
-msgstr ""
-
-#: includes/admin/class-about.php:982
-msgid "Smash Balloon Facebook Feeds Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:991
-msgid "Smash Balloon YouTube Feeds"
-msgstr ""
-
-#: includes/admin/class-about.php:992
-#: includes/admin/class-about.php:999
-msgid "Easily display YouTube videos on your WordPress site without writing any code. Comes with multiple layouts, ability to embed live streams, video filtering, ability to combine multiple channel videos, and more."
-msgstr ""
-
-#: includes/admin/class-about.php:998
-msgid "Smash Balloon YouTube Feeds Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:1007
-msgid "Smash Balloon Twitter Feeds"
-msgstr ""
-
-#: includes/admin/class-about.php:1008
-#: includes/admin/class-about.php:1015
-msgid "Easily display Twitter content in WordPress without writing any code. Comes with multiple layouts, ability to combine multiple Twitter feeds, Twitter card support, tweet moderation, and more."
-msgstr ""
-
-#: includes/admin/class-about.php:1014
-msgid "Smash Balloon Twitter Feeds Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:1023
-msgid "TrustPulse"
-msgstr ""
-
-#: includes/admin/class-about.php:1024
-msgid "Boost your sales and conversions by up to 15% with real-time social proof notifications. TrustPulse helps you show live user activity and purchases to help convince other users to purchase."
-msgstr ""
-
-#: includes/admin/class-about.php:1031
-msgid "SearchWP"
-msgstr ""
-
-#: includes/admin/class-about.php:1032
-msgid "The most advanced WordPress search plugin. Customize your WordPress search algorithm, reorder search results, track search metrics, and everything you need to leverage search to grow your business."
-msgstr ""
-
-#: includes/admin/class-about.php:1040
-msgid "AffiliateWP"
-msgstr ""
-
-#: includes/admin/class-about.php:1041
-msgid "The #1 affiliate management plugin for WordPress. Easily create an affiliate program for your eCommerce store or membership site within minutes and start growing your sales with the power of referral marketing."
-msgstr ""
-
-#: includes/admin/class-about.php:1049
-msgid "WP Simple Pay"
-msgstr ""
-
-#: includes/admin/class-about.php:1050
-#: includes/admin/class-about.php:1057
-msgid "The #1 Stripe payments plugin for WordPress. Start accepting one-time and recurring payments on your WordPress site without setting up a shopping cart. No code required."
-msgstr ""
-
-#: includes/admin/class-about.php:1056
-msgid "WP Simple Pay Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:1065
-msgid "Easy Digital Downloads"
-msgstr ""
-
-#: includes/admin/class-about.php:1066
-msgid "The best WordPress eCommerce plugin for selling digital downloads. Start selling eBooks, software, music, digital art, and more within minutes. Accept payments, manage subscriptions, advanced access control, and more."
-msgstr ""
-
-#: includes/admin/class-about.php:1073
-msgid "Sugar Calendar"
-msgstr ""
-
-#: includes/admin/class-about.php:1074
-#: includes/admin/class-about.php:1081
-msgid "A simple & powerful event calendar plugin for WordPress that comes with all the event management features including payments, scheduling, timezones, ticketing, recurring events, and more."
-msgstr ""
-
-#: includes/admin/class-about.php:1080
-msgid "Sugar Calendar Pro"
-msgstr ""
-
-#: includes/admin/class-about.php:1088
-msgid "WP Charitable"
-msgstr ""
-
-#: includes/admin/class-about.php:1089
-msgid "Top-rated WordPress donation and fundraising plugin. Over 10,000+ non-profit organizations and website owners use Charitable to create fundraising campaigns and raise more money online."
-msgstr ""
-
-#: includes/admin/class-about.php:1095
-msgid "WPCode"
-msgstr ""
-
-#: includes/admin/class-about.php:1096
-msgid "Future proof your WordPress customizations with the most popular code snippet management plugin for WordPress. Trusted by over 1,500,000+ websites for easily adding code to WordPress right from the admin area."
-msgstr ""
-
-#: includes/admin/class-about.php:1102
-msgid "Duplicator"
-msgstr ""
-
-#: includes/admin/class-about.php:1103
-msgid "Leading WordPress backup & site migration plugin. Over 1,500,000+ smart website owners use Duplicator to make reliable and secure WordPress backups to protect their websites. It also makes website migration really easy."
-msgstr ""
-
-#: includes/admin/class-about.php:1127
-msgid "Entries via Email Only"
-msgstr ""
-
-#: includes/admin/class-about.php:1133
-#: includes/admin/class-about.php:1139
-#: includes/admin/class-about.php:1145
-msgid "Complete Entry Management inside WordPress"
-msgstr ""
-
-#: includes/admin/class-about.php:1153
-msgid "Standard and Payment Fields"
-msgstr ""
-
-#: includes/admin/class-about.php:1154
-msgid "Name, Email, Single Line Text, Paragraph Text, Dropdown, Multiple Choice, Checkboxes, Numbers, Number Slider, and Payment Fields (Single Item, Total, etc.)"
-msgstr ""
-
-#: includes/admin/class-about.php:1160
-#: includes/admin/class-about.php:1167
-#: includes/admin/class-about.php:1174
-msgid "Access to all Standard, Fancy, and Payment Fields"
-msgstr ""
-
-#: includes/admin/class-about.php:1161
-#: includes/admin/class-about.php:1168
-#: includes/admin/class-about.php:1175
-msgid "Address, Phone, Website / URL, Date / Time, Password, File Upload, Layout, Rich Text, Content, HTML, Pagebreaks, Entry Preview, Section Dividers, Ratings, and Hidden Field"
-msgstr ""
-
-#: includes/admin/class-about.php:1183
-msgid "Not available"
-msgstr ""
-
-#: includes/admin/class-about.php:1189
-#: includes/admin/class-about.php:1195
-#: includes/admin/class-about.php:1201
-msgid "Powerful Form Logic for Building Smart Forms"
-msgstr ""
-
-#: includes/admin/class-about.php:1209
-#: includes/admin/class-about.php:1215
-#: includes/admin/class-about.php:1221
-msgid "Basic Form Templates"
-msgstr ""
-
-#: includes/admin/class-about.php:1227
-msgid "All Form Templates including Bonus 700+ pre-made form templates"
-msgstr ""
-
-#: includes/admin/class-about.php:1235
-msgid "Basic Anti-Spam Settings"
-msgstr ""
-
-#: includes/admin/class-about.php:1236
-msgid "Basic Protection, reCAPTCHA, hCaptcha, Cloudflare Turnstile and Akismet"
-msgstr ""
-
-#: includes/admin/class-about.php:1242
-#: includes/admin/class-about.php:1249
-#: includes/admin/class-about.php:1256
-msgid "Additional Anti-Spam Settings"
-msgstr ""
-
-#: includes/admin/class-about.php:1243
-#: includes/admin/class-about.php:1250
-#: includes/admin/class-about.php:1257
-msgid "Basic Protection, reCAPTCHA, hCaptcha, Cloudflare Turnstile, Akismet, Country Filter, Keyword Filter, and Custom Captcha"
-msgstr ""
-
-#: includes/admin/class-about.php:1265
-#: includes/admin/class-about.php:1272
-msgid "Limited Marketing Integration"
-msgstr ""
-
-#: includes/admin/class-about.php:1266
-#: includes/admin/class-about.php:1273
-msgid "Constant Contact only"
-msgstr ""
-
-#: includes/admin/class-about.php:1279
-#: includes/admin/class-about.php:1286
-msgid "Additional Marketing Integrations"
-msgstr ""
-
-#: includes/admin/class-about.php:1280
-#: includes/admin/class-about.php:1287
-msgid "Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Sendinblue, HubSpot, Drip, and MailerLite"
-msgstr ""
-
-#: includes/admin/class-about.php:1290
-#: includes/admin/class-about.php:1304
-#: includes/admin/class-about.php:1318
-#: includes/admin/class-about.php:1332
-msgid "<strong>Bonus:</strong> 5000+ integrations with Zapier."
-msgstr ""
-
-#: includes/admin/class-about.php:1300
-#: includes/admin/class-about.php:1314
-#: includes/admin/class-about.php:1328
-msgid "All Marketing Integrations"
-msgstr ""
-
-#: includes/admin/class-about.php:1301
-#: includes/admin/class-about.php:1315
-#: includes/admin/class-about.php:1329
-msgid "ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Sendinblue, HubSpot, Drip, and MailerLite"
-msgstr ""
-
-#: includes/admin/class-about.php:1344
-#: includes/admin/class-about.php:1351
-#: includes/admin/class-about.php:1358
-msgid "Limited Payment Forms"
-msgstr ""
-
-#: includes/admin/class-about.php:1345
-#: includes/admin/class-about.php:1352
-#: includes/admin/class-about.php:1359
-msgid "Accept payments using Stripe only"
-msgstr ""
-
-#: includes/admin/class-about.php:1365
-#: includes/admin/class-about.php:1372
-#: includes/admin/class-about.php:1379
-#: includes/admin/class-about.php:1386
-msgid "Create Payment Forms"
-msgstr ""
-
-#: includes/admin/class-about.php:1366
-msgid "Accept payments using PayPal Commerce, Stripe, Square, and PayPal Standard"
-msgstr ""
-
-#: includes/admin/class-about.php:1373
-#: includes/admin/class-about.php:1380
-#: includes/admin/class-about.php:1387
-msgid "Accept payments using PayPal Commerce, Stripe, Square, PayPal Standard, and Authorize.Net"
-msgstr ""
-
-#: includes/admin/class-about.php:1395
-#: includes/admin/class-about.php:1401
-#: includes/admin/class-about.php:1407
-msgid "Not Available"
-msgstr ""
-
-#: includes/admin/class-about.php:1413
-msgid "Create interactive Surveys and Polls with beautiful reports"
-msgstr ""
-
-#: includes/admin/class-about.php:1421
-msgid "No Advanced Features"
-msgstr ""
-
-#: includes/admin/class-about.php:1427
-#: includes/admin/class-about.php:1434
-msgid "Limited Advanced Features"
-msgstr ""
-
-#: includes/admin/class-about.php:1428
-msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation"
-msgstr ""
-
-#: includes/admin/class-about.php:1435
-msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation, Save and Resume Form"
-msgstr ""
-
-#: includes/admin/class-about.php:1441
-msgid "All Advanced Features"
-msgstr ""
-
-#: includes/admin/class-about.php:1442
-msgid "Multi-page Forms, File Upload Forms, Multiple Form Notifications, File Upload and CSV Attachments, Conditional Form Confirmation, Custom CAPTCHA, Offline Forms, Signature Forms, Save and Resume Form, Coupons"
-msgstr ""
-
-#: includes/admin/class-about.php:1450
-msgid "No Addons Included"
-msgstr ""
-
-#: includes/admin/class-about.php:1456
-msgid "Custom Captcha Addon included"
-msgstr ""
-
-#: includes/admin/class-about.php:1462
-msgid "Email Marketing Addons included"
-msgstr ""
-
-#: includes/admin/class-about.php:1468
-msgid "Pro Addons Included"
-msgstr ""
-
-#: includes/admin/class-about.php:1469
-msgid "Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Google Sheets, Coupons, and more (28 total)"
-msgstr ""
-
-#: includes/admin/class-about.php:1475
-#: includes/admin/class-about.php:1482
-#: includes/admin/class-about.php:1489
-msgid "All Addons Included"
-msgstr ""
-
-#: includes/admin/class-about.php:1476
-#: includes/admin/class-about.php:1483
-#: includes/admin/class-about.php:1490
-msgid "Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, Google Sheets, Coupons, and more (30+ total)"
-msgstr ""
-
-#: includes/admin/class-about.php:1498
-msgid "Limited Support"
-msgstr ""
-
-#: includes/admin/class-about.php:1504
-#: includes/admin/class-about.php:1510
-msgid "Standard Support"
-msgstr ""
-
-#: includes/admin/class-about.php:1516
-msgid "Priority Support"
-msgstr ""
-
-#: includes/admin/class-about.php:1522
-#: includes/admin/class-about.php:1528
-#: includes/admin/class-about.php:1534
-msgid "Premium Support"
-msgstr ""
-
-#: includes/admin/class-about.php:1542
-msgid "1 Site"
-msgstr ""
-
-#: includes/admin/class-about.php:1548
-msgid "3 Sites"
-msgstr ""
-
-#: includes/admin/class-about.php:1554
-msgid "5 Sites"
-msgstr ""
-
-#: includes/admin/class-about.php:1560
-#: includes/admin/class-about.php:1566
-#: includes/admin/class-about.php:1572
-msgid "Unlimited Sites"
 msgstr ""
 
 #: includes/admin/class-editor.php:46
@@ -2193,7 +2195,7 @@ msgstr ""
 #: includes/admin/class-menu.php:193
 #: includes/admin/class-menu.php:194
 #: lite/templates/education/builder/did-you-know.php:30
-#: lite/wpforms-lite.php:1346
+#: lite/wpforms-lite.php:1353
 #: src/Admin/Builder/AntiSpam.php:221
 msgid "Upgrade to Pro"
 msgstr ""
@@ -2729,15 +2731,15 @@ msgstr ""
 
 #: includes/admin/class-welcome.php:286
 #: lite/templates/admin/addons.php:65
-#: src/Admin/Notifications/EventDriven.php:598
-#: src/Admin/Notifications/EventDriven.php:605
-#: src/Admin/Notifications/EventDriven.php:612
-#: src/Admin/Notifications/EventDriven.php:651
-#: src/Admin/Notifications/EventDriven.php:658
-#: src/Admin/Notifications/EventDriven.php:665
-#: src/Admin/Notifications/EventDriven.php:718
-#: src/Admin/Notifications/EventDriven.php:725
-#: src/Admin/Notifications/EventDriven.php:732
+#: src/Admin/Notifications/EventDriven.php:601
+#: src/Admin/Notifications/EventDriven.php:608
+#: src/Admin/Notifications/EventDriven.php:615
+#: src/Admin/Notifications/EventDriven.php:654
+#: src/Admin/Notifications/EventDriven.php:661
+#: src/Admin/Notifications/EventDriven.php:668
+#: src/Admin/Notifications/EventDriven.php:721
+#: src/Admin/Notifications/EventDriven.php:728
+#: src/Admin/Notifications/EventDriven.php:735
 #: src/Admin/Tools/Views/Importer.php:363
 #: src/Lite/Admin/Pages/Addons.php:94
 msgid "Upgrade Now"
@@ -5628,75 +5630,75 @@ msgstr ""
 msgid "Pro Features:"
 msgstr ""
 
-#: lite/wpforms-lite.php:633
+#: lite/wpforms-lite.php:640
 msgid "Get WPForms Pro Today and Unlock all the Powerful Features »"
 msgstr ""
 
-#: lite/wpforms-lite.php:639
+#: lite/wpforms-lite.php:646
 msgid "<strong>Bonus:</strong> WPForms Lite users get <span class=\"green\">50% off regular price</span>, automatically applied at checkout."
 msgstr ""
 
-#: lite/wpforms-lite.php:867
+#: lite/wpforms-lite.php:874
 msgid "Form entries are not stored in WPForms Lite."
 msgstr ""
 
-#: lite/wpforms-lite.php:872
+#: lite/wpforms-lite.php:879
 msgid "View and Manage Your Form Entries inside WordPress"
 msgstr ""
 
-#: lite/wpforms-lite.php:875
+#: lite/wpforms-lite.php:882
 msgid "Once you upgrade to WPForms Pro, all future form entries will be stored in your WordPress database and displayed on this Entries screen."
 msgstr ""
 
-#: lite/wpforms-lite.php:879
+#: lite/wpforms-lite.php:886
 msgid "View Entries in Dashboard"
 msgstr ""
 
-#: lite/wpforms-lite.php:880
+#: lite/wpforms-lite.php:887
 msgid "Export Entries in a CSV File"
 msgstr ""
 
-#: lite/wpforms-lite.php:881
+#: lite/wpforms-lite.php:888
 msgid "Add Notes / Comments"
 msgstr ""
 
-#: lite/wpforms-lite.php:882
+#: lite/wpforms-lite.php:889
 msgid "Save Favorite Entries"
 msgstr ""
 
-#: lite/wpforms-lite.php:885
+#: lite/wpforms-lite.php:892
 msgid "Mark Read / Unread"
 msgstr ""
 
-#: lite/wpforms-lite.php:886
+#: lite/wpforms-lite.php:893
 msgid "Print Entries"
 msgstr ""
 
-#: lite/wpforms-lite.php:887
+#: lite/wpforms-lite.php:894
 msgid "Resend Notifications"
 msgstr ""
 
-#: lite/wpforms-lite.php:888
+#: lite/wpforms-lite.php:895
 msgid "See Geolocation Data"
 msgstr ""
 
 #. translators: %d - Backed up entries count.
-#: lite/wpforms-lite.php:902
+#: lite/wpforms-lite.php:909
 msgid "%d entry has been backed up"
 msgid_plural "%d entries have been backed up"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s - Time when Lite Connect was enabled.
-#: lite/wpforms-lite.php:916
+#: lite/wpforms-lite.php:923
 msgid "since you enabled Lite Connect on %s"
 msgstr ""
 
-#: lite/wpforms-lite.php:923
+#: lite/wpforms-lite.php:930
 msgid "Upgrade to WPForms Pro & Restore Form Entries"
 msgstr ""
 
-#: lite/wpforms-lite.php:929
+#: lite/wpforms-lite.php:936
 msgid "Upgrade to WPForms Pro Now"
 msgstr ""
 
@@ -5997,7 +5999,7 @@ msgid "No form ID found."
 msgstr ""
 
 #: src/Admin/Education/Builder/Captcha.php:68
-#: src/Admin/Pages/Analytics.php:522
+#: src/Admin/Pages/Analytics.php:530
 #: src/Admin/Pages/SMTP.php:442
 #: src/Lite/Admin/Education/LiteConnect.php:399
 #: src/Logger/Log.php:179
@@ -6472,85 +6474,86 @@ msgstr ""
 msgid "Welcome to WPForms!"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:523
-msgid "We’re grateful that you chose WPForms for your website! Now that you’ve installed the plugin, you’re less than 5 minutes away from publishing your first form. To make it easy, we’ve got 700+ form templates to get you started!"
+#. translators: %s - number of templates.
+#: src/Admin/Notifications/EventDriven.php:524
+msgid "We’re grateful that you chose WPForms for your website! Now that you’ve installed the plugin, you’re less than 5 minutes away from publishing your first form. To make it easy, we’ve got %s form templates to get you started!"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:527
+#: src/Admin/Notifications/EventDriven.php:530
 msgid "Start Building"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:534
+#: src/Admin/Notifications/EventDriven.php:537
 msgid "Read the Guide"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:551
+#: src/Admin/Notifications/EventDriven.php:554
 msgid "Don’t Miss Your Form Notification Emails!"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:552
+#: src/Admin/Notifications/EventDriven.php:555
 msgid "Did you know that many WordPress sites are not properly configured to send emails? With the free WP Mail SMTP plugin, you can easily optimize your site to send emails, avoid the spam folder, and make sure your emails land in the recipient’s inbox every time."
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:556
-#: src/Admin/Notifications/EventDriven.php:616
-#: src/Admin/Notifications/EventDriven.php:620
-#: src/Admin/Notifications/EventDriven.php:669
-#: src/Admin/Notifications/EventDriven.php:673
-#: src/Admin/Notifications/EventDriven.php:736
-#: src/Admin/Notifications/EventDriven.php:740
-#: src/Admin/Pages/Analytics.php:168
-#: src/Admin/Pages/Analytics.php:498
+#: src/Admin/Notifications/EventDriven.php:559
+#: src/Admin/Notifications/EventDriven.php:619
+#: src/Admin/Notifications/EventDriven.php:623
+#: src/Admin/Notifications/EventDriven.php:672
+#: src/Admin/Notifications/EventDriven.php:676
+#: src/Admin/Notifications/EventDriven.php:739
+#: src/Admin/Notifications/EventDriven.php:743
+#: src/Admin/Pages/Analytics.php:169
+#: src/Admin/Pages/Analytics.php:504
 #: src/Admin/Pages/SMTP.php:165
 #: src/Integrations/UncannyAutomator/UncannyAutomator.php:118
 msgid "Install Now"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:572
+#: src/Admin/Notifications/EventDriven.php:575
 msgid "Want to Be a VIP? Join Now!"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:573
+#: src/Admin/Notifications/EventDriven.php:576
 msgid "Running a WordPress site can be challenging. But help is just around the corner! Our Facebook group contains tons of tips and help to get your business growing! When you join our VIP Circle, you’ll get instant access to tips, tricks, and answers from a community of loyal WPForms users. Best of all, membership is 100% free!"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:577
+#: src/Admin/Notifications/EventDriven.php:580
 msgid "Join Now"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:585
+#: src/Admin/Notifications/EventDriven.php:588
 msgid "Want to Know What Your Customers Really Think?"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:586
+#: src/Admin/Notifications/EventDriven.php:589
 msgid "Nothing beats real feedback from your customers and visitors. That’s why many small businesses love our awesome Surveys and Polls addon. Instantly unlock full survey reporting right in your WordPress dashboard. And don’t forget: building a survey is easy with our pre-made templates, so you could get started within a few minutes!"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:638
+#: src/Admin/Notifications/EventDriven.php:641
 msgid "Get More Leads From Your Forms!"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:639
+#: src/Admin/Notifications/EventDriven.php:642
 msgid "Are your forms converting fewer visitors than you hoped? Often, visitors quit forms partway through. That can prevent you from getting all the leads you deserve to capture. With our Form Abandonment addon, you can capture partial entries even if your visitor didn’t hit Submit! From there, it’s easy to follow up with leads and turn them into loyal customers."
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:691
+#: src/Admin/Notifications/EventDriven.php:694
 msgid "What’s Your Dream WPForms Feature?"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:692
+#: src/Admin/Notifications/EventDriven.php:695
 msgid "If you could add just one feature to WPForms, what would it be? We want to know! Our team is busy surveying valued customers like you as we plan the year ahead. We’d love to know which features would take your business to the next level! Do you have a second to share your idea with us?"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:696
+#: src/Admin/Notifications/EventDriven.php:699
 msgid "Share Your Idea"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:705
+#: src/Admin/Notifications/EventDriven.php:708
 msgid "Congratulations! You Just Got Your 100th Form Entry!"
 msgstr ""
 
-#: src/Admin/Notifications/EventDriven.php:706
+#: src/Admin/Notifications/EventDriven.php:709
 msgid "You just hit 100 entries&hellip; and this is just the beginning! Now it’s time to dig into the data and figure out what makes your visitors tick. The User Journey addon shows you what your visitors looked at before submitting your form. Now you can easily find which areas of your site are triggering form conversions."
 msgstr ""
 
@@ -6559,137 +6562,137 @@ msgid "Watch Video"
 msgstr ""
 
 #. translators: %s - Lite plugin download URL.
-#: src/Admin/Pages/Analytics.php:142
+#: src/Admin/Pages/Analytics.php:143
 #: src/Admin/Pages/SMTP.php:139
 msgid "Could not install the plugin automatically. Please <a href=\"%s\">download</a> it and install it manually."
 msgstr ""
 
 #. translators: %s - Lite plugin download URL.
-#: src/Admin/Pages/Analytics.php:154
+#: src/Admin/Pages/Analytics.php:155
 #: src/Admin/Pages/SMTP.php:151
 msgid "Could not activate the plugin. Please activate it on the <a href=\"%s\">Plugins page</a>."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:165
+#: src/Admin/Pages/Analytics.php:166
 #: src/Admin/Pages/SMTP.php:162
 msgid "Installing..."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:166
+#: src/Admin/Pages/Analytics.php:167
 #: src/Admin/Pages/SMTP.php:163
 msgid "Activating..."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:167
-#: src/Admin/Pages/Analytics.php:421
+#: src/Admin/Pages/Analytics.php:168
+#: src/Admin/Pages/Analytics.php:422
 msgid "MonsterInsights Installed & Activated"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:169
-#: src/Admin/Pages/Analytics.php:498
+#: src/Admin/Pages/Analytics.php:170
+#: src/Admin/Pages/Analytics.php:504
 #: src/Admin/Pages/SMTP.php:166
 #: src/Integrations/UncannyAutomator/UncannyAutomator.php:118
 msgid "Activate Now"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:170
+#: src/Admin/Pages/Analytics.php:171
 #: src/Admin/Pages/SMTP.php:167
 msgid "Download Now"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:171
+#: src/Admin/Pages/Analytics.php:172
 #: src/Admin/Pages/SMTP.php:168
 msgid "Go to Plugins page"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:213
+#: src/Admin/Pages/Analytics.php:214
 msgid "WPForms ♥ MonsterInsights"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:214
+#: src/Admin/Pages/Analytics.php:215
 msgid "The Best Google Analytics Plugin for WordPress"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:215
+#: src/Admin/Pages/Analytics.php:216
 msgid "MonsterInsights connects WPForms to Google Analytics, providing a powerful integration with their Forms addon. MonsterInsights is a sister company of WPForms."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:241
+#: src/Admin/Pages/Analytics.php:242
 msgid "Analytics screenshot"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:243
-#: src/Admin/Pages/Analytics.php:397
+#: src/Admin/Pages/Analytics.php:244
+#: src/Admin/Pages/Analytics.php:398
 msgid "Track form impressions and conversions."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:244
+#: src/Admin/Pages/Analytics.php:245
 msgid "View form conversion rates from WordPress."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:245
+#: src/Admin/Pages/Analytics.php:246
 msgid "Complete UTM tracking with form entries."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:246
+#: src/Admin/Pages/Analytics.php:247
 msgid "Automatic integration with WPForms."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:307
+#: src/Admin/Pages/Analytics.php:308
 #: src/Admin/Pages/SMTP.php:307
 msgid "Step 1"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:341
+#: src/Admin/Pages/Analytics.php:342
 #: src/Admin/Pages/SMTP.php:341
 msgid "Step 2"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:342
+#: src/Admin/Pages/Analytics.php:343
 msgid "Setup MonsterInsights"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:343
+#: src/Admin/Pages/Analytics.php:344
 msgid "MonsterInsights has an intuitive setup wizard to guide you through the setup process."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:377
+#: src/Admin/Pages/Analytics.php:378
 msgid "Step 3"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:378
+#: src/Admin/Pages/Analytics.php:379
 msgid "Get Form Conversion Tracking"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:379
+#: src/Admin/Pages/Analytics.php:380
 msgid "With the MonsterInsights Form addon you can easily track your form views, entries, conversion rates, and more."
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:396
+#: src/Admin/Pages/Analytics.php:397
 msgid "Install & Activate MonsterInsights"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:407
+#: src/Admin/Pages/Analytics.php:408
 msgid "Install MonsterInsights"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:415
+#: src/Admin/Pages/Analytics.php:416
 msgid "MonsterInsights on WordPress.org"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:421
+#: src/Admin/Pages/Analytics.php:422
 msgid "Activate MonsterInsights"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:448
+#: src/Admin/Pages/Analytics.php:451
 msgid "Run Setup Wizard"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:454
+#: src/Admin/Pages/Analytics.php:457
 msgid "Setup Complete"
 msgstr ""
 
-#: src/Admin/Pages/Analytics.php:532
+#: src/Admin/Pages/Analytics.php:540
 #: src/Admin/Pages/SMTP.php:452
 msgid "Plugin unavailable."
 msgstr ""
@@ -8328,22 +8331,22 @@ msgid "Notifications can only use 1 From Email. Please do not enter multiple add
 msgstr ""
 
 #. translators: %1$s - WordPress site domain.
-#: src/Integrations/SMTP/Notifications.php:152
+#: src/Integrations/SMTP/Notifications.php:143
 msgid "The current 'From Email' address does not match your website domain name (%1$s). This can cause your notification emails to be blocked or marked as spam."
 msgstr ""
 
 #. translators: %1$s - WP Mail SMTP install page URL.
-#: src/Integrations/SMTP/Notifications.php:158
+#: src/Integrations/SMTP/Notifications.php:149
 msgid "We strongly recommend that you install the free <a href=\"%1$s\" target=\"_blank\">WP Mail SMTP</a> plugin! The Setup Wizard makes it easy to fix your emails."
 msgstr ""
 
 #. translators: %1$s - WordPress site domain.
-#: src/Integrations/SMTP/Notifications.php:173
+#: src/Integrations/SMTP/Notifications.php:164
 msgid "Alternately, try using a From Address that matches your website domain (no-reply@%1$s)."
 msgstr ""
 
 #. translators: %1$s - Fixing email delivery issues doc URL.
-#: src/Integrations/SMTP/Notifications.php:179
+#: src/Integrations/SMTP/Notifications.php:170
 msgid "Please check out our <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">doc on fixing email delivery issues</a> for more details."
 msgstr ""
 
@@ -8778,23 +8781,23 @@ msgstr ""
 msgid "Only the Lite version can be upgraded."
 msgstr ""
 
-#: src/Lite/Admin/Connect.php:97
+#: src/Lite/Admin/Connect.php:98
 msgid "WPForms Pro is installed but not activated."
 msgstr ""
 
-#: src/Lite/Admin/Connect.php:147
+#: src/Lite/Admin/Connect.php:149
 msgid "There was an error while installing an upgrade. Please download the plugin from wpforms.com and install it manually."
 msgstr ""
 
-#: src/Lite/Admin/Connect.php:201
+#: src/Lite/Admin/Connect.php:208
 msgid "There was an error while installing an upgrade. Please check file system permissions and try again. Also, you can download the plugin from wpforms.com and install it manually."
 msgstr ""
 
-#: src/Lite/Admin/Connect.php:227
+#: src/Lite/Admin/Connect.php:234
 msgid "No key provided."
 msgstr ""
 
-#: src/Lite/Admin/Connect.php:257
+#: src/Lite/Admin/Connect.php:265
 msgid "Pro version installed but needs to be activated on the Plugins page inside your WordPress admin."
 msgstr ""
 
@@ -10136,7 +10139,7 @@ msgstr ""
 
 #. translators: %s - WPForms.com Upgrade page URL.
 #: templates/education/admin/payments/single-page.php:22
-msgid "Unlock conditional logic, coupons (coming soon), lower Stripe fees, and more. <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Upgrade to Pro!</a>"
+msgid "Unlock conditional logic, coupons, lower Stripe fees, and more. <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Upgrade to Pro!</a>"
 msgstr ""
 
 #: templates/education/admin/payments/single-page.php:43
@@ -10286,21 +10289,21 @@ msgstr ""
 msgid "Create a form"
 msgstr ""
 
-#: wpforms.php:153
+#: wpforms.php:156
 msgid "Your site already has WPForms Pro activated. If you want to switch to WPForms Lite, please first go to Plugins → Installed Plugins and deactivate WPForms. Then, you can activate WPForms Lite."
 msgstr ""
 
 #. translators: %s - WPBeginner URL for recommended WordPress hosting.
-#: wpforms.php:188
+#: wpforms.php:191
 msgid "Your site is running an <strong>insecure version</strong> of PHP that is no longer supported. Please contact your web hosting provider to update your PHP version or switch to a <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">recommended WordPress hosting company</a>."
 msgstr ""
 
 #. translators: %s - WPForms.com URL for documentation with more details.
-#: wpforms.php:206
+#: wpforms.php:209
 msgid "<strong>Note:</strong> The WPForms plugin is disabled on your site until you fix the issue. <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Read more for additional information.</a>"
 msgstr ""
 
 #. translators: %s - WordPress version.
-#: wpforms.php:256
+#: wpforms.php:259
 msgid "The WPForms plugin is disabled because it requires WordPress %s or later."
 msgstr ""

@@ -62,7 +62,7 @@ class WPForms_Entries_Single {
 	 *
 	 * @since 1.3.9
 	 */
-	public function __construct() {
+	public function __construct() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		// Maybe load entries page.
 		add_action( 'admin_init', [ $this, 'init' ] );
@@ -72,6 +72,8 @@ class WPForms_Entries_Single {
 	 * Determine if the user is viewing the single entry page, if so, party on.
 	 *
 	 * @since 1.3.9
+	 *
+	 * @noinspection ForgottenDebugOutputInspection
 	 */
 	public function init() {
 
@@ -88,6 +90,16 @@ class WPForms_Entries_Single {
 			wp_die( esc_html__( 'Sorry, you are not allowed to view this entry.', 'wpforms' ), 403 );
 		}
 
+		$this->hooks();
+	}
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 1.8.2.3
+	 */
+	private function hooks() {
+
 		// Entry processing and setup.
 		add_action( 'wpforms_entries_init', [ $this, 'process_star' ], 8, 1 );
 		add_action( 'wpforms_entries_init', [ $this, 'process_unread' ], 8, 1 );
@@ -97,6 +109,7 @@ class WPForms_Entries_Single {
 		add_action( 'wpforms_entries_init', [ $this, 'setup' ], 10, 1 );
 		add_action( 'wpforms_entries_init', [ $this, 'register_alerts' ], 20, 1 );
 
+		// phpcs:ignore WPForms.Comments.PHPDocHooks.RequiredHookDocumentation, WPForms.PHP.ValidateHooks.InvalidHookName
 		do_action( 'wpforms_entries_init', 'details' );
 
 		// Output. Entry content and metaboxes.

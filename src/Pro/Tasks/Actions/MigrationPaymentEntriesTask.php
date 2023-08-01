@@ -212,10 +212,10 @@ class MigrationPaymentEntriesTask extends Task {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query(
-			"INSERT INTO {$this->temp_table_name} (entry_id)
+			"INSERT INTO $this->temp_table_name (entry_id)
 				SELECT entry_id
-				FROM {$entry_handler->table_name}
-				WHERE type = 'payment' AND entry_id NOT IN (SELECT entry_id FROM {$payment_handler->table_name})"
+				FROM $entry_handler->table_name
+				WHERE type = 'payment' AND entry_id NOT IN ( SELECT entry_id FROM $payment_handler->table_name )"
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
@@ -251,7 +251,7 @@ class MigrationPaymentEntriesTask extends Task {
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( "DROP TABLE IF EXISTS {$this->temp_table_name}" );
+		$wpdb->query( "DROP TABLE IF EXISTS $this->temp_table_name" );
 	}
 
 	/**
@@ -270,7 +270,7 @@ class MigrationPaymentEntriesTask extends Task {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$entry_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT entry_id FROM {$this->temp_table_name} WHERE id > %d LIMIT %d",
+				"SELECT entry_id FROM $this->temp_table_name WHERE id > %d LIMIT %d",
 				$action_index,
 				self::TASK_CHUNK_SIZE
 			)
@@ -381,8 +381,8 @@ class MigrationPaymentEntriesTask extends Task {
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			"SELECT entry_id, form_id, user_id, status, meta, date, date_modified, ip_address, user_agent, user_uuid
-			FROM {$entry_handler->table_name}
-			WHERE entry_id IN ( {$entry_ids_list} )"
+			FROM $entry_handler->table_name
+			WHERE entry_id IN ( $entry_ids_list )"
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 
@@ -459,9 +459,9 @@ class MigrationPaymentEntriesTask extends Task {
 
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
-			"INSERT INTO {$payment_handler->table_name}
+			"INSERT INTO $payment_handler->table_name
 			( form_id, status, subtotal_amount, discount_amount, total_amount, currency, entry_id, gateway, type, mode, transaction_id, customer_id, subscription_id, subscription_status, title, date_created_gmt, date_updated_gmt, is_published )
-			VALUES {$values}"
+			VALUES $values"
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 
@@ -515,9 +515,9 @@ class MigrationPaymentEntriesTask extends Task {
 
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
-			"INSERT INTO {$payment_meta_handler->table_name}
+			"INSERT INTO $payment_meta_handler->table_name
 			( payment_id, meta_key, meta_value )
-			VALUES {$values}"
+			VALUES $values"
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
@@ -546,7 +546,7 @@ class MigrationPaymentEntriesTask extends Task {
 
 		$wpdb->suppress_errors();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( "SET GLOBAL MAX_ALLOWED_PACKET = {$new_max_allowed_packet}" );
+		$wpdb->query( "SET GLOBAL MAX_ALLOWED_PACKET = $new_max_allowed_packet" );
 		$wpdb->suppress_errors( $is_suppressed );
 	}
 

@@ -72,7 +72,7 @@ class Ajax {
 		$table_name = wpforms()->get( 'entry' )->table_name;
 		$results    = (array) $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT date as day, COUNT(entry_id) as count FROM {$table_name} WHERE {$where_clause} date BETWEEN %s AND %s GROUP BY day ORDER BY day ASC",
+				"SELECT date as day, COUNT( entry_id ) as count FROM $table_name WHERE $where_clause date BETWEEN %s AND %s GROUP BY day ORDER BY day ASC",
 				[
 					$utc_start_date->format( Datepicker::DATETIME_FORMAT ),
 					$utc_end_date->format( Datepicker::DATETIME_FORMAT ),
@@ -176,7 +176,7 @@ class Ajax {
 
 		$form = wpforms()->get( 'access' )->filter_forms_by_current_user_capability( $form, 'view_entries_form_single' );
 		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
-		$where_clause = $wpdb->prepare( 'form_id IN (%1$s) AND', implode( ',', $form ) );
+		$where_clause = $wpdb->prepare( 'form_id IN ( %1$s ) AND', implode( ',', $form ) );
 
 		return [ '', $where_clause ];
 	}

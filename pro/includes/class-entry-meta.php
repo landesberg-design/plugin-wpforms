@@ -1,5 +1,8 @@
 <?php
 
+// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+/** @noinspection AutoloadingIssuesInspection */
+
 /**
  * Entry meta DB class.
  *
@@ -63,8 +66,8 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 	 *
 	 * @since 1.1.6
 	 *
-	 * @param array $args
-	 * @param bool $count
+	 * @param array $args  Arguments.
+	 * @param bool  $count Return count only when true.
 	 *
 	 * @return array|int
 	 */
@@ -72,25 +75,7 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 
 		global $wpdb;
 
-		$defaults = [
-			'number'   => 30,
-			'offset'   => 0,
-			'id'       => 0,
-			'entry_id' => 0,
-			'form_id'  => 0,
-			'user_id'  => '',
-			'status'   => '',
-			'type'     => '',
-			//'date'          => '', @todo
-			'orderby'  => 'id',
-			'order'    => 'DESC',
-		];
-
-		$args = wp_parse_args( $args, $defaults );
-
-		if ( $args['number'] < 1 ) {
-			$args['number'] = PHP_INT_MAX;
-		}
+		$args = $this->prepare_args( $args );
 
 		$where = $this->build_where(
 			$args,
@@ -101,11 +86,88 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 		$keys = [ 'status', 'type', 'data' ];
 
 		foreach ( $keys as $key ) {
-
 			if ( ! empty( $args[ $key ] ) ) {
 				$where .= empty( $where ) ? 'WHERE' : 'AND';
-				$where .= " `{$key}` = '" . esc_sql( $args[ $key ] ) . "' ";
+				$where .= " `$key` = '" . esc_sql( $args[ $key ] ) . "' ";
 			}
+		}
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( (bool) $count === true ) {
+			return absint( $wpdb->get_var( "SELECT COUNT( $this->primary_key ) FROM $this->table_name $where;" ) );
+		}
+
+		return $wpdb->get_results(
+			"SELECT * FROM $this->table_name $where ORDER BY {$args['orderby']} {$args['order']} LIMIT {$args['offset']}, {$args['number']};"
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	}
+
+	/**
+	 * Create custom entry meta database table.
+	 *
+	 * @since 1.1.6
+	 */
+	public function create_table() {
+
+		global $wpdb;
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		$charset_collate = '';
+
+		if ( ! empty( $wpdb->charset ) ) {
+			$charset_collate .= "DEFAULT CHARACTER SET $wpdb->charset";
+		}
+		if ( ! empty( $wpdb->collate ) ) {
+			$charset_collate .= " COLLATE $wpdb->collate";
+		}
+
+		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			entry_id bigint(20) NOT NULL,
+			form_id bigint(20) NOT NULL,
+			user_id bigint(20) NOT NULL,
+			status varchar(30) NOT NULL,
+			type varchar(255) NOT NULL,
+			data longtext NOT NULL,
+			date datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY entry_id (entry_id)
+		) {$charset_collate};";
+
+		dbDelta( $sql );
+	}
+
+	/**
+	 * Prepare arguments.
+	 *
+	 * @since 1.8.2.3
+	 *
+	 * @param array $args Arguments.
+	 *
+	 * @return array
+	 */
+	private function prepare_args( array $args ) {
+
+		$defaults = [
+			'number'   => 30,
+			'offset'   => 0,
+			'id'       => 0,
+			'entry_id' => 0,
+			'form_id'  => 0,
+			'user_id'  => '',
+			'status'   => '',
+			'type'     => '',
+			// @todo 'date'.
+			'orderby'  => 'id',
+			'order'    => 'DESC',
+		];
+
+		$args = wp_parse_args( $args, $defaults );
+
+		if ( $args['number'] < 1 ) {
+			$args['number'] = PHP_INT_MAX;
 		}
 
 		// Orderby.
@@ -124,53 +186,6 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 			$args['order'] = 'DESC';
 		}
 
-		if ( true === $count ) {
-
-			$results = absint( $wpdb->get_var( "SELECT COUNT({$this->primary_key}) FROM {$this->table_name} {$where};" ) );
-
-		} else {
-
-			$results = $wpdb->get_results(
-				"SELECT * FROM {$this->table_name} {$where} ORDER BY {$args['orderby']} {$args['order']} LIMIT {$args['offset']}, {$args['number']};"
-			);
-		}
-
-		return $results;
-	}
-
-	/**
-	 * Create custom entry meta database table.
-	 *
-	 * @since 1.1.6
-	 */
-	public function create_table() {
-
-		global $wpdb;
-
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-
-		$charset_collate = '';
-
-		if ( ! empty( $wpdb->charset ) ) {
-			$charset_collate .= "DEFAULT CHARACTER SET {$wpdb->charset}";
-		}
-		if ( ! empty( $wpdb->collate ) ) {
-			$charset_collate .= " COLLATE {$wpdb->collate}";
-		}
-
-		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
-			id bigint(20) NOT NULL AUTO_INCREMENT,
-			entry_id bigint(20) NOT NULL,
-			form_id bigint(20) NOT NULL,
-			user_id bigint(20) NOT NULL,
-			status varchar(30) NOT NULL,
-			type varchar(255) NOT NULL,
-			data longtext NOT NULL,
-			date datetime NOT NULL,
-			PRIMARY KEY  (id),
-			KEY entry_id (entry_id)
-		) {$charset_collate};";
-
-		dbDelta( $sql );
+		return $args;
 	}
 }

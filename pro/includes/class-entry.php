@@ -1,5 +1,8 @@
 <?php
 
+// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+/** @noinspection AutoloadingIssuesInspection */
+
 /**
  * Entry DB class.
  *
@@ -119,10 +122,13 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * @param array $args     Additional arguments.
 	 *
 	 * @return object|null
+	 * @noinspection PhpParameterNameChangedDuringInheritanceInspection
 	 */
 	public function get( $entry_id, $args = [] ) {
 
-		if ( ! isset( $args['cap'] ) && wpforms()->get( 'access' )->init_allowed() ) {
+		$access = wpforms()->get( 'access' );
+
+		if ( ! isset( $args['cap'] ) && $access && $access->init_allowed() ) {
 			$args['cap'] = 'view_entry_single';
 		}
 
@@ -146,6 +152,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * @param array  $args  Additional arguments.
 	 *
 	 * @return bool|null
+	 * @noinspection PhpParameterNameChangedDuringInheritanceInspection
 	 */
 	public function update( $id, $data = [], $where = '', $type = '', $args = [] ) {
 
@@ -171,6 +178,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * @param array $args     Additional arguments.
 	 *
 	 * @return bool False if the record could not be deleted, true otherwise.
+	 * @noinspection PhpParameterNameChangedDuringInheritanceInspection
 	 */
 	public function delete( $entry_id = 0, $args = [] ) {
 
@@ -182,11 +190,21 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return false;
 		}
 
-		\WPForms_Field_File_Upload::delete_uploaded_files_from_entry( $entry_id );
+		WPForms_Field_File_Upload::delete_uploaded_files_from_entry( $entry_id );
 
-		$entry  = parent::delete( $entry_id );
-		$meta   = wpforms()->entry_meta->delete_by( 'entry_id', $entry_id );
-		$fields = wpforms()->entry_fields->delete_by( 'entry_id', $entry_id );
+		$entry        = parent::delete( $entry_id );
+		$entry_meta   = wpforms()->get( 'entry_meta' );
+		$entry_fields = wpforms()->get( 'entry_fields' );
+		$meta         = null;
+		$fields       = null;
+
+		if ( $entry_meta ) {
+			$meta = $entry_meta->delete_by( 'entry_id', $entry_id );
+		}
+
+		if ( $entry_fields ) {
+			$fields = $entry_fields->delete_by( 'entry_id', $entry_id );
+		}
 
 		WPForms\Pro\Admin\DashboardWidget::clear_widget_cache();
 
@@ -211,18 +229,20 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return null;
 		}
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->table_name}
+				"SELECT * FROM $this->table_name
 				WHERE `form_id` = %d
-  				  AND {$this->primary_key} > %d
-				ORDER BY {$this->primary_key}
+  				  AND $this->primary_key > %d
+				ORDER BY $this->primary_key
 				LIMIT 1;",
 				absint( $form_id ),
 				absint( $entry_id )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 	/**
@@ -234,6 +254,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * @param int $form_id  Form ID.
 	 *
 	 * @return object|null Object from DB values or null.
+	 * @noinspection PhpUnused
 	 */
 	public function get_prev( $entry_id, $form_id ) {
 
@@ -243,18 +264,20 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return null;
 		}
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->table_name}
+				"SELECT * FROM $this->table_name
 				WHERE `form_id` = %d
-				  AND {$this->primary_key} < %d
-				ORDER BY {$this->primary_key} DESC
+				  AND $this->primary_key < %d
+				ORDER BY $this->primary_key DESC
 				LIMIT 1;",
 				absint( $form_id ),
 				absint( $entry_id )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 	/**
@@ -265,6 +288,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * @param int $form_id Form ID.
 	 *
 	 * @return object|null Object from DB values or null.
+	 * @noinspection PhpUnused
 	 */
 	public function get_last( $form_id ) {
 
@@ -274,16 +298,18 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return null;
 		}
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM {$this->table_name}
+				"SELECT * FROM $this->table_name
 				WHERE `form_id` = %d
-				ORDER BY {$this->primary_key} DESC
+				ORDER BY $this->primary_key DESC
 				LIMIT 1;",
 				(int) $form_id
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 	/**
@@ -294,6 +320,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * @param int $form_id Form ID.
 	 *
 	 * @return bool
+	 * @noinspection PhpUnused
 	 */
 	public function mark_all_read( $form_id = 0 ) {
 
@@ -303,7 +330,17 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return false;
 		}
 
-		return (bool) $wpdb->query( $wpdb->prepare( "UPDATE $this->table_name SET `viewed` = '1' WHERE `form_id` = %d", (int) $form_id ) ); // phpcs:ignore WordPress.DB
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE $this->table_name SET `viewed` = '1' WHERE `form_id` = %d",
+				(int) $form_id
+			)
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		return (bool) $result; // phpcs:ignore WordPress.DB
 	}
 
 	/**
@@ -315,6 +352,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * @param int $form_id  Form ID.
 	 *
 	 * @return int
+	 * @noinspection PhpUnused
 	 */
 	public function get_next_count( $entry_id, $form_id ) {
 
@@ -324,15 +362,18 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return 0;
 		}
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		$prev_count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT({$this->primary_key}) FROM {$this->table_name}
-				WHERE `form_id` = %d AND {$this->primary_key} > %d
-				ORDER BY {$this->primary_key} ASC;",
+				"SELECT COUNT( $this->primary_key ) FROM $this->table_name
+				WHERE `form_id` = %d AND $this->primary_key > %d
+				ORDER BY $this->primary_key;",
 				absint( $form_id ),
 				absint( $entry_id )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return absint( $prev_count );
 	}
@@ -347,6 +388,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * @param int $form_id  Form ID.
 	 *
 	 * @return int
+	 * @noinspection PhpUnused
 	 */
 	public function get_prev_count( $entry_id, $form_id ) {
 
@@ -356,15 +398,18 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return 0;
 		}
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		$prev_count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT({$this->primary_key}) FROM {$this->table_name}
-				WHERE `form_id` = %d AND {$this->primary_key} < %d
-				ORDER BY {$this->primary_key} ASC;",
+				"SELECT COUNT( $this->primary_key ) FROM $this->table_name
+				WHERE `form_id` = %d AND $this->primary_key < %d
+				ORDER BY $this->primary_key;",
 				absint( $form_id ),
 				absint( $entry_id )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return absint( $prev_count );
 	}
@@ -419,7 +464,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		 * @param array $args {
 		 *     Entries query arguments.
 		 *
-		 *     @type string  $select        Table field. Possible values: 'all', 'entry_ids'. By default 'all'.
+		 *     @type string  $select        Table field. Possible values: 'all', 'entry_ids'. By default, 'all'.
 		 *     @type integer $number        Number of the entries.
 		 *     @type integer $offset        Offset.
 		 *     @type integer $form_id       Form ID.
@@ -468,7 +513,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			'wpforms_entry_handler_get_entries_select',
 			[
 				'all'       => '*',
-				'entry_ids' => "{$this->table_name}.entry_id",
+				'entry_ids' => "$this->table_name.entry_id",
 			]
 		);
 
@@ -508,14 +553,14 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				$ids = (int) $args[ $key ];
 			}
 
-			$where[ 'arg_' . $key ] = "{$this->table_name}.{$key} IN ( {$ids} )";
+			$where[ 'arg_' . $key ] = "$this->table_name.$key IN ( $ids )";
 		}
 
 		// Allowed string arg items.
 		foreach ( [ 'status', 'type', 'user_uuid' ] as $key ) {
 
 			if ( $args[ $key ] !== '' ) {
-				$where[ 'arg_' . $key ] = "{$this->table_name}.{$key} = '" . esc_sql( $args[ $key ] ) . "'";
+				$where[ 'arg_' . $key ] = "$this->table_name.$key = '" . esc_sql( $args[ $key ] ) . "'";
 			}
 		}
 
@@ -532,8 +577,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				$date_end   = wpforms_get_day_period_date( 'end_of_day', strtotime( $args[ $key ][1] ), 'Y-m-d H:i:s', true );
 
 				if ( ! empty( $date_start ) && ! empty( $date_end ) ) {
-					$where[ 'arg_' . $key . '_start' ] = "{$this->table_name}.{$key} >= '{$date_start}'";
-					$where[ 'arg_' . $key . '_end' ]   = "{$this->table_name}.{$key} <= '{$date_end}'";
+					$where[ 'arg_' . $key . '_start' ] = "$this->table_name.$key >= '$date_start'";
+					$where[ 'arg_' . $key . '_end' ]   = "$this->table_name.$key <= '$date_end'";
 				}
 			} elseif ( is_string( $args[ $key ] ) ) {
 				/*
@@ -546,8 +591,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				$date_end   = wpforms_get_day_period_date( 'end_of_day', $timestamp, 'Y-m-d H:i:s', true );
 
 				if ( ! empty( $date_start ) && ! empty( $date_end ) ) {
-					$where[ 'arg_' . $key . '_start' ] = "{$this->table_name}.{$key} >= '{$date_start}'";
-					$where[ 'arg_' . $key . '_end' ]   = "{$this->table_name}.{$key} <= '{$date_end}'";
+					$where[ 'arg_' . $key . '_start' ] = "$this->table_name.$key >= '$date_start'";
+					$where[ 'arg_' . $key . '_end' ]   = "$this->table_name.$key <= '$date_end'";
 				}
 			}
 		}
@@ -562,7 +607,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		 */
 		if ( $args['orderby'] !== 'payment_total' ) {
 			$args['orderby'] = ! array_key_exists( $args['orderby'], $this->get_columns() ) ? $this->primary_key : $args['orderby'];
-			$args['orderby'] = "{$this->table_name}.{$args['orderby']}";
+			$args['orderby'] = "$this->table_name.{$args['orderby']}";
 		}
 
 		if ( 'ASC' === strtoupper( $args['order'] ) ) {
@@ -579,6 +624,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		if ( $args['number'] < 1 ) {
 			$args['number'] = PHP_INT_MAX;
 		}
+
 		$args['number'] = absint( $args['number'] );
 
 		/*
@@ -590,14 +636,14 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		// Add a LEFT OUTER JOIN for retrieve a notes' count.
 		if ( $args['notes_count'] ) {
 			$sql_from .= ' LEFT JOIN';
-			$sql_from .= " ( SELECT {$meta_table}.entry_id AS meta_entry_id, COUNT({$meta_table}.id) AS notes_count";
-			$sql_from .= " FROM {$meta_table}";
-			$sql_from .= " WHERE {$meta_table}.type = 'note'";
+			$sql_from .= " ( SELECT $meta_table.entry_id AS meta_entry_id, COUNT( $meta_table.id ) AS notes_count";
+			$sql_from .= " FROM $meta_table";
+			$sql_from .= " WHERE $meta_table.type = 'note'";
 			$sql_from .= ' GROUP BY meta_entry_id )';
-			$sql_from .= " notes_counts ON notes_counts.meta_entry_id = {$this->table_name}.entry_id";
+			$sql_from .= " notes_counts ON notes_counts.meta_entry_id = $this->table_name.entry_id";
 
 			// Changed the ORDER BY - notes' count sorting support.
-			if ( $args['orderby'] === "{$this->table_name}.notes_count" ) {
+			if ( $args['orderby'] === "$this->table_name.notes_count" ) {
 				$args['orderby'] = 'notes_counts.notes_count';
 			}
 		}
@@ -638,18 +684,18 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return absint(
 				// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->get_var(
-					"SELECT COUNT({$this->table_name}.{$this->primary_key})
-					FROM {$sql_from}
-					WHERE {$where_sql};"
+					"SELECT COUNT( $this->table_name.$this->primary_key )
+					FROM $sql_from
+					WHERE $where_sql;"
 				)
 				// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			);
 		}
 
 		$sql = "
-			SELECT {$select}
-			FROM {$sql_from}
-			WHERE {$where_sql}
+			SELECT $select
+			FROM $sql_from
+			WHERE $where_sql
 			ORDER BY {$args['orderby']} {$args['order']}
 			LIMIT {$args['offset']}, {$args['number']}
 		";
@@ -694,38 +740,39 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			)
 		) {
 			$fields_table     = wpforms()->get( 'entry_fields' )->table_name;
-			$second_sql_from .= " JOIN {$fields_table} ON {$this->table_name}.`entry_id` = {$fields_table}.`entry_id`";
+			$second_sql_from .= " JOIN $fields_table ON $this->table_name.`entry_id` = $fields_table.`entry_id`";
 		}
 
 		$second_sql = "
-			SELECT {$this->table_name}.`entry_id`
-			FROM {$second_sql_from}
-			WHERE {$second_where_sql}
+			SELECT $this->table_name.`entry_id`
+			FROM $second_sql_from
+			WHERE $second_where_sql
 			GROUP BY `entry_id`
 		";
 
 		global $wpdb;
 
-		$second_result    = $wpdb->get_results( $second_sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$second_result    = $wpdb->get_results( $second_sql );
 		$second_entry_ids = ! empty( $second_result ) ? wp_list_pluck( $second_result, 'entry_id' ) : [];
 
 		if ( empty( $second_entry_ids ) ) {
-			$where['arg_entry_id'] = "{$this->table_name}.`entry_id` IN ( 0 )";
+			$where['arg_entry_id'] = "$this->table_name.`entry_id` IN ( 0 )";
 
 			return $where;
 		}
 
 		$ids = array_map( 'intval', (array) $args['entry_id'] );
 
-		// `Any form field does not contains` and `Any form field is not` is a special cases.
+		// `Any form field does not contain` and `Any form field is not` are special cases.
 		$any_field_not = empty( $args['advanced_search'] ) &&
 						 ( empty( $args['field_id'] ) || $args['field_id'] === 'any' ) &&
 						 in_array( $args['value_compare'], [ 'is_not', 'contains_not' ], true );
 
 		if (
+			$any_field_not ||
 			! empty( $args['advanced_search'] ) ||
-			in_array( $args['value_compare'], [ 'is', 'contains' ], true ) ||
-			$any_field_not
+			in_array( $args['value_compare'], [ 'is', 'contains' ], true )
 		) {
 			$ids = array_merge( $ids, $second_entry_ids );
 		} else {
@@ -736,7 +783,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$ids = empty( $ids ) ? [ 0 ] : $ids;
 		$ids = implode( ',', array_map( 'intval', $ids ) );
 
-		$where['arg_entry_id'] = "{$this->table_name}.`entry_id` IN ({$ids})";
+		$where['arg_entry_id'] = "$this->table_name.`entry_id` IN ($ids)";
 
 		return $where;
 	}
@@ -760,10 +807,14 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		if ( empty( $args['advanced_search'] ) && is_numeric( $args['field_id'] ) ) {
 			$args['field_id']             = (int) $args['field_id'];
-			$second_where['arg_field_id'] = "{$fields_table}.field_id = '{$args['field_id']}'";
+			$second_where['arg_field_id'] = "$fields_table.field_id = '{$args['field_id']}'";
 		}
 
-		if ( ! isset( $args['value'] ) || wpforms_is_empty_string( $args['value'] ) || in_array( $args['value_compare'], [ 'is', 'contains' ], true ) ) {
+		if (
+			! isset( $args['value'] ) ||
+			wpforms_is_empty_string( $args['value'] ) ||
+			in_array( $args['value_compare'], [ 'is', 'contains' ], true )
+		) {
 			return $second_where;
 		}
 
@@ -777,17 +828,17 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			}
 
 			$escaped_value   = esc_sql( $args['value'] );
-			$condition_value = $args['value_compare'] === 'is_not' ? " = '{$escaped_value}'" : " LIKE '%{$escaped_value}%'";
+			$condition_value = $args['value_compare'] === 'is_not' ? " = '$escaped_value'" : " LIKE '%$escaped_value%'";
 			$form_ids        = implode( ',', array_map( 'intval', (array) $args['form_id'] ) );
 			$form_ids_where  = ! empty( $form_ids ) ? "AND `form_id` IN ( $form_ids )" : '';
 
 			if ( wpforms_is_empty_string( $escaped_value ) ) {
 
-				$second_where['fields_entry_not_in'] = "{$this->table_name}.`entry_id` NOT IN ( 0 )";
+				$second_where['fields_entry_not_in'] = "$this->table_name.`entry_id` NOT IN ( 0 )";
 
 			} else {
 
-				$second_where['fields_entry_not_in'] = "{$this->table_name}.`entry_id` NOT IN (
+				$second_where['fields_entry_not_in'] = "$this->table_name.`entry_id` NOT IN (
 					SELECT `entry_id`
 					FROM {$fields_table}
 					WHERE
@@ -804,7 +855,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		if ( $args['advanced_search'] === 'entry_notes' ) {
 			$entry_ids                         = $this->second_query_where_entry_notes_or_payment_details_result_ids( $args );
-			$second_where['meta_entry_not_in'] = "{$this->table_name}.`entry_id` NOT IN ( {$entry_ids} )";
+			$second_where['meta_entry_not_in'] = "$this->table_name.`entry_id` NOT IN ( $entry_ids )";
 		}
 
 		return $second_where;
@@ -831,7 +882,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		// If the sanitized search term is empty, we should return nothing in the case of direct logic.
 		if ( in_array( $args['value_compare'], [ 'is', 'contains' ], true ) ) {
-			return "{$this->table_name}.`entry_id` IN ( 0 )";
+			return "$this->table_name.`entry_id` IN ( 0 )";
 		}
 
 		return '';
@@ -854,7 +905,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		if ( empty( $args['advanced_search'] ) ) {
 			$fields_table = wpforms()->get( 'entry_fields' )->table_name;
 
-			return "{$fields_table}.`value` {$condition_value}";
+			return "$fields_table.`value` $condition_value";
 		}
 
 		// In the case of searching the `entry_id` with `is` or `is_not` we should prepare the value and generate different WHERE part.
@@ -885,15 +936,15 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		}
 
 		if ( $args['advanced_search'] === 'entry_id' ) {
-			return "{$this->table_name}.`entry_id` {$condition_value}";
+			return "$this->table_name.`entry_id` $condition_value";
 		}
 
 		if ( $args['advanced_search'] === 'ip_address' ) {
-			return "{$this->table_name}.`ip_address` {$condition_value}";
+			return "$this->table_name.`ip_address` $condition_value";
 		}
 
 		if ( $args['advanced_search'] === 'user_agent' ) {
-			return "{$this->table_name}.`user_agent` {$condition_value}";
+			return "$this->table_name.`user_agent` $condition_value";
 		}
 
 		if ( ! in_array( $args['advanced_search'], [ 'entry_notes', 'payment_details' ], true ) ) {
@@ -906,7 +957,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		) {
 			$entry_ids = $this->second_query_where_entry_notes_or_payment_details_result_ids( $args );
 
-			return "{$this->table_name}.`entry_id` IN ( {$entry_ids} )";
+			return "$this->table_name.`entry_id` IN ( $entry_ids )";
 		}
 
 		return '';
@@ -942,7 +993,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		$operator = $value_compare === 'is' ? 'IN' : 'NOT IN';
 
-		return "{$this->table_name}.`entry_id` {$operator} ( {$escaped_value} )";
+		return "$this->table_name.`entry_id` $operator ( $escaped_value )";
 	}
 
 	/**
@@ -1002,17 +1053,17 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$meta_table     = wpforms()->get( 'entry_meta' )->table_name;
 		$escaped_value  = strtolower( esc_sql( $args['value'] ) );
 		$data           = str_replace( [ '  ', ' ' ], [ ' ', '%' ], $escaped_value );
-		$data           = "AND data LIKE '%{$data}%'";
+		$data           = "AND data LIKE '%$data%'";
 		$form_ids_where = ! empty( $form_ids ) ? "AND form_id IN ( $form_ids )" : '';
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$notes = $wpdb->get_results(
 			"SELECT entry_id, data
-			FROM {$meta_table}
+			FROM $meta_table
 			WHERE
 				type = 'note'
 				$data
-				{$form_ids_where}"
+				$form_ids_where"
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
@@ -1100,10 +1151,10 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$charset_collate = '';
 
 		if ( ! empty( $wpdb->charset ) ) {
-			$charset_collate .= "DEFAULT CHARACTER SET {$wpdb->charset}";
+			$charset_collate .= "DEFAULT CHARACTER SET $wpdb->charset";
 		}
 		if ( ! empty( $wpdb->collate ) ) {
-			$charset_collate .= " COLLATE {$wpdb->collate}";
+			$charset_collate .= " COLLATE $wpdb->collate";
 		}
 
 		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
@@ -1138,7 +1189,16 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 */
 	public function get_count_per_page() {
 
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+		/**
+		 * Give developers an ability to modify number of entries per page.
+		 *
+		 * @since 1.6.5
+		 *
+		 * @param array $count Entries' count per page.
+		 */
 		return (int) apply_filters( 'wpforms_entries_per_page', 30 );
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -1158,7 +1218,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return false;
 		}
 
-		$form_data = wpforms()->get( 'form' )->get( (int) $entry->form_id, [ 'content_only' => true ] );
+		$form      = wpforms()->get( 'form' );
+		$form_data = $form ? $form->get( (int) $entry->form_id, [ 'content_only' => true ] ) : null;
 
 		if ( ! is_array( $form_data ) || empty( $form_data['fields'] ) ) {
 			return false;
@@ -1166,6 +1227,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		foreach ( $form_data['fields'] as $id => $form_field ) {
 
+			// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
 			/** This filter is documented in src/Pro/Admin/Entries/Edit.php */
 			$is_editable = (bool) apply_filters(
 				'wpforms_pro_admin_entries_edit_field_output_editable',
@@ -1174,6 +1236,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				$entry_fields,
 				$form_data
 			);
+			// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
 			if ( ! $is_editable ) {
 				unset( $form_data['fields'][ $id ] );
@@ -1196,8 +1259,10 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		$editable = in_array( $type, $this->get_editable_field_types(), true );
 
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
 		/** This filter is documented in src/Pro/Admin/Entries/Edit.php */
 		return (bool) apply_filters( 'wpforms_pro_admin_entries_edit_field_editable', $editable, $type );
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -1303,7 +1368,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		}
 
 		// Create payment.
-		$payment_id = wpforms()->get( 'payment' )->add( $payment_data );
+		$payment    = wpforms()->get( 'payment' );
+		$payment_id = $payment ? $payment->add( $payment_data ) : null;
 
 		if ( ! $payment_id ) {
 			return;
@@ -1321,7 +1387,11 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		];
 
 		// Insert payment meta.
-		wpforms()->get( 'payment_meta' )->bulk_add( $payment_id, $payment_meta );
+		$payment_meta_object = wpforms()->get( 'payment_meta' );
+
+		if ( $payment_meta_object ) {
+			$payment_meta_object->bulk_add( $payment_id, $payment_meta );
+		}
 	}
 
 	/**
@@ -1338,10 +1408,10 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$escaped_value = esc_sql( $args['value'] );
 
 		$condition_values = [
-			'is'           => " = '{$escaped_value}'",
-			'is_not'       => " <> '{$escaped_value}'",
-			'contains'     => " LIKE '%{$escaped_value}%'",
-			'contains_not' => " NOT LIKE '%{$escaped_value}%'",
+			'is'           => " = '$escaped_value'",
+			'is_not'       => " <> '$escaped_value'",
+			'contains'     => " LIKE '%$escaped_value%'",
+			'contains_not' => " NOT LIKE '%$escaped_value%'",
 		];
 
 		$value_compare = empty( $args['value_compare'] ) ? 'is' : $args['value_compare'];

@@ -502,7 +502,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 									$element.addClass( validClass ).removeClass( errorClass );
 								}
 
-								$field.removeClass( 'wpforms-has-error' );
+								// Remove the error class from the field container if there are no subfields errors.
+								if ( ! $field.find( ':input.wpforms-error' ).length ) {
+									$field.removeClass( 'wpforms-has-error' );
+								}
 
 								// Remove error message to be sure the next time the `errorPlacement` method will be executed.
 								if ( app.isModernMarkupEnabled() ) {
@@ -1263,11 +1266,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 			// Rating field: toggle selected state.
 			$( document ).on( 'change', '.wpforms-field-rating-item input', function() {
-
 				var $this  = $( this ),
 					$wrap  = $this.closest( '.wpforms-field-rating-items' ),
 					$items = $wrap.find( '.wpforms-field-rating-item' );
-
+				$this.focus(); // Enable keyboard navigation.
 				$items.removeClass( 'hover selected' );
 				$this.parent().prevAll().addBack().addClass( 'selected' );
 			} );
@@ -2496,6 +2498,9 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				$form
 					.find( '.wpforms-submit-container' )
 					.before( `<div class="wpforms-error-container"${roleAttr}>${errPrefix}${errors}</div>` );
+
+				app.setCurrentPage( $form, {} );
+
 				return;
 			}
 

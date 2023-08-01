@@ -163,7 +163,7 @@ WPForms.FormSelector = WPForms.FormSelector || ( function( document, window, $ )
 		 */
 		initDefaults: function() {
 
-			[ 'formId', 'copyPasteValue' ].forEach( key => delete defaultStyleSettings[ key ] );
+			[ 'formId', 'copyPasteJsonValue' ].forEach( key => delete defaultStyleSettings[ key ] );
 		},
 
 		/**
@@ -449,7 +449,7 @@ WPForms.FormSelector = WPForms.FormSelector || ( function( document, window, $ )
 								label={ strings.copy_paste_settings }
 								rows="4"
 								spellCheck="false"
-								value={ attributes.copyPasteValue }
+								value={ attributes.copyPasteJsonValue }
 								onChange={ value => handlers.pasteSettings( value ) }
 							/>
 							<div className="wpforms-gutenberg-form-selector-legend" dangerouslySetInnerHTML={{ __html: strings.copy_paste_notice }}></div>
@@ -734,7 +734,7 @@ WPForms.FormSelector = WPForms.FormSelector || ( function( document, window, $ )
 						content[key] = atts[ key ];
 					}
 
-					props.setAttributes( { 'copyPasteValue': JSON.stringify( content ) } );
+					props.setAttributes( { 'copyPasteJsonValue': JSON.stringify( content ) } );
 				},
 
 				/**
@@ -760,7 +760,7 @@ WPForms.FormSelector = WPForms.FormSelector || ( function( document, window, $ )
 						return;
 					}
 
-					pasteAttributes.copyPasteValue = value;
+					pasteAttributes.copyPasteJsonValue = value;
 
 					props.setAttributes( pasteAttributes );
 
@@ -898,9 +898,9 @@ WPForms.FormSelector = WPForms.FormSelector || ( function( document, window, $ )
 					type: 'string',
 					default: defaults.buttonTextColor,
 				},
-				copyPasteValue: {
+				copyPasteJsonValue: {
 					type: 'string',
-					default: defaults.copyPasteValue,
+					default: defaults.copyPasteJsonValue,
 				},
 			};
 		},

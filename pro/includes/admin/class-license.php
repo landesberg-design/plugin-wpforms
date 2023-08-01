@@ -1,6 +1,7 @@
 <?php
 
 use WPForms\Helpers\Transient;
+use WPForms\Admin\Notice;
 
 /**
  * License key fun.
@@ -290,6 +291,7 @@ class WPForms_License {
 		$option['is_expired']  = false;
 		$option['is_disabled'] = false;
 		$option['is_invalid']  = false;
+
 		update_option( 'wpforms_license', $option );
 
 		// If forced, set a contextual success message.
@@ -506,7 +508,7 @@ class WPForms_License {
 				esc_url( add_query_arg( [ 'page' => 'wpforms-settings' ], admin_url( 'admin.php' ) ) )
 			);
 
-			\WPForms\Admin\Notice::info(
+			Notice::info(
 				$notice,
 				[ 'class' => $class ]
 			);
@@ -514,27 +516,78 @@ class WPForms_License {
 			return; // Bail early, there is no point in going through the rest of the conditional statements, as the key is already missing.
 		}
 
+		// Set the renew now url.
+		$renew_now_url = add_query_arg(
+			[
+				'utm_source'   => 'WordPress',
+				'utm_medium'   => 'Admin Notice',
+				'utm_campaign' => 'plugin',
+				'utm_content'  => 'Renew Now',
+			],
+			'https://wpforms.com/account/licenses/'
+		);
+
+		// Set the learn more url.
+		$learn_more_url = add_query_arg(
+			[
+				'utm_source'   => 'WordPress',
+				'utm_medium'   => 'Admin Notice',
+				'utm_campaign' => 'plugin',
+				'utm_content'  => 'Learn More',
+			],
+			'https://wpforms.com/docs/how-to-renew-your-wpforms-license/'
+		);
+
 		// If a key has expired, output nag about renewing the key.
 		if ( isset( $option['is_expired'] ) && $option['is_expired'] ) :
 
-			$renew_now_url  = add_query_arg(
-				[
-					'utm_source'   => 'WordPress',
-					'utm_medium'   => 'Admin Notice',
-					'utm_campaign' => 'plugin',
-					'utm_content'  => 'Renew Now',
-				],
-				'https://wpforms.com/account/licenses/'
+				$notice = sprintf(
+					'<h3 style="margin: .75em 0 0 0;">
+						<img src="%1$s" style="vertical-align: text-top; width: 20px; margin-right: 7px;">%2$s
+					</h3>
+					<p>%3$s</p>
+					<p>
+						<a href="%4$s" class="button-primary">%5$s</a> &nbsp
+						<a href="%6$s" class="button-secondary">%7$s</a>
+					</p>',
+					esc_url( WPFORMS_PLUGIN_URL . 'assets/images/exclamation-triangle.svg' ),
+					esc_html__( 'Heads up! Your WPForms license has expired.', 'wpforms' ),
+					esc_html__( 'An active license is needed to create new forms and edit existing forms. It also provides access to new features & addons, plugin updates (including security improvements), and our world class support!', 'wpforms' ),
+					esc_url( $renew_now_url ),
+					esc_html__( 'Renew Now', 'wpforms' ),
+					esc_url( $learn_more_url ),
+					esc_html__( 'Learn More', 'wpforms' )
+				);
+
+				$this->print_error_notices( $notice, 'license-expired', $class );
+
+		endif;
+
+		// If a key has been disabled, output nag about using another key.
+		if ( isset( $option['is_disabled'] ) && $option['is_disabled'] ) {
+			$notice = sprintf(
+				'<h3 style="margin: .75em 0 0 0;">
+					<img src="%1$s" style="vertical-align: text-top; width: 20px; margin-right: 7px;">%2$s
+				</h3>
+				<p>%3$s</p>
+				<p>
+					<a href="%4$s" class="button-primary">%5$s</a> &nbsp
+					<a href="%6$s" class="button-secondary">%7$s</a>
+				</p>',
+				esc_url( WPFORMS_PLUGIN_URL . 'assets/images/exclamation-triangle.svg' ),
+				esc_html__( 'Heads up! Your WPForms license has been disabled.', 'wpforms' ),
+				esc_html__( 'Your license key for WPForms has been disabled. Please use a different key to continue receiving automatic updates', 'wpforms' ),
+				esc_url( $renew_now_url ),
+				esc_html__( 'Renew Now', 'wpforms' ),
+				esc_url( $learn_more_url ),
+				esc_html__( 'Learn More', 'wpforms' )
 			);
-			$learn_more_url = add_query_arg(
-				[
-					'utm_source'   => 'WordPress',
-					'utm_medium'   => 'Admin Notice',
-					'utm_campaign' => 'plugin',
-					'utm_content'  => 'Learn More',
-				],
-				'https://wpforms.com/docs/how-to-renew-your-wpforms-license/'
-			);
+
+			$this->print_error_notices( $notice, 'license-diabled', $class );
+		}
+
+		// If a key is invalid, output nag about using another key.
+		if ( isset( $option['is_invalid'] ) && $option['is_invalid'] ) {
 
 			$notice = sprintf(
 				'<h3 style="margin: .75em 0 0 0;">
@@ -546,49 +599,21 @@ class WPForms_License {
 					<a href="%6$s" class="button-secondary">%7$s</a>
 				</p>',
 				esc_url( WPFORMS_PLUGIN_URL . 'assets/images/exclamation-triangle.svg' ),
-				esc_html__( 'Heads up! Your WPForms license has expired.', 'wpforms' ),
-				esc_html__( 'An active license is needed to create new forms and edit existing forms. It also provides access to new features & addons, plugin updates (including security improvements), and our world class support!', 'wpforms' ),
+				esc_html__( 'Heads up! Your WPForms license is invalid.', 'wpforms' ),
+				esc_html__( 'The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates.', 'wpforms' ),
 				esc_url( $renew_now_url ),
 				esc_html__( 'Renew Now', 'wpforms' ),
 				esc_url( $learn_more_url ),
 				esc_html__( 'Learn More', 'wpforms' )
 			);
 
-			\WPForms\Admin\Notice::error(
-				$notice,
-				[
-					'class' => $class,
-					'autop' => false,
-					'slug'  => 'license-expired',
-				]
-			);
-		endif;
+			$this->print_error_notices( $notice, 'license-invalid', $class );
 
-		// If a key has been disabled, output nag about using another key.
-		if ( isset( $option['is_disabled'] ) && $option['is_disabled'] ) {
-			\WPForms\Admin\Notice::error(
-				esc_html__( 'Your license key for WPForms has been disabled. Please use a different key to continue receiving automatic updates.', 'wpforms' ),
-				[
-					'class' => $class,
-					'slug'  => 'license-disabled',
-				]
-			);
-		}
-
-		// If a key is invalid, output nag about using another key.
-		if ( isset( $option['is_invalid'] ) && $option['is_invalid'] ) {
-			\WPForms\Admin\Notice::error(
-				esc_html__( 'Your license key for WPForms is invalid. The key no longer exists or the user associated with the key has been deleted. Please use a different key to continue receiving automatic updates.', 'wpforms' ),
-				[
-					'class' => $class,
-					'slug'  => 'license-invalid',
-				]
-			);
 		}
 
 		// If there are any license errors, output them now.
 		if ( ! empty( $this->errors ) ) {
-			\WPForms\Admin\Notice::error(
+			Notice::error(
 				implode( '<br>', $this->errors ),
 				[ 'class' => $class ]
 			);
@@ -596,13 +621,37 @@ class WPForms_License {
 
 		// If there are any success messages, output them now.
 		if ( ! empty( $this->success ) ) {
-			\WPForms\Admin\Notice::info(
+			Notice::info(
 				implode( '<br>', $this->success ),
 				[ 'class' => $class ]
 			);
 		}
 	}
 
+	/**
+	 * Print error notices generated by the class.
+	 *
+	 * @since 1.8.2.3
+	 *
+	 * @param string $notice Notice html.
+	 * @param string $id     Notice id.
+	 * @param string $class  Notice classes.
+	 */
+	public function print_error_notices( $notice, $id, $class = '' ) {
+
+		if ( empty( $notice ) || empty( $id ) ) {
+			return;
+		}
+
+		Notice::error(
+			$notice,
+			[
+				'class' => $class,
+				'autop' => false,
+				'slug'  => 'license-expired',
+			]
+		);
+	}
 	/**
 	 * Retrieve addons from the stored transient or remote server.
 	 *

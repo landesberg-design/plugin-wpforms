@@ -284,7 +284,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 	public function get_columns_form_fields( $columns = [], $display = 3 ) {
 
 		if ( empty( $this->form_data['fields'] ) ) {
-			return [];
+			$columns['empty'] = '-';
+
+			return $columns;
 		}
 
 		$entry_columns = wpforms()->form->get_meta( $this->form_id, 'entry_columns', [ 'cap' => 'view_entries_form_single' ] );

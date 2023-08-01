@@ -1,5 +1,8 @@
 <?php
 
+// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+/** @noinspection AutoloadingIssuesInspection */
+
 /**
  * Entry fields DB class.
  *
@@ -135,7 +138,7 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 				$ids = (int) $args[ $key ];
 			}
 
-			$where[ 'arg_' . $key ] = "`{$key}` IN ( {$ids} )";
+			$where[ 'arg_' . $key ] = "`$key` IN ( $ids )";
 		}
 
 		// Processing value and value_compare.
@@ -147,19 +150,19 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 			switch ( $args['value_compare'] ) {
 				case '': // Preserving backward compatibility.
 				case 'is':
-					$condition_value = " = '{$escaped_value}'";
+					$condition_value = " = '$escaped_value'";
 					break;
 
 				case 'is_not':
-					$condition_value = " <> '{$escaped_value}'";
+					$condition_value = " <> '$escaped_value'";
 					break;
 
 				case 'contains':
-					$condition_value = " LIKE '%{$escaped_value}%'";
+					$condition_value = " LIKE '%$escaped_value%'";
 					break;
 
 				case 'contains_not':
-					$condition_value = " NOT LIKE '%{$escaped_value}%'";
+					$condition_value = " NOT LIKE '%$escaped_value%'";
 					break;
 			}
 
@@ -184,8 +187,8 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 				$date_end   = wpforms_get_day_period_date( 'end_of_day', strtotime( $args['date'][1] ), 'Y-m-d H:i:s', true );
 
 				if ( ! empty( $date_start ) && ! empty( $date_end ) ) {
-					$where['arg_date_start'] = "`date` >= '{$date_start}'";
-					$where['arg_date_end']   = "`date` <= '{$date_end}'";
+					$where['arg_date_start'] = "`date` >= '$date_start'";
+					$where['arg_date_end']   = "`date` <= '$date_end'";
 				}
 			} elseif ( is_string( $args['date'] ) ) {
 				/*
@@ -198,8 +201,8 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 				$date_end   = wpforms_get_day_period_date( 'end_of_day', $timestamp, 'Y-m-d H:i:s', true );
 
 				if ( ! empty( $date_start ) && ! empty( $date_end ) ) {
-					$where['arg_date_start'] = "`date` >= '{$date_start}'";
-					$where['arg_date_end']   = "`date` <= '{$date_end}'";
+					$where['arg_date_start'] = "`date` >= '$date_start'";
+					$where['arg_date_end']   = "`date` <= '$date_end'";
 				}
 			}
 		}
@@ -234,18 +237,18 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 
 			$results = absint(
 				$wpdb->get_var(
-					"SELECT COUNT({$this->primary_key})
-					FROM {$this->table_name}
-					WHERE {$where_sql};"
+					"SELECT COUNT( $this->primary_key )
+					FROM $this->table_name
+					WHERE $where_sql;"
 				)
 			);
 
 		} else {
 
 			$results = $wpdb->get_results(
-				"SELECT {$select}
-				FROM {$this->table_name}
-				WHERE {$where_sql}
+				"SELECT $select
+				FROM $this->table_name
+				WHERE $where_sql
 				ORDER BY {$args['orderby']} {$args['order']}
 				LIMIT {$args['offset']}, {$args['number']};"
 			);
@@ -380,10 +383,10 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 		$charset_collate = '';
 
 		if ( ! empty( $wpdb->charset ) ) {
-			$charset_collate .= "DEFAULT CHARACTER SET {$wpdb->charset}";
+			$charset_collate .= "DEFAULT CHARACTER SET $wpdb->charset";
 		}
 		if ( ! empty( $wpdb->collate ) ) {
-			$charset_collate .= " COLLATE {$wpdb->collate}";
+			$charset_collate .= " COLLATE $wpdb->collate";
 		}
 
 		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (

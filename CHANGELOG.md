@@ -1,6 +1,48 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.2.3] - 2023-07-18
+### Changed
+- Admin notice content and design is improved.
+- The library used for the modern phone field is updated to 18.1.4.
+- We optimized the Help screen performance within the Form Builder.
+
+### Fixed
+- The query string rewrite module from the 7G Firewall plugin was conflicting with the WPForms block in the Block Editor.
+- When the Stripe Links details were not filled, it was still possible to go to the Next page inside the multipage form.
+- Payment fields were not inheriting a newly updated currency from the WPForms Settings > Payments page.
+- When the multipage form was submitted, users saw duplicated errors (if relevant) on a page.
+- The multipage form did not return to the first page when a general AJAX error occurred.
+- When duplicating a field in the Form Builder, the options panel for the newly duplicated field was not consistently active.
+- WPForms admin area was using a site language instead of the currently logged-in user language if languages were different.
+- The select-entry checkbox and entry actions were hidden if entries didn't have editable fields.
+- When an email field contained long words without spaces, words were not properly wrapped.
+- On the Settings > Integrations page, when a section heading was clicked more than once in quick succession, the layout for adding an account could have been broken.
+- Accessibility: in Safari it was not possible to change the value of the Rating field with just the keyboard arrow keys.
+- Form settings were not reflecting new template settings when switching those templates.
+- Form Pages and Conversational Form permalinks were not updated to reflect template settings.
+- WPForms Challenge pointers were overlapping text labels in some languages.
+- The "Delete All" link on the Entries List did not work as expected when the entries were filtered by date or using entries' search.
+- Code challenge did not show the correct step number on existing forms.
+- In some cases, the page with a form on the front end was not scrolled to the error field.
+- The Dropdown border width was wrong when the input was smaller than the dropdown.
+- It was possible to resize the Paragraph field larger than the containers.
+- Empty option was replaced with the default one for a duplicated dropdown.
+- Error occurred in the browser console when editing the date on the Single Entries Page.
+- Single Line Text element map size was too small in the Form Builder preview.
+- There was a fatal error on the Analytics page if the MonsterInsights Lite plugin was active.
+- The Dropdown field inside the Layout field on mobile devices was partially overlapped.
+- The "Preview Conversational Form" button overlapped with the title when a browser window was resized.
+- Password strength notices did not have rounded borders as they should.
+- The Address field sub-labels were positioned too close to dropdowns inside the Layout field.
+- Form Location title and slug were incorrect after updating a post with that form embedded.
+- The "From Email" option validation message was invisible when the WP Mail SMTP plugin was active.
+- PHP warning 'Illegal string offset' appeared on some sites.
+- Placeholder text in the Dynamic choices of the Dropdown field was not displayed when the field was duplicated.
+- The "Let's Go!" button inside the Form Embed screen was disabled after the page title change.
+- Bulk option labels were not inline in some languages.
+- Some field titles were broken in Safari in the Twenty Twenty-One theme.
+
 ## [1.8.2.2] - 2023-06-28
 ### Added
 - WPForms is now compatible with the WPForms Coupons addon.

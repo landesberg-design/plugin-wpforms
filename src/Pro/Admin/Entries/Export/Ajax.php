@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Admin\Entries\Export;
 
+use Exception;
+use Generator;
 use WPForms\Pro\Helpers\CSV;
 use WPForms\Helpers\Transient;
 use WPForms\Pro\Admin\Entries;
@@ -73,7 +75,7 @@ class Ajax {
 	 *
 	 * @since 1.5.5
 	 *
-	 * @throws \Exception Try-catch.
+	 * @throws Exception Try-catch.
 	 */
 	public function ajax_form_data() {
 
@@ -81,11 +83,11 @@ class Ajax {
 
 			// Run a security check.
 			if ( ! check_ajax_referer( 'wpforms-tools-entries-export-nonce', 'nonce', false ) ) {
-				throw new \Exception( $this->export->errors['security'] );
+				throw new Exception( $this->export->errors['security'] );
 			}
 
 			if ( empty( $this->export->data['form_data'] ) ) {
-				throw new \Exception( $this->export->errors['form_data'] );
+				throw new Exception( $this->export->errors['form_data'] );
 			}
 
 			$fields = empty( $this->export->data['form_data']['fields'] ) ? [] : (array) $this->export->data['form_data']['fields'];
@@ -94,6 +96,7 @@ class Ajax {
 				static function ( $field ) {
 					/* translators: %d - Field ID. */
 					$field['label'] = ! empty( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $field['id'] );
+
 					return $field;
 				},
 				$fields
@@ -105,7 +108,7 @@ class Ajax {
 				]
 			);
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 
 			$error = $this->export->errors['common'] . '<br>' . $e->getMessage();
 
@@ -144,7 +147,7 @@ class Ajax {
 	 *
 	 * @since 1.5.5
 	 *
-	 * @throws \Exception Try-catch.
+	 * @throws Exception Try-catch.
 	 */
 	public function ajax_export_step() {// phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
@@ -156,17 +159,17 @@ class Ajax {
 
 			// Security checks.
 			if (
-				! check_ajax_referer( 'wpforms-tools-entries-export-nonce', 'nonce', false ) ||
 				empty( $args['nonce'] ) ||
 				empty( $args['action'] ) ||
+				! check_ajax_referer( 'wpforms-tools-entries-export-nonce', 'nonce', false ) ||
 				! wpforms_current_user_can( 'view_entries' )
 			) {
-				throw new \Exception( $this->export->errors['security'] );
+				throw new Exception( $this->export->errors['security'] );
 			}
 
 			// Check for form_id at the first step.
 			if ( empty( $args['form_id'] ) && empty( $args['request_id'] ) ) {
-				throw new \Exception( $this->export->errors['unknown_form_id'] );
+				throw new Exception( $this->export->errors['unknown_form_id'] );
 			}
 
 			// Unlimited execution time.
@@ -178,7 +181,7 @@ class Ajax {
 			$this->request_data = $this->get_request_data( $args );
 
 			if ( empty( $this->request_data ) ) {
-				throw new \Exception( $this->export->errors['unknown_request'] );
+				throw new Exception( $this->export->errors['unknown_request'] );
 			}
 
 			if ( $this->request_data['type'] === 'xlsx' ) {
@@ -197,7 +200,7 @@ class Ajax {
 
 			wp_send_json_success( $response );
 
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 
 			$error = $this->export->errors['common'] . '<br>' . $e->getMessage();
 
@@ -334,7 +337,7 @@ class Ajax {
 		if ( ! empty( $request_data['additional_info'] ) ) {
 			foreach ( $request_data['additional_info'] as $field_id ) {
 				if ( $field_id === 'del_fields' ) {
-					$columns_row = $columns_row + $this->get_deleted_fields_columns( $fields, $request_data );
+					$columns_row += $this->get_deleted_fields_columns( $fields, $request_data );
 				} else {
 					$columns_row[ $field_id ] = $this->export->additional_info_fields[ $field_id ];
 				}
@@ -358,7 +361,7 @@ class Ajax {
 	 *
 	 * @param array $entries Entries.
 	 *
-	 * @return \Generator
+	 * @return Generator
 	 */
 	public function get_entry_data( $entries ) {
 
@@ -450,7 +453,7 @@ class Ajax {
 
 			case 'viewed':
 			case 'starred':
-				$val = (bool) $entry[ $col_id ] ? esc_html__( 'Yes', 'wpforms' ) : esc_html__( 'No', 'wpforms' );
+				$val = $entry[ $col_id ] ? esc_html__( 'Yes', 'wpforms' ) : esc_html__( 'No', 'wpforms' );
 				break;
 
 			default:
@@ -480,12 +483,15 @@ class Ajax {
 	 */
 	public function get_additional_info_notes_value( $entry ) {
 
-		$entry_notes = wpforms()->entry_meta->get_meta(
-			[
-				'entry_id' => $entry['entry_id'],
-				'type'     => 'note',
-			]
-		);
+		$entry_meta_obj = wpforms()->get( 'entry_meta' );
+		$entry_notes    = $entry_meta_obj ?
+			$entry_meta_obj->get_meta(
+				[
+					'entry_id' => $entry['entry_id'],
+					'type'     => 'note',
+				]
+			) :
+			null;
 
 		$val = '';
 
@@ -493,7 +499,7 @@ class Ajax {
 			return $val;
 		}
 
-		$val = array_reduce(
+		return array_reduce(
 			$entry_notes,
 			function ( $carry, $item ) {
 
@@ -511,8 +517,6 @@ class Ajax {
 			},
 			$val
 		);
-
-		return $val;
 	}
 
 	/**
@@ -540,13 +544,16 @@ class Ajax {
 	 */
 	public function get_additional_info_geodata_value( $entry ) {
 
-		$location = wpforms()->entry_meta->get_meta(
-			[
-				'entry_id' => $entry['entry_id'],
-				'type'     => 'location',
-				'number'   => 1,
-			]
-		);
+		$entry_meta_obj = wpforms()->get( 'entry_meta' );
+		$location       = $entry_meta_obj ?
+			$entry_meta_obj->get_meta(
+				[
+					'entry_id' => $entry['entry_id'],
+					'type'     => 'location',
+					'number'   => 1,
+				]
+			) :
+			null;
 
 		$val = '';
 
@@ -622,9 +629,9 @@ class Ajax {
 			];
 		}
 
-		$val = array_reduce(
+		return array_reduce(
 			$loc_ary,
-			function ( $carry, $item ) {
+			static function ( $carry, $item ) {
 
 				$item   = (array) $item;
 				$carry .= $item['label'] . ': ' . $item['val'] . "\n";
@@ -633,8 +640,6 @@ class Ajax {
 			},
 			$val
 		);
-
-		return $val;
 	}
 
 	/**
@@ -697,15 +702,20 @@ class Ajax {
 
 		global $wpdb;
 
-		$table_name = wpforms()->entry_fields->table_name;
+		$table_name = wpforms()->get( 'entry_fields' )->table_name;
 
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 		$sql = $wpdb->prepare(
-			"SELECT DISTINCT field_id FROM `{$table_name}` WHERE `form_id` = %d AND `field_id` NOT IN ( " . implode( ',', wp_list_pluck( $existing_fields, 'id' ) ) . " )", // phpcs:ignore
+			"SELECT DISTINCT field_id FROM $table_name WHERE `form_id` = %d AND `field_id` NOT IN ( " .
+			implode( ',', wp_list_pluck( $existing_fields, 'id' ) ) . ' )',
 			(int) $request_data['db_args']['form_id']
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
 
 		$deleted_fields_columns = [];
-		$db_result              = $wpdb->get_col( $sql ); // phpcs:ignore
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$db_result = $wpdb->get_col( $sql );
 
 		foreach ( $db_result as $id ) {
 			/* translators: %d - deleted field ID. */

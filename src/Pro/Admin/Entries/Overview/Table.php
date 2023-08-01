@@ -486,7 +486,7 @@ class Table extends WP_List_Table {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
-			"SELECT DISTINCT form_id, COUNT(entry_id) as count FROM {$this->entry_handler->table_name} GROUP BY form_id ORDER BY count {$order}"
+			"SELECT DISTINCT form_id, COUNT( entry_id ) as count FROM {$this->entry_handler->table_name} GROUP BY form_id ORDER BY count {$order}"
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
@@ -513,7 +513,7 @@ class Table extends WP_List_Table {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT DISTINCT form_id, COUNT(entry_id) as count FROM {$this->entry_handler->table_name} WHERE date >= %s AND date <= %s GROUP BY form_id ORDER BY count {$order}",
+				"SELECT DISTINCT form_id, COUNT( entry_id ) as count FROM {$this->entry_handler->table_name} WHERE date >= %s AND date <= %s GROUP BY form_id ORDER BY count {$order}",
 				[
 					$start_date->format( Datepicker::DATETIME_FORMAT ),
 					$end_date->format( Datepicker::DATETIME_FORMAT ),
@@ -545,7 +545,7 @@ class Table extends WP_List_Table {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$total_entries = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(entry_id) as count FROM {$this->entry_handler->table_name} WHERE form_id = %d AND date >= %s AND date <= %s",
+				"SELECT COUNT( entry_id ) as count FROM {$this->entry_handler->table_name} WHERE form_id = %d AND date >= %s AND date <= %s",
 				[
 					$form->ID,
 					$start_date->format( Datepicker::DATETIME_FORMAT ),
@@ -585,7 +585,7 @@ class Table extends WP_List_Table {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (array) $wpdb->get_results(
-			"SELECT DISTINCT form_id, COUNT(entry_id) as count FROM {$this->entry_handler->table_name} WHERE form_id IN ({$form_ids_in}) GROUP BY form_id",
+			"SELECT DISTINCT form_id, COUNT( entry_id ) as count FROM {$this->entry_handler->table_name} WHERE form_id IN ( $form_ids_in ) GROUP BY form_id",
 			OBJECT_K
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
