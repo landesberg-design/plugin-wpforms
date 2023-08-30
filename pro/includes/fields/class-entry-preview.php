@@ -15,11 +15,12 @@ class WPForms_Entry_Preview extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Entry Preview', 'wpforms' );
-		$this->type  = 'entry-preview';
-		$this->icon  = 'fa-file-text-o';
-		$this->order = 190;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Entry Preview', 'wpforms' );
+		$this->keywords = esc_html__( 'confirm', 'wpforms' );
+		$this->type     = 'entry-preview';
+		$this->icon     = 'fa-file-text-o';
+		$this->order    = 190;
+		$this->group    = 'fancy';
 
 		$this->hooks();
 	}

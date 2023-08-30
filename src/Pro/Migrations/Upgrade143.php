@@ -307,7 +307,7 @@ class Upgrade143 extends UpgradeBase {
 			echo '<div class="progress-bar"><div class="bar"></div></div>';
 			echo '<p class="msg"><span class="percent">0%</span> - ';
 			printf(
-			/* translators: %1$s - total number of entries upgraded; %2$s - total number of entries on site. */
+			/* translators: %1$s - total number of entries upgraded, %2$s - total number of entries on site. */
 				esc_html__( 'Updated %1$s of %2$s entries.', 'wpforms' ),
 				'<span class="current">0</span>',
 				'<span class="total">0</span>'

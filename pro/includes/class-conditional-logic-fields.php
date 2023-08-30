@@ -240,7 +240,7 @@ class WPForms_Conditional_Logic_Fields {
 		$form_data['conditional_fields'] = [];
 
 		foreach ( $form_data['fields'] as $id => $field ) {
-			if ( $this->field_is_conditional( $field ) && ! in_array( $field['type'], [ 'html', 'divider' ], true ) ) {
+			if ( $this->field_is_conditional( $field ) && ! in_array( $field['type'], [ 'html', 'divider', 'content' ], true ) ) {
 				$form_data['conditional_fields'][] = $id;
 			}
 		}
@@ -679,7 +679,7 @@ class WPForms_Conditional_Logic_Fields {
 									} elseif ( isset( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] ) && '' !== trim( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] ) ) {
 										$val = esc_attr( $form['fields'][ $rule_field ]['choices'][ $rule_value ]['label'] );
 									} else {
-										/* translators: %d - choice value. */
+										/* translators: %d - choice number. */
 										$val = sprintf( esc_html__( 'Choice %d', 'wpforms' ), (string) $rule_value );
 									}
 								}

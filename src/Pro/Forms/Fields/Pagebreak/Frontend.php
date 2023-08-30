@@ -142,7 +142,7 @@ class Frontend extends FrontendBase {
 	 */
 	public function frontend_strings( $strings ) {
 
-		$strings['indicatorStepsPattern'] = sprintf( /* translators: %1$s - current step in multi-page form; %2$s - total number of pages. */
+		$strings['indicatorStepsPattern'] = sprintf( /* translators: %1$s - current step in multi-page form, %2$s - total number of pages. */
 			esc_html__( 'Step %1$s of %2$s', 'wpforms' ),
 			'{current}',
 			'{total}'

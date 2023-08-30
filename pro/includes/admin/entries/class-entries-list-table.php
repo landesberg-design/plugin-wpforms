@@ -86,6 +86,46 @@ class WPForms_Entries_Table extends WP_List_Table {
 	}
 
 	/**
+	 * List of CSS classes for the "WP_List_Table" table tag.
+	 *
+	 * @global string $mode List table view mode.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @return array
+	 */
+	protected function get_table_classes() {
+
+		global $mode;
+
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$mode       = get_user_setting( 'posts_list_mode', 'list' );
+		$mode_class = esc_attr( 'table-view-' . $mode );
+		$classes    = [
+			'widefat',
+			'striped',
+			'wpforms-table-list',
+			$mode_class,
+		];
+
+		// For styling purposes, we'll add a dedicated class name for determining the number of visible columns.
+		// The ideal threshold for applying responsive styling is set at "5" columns based on the need for "Tablet" view.
+		$columns_class = $this->get_column_count() > 5 ? 'many' : 'few';
+
+		$classes[] = "has-{$columns_class}-columns";
+
+		/**
+		 * Filters the list of CSS classes for the WP_List_Table table tag.
+		 *
+		 * @since 1.8.3
+		 *
+		 * @param string[] $classes   An array of CSS classes for the table tag.
+		 * @param array    $form_data Form data.
+		 */
+		return apply_filters( 'wpforms_entries_table_get_table_classes', $classes, $this->form_data );
+	}
+
+	/**
 	 * Get the entry counts for various types of entries.
 	 *
 	 * @since 1.0.0
@@ -138,7 +178,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function get_views() {
 
-		$base = remove_query_arg( [ 'type', 'status', 'paged' ] );
+		$base = remove_query_arg( [ 'type', 'status', 'paged', 'message' ] );
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$current = isset( $_GET['type'] ) ? sanitize_key( wp_unslash( $_GET['type'] ) ) : '';
@@ -636,7 +676,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$actions = [];
 
 		// View.
-		$actions[] = sprintf(
+		$actions['view'] = sprintf(
 			'<a href="%s" title="%s" class="view">%s</a>',
 			esc_url(
 				add_query_arg(
@@ -656,7 +696,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 			wpforms()->get( 'entry' )->has_editable_fields( $entry )
 		) {
 			// Edit.
-			$actions[] = sprintf(
+			$actions['edit'] = sprintf(
 				'<a href="%s" title="%s" class="edit">%s</a>',
 				esc_url(
 					add_query_arg(
@@ -674,7 +714,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		if ( wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
 			// Delete.
-			$actions[] = sprintf(
+			$actions['delete'] = sprintf(
 				'<a href="%s" title="%s" class="delete">%s</a>',
 				esc_url(
 					wp_nonce_url(
@@ -709,6 +749,35 @@ class WPForms_Entries_Table extends WP_List_Table {
 		if ( $which === 'bottom' ) {
 			return;
 		}
+
+		$this->display_date_range_filter();
+
+		/**
+		 * Fires after the filter controls, before the table.
+		 *
+		 * @since 1.8.3
+		 */
+		do_action( 'wpforms_entries_table_extra_tablenav' );
+	}
+
+	/**
+	 * Display date range filter.
+	 *
+	 * @since 1.8.3
+	 */
+	private function display_date_range_filter() {
+
+		/**
+		 * Filter to disable date range filter.
+		 *
+		 * @since 1.8.3
+		 *
+		 * @param bool $disable_date_range_filter Whether to disable date range filter.
+		 */
+		if ( apply_filters( 'wpforms_entries_table_display_date_range_filter_disable', false ) ) {
+			return;
+		}
+
 		?>
 
 		<div class="alignleft actions wpforms-filter-date">
@@ -735,15 +804,25 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 
-		return [
-			'read'   => esc_html__( 'Mark Read', 'wpforms' ),
-			'unread' => esc_html__( 'Mark Unread', 'wpforms' ),
-			'star'   => esc_html__( 'Star', 'wpforms' ),
-			'unstar' => esc_html__( 'Unstar', 'wpforms' ),
-			'print'  => esc_html__( 'Print', 'wpforms' ),
-			'null'   => esc_html__( '----------', 'wpforms' ),
-			'delete' => esc_html__( 'Delete', 'wpforms' ),
-		];
+		/**
+		 * Filter to disable bulk actions.
+		 *
+		 * @since 1.8.3
+		 *
+		 * @param bool $disable_bulk_actions Whether to disable bulk actions.
+		 */
+		return apply_filters(
+			'wpforms_entries_table_get_bulk_actions',
+			[
+				'read'   => esc_html__( 'Mark Read', 'wpforms' ),
+				'unread' => esc_html__( 'Mark Unread', 'wpforms' ),
+				'star'   => esc_html__( 'Star', 'wpforms' ),
+				'unstar' => esc_html__( 'Unstar', 'wpforms' ),
+				'print'  => esc_html__( 'Print', 'wpforms' ),
+				'null'   => esc_html__( '----------', 'wpforms' ),
+				'delete' => esc_html__( 'Delete', 'wpforms' ),
+			]
+		);
 	}
 
 	/**
@@ -752,6 +831,8 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 * @since 1.0.0
 	 */
 	public function process_bulk_actions() {
+
+		$this->display_bulk_action_message();
 
 		if ( empty( $_REQUEST['_wpnonce'] ) ) {
 			return;
@@ -765,7 +846,22 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 
 		$this->process_bulk_action_single();
-		$this->display_bulk_action_message();
+	}
+
+	/**
+	 * Get current action.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @return string
+	 */
+	public function current_action() {
+
+		if ( isset( $_REQUEST['empty_spam'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return 'empty_spam';
+		}
+
+		return parent::current_action();
 	}
 
 	/**
@@ -793,16 +889,26 @@ class WPForms_Entries_Table extends WP_List_Table {
 			return;
 		}
 
-		// Get entries, that would be affected.
-		$entries_list = wpforms()->entry->get_entries(
-			[
-				'entry_id'    => $ids,
-				'is_filtered' => true,
-				'number'      => $this->get_items_per_page( 'wpforms_entries_per_page', $this->per_page ),
-			]
-		);
+		$args = [
+			'entry_id'    => $ids,
+			'is_filtered' => true,
+			'number'      => $this->get_items_per_page( 'wpforms_entries_per_page', $this->per_page ),
+		];
 
-		$sendback = remove_query_arg( [ 'read', 'unread', 'starred', 'unstarred', 'print', 'deleted' ] );
+		// Get entries, that would be affected.
+		$entries_list = wpforms()->get( 'entry' )->get_entries( $args );
+
+		/**
+		 * Filter entries list.
+		 *
+		 * @since 1.8.3
+		 *
+		 * @param array $entries_list List of entries.
+		 * @param array $args         Arguments.
+		 */
+		$entries_list = apply_filters( 'wpforms_entries_table_process_actions_entries_list', $entries_list, $args );
+
+		$sendback = remove_query_arg( [ 'read', 'unread', 'starred', 'unstarred', 'print', 'deleted', 'empty_spam' ], wp_get_referer() );
 
 		switch ( $doaction ) {
 			// Mark as read.
@@ -833,6 +939,11 @@ class WPForms_Entries_Table extends WP_List_Table {
 			// Delete entries.
 			case 'delete':
 				$sendback = $this->process_bulk_action_single_delete( $ids, $sendback );
+				break;
+
+			// Empty spam.
+			case 'empty_spam':
+				$sendback = $this->process_bulk_action_empty_spam( $sendback );
 				break;
 		}
 
@@ -1127,6 +1238,41 @@ class WPForms_Entries_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Process the bulk action empty spam.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @param string $sendback URL query string.
+	 *
+	 * @return string
+	 */
+	protected function process_bulk_action_empty_spam( $sendback ) {
+
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( empty( $form_id ) ) {
+			return $sendback;
+		}
+
+		$entries = wpforms()->get( 'entry' )->get_entries(
+			[
+				'form_id' => $form_id,
+				'status'  => 'spam',
+			]
+		);
+
+		if ( ! $entries ) {
+			return $sendback;
+		}
+
+		foreach ( $entries as $entry ) {
+			wpforms()->get( 'entry' )->delete( $entry->entry_id );
+		}
+
+		return add_query_arg( 'deleted', count( $entries ), $sendback );
+	}
+
+	/**
 	 * Display bulk action result message.
 	 *
 	 * @since 1.5.7
@@ -1145,15 +1291,15 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		$bulk_messages = [
 			/* translators: %d - number of processed entries. */
-			'read'      => _n( '%d entry was successfully marked as read.', '%d entries were successfully marked as read.', $bulk_counts['read'] ),
+			'read'      => _n( '%d entry was successfully marked as read.', '%d entries were successfully marked as read.', $bulk_counts['read'], 'wpforms' ),
 			/* translators: %d - number of processed entries. */
-			'unread'    => _n( '%d entry was successfully marked as unread.', '%d entries were successfully marked as unread.', $bulk_counts['unread'] ),
+			'unread'    => _n( '%d entry was successfully marked as unread.', '%d entries were successfully marked as unread.', $bulk_counts['unread'], 'wpforms' ),
 			/* translators: %d - number of processed entries. */
-			'starred'   => _n( '%d entry was successfully starred.', '%d entries were successfully starred.', $bulk_counts['starred'] ),
+			'starred'   => _n( '%d entry was successfully starred.', '%d entries were successfully starred.', $bulk_counts['starred'], 'wpforms' ),
 			/* translators: %d - number of processed entries. */
-			'unstarred' => _n( '%d entry was successfully unstarred.', '%d entries were successfully unstarred.', $bulk_counts['unstarred'] ),
+			'unstarred' => _n( '%d entry was successfully unstarred.', '%d entries were successfully unstarred.', $bulk_counts['unstarred'], 'wpforms' ),
 			/* translators: %d - number of processed entries. */
-			'deleted'   => _n( '%d entry was successfully deleted.', '%d entries were successfully deleted.', $bulk_counts['deleted'] ),
+			'deleted'   => _n( '%d entry was successfully deleted.', '%d entries were successfully deleted.', $bulk_counts['deleted'], 'wpforms' ),
 		];
 
 		if ( $bulk_counts['deleted'] === -1 ) {

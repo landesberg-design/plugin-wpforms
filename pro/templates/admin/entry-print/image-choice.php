@@ -15,11 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 printf(
-	'<div class="field-value-choice field-value-choice-image field-value-choice-%1$s%2$s">
-		<div class="field-value-choice-image-wrapper"><img src="%3$s" alt="%4$s"/></div><div>%4$s</div>
-	</div>',
+	'<div class="field-value-choice field-value-choice-image field-value-choice-%1$s%2$s"><div class="field-value-choice-image-wrapper"><img src="%3$s" alt="%4$s"/></div><div>%5$s</div></div>',
 	esc_attr( $choice_type ),
 	$is_checked ? ' field-value-choice-checked' : '',
 	esc_url( $choice['image'] ),
-	esc_html( $choice['label'] )
+	esc_attr( $choice['label'] ),
+	wp_kses_post( $choice['label'] )
 );

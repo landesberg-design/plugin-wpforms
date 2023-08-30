@@ -79,14 +79,14 @@ $display_options = (array) apply_filters( 'wpforms_pro_admin_entries_print_previ
 			?>
 			<span>
 				<?php
-				printf( /* translators: %d is the entry ID. */
+				printf( /* translators: %d - entry ID. */
 					esc_html__( 'Entry #%d', 'wpforms' ),
 					absint( $entry->entry_id )
 				);
 				?>
 			</span>
 		</h1>
-		
+
 		<?php
 		// Only the first entry should display the form settings options.
 		if ( $has_header ) :

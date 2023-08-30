@@ -15,11 +15,12 @@ class WPForms_Field_HTML extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'HTML', 'wpforms' );
-		$this->type  = 'html';
-		$this->icon  = 'fa-code';
-		$this->order = 180;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'HTML', 'wpforms' );
+		$this->keywords = esc_html__( 'code', 'wpforms' );
+		$this->type     = 'html';
+		$this->icon     = 'fa-code';
+		$this->order    = 180;
+		$this->group    = 'fancy';
 
 		$this->hooks();
 	}

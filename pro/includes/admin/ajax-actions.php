@@ -157,7 +157,7 @@ function wpforms_verify_license() {
 
 	// Check for permissions.
 	if ( ! wpforms_current_user_can() ) {
-		wp_send_json_error();
+		wp_send_json_error( esc_html__( 'This feature requires an active license. Please contact the site administrator.', 'wpforms' ) );
 	}
 
 	// Check for license key.
@@ -362,3 +362,38 @@ function wpforms_builder_settings_block_state_remove() {
 }
 
 add_action( 'wp_ajax_wpforms_builder_settings_block_state_remove', 'wpforms_builder_settings_block_state_remove' );
+
+/**
+ * Update single entry filter settings.
+ *
+ * @since 1.8.3
+ */
+function wpforms_update_single_entry_filter_settings() {
+
+	// Validate nonce.
+	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'wpforms-admin' ) ) {
+		return;
+	}
+
+	if ( ! isset( $_POST['wpforms_entry_view_settings'] ) ) {
+		return;
+	}
+
+	$settings = ! empty( $_POST['wpforms_entry_view_settings'] ) && is_array( $_POST['wpforms_entry_view_settings'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['wpforms_entry_view_settings'] ) ) : [];
+	$option   = WPForms_Entries_Single::get_entry_view_settings();
+
+	foreach ( $option['fields'] as $key => $value ) {
+		$option['fields'][ $key ]['value'] = (int) in_array( $key, $settings, true );
+	}
+
+	foreach ( $option['display'] as $key => $value ) {
+		$option['display'][ $key ]['value'] = (int) in_array( $key, $settings, true );
+	}
+
+	update_option( 'wpforms_entry_view_settings', $option );
+
+	wp_die();
+}
+
+// Ajax to save entry settings.
+add_action( 'wp_ajax_wpforms_update_single_entry_filter_settings', 'wpforms_update_single_entry_filter_settings' );

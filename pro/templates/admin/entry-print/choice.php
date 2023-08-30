@@ -20,5 +20,5 @@ printf(
 	$is_checked ? ' field-value-choice-checked' : '',
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	$is_checked ? ' checked' : '',
-	esc_html( $choice['label'] )
+	wp_kses_post( $choice['label'] )
 );

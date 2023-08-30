@@ -73,11 +73,12 @@ class WPForms_Field_Layout extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Layout', 'wpforms' );
-		$this->type  = 'layout';
-		$this->icon  = 'fa-columns';
-		$this->order = 150;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Layout', 'wpforms' );
+		$this->keywords = esc_html__( 'column, row', 'wpforms' );
+		$this->type     = 'layout';
+		$this->icon     = 'fa-columns';
+		$this->order    = 150;
+		$this->group    = 'fancy';
 
 		// Default settings.
 		$this->defaults = [

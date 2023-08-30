@@ -1,6 +1,66 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.3.2] - 2023-08-15
+### Fixed
+- Addons' loading logic had a flaw preventing them from being properly loaded when license didn't match.
+
+## [1.8.3.1] - 2023-08-11
+### Fixed
+- There were situations when Stripe Credit Card field wasn't working properly in Elementor.
+
+## [1.8.3] - 2023-08-08
+### Added
+- New `{site_name}` smart tag.
+- Spam entries are now stored in the database and can be reviewed on the Entries page.
+- Fields in the Form Builder can now be searched by name or related keywords.
+- New settings that allow users to toggle different fields on the single entry view page.
+
+### Changed
+- Adjusted error message for Stripe subscription payment failure.
+- Elementor integration updated and improved.
+- Improved cache busting of entry counts on the Dashboard widget.
+- The Dashboard widget now displays counts with entries that are submitted today.
+- Anti-spam processing significantly improved.
+- Various notifications for users without required permissions have been improved.
+- Updated DOMPurify library to 3.0.5.
+- Improved handling of "entries disabled" state on the Entries Overview page and in the Dashboard widget.
+- Sidebar in the Form Builder now can be collapsed or expanded with a `Ctrl + T` keyboard shortcut.
+- Updated Icon Choices Font Awesome library to 6.4.0.
+- Improved empty states for blocks/widgets on Gutenberg and Elementor editor.
+
+### Fixed
+- Submit button font family was not inherited from theme styles.
+- Offer to install or activate Custom Captcha addon when adding it to the form via the Form Settings > Spam Protection and Security screen.
+- Incorrect field settings panel opening when adding Custom Captcha field from the Spam Protection and Security screen.
+- No spacing between the field label and the field on Settings pages.
+- Handling of string to array conversion type error in rare cases when the option in the database contained malformed value.
+- Improved the preview for the Dropdown choices with HTML tags in the Form Builder.
+- Improved handling of redirects on the Entries pages with some configurations.
+- Stripe Payment fields previously ignoring "Include Form Styling" setting.
+- Content fields with conditional logic enabled not showing in the notification email.
+- Handling JavaScript errors and PHP Notices when using missing fields in Conditional Logic.
+- Mis-alignment of Country subfield in the Address field.
+- Improved responsive styles for multiple choice controls on the Settings pages.
+- Removed redundant space between Stripe credit card sub-fields when sub-labels are hidden.
+- Handling console error on post/page edit screen when not connected to Stripe.
+- Handling a PHP Notice that was generated when the legacy API is used for Stripe payments.
+- Revised link to Comprehensive Guide in the Elementor WPForms widget.
+- Removed a console error when a Rich Text field was used with Form Locker.
+- Conditional Logic "IS NOT" rule not working correctly if the value was equal to 0 (zero).
+- Modern style Upload fields were not highlighted when an error occurred.
+- Akismet anti-spam check could be skipped in certain cases.
+- Stripe Payment field displaying a warning sign with an empty error message when card validation failed.
+- Resend notifications link was not disabled when "completed payments" notifications were enabled.
+- Hierarchical Dynamic Choices list that resulted in a PHP timeout error when the list was more than 3 levels deep.
+- CAPTCHA badge preventing the Divi Visual Builder preview from loading.
+- Inconsistent email validation between front-end and server.
+- Form Location title or slug occasionally not updating after updating a post.
+- Buttons in the confirmation modal that were not aligned correctly if they didn't fit in one line.
+- Legacy Credit Card's Security Number field not being aligned with other fields.
+- Handling of different Classic/Modern file upload and Submit button combinations.
+- Images in the Rich Text Editor could fail to display because of special characters.
+
 ## [1.8.2.3] - 2023-07-18
 ### Changed
 - Admin notice content and design is improved.

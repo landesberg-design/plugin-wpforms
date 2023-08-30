@@ -36,6 +36,7 @@ class Field extends \WPForms_Field {
 
 		// Define field type information.
 		$this->name     = esc_html__( 'Dropdown Items', 'wpforms-lite' );
+		$this->keywords = esc_html__( 'product, store, ecommerce, pay, payment', 'wpforms-lite' );
 		$this->type     = 'payment-select';
 		$this->icon     = 'fa-caret-square-o-down';
 		$this->order    = 70;
@@ -422,7 +423,7 @@ class Field extends \WPForms_Field {
 		foreach ( $choices as $key => $choice ) {
 			$amount = wpforms_format_amount( wpforms_sanitize_amount( $choice['attr']['value'] ) );
 			$label  = isset( $choice['label']['text'] ) ? $choice['label']['text'] : '';
-			/* translators: %s - Choice item number. */
+			/* translators: %s - item number. */
 			$label  = $label !== '' ? $label : sprintf( esc_html__( 'Item %s', 'wpforms-lite' ), $key );
 			$label .= ! empty( $field['show_price_after_labels'] ) && isset( $choice['attr']['value'] ) ? ' - ' . wpforms_format_amount( wpforms_sanitize_amount( $choice['attr']['value'] ), true ) : '';
 

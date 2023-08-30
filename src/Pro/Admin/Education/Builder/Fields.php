@@ -149,15 +149,19 @@ class Fields extends Education\Builder\Fields {
 			return $atts;
 		}
 
-		/* translators: %s - field name. */
-		$atts['data']['field-name'] = sprintf( esc_html__( '%s field', 'wpforms' ), $field['name'] );
+		$atts['data']['field-name'] = sprintf( /* translators: %s - field name. */
+			esc_html__( '%s field', 'wpforms' ),
+			$field['name']
+		);
 		$atts['data']['action']     = $field['action'];
 		$atts['data']['nonce']      = wp_create_nonce( 'wpforms-admin' );
 
 		if ( ! empty( $field['plugin_name'] ) ) {
 			$atts['data']['name'] = ! preg_match( '/addon$/i', $field['plugin_name'] ) ?
-				/* translators: %s - addon name. */
-				sprintf( esc_html__( '%s addon', 'wpforms' ), $field['plugin_name'] ) :
+				sprintf( /* translators: %s - addon name. */
+					esc_html__( '%s addon', 'wpforms' ),
+					$field['plugin_name']
+				) :
 				$field['plugin_name'];
 		}
 

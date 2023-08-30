@@ -77,11 +77,12 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Rich Text', 'wpforms' );
-		$this->type  = 'richtext';
-		$this->icon  = 'fa-pencil-square-o';
-		$this->order = 133;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Rich Text', 'wpforms' );
+		$this->keywords = esc_html__( 'image, text, table, list, heading, wysiwyg, visual', 'wpforms' );
+		$this->type     = 'richtext';
+		$this->icon     = 'fa-pencil-square-o';
+		$this->order    = 133;
+		$this->group    = 'fancy';
 
 		// Init upload files helper.
 		$this->upload = new Upload();

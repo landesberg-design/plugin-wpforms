@@ -15,11 +15,12 @@ class WPForms_Field_URL extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Website / URL', 'wpforms' );
-		$this->type  = 'url';
-		$this->icon  = 'fa-link';
-		$this->order = 90;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Website / URL', 'wpforms' );
+		$this->keywords = esc_html__( 'uri, link, hyperlink', 'wpforms' );
+		$this->type     = 'url';
+		$this->icon     = 'fa-link';
+		$this->order    = 90;
+		$this->group    = 'fancy';
 	}
 
 	/**

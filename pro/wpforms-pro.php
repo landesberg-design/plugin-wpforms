@@ -369,7 +369,7 @@ class WPForms_Pro {
 					'</p>';
 		$class   = $no_refresh ? 'wpforms-hide' : '';
 		$output .= '<p class="desc ' . $class . '">' .
-					sprintf( /* translators: %s - Refresh link. */
+					sprintf( /* translators: %s - refresh link. */
 						esc_html__( 'If your license has been upgraded or is incorrect, then please %1$sforce a refresh%2$s.', 'wpforms' ),
 						'<a href="#" id="wpforms-setting-license-key-refresh">',
 						'</a>'
@@ -653,15 +653,20 @@ class WPForms_Pro {
 		}
 
 		if ( ! wpforms_current_user_can( 'view_entries_form_single', $form->ID ) ) {
-			return '-';
+			return '&mdash;';
 		}
 
-		$count = wpforms()->entry->get_entries(
+		$form_data = wpforms_decode( $form->post_content );
+		$count     = wpforms()->get( 'entry' )->get_entries(
 			[
 				'form_id' => $form->ID,
 			],
 			true
 		);
+
+		if ( $count === 0 && ! empty( $form_data['settings']['disable_entries'] ) ) {
+			return '&mdash;';
+		}
 
 		$value = sprintf(
 			'<a href="%s">%d</a>',
@@ -697,8 +702,12 @@ class WPForms_Pro {
 		if ( empty( $notifications ) ) {
 			$next_id = 2;
 
-			/* translators: %s - form name. */
-			$notifications[1]['subject']        = ! empty( $form_settings['notification_subject'] ) ? $form_settings['notification_subject'] : sprintf( esc_html__( 'New %s Entry', 'wpforms' ), $settings->form->post_title );
+			$notifications[1]['subject']        = ! empty( $form_settings['notification_subject'] ) ?
+				$form_settings['notification_subject'] :
+				sprintf( /* translators: %s - form name. */
+					esc_html__( 'New %s Entry', 'wpforms' ),
+					$settings->form->post_title
+				);
 			$notifications[1]['email']          = ! empty( $form_settings['notification_email'] ) ? $form_settings['notification_email'] : '{admin_email}';
 			$notifications[1]['sender_name']    = ! empty( $form_settings['notification_fromname'] ) ? $form_settings['notification_fromname'] : $from_name;
 			$notifications[1]['sender_address'] = ! empty( $form_settings['notification_fromaddress'] ) ? $form_settings['notification_fromaddress'] : $from_email;
@@ -725,7 +734,7 @@ class WPForms_Pro {
 			echo '<button type="button" class="wpforms-dismiss-button" title="' . esc_attr__( 'Dismiss this message.', 'wpforms' ) . '" data-section="builder-notifications-description"></button>';
 			echo '<p>';
 			printf(
-				wp_kses( /* translators: %s - Link to the WPForms.com doc article. */
+				wp_kses( /* translators: %s - link to the WPForms.com doc article. */
 					__( 'Notifications are emails sent when a form is submitted. By default, these emails include entry details. For setup and customization options, including a video overview, please <a href="%s" target="_blank" rel="noopener noreferrer">see our tutorial</a>.', 'wpforms' ),
 					[
 						'a' => [
@@ -740,7 +749,7 @@ class WPForms_Pro {
 			echo '</p>';
 			echo '<p>';
 			printf(
-				wp_kses( /* translators: 1$s, %2$s - Links to the WPForms.com doc articles. */
+				wp_kses( /* translators: 1$s, %2$s - links to the WPForms.com doc articles. */
 					__( 'After saving these settings, be sure to <a href="%1$s" target="_blank" rel="noopener noreferrer">test a form submission</a>. This lets you see how emails will look, and to ensure that they <a href="%2$s" target="_blank" rel="noopener noreferrer">are delivered successfully</a>.', 'wpforms' ),
 					[
 						'a'  => [
@@ -886,8 +895,10 @@ class WPForms_Pro {
 						$settings->form_data,
 						esc_html__( 'Email Subject Line', 'wpforms' ),
 						[
-							/* translators: %s - form name. */
-							'default'    => sprintf( esc_html__( 'New Entry: %s', 'wpforms' ), $settings->form->post_title ),
+							'default'    => sprintf( /* translators: %s - form name. */
+								esc_html__( 'New Entry: %s', 'wpforms' ),
+								$settings->form->post_title
+							),
 							'smarttags'  => [
 								'type' => 'all',
 							],

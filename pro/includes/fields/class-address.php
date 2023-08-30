@@ -594,29 +594,33 @@ class WPForms_Field_Address extends WPForms_Field {
 			absint( $field['id'] )
 		);
 
-			$this->field_element(
-				'label',
-				$field,
-				[
-					'slug'  => 'country_placeholder',
-					'value' => esc_html__( 'Country', 'wpforms' ),
-				]
-			);
+			echo '<div class="wpforms-field-header">';
 
-			$this->field_element(
-				'toggle',
-				$field,
-				[
-					'slug'          => 'country_hide',
-					'value'         => $country_hide,
-					'desc'          => esc_html__( 'Hide', 'wpforms' ),
-					'title'         => esc_html__( 'Turn On if you want to hide this sub field.', 'wpforms' ),
-					'label-left'    => true,
-					'control-class' => 'wpforms-field-option-in-label-right',
-					'class'         => 'wpforms-subfield-hide',
-				],
-				true
-			);
+				$this->field_element(
+					'label',
+					$field,
+					[
+						'slug'  => 'country_placeholder',
+						'value' => esc_html__( 'Country', 'wpforms' ),
+					]
+				);
+
+				$this->field_element(
+					'toggle',
+					$field,
+					[
+						'slug'          => 'country_hide',
+						'value'         => $country_hide,
+						'desc'          => esc_html__( 'Hide', 'wpforms' ),
+						'title'         => esc_html__( 'Turn On if you want to hide this sub field.', 'wpforms' ),
+						'label-left'    => true,
+						'control-class' => 'wpforms-field-option-in-label-right',
+						'class'         => 'wpforms-subfield-hide',
+					],
+					true
+				);
+
+			echo '</div>';
 
 			echo '<div class="wpforms-field-options-columns-2 wpforms-field-options-columns">';
 				echo '<div class="placeholder wpforms-field-options-column">';

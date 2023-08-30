@@ -89,9 +89,9 @@ var WPFormsRichTextField = window.WPFormsRichTextField || ( function( document, 
 				docStyle.background = 'transparent';
 
 				app.initEditorModernMarkupMode( editor );
-
 				app.mediaPostIdUpdate();
 				app.observeEditorChanges( editor );
+				app.cleanImages( editor );
 
 				$document.trigger( 'wpformsRichTextEditorInit', [ editor ] );
 			} );
@@ -116,7 +116,7 @@ var WPFormsRichTextField = window.WPFormsRichTextField || ( function( document, 
 			$document.on( 'click', '.media-modal-close, .media-modal-backdrop', app.enableAddMediaButtons );
 
 			// Closing media modal via ESC key.
-			if ( wp.media ) {
+			if ( typeof wp !== 'undefined' && typeof wp.media === 'function' ) {
 				wp.media.view.Modal.prototype.on( 'escape', function() {
 					app.enableAddMediaButtons( 'escapeEvent' );
 				} );
@@ -154,6 +154,38 @@ var WPFormsRichTextField = window.WPFormsRichTextField || ( function( document, 
 				$( this ).closest( '.wp-editor-wrap' ).removeClass( 'wpforms-focused' );
 			} );
 		},
+
+		/**
+		 * Replace special characters in image attributes.
+		 *
+		 * @since 1.8.3
+		 * @param {object} editor TinyMCE editor instance.
+		 */
+		cleanImages: function( editor ) {
+
+			// Get TinyMCE content in raw format.
+			const content = editor.getContent( { format: 'raw' } );
+
+			// Create a temporary element to manipulate the content.
+			const imageDiv = document.createElement( 'div' );
+
+			// Set the content to the temporary element.
+			imageDiv.innerHTML = content;
+
+			// Find all the images in the content.
+			const images = imageDiv.querySelectorAll( 'img' );
+
+			// Loop through all the images.
+			for ( let i = 0; i < images.length; i++ ) {
+
+				// Replace wrong quote characters.
+				images[ i ].outerHTML = images[ i ].outerHTML.replace( /"”|”"|"″|″"/g, '"' );
+			}
+
+			// Send clean image back to TinyMCE.
+			editor.setContent( imageDiv.innerHTML );
+		},
+
 
 		/**
 		 * Add media button for WordPress 4.9.

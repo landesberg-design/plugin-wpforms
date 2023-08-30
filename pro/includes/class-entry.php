@@ -215,13 +215,15 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * Get next entry.
 	 *
 	 * @since 1.1.5
+	 * @since 1.8.3 Added $status parameter.
 	 *
-	 * @param int $entry_id Entry ID.
-	 * @param int $form_id  Form ID.
+	 * @param int    $entry_id Entry ID.
+	 * @param int    $form_id  Form ID.
+	 * @param string $status   Entry status.
 	 *
 	 * @return object|null Object from DB values or null.
 	 */
-	public function get_next( $entry_id, $form_id ) {
+	public function get_next( $entry_id, $form_id, $status ) {
 
 		global $wpdb;
 
@@ -229,34 +231,43 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return null;
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// If status is spam, we get the next spam entry. Otherwise, the next non-spam entry with any status.
+		$status_operator = $status === 'spam' ? '=' : '!=';
+
+		// Note: we're disabling InterpolatedNotPrepared sniff because it triggers
+		// a false positive when using operator (= or !=) in the query. The
+		// prepare() method does not support placeholders for operators.
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT * FROM $this->table_name
 				WHERE `form_id` = %d
-  				  AND $this->primary_key > %d
-				ORDER BY $this->primary_key
+  				  AND {$this->primary_key} > %d
+  				  AND `status` {$status_operator} 'spam'
+				ORDER BY {$this->primary_key}
 				LIMIT 1;",
 				absint( $form_id ),
 				absint( $entry_id )
 			)
 		);
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 	/**
 	 * Get previous entry.
 	 *
 	 * @since 1.1.5
+	 * @since 1.8.3 Added $status parameter.
 	 *
-	 * @param int $entry_id Entry ID.
-	 * @param int $form_id  Form ID.
+	 * @param int    $entry_id Entry ID.
+	 * @param int    $form_id  Form ID.
+	 * @param string $status   Entry status.
 	 *
 	 * @return object|null Object from DB values or null.
 	 * @noinspection PhpUnused
 	 */
-	public function get_prev( $entry_id, $form_id ) {
+	public function get_prev( $entry_id, $form_id, $status ) {
 
 		global $wpdb;
 
@@ -264,20 +275,27 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return null;
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// If status is spam, we get the next spam entry. Otherwise, the next non-spam entry with any status.
+		$status_operator = $status === 'spam' ? '=' : '!=';
+
+		// Note: we're disabling InterpolatedNotPrepared sniff because it triggers
+		// a false positive when using operator (= or !=) in the query. The
+		// prepare() method does not support placeholders for operators.
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT * FROM $this->table_name
 				WHERE `form_id` = %d
-				  AND $this->primary_key < %d
-				ORDER BY $this->primary_key DESC
+				  AND {$this->primary_key} < %d
+				  AND `status` {$status_operator} 'spam'
+				ORDER BY {$this->primary_key} DESC
 				LIMIT 1;",
 				absint( $form_id ),
 				absint( $entry_id )
 			)
 		);
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 	/**
@@ -347,14 +365,16 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * Get next entries count.
 	 *
 	 * @since 1.5.0
+	 * @since 1.8.3 Added $status parameter.
 	 *
-	 * @param int $entry_id Entry ID.
-	 * @param int $form_id  Form ID.
+	 * @param int    $entry_id Entry ID.
+	 * @param int    $form_id  Form ID.
+	 * @param string $status   Entry status.
 	 *
 	 * @return int
 	 * @noinspection PhpUnused
 	 */
-	public function get_next_count( $entry_id, $form_id ) {
+	public function get_next_count( $entry_id, $form_id, $status ) {
 
 		global $wpdb;
 
@@ -362,18 +382,25 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return 0;
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// If status is spam, we get the next spam entry. Otherwise, the next non-spam entry with any status.
+		$status_operator = $status === 'spam' ? '=' : '!=';
+
+		// Note: we're disabling InterpolatedNotPrepared sniff because it triggers
+		// a false positive when using operator (= or !=) in the query. The
+		// prepare() method does not support placeholders for operators.
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$prev_count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT( $this->primary_key ) FROM $this->table_name
-				WHERE `form_id` = %d AND $this->primary_key > %d
-				ORDER BY $this->primary_key;",
+				"SELECT COUNT({$this->primary_key}) FROM {$this->table_name}
+				WHERE `form_id` = %d AND {$this->primary_key} > %d
+				AND `status` {$status_operator} 'spam'
+				ORDER BY {$this->primary_key} ASC;",
 				absint( $form_id ),
 				absint( $entry_id )
 			)
 		);
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return absint( $prev_count );
 	}
@@ -383,14 +410,16 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 *
 	 * @since 1.1.5
 	 * @since 1.5.0 Changed return type to always be an integer.
+	 * @since 1.8.3 Added $status parameter.
 	 *
-	 * @param int $entry_id Entry ID.
-	 * @param int $form_id  Form ID.
+	 * @param int    $entry_id Entry ID.
+	 * @param int    $form_id  Form ID.
+	 * @param string $status   Entry status.
 	 *
 	 * @return int
 	 * @noinspection PhpUnused
 	 */
-	public function get_prev_count( $entry_id, $form_id ) {
+	public function get_prev_count( $entry_id, $form_id, $status ) {
 
 		global $wpdb;
 
@@ -398,18 +427,25 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return 0;
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// If status is spam, we get the next spam entry. Otherwise, the next non-spam entry with any status.
+		$status_operator = $status === 'spam' ? '=' : '!=';
+
+		// Note: we're disabling InterpolatedNotPrepared sniff because it triggers
+		// a false positive when using operator (= or !=) in the query. The
+		// prepare() method does not support placeholders for operators.
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$prev_count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT( $this->primary_key ) FROM $this->table_name
-				WHERE `form_id` = %d AND $this->primary_key < %d
-				ORDER BY $this->primary_key;",
+				"SELECT COUNT({$this->primary_key}) FROM {$this->table_name}
+				WHERE `form_id` = %d AND {$this->primary_key} < %d
+				AND `status` {$status_operator} 'spam'
+				ORDER BY {$this->primary_key} ASC;",
 				absint( $form_id ),
 				absint( $entry_id )
 			)
 		);
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return absint( $prev_count );
 	}
@@ -472,7 +508,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		 *     @type bool    $is_filtered   Skip filtering by entry IDs.
 		 *     @type mixed   $post_id       Post ID.
 		 *     @type mixed   $user_id       User ID.
-		 *     @type string  $status        Entry status.
+		 *     @type mixed   $status        Entry status.
 		 *     @type string  $type          Not used, rudimentary key.
 		 *     @type string  $viewed        Viewed flag.
 		 *     @type string  $starred       Starred flag.
@@ -557,11 +593,35 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		}
 
 		// Allowed string arg items.
-		foreach ( [ 'status', 'type', 'user_uuid' ] as $key ) {
+		foreach ( [ 'type', 'user_uuid' ] as $key ) {
 
 			if ( $args[ $key ] !== '' ) {
 				$where[ 'arg_' . $key ] = "$this->table_name.$key = '" . esc_sql( $args[ $key ] ) . "'";
 			}
+		}
+
+		// Process status.
+		if ( ! empty( $args['status'] ) ) {
+
+			$status = $args['status'];
+
+			if ( ! is_array( $status ) ) {
+				$status = [ $status ];
+			}
+
+			// Sanitize and escape.
+			$status = array_map( 'esc_sql', array_map( 'sanitize_text_field', $status ) );
+
+			// Filter empty and duplicate values.
+			$status = array_unique( array_filter( $status ) );
+
+			if ( ! empty( $status ) ) {
+				$status = implode( "','", $status );
+
+				$where['arg_status'] = "{$this->table_name}.status IN ( '{$status}' )";
+			}
+		} else {
+			$where['arg_status'] = "{$this->table_name}.status != 'spam'";
 		}
 
 		// Process dates.

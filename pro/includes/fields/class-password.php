@@ -15,11 +15,12 @@ class WPForms_Field_Password extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Password', 'wpforms' );
-		$this->type  = 'password';
-		$this->icon  = 'fa-lock';
-		$this->order = 130;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Password', 'wpforms' );
+		$this->keywords = esc_html__( 'user', 'wpforms' );
+		$this->type     = 'password';
+		$this->icon     = 'fa-lock';
+		$this->order    = 130;
+		$this->group    = 'fancy';
 
 		$this->hooks();
 	}

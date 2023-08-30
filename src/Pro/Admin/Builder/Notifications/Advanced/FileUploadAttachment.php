@@ -107,7 +107,7 @@ class FileUploadAttachment {
 		$options = Settings::get_fields_from_form_data( $form_data, $values, [], [ 'file-upload' ] );
 
 		$note = sprintf(
-			wp_kses( /* translators: Links to the WPForms.com doc articles. */
+			wp_kses( /* translators: %s - link to the WPForms.com doc article. */
 				__( '<strong>Heads up!</strong> Some email providers have limits on attachment file size. If your visitors upload large files, your notifications may not be delivered. <a href="%s" target="_blank" rel="noopener noreferrer">Learn More</a>', 'wpforms' ),
 				[
 					'a'      => [

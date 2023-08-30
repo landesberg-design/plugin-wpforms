@@ -60,9 +60,9 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 				}
 			);
 
-			app.initializeFormsDefaultObject();
-
 			$( document ).on( 'wpformsReady', function() {
+
+				app.initializeFormsDefaultObject();
 
 				$( '.wpforms-stripe form' ).each( app.setupStripeForm );
 
@@ -348,7 +348,7 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 					},
 					'.Label': {
 						fontFamily: inputStyle.fontFamily,
-						lineHeight: '1.3',
+						lineHeight: labelHide ? '1.3' : '0',
 						opacity: Number( labelHide ),
 						color: '#000000',
 					},
@@ -757,7 +757,9 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 				$stripeDiv = $form.find( '.wpforms-field-stripe-credit-card' ),
 				errors = {};
 
-			errors[fieldName] = message;
+			if ( message ) {
+				errors[fieldName] = message;
+			}
 
 			wpforms.displayFormAjaxFieldErrors( $form, errors );
 
@@ -994,6 +996,7 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 					margin: `0 0 ${cssVars['field-size-sublabel-spacing']} 0`,
 					color: cssVars['label-sublabel-color'],
 					opacity: Number( Boolean( appearance?.sublabelHide ) ),
+					lineHeight : appearance?.sublabelHide ? 'inherit' : '0',
 				},
 				'.Error': {
 					fontSize: cssVars['label-size-sublabel-font-size'],

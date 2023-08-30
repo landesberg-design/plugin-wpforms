@@ -52,34 +52,42 @@ class DashboardWidget extends Widget {
 	public function __construct() {
 
 		$this->entries_count = new EntriesCount();
-
-		add_action( 'admin_init', [ $this, 'init' ] );
 	}
 
 	/**
 	 * Init class.
 	 *
 	 * @since 1.5.5
+	 * @since 1.8.3 Added cache clean hooks.
 	 */
-	public function init() {
+	public function init() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
+
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+		/** This filter is documented in the wpforms/src/Lite/Admin/DashboardWidget.php file. */
+		if ( ! apply_filters( 'wpforms_admin_dashboardwidget', true ) ) {
+			return;
+		}
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
 		// This widget should be displayed for certain high-level users only.
-		if ( ! wpforms_current_user_can( 'view_forms' ) ) {
+		if ( ! wpforms_current_user_can( 'view_entries' ) ) {
 			return;
 		}
 
-		global $pagenow;
+		add_action( 'wpforms_create_form', [ static::class, 'clear_widget_cache' ] );
+		add_action( 'wpforms_save_form', [ static::class, 'clear_widget_cache' ] );
+		add_action( 'wpforms_delete_form', [ static::class, 'clear_widget_cache' ] );
 
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$is_admin_page   = $pagenow === 'index.php' && empty( $_GET['page'] );
-		$is_ajax_request = wp_doing_ajax() && isset( $_REQUEST['action'] ) && strpos( sanitize_key( $_REQUEST['action'] ), 'wpforms_dash_widget' ) !== false;
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		/**
+		 * Clear cache after PRO plugin deactivation.
+		 *
+		 * If user wants to switch to Lite version it needs to deactivate PRO plugin first.
+		 * After activation of Lite version, the cache will be cleared.
+		 */
+		add_action( 'deactivate_wpforms/wpforms.php', [ static::class, 'clear_widget_cache' ] );
 
-		if ( ! $is_admin_page && ! $is_ajax_request ) {
-			return;
-		}
-
-		if ( ! apply_filters( 'wpforms_admin_dashboardwidget', '__return_true' ) ) {
+		// Continue only if we are on the dashboard page.
+		if ( ! $this->is_dashboard_page() && ! $this->is_dashboard_widget_ajax_request() ) {
 			return;
 		}
 
@@ -107,10 +115,10 @@ class DashboardWidget extends Widget {
 			'allow_data_caching'               => apply_filters( "wpforms_{$widget_slug}_allow_data_caching", true ),
 
 			// PHP DateTime supported string (http://php.net/manual/en/datetime.formats.php).
-			'date_end_str'                     => apply_filters( "wpforms_{$widget_slug}_date_end_str", 'yesterday' ),
+			'date_end_str'                     => apply_filters( "wpforms_{$widget_slug}_date_end_str", 'today' ),
 
-			// Transient lifetime in seconds. Defaults to the end of a current day.
-			'transient_lifetime'               => apply_filters( "wpforms_{$widget_slug}_transient_lifetime", strtotime( 'tomorrow' ) - time() ),
+			// Transient lifetime in seconds. Defaults to one hour in seconds.
+			'transient_lifetime'               => apply_filters( "wpforms_{$widget_slug}_transient_lifetime", HOUR_IN_SECONDS ),
 
 			// Determine if the days with no entries should appear on a chart. Once switched, the effect applies after cache expiration.
 			'display_chart_empty_entries'      => apply_filters( "wpforms_{$widget_slug}_display_chart_empty_entries", true ),
@@ -140,10 +148,6 @@ class DashboardWidget extends Widget {
 		add_action( "wp_ajax_wpforms_{$widget_slug}_get_chart_data", [ $this, 'get_chart_data_ajax' ] );
 		add_action( "wp_ajax_wpforms_{$widget_slug}_get_forms_list", [ $this, 'get_forms_list_ajax' ] );
 		add_action( "wp_ajax_wpforms_{$widget_slug}_save_widget_meta", [ $this, 'save_widget_meta_ajax' ] );
-
-		add_action( 'wpforms_create_form', [ static::class, 'clear_widget_cache' ] );
-		add_action( 'wpforms_save_form', [ static::class, 'clear_widget_cache' ] );
-		add_action( 'wpforms_delete_form', [ static::class, 'clear_widget_cache' ] );
 	}
 
 	/**
@@ -456,6 +460,8 @@ class DashboardWidget extends Widget {
 					continue;
 				}
 
+				$form_data = $form['form_id'] ? wpforms()->get( 'form' )->get( $form['form_id'], [ 'content_only' => true ] ) : [];
+
 				$classes = [
 					$key >= $show_forms && $show_forms > 0 ? 'wpforms-dash-widget-forms-list-hidden-el' : '',
 					$is_active_form ? 'wpforms-dash-widget-form-active' : '',
@@ -522,8 +528,11 @@ class DashboardWidget extends Widget {
 					?>
 					<td>
 						<?php
-						// Ensure the current user has enough permission to view entries of this form.
-						if ( wpforms_current_user_can( 'view_entries_form_single', $form['form_id'] ) ) {
+
+						if ( $form['count'] === 0 && ! empty( $form_data['settings']['disable_entries'] ) ) {
+							echo '&mdash;';
+						} elseif ( wpforms_current_user_can( 'view_entries_form_single', $form['form_id'] ) ) {
+							// Ensure the current user has enough permission to view entries of this form.
 							printf(
 								'<a href="%s" class="entry-list-link">%d</a>',
 								esc_url( $form['edit_url'] ),

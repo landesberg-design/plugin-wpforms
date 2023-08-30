@@ -15,10 +15,11 @@ class WPForms_Field_Name extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Name', 'wpforms-lite' );
-		$this->type  = 'name';
-		$this->icon  = 'fa-user';
-		$this->order = 150;
+		$this->name     = esc_html__( 'Name', 'wpforms-lite' );
+		$this->keywords = esc_html__( 'user, first, last', 'wpforms-lite' );
+		$this->type     = 'name';
+		$this->icon     = 'fa-user';
+		$this->order    = 150;
 
 		$this->hooks();
 	}

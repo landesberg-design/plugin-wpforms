@@ -34,11 +34,12 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Page Break', 'wpforms' );
-		$this->type  = 'pagebreak';
-		$this->icon  = 'fa-files-o';
-		$this->order = 160;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Page Break', 'wpforms' );
+		$this->keywords = esc_html__( 'progress bar, multi step, multi part', 'wpforms' );
+		$this->type     = 'pagebreak';
+		$this->icon     = 'fa-files-o';
+		$this->order    = 160;
+		$this->group    = 'fancy';
 
 		$this->hooks();
 	}
@@ -231,7 +232,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 				'<span class="wpforms-page-indicator-page-title-sep" %s> - </span>',
 				empty( $p1 ) ? 'style="display:none;"' : ''
 			);
-			printf( /* translators: %1$s - current step in multi-page form; %2$d - total number of pages. */
+			printf( /* translators: %1$s - current step in multi-page form, %2$d - total number of pages. */
 				'<span class="wpforms-page-indicator-steps">' . esc_html__( 'Step %1$s of %2$d', 'wpforms' ) . '</span>',
 				'<span class="wpforms-page-indicator-steps-current">1</span>',
 				count( $pagebreak['pages'] )

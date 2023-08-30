@@ -1,3 +1,4 @@
+/* global WPFormsUtils */
 'use strict';
 
 ( function( $ ) {
@@ -151,18 +152,57 @@
 	}
 
 	/**
+	 * Disable submit button and add overlay.
+	 *
+	 * @param {object} $form jQuery form element.
+	 */
+	function disableSubmitButton( $form ) {
+
+		// Find the primary submit button and the "Next" button for multi-page forms.
+		let $btn = $form.find( '.wpforms-submit' );
+		const $btnNext = $form.find( '.wpforms-page-next:visible' );
+		const handler = toggleLoadingMessage( $form ); // Get the handler function for loading message toggle.
+
+		// For multi-pages layout, use the "Next" button instead of the primary submit button.
+		if ( $form.find( '.wpforms-page-indicator' ).length !== 0 && $btnNext.length !== 0 ) {
+			$btn = $btnNext;
+		}
+
+		// Disable the submit button.
+		$btn.prop( 'disabled', true );
+		WPFormsUtils.triggerEvent( $form, 'wpformsFormSubmitButtonDisable', [ $form, $btn ] );
+
+		// If the overlay is not already added and the button is of type "submit", add an overlay.
+		if ( ! $form.find( '.wpforms-submit-overlay' ).length && $btn.attr( 'type' ) === 'submit' ) {
+
+			// Add a container for the overlay and append the overlay element to it.
+			$btn.parent().addClass( 'wpforms-submit-overlay-container' );
+			$btn.parent().append( '<div class="wpforms-submit-overlay"></div>' );
+
+			// Set the overlay dimensions to match the submit button's size.
+			$form.find( '.wpforms-submit-overlay' ).css( {
+				width: `${$btn.outerWidth()}px`,
+				height: `${$btn.parent().outerHeight()}px`,
+			} );
+
+			// Attach the click event to the overlay so that it triggers the handler function.
+			$form.find( '.wpforms-submit-overlay' ).on( 'click', handler );
+		}
+	}
+
+	/**
 	 * Disable submit button when we are sending files to the server.
 	 *
 	 * @since 1.5.6
 	 *
 	 * @param {object} dz Dropzone object.
 	 */
-	function toggleSubmit( dz ) {
+	function toggleSubmit( dz ) { // eslint-disable-line complexity
 
-		var $form    = jQuery( dz.element ).closest( 'form' ),
-			$btn     = $form.find( '.wpforms-submit' ),
+		var $form = jQuery( dz.element ).closest( 'form' ),
+			$btn = $form.find( '.wpforms-submit' ),
 			$btnNext = $form.find( '.wpforms-page-next:visible' ),
-			handler  = toggleLoadingMessage( $form ),
+			handler = toggleLoadingMessage( $form ),
 			disabled = uploadInProgress( dz );
 
 		// For multi-pages layout.
@@ -170,22 +210,14 @@
 			$btn = $btnNext;
 		}
 
-		if ( disabled === Boolean( $btn.prop( 'disabled' ) ) ) {
+		const isButtonDisabled = Boolean( $btn.prop( 'disabled' ) ) || $btn.hasClass( 'wpforms-disabled' );
+
+		if ( disabled === isButtonDisabled ) {
 			return;
 		}
 
 		if ( disabled ) {
-			$btn.prop( 'disabled', true );
-			if ( ! $form.find( '.wpforms-submit-overlay' ).length && $btn.attr( 'type' ) === 'submit' ) {
-				$btn.parent().addClass( 'wpforms-submit-overlay-container' );
-				$btn.parent().append( '<div class="wpforms-submit-overlay"></div>' );
-				$form.find( '.wpforms-submit-overlay' ).css( {
-					width: `${$btn.outerWidth()}px`,
-					height: `${$btn.parent().outerHeight()}px`,
-				} );
-				$form.find( '.wpforms-submit-overlay' ).on( 'click', handler );
-			}
-
+			disableSubmitButton( $form );
 			return;
 		}
 
@@ -194,6 +226,7 @@
 		}
 
 		$btn.prop( 'disabled', false );
+		WPFormsUtils.triggerEvent( $form, 'wpformsFormSubmitButtonRestore', [ $form, $btn ] );
 		$form.find( '.wpforms-submit-overlay' ).off( 'click', handler );
 		$form.find( '.wpforms-submit-overlay' ).remove();
 		$btn.parent().removeClass( 'wpforms-submit-overlay-container' );
@@ -629,10 +662,13 @@
 			file.status = 'error';
 
 			if ( ! file.xhr ) {
-				var errorMessage = window.wpforms_file_upload.errors.file_not_uploaded + ' ' + window.wpforms_file_upload.errors.default_error;
+				const field = dz.element.closest( '.wpforms-field' );
+				const hiddenInput = field.querySelector( '.dropzone-input' );
+				const errorMessage = window.wpforms_file_upload.errors.file_not_uploaded + ' ' + window.wpforms_file_upload.errors.default_error;
 
 				file.previewElement.classList.add( 'dz-processing', 'dz-error', 'dz-complete' );
-				file.previewElement.closest( '.wpforms-field' ).classList.add( 'wpforms-has-error' );
+				hiddenInput.classList.add( 'wpforms-error' );
+				field.classList.add( 'wpforms-has-error' );
 				addErrorMessage( file, errorMessage );
 			}
 
@@ -725,6 +761,13 @@
 			dz.loading = Math.max( dz.loading, 0 );
 
 			toggleSubmit( dz );
+
+			const numErrors = dz.element.querySelectorAll( '.dz-preview.dz-error' ).length;
+
+			if ( numErrors === 0 ) {
+				dz.element.classList.remove( 'wpforms-error' );
+				dz.element.closest( '.wpforms-field' ).classList.remove( 'wpforms-has-error' );
+			}
 		};
 	}
 
@@ -754,6 +797,8 @@
 
 			file.isErrorNotUploadedDisplayed = true;
 			file.previewElement.querySelectorAll( '[data-dz-errormessage]' )[0].textContent = window.wpforms_file_upload.errors.file_not_uploaded + ' ' + errorMessage;
+			dz.element.classList.add( 'wpforms-error' );
+			dz.element.closest( '.wpforms-field' ).classList.add( 'wpforms-has-error' );
 		};
 	}
 
@@ -911,6 +956,21 @@
 	}
 
 	/**
+	 * Classic File upload success callback to determine if all files are uploaded.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @param {Event} e Event.
+	 * @param {jQuery} $form Form.
+	 */
+	function combinedUploadsSizeOk( e, $form ) {
+
+		if ( anyUploadsInProgress() ) {
+			disableSubmitButton( $form );
+		}
+	}
+
+	/**
 	 * Events.
 	 *
 	 * @since 1.8.1
@@ -924,6 +984,9 @@
 
 		$( '.wpforms-uploader' )
 			.on( 'click', dropzoneClick );
+
+		$( 'form.wpforms-form' )
+			.on( 'wpformsCombinedUploadsSizeOk', combinedUploadsSizeOk );
 	}
 
 	/**

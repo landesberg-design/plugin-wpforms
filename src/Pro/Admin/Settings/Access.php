@@ -54,29 +54,29 @@ class Access {
 	 */
 	public function enqueues() {
 
-		$min = \wpforms_get_min_suffix();
+		$min = wpforms_get_min_suffix();
 
-		\wp_enqueue_script(
+		wp_enqueue_script(
 			'wpforms-settings-access',
-			\WPFORMS_PLUGIN_URL . "assets/pro/js/admin/settings-access{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/settings-access{$min}.js",
 			[ 'jquery', 'jquery-confirm' ],
-			\WPFORMS_VERSION,
+			WPFORMS_VERSION,
 			true
 		);
 
-		\wp_localize_script(
+		wp_localize_script(
 			'wpforms-settings-access',
 			'wpforms_settings_access',
 			[
 				'labels' => [
-					'caps'  => \wpforms()->get( 'access' )->get_caps(),
-					'roles' => \wp_list_pluck( \get_editable_roles(), 'name' ),
+					'caps'  => wpforms()->get( 'access' )->get_caps(),
+					'roles' => wp_list_pluck( get_editable_roles(), 'name' ),
 				],
 				'l10n'   => [
-					/* translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to. */
-					'grant_caps'  => '<p>' . \esc_html__( 'In order to give %1$s access, %2$s access is also required.', 'wpforms' ) . '</p><p>' . \esc_html__( 'Would you like to also grant %2$s access to %3$s?', 'wpforms' ) . '</p>',
-					/* translators: %1$s - capability being granted; %2$s - capability(s) required for a capability being granted; %3$s - role a capability is granted to. */
-					'remove_caps' => '<p>' . \esc_html__( 'In order to remove %1$s access, %2$s access is also required to be removed.', 'wpforms' ) . '</p><p>' . \esc_html__( 'Would you like to also remove %2$s access from %3$s?', 'wpforms' ) . '</p>',
+					/* translators: %1$s - capability being granted, %2$s - capability(s) required for a capability being granted, %3$s - role a capability is granted to. */
+					'grant_caps'  => '<p>' . esc_html__( 'In order to give %1$s access, %2$s access is also required.', 'wpforms' ) . '</p><p>' . esc_html__( 'Would you like to also grant %2$s access to %3$s?', 'wpforms' ) . '</p>',
+					/* translators: %1$s - capability being granted, %2$s - capability(s) required for a capability being granted, %3$s - role a capability is granted to. */
+					'remove_caps' => '<p>' . esc_html__( 'In order to remove %1$s access, %2$s access is also required to be removed.', 'wpforms' ) . '</p><p>' . esc_html__( 'Would you like to also remove %2$s access from %3$s?', 'wpforms' ) . '</p>',
 				],
 			]
 		);

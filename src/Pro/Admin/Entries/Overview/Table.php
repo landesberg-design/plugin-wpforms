@@ -9,6 +9,7 @@ if ( ! class_exists( 'WP_List_Table', false ) ) {
 use WPForms\Admin\Helpers\Datepicker;
 use WP_List_Table;
 use WP_Post;
+use WPForms\Pro\AntiSpam\SpamEntry;
 use WPForms_Entry_Handler;
 
 /**
@@ -215,6 +216,12 @@ class Table extends WP_List_Table {
 		$form_id       = $form->ID;
 		$total_entries = isset( $this->total_entry_counts[ $form_id ] ) ? absint( $this->total_entry_counts[ $form_id ]->count ) : 0;
 
+		$form_data = wpforms_decode( $form->post_content );
+
+		if ( $total_entries === 0 && ! empty( $form_data['settings']['disable_entries'] ) ) {
+			return '&mdash;';
+		}
+
 		return $this->get_form_entries_url( $form, $total_entries );
 	}
 
@@ -236,6 +243,12 @@ class Table extends WP_List_Table {
 			'action' => 'filter_date',
 			'date'   => sprintf( '%s - %s', $start_date->format( Datepicker::DATE_FORMAT ), $end_date->format( Datepicker::DATE_FORMAT ) ),
 		];
+
+		$form_data = wpforms_decode( $form->post_content );
+
+		if ( $total_entries === 0 && ! empty( $form_data['settings']['disable_entries'] ) ) {
+			return '&mdash;';
+		}
 
 		return $this->get_form_entries_url( $form, $total_entries, $query_string );
 	}
@@ -317,8 +330,20 @@ class Table extends WP_List_Table {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$mode       = get_user_setting( 'posts_list_mode', 'list' );
 		$mode_class = esc_attr( 'table-view-' . $mode );
+		$classes    = [
+			'widefat',
+			'striped',
+			'wpforms-table-list',
+			$mode_class,
+		];
 
-		return [ 'widefat', 'striped', 'wpforms-table-list', $mode_class ];
+		// For styling purposes, we'll add a dedicated class name for determining the number of visible columns.
+		// The ideal threshold for applying responsive styling is set at "5" columns based on the need for "Tablet" view.
+		$columns_class = $this->get_column_count() > 5 ? 'many' : 'few';
+
+		$classes[] = "has-{$columns_class}-columns";
+
+		return $classes;
 	}
 
 	/**
@@ -484,9 +509,15 @@ class Table extends WP_List_Table {
 
 		global $wpdb;
 
+		$spam_status = SpamEntry::ENTRY_STATUS;
+
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
-			"SELECT DISTINCT form_id, COUNT( entry_id ) as count FROM {$this->entry_handler->table_name} GROUP BY form_id ORDER BY count {$order}"
+			"SELECT DISTINCT form_id, COUNT(entry_id) as count
+			FROM {$this->entry_handler->table_name}
+			WHERE status != '{$spam_status}'
+			GROUP BY form_id
+			ORDER BY count {$order}"
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
@@ -513,10 +544,17 @@ class Table extends WP_List_Table {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT DISTINCT form_id, COUNT( entry_id ) as count FROM {$this->entry_handler->table_name} WHERE date >= %s AND date <= %s GROUP BY form_id ORDER BY count {$order}",
+				"SELECT DISTINCT form_id, COUNT(entry_id) as count
+				FROM {$this->entry_handler->table_name}
+				WHERE date >= %s
+				AND date <= %s
+				AND status != %s
+				GROUP BY form_id
+				ORDER BY count {$order}",
 				[
 					$start_date->format( Datepicker::DATETIME_FORMAT ),
 					$end_date->format( Datepicker::DATETIME_FORMAT ),
+					SpamEntry::ENTRY_STATUS,
 				]
 			)
 		);
@@ -545,11 +583,17 @@ class Table extends WP_List_Table {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$total_entries = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT( entry_id ) as count FROM {$this->entry_handler->table_name} WHERE form_id = %d AND date >= %s AND date <= %s",
+				"SELECT COUNT(entry_id) as count
+				FROM {$this->entry_handler->table_name}
+				WHERE form_id = %d
+				AND date >= %s
+				AND date <= %s
+				AND status != %s",
 				[
 					$form->ID,
 					$start_date->format( Datepicker::DATETIME_FORMAT ),
 					$end_date->format( Datepicker::DATETIME_FORMAT ),
+					SpamEntry::ENTRY_STATUS,
 				]
 			)
 		);
@@ -582,10 +626,15 @@ class Table extends WP_List_Table {
 		global $wpdb;
 
 		$form_ids_in = wpforms_wpdb_prepare_in( $form_ids, '%d' );
+		$spam_status = SpamEntry::ENTRY_STATUS;
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (array) $wpdb->get_results(
-			"SELECT DISTINCT form_id, COUNT( entry_id ) as count FROM {$this->entry_handler->table_name} WHERE form_id IN ( $form_ids_in ) GROUP BY form_id",
+			"SELECT DISTINCT form_id, COUNT(entry_id) as count
+			FROM {$this->entry_handler->table_name}
+			WHERE form_id IN ({$form_ids_in})
+			AND status != '{$spam_status}'
+			GROUP BY form_id",
 			OBJECT_K
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared

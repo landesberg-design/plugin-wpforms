@@ -180,7 +180,7 @@ class KeywordFilter {
 	 *
 	 * @return string
 	 */
-	private function get_submitted_content( $fields ) {
+	protected function get_submitted_content( $fields ) {
 
 		$filtered_fields = $this->get_filtered_fields();
 
@@ -253,7 +253,7 @@ class KeywordFilter {
 	 *
 	 * @return array
 	 */
-	private function get_keywords() {
+	protected function get_keywords() {
 
 		$keywords = (array) json_decode( get_option( self::OPTION_NAME, '' ), true );
 
@@ -276,7 +276,7 @@ class KeywordFilter {
 	 *
 	 * @return bool
 	 */
-	private function is_blocked_submission( $fields ) {
+	protected function is_blocked_submission( $fields ) {
 
 		$text     = $this->get_submitted_content( $fields );
 		$keywords = $this->get_keywords();
@@ -339,7 +339,7 @@ class KeywordFilter {
 	 *
 	 * @return bool
 	 */
-	private function is_enabled( $form_data ) {
+	protected function is_enabled( $form_data ) {
 
 		return ! empty( $form_data['settings']['anti_spam']['keyword_filter']['enable'] );
 	}
@@ -353,7 +353,7 @@ class KeywordFilter {
 	 *
 	 * @return string
 	 */
-	private function get_error_message( $form_data ) {
+	protected function get_error_message( $form_data ) {
 
 		return ! empty( $form_data['settings']['anti_spam']['keyword_filter']['message'] ) ?
 			$form_data['settings']['anti_spam']['keyword_filter']['message'] :

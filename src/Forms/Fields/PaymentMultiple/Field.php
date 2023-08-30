@@ -18,6 +18,7 @@ class Field extends \WPForms_Field {
 
 		// Define field type information.
 		$this->name     = esc_html__( 'Multiple Items', 'wpforms-lite' );
+		$this->keywords = esc_html__( 'product, store, ecommerce, pay, payment', 'wpforms-lite' );
 		$this->type     = 'payment-multiple';
 		$this->icon     = 'fa-list-ul';
 		$this->order    = 50;
@@ -408,7 +409,7 @@ class Field extends \WPForms_Field {
 			foreach ( $choices as $key => $choice ) {
 
 				$label = isset( $choice['label']['text'] ) ? $choice['label']['text'] : '';
-				/* translators: %s - Choice item number. */
+				/* translators: %s - item number. */
 				$label  = $label !== '' ? $label : sprintf( esc_html__( 'Item %s', 'wpforms-lite' ), $key );
 				$label .= ! empty( $field['show_price_after_labels'] ) && isset( $choice['data']['amount'] ) ? ' - ' . wpforms_format_amount( wpforms_sanitize_amount( $choice['data']['amount'] ), true ) : '';
 

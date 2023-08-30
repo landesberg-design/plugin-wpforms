@@ -1056,7 +1056,10 @@ class Locator {
 			return;
 		}
 
-		$this->save_location_meta( $form_ids_to_add, $post_after->ID, $post_after );
+		// Merge the form IDs and remove duplicates.
+		$form_ids = array_unique( array_merge( $form_ids_to_add, $form_ids_after ) );
+
+		$this->save_location_meta( $form_ids, $post_after->ID, $post_after );
 	}
 
 	/**

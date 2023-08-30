@@ -103,7 +103,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 		if ( $is_media_file ) {
 
 			$title = sprintf(
-				wp_kses( /* translators: %s - Link to the Media Library. */
+				wp_kses( /* translators: %s - link to the Media Library. */
 					__( 'Please use the default <a href="%s">WordPress Media</a> interface to remove this file.', 'wpforms' ),
 					[
 						'a' => [

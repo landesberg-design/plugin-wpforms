@@ -425,7 +425,8 @@
 
 						val = WPFormsConditionals.getElementValueByRule( rule, $form );
 
-						if ( null === val ) {
+						// eslint-disable-next-line max-depth
+						if ( val === null || val === undefined ) {
 							val = '';
 						}
 

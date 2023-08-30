@@ -357,7 +357,7 @@ class Builder {
 
 		$strings['layout'] = [
 			'not_allowed_fields'         => $this->field_obj->get_not_allowed_fields(),
-			/* translators: %s - Field name. */
+			/* translators: %s - field name. */
 			'not_allowed_alert_text'     => esc_html__( 'The %s field can’t be placed inside a Layout field.', 'wpforms' ),
 			'empty_label'                => esc_html__( 'Layout', 'wpforms' ),
 			'got_it'                     => esc_html__( 'Got it!', 'wpforms' ),

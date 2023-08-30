@@ -3,6 +3,7 @@
 namespace WPForms\Pro\Reports;
 
 use DateTime;
+use WPForms\Pro\AntiSpam\SpamEntry;
 
 /**
  * Generate form submissions reports.
@@ -128,7 +129,7 @@ class EntriesCount {
 		$sql = "SELECT form_id, COUNT( entry_id ) as count FROM $table_name";
 
 		$sql .= $this->prepare_where_conditions( $forms, $utc_date_start, $utc_date_end );
-		$sql .= 'GROUP BY form_id ORDER BY count DESC;';
+		$sql .= ' GROUP BY form_id ORDER BY count DESC;';
 
 		$results = (array) $wpdb->get_results( $sql, OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
@@ -219,6 +220,10 @@ class EntriesCount {
 
 			$placeholders[] = $utc_date_end->format( $format );
 		}
+
+		// Exclude spam entries.
+		$sql           .= ' AND status != %s';
+		$placeholders[] = SpamEntry::ENTRY_STATUS;
 
 		return $wpdb->prepare( $sql, $placeholders ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	}

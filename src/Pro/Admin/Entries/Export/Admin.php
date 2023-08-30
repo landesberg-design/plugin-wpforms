@@ -135,7 +135,7 @@ class Admin {
 		if ( ! empty( $forms ) ) {
 			?>
 			<span class="choicesjs-select-wrap">
-				<select id="wpforms-tools-entries-export-selectform" class="choicesjs-select" name="form" data-search="true" data-choices-position="bottom">
+				<select id="wpforms-tools-entries-export-selectform" class="choicesjs-select" name="form" data-search="<?php echo esc_attr( wpforms_choices_js_is_search_enabled( $forms ) ); ?>" data-choices-position="bottom">
 					<option value="" placeholder><?php esc_attr_e( 'Select a Form', 'wpforms' ); ?></option>
 					<?php
 					foreach ( $forms as $form ) {
@@ -185,7 +185,7 @@ class Admin {
 
 			$name = ! empty( $field['label'] )
 				? trim( wp_strip_all_tags( $field['label'] ) )
-				: sprintf( /* translators: %d - Field ID. */
+				: sprintf( /* translators: %d - field ID. */
 					esc_html__( 'Field #%d', 'wpforms' ),
 					(int) $id
 				);
@@ -291,8 +291,12 @@ class Admin {
 						if ( in_array( $field['type'], $this->export->configuration['disallowed_fields'], true ) ) {
 							continue;
 						}
-						/* translators: %d - Field ID. */
-						$name = ! empty( $field['label'] ) ? wp_strip_all_tags( $field['label'] ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $id );
+						$name = ! empty( $field['label'] ) ?
+							wp_strip_all_tags( $field['label'] ) :
+							sprintf( /* translators: %d - field ID. */
+								esc_html__( 'Field #%d', 'wpforms' ),
+								(int) $id
+							);
 
 						printf(
 							'<option value="%d" %s>%s</option>',

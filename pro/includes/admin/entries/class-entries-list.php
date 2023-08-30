@@ -115,15 +115,19 @@ class WPForms_Entries_List {
 	public function init() { // phpcs:disable WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		// Only load if we are actually on the overview page.
-		if ( ! wpforms_is_admin_page( 'entries' ) || $this->get_current_screen_view() !== 'list' ) {
+		if ( ! wpforms_is_admin_page( 'entries', 'list' ) ) {
 			return;
 		}
 
 		$form_id = $this->get_filtered_form_id();
 
-		// Init default entries screen.
-		if ( empty( $form_id ) || ! wpforms_current_user_can( 'view_entries_form_single', $form_id ) ) {
-			return;
+		if ( empty( $form_id ) ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=wpforms-entries' ) );
+			exit;
+		}
+
+		if ( ! wpforms_current_user_can( 'view_entries_form_single', $form_id ) ) {
+			wp_die( esc_html__( 'You do not have permission to view this form\'s entries.', 'wpforms' ), 403 );
 		}
 
 		$form = wpforms()->get( 'form' )->get( $form_id );
@@ -214,21 +218,6 @@ class WPForms_Entries_List {
 		$this->entries = new WPForms_Entries_Table();
 
 		$this->entries->process_bulk_actions();
-	}
-
-	/**
-	 * Get the current Entries view: 'list' or 'details'.
-	 *
-	 * @since 1.4.4
-	 *
-	 * @return string
-	 */
-	protected function get_current_screen_view() {
-
-		$view = ! empty( $_GET['view'] ) ? sanitize_key( $_GET['view'] ) : 'list'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		// phpcs:ignore WPForms.Comments.PHPDocHooks.RequiredHookDocumentation
-		return apply_filters( 'wpforms_entries_list_get_current_screen_view', $view );
 	}
 
 	/**
@@ -572,7 +561,7 @@ class WPForms_Entries_List {
 			$field            = ! empty( $advanced_options[ $field ] ) ? $advanced_options[ $field ] : __( 'any form field', 'wpforms' );
 		}
 
-		return sprintf( /* translators: 1: field name, 2: operation, 3: term. */
+		return sprintf( /* translators: %1$s - field name, %2$s - operation, %3$s term. */
 			__( 'where %1$s %2$s "%3$s"', 'wpforms' ),
 			'<em>' . esc_html( $field ) . '</em>',
 			esc_html( $comparison ),
@@ -628,14 +617,14 @@ class WPForms_Entries_List {
 
 			switch ( count( $dates ) ) {
 				case 1:
-					$html = sprintf( /* translators: %s: Date. */
+					$html = sprintf( /* translators: %s: date. */
 						esc_html__( 'on %s', 'wpforms' ),
 						'<em>' . $dates[0] . '</em>'
 					);
 					break;
 
 				case 2:
-					$html = sprintf( /* translators: 1: Date 2: Date. */
+					$html = sprintf( /* translators: %1$s - date, %2$s - date. */
 						esc_html__( 'between %1$s and %2$s', 'wpforms' ),
 						'<em>' . $dates[0] . '</em>',
 						'<em>' . $dates[1] . '</em>'
@@ -765,9 +754,24 @@ class WPForms_Entries_List {
 		}
 
 		$form_data = ! empty( $this->form->post_content ) ? wpforms_decode( $this->form->post_content ) : '';
+
+		/**
+		 * Filter the list all wrap classes.
+		 *
+		 * @since 1.8.3
+		 *
+		 * @param array $classes List all wrap classes.
+		 */
+		$classes = apply_filters(
+			'wpforms_entries_list_list_all_wrap_classes',
+			[
+				'wrap',
+				'wpforms-admin-wrap',
+			]
+		);
 		?>
 
-		<div id="wpforms-entries-list" class="wrap wpforms-admin-wrap">
+		<div id="wpforms-entries-list" class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
 
 			<h1 class="page-title"><?php esc_html_e( 'Entries', 'wpforms' ); ?></h1>
 
@@ -780,12 +784,19 @@ class WPForms_Entries_List {
 			$last_entry = wpforms()->get( 'entry' )->get_last( $this->form_id );
 			?>
 
+			<?php $this->entries_disabled_notice(); ?>
+
 			<div class="wpforms-admin-content">
 
 			<?php
 
+			// Show empty entries table after delete bulk action.
+			$is_deleted = isset( $_REQUEST['deleted'] ) && $_REQUEST['deleted'] === '1'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
 			if (
 				empty( $this->entries->items ) &&
+				$this->entries->counts['spam'] === 0 &&
+				! $is_deleted &&
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				! isset( $_GET['search'] ) && ! isset( $_GET['date'] ) && ! isset( $_GET['type'] ) && ! isset( $_GET['status'] )
 			) {
@@ -795,7 +806,9 @@ class WPForms_Entries_List {
 				echo wpforms_render(
 					'admin/empty-states/no-entries',
 					[
-						'message' => __( 'It looks like you don\'t have any form entries just yet - check back soon!', 'wpforms' ),
+						'message' => ! empty( $this->entries->form_data['settings']['disable_entries'] )
+							? __( 'Storing entry information has been disabled for this form.', 'wpforms' )
+							: __( 'It looks like you don\'t have any form entries just yet - check back soon!', 'wpforms' ),
 					],
 					true
 				);
@@ -810,6 +823,9 @@ class WPForms_Entries_List {
 				 * @param WPForms_Entries_List $entries_list WPForms_Entries_List class instance.
 				 */
 				do_action( 'wpforms_entry_list_title', $form_data, $this );
+
+				// Are we on the "Spam" tab?
+				$is_spam = isset( $_GET['status'] ) && $_GET['status'] === 'spam'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			?>
 
 				<form id="wpforms-entries-table" method="GET"
@@ -828,7 +844,7 @@ class WPForms_Entries_List {
 										absint( count( $this->entries->items ) ),
 										'wpforms'
 									),
-									absint( $this->entries->counts['total'] )
+									$is_spam ? absint( $this->entries->counts['spam'] ) : absint( $this->entries->counts['total'] )
 								),
 								[
 									'strong' => [],
@@ -851,6 +867,10 @@ class WPForms_Entries_List {
 					<input type="hidden" name="page" value="wpforms-entries" />
 					<input type="hidden" name="view" value="list" />
 					<input type="hidden" name="form_id" value="<?php echo absint( $this->form_id ); ?>" />
+
+					<?php if ( $is_spam ) : ?>
+						<input type="hidden" name="status" value="spam" />
+					<?php endif; ?>
 
 					<?php $this->entries->views(); ?>
 
@@ -1067,7 +1087,7 @@ class WPForms_Entries_List {
 
 			$form_title = ! empty( $form )
 				? $form->post_title
-				: sprintf( /* translators: %d - form id. */
+				: sprintf( /* translators: %d - form ID. */
 					esc_html__( 'Form (#%d)', 'wpforms' ),
 					$this->form_id
 				);
@@ -1283,13 +1303,13 @@ class WPForms_Entries_List {
 			return $response;
 		}
 
-		$entries_count = wpforms()->entry->get_next_count( $entry_id, $form_id );
+		$entries_count = wpforms()->get( 'entry' )->get_next_count( $entry_id, $form_id, '' );
 
 		if ( empty( $entries_count ) ) {
 			return $response;
 		}
 
-		/* translators: %d - Number of form entries. */
+		/* translators: %d - number of form entries. */
 		$response['wpforms_new_entries_notification'] = esc_html( sprintf( _n( 'See %d new entry', 'See %d new entries', $entries_count, 'wpforms' ), $entries_count ) );
 
 		return $response;
@@ -1318,6 +1338,35 @@ class WPForms_Entries_List {
 		}
 
 		return $strings;
+	}
+
+	/**
+	 * Display info notice for forms that have entries and disable_entries setting.
+	 *
+	 * The entries list isn't available when register_alerts runs.
+	 *
+	 * @since 1.8.3
+	 *
+	 * @return void
+	 */
+	protected function entries_disabled_notice() {
+
+		if (
+			empty( $this->entries->form_data['settings']['disable_entries'] )
+			|| empty( $this->entries->items )
+		) {
+			return;
+		}
+
+		?>
+
+		<div class="notice wpforms-notice notice-info" style="display: block;">
+			<p>
+				<?php esc_html_e( 'Storing entry information has been disabled for this form.', 'wpforms' ); ?>
+			</p>
+		</div>
+
+		<?php
 	}
 }
 

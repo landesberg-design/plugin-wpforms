@@ -41,7 +41,7 @@ class Core extends \WPForms\Admin\Education\Core {
 		$strings = parent::get_js_strings();
 
 		$strings['addon_error'] = sprintf(
-			wp_kses( /* translators: %1$s - An addon download URL, %2$s - Link to manual installation guide. */
+			wp_kses( /* translators: %1$s - addon download URL, %2$s - link to manual installation guide. */
 				__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpforms.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>.', 'wpforms' ),
 				[
 					'a' => [
@@ -108,12 +108,6 @@ class Core extends \WPForms\Admin\Education\Core {
 			$strings['license']['prompt'] = esc_html__( 'Your WPForms license is not active. To access the %name%, please contact support for more details.', 'wpforms' );
 			$strings['license']['button'] = esc_html__( 'Contact Support', 'wpforms' );
 			$strings['license']['url']    = esc_url_raw( wpforms_utm_link( 'https://wpforms.com/account/support/', 'Builder Modal Disabled License', '~utm-content~' ) );
-		}
-
-		$strings['can_install_addons'] = wpforms_can_install( 'addon' );
-
-		if ( ! $strings['can_install_addons'] ) {
-			$strings['install_prompt'] = '<p>' . esc_html__( 'The %name% is not installed. Please install and activate it to use this feature.', 'wpforms' ) . '</p>';
 		}
 
 		return $strings;

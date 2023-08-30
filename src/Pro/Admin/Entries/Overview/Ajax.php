@@ -5,6 +5,7 @@ namespace WPForms\Pro\Admin\Entries\Overview;
 use WPForms\Admin\Helpers\Chart;
 use WPForms\Admin\Helpers\Datepicker;
 use WP_Post;
+use WPForms\Pro\AntiSpam\SpamEntry;
 
 /**
  * "Entries" overview page inside the admin, which lists all forms.
@@ -72,10 +73,16 @@ class Ajax {
 		$table_name = wpforms()->get( 'entry' )->table_name;
 		$results    = (array) $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT date as day, COUNT( entry_id ) as count FROM $table_name WHERE $where_clause date BETWEEN %s AND %s GROUP BY day ORDER BY day ASC",
+				"SELECT date as day, COUNT(entry_id) as count 
+				FROM {$table_name} 
+				WHERE {$where_clause} date BETWEEN %s AND %s
+				AND status != %s
+				GROUP BY day 
+				ORDER BY day ASC",
 				[
 					$utc_start_date->format( Datepicker::DATETIME_FORMAT ),
 					$utc_end_date->format( Datepicker::DATETIME_FORMAT ),
+					SpamEntry::ENTRY_STATUS,
 				]
 			),
 			ARRAY_A

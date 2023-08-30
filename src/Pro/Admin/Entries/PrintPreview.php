@@ -62,8 +62,18 @@ class PrintPreview {
 	 */
 	public function hooks() {
 
+		/**
+		 * Allow adding entry properties on the print page.
+		 *
+		 * @since 1.8.1
+		 *
+		 * @param object $entry     Entry object.
+		 * @param array  $form_data Form data and settings.
+		 */
+		do_action( 'wpforms_pro_admin_entries_print_preview_entry', $this->entry, $this->form_data );
+
 		add_action( 'admin_init', [ $this, 'print_html' ], 1 );
-		add_filter( 'wpforms_entry_single_data', [ $this, 'add_hidden_data' ], 1010, 2 );
+		add_filter( 'wpforms_entry_single_data', [ $this, 'add_hidden_data' ], 1010, 3 );
 	}
 
 	/**
@@ -135,16 +145,6 @@ class PrintPreview {
 		if ( empty( $this->form_data ) ) {
 			return false;
 		}
-
-		/**
-		 * Allow adding entry properties on the print page.
-		 *
-		 * @since 1.8.1
-		 *
-		 * @param object $entry     Entry object.
-		 * @param array  $form_data Form data and settings.
-		 */
-		do_action( 'wpforms_pro_admin_entries_print_preview_entry', $this->entry, $this->form_data );
 
 		return true;
 	}
@@ -459,7 +459,7 @@ class PrintPreview {
 		return sprintf(
 			'<div class="field-value-default-mode">%1$s</div><div class="field-value-choices-mode">%2$s</div>',
 			wpforms_is_empty_string( $field_value ) ? esc_html__( 'Empty', 'wpforms' ) : $field_value,
-			$choices_html
+			wpforms_esc_unselected_choices( $choices_html )
 		);
 	}
 
@@ -485,8 +485,8 @@ class PrintPreview {
 				: $choice['label'];
 		}
 
-		$label = isset( $choice['label']['text'] ) ? $choice['label']['text'] : '';
-		/* translators: %s - Choice item number. */
+		$label = isset( $choice['label'] ) ? $choice['label'] : '';
+		/* translators: %s - item number. */
 		$label = $label !== '' ? $label : sprintf( esc_html__( 'Item %s', 'wpforms' ), $key );
 
 		if ( empty( $this->form_data['fields'][ $field['id'] ]['show_price_after_labels'] ) ) {
@@ -514,7 +514,7 @@ class PrintPreview {
 	private function is_checked_choice( $field, $choice, $key, $is_dynamic ) {
 
 		$is_payment     = strpos( $field['type'], 'payment-' ) === 0;
-		$separator      = $is_payment || $is_dynamic ? ',' : PHP_EOL;
+		$separator      = $is_payment || $is_dynamic ? ',' : "\n";
 		$active_choices = explode( $separator, $field['value_raw'] );
 
 		if ( $is_dynamic ) {
@@ -532,7 +532,7 @@ class PrintPreview {
 		$label = ! isset( $choice['label'] ) || wpforms_is_empty_string( $choice['label'] )
 			/* translators: %s - choice number. */
 			? sprintf( esc_html__( 'Choice %s', 'wpforms' ), $key )
-			: $choice['label'];
+			: sanitize_text_field( $choice['label'] );
 
 		return in_array( $label, $active_choices, true );
 	}
@@ -542,20 +542,20 @@ class PrintPreview {
 	 *
 	 * @since 1.6.7
 	 *
-	 * @param array  $fields Form fields.
-	 * @param object $entry  Entry fields.
+	 * @param array  $fields    Form fields.
+	 * @param object $entry     Entry fields.
+	 * @param object $form_data Form data.
 	 *
 	 * @return array
 	 */
-	public function add_hidden_data( $fields, $entry ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	public function add_hidden_data( $fields, $entry, $form_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$form_data = wpforms()->get( 'form' )->get( $entry->form_id, [ 'content_only' => true ] );
-		$settings  = ! empty( $form_data['fields'] ) ? $form_data['fields'] : [];
+		$settings = ! empty( $form_data['fields'] ) ? $form_data['fields'] : [];
 
 		// Content, Divider, HTML and layout fields must always be included because it's allowed to show and hide these fields.
 		$forced_allowed_fields = [ 'content', 'divider', 'html', 'layout', 'pagebreak' ];
 
-		// Order entry fields by the form fields.
+		// First order settings field and remove fields that we dont need.
 		foreach ( $settings as $key => $setting ) {
 
 			if ( empty( $setting['type'] ) ) {
@@ -583,6 +583,14 @@ class PrintPreview {
 			}
 
 			$settings[ $key ] = $fields[ $key ];
+		}
+
+		// Second, add fields that might have been removed on the form but are still tied to the entry.
+		foreach ( $fields as $key => $field ) {
+
+			if ( ! isset( $settings[ $key ] ) ) {
+				$settings[ $key ] = $field;
+			}
 		}
 
 		return $settings;

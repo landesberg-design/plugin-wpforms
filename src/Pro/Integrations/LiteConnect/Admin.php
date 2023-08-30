@@ -525,7 +525,7 @@ final class Admin {
 		$enabled_since = Integration::get_enabled_since();
 
 		$string = sprintf(
-			esc_html( /* translators: %d - Backed up entries count. */
+			esc_html( /* translators: %d - backed up entries count. */
 				_n(
 					'%d form entry has been backed up',
 					'%d form entries have been backed up',
@@ -538,7 +538,7 @@ final class Admin {
 
 		if ( ! empty( $enabled_since ) ) {
 			$string .= ' ' . sprintf(
-				/* translators: %s - Time when Lite Connect was enabled. */
+				/* translators: %s - time when Lite Connect was enabled. */
 				esc_html__( 'since you enabled Lite Connect on %s', 'wpforms' ),
 				esc_html( date_i18n( 'M j, Y', $enabled_since + get_option( 'gmt_offset' ) * 3600 ) )
 			);

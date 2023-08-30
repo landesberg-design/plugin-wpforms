@@ -683,7 +683,7 @@ function wpforms_install_addon() {
 	$error = $type === 'plugin'
 		? esc_html__( 'Could not install the plugin. Please download and install it manually.', 'wpforms-lite' )
 		: sprintf(
-			wp_kses( /* translators: %1$s - An addon download URL, %2$s - Link to manual installation guide. */
+			wp_kses( /* translators: %1$s - addon download URL, %2$s - link to manual installation guide. */
 				__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpforms.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>.', 'wpforms-lite' ),
 				[
 					'a' => [

@@ -435,7 +435,7 @@ class WPForms_License {
 
 		if ( ! $this->get() ) {
 			return sprintf(
-				wp_kses( /* translators: %1$s - WPForms.com Account dashboard URL; %2$s - WPForms.com pricing URL. */
+				wp_kses( /* translators: %1$s - WPForms.com Account dashboard URL, %2$s - WPForms.com pricing URL. */
 					__( 'Your license key can be found in your <a href="%1$s" target="_blank" rel="noopener noreferrer">WPForms Account Dashboard</a>. Don’t have a license? <a href="%2$s" target="_blank" rel="noopener noreferrer">Sign up today!</a>', 'wpforms' ),
 					[
 						'a' => [

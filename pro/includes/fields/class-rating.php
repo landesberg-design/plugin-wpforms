@@ -25,11 +25,12 @@ class WPForms_Rating_Text extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Rating', 'wpforms' );
-		$this->type  = 'rating';
-		$this->icon  = 'fa-star';
-		$this->order = 200;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Rating', 'wpforms' );
+		$this->keywords = esc_html__( 'review, emoji, star', 'wpforms' );
+		$this->type     = 'rating';
+		$this->icon     = 'fa-star';
+		$this->order    = 200;
+		$this->group    = 'fancy';
 
 		// Define additional field properties.
 		add_filter( 'wpforms_field_properties_rating', [ $this, 'field_properties' ], 5, 3 );
@@ -477,7 +478,7 @@ class WPForms_Rating_Text extends WPForms_Field {
 
 				// Hidden label for screen readers.
 				echo '<span class="wpforms-screen-reader-element">';
-					/* translators: %1$s - rating value; %2$s - rating scale. */
+					/* translators: %1$s - rating value, %2$s - rating scale. */
 					printf( esc_html__( 'Rate %1$d out of %2$d', 'wpforms' ), $i, $scale );
 				echo '</span>';
 

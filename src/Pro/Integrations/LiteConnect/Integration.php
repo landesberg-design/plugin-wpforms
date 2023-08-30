@@ -208,6 +208,23 @@ class Integration extends \WPForms\Integrations\LiteConnect\Integration {
 			wpforms()->get( 'payment' )->update( $entry_args['payment_id'], [ 'entry_id' => $entry_id ], '', '', [ 'cap' => false ] );
 		}
 
+		$status = isset( $entry_args['status'] ) ? $entry_args['status'] : '';
+
+		if ( $status === 'spam' ) {
+			$spam_reason = isset( $entry_args['form_data']['spam_reason'] ) ? $entry_args['form_data']['spam_reason'] : '';
+
+			// Add spam_reason to meta.
+			wpforms()->get( 'entry_meta' )->add(
+				[
+					'entry_id' => $entry_id,
+					'form_id'  => $entry_args['form_id'],
+					'type'     => 'spam',
+					'data'     => $spam_reason,
+				],
+				'entry_meta'
+			);
+		}
+
 		$fields     = json_decode( $entry_args['fields'], true );
 		$submission = wpforms()->get( 'submission' );
 

@@ -94,8 +94,12 @@ class Ajax {
 
 			$fields = array_map(
 				static function ( $field ) {
-					/* translators: %d - Field ID. */
-					$field['label'] = ! empty( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $field['id'] );
+					$field['label'] = ! empty( $field['label'] ) ?
+						trim( wp_strip_all_tags( $field['label'] ) ) :
+						sprintf( /* translators: %d - field ID. */
+							esc_html__( 'Field #%d', 'wpforms' ),
+							(int) $field['id']
+						);
 
 					return $field;
 				},
@@ -315,8 +319,12 @@ class Ajax {
 		if ( ! empty( $request_data['form_data']['fields'] ) ) {
 			$fields = array_map(
 				static function ( $field ) {
-					/* translators: %d - Field ID. */
-					$field['label'] = ! empty( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : sprintf( esc_html__( 'Field #%d', 'wpforms' ), (int) $field['id'] );
+					$field['label'] = ! empty( $field['label'] ) ?
+						trim( wp_strip_all_tags( $field['label'] ) ) :
+						sprintf( /* translators: %d - field ID. */
+							esc_html__( 'Field #%d', 'wpforms' ),
+							(int) $field['id']
+						);
 
 					return $field;
 				},

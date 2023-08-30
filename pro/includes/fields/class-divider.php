@@ -15,11 +15,12 @@ class WPForms_Field_Divider extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Section Divider', 'wpforms' );
-		$this->type  = 'divider';
-		$this->icon  = 'fa-arrows-h';
-		$this->order = 170;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Section Divider', 'wpforms' );
+		$this->keywords = esc_html__( 'line, hr', 'wpforms' );
+		$this->type     = 'divider';
+		$this->icon     = 'fa-arrows-h';
+		$this->order    = 170;
+		$this->group    = 'fancy';
 
 		$this->hooks();
 	}

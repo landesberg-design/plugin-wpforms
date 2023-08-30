@@ -151,9 +151,12 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			elements.$nextFieldId         = $( '#wpforms-field-id' );
 			elements.$fieldOptions        = $( '#wpforms-field-options' );
-			elements.$fieldsPreviewWrap   = $( '#wpforms-panel-fields .wpforms-panel-content-wrap' ),
+			elements.$fieldsPreviewWrap   = $( '#wpforms-panel-fields .wpforms-panel-content-wrap' );
 			elements.$sortableFieldsWrap  = $( '#wpforms-panel-fields .wpforms-field-wrap' );
 			elements.$addFieldsButtons    = $( '.wpforms-add-fields-button' ).not( '.not-draggable' ).not( '.warning-modal' ).not( '.education-modal' );
+			elements.$fieldsSidebar       = $( '#wpforms-panel-fields .wpforms-add-fields' );
+			elements.$searchInput         = $( '#wpforms-search-fields-input' );
+			elements.$sidebarToggle       = $( '.wpforms-panels .wpforms-panel-sidebar-content .wpforms-panel-sidebar-toggle' );
 
 			// Remove Embed button if builder opened in popup.
 			if ( app.isBuilderInPopup() ) {
@@ -6041,7 +6044,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				if ( $enabled.length === 0 ) {
 					alertText = wpforms_builder.notification_by_status_enable_alert;
-					alertText = alertText.replace( /%s/g, $input.data( 'provider-title' ) );
+					alertText = alertText.replace( /%1\$s/g, $input.data( 'provider-title' ) );
 				} else {
 					alertText = wpforms_builder.notification_by_status_switch_alert;
 					alertText = alertText.replace( /%2\$s/g, $enabled.data( 'provider-title' ) );
@@ -6976,12 +6979,13 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 */
 		builderInPopupClose: function( action ) {
 
-			var $popup = window.parent.jQuery( '#wpforms-builder-elementor-popup' );
+			const $popup = window.parent.jQuery( '.wpforms-builder-popup' );
+			const $title = $( '.wpforms-center-form-name' ).text();
 
 			$popup.find( '#wpforms-builder-iframe' ).attr( 'src', 'about:blank' );
 			$popup.fadeOut();
 
-			$popup.trigger( 'wpformsBuilderInPopupClose', [ action, s.formID ] );
+			$popup.trigger( 'wpformsBuilderInPopupClose', [ action, s.formID, $title ] );
 		},
 
 		//--------------------------------------------------------------------//
@@ -8537,6 +8541,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * Ctrl+S - Save.
 		 * Ctrl+Q - Exit.
 		 * Ctrl+/ - Keyboard Shortcuts modal.
+		 * Ctrl+F - Focus search fields input.
+		 * Ctrl+T - Toggle sidebar.
 		 *
 		 * @since 1.2.4
 		 */
@@ -8575,6 +8581,17 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 					case 191: // Keyboard shortcuts modal on Ctrl+/.
 						app.openKeyboardShortcutsModal();
+						break;
+
+					case 84: // Toggle sidebar on Ctrl+T.
+						$( elements.$sidebarToggle, $builder ).trigger( 'click' );
+						break;
+
+					case 70: // Focus search fields input on Ctrl+F.
+						elements.$fieldsSidebar.animate( {
+							scrollTop: 0,
+						}, 500 );
+						elements.$searchInput.focus();
 						break;
 
 					default:

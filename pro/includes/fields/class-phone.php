@@ -22,11 +22,12 @@ class WPForms_Field_Phone extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Phone', 'wpforms' );
-		$this->type  = 'phone';
-		$this->icon  = 'fa-phone';
-		$this->order = 50;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Phone', 'wpforms' );
+		$this->keywords = esc_html__( 'telephone, mobile, cell', 'wpforms' );
+		$this->type     = 'phone';
+		$this->icon     = 'fa-phone';
+		$this->order    = 50;
+		$this->group    = 'fancy';
 
 		// Define additional field properties.
 		add_filter( 'wpforms_field_properties_phone', [ $this, 'field_properties' ], 5, 3 );

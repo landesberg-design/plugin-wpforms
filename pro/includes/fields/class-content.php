@@ -17,11 +17,12 @@ class WPForms_Field_Content extends WPForms_Field {
 	public function init() {
 
 		// Define field type information.
-		$this->name  = esc_html__( 'Content', 'wpforms' );
-		$this->type  = 'content';
-		$this->icon  = 'fa-file-image-o';
-		$this->order = 181;
-		$this->group = 'fancy';
+		$this->name     = esc_html__( 'Content', 'wpforms' );
+		$this->keywords = esc_html__( 'image, text, table, list, heading, wysiwyg, visual', 'wpforms' );
+		$this->type     = 'content';
+		$this->icon     = 'fa-file-image-o';
+		$this->order    = 181;
+		$this->group    = 'fancy';
 
 		$this->hooks();
 	}

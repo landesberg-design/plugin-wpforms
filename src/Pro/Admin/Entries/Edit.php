@@ -160,8 +160,15 @@ class Edit {
 			return;
 		}
 
+		$entry_id = isset( $_GET['entry_id'] ) ? absint( $_GET['entry_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification
+
+		if ( empty( $entry_id ) ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=wpforms-entries' ) );
+			exit;
+		}
+
 		// Entry processing and setup.
-		add_action( 'wpforms_entries_init', [ $this, 'setup' ], 10, 1 );
+		add_action( 'wpforms_entries_init', [ $this, 'setup' ] );
 
 		do_action( 'wpforms_entries_init', 'edit' );
 
@@ -393,14 +400,6 @@ class Edit {
 	 */
 	public function setup() {
 
-		// No entry ID was provided, abort.
-		if ( empty( $_GET['entry_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-			$this->abort_message = esc_html__( 'It looks like the provided entry ID isn\'t valid.', 'wpforms' );
-			$this->abort         = true;
-
-			return;
-		}
-
 		// Find the entry.
 		// phpcs:ignore WordPress.Security.NonceVerification
 		$entry = wpforms()->get( 'entry' )->get( (int) $_GET['entry_id'] );
@@ -553,11 +552,14 @@ class Edit {
 		];
 		?>
 
-		<div id="wpforms-entries-single" class="wrap wpforms-admin-wrap">
+		<div id="wpforms-entries-single" class="wrap wpforms-admin-wrap wpforms-entries-single-edit">
 
 			<h1 class="page-title">
 				<?php esc_html_e( 'Edit Entry', 'wpforms' ); ?>
-				<a href="<?php echo esc_url( $view_entry_url ); ?>" class="add-new-h2 wpforms-btn-orange"><?php esc_html_e( 'Back to Entry', 'wpforms' ); ?></a>
+				<a href="<?php echo esc_url( $view_entry_url ); ?>" class="page-title-action wpforms-btn wpforms-btn-orange">
+					<svg class="page-title-action-icon" viewBox="0 0 13 12"><path d="M12.6 5.2v1.6H3.2l3.1 3.1-.8 1.6L0 6 5.5.5l.8 1.6-3.1 3.1h9.4Z"/></svg>
+					<span class="page-title-action-text"><?php esc_html_e( 'Back to Entry', 'wpforms' ); ?></span>
+				</a>
 			</h1>
 
 			<div class="wpforms-admin-content">
@@ -1422,7 +1424,7 @@ class Edit {
 	 */
 	private function add_removed_file_meta( $filename ) {
 
-		/* translators: %s - Name of the file that has been deleted. */
+		/* translators: %s - name of the file that has been deleted. */
 		$this->add_entry_meta( sprintf( esc_html__( 'The uploaded file "%s" has been deleted.', 'wpforms' ), esc_html( $filename ) ) );
 	}
 

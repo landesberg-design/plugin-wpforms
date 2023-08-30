@@ -166,7 +166,7 @@ class Notifications implements IntegrationInterface {
 		);
 
 		$fix_email_delivery_text = sprintf(
-			wp_kses( /* translators: %1$s - Fixing email delivery issues doc URL. */
+			wp_kses( /* translators: %1$s - fixing email delivery issues doc URL. */
 				__(
 					'Please check out our <a href="%1$s" target="_blank" rel="noopener noreferrer">doc on fixing email delivery issues</a> for more details.',
 					'wpforms-lite'
