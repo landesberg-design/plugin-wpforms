@@ -56,7 +56,7 @@ class Admin {
 		wp_enqueue_script( 'wpforms-flatpickr' );
 		wp_enqueue_script( 'wpforms-tools-entries-export' );
 		?>
-		<div class="wpforms-setting-row tools">
+		<div class="wpforms-setting-row tools wpforms-settings-row-divider">
 
 			<h4><?php esc_html_e( 'Export Entries', 'wpforms' ); ?></h4>
 

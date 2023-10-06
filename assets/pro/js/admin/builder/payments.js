@@ -105,7 +105,11 @@ var WPFormsBuilderPayments = window.WPFormsBuilderPayments || ( function( docume
 		 */
 		addPlan: function() {
 
-			var $wrapper = app.getProviderSection( $( this ) );
+			if ( $( this ).hasClass( 'education-modal' ) ) {
+				return;
+			}
+
+			const $wrapper = app.getProviderSection( $( this ) );
 
 			$.confirm( {
 				title: false,
@@ -241,9 +245,8 @@ var WPFormsBuilderPayments = window.WPFormsBuilderPayments || ( function( docume
 		 *
 		 * @since 1.7.5
 		 */
-		checkPlanName: function() {
-
-			var $input = $( this ),
+		checkPlanName() {
+			const $input = $( this ),
 				$plan = $input.closest( '.wpforms-panel-content-section-payment-plan' ),
 				$planName = $plan.find( '.wpforms-panel-content-section-payment-plan-head-title' );
 
@@ -253,7 +256,13 @@ var WPFormsBuilderPayments = window.WPFormsBuilderPayments || ( function( docume
 				return;
 			}
 
-			var defaultValue = app.getDefaultPlanName( $plan.data( 'plan-id' ) + 1 );
+			if ( ! $plan.length ) {
+				$planName.html( '' );
+
+				return;
+			}
+
+			const defaultValue = app.getDefaultPlanName( $plan.data( 'plan-id' ) + 1 );
 
 			$planName.html( defaultValue );
 			$input.val( defaultValue );

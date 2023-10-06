@@ -4,6 +4,7 @@ namespace WPForms\Pro\Admin\Entries\Export;
 
 use Exception;
 use Generator;
+use WPForms\Db\Payments\ValueValidator;
 use WPForms\Pro\Helpers\CSV;
 use WPForms\Helpers\Transient;
 use WPForms\Pro\Admin\Entries;
@@ -414,7 +415,17 @@ class Ajax {
 				'wpforms_pro_admin_entries_export_get_entry_data'
 			);
 
-			yield apply_filters( 'wpforms_pro_admin_entries_export_ajax_get_entry_data', $export_data[ $entry->entry_id ], $this->request_data );
+			/**
+			 * Filters the export data.
+			 *
+			 * @since 1.6.5
+			 * @since 1.8.4 Added the `$entry` parameter.
+			 *
+			 * @param array  $export_data  An array of information to be exported from the entry.
+			 * @param array  $request_data An array of information requested from the entry.
+			 * @param object $entry        The entry object.
+			 */
+			yield apply_filters( 'wpforms_pro_admin_entries_export_ajax_get_entry_data', $export_data[ $entry->entry_id ], $this->request_data, $entry );
 		}
 	}
 
@@ -819,12 +830,27 @@ class Ajax {
 		array_walk(
 			$payment_table_data,
 			static function( $item, $key ) use ( $ptinfo_labels, &$value ) {
-				if ( ! isset( $ptinfo_labels[ $key ] ) ) {
+				if ( ! isset( $ptinfo_labels[ $key ] ) || wpforms_is_empty_string( $item ) ) {
 					return;
 				}
 
 				if ( $key === 'total_amount' ) {
 					$item = wpforms_format_amount( $item );
+				}
+
+				if ( $key === 'gateway' ) {
+
+					$item = ValueValidator::get_allowed_gateways()[ $item ];
+				}
+
+				if ( $key === 'type' ) {
+
+					$item = ValueValidator::get_allowed_types()[ $item ];
+				}
+
+				if ( $key === 'subscription_status' ) {
+
+					$item = ucwords( str_replace( '-', ' ', $item ) );
 				}
 
 				$value .= $ptinfo_labels[ $key ] . ': ';
@@ -847,7 +873,7 @@ class Ajax {
 		array_walk(
 			$meta,
 			static function( $item, $key ) use ( $meta_labels, &$value ) {
-				if ( ! isset( $meta_labels[ $key ] ) ) {
+				if ( ! isset( $meta_labels[ $key ], $item->value ) || wpforms_is_empty_string( $item->value ) ) {
 					return;
 				}
 

@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Entry preview field.
  *
@@ -342,7 +346,8 @@ class WPForms_Entry_Preview extends WPForms_Field {
 			}
 		}
 
-		return $entry_preview_fields;
+		/** This filter is documented in wpforms/includes/class-process.php */
+		return apply_filters( 'wpforms_process_filter', $entry_preview_fields, $submitted_fields, $form_data ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**

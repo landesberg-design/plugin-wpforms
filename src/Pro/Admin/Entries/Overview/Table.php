@@ -2,6 +2,10 @@
 
 namespace WPForms\Pro\Admin\Entries\Overview;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( ! class_exists( 'WP_List_Table', false ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
@@ -164,11 +168,12 @@ class Table extends WP_List_Table {
 	public function get_columns() {
 
 		return [
-			'name'     => __( 'Form Name', 'wpforms' ),
-			'created'  => __( 'Created', 'wpforms' ),
-			'all_time' => __( 'All Time', 'wpforms' ),
-			'timespan' => isset( $this->timespan[3] ) ? esc_html( $this->timespan[3] ) : '', // 4th item in the array is always a label.
-			'graph'    => __( 'Graph', 'wpforms' ),
+			'name'       => __( 'Form Name', 'wpforms' ),
+			'created'    => __( 'Created', 'wpforms' ),
+			'last_entry' => __( 'Last Entry', 'wpforms' ),
+			'all_time'   => __( 'All Time', 'wpforms' ),
+			'timespan'   => isset( $this->timespan[3] ) ? esc_html( $this->timespan[3] ) : '', // 4th item in the array is always a label.
+			'graph'      => __( 'Graph', 'wpforms' ),
 		];
 	}
 
@@ -200,6 +205,45 @@ class Table extends WP_List_Table {
 	public function column_created( $form ) {
 
 		return get_the_date( get_option( 'date_format' ), $form );
+	}
+
+	/**
+	 * Return "Last Entry" column.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param WP_Post $form Form object.
+	 *
+	 * @return string
+	 */
+	public function column_last_entry( $form ) {
+
+		$last_entry = wpforms()->get( 'entry' )->get_last( $form->ID );
+
+		if ( ! $last_entry ) {
+			return self::PLACEHOLDER;
+		}
+
+		$entry_url = add_query_arg(
+			[
+				'page'     => 'wpforms-entries',
+				'view'     => 'details',
+				'entry_id' => $last_entry->entry_id,
+			],
+			admin_url( 'admin.php' )
+		);
+
+		$label = wpforms_date_format( $last_entry->date, get_option( 'date_format' ) );
+
+		if ( wpforms_current_user_can( 'edit_entry_single', $last_entry->entry_id ) ) {
+			return sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( $entry_url ),
+				$label
+			);
+		}
+
+		return $label;
 	}
 
 	/**
@@ -356,10 +400,11 @@ class Table extends WP_List_Table {
 	protected function get_sortable_columns() {
 
 		return [
-			'name'     => [ 'title', false ],
-			'created'  => [ 'date', false ],
-			'all_time' => [ 'entries', false ],
-			'timespan' => [ 'timespan', false ],
+			'name'       => [ 'title', false ],
+			'created'    => [ 'date', false ],
+			'last_entry' => [ 'entry', false ],
+			'all_time'   => [ 'entries', false ],
+			'timespan'   => [ 'timespan', false ],
 		];
 	}
 
@@ -476,6 +521,11 @@ class Table extends WP_List_Table {
 			$exclude = $this->sort_by_entries_in_timespan( $order );
 		}
 
+		// Sort by the last entry.
+		if ( $orderby === 'entry' ) {
+			$exclude = $this->sort_by_last_entry( $order );
+		}
+
 		$form_ids = (array) wpforms()->get( 'form' )->get(
 			'',
 			[
@@ -518,6 +568,30 @@ class Table extends WP_List_Table {
 			WHERE status != '{$spam_status}'
 			GROUP BY form_id
 			ORDER BY count {$order}"
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		return $this->filter_published_form_ids( $form_ids );
+	}
+
+	/**
+	 * Retrieves an array of sorted forms based on last entry.
+	 *
+	 * @global wpdb $wpdb Instantiation of the wpdb class.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param string $order Designates ascending or descending order of forms. Default 'DESC'.
+	 *
+	 * @return array
+	 */
+	private function sort_by_last_entry( $order = 'DESC' ) {
+
+		global $wpdb;
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$form_ids = $wpdb->get_col(
+			"SELECT DISTINCT form_id FROM {$this->entry_handler->table_name} GROUP BY form_id ORDER BY entry_id {$order}"
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 

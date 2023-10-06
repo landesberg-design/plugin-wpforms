@@ -1,6 +1,69 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.4] - 2023-09-26
+### IMPORTANT
+- Support for PHP 5.6 has been discontinued. If you are running PHP 5.6, you MUST upgrade PHP before installing WPForms 1.8.4. Failure to do that will disable WPForms core functionality.
+- Support for WordPress 5.4 and below has been discontinued. If you are running any of those outdated versions, you MUST upgrade WordPress before installing WPForms 1.8.4. Failure to do that will disable WPForms core functionality.
+
+### Added
+- Statuses of Stripe payments can now be synchronized through webhooks!
+- Users can now perform payment refunds, subscription cancelations, and more for Stripe payments.
+- Payments can be filtered by type, gateway, and status on the Payments Overview page.
+- New stats added to the Payments Overview chart: Total Refunded, New Subscriptions, and Subscription Renewals.
+- When searching for forms on the Form Overview page, you can use a form ID now.
+- There is a new "Latest entry" date column on the Forms Overview page which is sortable.
+- There is a new Advanced Options tab for the Hidden field, available in the Form Builder.
+
+### Changed
+- WPForms Challenge text is improved to be more clear.
+- The `intl-tel-input` library has been updated to v18.2.1.
+- Form templates are now ordered by creation date in ascending order.
+- Styles for the Stripe Payment Links are improved.
+- Notice text colors in the Form Builder are updated.
+- Number slider behavior is improved.
+- On the Forms Overview page, the Created column is renamed to Date. Now it displays the date and time when the form was updated.
+- Admin pages were updated to use a new unified Design Language.
+- Stripe One-Time and Recurring payments can be enabled and configured separately for new forms.
+- The Hidden field's Default value and CSS classes options were moved to the new Advanced tab.
+- It's now more obvious in the Form Builder preview pane that the Hidden field label is not visible to end-users.
+
+### Fixed
+- The Style Settings widget was not permanently disabled for Lead Forms.
+- With more than one notification in a form, some Reply-to emails defaulted to the site admin email.
+- WPForms block did not get a list of forms dynamically.
+- After updating a form entry, the date format of the modified date was different.
+- Error message broke vertical alignment on Date/Time field.
+- Layout fields had double vertical spaces.
+- Very long tag names in the Manage Tags modal on the Forms Overview page were not wrapped.
+- Disabled inputs looked different in the Form Builder > Notifications panel for the "From EMAIL" and "From NAME" options.
+- A splash screen was displayed when all payments were moved to Trash, preventing the ability to restore trashed payments.
+- The Smart phone field dropdown was cut off on the Entry Edit page.
+- Dynamic choices of custom taxonomies (tags) for the Checkboxes field were displayed incorrectly under some conditions.
+- Stripe Credit Card field error was not visible for multipage forms in some cases.
+- WPForms Challenge welcome pop-up was displayed above the splash screen on tablets.
+- Notices were generated in the `debug.log` file for a form with Lead Forms.
+- The form submission "Send" button was not working correctly on click when Invisible Captcha had an invalid key.
+- The Name, Address, and Password fields treated value `0` as empty.
+- HTML-ENTITIES encoding threw a deprecation warning on PHP 8.2.
+- An irrational scrolling occurred when quickly adding multiple fields in the Form Builder.
+- Rows height in the Entries Overview table were inconsistent.
+- The Date/Time field produced notices in the `debug.log` file under certain conditions.
+- Fields with subfields were rendered differently in the Form Builder Preview pane and on the front end.
+- Activation of addons on the Addon page did not return proper status.
+- Rich Text field's validation error had an incorrect placement.
+- Stripe fields were misplaced in the Block Editor form preview with Lead Forms.
+- Multiple Modern Dropdown field value was not centered in the Modern Markup.
+- Page change didn't work on Multipage forms inside the Elementor popup.
+- Bullet points were displayed for the country code list in the Phone field with the Divi theme.
+- The Entries Overview table display was improved when having more columns.
+- Failed payments were counted in the Total Sales chart.
+- Users were able to view trashed payments.
+- Splash screen was displayed when all payments were moved to Trash.
+- An incorrect currency of already processed payments was displayed when the global currency setting was changed.
+- It was possible to export empty payment data for entries into the .csv/.xlsx file.
+- There was an empty form name in the Single Payment details metabox if a payment form was deleted or no longer editable.
+
 ## [1.8.3.2] - 2023-08-15
 ### Fixed
 - Addons' loading logic had a flaw preventing them from being properly loaded when license didn't match.

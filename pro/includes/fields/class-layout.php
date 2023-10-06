@@ -6,6 +6,10 @@
  * @noinspection PhpPropertyOnlyWrittenInspection
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WPForms\Pro\Forms\Fields\Layout\Builder;
 use WPForms\Pro\Forms\Fields\Layout\Frontend;
 

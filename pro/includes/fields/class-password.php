@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Password field.
  *
@@ -468,9 +472,9 @@ class WPForms_Field_Password extends WPForms_Field {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value.
-	 * @param array $form_data    Form data and settings.
+	 * @param int          $field_id     Field ID.
+	 * @param array|string $field_submit Submitted field value.
+	 * @param array        $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
 
@@ -482,18 +486,17 @@ class WPForms_Field_Password extends WPForms_Field {
 		if ( empty( $fields[ $field_id ]['confirmation'] ) ) {
 
 			// Required check.
-			if ( empty( $field_submit ) && ! empty( $fields[ $field_id ]['required'] ) ) {
+			if ( ! empty( $fields[ $field_id ]['required'] ) && wpforms_is_empty_string( $field_submit ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ] = $required;
 			}
 		} else {
 
-			// Required check.
-			if ( empty( $field_submit['primary'] ) && ! empty( $fields[ $field_id ]['required'] ) ) {
+			if ( ! empty( $fields[ $field_id ]['required'] ) && isset( $field_submit['primary'] ) && wpforms_is_empty_string( $field_submit['primary'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ]['primary'] = $required;
 			}
 
 			// Required check, secondary confirmation field.
-			if ( empty( $field_submit['secondary'] ) && ! empty( $fields[ $field_id ]['required'] ) ) {
+			if ( ! empty( $fields[ $field_id ]['required'] ) && isset( $field_submit['secondary'] ) && wpforms_is_empty_string( $field_submit['secondary'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ]['secondary'] = $required;
 			}
 
@@ -510,7 +513,7 @@ class WPForms_Field_Password extends WPForms_Field {
 			! $this->is_empty_not_required_field( $field_id, $field_submit, $fields ) // Don't check the password strength for empty fields which is set as not required.
 		) {
 
-			require_once WPFORMS_PLUGIN_DIR . 'libs/bjeavons/zxcvbn-php/autoload.php';
+			require_once WPFORMS_PLUGIN_DIR . 'pro/libs/bjeavons/zxcvbn-php/autoload.php';
 
 			$password_value = empty( $fields[ $field_id ]['confirmation'] ) ? $field_submit : $field_submit['primary'];
 			$strength       = ( new \ZxcvbnPhp\Zxcvbn() )->passwordStrength( $password_value );
@@ -526,20 +529,20 @@ class WPForms_Field_Password extends WPForms_Field {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value.
-	 * @param array $form_data    Form data and settings.
+	 * @param int          $field_id     Field ID.
+	 * @param array|string $field_submit Submitted field value.
+	 * @param array        $form_data    Form data and settings.
 	 */
 	public function format( $field_id, $field_submit, $form_data ) {
 
 		// Define data.
 		if ( is_array( $field_submit ) ) {
-			$value = ! empty( $field_submit['primary'] ) ? $field_submit['primary'] : '';
+			$value = isset( $field_submit['primary'] ) && ! wpforms_is_empty_string( $field_submit['primary'] ) ? $field_submit['primary'] : '';
 		} else {
-			$value = ! empty( $field_submit ) ? $field_submit : '';
+			$value = ! wpforms_is_empty_string( $field_submit ) ? $field_submit : '';
 		}
 
-		$name = ! empty( $form_data['fields'][ $field_id ] ['label'] ) ? $form_data['fields'][ $field_id ]['label'] : '';
+		$name = ! wpforms_is_empty_string( $form_data['fields'][ $field_id ] ['label'] ) ? $form_data['fields'][ $field_id ]['label'] : '';
 
 		// Set final field details.
 		wpforms()->process->fields[ $field_id ] = [

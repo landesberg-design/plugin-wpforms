@@ -401,7 +401,7 @@ abstract class WPForms_Payment {
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo wpforms_render(
-			'builder/payments/recurring/item',
+			'builder/payment/recurring/item',
 			[
 				'plan_id' => $plan_id,
 				'content' => $this->get_builder_content_recurring_payment_content( $plan_id ),

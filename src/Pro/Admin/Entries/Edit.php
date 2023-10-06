@@ -556,8 +556,7 @@ class Edit {
 
 			<h1 class="page-title">
 				<?php esc_html_e( 'Edit Entry', 'wpforms' ); ?>
-				<a href="<?php echo esc_url( $view_entry_url ); ?>" class="page-title-action wpforms-btn wpforms-btn-orange">
-					<svg class="page-title-action-icon" viewBox="0 0 13 12"><path d="M12.6 5.2v1.6H3.2l3.1 3.1-.8 1.6L0 6 5.5.5l.8 1.6-3.1 3.1h9.4Z"/></svg>
+				<a href="<?php echo esc_url( $view_entry_url ); ?>" class="page-title-action wpforms-btn wpforms-btn-orange" data-action="back">
 					<span class="page-title-action-text"><?php esc_html_e( 'Back to Entry', 'wpforms' ); ?></span>
 				</a>
 			</h1>
@@ -757,29 +756,8 @@ class Edit {
 		// Add properties to the field.
 		$field['properties'] = wpforms()->frontend->get_field_properties( $field, $form_data );
 
-		/**
-		 * Is the field editable?
-		 *
-		 * @since 1.5.9.5
-		 * @since 1.6.8.1 Added $entry_fields and $form_data arguments.
-		 *
-		 * @param bool  $is_editable  Is the field editable?
-		 * @param array $field        Field data.
-		 * @param array $entry_fields Entry fields data.
-		 * @param array $form_data    Form data and settings.
-		 *
-		 * @return bool
-		 */
-		$is_editable = (bool) apply_filters(
-			'wpforms_pro_admin_entries_edit_field_output_editable',
-			$this->is_field_entries_editable( $field['type'] ),
-			$field,
-			$entry_fields,
-			$form_data
-		);
-
 		// Field output.
-		if ( $is_editable ) {
+		if ( $this->is_field_entries_output_editable( $field, $entry_fields, $form_data ) ) {
 			$this->display_edit_form_field_editable( $entry_field, $field, $form_data );
 		} else {
 			$this->display_edit_form_field_non_editable( $field_value );
@@ -1009,7 +987,10 @@ class Edit {
 
 		foreach ( (array) $form_data['fields']  as $field_properties ) {
 
-			if ( ! $this->is_field_entries_editable( $field_properties['type'] ) ) {
+			if (
+				! $this->is_field_entries_editable( $field_properties['type'], $field_properties, $form_data ) ||
+				! $this->is_field_entries_output_editable( $field_properties, $this->entry_fields, $form_data )
+			) {
 				continue;
 			}
 
@@ -1068,8 +1049,13 @@ class Edit {
 
 		array_map( [ $this, 'add_removed_file_meta' ], $removed_files );
 
-		$response = [
-			'modified' => esc_html( date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), strtotime( $this->date_modified ) + ( get_option( 'gmt_offset' ) * 3600 ) ) ),
+		$datetime_offset = get_option( 'gmt_offset' ) * 3600;
+		$response        = [
+			'modified' => sprintf( /* translators: %1$s - date for the entry; %2$s - time for the entry. */
+				esc_html__( '%1$s at %2$s', 'wpforms' ),
+				date_i18n( 'M j, Y', strtotime( $this->date_modified ) + $datetime_offset ),
+				date_i18n( get_option( 'time_format' ), strtotime( $this->date_modified ) + $datetime_offset )
+			),
 		];
 
 		do_action( 'wpforms_pro_admin_entries_edit_submit_completed', $this->form_data, $response, $updated_fields, $this->entry );
@@ -1119,7 +1105,7 @@ class Edit {
 			// Process the field only if value was changed or not existed in DB at all. Also check if field is editable.
 			if (
 				( $dbdata_value_exist && (string) $dbdata_fields[ $field_id ]['value'] === $save_field['value'] ) ||
-				! $this->is_field_entries_editable( $field_type )
+				! $this->is_field_entries_editable( $field_type, $this->form_data['fields'][ $field_id ], $this->form_data )
 			) {
 				continue;
 			}
@@ -1292,11 +1278,13 @@ class Edit {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param string $type Field type.
+	 * @param string $type      Field type.
+	 * @param array  $field     Field data.
+	 * @param array  $form_data Form data.
 	 *
 	 * @return bool
 	 */
-	private function is_field_entries_editable( $type ) {
+	private function is_field_entries_editable( $type, $field, $form_data ) {
 
 		$editable = in_array( $type,  wpforms()->get( 'entry' )->get_editable_field_types(), true );
 
@@ -1304,13 +1292,50 @@ class Edit {
 		 * Allow change if the field is editable regarding to its type.
 		 *
 		 * @since 1.6.0
+		 * @since 1.8.4 Added $field and $form_data arguments.
 		 *
-		 * @param bool   $editable True if is editable.
-		 * @param string $type     Field type.
+		 * @param bool   $editable  True if is editable.
+		 * @param string $type      Field type.
+		 * @param array  $field     Field data.
+		 * @param array  $form_data Form data.
 		 *
 		 * @return bool
 		 */
-		return (bool) apply_filters( 'wpforms_pro_admin_entries_edit_field_editable', $editable, $type );
+		return (bool) apply_filters( 'wpforms_pro_admin_entries_edit_field_editable', $editable, $type, $field, $form_data );
+	}
+
+	/**
+	 * Check if the field entries are editable.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param array $field        Field data.
+	 * @param array $entry_fields Entry fields data.
+	 * @param array $form_data    Form data and settings.
+	 *
+	 * @return bool
+	 */
+	private function is_field_entries_output_editable( $field, $entry_fields, $form_data ) {
+
+		/**
+		 * Is the field editable?
+		 *
+		 * @since 1.5.9.5
+		 *
+		 * @param bool  $is_editable  Is the field editable?
+		 * @param array $field        Field data.
+		 * @param array $entry_fields Entry fields data.
+		 * @param array $form_data    Form data and settings.
+		 *
+		 * @return bool ____
+		 */
+		return (bool) apply_filters(
+			'wpforms_pro_admin_entries_edit_field_output_editable',
+			$this->is_field_entries_editable( $field['type'], $field, $form_data ),
+			$field,
+			$entry_fields,
+			$form_data
+		);
 	}
 
 	/**

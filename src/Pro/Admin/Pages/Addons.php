@@ -159,8 +159,11 @@ class Addons {
 
 			<h1 class="page-title">
 				<?php esc_html_e( 'WPForms Addons', 'wpforms' ); ?>
-				<a href="<?php echo esc_url_raw( add_query_arg( [ 'wpforms_refresh_addons' => '1' ] ) ); ?>" class="add-new-h2 wpforms-btn-orange">
-					<?php esc_html_e( 'Refresh Addons', 'wpforms' ); ?>
+				<a href="<?php echo esc_url_raw( add_query_arg( [ 'wpforms_refresh_addons' => '1' ] ) ); ?>" class="page-title-action wpforms-btn add-new-h2 wpforms-btn-orange" data-action="update">
+					<svg viewBox="0 0 20 14" class="page-title-action-icon">
+						<path d="M10.2 0a7.3 7.3 0 0 1 7.22 6.25h2.16l-3.64 4.17-3.65-4.17h2.42a4.62 4.62 0 0 0-4.5-3.6c-1.51 0-2.84.75-3.69 1.86L4.74 2.48A7.26 7.26 0 0 1 10.21 0Zm-.4 14a7.3 7.3 0 0 1-7.22-6.25H.42l3.64-4.17 3.65 4.17H5.29a4.62 4.62 0 0 0 4.5 3.6c1.51 0 2.85-.75 3.69-1.86l1.78 2.03A7.24 7.24 0 0 1 9.79 14Z"/>
+					</svg>
+					<span class="page-title-action-text"><?php esc_html_e( 'Refresh Addons', 'wpforms' ); ?></span>
 				</a>
 				<input type="search" placeholder="<?php esc_attr_e( 'Search Addons', 'wpforms' ); ?>" id="wpforms-admin-addons-search">
 			</h1>

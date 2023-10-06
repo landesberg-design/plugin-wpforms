@@ -491,15 +491,28 @@ class WPForms_Entries_Table extends WP_List_Table {
 			);
 		}
 
-		// Generate the single payment URL.
-		$payment_url = add_query_arg(
-			[
-				'page'       => 'wpforms-payments',
-				'view'       => 'single',
-				'payment_id' => absint( $payment->id ),
-			],
-			admin_url( 'admin.php' )
-		);
+		if ( ! $payment->is_published ) {
+			return sprintf(
+				'<span class="payment-status-%s" title="%s">%s</a>',
+				sanitize_html_class( $status_slug ),
+				esc_html__( 'The payment in the Trash.', 'wpforms' ),
+				wpforms_format_amount( $payment->total_amount, true, $payment->currency )
+			);
+		}
+
+		$payment_url = '';
+
+		if ( wpforms_current_user_can() ) {
+			// Generate the single payment URL.
+			$payment_url = add_query_arg(
+				[
+					'page'       => 'wpforms-payments',
+					'view'       => 'payment',
+					'payment_id' => absint( $payment->id ),
+				],
+				admin_url( 'admin.php' )
+			);
+		}
 
 		return sprintf(
 			'<a href="%s" class="payment-status-%s" title="%s">%s</a>',
@@ -1609,6 +1622,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$lines_limit = $field_type === 'address' ? 5 : 4;
 		$chars_limit = 75;
 
+		// Decode HTML entities to avoid truncating on &euro; and similar.
+		$value = html_entity_decode( $value, ENT_COMPAT, 'UTF-8' );
+
 		$lines = preg_split( '/\r\n|\r|\n/', $value );
 		$value = array_slice( $lines, 0, $lines_limit );
 		$value = implode( PHP_EOL, $value );
@@ -1658,5 +1674,48 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$status_label     = isset( $allowed_statuses[ $payment_status ] ) ? $allowed_statuses[ $payment_status ] : __( 'N/A', 'wpforms' );
 
 		return [ $status_label, $status_slug, $payment ];
+	}
+
+	/**
+	 * Displays the table.
+	 *
+	 * @since 1.8.4
+	 */
+	public function display() {
+
+		$singular = $this->_args['singular'];
+
+		$this->display_tablenav( 'top' );
+
+		$this->screen->render_screen_reader_content( 'heading_list' );
+		?>
+		<div class="wpforms-table-container">
+			<table class="wp-list-table <?php echo esc_attr( implode( ' ', $this->get_table_classes() ) ); ?>">
+				<?php $this->print_table_description(); ?>
+				<thead>
+				<tr>
+					<?php $this->print_column_headers(); ?>
+				</tr>
+				</thead>
+
+				<tbody id="the-list"
+					<?php
+					if ( $singular ) {
+						echo ' data-wp-lists="list:' . esc_attr( $singular ) . '"';
+					}
+					?>
+				>
+				<?php $this->display_rows_or_placeholder(); ?>
+				</tbody>
+
+				<tfoot>
+				<tr>
+					<?php $this->print_column_headers( false ); ?>
+				</tr>
+				</tfoot>
+			</table>
+		</div>
+		<?php
+		$this->display_tablenav( 'bottom' );
 	}
 }

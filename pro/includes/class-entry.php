@@ -724,6 +724,15 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				payment_totals.meta_entry_id = {$this->table_name}.entry_id";
 		}
 
+		/**
+		 * Give developers an ability to modify FROM (add new tables, etc).
+		 *
+		 * @since 1.8.4
+		 *
+		 * @param string $sql_from The SQL FROM clause.
+		 */
+		$sql_from = apply_filters( 'wpforms_entry_handler_get_entries_sql_from', $sql_from );
+
 		// In the case of search, we maybe need to run an additional query first.
 		if ( ! empty( $args['value_compare'] ) ) {
 			$where = $this->second_query_update_where( $args, $where );
@@ -909,14 +918,12 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			}
 		}
 
-		if ( ! in_array( $args['advanced_search'], [ 'entry_notes', 'payment_details' ], true ) ) {
+		if ( $args['advanced_search'] !== 'entry_notes' ) {
 			return $second_where;
 		}
 
-		if ( $args['advanced_search'] === 'entry_notes' ) {
-			$entry_ids                         = $this->second_query_where_entry_notes_or_payment_details_result_ids( $args );
-			$second_where['meta_entry_not_in'] = "$this->table_name.`entry_id` NOT IN ( $entry_ids )";
-		}
+		$entry_ids                         = $this->second_query_where_entry_notes_ids( $args );
+		$second_where['meta_entry_not_in'] = "$this->table_name.`entry_id` NOT IN ( $entry_ids )";
 
 		return $second_where;
 	}
@@ -1007,20 +1014,17 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return "$this->table_name.`user_agent` $condition_value";
 		}
 
-		if ( ! in_array( $args['advanced_search'], [ 'entry_notes', 'payment_details' ], true ) ) {
+		if ( $args['advanced_search'] !== 'entry_notes' ) {
 			return '';
 		}
 
-		if (
-			$args['advanced_search'] === 'payment_details' ||
-			in_array( $args['value_compare'], [ 'is', 'contains' ], true )
-		) {
-			$entry_ids = $this->second_query_where_entry_notes_or_payment_details_result_ids( $args );
-
-			return "$this->table_name.`entry_id` IN ( $entry_ids )";
+		if ( ! in_array( $args['value_compare'], [ 'is', 'contains' ], true ) ) {
+			return '';
 		}
 
-		return '';
+		$entry_ids = $this->second_query_where_entry_notes_ids( $args );
+
+		return "{$this->table_name}.`entry_id` IN ( {$entry_ids} )";
 	}
 
 	/**
@@ -1057,15 +1061,15 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	}
 
 	/**
-	 * Advanced search by Entry Notes or Payment Entries.
+	 * Advanced search by Entry Notes.
 	 *
-	 * @since 1.7.5
+	 * @since 1.8.4
 	 *
 	 * @param array $args Arguments.
 	 *
 	 * @return string Comma separated list of entry ids.
 	 */
-	private function second_query_where_entry_notes_or_payment_details_result_ids( $args ) {
+	private function second_query_where_entry_notes_ids( $args ) {
 
 		// We have to cache it, as the same request is executed 4 times on entry search.
 		$form_ids        = implode( ',', array_map( 'intval', (array) $args['form_id'] ) );
@@ -1077,19 +1081,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return $entry_ids_str;
 		}
 
-		switch ( $args['advanced_search'] ) {
-			case 'entry_notes':
-				$entry_ids_str = $this->second_query_where_entry_notes_result_ids( $args, $form_ids );
-				break;
-
-			case 'payment_details':
-				$entry_ids_str = $this->second_query_where_entry_payment_details_result_ids( $condition_value, $form_ids );
-				break;
-
-			default:
-				$entry_ids_str = '0';
-				break;
-		}
+		$entry_ids_str = $args['advanced_search'] === 'entry_notes' ? $this->second_query_where_entry_notes_result_ids( $args, $form_ids ) : '0';
 
 		wp_cache_set( $key, $entry_ids_str, self::CACHE_GROUP );
 
@@ -1153,48 +1145,6 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$entry_ids = ! empty( $notes ) ? wp_list_pluck( $notes, 'entry_id' ) : [ 0 ];
 
 		return implode( ',', array_unique( $entry_ids ) );
-	}
-
-	/**
-	 * Advanced search by Payment Details.
-	 *
-	 * @since 1.7.5
-	 *
-	 * @param string $condition_value Condition value.
-	 * @param string $form_ids        Form ids.
-	 *
-	 * @return string Comma separated list of entry ids.
-	 */
-	private function second_query_where_entry_payment_details_result_ids( $condition_value, $form_ids ) {
-
-		global $wpdb;
-
-		$meta_table     = wpforms()->get( 'entry_meta' )->table_name;
-		$data           = 'AND data ' . $condition_value;
-		$form_ids_where = ! empty( $form_ids ) ? "AND form_id IN ( $form_ids )" : '';
-
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$result = $wpdb->query(
-			"SELECT DISTINCT entry_id
-					FROM $meta_table
-					WHERE
-						type LIKE 'payment_%'
-						$data
-						$form_ids_where"
-		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
-		if ( $result ) {
-			$entry_ids = '';
-
-			foreach ( $wpdb->last_result as $item ) {
-				$entry_ids .= $item->entry_id . ',';
-			}
-
-			$entry_ids = rtrim( $entry_ids, ',' );
-		}
-
-		return $result ? $entry_ids : '0';
 	}
 
 	/**
@@ -1291,7 +1241,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			/** This filter is documented in src/Pro/Admin/Entries/Edit.php */
 			$is_editable = (bool) apply_filters(
 				'wpforms_pro_admin_entries_edit_field_output_editable',
-				$this->is_field_editable( $form_field['type'] ),
+				$this->is_field_editable( $form_field['type'], $form_field, $form_data ),
 				$form_field,
 				$entry_fields,
 				$form_data
@@ -1310,18 +1260,21 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * Determine whether the field type is editable.
 	 *
 	 * @since 1.7.0
+	 * @since 1.8.4 Added $field and $form_data parameters.
 	 *
-	 * @param string $type Field type.
+	 * @param string $type      Field type.
+	 * @param array  $field     Field data.
+	 * @param array  $form_data Form data.
 	 *
 	 * @return bool True if editable.
 	 */
-	private function is_field_editable( $type ) {
+	private function is_field_editable( $type, $field, $form_data ) {
 
 		$editable = in_array( $type, $this->get_editable_field_types(), true );
 
 		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
 		/** This filter is documented in src/Pro/Admin/Entries/Edit.php */
-		return (bool) apply_filters( 'wpforms_pro_admin_entries_edit_field_editable', $editable, $type );
+		return (bool) apply_filters( 'wpforms_pro_admin_entries_edit_field_editable', $editable, $type, $field, $form_data );
 		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 

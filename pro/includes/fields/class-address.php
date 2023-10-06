@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Address text field.
  *
@@ -1013,27 +1017,27 @@ class WPForms_Field_Address extends WPForms_Field {
 		if ( ! empty( $form_data['fields'][ $field_id ]['required'] ) ) {
 
 			// Require Address Line 1.
-			if ( empty( $field_submit['address1'] ) ) {
+			if ( isset( $field_submit['address1'] ) && wpforms_is_empty_string( $field_submit['address1'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ]['address1'] = $required;
 			}
 
 			// Require City.
-			if ( empty( $field_submit['city'] ) ) {
+			if ( isset( $field_submit['city'] ) && wpforms_is_empty_string( $field_submit['city'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ]['city'] = $required;
 			}
 
 			// Require ZIP/Postal.
-			if ( empty( $form_data['fields'][ $field_id ]['postal_hide'] ) && isset( $this->schemes[ $scheme ]['postal_label'] ) && empty( $field_submit['postal'] ) ) {
+			if ( isset( $this->schemes[ $scheme ]['postal_label'], $field_submit['postal'] ) && empty( $form_data['fields'][ $field_id ]['postal_hide'] ) && wpforms_is_empty_string( $field_submit['postal'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ]['postal'] = $required;
 			}
 
 			// Required State.
-			if ( isset( $this->schemes[ $scheme ]['states'] ) && empty( $field_submit['state'] ) ) {
+			if ( isset( $this->schemes[ $scheme ]['states'], $field_submit['state'] ) && wpforms_is_empty_string( $field_submit['state'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ]['state'] = $required;
 			}
 
 			// Required Country.
-			if ( empty( $form_data['fields'][ $field_id ]['country_hide'] ) && isset( $this->schemes[ $scheme ]['countries'] ) && empty( $field_submit['country'] ) ) {
+			if ( isset( $this->schemes[ $scheme ]['countries'], $field_submit['country'] ) && empty( $form_data['fields'][ $field_id ]['country_hide'] ) && wpforms_is_empty_string( $field_submit['country'] ) ) {
 				wpforms()->process->errors[ $form_id ][ $field_id ]['country'] = $required;
 			}
 		}
@@ -1050,35 +1054,36 @@ class WPForms_Field_Address extends WPForms_Field {
 	 */
 	public function format( $field_id, $field_submit, $form_data ) {
 
-		$name     = ! empty( $form_data['fields'][ $field_id ]['label'] ) ? $form_data['fields'][ $field_id ]['label'] : '';
-		$address1 = ! empty( $field_submit['address1'] ) ? $field_submit['address1'] : '';
-		$address2 = ! empty( $field_submit['address2'] ) ? $field_submit['address2'] : '';
-		$city     = ! empty( $field_submit['city'] ) ? $field_submit['city'] : '';
-		$state    = ! empty( $field_submit['state'] ) ? $field_submit['state'] : '';
-		$postal   = ! empty( $field_submit['postal'] ) ? $field_submit['postal'] : '';
+		$name     = isset( $form_data['fields'][ $field_id ]['label'] ) && ! wpforms_is_empty_string( $form_data['fields'][ $field_id ]['label'] ) ? $form_data['fields'][ $field_id ]['label'] : '';
+		$address1 = isset( $field_submit['address1'] ) && ! wpforms_is_empty_string( $field_submit['address1'] ) ? $field_submit['address1'] : '';
+		$address2 = isset( $field_submit['address2'] ) && ! wpforms_is_empty_string( $field_submit['address2'] ) ? $field_submit['address2'] : '';
+		$city     = isset( $field_submit['city'] ) && ! wpforms_is_empty_string( $field_submit['city'] ) ? $field_submit['city'] : '';
+		$state    = isset( $field_submit['state'] ) && ! wpforms_is_empty_string( $field_submit['state'] ) ? $field_submit['state'] : '';
+		$postal   = isset( $field_submit['postal'] ) && ! wpforms_is_empty_string( $field_submit['postal'] ) ? $field_submit['postal'] : '';
 
 		// If scheme type is 'us', define US as a country field value.
 		if ( ! empty( $form_data['fields'][ $field_id ]['scheme'] ) && $form_data['fields'][ $field_id ]['scheme'] === 'us' ) {
 			$country = 'US';
 		} else {
-			$country = ! empty( $field_submit['country'] ) ? $field_submit['country'] : '';
+			$country = isset( $field_submit['country'] ) && ! wpforms_is_empty_string( $field_submit['country'] ) ? $field_submit['country'] : '';
 		}
 
 		$value  = '';
-		$value .= ! empty( $address1 ) ? "$address1\n" : '';
-		$value .= ! empty( $address2 ) ? "$address2\n" : '';
-		if ( ! empty( $city ) && ! empty( $state ) ) {
+		$value .= ! wpforms_is_empty_string( $address1 ) ? "$address1\n" : '';
+		$value .= ! wpforms_is_empty_string( $address2 ) ? "$address2\n" : '';
+
+		if ( ! wpforms_is_empty_string( $city ) && ! wpforms_is_empty_string( $state ) ) {
 			$value .= "$city, $state\n";
-		} elseif ( ! empty( $state ) ) {
+		} elseif ( ! wpforms_is_empty_string( $state ) ) {
 			$value .= "$state\n";
-		} elseif ( ! empty( $city ) ) {
+		} elseif ( ! wpforms_is_empty_string( $city ) ) {
 			$value .= "$city\n";
 		}
-		$value .= ! empty( $postal ) ? "$postal\n" : '';
-		$value .= ! empty( $country ) ? "$country\n" : '';
+		$value .= ! wpforms_is_empty_string( $postal ) ? "$postal\n" : '';
+		$value .= ! wpforms_is_empty_string( $country ) ? "$country\n" : '';
 		$value  = wpforms_sanitize_textarea_field( $value );
 
-		if ( empty( $city ) && empty( $address1 ) ) {
+		if ( wpforms_is_empty_string( $city ) && wpforms_is_empty_string( $address1 ) ) {
 			$value = '';
 		}
 

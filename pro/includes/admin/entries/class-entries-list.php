@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WPForms\Admin\Notice;
 use WPForms\Pro\Admin\Entries\Helpers;
 
@@ -948,7 +952,7 @@ class WPForms_Entries_List {
 					}
 					?>
 				</p>
-				<select name="fields[]" multiple>
+				<select name="fields[]" multiple size="1">
 					<option value="" placeholder><?php esc_html_e( 'Select columns&hellip;', 'wpforms' ); ?></option>
 					<?php
 					/*
@@ -1048,6 +1052,17 @@ class WPForms_Entries_List {
 			admin_url( 'admin.php' )
 		);
 
+		// Payments URL.
+		if ( wpforms()->get( 'payment' )->get_by( 'form_id', $this->form_id ) ) {
+			$payments_url = add_query_arg(
+				[
+					'page'    => 'wpforms-payments',
+					'form_id' => absint( $this->form_id ),
+				],
+				admin_url( 'admin.php' )
+			);
+		}
+
 		// Preview Entry URL.
 		$preview_url = esc_url( wpforms_get_form_preview_url( $this->form_id ) );
 
@@ -1111,6 +1126,13 @@ class WPForms_Entries_List {
 					<a href="<?php echo esc_url( $base ); ?>" class="form-details-actions-entries">
 						<span class="dashicons dashicons-list-view"></span>
 						<?php esc_html_e( 'All Entries', 'wpforms' ); ?>
+					</a>
+				<?php endif; ?>
+
+				<?php if ( isset( $payments_url ) ) : ?>
+					<a href="<?php echo esc_url( $payments_url ); ?>" class="form-details-actions-view-payments">
+						<span class="fa fa-credit-card"></span>
+						<?php esc_html_e( 'View Payments', 'wpforms' ); ?>
 					</a>
 				<?php endif; ?>
 

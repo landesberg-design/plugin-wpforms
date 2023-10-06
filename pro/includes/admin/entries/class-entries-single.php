@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WPForms\Admin\Payments\Views\Overview\Helpers;
 use WPForms\Db\Payments\ValueValidator;
 
@@ -734,8 +738,10 @@ class WPForms_Entries_Single {
 				$form_url = apply_filters( 'wpforms_entries_single_details_form_url', $this->form->form_url, $entry->entry_id, $form_data['id'] );
 				?>
 
-				<a href="<?php echo esc_url( $form_url ); ?>" class="page-title-action wpforms-btn wpforms-btn-orange">
-					<svg class="page-title-action-icon" viewBox="0 0 13 12"><path d="M12.6 5.2v1.6H3.2l3.1 3.1-.8 1.6L0 6 5.5.5l.8 1.6-3.1 3.1h9.4Z"/></svg>
+				<a href="<?php echo esc_url( $form_url ); ?>" class="page-title-action wpforms-btn wpforms-btn-orange" data-action="back">
+					<svg viewBox="0 0 16 14" class="page-title-action-icon">
+						<path d="M16 6v2H4l4 4-1 2-7-7 7-7 1 2-4 4h12Z"/>
+					</svg>
 					<span class="page-title-action-text"><?php esc_html_e( 'Back to All Entries', 'wpforms' ); ?></span>
 				</a>
 
@@ -1659,11 +1665,13 @@ class WPForms_Entries_Single {
 
 		$allowed_types    = ValueValidator::get_allowed_types();
 		$allowed_gateways = ValueValidator::get_allowed_gateways();
+		$allowed_statuses = ValueValidator::get_allowed_statuses();
 		$placeholder      = __( 'N/A', 'wpforms' );
 
 		$payment_type         = isset( $payment->type, $allowed_types[ $payment->type ] ) ? $allowed_types[ $payment->type ] : $placeholder;
 		$payment_gateway      = isset( $payment->gateway, $allowed_gateways[ $payment->gateway ] ) ? $allowed_gateways[ $payment->gateway ] : $placeholder;
-		$payment_total        = ! empty( $payment->total_amount ) ? wpforms_format_amount( wpforms_sanitize_amount( $payment->total_amount ), $payment->currency ) : $placeholder;
+		$payment_status       = isset( $payment->status, $allowed_statuses[ $payment->status ] ) ? $allowed_statuses[ $payment->status ] : $placeholder;
+		$payment_total        = ! empty( $payment->total_amount ) ? wpforms_format_amount( wpforms_sanitize_amount( $payment->total_amount, $payment->currency ), true, $payment->currency ) : $placeholder;
 		$payment_subscription = Helpers::get_subscription_description( $payment->id, $payment_total );
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -1671,6 +1679,7 @@ class WPForms_Entries_Single {
 			'admin/entries/single-entry/payment-details',
 			[
 				'payment'              => $payment,
+				'payment_status'       => $payment_status,
 				'payment_type'         => $payment_type,
 				'payment_gateway'      => $payment_gateway,
 				'payment_total'        => $payment_total,
@@ -1678,14 +1687,14 @@ class WPForms_Entries_Single {
 				'payment_url'          => add_query_arg(
 					[
 						'page'       => 'wpforms-payments',
-						'view'       => 'single',
+						'view'       => 'payment',
 						'payment_id' => absint( $payment->id ),
 					],
 					admin_url( 'admin.php' )
 				),
 				'entry'                => $entry,
 				'form_data'            => $form_data,
-				'show_button'          => wpforms_current_user_can(),
+				'show_button'          => wpforms_current_user_can() && $payment->is_published,
 			],
 			true
 		);

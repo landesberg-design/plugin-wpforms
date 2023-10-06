@@ -83,98 +83,165 @@ class Access {
 	}
 
 	/**
-	 * Get Access settings panel labels.
+	 * Get forms caps settings labels.
 	 *
-	 * @since 1.5.8
+	 * @since 1.8.4
+	 *
+	 * @return array
 	 */
-	protected function get_caps_settings_labels() {
+	protected function get_forms_caps_settings_labels() {
 
 		return [
-			'create_forms'   => [
-				'title' => \esc_html__( 'Create Forms', 'wpforms' ),
+			'create_forms' => [
+				'title' => esc_html__( 'Create Forms', 'wpforms' ),
 				'caps'  => [
 					'wpforms_create_forms' => [
 						'title' => '',
-						'desc'  => '',
+						'desc'  => wp_kses(
+							__( 'Can create new forms.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 				],
 			],
-			'view_forms'     => [
-				'title' => \esc_html__( 'View Forms', 'wpforms' ),
+			'view_forms'   => [
+				'title' => esc_html__( 'View Forms', 'wpforms' ),
 				'caps'  => [
 					'wpforms_view_own_forms'    => [
-						'title' => \esc_html__( 'Own', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can view forms created by themselves.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can view forms created by <strong>themselves</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 					'wpforms_view_others_forms' => [
-						'title' => \esc_html__( 'Others', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can view forms created by others.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can view forms created by <strong>others</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 				],
 			],
-			'edit_forms'     => [
-				'title' => \esc_html__( 'Edit Forms', 'wpforms' ),
+			'edit_forms'   => [
+				'title' => esc_html__( 'Edit Forms', 'wpforms' ),
 				'caps'  => [
 					'wpforms_edit_own_forms'    => [
-						'title' => \esc_html__( 'Own', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can edit forms created by themselves.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can edit forms created by <strong>themselves</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 					'wpforms_edit_others_forms' => [
-						'title' => \esc_html__( 'Others', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can edit forms created by others.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can edit forms created by <strong>others</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 				],
 			],
-			'delete_forms'   => [
-				'title' => \esc_html__( 'Delete Forms', 'wpforms' ),
+			'delete_forms' => [
+				'title' => esc_html__( 'Delete Forms', 'wpforms' ),
 				'caps'  => [
 					'wpforms_delete_own_forms'    => [
-						'title' => \esc_html__( 'Own', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can delete forms created by themselves.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can delete forms created by <strong>themselves</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 					'wpforms_delete_others_forms' => [
-						'title' => \esc_html__( 'Others', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can delete forms created by others.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can delete forms created by <strong>others</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 				],
 			],
-			// Entry categories.
+		];
+	}
+
+	/**
+	 * Get entries caps settings labels.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @return array
+	 */
+	protected function get_entries_caps_settings_labels() {
+
+		return [
 			'view_entries'   => [
-				'title' => \esc_html__( 'View Entries', 'wpforms' ),
+				'title' => esc_html__( 'View Entries', 'wpforms' ),
 				'caps'  => [
 					'wpforms_view_entries_own_forms'    => [
-						'title' => \esc_html__( 'Own', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can view entries of forms created by themselves.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can view entries of forms created by <strong>themselves</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 					'wpforms_view_entries_others_forms' => [
-						'title' => \esc_html__( 'Others', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can view entries of forms created by others.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can view entries of forms created by <strong>others</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 				],
 			],
 			'edit_entries'   => [
-				'title' => \esc_html__( 'Edit Entries', 'wpforms' ),
+				'title' => esc_html__( 'Edit Entries', 'wpforms' ),
 				'caps'  => [
 					'wpforms_edit_entries_own_forms'    => [
-						'title' => \esc_html__( 'Own', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can edit entries of forms created by themselves.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can edit entries of forms created by <strong>themselves</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 					'wpforms_edit_entries_others_forms' => [
-						'title' => \esc_html__( 'Others', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can edit entries of forms created by others.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can edit entries of forms created by <strong>others</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 				],
 			],
 			'delete_entries' => [
-				'title' => \esc_html__( 'Delete Entries', 'wpforms' ),
+				'title' => esc_html__( 'Delete Entries', 'wpforms' ),
 				'caps'  => [
 					'wpforms_delete_entries_own_forms'    => [
-						'title' => \esc_html__( 'Own', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can delete entries of forms created by themselves.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can delete entries of forms created by <strong>themselves</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 					'wpforms_delete_entries_others_forms' => [
-						'title' => \esc_html__( 'Others', 'wpforms' ),
-						'desc'  => \esc_html__( 'Can delete entries of forms created by others.', 'wpforms' ),
+						'desc' => wp_kses(
+							__( 'Can delete entries of forms created by <strong>others</strong>.', 'wpforms' ),
+							[
+								'strong' => [],
+							]
+						),
 					],
 				],
 			],
@@ -219,7 +286,7 @@ class Access {
 			'content'  => '<h4>' . esc_html__( 'Access', 'wpforms' ) . '</h4><p>' .
 			sprintf(
 				wp_kses( /* translators: %s - WPForms.com access control link. */
-					__( 'Select the user roles that are allowed to manage different aspects of WPForms. By default, all permissions are provided only to administrator users. Please see our <a href="%s" target="_blank" rel="noopener noreferrer">Access Controls documentation</a> for full details.', 'wpforms' ),
+					__( 'By default, all permissions are provided only to administrator users. Please see our <a href="%s" target="_blank" rel="noopener noreferrer">Access Controls documentation</a> for full details.', 'wpforms' ),
 					[
 						'a' => [
 							'href'   => [],
@@ -236,10 +303,11 @@ class Access {
 			'class'    => [ 'section-heading' ],
 		];
 
-		$labels     = $this->get_caps_settings_labels();
 		$roles      = get_editable_roles();
 		$caps       = wpforms()->get( 'access' )->get_caps();
 		$master_cap = wpforms_get_capability_manage_options();
+		$options    = [];
+		$role_caps  = [];
 
 		// Get a list of assigned capabilities for every role.
 		foreach ( $roles as $role => $details ) {
@@ -249,6 +317,86 @@ class Access {
 			$options[ $role ]   = $details['name'];
 			$role_caps[ $role ] = array_intersect_key( $caps, array_filter( $details['capabilities'] ) );
 		}
+
+		$forms_section   = $this->get_forms_section( $role_caps, $caps, $options );
+		$entries_section = $this->get_entries_section( $role_caps, $caps, $options );
+
+		$settings[ self::SLUG ] = array_merge( $settings[ self::SLUG ], $forms_section, $entries_section );
+
+		return $settings;
+	}
+
+	/**
+	 * Get Forms section settings.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param array $role_caps Set of roles with assigned capabilities.
+	 * @param array $caps      Set of capabilities.
+	 * @param array $options   Set of roles with names.
+	 *
+	 * @return array
+	 */
+	protected function get_forms_section( $role_caps, $caps, $options ) {
+
+		$settings[ self::SLUG . '-forms-heading' ] = [
+			'id'       => self::SLUG . '-forms-heading',
+			'content'  => '<h4>' . esc_html__( 'Forms', 'wpforms' ) . '</h4><p>' . esc_html__( 'Select the user roles that are allowed to manage forms.', 'wpforms' ) . '</p>',
+			'type'     => 'content',
+			'no_label' => true,
+			'class'    => [ 'section-heading' ],
+		];
+
+		$labels = $this->get_forms_caps_settings_labels();
+
+		$forms_settings = $this->get_settings( $labels, $role_caps, $caps, $options );
+
+		return array_merge( $settings, $forms_settings );
+	}
+
+	/**
+	 * Get Entries section settings.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param array $role_caps Set of roles with assigned capabilities.
+	 * @param array $caps      Set of capabilities.
+	 * @param array $options   Set of roles with names.
+	 *
+	 * @return array
+	 */
+	protected function get_entries_section( $role_caps, $caps, $options ) {
+
+		$settings[ self::SLUG . '-entries-heading' ] = [
+			'id'       => self::SLUG . '-entries-heading',
+			'content'  => '<h4>' . esc_html__( 'Entries', 'wpforms' ) . '</h4><p>' . esc_html__( 'Select the user roles that are allowed to manage entries.', 'wpforms' ) . '</p>',
+			'type'     => 'content',
+			'no_label' => true,
+			'class'    => [ 'section-heading' ],
+		];
+
+		$labels = $this->get_entries_caps_settings_labels();
+
+		$entries_settings = $this->get_settings( $labels, $role_caps, $caps, $options );
+
+		return array_merge( $settings, $entries_settings );
+	}
+
+	/**
+	 * Get settings for a section.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param array $labels    Set of labels for a section.
+	 * @param array $role_caps Set of roles with assigned capabilities.
+	 * @param array $caps      Set of capabilities.
+	 * @param array $options   Set of roles with names.
+	 *
+	 * @return array
+	 */
+	protected function get_settings( $labels, $role_caps, $caps, $options ) {
+
+		$settings = [];
 
 		foreach ( $labels as $row_id => $row ) {
 
@@ -260,8 +408,7 @@ class Access {
 
 				$columns[ $cap_id ] = [
 					'id'        => $cap_id,
-					'name'      => esc_html( $cap['title'] ),
-					'desc'      => esc_html( $cap['desc'] ),
+					'desc'      => $cap['desc'],
 					'type'      => 'select',
 					'choicesjs' => true,
 					'multiple'  => true,
@@ -271,7 +418,7 @@ class Access {
 				];
 			}
 
-			$settings[ self::SLUG ][ $row_id ] = [
+			$settings[ $row_id ] = [
 				'id'      => $row_id,
 				'name'    => esc_html( $row['title'] ),
 				'type'    => 'columns',

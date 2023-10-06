@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Hidden text field.
  *
@@ -20,6 +24,19 @@ class WPForms_Field_Hidden extends WPForms_Field {
 		$this->icon  = 'fa-eye-slash';
 		$this->order = 210;
 		$this->group = 'fancy';
+
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.8.4
+	 */
+	private function hooks() {
+
+		add_filter( 'wpforms_field_new_default', [ $this, 'field_new_default' ] );
+		add_filter( 'wpforms_field_new_class', [ $this, 'preview_field_new_class' ], 10, 2 );
 	}
 
 	/**
@@ -42,22 +59,24 @@ class WPForms_Field_Hidden extends WPForms_Field {
 		$this->field_option( 'basic-options', $field, $args );
 
 		// Label.
-		$this->field_option( 'label', $field );
+		$this->field_option(
+			'label',
+			$field,
+			[
+				'tooltip' => esc_html__( 'Enter text for the form field label. Never displayed on the front-end.', 'wpforms-lite' ),
+			]
+		);
 
 		// Set label to disabled.
-		$args = [
-			'type'  => 'hidden',
-			'slug'  => 'label_disable',
-			'value' => '1',
-		];
-
-		$this->field_element( 'text', $field, $args );
-
-		// Default value.
-		$this->field_option( 'default_value', $field );
-
-		// Custom CSS classes.
-		$this->field_option( 'css', $field );
+		$this->field_element(
+			'text',
+			$field,
+			[
+				'type'  => 'hidden',
+				'slug'  => 'label_disable',
+				'value' => '1',
+			]
+		);
 
 		// Options close markup.
 		$args = [
@@ -65,6 +84,78 @@ class WPForms_Field_Hidden extends WPForms_Field {
 		];
 
 		$this->field_option( 'basic-options', $field, $args );
+
+		// Advanced options open markup.
+		$this->field_option(
+			'advanced-options',
+			$field,
+			[
+				'markup' => 'open',
+			]
+		);
+
+		// Default value.
+		$this->field_option( 'default_value', $field );
+
+		// Custom CSS classes.
+		$this->field_option( 'css', $field );
+
+		// Hide Label.
+		$this->field_option(
+			'label_hide',
+			$field,
+			[
+				'class' => 'wpforms-disabled',
+			]
+		);
+
+		// Advanced options close markup.
+		$this->field_option(
+			'advanced-options',
+			$field,
+			[
+				'markup' => 'close',
+			]
+		);
+	}
+
+	/**
+	 * New field default settings in the form builder.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param array $field Field settings.
+	 *
+	 * @return array
+	 */
+	public function field_new_default( $field ): array {
+
+		if ( empty( $field['type'] ) || $field['type'] !== $this->type ) {
+			return $field;
+		}
+
+		$field['label_hide'] = '1';
+
+		return $field;
+	}
+
+	/**
+	 * Get new field CSS class.
+	 *
+	 * @since 1.8.4
+	 *
+	 * @param string $css_class Preview new field CSS class.
+	 * @param array  $field     Field data.
+	 *
+	 * @return string
+	 */
+	public function preview_field_new_class( $css_class, $field ): string {
+
+		if ( empty( $field['type'] ) || $field['type'] !== $this->type ) {
+			return $css_class;
+		}
+
+		return trim( $css_class . ' label_hide' );
 	}
 
 	/**
@@ -78,6 +169,9 @@ class WPForms_Field_Hidden extends WPForms_Field {
 
 		// Define data.
 		$default_value = ! empty( $field['default_value'] ) ? $field['default_value'] : '';
+
+		// The Hidden field label is always hidden.
+		$field['label_hide'] = '1';
 
 		// Label.
 		$this->field_preview_option( 'label', $field );

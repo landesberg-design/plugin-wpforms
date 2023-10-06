@@ -11,10 +11,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$image_url = ! empty( $choice['image'] ) ? $choice['image'] : null;
+$image     = ! empty( $image_url ) ? sprintf( '<img src="%s" alt="%s"/>', esc_url( $image_url ), esc_attr( $choice['label'] ) ) : '';
+
 ?>
 <div class="field-value-choice field-value-choice-image field-value-choice-<?php echo esc_attr( $choice_type ); ?> <?php echo $is_checked ? ' field-value-choice-checked' : ''; ?>">
 	<div class="field-value-choice-image-wrapper">
-		<img src="<?php echo esc_url( $choice['image'] ); ?>" alt="<?php echo esc_attr( $choice['label'] ); ?>"/>
+		<?php if ( ! empty( $image ) ) : ?>
+			<?php echo wp_kses_post( $image ); ?>
+		<?php endif; ?>
 	</div>
 	<div><?php echo wp_kses_post( $choice['label'] ); ?></div>
 </div>

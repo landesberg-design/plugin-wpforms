@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WPForms\Pro\Integrations\LiteConnect\Integration;
 use WPForms\Admin\Builder\TemplateSingleCache;
 
@@ -341,7 +345,7 @@ class WPForms_Pro {
 		// Offer interactions when license is not defined as a constant.
 		if ( ! $is_constant ) {
 			$class   = $has_key ? 'wpforms-hide' : '';
-			$output .= '<button id="wpforms-setting-license-key-verify" class="wpforms-btn wpforms-btn-md wpforms-btn-orange ' . $class . '">' . esc_html__( 'Verify Key', 'wpforms' ) . '</button>';
+			$output .= '<button id="wpforms-setting-license-key-verify" class="wpforms-btn wpforms-btn-md wpforms-btn-blue ' . $class . '">' . esc_html__( 'Verify Key', 'wpforms' ) . '</button>';
 		}
 
 		// Skip, in case license did not expire.
@@ -498,16 +502,18 @@ class WPForms_Pro {
 			$settings['general'],
 			[
 				'gdpr-disable-uuid'    => [
-					'id'   => 'gdpr-disable-uuid',
-					'name' => esc_html__( 'Disable User Cookies', 'wpforms' ),
-					'desc' => esc_html__( 'Check this option to disable user tracking cookies. This will disable the Related Entries feature and the Form Abandonment addon.', 'wpforms' ),
-					'type' => 'checkbox',
+					'id'     => 'gdpr-disable-uuid',
+					'name'   => esc_html__( 'Disable User Cookies', 'wpforms' ),
+					'desc'   => esc_html__( 'Disable user tracking cookies. This will disable the Related Entries feature and the Form Abandonment addon.', 'wpforms' ),
+					'type'   => 'toggle',
+					'status' => true,
 				],
 				'gdpr-disable-details' => [
-					'id'   => 'gdpr-disable-details',
-					'name' => esc_html__( 'Disable User Details', 'wpforms' ),
-					'desc' => esc_html__( 'Check this option to prevent the storage of IP addresses and User Agent on all forms. If unchecked, then this can be managed on a form-by-form basis inside the form builder under Settings → General', 'wpforms' ),
-					'type' => 'checkbox',
+					'id'     => 'gdpr-disable-details',
+					'name'   => esc_html__( 'Disable User Details', 'wpforms' ),
+					'desc'   => esc_html__( 'Disable storage IP addresses and User Agent on all forms. If unchecked, then this can be managed on a form-by-form basis inside the form builder under Settings → General', 'wpforms' ),
+					'type'   => 'toggle',
+					'status' => true,
 				],
 			],
 			'gdpr'
@@ -934,14 +940,11 @@ class WPForms_Pro {
 								'parent'     => 'settings',
 								'subsection' => $id,
 								'input_id'   => 'wpforms-panel-field-notifications-sender_name-' . $id,
-								'readonly'   => ! empty( $from_name_after ),
-								'after'      => ! empty( $from_name_after ) ? '<div class="wpforms-alert wpforms-alert-warning">' . $from_name_after . '</div>' : '',
-								'class'      => ! empty( $from_name_after ) ? 'from-name wpforms-panel-field-warning' : 'from-name',
 							],
 							$settings->form_data,
 							$id
 						)
-						// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+					// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 					);
 					wpforms_panel_field(
 						'text',

@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WPForms\Pro\Forms\Fields\FileUpload\Chunk;
 use WPForms\Pro\Helpers\Upload;
 use WPForms\Pro\Robots;

@@ -2,7 +2,8 @@
 
 namespace WPForms\Pro\Admin\Education\Admin;
 
-use \WPForms\Admin\Education\EducationInterface;
+use WP_List_Table;
+use WPForms\Admin\Education\EducationInterface;
 
 /**
  * Admin/DidYouKnow Education feature.

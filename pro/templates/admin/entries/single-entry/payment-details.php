@@ -5,6 +5,7 @@
  * @since 1.8.2
  *
  * @var object $payment              Payment object.
+ * @var string $payment_status       Payment status.
  * @var string $payment_type         Payment type.
  * @var string $payment_gateway      Payment gateway.
  * @var string $payment_total        Payment total.
@@ -37,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							'strong' => [],
 						]
 					),
-					esc_html( $payment->status )
+					esc_html( $payment_status )
 				);
 				?>
 			</p>

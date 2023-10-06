@@ -133,7 +133,6 @@ class EntryCsvAttachment {
 			'date format="m/d/Y"' => '',
 			'query_var key=""'    => '',
 			'user_meta key=""'    => '',
-			'entry_geolocation'   => '',
 		];
 	}
 
@@ -480,6 +479,16 @@ class EntryCsvAttachment {
 			$entry_fields,
 			$entry_id
 		);
+
+		/**
+		 * Give devs the ability to modify the content for the Entry CSV Attachment.
+		 *
+		 * @since 1.8.4
+		 *
+		 * @param array $content  Content.
+		 * @param int   $entry_id Entry ID.
+		 */
+		$content = apply_filters( 'wpforms_pro_admin_builder_notifications_advanced_entry_csv_attachment_content', $content, $entry_id );
 
 		$csv_content = [ $content['header'], $content['body'] ];
 		$file_name   = $this->get_file_name( $notification );
