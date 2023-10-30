@@ -552,6 +552,7 @@ class Loader {
 		// Education features classes.
 		$features = [
 			'LiteConnect',
+			'Builder\Calculations',
 			'Builder\Captcha',
 			'Builder\Fields',
 			'Builder\Settings',

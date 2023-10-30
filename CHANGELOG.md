@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.4.1] - 2023-10-24
+### Fixed
+- A fatal error was thrown when using the WP-CLI command with the --context=admin parameter.
+- Stripe assets were loaded on every page when the Elementor plugin was activated.
+- Resized images in Image Choices were displayed in their original sizes inside Notifications.
+
 ## [1.8.4] - 2023-09-26
 ### IMPORTANT
 - Support for PHP 5.6 has been discontinued. If you are running PHP 5.6, you MUST upgrade PHP before installing WPForms 1.8.4. Failure to do that will disable WPForms core functionality.

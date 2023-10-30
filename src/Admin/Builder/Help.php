@@ -310,24 +310,28 @@ class Help {
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
+				'/docs/calculations-addon/',
 			],
 			'paragraph'                 => [
 				'/docs/how-to-limit-words-or-characters-in-a-form-field/',
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
+				'/docs/calculations-addon/',
 			],
 			'paragraph text'            => [
 				'/docs/how-to-limit-words-or-characters-in-a-form-field/',
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
+				'/docs/calculations-addon/',
 			],
 			'textarea'                  => [
 				'/docs/how-to-limit-words-or-characters-in-a-form-field/',
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
+				'/docs/calculations-addon/',
 			],
 			'input mask'                => [
 				'/docs/how-to-use-custom-input-masks/',
@@ -523,6 +527,7 @@ class Help {
 				'/docs/how-to-choose-the-right-form-field-for-your-forms/',
 				'/docs/how-to-use-smart-tags-in-wpforms/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
+				'/docs/calculations-addon/',
 			],
 			'rating'                    => [
 				'/docs/how-to-add-a-rating-field-to-wpforms/',
@@ -628,6 +633,7 @@ class Help {
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
+				'/docs/calculations-addon/',
 			],
 			'website/url'               => [
 				'/docs/how-to-customize-form-field-options/',
@@ -843,6 +849,7 @@ class Help {
 				'/docs/how-to-customize-form-field-options/',
 				'/docs/how-to-use-conditional-logic-with-wpforms/',
 				'/docs/how-to-customize-the-style-of-individual-form-fields/',
+				'/docs/calculations-addon/',
 			],
 			'multiple items'            => [
 				'/docs/viewing-and-managing-payments/',
@@ -991,6 +998,26 @@ class Help {
 			'conditional confirmation'  => [
 				'/docs/setup-form-confirmation-wpforms/',
 				'/docs/how-to-create-conditional-form-confirmations/',
+			],
+			'calculation'               => [
+				'/docs/calculations-addon/',
+				'/docs/building-formulas-with-the-calculations-addon/',
+				'/calculations-formula-cheatsheet/',
+			],
+			'calculations'              => [
+				'/docs/calculations-addon/',
+				'/docs/building-formulas-with-the-calculations-addon/',
+				'/calculations-formula-cheatsheet/',
+			],
+			'formula'                   => [
+				'/docs/calculations-addon/',
+				'/docs/building-formulas-with-the-calculations-addon/',
+				'/calculations-formula-cheatsheet/',
+			],
+			'conditional calculation'   => [
+				'/docs/calculations-addon/',
+				'/docs/building-formulas-with-the-calculations-addon/',
+				'/calculations-formula-cheatsheet/',
 			],
 			'lead forms'                => [
 				'/docs/lead-forms-addon/',

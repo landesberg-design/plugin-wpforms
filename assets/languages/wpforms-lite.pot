@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms Lite 1.8.4\n"
+"Project-Id-Version: WPForms Lite 1.8.4.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms-lite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-09-25T15:07:23+03:00\n"
+"POT-Creation-Date: 2023-10-23T19:51:39+03:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: wpforms-lite\n"
@@ -41,25 +41,25 @@ msgstr ""
 
 #: includes/admin/admin.php:151
 #: includes/admin/admin.php:261
-#: includes/fields/class-base.php:2882
+#: includes/fields/class-base.php:2989
 #: src/Admin/Forms/Tags.php:180
 msgid "Loading..."
 msgstr ""
 
 #: includes/admin/admin.php:152
 #: includes/admin/builder/class-builder.php:686
-#: includes/fields/class-base.php:2883
+#: includes/fields/class-base.php:2990
 #: src/Admin/Forms/Tags.php:181
 msgid "No results found"
 msgstr ""
 
 #: includes/admin/admin.php:153
-#: includes/fields/class-base.php:2884
+#: includes/fields/class-base.php:2991
 msgid "No choices to choose from"
 msgstr ""
 
 #: includes/admin/admin.php:154
-#: includes/fields/class-base.php:2885
+#: includes/fields/class-base.php:2992
 msgid "Press to select"
 msgstr ""
 
@@ -561,17 +561,17 @@ msgstr ""
 
 #. translators: %1$s - data source name (e.g. Categories, Posts), %2$s - data source type (e.g. post type, taxonomy).
 #: includes/admin/builder/class-builder.php:570
-#: includes/fields/class-base.php:3062
+#: includes/fields/class-base.php:3169
 msgid "This field will not be displayed in your form since there are no %2$s belonging to %1$s."
 msgstr ""
 
 #: includes/admin/builder/class-builder.php:575
-#: includes/fields/class-base.php:3048
+#: includes/fields/class-base.php:3155
 msgid "posts"
 msgstr ""
 
 #: includes/admin/builder/class-builder.php:576
-#: includes/fields/class-base.php:3053
+#: includes/fields/class-base.php:3160
 msgid "terms"
 msgstr ""
 
@@ -884,10 +884,10 @@ msgstr ""
 
 #. translators: %s - choice number.
 #: includes/admin/builder/class-builder.php:675
-#: includes/fields/class-checkbox.php:177
-#: includes/fields/class-checkbox.php:802
-#: includes/fields/class-radio.php:154
-#: includes/fields/class-radio.php:634
+#: includes/fields/class-checkbox.php:130
+#: includes/fields/class-checkbox.php:755
+#: includes/fields/class-radio.php:117
+#: includes/fields/class-radio.php:597
 msgid "Choice %s"
 msgstr ""
 
@@ -1911,7 +1911,7 @@ msgstr ""
 
 #: includes/admin/class-about.php:1288
 #: includes/admin/class-about.php:1295
-msgid "Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Sendinblue, HubSpot, Drip, and MailerLite"
+msgid "Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Brevo, HubSpot, Drip, and MailerLite"
 msgstr ""
 
 #: includes/admin/class-about.php:1298
@@ -1930,7 +1930,7 @@ msgstr ""
 #: includes/admin/class-about.php:1309
 #: includes/admin/class-about.php:1323
 #: includes/admin/class-about.php:1337
-msgid "ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Sendinblue, HubSpot, Drip, and MailerLite"
+msgid "ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, and MailerLite"
 msgstr ""
 
 #: includes/admin/class-about.php:1352
@@ -2014,7 +2014,7 @@ msgid "Pro Addons Included"
 msgstr ""
 
 #: includes/admin/class-about.php:1477
-msgid "Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Google Sheets, Coupons, and more (28 total)"
+msgid "Calculations, Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Google Sheets, Coupons, and more (28 total)"
 msgstr ""
 
 #: includes/admin/class-about.php:1483
@@ -2026,7 +2026,7 @@ msgstr ""
 #: includes/admin/class-about.php:1484
 #: includes/admin/class-about.php:1491
 #: includes/admin/class-about.php:1498
-msgid "Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, Google Sheets, Coupons, and more (30+ total)"
+msgid "Calculations, Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Webhooks, Google Sheets, Coupons, and more (30+ total)"
 msgstr ""
 
 #: includes/admin/class-about.php:1506
@@ -2557,7 +2557,7 @@ msgid "Checkbox Selection Limit"
 msgstr ""
 
 #: includes/admin/class-settings.php:479
-#: includes/fields/class-checkbox.php:682
+#: includes/fields/class-checkbox.php:635
 #: src/Frontend/Frontend.php:1800
 msgid "You have exceeded the number of allowed selections: {#}."
 msgstr ""
@@ -3377,19 +3377,19 @@ msgstr ""
 msgid "No field type found"
 msgstr ""
 
-#: includes/fields/class-base.php:2886
+#: includes/fields/class-base.php:2993
 msgid "Only unique values can be added"
 msgstr ""
 
-#: includes/fields/class-base.php:2887
+#: includes/fields/class-base.php:2994
 msgid "Only values matching specific conditions can be added"
 msgstr ""
 
-#: includes/fields/class-base.php:3042
+#: includes/fields/class-base.php:3149
 msgid "Dynamic choices"
 msgstr ""
 
-#: includes/fields/class-base.php:3043
+#: includes/fields/class-base.php:3150
 msgid "items"
 msgstr ""
 
@@ -3420,46 +3420,46 @@ msgstr ""
 msgid "Third Choice"
 msgstr ""
 
-#: includes/fields/class-checkbox.php:174
-#: src/Forms/Fields/PaymentCheckbox/Field.php:160
+#: includes/fields/class-checkbox.php:127
+#: src/Forms/Fields/PaymentCheckbox/Field.php:111
 msgid "Checked"
 msgstr ""
 
-#: includes/fields/class-checkbox.php:341
-#: includes/fields/class-radio.php:304
+#: includes/fields/class-checkbox.php:294
+#: includes/fields/class-radio.php:267
 msgid "Randomize Choices"
 msgstr ""
 
-#: includes/fields/class-checkbox.php:342
-#: includes/fields/class-radio.php:305
+#: includes/fields/class-checkbox.php:295
+#: includes/fields/class-radio.php:268
 msgid "Check this option to randomize the order of the choices."
 msgstr ""
 
-#: includes/fields/class-checkbox.php:363
-#: includes/fields/class-radio.php:326
+#: includes/fields/class-checkbox.php:316
+#: includes/fields/class-radio.php:289
 #: includes/fields/class-select.php:239
 msgid "Show Values"
 msgstr ""
 
-#: includes/fields/class-checkbox.php:364
-#: includes/fields/class-radio.php:327
+#: includes/fields/class-checkbox.php:317
+#: includes/fields/class-radio.php:290
 #: includes/fields/class-select.php:240
 msgid "Check this option to manually set form field values."
 msgstr ""
 
-#: includes/fields/class-checkbox.php:388
+#: includes/fields/class-checkbox.php:341
 msgid "Choice Limit"
 msgstr ""
 
-#: includes/fields/class-checkbox.php:389
+#: includes/fields/class-checkbox.php:342
 msgid "Limit the number of checkboxes a user can select. Leave empty for unlimited."
 msgstr ""
 
-#: includes/fields/class-checkbox.php:429
+#: includes/fields/class-checkbox.php:382
 msgid "Enable Disclaimer / Terms of Service Display"
 msgstr ""
 
-#: includes/fields/class-checkbox.php:430
+#: includes/fields/class-checkbox.php:383
 msgid "Check this option to adjust the field styling to support Disclaimers and Terms of Service type agreements."
 msgstr ""
 
@@ -5510,6 +5510,7 @@ msgid "Dismiss this message."
 msgstr ""
 
 #: lite/templates/education/admin/edit-post/classic-notice.php:27
+#: src/Admin/Education/Builder/Calculations.php:110
 msgid "Dismiss this notice."
 msgstr ""
 
@@ -5806,6 +5807,7 @@ msgstr ""
 
 #. translators: %s - addon name.
 #: src/Admin/Addons/Addons.php:389
+#: src/Admin/Education/Builder/Calculations.php:186
 #: src/Admin/Education/Builder/Geolocation.php:112
 msgid "%s addon"
 msgstr ""
@@ -6129,6 +6131,28 @@ msgid "Last %d day"
 msgid_plural "Last %d days"
 msgstr[0] ""
 msgstr[1] ""
+
+#. translators: %1$s - link to the WPForms.com doc article.
+#: src/Admin/Education/Builder/Calculations.php:91
+msgid "Easily perform calculations based on user input. Head over to the <a href=\"#advanced-tab\">Advanced Tab</a> to get started or read <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">our documentation</a> to learn more."
+msgstr ""
+
+#: src/Admin/Education/Builder/Calculations.php:112
+msgid "New feature"
+msgstr ""
+
+#: src/Admin/Education/Builder/Calculations.php:113
+msgid "Calculations Are Here!"
+msgstr ""
+
+#: src/Admin/Education/Builder/Calculations.php:202
+msgid "Calculations"
+msgstr ""
+
+#: src/Admin/Education/Builder/Calculations.php:228
+#: src/Admin/Education/Builder/Calculations.php:239
+msgid "Enable Calculation"
+msgstr ""
 
 #: src/Admin/Education/Builder/Captcha.php:61
 msgid "No form ID found."
@@ -6972,7 +6996,7 @@ msgid "Used by 2+ million websites."
 msgstr ""
 
 #: src/Admin/Pages/SMTP.php:245
-msgid "Free mailers: SendLayer, SMTP.com, Sendinblue, Google Workspace / Gmail, Mailgun, Postmark, SendGrid."
+msgid "Free mailers: SendLayer, SMTP.com, Brevo, Google Workspace / Gmail, Mailgun, Postmark, SendGrid."
 msgstr ""
 
 #: src/Admin/Pages/SMTP.php:246
@@ -8147,27 +8171,27 @@ msgid "Third Item"
 msgstr ""
 
 #. translators: %s - item number.
-#: src/Forms/Fields/PaymentCheckbox/Field.php:163
-#: src/Forms/Fields/PaymentCheckbox/Field.php:438
-#: src/Forms/Fields/PaymentMultiple/Field.php:413
+#: src/Forms/Fields/PaymentCheckbox/Field.php:114
+#: src/Forms/Fields/PaymentCheckbox/Field.php:389
+#: src/Forms/Fields/PaymentMultiple/Field.php:376
 #: src/Forms/Fields/PaymentSelect/Field.php:427
 msgid "Item %s"
 msgstr ""
 
-#: src/Forms/Fields/PaymentCheckbox/Field.php:318
-#: src/Forms/Fields/PaymentMultiple/Field.php:293
+#: src/Forms/Fields/PaymentCheckbox/Field.php:269
+#: src/Forms/Fields/PaymentMultiple/Field.php:256
 #: src/Forms/Fields/PaymentSelect/Field.php:238
 msgid "Show price after item labels"
 msgstr ""
 
-#: src/Forms/Fields/PaymentCheckbox/Field.php:319
-#: src/Forms/Fields/PaymentMultiple/Field.php:294
+#: src/Forms/Fields/PaymentCheckbox/Field.php:270
+#: src/Forms/Fields/PaymentMultiple/Field.php:257
 #: src/Forms/Fields/PaymentSelect/Field.php:239
 msgid "Check this option to show price of the item after the label."
 msgstr ""
 
-#: src/Forms/Fields/PaymentCheckbox/Field.php:532
-#: src/Forms/Fields/PaymentMultiple/Field.php:504
+#: src/Forms/Fields/PaymentCheckbox/Field.php:483
+#: src/Forms/Fields/PaymentMultiple/Field.php:467
 msgid "Invalid payment option."
 msgstr ""
 

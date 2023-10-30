@@ -163,7 +163,7 @@ class Notices {
 					<?php
 					printf(
 						'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
-						'#',
+						esc_url( wpforms_utm_link( 'https://wpforms.com/introducing-wpforms-1-8-4-new-stripe-payment-tools/#stripe-conditional-logic', 'Builder Settings', 'Stripe New Payments Interface' ) ),
 						esc_html__( 'What\'s new?', 'wpforms-lite' )
 					);
 					?>
