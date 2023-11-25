@@ -14,6 +14,8 @@
  * @var string $url           Download URL.
  */
 
+use WPForms\Admin\Education\Helpers;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -236,9 +238,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php
 					esc_html_e( 'User Journey', 'wpforms' );
 					if ( ! $plugin_allow ) {
-						?>
-						<span class="badge"></span>
-					<?php } ?>
+						Helpers::print_badge( 'Pro', 'sm', 'inline', 'platinum' );
+					}
+					?>
 				</h2>
 				<p><?php esc_html_e( 'Easily trace each visitor’s path through your site, right up to the moment they hit ‘Submit’!', 'wpforms' ); ?></p>
 				<?php if ( $plugin_allow ) { ?>

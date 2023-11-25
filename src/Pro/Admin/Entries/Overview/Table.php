@@ -559,13 +559,14 @@ class Table extends WP_List_Table {
 
 		global $wpdb;
 
-		$spam_status = SpamEntry::ENTRY_STATUS;
+		$spam_status  = SpamEntry::ENTRY_STATUS;
+		$trash_status = 'trash';
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
 			"SELECT DISTINCT form_id, COUNT(entry_id) as count
 			FROM {$this->entry_handler->table_name}
-			WHERE status != '{$spam_status}'
+			WHERE status NOT IN ( '{$spam_status}', '{$trash_status}' )
 			GROUP BY form_id
 			ORDER BY count {$order}"
 		);
@@ -622,13 +623,14 @@ class Table extends WP_List_Table {
 				FROM {$this->entry_handler->table_name}
 				WHERE date >= %s
 				AND date <= %s
-				AND status != %s
+				AND status NOT IN ( %s, %s )
 				GROUP BY form_id
 				ORDER BY count {$order}",
 				[
 					$start_date->format( Datepicker::DATETIME_FORMAT ),
 					$end_date->format( Datepicker::DATETIME_FORMAT ),
 					SpamEntry::ENTRY_STATUS,
+					'trash',
 				]
 			)
 		);
@@ -662,12 +664,13 @@ class Table extends WP_List_Table {
 				WHERE form_id = %d
 				AND date >= %s
 				AND date <= %s
-				AND status != %s",
+				AND status NOT IN ( %s, %s )",
 				[
 					$form->ID,
 					$start_date->format( Datepicker::DATETIME_FORMAT ),
 					$end_date->format( Datepicker::DATETIME_FORMAT ),
 					SpamEntry::ENTRY_STATUS,
+					'trash',
 				]
 			)
 		);
@@ -699,15 +702,16 @@ class Table extends WP_List_Table {
 
 		global $wpdb;
 
-		$form_ids_in = wpforms_wpdb_prepare_in( $form_ids, '%d' );
-		$spam_status = SpamEntry::ENTRY_STATUS;
+		$form_ids_in  = wpforms_wpdb_prepare_in( $form_ids, '%d' );
+		$spam_status  = SpamEntry::ENTRY_STATUS;
+		$trash_status = 'trash';
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (array) $wpdb->get_results(
 			"SELECT DISTINCT form_id, COUNT(entry_id) as count
 			FROM {$this->entry_handler->table_name}
 			WHERE form_id IN ({$form_ids_in})
-			AND status != '{$spam_status}'
+			AND status NOT IN ( '{$spam_status}', '{$trash_status}' )
 			GROUP BY form_id",
 			OBJECT_K
 		);

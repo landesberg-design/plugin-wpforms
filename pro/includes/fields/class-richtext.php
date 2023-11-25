@@ -147,6 +147,31 @@ class WPForms_Field_Richtext extends WPForms_Field {
 
 		// This field requires fieldset+legend instead of the field label.
 		add_filter( "wpforms_frontend_modern_is_field_requires_fieldset_{$this->type}", '__return_true', PHP_INT_MAX, 2 );
+
+		add_filter( 'tiny_mce_before_init', [ $this, 'customize_tinymc' ] );
+	}
+
+
+	/**
+	 * Customize TinyMCE editor.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @see https://codex.wordpress.org/TinyMCE#Customize_TinyMCE_with_Filters
+	 *
+	 * @param array $in The TinyMCE settings array.
+	 *
+	 * @return array The modified TinyMCE settings array.
+	 * @noinspection PhpMissingReturnTypeInspection
+	 * @noinspection ReturnTypeCanBeDeclaredInspection
+	 */
+	public function customize_tinymc( $in ) {
+
+		// Append custom CSS file to comma seperated list of stylesheets.
+		$current_content_css = ! empty( $in['content_css'] ) ? $in['content_css'] : '';
+		$in['content_css']   = implode( ',', [ $current_content_css, esc_url( $this->get_editor_content_css_url() ) ] );
+
+		return $in;
 	}
 
 	/**
@@ -1493,17 +1518,20 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param array $strings Frontend strings.
 	 *
 	 * @return array Frontend strings.
+	 * @noinspection PhpMissingReturnTypeInspection
+	 * @noinspection ReturnTypeCanBeDeclaredInspection
 	 */
 	public function add_frontend_strings( $strings ) {
 
-		$suffix  = SCRIPT_DEBUG ? '' : '.min';
 		$version = 'ver=' . get_bloginfo( 'version' );
+		$min     = wpforms_get_min_suffix();
 
 		$strings['richtext_add_media_button']   = version_compare( get_bloginfo( 'version' ), '5.0', '<' );
 		$strings['entry_preview_iframe_styles'] = [
 			esc_url( includes_url( "js/tinymce/skins/lightgray/content.min.css?{$version}" ) ),
-			esc_url( includes_url( "css/dashicons{$suffix}.css?{$version}" ) ),
+			esc_url( includes_url( "css/dashicons{$min}.css?{$version}" ) ),
 			esc_url( includes_url( "js/tinymce/skins/wordpress/wp-content.css?{$version}" ) ),
+			esc_url( $this->get_editor_content_css_url() ),
 		];
 
 		return $strings;
@@ -1609,6 +1637,20 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		$args['post_mime_type'] = array_values( get_allowed_mime_types() );
 
 		return $args;
+	}
+
+	/**
+	 * Get editor content CSS URL.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @return string
+	 */
+	private function get_editor_content_css_url(): string {
+
+		$min = wpforms_get_min_suffix();
+
+		return WPFORMS_PLUGIN_URL . "assets/pro/css/fields/richtext/editor-content{$min}.css";
 	}
 }
 

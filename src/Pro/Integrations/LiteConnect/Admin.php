@@ -540,7 +540,7 @@ final class Admin {
 			$string .= ' ' . sprintf(
 				/* translators: %s - time when Lite Connect was enabled. */
 				esc_html__( 'since you enabled Lite Connect on %s', 'wpforms' ),
-				esc_html( date_i18n( 'M j, Y', $enabled_since + get_option( 'gmt_offset' ) * 3600 ) )
+				esc_html( wpforms_date_format( $enabled_since, '', true ) )
 			);
 		}
 

@@ -88,7 +88,7 @@ class Notices {
 
 		return sprintf(
 			wp_kses( /* translators: %s - general admin settings page URL. */
-				__( '<strong>Pay-as-you-go Pricing</strong><br> 3%% fee per-transaction + Stripe fees. <a href="%s">Renew your license</a> to remove additional fees and unlock powerful <features class=""></features>', 'wpforms-lite' ),
+				__( '<strong>Pay-as-you-go Pricing</strong><br> 3%% fee per-transaction + Stripe fees. <a href="%s">Renew your license</a> to remove additional fees and unlock powerful features.', 'wpforms-lite' ),
 				[
 					'strong' => [],
 					'br'     => [],

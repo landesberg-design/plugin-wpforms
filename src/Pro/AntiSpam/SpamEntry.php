@@ -576,6 +576,7 @@ class SpamEntry {
 				'read',
 				'unread',
 				'null',
+				'trash',
 				'delete',
 			];
 

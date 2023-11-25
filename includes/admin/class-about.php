@@ -544,7 +544,7 @@ class WPForms_About {
 									<?php
 									printf( /* translators: %s - number of templates. */
 										esc_html__( '%s customizable form templates', 'wpforms-lite' ),
-										'1000+'
+										'1100+'
 									);
 									?>
 								</li>
@@ -554,11 +554,15 @@ class WPForms_About {
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
-									<?php esc_html_e( 'Unlock all fields & features, including Rich Text & conditional logic', 'wpforms-lite' ); ?>
+									<?php esc_html_e( 'Unlock all fields & features, including smart conditional logic', 'wpforms-lite' ); ?>
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
-									<?php esc_html_e( 'Make Surveys and Polls and create reports', 'wpforms-lite' ); ?>
+									<?php esc_html_e( 'Create powerful custom calculation forms', 'wpforms-lite' ); ?>
+								</li>
+								<li>
+									<i class="fa fa-check" aria-hidden="true"></i>
+									<?php esc_html_e( 'Make surveys and generate reports', 'wpforms-lite' ); ?>
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
@@ -570,15 +574,19 @@ class WPForms_About {
 							<ul class="list-features list-plain">
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
-									<?php esc_html_e( '5000+ integrations with marketing and payment services', 'wpforms-lite' ); ?>
+									<?php esc_html_e( '6000+ integrations with marketing and payment services', 'wpforms-lite' ); ?>
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
-									<?php esc_html_e( 'Let users Save and Resume submissions to prevent abandonment', 'wpforms-lite' ); ?>
+									<?php esc_html_e( 'Let users save & resume submissions to prevent abandonment', 'wpforms-lite' ); ?>
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
-									<?php esc_html_e( 'Take payments with PayPal Commerce, Stripe Pro, Square, Authorize.Net, and PayPal Standard', 'wpforms-lite' ); ?>
+									<?php esc_html_e( 'Take payments with Stripe, PayPal, Square, & Authorize.Net', 'wpforms-lite' ); ?>
+								</li>
+								<li>
+									<i class="fa fa-check" aria-hidden="true"></i>
+									<?php esc_html_e( 'Export entries to Google Sheets, Excel, and CSV', 'wpforms-lite' ); ?>
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
@@ -1230,7 +1238,7 @@ class WPForms_About {
 						'<strong>' .
 						sprintf( /* translators: %s - number of templates. */
 							esc_html__( 'All Form Templates including Bonus %s pre-made form templates', 'wpforms-lite' ),
-							'1000+'
+							'1100+'
 						) .
 						'</strong>',
 					],
@@ -1285,17 +1293,17 @@ class WPForms_About {
 					'status' => 'partial',
 					'text'   => [
 						'<strong>' . esc_html__( 'Additional Marketing Integrations', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Brevo, HubSpot, Drip, and MailerLite', 'wpforms-lite' ),
+						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Brevo, Drip, and MailerLite', 'wpforms-lite' ),
 					],
 				],
 				'pro'      => [
 					'status' => 'full',
 					'text'   => [
 						'<strong>' . esc_html__( 'Additional Marketing Integrations', 'wpforms-lite' ) . '</strong>',
-						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Brevo, HubSpot, Drip, and MailerLite', 'wpforms-lite' ),
+						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Brevo, Drip, and MailerLite', 'wpforms-lite' ),
 						'',
 						wp_kses(
-							__( '<strong>Bonus:</strong> 5000+ integrations with Zapier.', 'wpforms-lite' ),
+							__( '<strong>Bonus:</strong> 6000+ integrations with Zapier.', 'wpforms-lite' ),
 							[
 								'strong' => [],
 							]
@@ -1309,7 +1317,7 @@ class WPForms_About {
 						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, and MailerLite', 'wpforms-lite' ),
 						'',
 						wp_kses(
-							__( '<strong>Bonus:</strong> 5000+ integrations with Zapier.', 'wpforms-lite' ),
+							__( '<strong>Bonus:</strong> 6000+ integrations with Zapier.', 'wpforms-lite' ),
 							[
 								'strong' => [],
 							]
@@ -1323,7 +1331,7 @@ class WPForms_About {
 						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, and MailerLite', 'wpforms-lite' ),
 						'',
 						wp_kses(
-							__( '<strong>Bonus:</strong> 5000+ integrations with Zapier.', 'wpforms-lite' ),
+							__( '<strong>Bonus:</strong> 6000+ integrations with Zapier.', 'wpforms-lite' ),
 							[
 								'strong' => [],
 							]
@@ -1337,7 +1345,7 @@ class WPForms_About {
 						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, and MailerLite', 'wpforms-lite' ),
 						'',
 						wp_kses(
-							__( '<strong>Bonus:</strong> 5000+ integrations with Zapier.', 'wpforms-lite' ),
+							__( '<strong>Bonus:</strong> 6000+ integrations with Zapier.', 'wpforms-lite' ),
 							[
 								'strong' => [],
 							]

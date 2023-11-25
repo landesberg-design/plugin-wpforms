@@ -2289,7 +2289,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 				continue;
 			}
 
-			$removed_files = self::delete_uploaded_file_from_entry( $removed_files, $field, $exclude_fields, $files_path );
+			$removed_files = self::delete_uploaded_file_from_entry( $removed_files, $field, $exclude_fields, $files_path, $entry );
 		}
 
 		return $removed_files;
@@ -2299,23 +2299,24 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 * Maybe delete uploaded file from entry.
 	 *
 	 * @since 1.6.6
+	 * @since 1.8.5 Added $entry argument.
 	 *
 	 * @param array  $removed_files  Removed files array.
 	 * @param array  $field          Field to delete.
 	 * @param array  $exclude_fields Exclude fields.
 	 * @param string $files_path     Form files path.
+	 * @param object $entry          Entry.
 	 *
 	 * @return array
 	 */
-	private static function delete_uploaded_file_from_entry( $removed_files, $field, $exclude_fields, $files_path ) {
+	private static function delete_uploaded_file_from_entry( $removed_files, $field, $exclude_fields, $files_path, $entry ) {
 
 		if ( ! self::is_modern_upload( $field ) ) {
 
-			$removed_files[] = self::delete_uploaded_file( $files_path, $field );
+			$removed_files[] = self::delete_uploaded_file( $files_path, $field, $entry );
 
 			return $removed_files;
 		}
-
 		$values = $field['value_raw'];
 
 		if ( $exclude_fields ) {
@@ -2327,7 +2328,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		}
 
 		foreach ( $values as $value_raw ) {
-			$removed_files[] = self::delete_uploaded_file( $files_path, $value_raw );
+			$removed_files[] = self::delete_uploaded_file( $files_path, $value_raw, $entry );
 		}
 
 		return $removed_files;
@@ -2337,16 +2338,25 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 * Delete uploaded file.
 	 *
 	 * @since 1.6.6
+	 * @since 1.8.5 Add $entry argument and delete files from Media Library for spam entries.
 	 *
 	 * @param string $files_path Path to files.
 	 * @param array  $file_data  File data.
+	 * @param object $entry      Entry.
 	 *
 	 * @return string
 	 */
-	private static function delete_uploaded_file( $files_path, $file_data ) {
+	private static function delete_uploaded_file( $files_path, $file_data, $entry ) {
 
 		if ( empty( $file_data['file'] ) ) {
 			return '';
+		}
+
+		// We delete attachments from Media Library only for spam entries.
+		if ( $entry->status === 'spam' && ! empty( $file_data['attachment_id'] ) ) {
+			wp_delete_attachment( $file_data['attachment_id'], true );
+
+			return $file_data['file_user_name'];
 		}
 
 		$file = trailingslashit( $files_path ) . $file_data['file'];

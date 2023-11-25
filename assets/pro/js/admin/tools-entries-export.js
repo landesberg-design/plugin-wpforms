@@ -1,37 +1,37 @@
-/* global wpforms_tools_entries_export, ajaxurl */
+/* global wpforms_tools_entries_export, ajaxurl, Choices */
 /**
  * WPForms Entries Export function.
  *
  * @since 1.5.5
  */
 
-'use strict';
-
-var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, window, $ ) {
-
+const WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, window, $ ) {
 	/**
 	 * Elements.
 	 *
 	 * @since 1.5.5
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
-	var el = {
-
-		$form 			     : $( '#wpforms-tools-entries-export' ),
-		$selectForm          : $( '#wpforms-tools-entries-export-selectform' ),
-		$selectFormSpinner   : $( '#wpforms-tools-entries-export-selectform-spinner' ),
-		$selectFormMsg       : $( '#wpforms-tools-entries-export-selectform-msg' ),
-		$expOptions          : $( '#wpforms-tools-entries-export-options' ),
-		$fieldsCheckboxes    : $( '#wpforms-tools-entries-export-options-fields-checkboxes' ),
-		$dateSection         : $( '#wpforms-tools-entries-export-options-date' ),
-		$dateFlatpickr       : $( '#wpforms-tools-entries-export-options-date-flatpickr' ),
-		$searchSection       : $( '#wpforms-tools-entries-export-options-search' ),
-		$searchField         : $( '#wpforms-tools-entries-export-options-search-field' ),
-		$submitButton        : $( '#wpforms-tools-entries-export-submit' ),
-		$cancelButton        : $( '#wpforms-tools-entries-export-cancel' ),
-		$processMsg          : $( '#wpforms-tools-entries-export-process-msg' ),
-
+	const el = {
+		$form 			         : $( '#wpforms-tools-entries-export' ),
+		$selectForm              : $( '#wpforms-tools-entries-export-selectform' ),
+		$selectFormSpinner       : $( '#wpforms-tools-entries-export-selectform-spinner' ),
+		$selectFormMsg           : $( '#wpforms-tools-entries-export-selectform-msg' ),
+		$expOptions              : $( '#wpforms-tools-entries-export-options' ),
+		$fieldsCheckboxes        : $( '#wpforms-tools-entries-export-options-fields-checkboxes' ),
+		$paymentFieldsSection    : $( '#wpforms-tools-entries-export-options-payment-fields' ),
+		$paymentFieldsCheckboxes : $( '#wpforms-tools-entries-export-options-payment-fields-checkboxes' ),
+		$dateSection             : $( '#wpforms-tools-entries-export-options-date' ),
+		$dateFlatpickr           : $( '#wpforms-tools-entries-export-options-date-flatpickr' ),
+		$searchSection           : $( '#wpforms-tools-entries-export-options-search' ),
+		$searchField             : $( '#wpforms-tools-entries-export-options-search-field' ),
+		$submitButton            : $( '#wpforms-tools-entries-export-submit' ),
+		$cancelButton            : $( '#wpforms-tools-entries-export-cancel' ),
+		$processMsg              : $( '#wpforms-tools-entries-export-process-msg' ),
+		$optionFields            : $( '#wpforms-tools-entries-export-options-type-info' ),
+		$selectStatuses          : $( '#wpforms-tools-entries-export-select-statuses' ),
+		$optionStatuses          : $( '#wpforms-tools-entries-export-options-status' ),
 	};
 
 	/**
@@ -39,34 +39,34 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 	 *
 	 * @since 1.5.5
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
-	var i18n = wpforms_tools_entries_export.i18n;
+	const i18n = wpforms_tools_entries_export.i18n;
 
 	/**
 	 * Runtime variables.
 	 *
 	 * @since 1.5.5
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
-	var vars = {};
+	const vars = {};
 
 	/**
 	 * Public functions and properties.
 	 *
 	 * @since 1.5.5
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
-	var app = {
+	const app = {
 
 		/**
 		 * Forms data cached.
 		 *
 		 * @since 1.5.5
 		 *
-		 * @type {object}
+		 * @type {Object}
 		 */
 		formsCache: {},
 
@@ -75,8 +75,7 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 */
-		init: function() {
-
+		init() {
 			$( app.ready );
 		},
 
@@ -85,12 +84,12 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 */
-		ready: function() {
-
+		ready() {
 			vars.processing = false;
 
+			app.initChoices();
 			app.initDateRange();
-			app.initFormCont();
+			app.initFormContainer();
 			app.initSubmit();
 			app.events();
 		},
@@ -100,39 +99,23 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 */
-		events: function() {
-
+		events() {
 			// Selecting form.
-			el.$selectForm[0].addEventListener( 'choice', function( e ) {
-
-				if ( e.detail.choice.placeholder ) {
-					el.$expOptions.addClass( 'hidden' );
-					return;
-				}
-				if ( vars.formID === e.detail.choice.value ) {
-					return;
-				}
-				vars.formID = e.detail.choice.value;
-				if ( 'undefined' === typeof app.formsCache[ vars.formID ] ) {
-					app.retrieveFormAndRenderFields();
-				} else {
-					app.renderFields( app.formsCache[ vars.formID ] );
-				}
+			el.$selectForm[ 0 ].addEventListener( 'choice', function( event ) {
+				app.selectFormEvent( event );
 			} );
 
 			// Toggle all checkboxes on or off.
 			$( document ).on( 'change', '#wpforms-tools-entries-export-options .wpforms-toggle-all', function() {
-
-				const $this  = $( this ),
-					$toggle  = $this.find( 'input' ),
+				const $this = $( this ),
+					$toggle = $this.find( 'input' ),
 					$options = $this.siblings().find( 'input' );
 
 				$options.prop( 'checked', $toggle.prop( 'checked' ) );
 			} );
 
 			// Update toggle all state when changing individual checkbox.
-			$( document ).on( 'change', '#wpforms-tools-entries-export-options-fields-checkboxes label, #wpforms-tools-entries-export-options-additional-info label', function() {
-
+			$( document ).on( 'change', '#wpforms-tools-entries-export-options-fields-checkboxes label, #wpforms-tools-entries-export-options-payment-fields-checkboxes label, #wpforms-tools-entries-export-options-additional-info label', function() {
 				const $this = $( this );
 
 				if ( $this.hasClass( 'wpforms-toggle-all' ) ) {
@@ -140,20 +123,80 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 				}
 
 				const $options = $this.parent().find( 'label' ).not( '.wpforms-toggle-all' ).find( 'input' );
-				const $checked = $options.filter( function( _index ) {
-
-					return $( this ).is( ':checked' );
-				} );
-				const $toggle  = $this.siblings( '.wpforms-toggle-all' ).find( 'input' );
+				const $checked = $options.filter( ':checked' );
+				const $toggle = $this.siblings( '.wpforms-toggle-all' ).find( 'input' );
 
 				$toggle.prop( 'checked', $checked.length === $options.length );
 			} );
 
 			// Display file download error.
 			$( document ).on( 'csv_file_error', function( e, msg ) {
-				app.displaySubmitMsg( msg, 'error' );
+				app.displaySubmitMessage( msg, 'error' );
 			} );
 
+			// Display dynamic columns notice.
+			$( document ).on( 'change', '#wpforms-tools-entries-export-options-type-info input', function() {
+				app.switchDynamicColumnsNotice( $( this ) );
+			} );
+		},
+
+		/**
+		 * Select form event.
+		 *
+		 * @since 1.8.5
+		 *
+		 * @param {Object} event Event.
+		 */
+		selectFormEvent( event ) {
+			if ( event.detail.choice.placeholder ) {
+				el.$expOptions.addClass( 'hidden' );
+				return;
+			}
+			if ( vars.formID === event.detail.choice.value ) {
+				return;
+			}
+
+			vars.formID = event.detail.choice.value;
+
+			app.resetChoices();
+			el.$optionStatuses.removeClass( 'wpforms-hidden' );
+
+			if ( 'undefined' === typeof app.formsCache[ vars.formID ] ) {
+				app.retrieveFormAndRenderFields();
+			} else {
+				if ( app.formsCache[ vars.formID ].statuses.length > 1 ) {
+					app.setChoices( app.formsCache[ vars.formID ].statuses );
+				} else {
+					el.$optionStatuses.addClass( 'wpforms-hidden' );
+				}
+
+				// Render cached form fields checkboxes.
+				app.renderFields( app.formsCache[ vars.formID ].fields );
+
+				// Render cached payment fields checkboxes.
+				app.renderFields( app.formsCache[ vars.formID ].paymentFields, true );
+
+				app.handleSearchFields( app.formsCache[ vars.formID ].fields, app.formsCache[ vars.formID ].paymentFields );
+
+				app.optionsFields( app.formsCache[ vars.formID ].dynamicColumns );
+				app.addDynamicColumnsNotice( app.formsCache[ vars.formID ].dynamicColumnsNotice );
+			}
+		},
+
+		/**
+		 * Switch dynamic columns notice.
+		 *
+		 * @since 1.8.5
+		 *
+		 * @param {Object} input Input.
+		 */
+		switchDynamicColumnsNotice( input ) {
+			const inputValue = input.val();
+
+			if ( inputValue === 'dynamic_columns' ) {
+				const $notice = input.parent().find( '.wpforms-tools-entries-export-notice-warning' );
+				$notice.toggleClass( 'wpforms-hide' );
+			}
 		},
 
 		/**
@@ -161,28 +204,52 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 */
-		retrieveFormAndRenderFields: function() {
-
+		retrieveFormAndRenderFields() {
 			vars.ajaxData = {
 				action: 'wpforms_tools_entries_export_form_data',
 				nonce:  wpforms_tools_entries_export.nonce,
 				form:   vars.formID,
 			};
 			el.$selectFormSpinner.removeClass( 'hidden' );
-			app.displayFormsMsg( '' );
+			app.displayFormsMessage( '' );
 			$.get( ajaxurl, vars.ajaxData )
 				.done( function( res ) {
 					if ( res.success ) {
+						// Render form fields checkboxes.
 						app.renderFields( res.data.fields );
-						app.formsCache[ vars.formID ] = res.data.fields;
+
+						// Render payment fields checkboxes.
+						app.renderFields( res.data.payment_fields, true );
+
+						app.optionsFields( res.data.dynamic_columns );
+
+						if ( res.data.dynamic_columns ) {
+							app.addDynamicColumnsNotice( res.data.dynamic_columns_notice );
+						}
+
+						app.handleSearchFields( res.data.fields, res.data.payment_fields );
+
+						app.formsCache[ vars.formID ] = {
+							fields: res.data.fields,
+							paymentFields: res.data.payment_fields,
+							dynamicColumns: res.data.dynamic_columns,
+							dynamicColumnsNotice: res.data.dynamic_columns_notice,
+							statuses: res.data.statuses,
+						};
 						el.$expOptions.removeClass( 'hidden' );
+
+						if ( res.data.statuses.length > 1 ) {
+							app.setChoices( res.data.statuses );
+						} else {
+							el.$optionStatuses.addClass( 'wpforms-hidden' );
+						}
 					} else {
-						app.displayFormsMsg( res.data.error );
+						app.displayFormsMessage( res.data.error );
 						el.$expOptions.addClass( 'hidden' );
 					}
 				} )
 				.fail( function( jqXHR, textStatus, errorThrown ) {
-					app.displayFormsMsg( i18n.error_prefix + ':<br>' + errorThrown );
+					app.displayFormsMessage( i18n.error_prefix + ':<br>' + errorThrown );
 					el.$expOptions.addClass( 'hidden' );
 				} )
 				.always( function() {
@@ -197,35 +264,32 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @param {string} requestId Request Identifier.
 		 */
-		exportAjaxStep: function( requestId ) {
-
-			var ajaxData;
-
+		exportAjaxStep( requestId ) {
 			if ( ! vars.processing ) {
 				return;
 			}
 
-			ajaxData = app.getAjaxPostData( requestId );
+			const ajaxData = app.getAjaxPostData( requestId );
 			$.post( ajaxurl, ajaxData )
 				.done( function( res ) {
-					var msg = '';
+					let msg = '';
 					clearTimeout( vars.timerId );
 					if ( ! res.success ) {
-						app.displaySubmitMsg( res.data.error, 'error' );
+						app.displaySubmitMessage( res.data.error, 'error' );
 						return;
 					}
 					if ( res.data.count === 0 ) {
-						app.displaySubmitMsg( i18n.prc_2_no_entries );
+						app.displaySubmitMessage( i18n.prc_2_no_entries );
 						return;
 					}
 					msg = i18n.prc_3_done;
 					msg += '<br>' + i18n.prc_3_download + ', <a href="#" class="wpforms-download-link">' + i18n.prc_3_click_here + '</a>.';
-					app.displaySubmitMsg( msg, 'info' );
+					app.displaySubmitMessage( msg, 'info' );
 					app.triggerDownload( res.data.request_id );
 				} )
 				.fail( function( jqXHR, textStatus, errorThrown ) {
 					clearTimeout( vars.timerId );
-					app.displaySubmitMsg( i18n.error_prefix + ':<br>' + errorThrown, 'error' );
+					app.displaySubmitMessage( i18n.error_prefix + ':<br>' + errorThrown, 'error' );
 				} )
 				.always( function() {
 					app.displaySubmitSpinner( false );
@@ -239,26 +303,33 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @param {string} requestId Request Identifier.
 		 *
-		 * @returns {object} Ajax POST data.
+		 * @return {Object} Ajax POST data.
 		 */
-		getAjaxPostData: function( requestId ) {
-
-			var ajaxData;
+		getAjaxPostData( requestId ) {
+			let ajaxData;
 
 			if ( requestId === 'first-step' ) {
+				const statuses = [];
 				ajaxData = el.$form.serializeArray().reduce( function( obj, item ) {
-					obj[ item.name ] = item.value;
+					if ( item.name === 'statuses' ) {
+						statuses.push( item.value );
+					} else {
+						obj[ item.name ] = item.value;
+					}
 					return obj;
 				}, {} );
 				if ( el.$fieldsCheckboxes.find( 'input' ).length < 1 ) {
 					ajaxData.date = '';
-					ajaxData['search[term]'] = '';
+					ajaxData[ 'search[term]' ] = '';
 				}
+
+				ajaxData.statuses = statuses;
 			} else {
 				ajaxData = {
-					'action':     'wpforms_tools_entries_export_step',
-					'nonce':      wpforms_tools_entries_export.nonce,
-					'request_id': requestId,
+					action:     'wpforms_tools_entries_export_step',
+					nonce:      wpforms_tools_entries_export.nonce,
+					// eslint-disable-next-line camelcase
+					request_id: requestId,
 				};
 			}
 
@@ -270,13 +341,11 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 */
-		initSubmit: function() {
-
+		initSubmit() {
 			el.$submitButton.on( 'click', function( e ) {
-
 				e.preventDefault();
 
-				var $t = $( this );
+				const $t = $( this );
 
 				if ( $t.hasClass( 'wpforms-btn-spinner-on' ) ) {
 					return;
@@ -284,24 +353,22 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 
 				el.$submitButton.blur();
 				app.displaySubmitSpinner( true );
-				app.displaySubmitMsg( '' );
+				app.displaySubmitMessage( '' );
 
 				vars.timerId = setTimeout(
 					function() {
-						app.displaySubmitMsg( i18n.prc_1_filtering + '<br>' + i18n.prc_1_please_wait, 'info' );
+						app.displaySubmitMessage( i18n.prc_1_filtering + '<br>' + i18n.prc_1_please_wait, 'info' );
 					},
 					3000
 				);
 
 				app.exportAjaxStep( 'first-step' );
-
 			} );
 
 			el.$cancelButton.on( 'click', function( e ) {
-
 				e.preventDefault();
 				el.$cancelButton.blur();
-				app.displaySubmitMsg( '' );
+				app.displaySubmitMessage( '' );
 				app.displaySubmitSpinner( false );
 			} );
 		},
@@ -311,8 +378,7 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 */
-		initFormCont: function() {
-
+		initFormContainer() {
 			if ( wpforms_tools_entries_export.form_id > 0 ) {
 				el.$expOptions.removeClass( 'hidden' );
 
@@ -324,17 +390,67 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		},
 
 		/**
+		 * Init Choices.
+		 *
+		 * @since 1.8.5
+		 */
+		initChoices() {
+			vars.Choices = new Choices( el.$selectStatuses[ 0 ], {
+				removeItemButton: true,
+				itemSelectText: '',
+			} );
+		},
+
+		/**
+		 * Reset Choices.
+		 *
+		 * @since 1.8.5
+		 */
+		resetChoices() {
+			vars.Choices.clearInput();
+			vars.Choices.clearStore();
+			vars.Choices.setChoices( [], 'value', 'label', true );
+		},
+
+		/**
+		 * Set Choices.
+		 * Exclude choice with value 'spam'.
+		 *
+		 * @since 1.8.5
+		 *
+		 * @param {Array} choices Choices.
+		 */
+		setChoices( choices ) {
+			// Try to get 'spam' choice.
+			const spamChoice = choices.filter( function( choice ) {
+				return choice.value === 'spam';
+			} )[ 0 ];
+
+			// Set 'spam' choice.
+			if ( spamChoice ) {
+				vars.Choices.setChoices( [ spamChoice ], 'value', 'label', true );
+			}
+
+			// Exclude choice with value 'spam'.
+			choices = choices.filter( function( choice ) {
+				return choice.value !== 'spam';
+			} );
+
+			// Select all choices.
+			vars.Choices.setValue( choices, 'value', 'label', true );
+		},
+
+		/**
 		 * Init Flatpickr at Date Range field.
 		 *
 		 * @since 1.5.5
 		 */
-		initDateRange: function() {
-
-			var langCode = wpforms_tools_entries_export.lang_code,
-				flatpickr = window.flatpickr,
-				flatpickrLocale = {
-					rangeSeparator: ' - ',
-				};
+		initDateRange() {
+			const langCode = wpforms_tools_entries_export.lang_code;
+			const flatpickr = window.flatpickr;
+			let flatpickrLocale = {
+				rangeSeparator: ' - ',
+			};
 
 			if (
 				flatpickr !== 'undefined' &&
@@ -360,50 +476,115 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 *
-		 * @param {object} fields Form fields data.
+		 * @param {Object}  fields        Form fields data.
+		 * @param {boolean} paymentFields Payment fields flag.
 		 */
-		renderFields: function( fields ) {
-
+		renderFields( fields, paymentFields = false ) {
 			if ( typeof fields !== 'object' ) {
 				return;
 			}
 
-			var html = {
-					checkboxes: '',
-					options: '',
-				},
-				fieldsKeys = Object.keys( fields );
+			const html = {
+				checkboxes: '',
+				options: '',
+			};
+			const fieldsKeys = Object.keys( fields );
+
+			el.$paymentFieldsSection.show();
 
 			if ( fieldsKeys.length === 0 ) {
-
 				html.checkboxes = '<span>' + i18n.error_form_empty + '</span>';
-				el.$dateSection.addClass( 'hidden' );
-				el.$searchSection.addClass( 'hidden' );
 			} else {
-
 				html.checkboxes += '<label class="wpforms-toggle-all"><input type="checkbox" checked> ' + i18n.label_select_all + '</label>';
 
-				fieldsKeys.forEach( function( key, i ) {
-					var ch = '<label><input type="checkbox" name="fields[{i}]" value="{id}" checked> {label}</label>',
-						id = parseInt( fields[ key ].id, 10 );
-					ch = ch.replace( '{i}', parseInt( i, 10 ) );
+				fieldsKeys.forEach( function( index ) {
+					let ch = '<label><input type="checkbox" name="fields[{index}]" value="{id}" checked> {label}</label>';
+					const id = parseInt( fields[ index ].id, 10 );
+					ch = ch.replace( '{index}', parseInt( index, 10 ) + '-' + id );
 					ch = ch.replace( '{id}', id );
-					ch = ch.replace( '{label}', fields[ key ].label );
+					ch = ch.replace( '{label}', fields[ index ].label );
 					html.checkboxes += ch;
 
-					var op = '<option value="{id}">{label}</option>';
+					let op = '<option value="{id}">{label}</option>';
 					op = op.replace( '{id}', id );
-					op = op.replace( '{label}', fields[ key ].label );
+					op = op.replace( '{label}', fields[ index ].label );
 					html.options += op;
 				} );
 				el.$dateSection.removeClass( 'hidden' );
 				el.$searchSection.removeClass( 'hidden' );
 			}
 
-			el.$fieldsCheckboxes.html( html.checkboxes );
+			if ( paymentFields ) {
+				el.$paymentFieldsCheckboxes.html( html.checkboxes );
+			} else {
+				el.$fieldsCheckboxes.html( html.checkboxes );
+			}
+
+			// Hide payment fields section if there are no payment fields.
+			if ( paymentFields && fieldsKeys.length === 0 ) {
+				el.$paymentFieldsSection.hide();
+			}
 
 			el.$searchField.find( 'optgroup:first-child option:not(:first-child)' ).remove();
 			el.$searchField.find( 'optgroup:first-child' ).append( html.options );
+		},
+
+		/**
+		 * Hide date and search sections if there are no fields.
+		 *
+		 * @since 1.8.5.2
+		 *
+		 * @param {Object} formFields    Form fields.
+		 * @param {Object} paymentFields Payment fields.
+		 */
+		handleSearchFields( formFields, paymentFields ) {
+			const formFieldsCount = Object.keys( formFields ).length;
+			const paymentFieldsCount = Object.keys( paymentFields ).length;
+
+			if ( formFieldsCount === 0 && paymentFieldsCount === 0 ) {
+				el.$dateSection.addClass( 'hidden' );
+				el.$searchSection.addClass( 'hidden' );
+			}
+		},
+
+		/**
+		 * Show/hide additional options.
+		 *
+		 * @since 1.8.5
+		 *
+		 * @param {boolean} isDynamicColumns Is dynamic columns enabled.
+		 */
+		optionsFields( isDynamicColumns ) {
+			app.switchDynamicColumns( isDynamicColumns );
+			if ( isDynamicColumns ) {
+				// Reset the dynamic columns option after form change.
+				el.$optionFields.find( 'input[value=dynamic_columns]' ).prop( 'checked', false );
+			}
+		},
+
+		/**
+		 * Show/hide dynamic columns option.
+		 *
+		 * @since 1.8.5
+		 *
+		 * @param {boolean} isDynamicColumns Is dynamic columns enabled.
+		 */
+		switchDynamicColumns( isDynamicColumns ) {
+			const labelElement = el.$optionFields.find( 'input[value=dynamic_columns]' ).parent();
+			labelElement.toggle( isDynamicColumns );
+		},
+
+		/**
+		 * Add notice about dynamic columns.
+		 *
+		 * @since 1.8.5
+		 *
+		 * @param {string} notice Notice.
+		 */
+		addDynamicColumnsNotice( notice ) {
+			el.$optionFields.find( '.wpforms-tools-entries-export-notice-warning' ).remove();
+			const labelElement = el.$optionFields.find( 'input[value=dynamic_columns]' ).parent();
+			labelElement.append( '<div class="wpforms-tools-entries-export-notice-warning wpforms-hide">' + notice + '</div>' );
 		},
 
 		/**
@@ -413,8 +594,7 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @param {boolean} show Show or hide the submit button spinner.
 		 */
-		displaySubmitSpinner: function( show ) {
-
+		displaySubmitSpinner( show ) {
 			if ( show ) {
 				el.$submitButton.addClass( 'wpforms-btn-spinner-on' );
 				el.$cancelButton.removeClass( 'hidden' );
@@ -431,16 +611,15 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 *
-		 * @param {string} msg  Message.
+		 * @param {string} message Message.
 		 */
-		displayFormsMsg: function( msg ) {
+		displayFormsMessage( message ) {
+			el.$selectFormMsg.html( '<p>' + message + '</p>' );
 
-			el.$selectFormMsg.html( msg );
-
-			if ( msg.length > 0 ) {
-				el.$selectFormMsg.removeClass( 'hidden' );
+			if ( message.length > 0 ) {
+				el.$selectFormMsg.removeClass( 'wpforms-hidden' );
 			} else {
-				el.$selectFormMsg.addClass( 'hidden' );
+				el.$selectFormMsg.addClass( 'wpforms-hidden' );
 			}
 		},
 
@@ -449,23 +628,22 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @since 1.5.5
 		 *
-		 * @param {string} msg  Message.
-		 * @param {string} type Use 'error' for errors messages.
+		 * @param {string} message Message.
+		 * @param {string} type    Use 'error' for errors messages.
 		 */
-		displaySubmitMsg: function( msg, type ) {
-
+		displaySubmitMessage( message, type = '' ) {
 			if ( type && type === 'error' ) {
 				el.$processMsg.addClass( 'wpforms-error' );
 			} else {
 				el.$processMsg.removeClass( 'wpforms-error' );
 			}
 
-			el.$processMsg.html( msg );
+			el.$processMsg.html( '<p>' + message + '</p>' );
 
-			if ( msg.length > 0 ) {
-				el.$processMsg.removeClass( 'hidden' );
+			if ( message.length > 0 ) {
+				el.$processMsg.removeClass( 'wpforms-hidden' );
 			} else {
-				el.$processMsg.addClass( 'hidden' );
+				el.$processMsg.addClass( 'wpforms-hidden' );
 			}
 		},
 
@@ -476,9 +654,8 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 		 *
 		 * @param {string} requestId Request ID.
 		 */
-		triggerDownload: function( requestId ) {
-
-			var url = wpforms_tools_entries_export.export_page;
+		triggerDownload( requestId ) {
+			let url = wpforms_tools_entries_export.export_page;
 
 			url += '&action=wpforms_tools_entries_export_download';
 			url += '&nonce=' + wpforms_tools_entries_export.nonce;
@@ -493,7 +670,6 @@ var WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document, 
 
 	// Provide access to public functions/properties.
 	return app;
-
 }( document, window, jQuery ) );
 
 // Initialize.

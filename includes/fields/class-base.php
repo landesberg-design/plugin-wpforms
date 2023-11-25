@@ -2451,17 +2451,14 @@ abstract class WPForms_Field {
 								esc_attr( $icon )
 							);
 
-							$output .= '<span class="wpforms-icon-choices-label">';
-
 							$output .= sprintf(
-								'<input type="%s" class="%s" %s readonly> %s',
+								'<input type="%1$s" class="%2$s" %3$s readonly>',
 								$type,
 								wpforms_sanitize_classes( $input_class, true ),
-								$selected,
-								wp_kses( $label, $allowed_tags )
+								$selected
 							);
 
-							$output .= '</span>';
+							$output .= '<span class="wpforms-icon-choices-label">' . wp_kses( $label, $allowed_tags ) . '</span>';
 
 							$output .= '</label>';
 
@@ -2989,7 +2986,7 @@ abstract class WPForms_Field {
 			'loadingText'       => esc_html__( 'Loading...', 'wpforms-lite' ),
 			'noResultsText'     => esc_html__( 'No results found', 'wpforms-lite' ),
 			'noChoicesText'     => esc_html__( 'No choices to choose from', 'wpforms-lite' ),
-			'itemSelectText'    => esc_attr__( 'Press to select', 'wpforms-lite' ),
+			'itemSelectText'    => '',
 			'uniqueItemText'    => esc_html__( 'Only unique values can be added', 'wpforms-lite' ),
 			'customAddItemText' => esc_html__( 'Only values matching specific conditions can be added', 'wpforms-lite' ),
 		];

@@ -9,6 +9,6 @@
         }
     },
     "require": {
-        "mk-j/php_xlsxwriter": "0.38"
+        "mk-j/php_xlsxwriter": "0.39"
     }
 }

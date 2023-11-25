@@ -71,7 +71,7 @@ class FileUploadAttachment {
 	 */
 	public function settings( $content, $settings, $id ) {
 
-		$new_content = wpforms_panel_field(
+		$content .= wpforms_panel_field(
 			'toggle',
 			'notifications',
 			'file_upload_attachment_enable',
@@ -85,9 +85,9 @@ class FileUploadAttachment {
 			false
 		);
 
-		$new_content .= $this->file_upload_attachment_fields( $settings->form_data, $id );
+		$content .= $this->file_upload_attachment_fields( $settings->form_data, $id );
 
-		return $new_content . $content;
+		return $content;
 	}
 
 	/**

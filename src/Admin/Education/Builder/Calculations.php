@@ -3,6 +3,7 @@
 namespace WPForms\Admin\Education\Builder;
 
 use WPForms\Admin\Education\AddonsItemBase;
+use WPForms\Admin\Education\Helpers;
 
 /**
  * Builder/Calculations Education feature for Lite and Pro.
@@ -235,9 +236,9 @@ class Calculations extends AddonsItemBase {
 		return wp_parse_args(
 			[
 				'desc'  => sprintf(
-					'%1$s<span class="wpforms-field-option-education-pro-badge">%2$s</span>',
+					'%1$s%2$s',
 					esc_html__( 'Enable Calculation', 'wpforms-lite' ),
-					esc_html( $addon['license_level'] )
+					Helpers::get_badge( $addon['license_level'], 'sm', 'inline', 'slate' )
 				),
 				'attrs' => [
 					'disabled' => 'disabled',

@@ -2,6 +2,7 @@
 
 use WPForms\Pro\Admin\Entries\Helpers;
 use WPForms\Db\Payments\ValueValidator;
+use WPForms\Pro\Admin\DashboardWidget;
 
 /**
  * Generate the table on the entries overview page.
@@ -83,6 +84,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		// Default number of forms to show per page.
 		$this->per_page = wpforms()->entry->get_count_per_page();
+
+		// Add trashed views.
+		add_filter( 'wpforms_entries_table_views', [ $this, 'add_trashed_views' ] );
 	}
 
 	/**
@@ -113,6 +117,11 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$columns_class = $this->get_column_count() > 5 ? 'many' : 'few';
 
 		$classes[] = "has-{$columns_class}-columns";
+
+		// Add trash class.
+		if ( $this->is_trash_list() ) {
+			$classes[] = 'wpforms-entries-table-trash';
+		}
 
 		/**
 		 * Filters the list of CSS classes for the WP_List_Table table tag.
@@ -157,6 +166,14 @@ class WPForms_Entries_Table extends WP_List_Table {
 			true
 		);
 
+		$this->counts['trash'] = wpforms()->get( 'entry' )->get_entries(
+			[
+				'form_id' => $this->form_id,
+				'status'  => WPForms_Entries_List::TRASH_ENTRY_STATUS,
+			],
+			true
+		);
+
 		// Only show the payment view if the form has a payment field.
 		if ( wpforms_has_payment( 'form', $this->form_data ) ) {
 			$this->counts['payment'] = wpforms()->get( 'entry' )->get_entries(
@@ -185,6 +202,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$total   = '&nbsp;<span class="count">(<span class="total-num">' . $this->counts['total'] . '</span>)</span>';
 		$unread  = '&nbsp;<span class="count">(<span class="unread-num">' . $this->counts['unread'] . '</span>)</span>';
 		$starred = '&nbsp;<span class="count">(<span class="starred-num">' . $this->counts['starred'] . '</span>)</span>';
+
 		$all     = empty( $_GET['status'] ) && ( $current === 'all' || empty( $current ) ) ? ' class="current"' : '';
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
@@ -223,6 +241,35 @@ class WPForms_Entries_Table extends WP_List_Table {
 		);
 
 		return apply_filters( 'wpforms_entries_table_views', $views, $this->form_data, $this->counts );
+	}
+
+	/**
+	 * Add Trashed views to the list of views.
+	 * We've seperated it to use the filter because we need it to be after spam, which uses the filter.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $views Entries table views.
+	 *
+	 * @return array $views Array of all the list table views.
+	 */
+	public function add_trashed_views( $views ) {
+
+		if ( ! $this->counts['trash'] && ! wpforms()->get( 'entry' )->get_trash_count( $this->form_id ) && ( ! isset( $_GET['status'] ) || $_GET['status'] !== 'trash' ) ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return $views;
+		}
+
+		$trashed = '&nbsp;<span class="count">(<span class="trashed-num">' . $this->counts['trash'] . '</span>)</span>';
+		$base    = remove_query_arg( [ 'type', 'status', 'paged', 'message' ] );
+
+		$views['trashed'] = sprintf(
+			'<a href="%1s"%2s>%3s</a>',
+			esc_url( add_query_arg( 'status', WPForms_Entries_List::TRASH_ENTRY_STATUS, $base ) ),
+			$this->is_trash_list() ? ' class="current"' : '',
+			esc_html__( 'Trash', 'wpforms' ) . $trashed
+		);
+
+		return $views;
 	}
 
 	/**
@@ -266,7 +313,10 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		$actions            = esc_html__( 'Actions', 'wpforms' );
 		$actions           .= ' <a href="#" title="' . esc_attr__( 'Change columns to display', 'wpforms' ) . '" id="wpforms-entries-table-edit-columns"><i class="fa fa-cog" aria-hidden="true"></i></a>';
-		$columns['actions'] = $actions;
+
+		if ( ! $this->is_trash_list() || wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
+			$columns['actions'] = $actions;
+		}
 
 		return apply_filters( 'wpforms_entries_table_columns', $columns, $this->form_data );
 	}
@@ -460,8 +510,22 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function column_type_field( $entry, $column_name ) {
 
+		// Show the original type if is trash.
+		if ( isset( $_GET['status'] ) && $_GET['status'] === WPForms_Entries_List::TRASH_ENTRY_STATUS ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$meta = wpforms()->entry_meta->get_meta(
+				[
+					'entry_id' => $entry->entry_id,
+					'type'     => 'status_prev',
+				]
+			);
+
+			if ( isset( $meta[0] ) && ! empty( $meta[0]->status ) ) {
+				return ucwords( sanitize_text_field( $meta[0]->status ) );
+			}
+		}
+
 		// If the entry has a status, show it.
-		if ( ! empty( $entry->status ) && $entry->type !== 'payment' ) {
+		if ( ! empty( $entry->status ) && $entry->type !== 'payment' && $entry->status !== WPForms_Entries_List::TRASH_ENTRY_STATUS ) {
 			return ucwords( sanitize_text_field( $entry->status ) );
 		}
 
@@ -688,66 +752,119 @@ class WPForms_Entries_Table extends WP_List_Table {
 
 		$actions = [];
 
-		// View.
-		$actions['view'] = sprintf(
-			'<a href="%s" title="%s" class="view">%s</a>',
-			esc_url(
-				add_query_arg(
-					[
-						'view'     => 'details',
-						'entry_id' => $entry->entry_id,
-					],
-					admin_url( 'admin.php?page=wpforms-entries' )
-				)
-			),
-			esc_attr__( 'View Form Entry', 'wpforms' ),
-			esc_html__( 'View', 'wpforms' )
-		);
+		// Show the delete action only on trash and spam page.
+		if ( $this->should_delete( $entry->entry_id ) ) {
+			if ( wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
+				// Restore.
+				$actions['restore'] = sprintf(
+					'<a href="%s" title="%s" class="restore">%s</a>',
+					esc_url(
+						wp_nonce_url(
+							add_query_arg(
+								[
+									'view'     => 'list',
+									'action'   => 'restore',
+									'form_id'  => $this->form_id,
+									'entry_id' => $entry->entry_id,
+								]
+							),
+							'bulk-entries'
+						)
+					),
+					esc_attr__( 'Restore Form Entry', 'wpforms' ),
+					esc_html__( 'Restore', 'wpforms' )
+				);
+				// Delete.
+				$actions['delete'] = sprintf(
+					'<a href="%s" title="%s" class="delete">%s</a>',
+					esc_url(
+						wp_nonce_url(
+							add_query_arg(
+								[
+									'view'     => 'list',
+									'action'   => 'delete',
+									'form_id'  => $this->form_id,
+									'entry_id' => $entry->entry_id,
+								]
+							),
+							'bulk-entries'
+						)
+					),
+					esc_attr__( 'Delete Form Entry', 'wpforms' ),
+					esc_html__( 'Delete', 'wpforms' )
+				);
 
-		if (
-			wpforms_current_user_can( 'edit_entries_form_single', $this->form_id ) &&
-			wpforms()->get( 'entry' )->has_editable_fields( $entry )
-		) {
-			// Edit.
-			$actions['edit'] = sprintf(
-				'<a href="%s" title="%s" class="edit">%s</a>',
+			}
+		} else {
+			// View.
+			$actions['view'] = sprintf(
+				'<a href="%s" title="%s" class="view">%s</a>',
 				esc_url(
 					add_query_arg(
 						[
-							'view'     => 'edit',
+							'view'     => 'details',
 							'entry_id' => $entry->entry_id,
 						],
 						admin_url( 'admin.php?page=wpforms-entries' )
 					)
 				),
-				esc_attr__( 'Edit Form Entry', 'wpforms' ),
-				esc_html__( 'Edit', 'wpforms' )
+				esc_attr__( 'View Form Entry', 'wpforms' ),
+				esc_html__( 'View', 'wpforms' )
 			);
-		}
 
-		if ( wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
-			// Delete.
-			$actions['delete'] = sprintf(
-				'<a href="%s" title="%s" class="delete">%s</a>',
-				esc_url(
-					wp_nonce_url(
+			if (
+				wpforms_current_user_can( 'edit_entries_form_single', $this->form_id ) &&
+				wpforms()->get( 'entry' )->has_editable_fields( $entry )
+			) {
+				// Edit.
+				$actions['edit'] = sprintf(
+					'<a href="%s" title="%s" class="edit">%s</a>',
+					esc_url(
 						add_query_arg(
 							[
-								'view'     => 'list',
-								'action'   => 'delete',
-								'form_id'  => $this->form_id,
+								'view'     => 'edit',
 								'entry_id' => $entry->entry_id,
-							]
-						),
-						'bulk-entries'
-					)
-				),
-				esc_attr__( 'Delete Form Entry', 'wpforms' ),
-				esc_html__( 'Delete', 'wpforms' )
-			);
+							],
+							admin_url( 'admin.php?page=wpforms-entries' )
+						)
+					),
+					esc_attr__( 'Edit Form Entry', 'wpforms' ),
+					esc_html__( 'Edit', 'wpforms' )
+				);
+			}
+
+			if ( wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
+				// Trash can share the same capabilites as delete.
+				$actions['trash'] = sprintf(
+					'<a href="%s" title="%s" class="trash">%s</a>',
+					esc_url(
+						wp_nonce_url(
+							add_query_arg(
+								[
+									'view'     => 'list',
+									'action'   => 'trash',
+									'form_id'  => $this->form_id,
+									'entry_id' => $entry->entry_id,
+								]
+							),
+							'bulk-entries'
+						)
+					),
+					esc_attr__( 'Trash Form Entry', 'wpforms' ),
+					esc_html__( 'Trash', 'wpforms' )
+				);
+			}
 		}
 
-		return implode( ' <span class="sep">|</span> ', apply_filters( 'wpforms_entry_table_actions', $actions, $entry ) );
+		/**
+		 * Filter to modify table actions.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @param array $actions Actions array.
+		 * @param array $entry   Entry data.
+		 */
+		return implode( ' <span class="sep">|</span> ', apply_filters( 'wpforms_entry_table_actions', $actions, $entry ) ); //phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -790,7 +907,6 @@ class WPForms_Entries_Table extends WP_List_Table {
 		if ( apply_filters( 'wpforms_entries_table_display_date_range_filter_disable', false ) ) {
 			return;
 		}
-
 		?>
 
 		<div class="alignleft actions wpforms-filter-date">
@@ -817,6 +933,16 @@ class WPForms_Entries_Table extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 
+		$bulk_actions = [
+			'read'   => esc_html__( 'Mark Read', 'wpforms' ),
+			'unread' => esc_html__( 'Mark Unread', 'wpforms' ),
+			'star'   => esc_html__( 'Star', 'wpforms' ),
+			'unstar' => esc_html__( 'Unstar', 'wpforms' ),
+			'print'  => esc_html__( 'Print', 'wpforms' ),
+		];
+
+		$bulk_actions = $this->get_addtional_bulk_actions( $bulk_actions );
+
 		/**
 		 * Filter to disable bulk actions.
 		 *
@@ -826,16 +952,42 @@ class WPForms_Entries_Table extends WP_List_Table {
 		 */
 		return apply_filters(
 			'wpforms_entries_table_get_bulk_actions',
-			[
-				'read'   => esc_html__( 'Mark Read', 'wpforms' ),
-				'unread' => esc_html__( 'Mark Unread', 'wpforms' ),
-				'star'   => esc_html__( 'Star', 'wpforms' ),
-				'unstar' => esc_html__( 'Unstar', 'wpforms' ),
-				'print'  => esc_html__( 'Print', 'wpforms' ),
-				'null'   => esc_html__( '----------', 'wpforms' ),
-				'delete' => esc_html__( 'Delete', 'wpforms' ),
-			]
+			$bulk_actions
 		);
+	}
+
+	/**
+	 * Define additional bulk actions available for our table listing.
+	 * Additional settings are all related to delete/restore action.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $bulk_actions Bulk actions.
+	 *
+	 * @return array
+	 */
+	private function get_addtional_bulk_actions( $bulk_actions ) {
+
+		if ( ! wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
+			return $bulk_actions;
+		}
+
+		$bulk_actions['null'] = esc_html__( '----------', 'wpforms' );
+
+		if ( ! $this->is_trash_list() ) {
+
+			// Add Trash before delete.
+			$bulk_actions['trash'] = esc_html__( 'Move to Trash', 'wpforms' );
+		} else {
+
+			// Add Restore before delete.
+			$bulk_actions['restore'] = esc_html__( 'Restore', 'wpforms' );
+
+		}
+
+		$bulk_actions['delete'] = esc_html__( 'Delete', 'wpforms' );
+
+		return $bulk_actions;
 	}
 
 	/**
@@ -885,6 +1037,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 	protected function process_bulk_action_single() {
 
 		$doaction = $this->current_action();
+		$status   = '';
 
 		if ( empty( $doaction ) || $doaction === 'filter_date' ) {
 			return;
@@ -902,10 +1055,16 @@ class WPForms_Entries_Table extends WP_List_Table {
 			return;
 		}
 
+		// check if it is trash list.
+		if ( $this->is_trash_list() ) {
+			$status = WPForms_Entries_List::TRASH_ENTRY_STATUS;
+		}
+
 		$args = [
 			'entry_id'    => $ids,
 			'is_filtered' => true,
 			'number'      => $this->get_items_per_page( 'wpforms_entries_per_page', $this->per_page ),
+			'status'      => $status,
 		];
 
 		// Get entries, that would be affected.
@@ -921,7 +1080,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		 */
 		$entries_list = apply_filters( 'wpforms_entries_table_process_actions_entries_list', $entries_list, $args );
 
-		$sendback = remove_query_arg( [ 'read', 'unread', 'starred', 'unstarred', 'print', 'deleted', 'empty_spam' ], wp_get_referer() );
+		$sendback = remove_query_arg( [ 'read', 'unread', 'starred', 'unstarred', 'print', 'deleted', 'empty_spam', 'trashed', 'restored', 'paged' ], wp_get_referer() );
 
 		switch ( $doaction ) {
 			// Mark as read.
@@ -949,9 +1108,19 @@ class WPForms_Entries_Table extends WP_List_Table {
 				$this->process_bulk_action_single_print( $ids );
 				break;
 
+			// Trash entries.
+			case 'trash':
+				$sendback = $this->process_bulk_action_single_trash( $ids, $sendback );
+				break;
+
 			// Delete entries.
 			case 'delete':
 				$sendback = $this->process_bulk_action_single_delete( $ids, $sendback );
+				break;
+
+			// Restore entries.
+			case 'restore':
+				$sendback = $this->process_bulk_action_single_restore( $ids, $sendback );
 				break;
 
 			// Empty spam.
@@ -1230,6 +1399,162 @@ class WPForms_Entries_Table extends WP_List_Table {
 	/**
 	 * Process the bulk action delete.
 	 *
+	 * @since 1.8.5
+	 *
+	 * @param array  $ids      IDs to process.
+	 * @param string $sendback URL query string.
+	 *
+	 * @return string
+	 */
+	private function process_bulk_action_single_trash( $ids, $sendback ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		$trashed = 0;
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$user_id = get_current_user_id();
+
+		foreach ( $ids as $id ) {
+			// Get the entry first.
+			$entry = wpforms()->get( 'entry' )->get( $id );
+
+			if ( ! $entry ) {
+				continue;
+			}
+
+			$status = $entry->status;
+
+			/**
+			 * TODO :: After the support for PHP 7 ends,
+			 * we can update the following code to use named arguments and skip the optional params.
+			 */
+			$success = wpforms()->get( 'entry' )->update(
+				$id,
+				[ 'status' => WPForms_Entries_List::TRASH_ENTRY_STATUS ],
+				'',
+				'',
+				[ 'cap' => 'delete_entry_single' ] // Force the cap to trash the entry, since we cant provide edit cap here.
+			);
+
+			// If it didn't work continue.
+			if ( ! $success ) {
+				continue;
+			}
+
+			if ( $status !== '' ) {
+				wpforms()->get( 'entry_meta' )->add(
+					[
+						'entry_id' => $id,
+						'form_id'  => $form_id,
+						'user_id'  => $user_id,
+						'type'     => 'status_prev',
+						'data'     => '',
+						'status'   => $status,
+					],
+					'entry_meta'
+				);
+			}
+
+			++$trashed;
+		}
+
+		// If trashed entries are more than 1, then clear widget cache.
+		if ( $trashed >= 1 ) {
+			DashboardWidget::clear_widget_cache();
+		}
+
+		return add_query_arg(
+			[
+				'trashed' => $trashed,
+				'view'    => 'list', // force the list view to make sure we go to the right page.
+				'form_id' => $form_id,
+			],
+			$sendback
+		);
+	}
+
+	/**
+	 * Process the bulk action restore.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array  $ids      IDs to process.
+	 * @param string $sendback URL query string.
+	 *
+	 * @return string
+	 */
+	private function process_bulk_action_single_restore( $ids, $sendback ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		$restored = 0;
+
+		foreach ( $ids as $id ) {
+			// Reset or set initial status.
+			$status = '';
+
+			// Get the entry first.
+			$entry = wpforms()->get( 'entry' )->get( $id );
+
+			if ( ! $entry ) {
+				continue;
+			}
+
+			$meta = wpforms()->get( 'entry_meta' )->get_meta(
+				[
+					'entry_id' => $id,
+					'type'     => 'status_prev',
+				]
+			);
+
+			// check meta for status log to restore the status.
+			if ( $meta ) {
+				$status = $meta[0]->status;
+
+				// After taking status from meta, delete the meta.
+				wpforms()->get( 'entry_meta' )->delete_by( 'id', $meta[0]->id );
+			}
+
+			/**
+			 * TODO :: After the support for PHP 7 ends,
+			 * we can update the following code to use named arguments and skip the optional params.
+			 */
+			$success = wpforms()->get( 'entry' )->update(
+				$id,
+				[ 'status' => $status ],
+				'',
+				'',
+				[ 'cap' => 'delete_entry_single' ] // Force the cap to trash the entry, since we cant provide edit cap here.
+			);
+
+			// If it didn't work continue.
+			if ( ! $success ) {
+				continue;
+			}
+
+			++$restored;
+		}
+
+		$trash_count = wpforms()->get( 'entry' )->get_entries(
+			[
+				'form_id' => $this->form_id,
+				'status'  => WPForms_Entries_List::TRASH_ENTRY_STATUS,
+			],
+			true
+		);
+
+		// If trash is emptied.
+		if ( $trash_count < 1 ) {
+			$sendback = remove_query_arg( 'status', $sendback );
+		}
+
+		// If restored entries are more than 1, then clear widget cache.
+		if ( $restored >= 1 ) {
+			DashboardWidget::clear_widget_cache();
+		}
+
+		return add_query_arg( 'restored', $restored, $sendback );
+	}
+
+	/**
+	 * Process the bulk action delete.
+	 *
 	 * @since 1.5.7
 	 *
 	 * @param array  $ids      IDs to process.
@@ -1240,14 +1565,22 @@ class WPForms_Entries_Table extends WP_List_Table {
 	protected function process_bulk_action_single_delete( $ids, $sendback ) {
 
 		$deleted = 0;
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		foreach ( $ids as $id ) {
 			if ( wpforms()->entry->delete( $id ) ) {
-				$deleted++;
+				++$deleted;
 			}
 		}
 
-		return add_query_arg( 'deleted', $deleted, $sendback );
+		return add_query_arg(
+			[
+				'deleted' => $deleted,
+				'view'    => 'list', // force the list view to make sure we go to the right page.
+				'form_id' => $form_id,
+			],
+			$sendback
+		);
 	}
 
 	/**
@@ -1299,6 +1632,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 			'starred'   => isset( $_REQUEST['starred'] ) ? absint( $_REQUEST['starred'] ) : 0,
 			'unstarred' => isset( $_REQUEST['unstarred'] ) ? absint( $_REQUEST['unstarred'] ) : 0,
 			'deleted'   => isset( $_REQUEST['deleted'] ) ? (int) $_REQUEST['deleted'] : 0,
+			'trashed'   => isset( $_REQUEST['trashed'] ) ? (int) $_REQUEST['trashed'] : 0,
+			'restored'  => isset( $_REQUEST['restored'] ) ? (int) $_REQUEST['restored'] : 0,
+
 		];
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
@@ -1313,10 +1649,18 @@ class WPForms_Entries_Table extends WP_List_Table {
 			'unstarred' => _n( '%d entry was successfully unstarred.', '%d entries were successfully unstarred.', $bulk_counts['unstarred'], 'wpforms' ),
 			/* translators: %d - number of processed entries. */
 			'deleted'   => _n( '%d entry was successfully deleted.', '%d entries were successfully deleted.', $bulk_counts['deleted'], 'wpforms' ),
+			/* translators: %d - number of processed entries. */
+			'trashed'   => _n( '%d entry was successfully trashed.', '%d entries were successfully trashed.', $bulk_counts['trashed'], 'wpforms' ),
+			/* translators: %d - number of processed entries. */
+			'restored'  => _n( '%d entry was successfully restored.', '%d entries were successfully restored.', $bulk_counts['restored'], 'wpforms' ),
 		];
 
 		if ( $bulk_counts['deleted'] === -1 ) {
 			$bulk_messages['deleted'] = esc_html__( 'All entries for the currently selected form were successfully deleted.', 'wpforms' );
+		}
+
+		if ( $bulk_counts['trashed'] === -1 ) {
+			$bulk_messages['trashed'] = esc_html__( 'All entries for the currently selected form were successfully trashed.', 'wpforms' );
 		}
 
 		// Leave only non-zero counts, so only those that were processed are left.
@@ -1540,7 +1884,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! empty( $_GET['status'] ) ) {
-			$data_args['status'] = sanitize_text_field( $_GET['status'] ); // phpcs:ignore WordPress.Security
+			$data_args['status'] = sanitize_key( $_GET['status'] ); // phpcs:ignore WordPress.Security
 			$total_items         = ! empty( $this->counts[ $data_args['status'] ] ) ? $this->counts[ $data_args['status'] ] : 0;
 		}
 
@@ -1549,6 +1893,7 @@ class WPForms_Entries_Table extends WP_List_Table {
 		}
 
 		$data_args = apply_filters( 'wpforms_entry_table_args', $data_args );
+
 		$data      = wpforms()->get( 'entry' )->get_entries( $data_args );
 
 		// Giddy up.
@@ -1674,6 +2019,40 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$status_label     = isset( $allowed_statuses[ $payment_status ] ) ? $allowed_statuses[ $payment_status ] : __( 'N/A', 'wpforms' );
 
 		return [ $status_label, $status_slug, $payment ];
+	}
+
+	/**
+	 * Check the status of entries to check if they are trashable.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $entry_id Entry id to check.
+	 *
+	 * @return boolean
+	 */
+	private function should_delete( $entry_id ) {
+
+		$entry = wpforms()->get( 'entry' )->get( $entry_id );
+
+		if ( ! $entry ) {
+			return false;
+		}
+
+		return in_array( $entry->status, [ WPForms_Entries_List::TRASH_ENTRY_STATUS ], true );
+	}
+
+	/**
+	 * Check if the current page is a trash list.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @return bool
+	 */
+	private function is_trash_list() {
+
+		$status = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		return $status === WPForms_Entries_List::TRASH_ENTRY_STATUS;
 	}
 
 	/**

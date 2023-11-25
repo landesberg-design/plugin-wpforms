@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use WPForms\Admin\Notice;
 use WPForms\Pro\Admin\Entries\Helpers;
+use WPForms\Pro\AntiSpam\SpamEntry;
 
 /**
  * Display list of all entries for a single form.
@@ -15,6 +16,13 @@ use WPForms\Pro\Admin\Entries\Helpers;
 class WPForms_Entries_List {
 
 	use WPForms\Pro\Admin\Entries\FilterSearch;
+
+	/**
+	 * Entry trash status.
+	 *
+	 * @since 1.8.5
+	 */
+	const TRASH_ENTRY_STATUS = 'trash';
 
 	/**
 	 * Store admin alerts.
@@ -109,6 +117,7 @@ class WPForms_Entries_List {
 
 		// AJAX-callbacks.
 		add_action( 'wp_ajax_wpforms_entry_list_process_delete_all', [ $this, 'process_delete' ] );
+		add_action( 'wp_ajax_wpforms_entry_list_process_trash_all', [ $this, 'process_trash' ] );
 	}
 
 	/**
@@ -136,7 +145,7 @@ class WPForms_Entries_List {
 
 		$form = wpforms()->get( 'form' )->get( $form_id );
 
-		if ( empty( $form ) || $form->post_status === 'trash' ) {
+		if ( empty( $form ) || $form->post_status === self::TRASH_ENTRY_STATUS ) {
 			$this->abort_message = esc_html__( 'It looks like the form you are trying to access is no longer available.', 'wpforms' );
 			$this->abort         = true;
 		}
@@ -186,6 +195,8 @@ class WPForms_Entries_List {
 			'unstarred',
 			'starred',
 			'deleted',
+			'trashed',
+			'restored',
 		];
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -451,10 +462,21 @@ class WPForms_Entries_List {
 			wpforms()->entry_fields->delete_where_in( 'entry_id', $this->filter['entry_id'] );
 
 		} else {
+			// Get the screen first.
+			$screen = isset( $_REQUEST['page'] ) ? sanitize_key( $_REQUEST['page'] ) : '';
+
+			// The delete all functionality should only be available on the trash screen.
+			// All other places the delete all button will be replaced by trash all button.
+			if ( ! $screen === self::TRASH_ENTRY_STATUS ) {
+				wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'wpforms' ) );
+			}
+
 			// Default args to find entries.
 			$args = [
 				'form_id' => $form_id,
 				'select'  => 'entry_ids',
+				'status'  => $screen,
+				'number'  => '-1',
 			];
 
 			// Apply the date filter if set.
@@ -465,27 +487,24 @@ class WPForms_Entries_List {
 			// Get entries.
 			$entries = wpforms()->entry->get_entries( $args );
 
-			// Delete all the entries in respect to the filter applied.
-			if ( $this->is_list_filtered() && ! empty( $entries ) ) {
-				$deleted = 0;
-
-				foreach ( $entries as $entry ) {
-
-					// Don't need to delete meta as this method will delete everything related to the entry.
-					if ( wpforms()->entry->delete( $entry->entry_id ) ) {
-						$deleted++; // Count for notice.
-					}
-				}
-			} else {
-				// If no filter is applied delete directly by form ID.
-				array_map( [ WPForms_Field_File_Upload::class, 'delete_uploaded_files_from_entry' ], array_column( $entries, 'entry_id' ) );
-				$deleted = wpforms()->entry->delete_by( 'form_id', $form_id ) ? 1 : 0;
-
-				wpforms()->entry_meta->delete_by( 'form_id', $form_id );
-				wpforms()->entry_fields->delete_by( 'form_id', $form_id );
+			if ( ! $entries ) {
+				wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'wpforms' ) );
 			}
 
-			$deleted = $deleted ? $deleted : 0;
+			$deleted = 0;
+
+			// Delete uploaded files.
+			array_map( [ WPForms_Field_File_Upload::class, 'delete_uploaded_files_from_entry' ], array_column( $entries, 'entry_id' ) );
+			foreach ( $entries as $entry ) {
+
+				// Don't need to delete meta as this method will delete everything related to the entry.
+				if ( wpforms()->entry->delete_where_in( 'entry_id', $entry->entry_id ) ) {
+					wpforms()->entry_meta->delete_where_in( 'entry_id', $entry->entry_id );
+					wpforms()->entry_fields->delete_where_in( 'entry_id', $entry->entry_id );
+
+					++$deleted; // Count for notice.
+				}
+			}
 		}
 
 		$redirect_url = ! empty( $_GET['url'] ) ? add_query_arg( 'deleted', $deleted, esc_url_raw( wp_unslash( $_GET['url'] ) ) ) : '';
@@ -493,6 +512,162 @@ class WPForms_Entries_List {
 		WPForms\Pro\Admin\DashboardWidget::clear_widget_cache();
 
 		wp_send_json_success( $redirect_url );
+	}
+
+	/**
+	 * Entry trash and trigger if needed.
+	 *
+	 * @since 1.8.5
+	 */
+	public function process_trash() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		// Security check.
+		if ( ! check_ajax_referer( 'wpforms-admin', 'nonce', false ) ) {
+			wp_send_json_error( esc_html__( 'Your session expired. Please reload the builder.', 'wpforms' ) );
+		}
+
+		$form_id = $this->get_filtered_form_id();
+
+		// Check for run switch.
+		if ( ! $form_id ) {
+			wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'wpforms' ) );
+		}
+
+		// Permission check.
+		if ( ! wpforms_current_user_can( 'delete_entries_form_single', $form_id ) ) {
+			wp_send_json_error( esc_html__( 'You do not have permission to perform this action.', 'wpforms' ) );
+		}
+
+		if ( $this->is_list_filtered() ) {
+			$this->process_filter_dates();
+			$this->process_filter_search();
+		}
+
+		$entries_id = $this->process_trash_data( $form_id );
+
+		if ( empty( $entries_id ) ) {
+			wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'wpforms' ) );
+		}
+
+		$trashed = $this->process_trash_with_ids( $entries_id, $form_id );
+
+		$redirect_url = ! empty( $_GET['url'] ) ? add_query_arg( 'trashed', $trashed, esc_url_raw( wp_unslash( $_GET['url'] ) ) ) : '';
+
+		WPForms\Pro\Admin\DashboardWidget::clear_widget_cache();
+
+		wp_send_json_success( $redirect_url );
+	}
+
+	/**
+	 * Process entries for trashing.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param int $form_id Form ID.
+	 *
+	 * @return array $entries_id Entry IDs.
+	 */
+	private function process_trash_data( $form_id ) {
+
+		// Check if entries filtered.
+		// This also checks if there's entry ids provided. See: FilterSearch Trait.
+		if ( ! empty( $this->filter['entry_id'] ) ) {
+			return $this->filter['entry_id'];
+		}
+
+		// Get the screen first.
+		$screen = isset( $_REQUEST['page'] ) ? sanitize_key( $_REQUEST['page'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		// We can only trash all on all other screens expect trash screen.
+		if ( $screen === self::TRASH_ENTRY_STATUS ) {
+			return [];
+		}
+
+		// Default args to find entries.
+		$args = [
+			'form_id' => $form_id,
+			'select'  => 'entry_ids',
+			'number'  => '-1',
+		];
+
+		// Apply the date filter if set.
+		if ( ! empty( $this->filter['date'] ) ) {
+			$args['date'] = $this->filter['date'];
+		}
+
+		// Get entries.
+		$all_entries  = wpforms()->get( 'entry' )->get_entries( $args );
+		$spam_entries = wpforms()->get( 'entry' )->get_entries(
+			[
+				'form_id' => $form_id,
+				'status'  => SpamEntry::ENTRY_STATUS,
+				'select'  => 'entry_ids',
+			]
+		);
+
+		return wp_list_pluck( array_merge( $all_entries, $spam_entries ), 'entry_id' );
+	}
+
+	/**
+	 * Process trash when entry ids are given.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $entry_ids Entry IDs.
+	 * @param int   $form_id   Form ID.
+	 *
+	 * @return int  $trashed Number of trashed entries.
+	 */
+	private function process_trash_with_ids( $entry_ids, $form_id ) {
+
+		$trashed = 0;
+		$user_id = get_current_user_id();
+
+		foreach ( $entry_ids as $id ) {
+			// Get the entry first.
+			$entry = wpforms()->get( 'entry' )->get( $id );
+
+			if ( ! $entry ) {
+				continue;
+			}
+
+			$status = $entry->status;
+
+			/**
+			 * TODO :: After the support for PHP 7 ends,
+			 * we can update the following code to use named arguments and skip the optional params.
+			 */
+			$success = wpforms()->get( 'entry' )->update(
+				$id,
+				[ 'status' => self::TRASH_ENTRY_STATUS ],
+				'',
+				'',
+				[ 'cap' => 'delete_entry_single' ] // Force the cap to trash the entry, since we cant provide edit cap here.
+			);
+
+			// If it didn't work continue.
+			if ( ! $success ) {
+				continue;
+			}
+
+			if ( $status !== '' ) {
+				wpforms()->get( 'entry_meta' )->add(
+					[
+						'entry_id' => $id,
+						'form_id'  => $form_id,
+						'user_id'  => $user_id,
+						'type'     => 'status_prev',
+						'data'     => '',
+						'status'   => $status,
+					],
+					'entry_meta'
+				);
+			}
+
+			++$trashed;
+		}
+
+		return $trashed;
 	}
 
 	/**
@@ -612,7 +787,7 @@ class WPForms_Entries_List {
 			$dates = array_map(
 				static function ( $date ) {
 
-					return date_i18n( 'M j, Y', strtotime( $date ) );
+					return wpforms_date_format( $date );
 				},
 				$dates
 			);
@@ -800,6 +975,7 @@ class WPForms_Entries_List {
 			if (
 				empty( $this->entries->items ) &&
 				$this->entries->counts['spam'] === 0 &&
+				$this->entries->counts['trash'] === 0 &&
 				! $is_deleted &&
 				// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				! isset( $_GET['search'] ) && ! isset( $_GET['date'] ) && ! isset( $_GET['type'] ) && ! isset( $_GET['status'] )
@@ -828,8 +1004,9 @@ class WPForms_Entries_List {
 				 */
 				do_action( 'wpforms_entry_list_title', $form_data, $this );
 
-				// Are we on the "Spam" tab?
-				$is_spam = isset( $_GET['status'] ) && $_GET['status'] === 'spam'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				// Are we on the "Spam" or "Trash" tab?
+				$has_status = isset( $_GET['status'] ) && in_array( $_GET['status'], [ SpamEntry::ENTRY_STATUS, self::TRASH_ENTRY_STATUS ], true ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$status     = $has_status ? sanitize_key( $_GET['status'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			?>
 
 				<form id="wpforms-entries-table" method="GET"
@@ -840,19 +1017,20 @@ class WPForms_Entries_List {
 
 						<div id="wpforms-reset-filter">
 							<?php
-							echo wp_kses(
-								sprintf( /* translators: %s - number of entries found. */
+
+							printf(
+								wp_kses( /* translators: %s - number of entries found. */
 									_n(
 										'Found <strong>%s entry</strong>',
 										'Found <strong>%s entries</strong>',
 										absint( count( $this->entries->items ) ),
 										'wpforms'
 									),
-									$is_spam ? absint( $this->entries->counts['spam'] ) : absint( $this->entries->counts['total'] )
+									[
+										'strong' => [],
+									]
 								),
-								[
-									'strong' => [],
-								]
+								$has_status ? absint( $this->entries->counts[ $status ] ) : absint( $this->entries->counts['total'] )
 							);
 							?>
 
@@ -872,9 +1050,10 @@ class WPForms_Entries_List {
 					<input type="hidden" name="view" value="list" />
 					<input type="hidden" name="form_id" value="<?php echo absint( $this->form_id ); ?>" />
 
-					<?php if ( $is_spam ) : ?>
-						<input type="hidden" name="status" value="spam" />
+					<?php if ( $has_status ) : ?>
+						<input type="hidden" name="status" value="<?php echo esc_attr( $status ); ?>" />
 					<?php endif; ?>
+
 
 					<?php $this->entries->views(); ?>
 
@@ -1078,14 +1257,18 @@ class WPForms_Entries_List {
 			],
 			admin_url( 'admin.php' )
 		);
+
+		$read_url_args = [ 'action' => 'markread' ];
+
+		if ( isset( $_GET['status'] ) && ! empty( $_GET['status'] ) ) {
+			$read_url_args['status'] = sanitize_key( $_GET['status'] );
+		}
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		// Mark Read URL.
 		$read_url = wp_nonce_url(
 			add_query_arg(
-				[
-					'action' => 'markread',
-				],
+				$read_url_args,
 				$base
 			),
 			'wpforms_entry_list_markread'
@@ -1162,9 +1345,11 @@ class WPForms_Entries_List {
 				</a>
 
 				<?php if ( wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) : ?>
-					<a href="<?php echo esc_url( $delete_url ); ?>" class="form-details-actions-deleteall">
+					<?php $status = ! empty( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+
+					<a href="<?php echo esc_url( $delete_url ); ?>" class="form-details-actions-removeall" data-page="<?php echo esc_attr( $status ); ?>">
 						<span class="dashicons dashicons-trash"></span>
-						<?php esc_html_e( 'Delete All', 'wpforms' ); ?>
+						<?php $status === self::TRASH_ENTRY_STATUS ? esc_html_e( 'Delete All', 'wpforms' ) : esc_html_e( 'Trash All', 'wpforms' ); ?>
 					</a>
 				<?php endif; ?>
 

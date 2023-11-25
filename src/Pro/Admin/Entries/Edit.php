@@ -418,6 +418,15 @@ class Edit {
 			return;
 		}
 
+		// Check if entry has trash status.
+		if ( $entry->status === 'trash' ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$this->abort_message = esc_html__( 'You can\'t edit this entry because it\'s in the trash.', 'wpforms' );
+			$this->abort         = true;
+
+			return;
+		}
+
 		// No editable fields, redirect back.
 		if ( ! wpforms()->get( 'entry' )->has_editable_fields( $entry ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			$entry_list = add_query_arg(
@@ -1051,11 +1060,7 @@ class Edit {
 
 		$datetime_offset = get_option( 'gmt_offset' ) * 3600;
 		$response        = [
-			'modified' => sprintf( /* translators: %1$s - date for the entry; %2$s - time for the entry. */
-				esc_html__( '%1$s at %2$s', 'wpforms' ),
-				date_i18n( 'M j, Y', strtotime( $this->date_modified ) + $datetime_offset ),
-				date_i18n( get_option( 'time_format' ), strtotime( $this->date_modified ) + $datetime_offset )
-			),
+			'modified' => wpforms_datetime_format( $this->date_modified, '', true ),
 		];
 
 		do_action( 'wpforms_pro_admin_entries_edit_submit_completed', $this->form_data, $response, $updated_fields, $this->entry );

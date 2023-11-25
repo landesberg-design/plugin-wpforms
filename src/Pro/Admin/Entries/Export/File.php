@@ -6,6 +6,7 @@ use Exception;
 // phpcs:ignore WPForms.PHP.UseStatement.UnusedUseStatement
 use WP_Filesystem_Base;
 use WPForms\Helpers\Transient;
+use WPForms\Vendor\XLSXWriter;
 
 /**
  * File-related routines.
@@ -104,7 +105,7 @@ class File {
 
 		$export_file = $this->get_tmpfname( $request_data );
 
-		$writer = new \XLSXWriter();
+		$writer = new XLSXWriter();
 
 		$writer->setTempDir( $this->get_tmpdir() );
 

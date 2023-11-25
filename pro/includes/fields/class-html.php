@@ -252,7 +252,7 @@ class WPForms_Field_HTML extends WPForms_Field {
 		printf(
 			'<div %s>%s</div>',
 			wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
-			do_shortcode( $primary['code'] )
+			do_shortcode( force_balance_tags( $primary['code'] ) )
 		);
 	}
 

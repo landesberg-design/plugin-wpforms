@@ -73,16 +73,17 @@ class Ajax {
 		$table_name = wpforms()->get( 'entry' )->table_name;
 		$results    = (array) $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT date as day, COUNT(entry_id) as count 
-				FROM {$table_name} 
+				"SELECT date as day, COUNT(entry_id) as count
+				FROM {$table_name}
 				WHERE {$where_clause} date BETWEEN %s AND %s
-				AND status != %s
-				GROUP BY day 
+				AND status NOT IN ( %s, %s )
+				GROUP BY day
 				ORDER BY day ASC",
 				[
 					$utc_start_date->format( Datepicker::DATETIME_FORMAT ),
 					$utc_end_date->format( Datepicker::DATETIME_FORMAT ),
 					SpamEntry::ENTRY_STATUS,
+					'trash',
 				]
 			),
 			ARRAY_A

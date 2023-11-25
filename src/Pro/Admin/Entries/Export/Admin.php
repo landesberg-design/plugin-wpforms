@@ -3,6 +3,7 @@
 namespace WPForms\Pro\Admin\Entries\Export;
 
 use WPForms\Pro\Admin\Entries\Helpers;
+use WPForms\Pro\Admin\Entries\Export\Traits\Export as ExportTrait;
 
 /**
  * HTML-related stuff for Admin page.
@@ -10,6 +11,8 @@ use WPForms\Pro\Admin\Entries\Helpers;
  * @since 1.5.5
  */
 class Admin {
+
+	use ExportTrait;
 
 	/**
 	 * Instance of Export Class.
@@ -79,6 +82,14 @@ class Admin {
 						</div>
 					</section>
 
+					<section class="wp-clearfix" id="wpforms-tools-entries-export-options-payment-fields">
+						<h5><?php esc_html_e( 'Payment Fields', 'wpforms' ); ?></h5>
+
+						<div id="wpforms-tools-entries-export-options-payment-fields-checkboxes">
+							<?php $this->display_fields_selection_block( true ); ?>
+						</div>
+					</section>
+
 					<section class="wp-clearfix" id="wpforms-tools-entries-export-options-additional-info">
 						<h5><?php esc_html_e( 'Additional Information', 'wpforms' ); ?></h5>
 						<?php $this->display_additional_info_block(); ?>
@@ -93,6 +104,8 @@ class Admin {
 							placeholder="<?php esc_attr_e( 'Select a date range', 'wpforms' ); ?>">
 					</section>
 
+					<?php $this->display_search_statuses_block(); ?>
+
 					<section class="wp-clearfix" id="wpforms-tools-entries-export-options-search">
 						<h5><?php esc_html_e( 'Search', 'wpforms' ); ?></h5>
 						<?php $this->display_search_block(); ?>
@@ -105,7 +118,7 @@ class Admin {
 							<span class="wpforms-btn-spinner"><i class="fa fa-cog fa-spin fa-lg"></i></span>
 						</button>
 						<a href="#" class="hidden" id="wpforms-tools-entries-export-cancel"><?php esc_html_e( 'Cancel', 'wpforms' ); ?></a>
-						<div id="wpforms-tools-entries-export-process-msg" class="hidden"></div>
+						<div id="wpforms-tools-entries-export-process-msg" class="wpforms-notice notice-success wpforms-hidden"></div>
 					</section>
 
 				</div>
@@ -122,7 +135,7 @@ class Admin {
 	public function display_form_selection_block() {
 
 		// Retrieve available forms.
-		$forms = wpforms()->form->get(
+		$forms = wpforms()->get( 'form' )->get(
 			'',
 			[
 				'orderby' => 'title',
@@ -150,7 +163,7 @@ class Admin {
 				</select>
 				<span class="hidden" id="wpforms-tools-entries-export-selectform-spinner"><i class="fa fa-cog fa-spin fa-lg"></i></span>
 			</span>
-			<div id="wpforms-tools-entries-export-selectform-msg" class="hidden wpforms-error"></div>
+			<div id="wpforms-tools-entries-export-selectform-msg" class="wpforms-notice wpforms-error wpforms-hidden"></div>
 			<?php
 		} else {
 			echo '<p>' . esc_html__( 'You need to have at least one form before you can use entries export.', 'wpforms' ) . '</p>';
@@ -158,16 +171,66 @@ class Admin {
 	}
 
 	/**
+	 * Display search statuses block HTML.
+	 *
+	 * @since 1.8.5
+	 */
+	private function display_search_statuses_block() {
+
+		$form_id  = $this->export->data['get_args']['form_id'];
+		$statuses = [];
+
+		if ( $form_id ) {
+			$statuses = $this->get_available_form_entry_statuses( $form_id );
+		}
+
+		$classes = [
+			'wp-clearfix',
+			count( $statuses ) > 1 ? '' : 'wpforms-hidden', // Hide if only one status is available.
+		];
+
+		?>
+		<section class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>" id="wpforms-tools-entries-export-options-status">
+			<h5><?php esc_html_e( 'Status', 'wpforms' ); ?></h5>
+			<span class="choicesjs-select-wrap">
+				<select id="wpforms-tools-entries-export-select-statuses" name="statuses" data-choices-position="bottom" multiple size="1">
+					<?php
+					foreach ( $statuses as $status ) {
+						$selected = $status['value'] === 'spam' ? '' : ' selected';
+
+						printf(
+							'<option value="%s"%s>%s</option>',
+							esc_attr( $status['value'] ),
+							esc_attr( $selected ),
+							esc_html( $status['label'] )
+						);
+					}
+					?>
+				</select>
+			</span>
+		</section>
+		<?php
+	}
+
+	/**
 	 * Form fields checkboxes block HTML.
 	 *
 	 * @since 1.5.5
+	 * @since 1.8.5 Added $is_payment_fields parameter.
+	 *
+	 * @param bool $is_payment_fields Whether to display payment fields.
 	 */
-	public function display_fields_selection_block() {
+	public function display_fields_selection_block( $is_payment_fields = false ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		$form_data = $this->export->data['form_data'];
 		$fields    = $this->export->data['get_args']['fields'];
 
-		if ( empty( $form_data['fields'] ) ) {
+		$form_fields    = isset( $form_data['fields'] ) ? $form_data['fields'] : [];
+		$payment_fields = isset( $form_data['payment_fields'] ) ? $form_data['payment_fields'] : [];
+
+		$form_data_fields = $is_payment_fields ? $payment_fields : $form_fields;
+
+		if ( empty( $form_data_fields ) ) {
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			printf( '<span>%s</span>', $this->export->errors['form_empty'] );
 
@@ -178,7 +241,7 @@ class Admin {
 
 		$i = 0;
 
-		foreach ( $form_data['fields'] as $id => $field ) {
+		foreach ( $form_data_fields as $id => $field ) {
 			if ( in_array( $field['type'], $this->export->configuration['disallowed_fields'], true ) ) {
 				continue;
 			}
@@ -191,14 +254,14 @@ class Admin {
 				);
 
 			printf(
-				'<label><input type="checkbox" name="fields[%1$d]" value="%2$d" %3$s> %4$s</label>',
-				(int) $i,
+				'<label><input type="checkbox" name="fields[%1$s]" value="%2$d" %3$s> %4$s</label>',
+				esc_attr( $i . '-' . $id ),
 				(int) $id,
 				esc_attr( $this->get_checked_property( $id, $fields ) ),
 				esc_html( $name )
 			);
 
-			$i ++;
+			++$i;
 		}
 	}
 
@@ -254,18 +317,35 @@ class Admin {
 		echo '<section class="wp-clearfix" id="wpforms-tools-entries-export-options-type-info">';
 		echo '<h5>' . esc_html__( 'Export Options', 'wpforms' ) . '</h5>';
 
-		$i = 0;
+		$index = 0;
 
 		foreach ( $export_options as $slug => $label ) {
+			$classes = [];
+			$desc    = '';
+
+			if ( $slug === 'dynamic_columns' ) {
+				$fields = isset( $this->export->data['form_data']['fields'] ) ? $this->export->data['form_data']['fields'] : [];
+
+				$dynamic_choices_count = $this->get_dynamic_choices_count( $fields );
+
+				if ( $dynamic_choices_count ) {
+					$desc = sprintf( '<div class="wpforms-tools-entries-export-notice-warning wpforms-hide">%s</div>', $this->get_dynamic_columns_notice( $dynamic_choices_count ) );
+				}
+
+				$classes[] = $dynamic_choices_count ? '' : 'wpforms-hide';
+			}
+
 			printf(
-				'<label><input type="checkbox" name="export_options[%1$d]" value="%2$s" %3$s> %4$s</label>',
-				(int) $i,
+				'<label class="%5$s"><input type="checkbox" name="export_options[%1$d]" value="%2$s" %3$s> %4$s%6$s</label>',
+				esc_attr( $index ),
 				esc_attr( $slug ),
 				esc_attr( $this->get_checked_property( $slug, $export_option, '' ) ),
-				esc_html( $label )
+				esc_html( $label ),
+				wpforms_sanitize_classes( $classes, true ),
+				wp_kses( $desc, [ 'div' => [ 'class' => true ] ] )
 			);
 
-			$i ++;
+			++$index;
 		}
 
 		echo '</section>';

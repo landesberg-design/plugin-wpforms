@@ -259,9 +259,8 @@ class WPForms_Entries_Export {
 					$data[1][ $field['id'] ] = wpforms_decode_string( $field['value'] );
 				}
 			}
-			$date_format         = sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) );
-			$data[1]['date']     = date_i18n( $date_format, strtotime( $this->entry->date ) + ( get_option( 'gmt_offset' ) * 3600 ) );
-			$data[1]['date_gmt'] = date_i18n( $date_format, strtotime( $this->entry->date ) );
+			$data[1]['date']     = wpforms_datetime_format( $this->entry->date, '', true );
+			$data[1]['date_gmt'] = wpforms_datetime_format( $this->entry->date, '' );
 			$data[1]['entry_id'] = absint( $this->entry->entry_id );
 
 		else :
@@ -288,9 +287,8 @@ class WPForms_Entries_Export {
 						}
 					}
 				}
-				$date_format                          = sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) );
-				$data[ $entry->entry_id ]['date']     = date_i18n( $date_format, strtotime( $entry->date ) + ( get_option( 'gmt_offset' ) * 3600 ) );
-				$data[ $entry->entry_id ]['date_gmt'] = date_i18n( $date_format, strtotime( $entry->date ) );
+				$data[ $entry->entry_id ]['date']     = wpforms_datetime_format( $entry->date, '', true );
+				$data[ $entry->entry_id ]['date_gmt'] = wpforms_datetime_format( $entry->date, '' );
 				$data[ $entry->entry_id ]['entry_id'] = absint( $entry->entry_id );
 			}
 

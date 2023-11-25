@@ -231,8 +231,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return null;
 		}
 
-		// If status is spam, we get the next spam entry. Otherwise, the next non-spam entry with any status.
-		$status_operator = $status === 'spam' ? '=' : '!=';
+		$where_status = $this->get_status_where_clause( $status );
 
 		// Note: we're disabling InterpolatedNotPrepared sniff because it triggers
 		// a false positive when using operator (= or !=) in the query. The
@@ -244,7 +243,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				"SELECT * FROM $this->table_name
 				WHERE `form_id` = %d
   				  AND {$this->primary_key} > %d
-  				  AND `status` {$status_operator} 'spam'
+				  {$where_status}
 				ORDER BY {$this->primary_key}
 				LIMIT 1;",
 				absint( $form_id ),
@@ -275,8 +274,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return null;
 		}
 
-		// If status is spam, we get the next spam entry. Otherwise, the next non-spam entry with any status.
-		$status_operator = $status === 'spam' ? '=' : '!=';
+		$where_status = $this->get_status_where_clause( $status );
 
 		// Note: we're disabling InterpolatedNotPrepared sniff because it triggers
 		// a false positive when using operator (= or !=) in the query. The
@@ -288,7 +286,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				"SELECT * FROM $this->table_name
 				WHERE `form_id` = %d
 				  AND {$this->primary_key} < %d
-				  AND `status` {$status_operator} 'spam'
+				  {$where_status}
 				ORDER BY {$this->primary_key} DESC
 				LIMIT 1;",
 				absint( $form_id ),
@@ -348,11 +346,17 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return false;
 		}
 
+		$status       = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$where_status = $this->get_status_where_clause( $status );
+
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->query(
 			$wpdb->prepare(
-				"UPDATE $this->table_name SET `viewed` = '1' WHERE `form_id` = %d",
+				"UPDATE $this->table_name
+				SET `viewed` = '1'
+				WHERE `form_id` = %d
+				{$where_status}",
 				(int) $form_id
 			)
 		);
@@ -382,8 +386,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return 0;
 		}
 
-		// If status is spam, we get the next spam entry. Otherwise, the next non-spam entry with any status.
-		$status_operator = $status === 'spam' ? '=' : '!=';
+		$where_status = $this->get_status_where_clause( $status );
 
 		// Note: we're disabling InterpolatedNotPrepared sniff because it triggers
 		// a false positive when using operator (= or !=) in the query. The
@@ -394,7 +397,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			$wpdb->prepare(
 				"SELECT COUNT({$this->primary_key}) FROM {$this->table_name}
 				WHERE `form_id` = %d AND {$this->primary_key} > %d
-				AND `status` {$status_operator} 'spam'
+				  {$where_status}
 				ORDER BY {$this->primary_key} ASC;",
 				absint( $form_id ),
 				absint( $entry_id )
@@ -427,8 +430,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return 0;
 		}
 
-		// If status is spam, we get the next spam entry. Otherwise, the next non-spam entry with any status.
-		$status_operator = $status === 'spam' ? '=' : '!=';
+		$where_status = $this->get_status_where_clause( $status );
 
 		// Note: we're disabling InterpolatedNotPrepared sniff because it triggers
 		// a false positive when using operator (= or !=) in the query. The
@@ -439,7 +441,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			$wpdb->prepare(
 				"SELECT COUNT({$this->primary_key}) FROM {$this->table_name}
 				WHERE `form_id` = %d AND {$this->primary_key} < %d
-				AND `status` {$status_operator} 'spam'
+				  {$where_status}
 				ORDER BY {$this->primary_key} ASC;",
 				absint( $form_id ),
 				absint( $entry_id )
@@ -612,8 +614,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			// Sanitize and escape.
 			$status = array_map( 'esc_sql', array_map( 'sanitize_text_field', $status ) );
 
-			// Filter empty and duplicate values.
-			$status = array_unique( array_filter( $status ) );
+			// Filter duplicate values.
+			$status = array_unique( $status ); // Empty status is valid for published entries.
 
 			if ( ! empty( $status ) ) {
 				$status = implode( "','", $status );
@@ -621,7 +623,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				$where['arg_status'] = "{$this->table_name}.status IN ( '{$status}' )";
 			}
 		} else {
-			$where['arg_status'] = "{$this->table_name}.status != 'spam'";
+			$where['arg_status'] = "{$this->table_name}.status NOT IN ( 'spam', 'trash' )";
 		}
 
 		// Process dates.
@@ -750,6 +752,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$where_sql = implode( ' AND ', array_unique( array_filter( $where ) ) );
 
 		if ( $count === true ) {
+
 			return absint(
 				// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->get_var(
@@ -1158,14 +1161,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-		$charset_collate = '';
-
-		if ( ! empty( $wpdb->charset ) ) {
-			$charset_collate .= "DEFAULT CHARACTER SET $wpdb->charset";
-		}
-		if ( ! empty( $wpdb->collate ) ) {
-			$charset_collate .= " COLLATE $wpdb->collate";
-		}
+		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
 			entry_id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -1430,5 +1426,58 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$value_compare = empty( $args['value_compare'] ) ? 'is' : $args['value_compare'];
 
 		return empty( $condition_values[ $value_compare ] ) ? $condition_values['is'] : $condition_values[ $value_compare ];
+	}
+
+	/**
+	 * Get where clause for filtering by status.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param string $status Entry status.
+	 *
+	 * @return string WHERE clause.
+	 */
+	private function get_status_where_clause( $status = '' ) {
+
+		// Check the status to determine the WHERE clause.
+		// If status is spam or trash, we get the previous spam/trash entry. Otherwise, the previous non-spam/trash entry with any status.
+		if ( empty( $status ) || ! in_array( $status, [ 'spam', 'trash' ], true ) ) {
+			return "AND `status` NOT IN ( 'spam', 'trash' )";
+		}
+
+		return "AND `status` = '{$status}'";
+	}
+
+	/**
+	 * Get trashed entries count.
+	 * This function is not supposed to affected by search filters.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param int $form_id Form ID.
+	 *
+	 * @return int Count of trashed entries.
+	 */
+	public function get_trash_count( $form_id ) {
+
+		global $wpdb;
+
+		if ( empty( $form_id ) ) {
+			return 0;
+		}
+
+		// Note: we don't use `get_entries()` method here, because it's affected by search filters.
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT({$this->primary_key}) FROM {$this->table_name}
+				WHERE `form_id` = %d AND `status` = 'trash'",
+				absint( $form_id )
+			)
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		return absint( $count );
 	}
 }

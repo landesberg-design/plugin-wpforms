@@ -130,6 +130,7 @@ class Export {
 			return;
 		}
 
+		$this->hooks();
 		$this->init_args();
 		$this->init_settings();
 		$this->init_form_data();
@@ -182,6 +183,8 @@ class Export {
 		if ( class_exists( 'ZipArchive' ) ) {
 			$this->export_options_fields['xlsx'] = esc_html__( 'Export in Microsoft Excel (.xlsx)', 'wpforms' );
 		}
+
+		$this->export_options_fields['dynamic_columns'] = esc_html__( 'Separate dynamic choices into individual columns', 'wpforms' );
 
 		// Export options fields.
 		$this->export_options_fields = apply_filters(
@@ -284,6 +287,16 @@ class Export {
 	}
 
 	/**
+	 * Init hooks.
+	 *
+	 * @since 1.8.5
+	 */
+	private function hooks() {
+
+		add_filter( 'wpforms_pro_admin_entries_export_form_data', [ $this, 'filter_form_data' ] );
+	}
+
+	/**
 	 * Init GET or POST args.
 	 *
 	 * @since 1.5.5
@@ -363,6 +376,21 @@ class Export {
 			}
 		}
 
+		// Entry statuses.
+		$args['status'] = [];
+
+		if ( ! empty( $req['statuses'] ) ) {
+			$args['status'] = array_map(
+				static function ( $status ) {
+
+					$status = sanitize_key( wp_unslash( $status ) );
+
+					return $status === 'published' ? '' : $status; // published is empty string in the database.
+				},
+				$req['statuses']
+			);
+		}
+
 		// Search.
 		$args['search'] = [
 			'field'      => 'any',
@@ -421,6 +449,59 @@ class Export {
 			'wpforms_pro_admin_entries_export_form_data',
 			$data
 		);
+	}
+
+	/**
+	 * Filter form data.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $form_data Form data.
+	 *
+	 * @return array
+	 */
+	public function filter_form_data( $form_data ) {
+
+		$fields = isset( $form_data['fields'] ) ? $form_data['fields'] : [];
+
+		if ( empty( $fields ) ) {
+			return $form_data;
+		}
+
+		$disallowed_fields = $this->configuration['disallowed_fields'];
+		$payment_fields    = wpforms_get_payments_fields();
+
+		// Remove disallowed fields.
+		$allowed_fields = array_filter(
+			$fields,
+			static function ( $field ) use ( $disallowed_fields ) {
+
+				return ! in_array( $field['type'], $disallowed_fields, true );
+			}
+		);
+
+		// Retrieve payment fields.
+		$form_payment_fields = array_filter(
+			$allowed_fields,
+			static function ( $field ) use ( $payment_fields ) {
+
+				return in_array( $field['type'], $payment_fields, true );
+			}
+		);
+
+		// Remove payment fields.
+		$allowed_fields = array_filter(
+			$allowed_fields,
+			static function ( $field ) use ( $payment_fields ) {
+
+				return ! in_array( $field['type'], $payment_fields, true );
+			}
+		);
+
+		$form_data['fields']         = $allowed_fields;
+		$form_data['payment_fields'] = $form_payment_fields;
+
+		return $form_data;
 	}
 
 	/**

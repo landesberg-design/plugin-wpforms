@@ -23,7 +23,10 @@ class Divi extends \WPForms\Integrations\Divi\Divi {
 
 		$min = wpforms_get_min_suffix();
 
-		wp_enqueue_style(
+		// Deregister style 'wpforms-dropzone' already registered for Gutenberg.
+		wp_deregister_style( 'wpforms-dropzone' );
+
+		wp_register_style(
 			'wpforms-dropzone',
 			WPFORMS_PLUGIN_URL . "assets/pro/css/integrations/divi/dropzone{$min}.css",
 			[],

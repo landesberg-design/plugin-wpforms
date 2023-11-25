@@ -463,6 +463,7 @@ class Help {
 			],
 			'email'                     => [
 				'/docs/setup-form-notification-wpforms/',
+				'/docs/customizing-form-notification-emails/',
 				'/docs/how-to-create-conditional-form-notifications-in-wpforms/',
 				'/docs/troubleshooting-email-notifications/',
 				'/docs/how-to-fix-wordpress-contact-form-not-sending-email-with-smtp/',
@@ -953,24 +954,28 @@ class Help {
 			],
 			'notification'              => [
 				'/docs/setup-form-notification-wpforms/',
+				'/docs/customizing-form-notification-emails/',
 				'/docs/how-to-create-conditional-form-notifications-in-wpforms/',
 				'/docs/troubleshooting-email-notifications/',
 				'/docs/how-to-fix-wordpress-contact-form-not-sending-email-with-smtp/',
 			],
 			'notifications'             => [
 				'/docs/setup-form-notification-wpforms/',
+				'/docs/customizing-form-notification-emails/',
 				'/docs/how-to-create-conditional-form-notifications-in-wpforms/',
 				'/docs/troubleshooting-email-notifications/',
 				'/docs/how-to-fix-wordpress-contact-form-not-sending-email-with-smtp/',
 			],
 			'notification email'        => [
 				'/docs/setup-form-notification-wpforms/',
+				'/docs/customizing-form-notification-emails/',
 				'/docs/how-to-create-conditional-form-notifications-in-wpforms/',
 				'/docs/troubleshooting-email-notifications/',
 				'/docs/how-to-fix-wordpress-contact-form-not-sending-email-with-smtp/',
 			],
 			'notification emails'       => [
 				'/docs/setup-form-notification-wpforms/',
+				'/docs/customizing-form-notification-emails/',
 				'/docs/how-to-create-conditional-form-notifications-in-wpforms/',
 				'/docs/troubleshooting-email-notifications/',
 				'/docs/how-to-fix-wordpress-contact-form-not-sending-email-with-smtp/',

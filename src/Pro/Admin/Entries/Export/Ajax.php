@@ -8,6 +8,7 @@ use WPForms\Db\Payments\ValueValidator;
 use WPForms\Pro\Helpers\CSV;
 use WPForms\Helpers\Transient;
 use WPForms\Pro\Admin\Entries;
+use WPForms\Pro\Admin\Entries\Export\Traits\Export as ExportTrait;
 
 /**
  * Ajax endpoints and data processing.
@@ -17,6 +18,7 @@ use WPForms\Pro\Admin\Entries;
 class Ajax {
 
 	use Entries\FilterSearch;
+	use ExportTrait;
 
 	/**
 	 * Instance of Export Class.
@@ -91,25 +93,18 @@ class Ajax {
 				throw new Exception( $this->export->errors['form_data'] );
 			}
 
-			$fields = empty( $this->export->data['form_data']['fields'] ) ? [] : (array) $this->export->data['form_data']['fields'];
+			$fields         = empty( $this->export->data['form_data']['fields'] ) ? [] : (array) $this->export->data['form_data']['fields'];
+			$payment_fields = empty( $this->export->data['form_data']['payment_fields'] ) ? [] : (array) $this->export->data['form_data']['payment_fields'];
 
-			$fields = array_map(
-				static function ( $field ) {
-					$field['label'] = ! empty( $field['label'] ) ?
-						trim( wp_strip_all_tags( $field['label'] ) ) :
-						sprintf( /* translators: %d - field ID. */
-							esc_html__( 'Field #%d', 'wpforms' ),
-							(int) $field['id']
-						);
-
-					return $field;
-				},
-				$fields
-			);
+			$dynamic_choices_count = $this->get_dynamic_choices_count( $fields );
 
 			wp_send_json_success(
 				[
-					'fields' => $this->exclude_disallowed_fields( $fields ),
+					'fields'                 => $this->get_prepared_fields( $fields ),
+					'payment_fields'         => $this->get_prepared_fields( $payment_fields ),
+					'statuses'               => $this->get_available_form_entry_statuses( $this->export->data['form_data']['id'] ),
+					'dynamic_columns'        => $dynamic_choices_count > 1,
+					'dynamic_columns_notice' => $this->get_dynamic_columns_notice( $dynamic_choices_count ),
 				]
 			);
 
@@ -123,28 +118,6 @@ class Ajax {
 
 			wp_send_json_error( [ 'error' => $error ] );
 		}
-	}
-
-	/**
-	 * Exclude disallowed fields from fields array.
-	 *
-	 * @since 1.6.6
-	 *
-	 * @param array $fields Fields array.
-	 *
-	 * @return array
-	 */
-	private function exclude_disallowed_fields( $fields ) {
-
-		$disallowed_fields = $this->export->configuration['disallowed_fields'];
-
-		return array_filter(
-			array_values( $fields ),
-			static function ( $v ) use ( $disallowed_fields ) {
-
-				return isset( $v['type'] ) && ! in_array( $v['type'], $disallowed_fields, true );
-			}
-		);
 	}
 
 	/**
@@ -237,6 +210,7 @@ class Ajax {
 			'is_filtered' => ! empty( $args['entry_id'] ),
 			'date'        => $args['dates'],
 			'select'      => 'entry_ids',
+			'status'      => $args['status'],
 		];
 
 		if ( $args['search']['term'] !== '' ) {
@@ -263,16 +237,31 @@ class Ajax {
 
 		$form_data['fields'] = empty( $form_data['fields'] ) ? [] : (array) $form_data['fields'];
 
+		$fields = $this->exclude_fields( $form_data['fields'], $this->export->configuration['disallowed_fields'] );
+
+		$fields_indexes = wp_list_pluck( $fields, 'id' );
+
+		// Sort selected fields by order in form.
+		// This is needed to correctly display the columns in the exported file after separating fields by type.
+		foreach ( $fields_indexes as $index => $field_id ) {
+			if ( ! in_array( (int) $field_id, $args['fields'], true ) ) {
+				unset( $fields_indexes[ $index ] );
+			}
+		}
+
+		$export_options = ! empty( $args['export_options'] ) ? $args['export_options'] : [];
+
 		// Prepare `request data` for saving.
 		$request_data = [
 			'request_id'      => md5( wp_json_encode( $db_args ) . microtime() ),
 			'form_data'       => $form_data,
 			'db_args'         => $db_args,
-			'fields'          => empty( $args['entry_id'] ) ? $args['fields'] : wp_list_pluck( $this->exclude_disallowed_fields( $form_data['fields'] ), 'id' ),
+			'fields'          => empty( $args['entry_id'] ) ? $fields_indexes : wp_list_pluck( $fields, 'id' ),
 			'additional_info' => empty( $args['entry_id'] ) ? $args['additional_info'] : array_keys( $this->export->additional_info_fields ),
 			'count'           => $count,
 			'total_steps'     => (int) ceil( $count / $this->export->configuration['entries_per_step'] ),
-			'type'            => ! empty( $args['export_options'] ) ? $args['export_options'][0] : 'csv',
+			'type'            => in_array( 'xlsx', $export_options, true ) ? 'xlsx' : 'csv',
+			'dynamic_columns' => in_array( 'dynamic_columns', $export_options, true ),
 		];
 
 		/**
@@ -301,7 +290,6 @@ class Ajax {
 			'request_id' => $this->request_data['request_id'],
 			'count'      => $this->request_data['count'],
 		];
-
 	}
 
 	/**
@@ -338,7 +326,39 @@ class Ajax {
 				if ( ! isset( $columns_labels[ $field_id ] ) ) {
 					continue;
 				}
-				$columns_row[ $field_id ] = $columns_labels[ $field_id ];
+
+				$field = $request_data['form_data']['fields'][ $field_id ];
+
+				// Check if field is multiple input.
+				// It can be: name, address, select, checkbox, payment-checkbox, file-upload, likert_scale.
+				if ( $this->is_multiple_input( $field ) ) {
+
+					$enabled_dynamic_columns = $request_data['dynamic_columns'];
+
+					$columns = $this->get_multiple_choices_columns( $field, $request_data['form_data'], $enabled_dynamic_columns );
+
+					// No need to add dynamic columns if they are disabled.
+					// Return regular column instead.
+					if ( ! $enabled_dynamic_columns && $this->is_dynamic_choices( $field ) ) {
+						$columns_row[ $field_id ] = $columns_labels[ $field_id ];
+
+						continue;
+					}
+
+					// Add dynamic columns for each multiple field value.
+					foreach ( $columns as $key => $column ) {
+						$is_modified = $column['modified'] ?? false;
+
+						$columns_row[ "multiple_field_{$field_id}_{$key}" ] = sprintf(
+							'%s: %s%s',
+							$columns_labels[ $field_id ],
+							trim( $column['label'] ),
+							$is_modified ? __( ' (modified)', 'wpforms' ) : ''
+						);
+					}
+				} else {
+					$columns_row[ $field_id ] = $columns_labels[ $field_id ];
+				}
 			}
 		} else {
 			$fields = [];
@@ -390,6 +410,8 @@ class Ajax {
 				} elseif ( strpos( $col_id, 'del_field_' ) !== false ) {
 					$f_id           = str_replace( 'del_field_', '', $col_id );
 					$row[ $col_id ] = isset( $fields[ $f_id ]['value'] ) ? $fields[ $f_id ]['value'] : '';
+				} elseif ( strpos( $col_id, 'multiple_field_' ) !== false ) {
+					$row[ $col_id ] = $this->get_multiple_row_value( $fields, $col_id );
 				} else {
 					$row[ $col_id ] = $this->get_additional_info_value( $col_id, $entry, $this->request_data['form_data'] );
 				}
@@ -430,6 +452,277 @@ class Ajax {
 	}
 
 	/**
+	 * Get multiple row value.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array  $fields Field data.
+	 * @param string $col_id Column id.
+	 *
+	 * @return string
+	 */
+	private function get_multiple_row_value( $fields, $col_id ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh,Generic.Metrics.CyclomaticComplexity.MaxExceeded
+
+		$row_value = '';
+
+		// Get multiple field id. Contains field id and value id.
+		// See get_csv_cols method.
+		// $col_id: 'multiple_field_' . $field_id . '_' . $key.
+		$id = str_replace( 'multiple_field_', '', $col_id );
+
+		// Get field id and value id.
+		// $id: $field_id . '_' . $key.
+		$multiple_key = explode( '_', $id );
+
+		// The First element is field id.
+		$multiple_field_id = $multiple_key[0];
+
+		// Second element is value id.
+		$multiple_value_id = (int) end( $multiple_key );
+
+		$field = isset( $fields[ $multiple_field_id ] ) ? $fields[ $multiple_field_id ] : null;
+
+		if ( ! $field ) {
+			return $row_value;
+		}
+
+		$type = $field['type'];
+
+		// Convert value to array.
+		$values = $this->get_field_values( $field );
+
+		// Get field choices.
+		$choices = $this->get_multiple_choices_columns(
+			$this->request_data['form_data']['fields'][ $multiple_field_id ],
+			$this->request_data['form_data'],
+			$this->request_data['dynamic_columns']
+		);
+
+		/**
+		 * If field has only one choice, set label to 'Checked'.
+		 *
+		 * See field_properties method.
+		 * includes/fields/class-checkbox.php
+		 * src/Forms/Fields/PaymentCheckbox/Field.php
+		 */
+		if ( count( $choices ) === 1 ) {
+			$choices = array_map(
+				static function ( $choice ) {
+
+					$choice['label'] = __( 'Checked', 'wpforms' );
+
+					return $choice;
+				},
+				$choices
+			);
+		}
+
+		// Make sure that values array has the same length as choices array.
+		$values = array_pad( $values, count( $choices ), '' );
+
+		// Add each value to the separate column in the row.
+		foreach ( $values as $index => $value ) {
+			// No needed comparison indexes for File Upload, Name and Address fields.
+			if ( in_array( $type, [ 'file-upload', 'name', 'address' ], true ) ) {
+				// If value index not equal to value id, skip it.
+				if ( $multiple_value_id !== $index ) {
+					continue;
+				}
+
+				$row_value = $value;
+
+				continue;
+			}
+
+			$labels = array_column( $choices, 'label' );
+
+			// Try to find value index in choices array.
+			$value_index = array_search( $value, array_map( 'trim', $labels ), true );
+
+			// For Likert Scale field search value index by key.
+			if ( $type === 'likert_scale' ) {
+				$value_index = array_search( $index, array_column( $choices, 'label' ), true );
+
+				// Try to find modified value index.
+				if ( $value_index === false ) {
+					$index .= __( ' (modified)', 'wpforms' );
+
+					$value_index = array_search( $index, array_column( $choices, 'label' ), true );
+				}
+			}
+
+			// If value not found in choices array, skip it.
+			if ( $value_index === false ) {
+				continue;
+			}
+
+			// If value index not equal to value id, skip it.
+			if ( $multiple_value_id !== $value_index ) {
+				continue;
+			}
+
+			// For Likert Scale field we can set value without choices array.
+			if ( $field['type'] === 'likert_scale' ) {
+				$row_value = $value;
+
+				continue;
+			}
+
+			// Set value.
+			if ( isset( $choices[ $value_index ] ) ) {
+				$row_value = $choices[ $value_index ]['label'];
+
+				if ( $field['type'] === 'payment-checkbox' ) {
+					$row_value = sprintf(
+						'%1$s - %2$s',
+						$choices[ $value_index ]['label'],
+						wpforms_format_amount( $choices[ $value_index ]['value'], true, $field['currency'] )
+					);
+				}
+			}
+		}
+
+		return $row_value;
+	}
+
+	/**
+	 * Get entry field values.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $field Field data.
+	 *
+	 * @return array
+	 */
+	private function get_field_values( $field ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		// Get field value.
+		$value = $field['value'] ?? '';
+
+		// For Payment Checkbox field.
+		if ( isset( $field['value_choice'] ) ) {
+			$value = $field['value_choice'];
+
+			$values = explode( "\n", $value );
+			$values = array_map( 'trim', $values );
+
+			$value_raw = explode( ',', $field['value_raw'] );
+
+			foreach ( $values as $index => $value ) {
+				if ( ! $value ) {
+					$values[ $index ] = sprintf(
+						/* translators: %s - choice number. */
+						esc_html__( 'Choice %s', 'wpforms' ),
+						$value_raw[ $index ]
+					);
+				}
+			}
+
+			return $values;
+		}
+
+		// Convert value to array.
+		$values = explode( "\n", $value );
+		$values = array_map( 'trim', $values );
+
+		$type = $field['type'];
+
+		// Prepare values for Name field, depends on format.
+		if ( $type === 'name' ) {
+			return $this->request_data['form_data']['fields'][ $field['id'] ]['format'] === 'first-last' ?
+				[ $field['first'], $field['last'] ] :
+				[ $field['first'], $field['middle'], $field['last'] ];
+		}
+
+		// Prepare values for Address field.
+		if ( $type === 'address' ) {
+			return [
+				$field['address1'],
+				$field['address2'],
+				$field['city'],
+				$field['state'],
+				$field['postal'],
+				$field['country'],
+			];
+		}
+
+		// Prepare values for Likert Scale field.
+		if ( $type === 'likert_scale' ) {
+			return $this->get_likert_scale_field_value( $values );
+		}
+
+		return $values;
+	}
+
+	/**
+	 * Get Likert Scale field value.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $values Field values.
+	 *
+	 * @return array
+	 */
+	private function get_likert_scale_field_value( $values ) {
+
+		// Get only odd values for rows.
+		$rows = array_filter(
+			$values,
+			static function ( $key ) {
+
+				return $key % 2 !== 0;
+			},
+			ARRAY_FILTER_USE_KEY
+		);
+
+		// Explode row values by comma.
+		$rows = array_map(
+			static function ( $key ) {
+
+				return array_map( 'trim', explode( ',', $key ) );
+			},
+			$rows
+		);
+
+		// Get only even values for columns.
+		$columns = array_filter(
+			$values,
+			static function ( $key ) {
+
+				return $key % 2 === 0;
+			},
+			ARRAY_FILTER_USE_KEY
+		);
+
+		// Remove colon from values.
+		$columns = array_map(
+			static function ( $value ) {
+
+				return str_replace( ':', '', $value );
+			},
+			$columns
+		);
+
+		$field_value = [];
+
+		// Prepare an array with columns as keys and rows as values.
+		foreach ( $rows as $index => $row ) {
+			foreach ( $row as $row_label ) {
+				$field_value[ $row_label ][] = $columns[ $index - 1 ];
+			}
+		}
+
+		// Convert values to string.
+		return array_map(
+			static function ( $value ) {
+
+				return implode( ', ', $value );
+			},
+			$field_value
+		);
+	}
+
+	/**
 	 * Get value of additional information column.
 	 *
 	 * @since 1.5.5
@@ -447,7 +740,7 @@ class Ajax {
 
 		switch ( $col_id ) {
 			case 'date':
-				$val = date_i18n( $this->date_format(), strtotime( $entry['date'] ) + $this->gmt_offset_sec() );
+				$val = wpforms_datetime_format( $entry['date'], '', true );
 				break;
 
 			case 'notes':
@@ -528,7 +821,7 @@ class Ajax {
 				$author_name  = ! empty( $author->first_name ) ? $author->first_name : $author->user_login;
 				$author_name .= ! empty( $author->last_name ) ? ' ' . $author->last_name : '';
 
-				$carry .= date_i18n( $this->date_format(), strtotime( $item['date'] ) + $this->gmt_offset_sec() ) . ', ';
+				$carry .= wpforms_datetime_format( $item['date'], '', true ) . ', ';
 				$carry .= $author_name . ': ';
 				$carry .= wp_strip_all_tags( $item['data'] ) . "\n";
 
@@ -783,8 +1076,11 @@ class Ajax {
 	 * Get date format.
 	 *
 	 * @since 1.5.5
+	 * @deprecated 1.8.5
 	 */
 	public function date_format() {
+
+		_deprecated_function( __METHOD__, '1.8.5 of the WPForms plugin' );
 
 		$this->export->data['date_format'] = empty( $this->export->data['date_format'] ) ? sprintf( '%s %s', get_option( 'date_format' ), get_option( 'time_format' ) ) : $this->export->data['date_format'];
 
@@ -795,8 +1091,11 @@ class Ajax {
 	 * Get GMT offset in seconds.
 	 *
 	 * @since 1.5.5
+	 * @deprecated 1.8.5
 	 */
 	public function gmt_offset_sec() {
+
+		_deprecated_function( __METHOD__, '1.8.5 of the WPForms plugin' );
 
 		$this->export->data['gmt_offset_sec'] = empty( $this->export->data['gmt_offset_sec'] ) ? get_option( 'gmt_offset' ) * 3600 : $this->export->data['gmt_offset_sec'];
 
@@ -883,5 +1182,326 @@ class Ajax {
 		);
 
 		return $value;
+	}
+
+	/**
+	 * Get prepared fields.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $fields Fields.
+	 *
+	 * @return array
+	 */
+	private function get_prepared_fields( $fields ) {
+
+		$fields = array_map(
+			static function ( $field ) {
+				$field['label'] = ! empty( $field['label'] ) ?
+					trim( wp_strip_all_tags( $field['label'] ) ) :
+					sprintf( /* translators: %d - field ID. */
+						esc_html__( 'Field #%d', 'wpforms' ),
+						(int) $field['id']
+					);
+
+				return $field;
+			},
+			$fields
+		);
+
+		// Reset array keys to save order of fields in JS.
+		return array_values( $fields );
+	}
+
+	/**
+	 * Exclude fields from a fields array.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $fields         Fields array.
+	 * @param array $exclude_fields Fields to exclude.
+	 *
+	 * @return array
+	 */
+	private function exclude_fields( $fields, $exclude_fields ) {
+
+		return array_filter(
+			array_values( $fields ),
+			static function ( $field ) use ( $exclude_fields ) {
+
+				return isset( $field['type'] ) && ! in_array( $field['type'], $exclude_fields, true );
+			}
+		);
+	}
+
+	/**
+	 * Get multiple field choices columns.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $field              Field data.
+	 * @param array $form_data          Form data.
+	 * @param bool  $is_dynamic_columns Is dynamic choices.
+	 *
+	 * @return array
+	 */
+	private function get_multiple_choices_columns( $field, $form_data, $is_dynamic_columns = false ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		$type = $field['type'];
+
+		if ( in_array( $type, [ 'select', 'checkbox', 'payment-checkbox' ], true ) ) {
+			if ( $this->is_dynamic_choices( $field ) && $is_dynamic_columns ) {
+				return wpforms_get_field_dynamic_choices( $field, $form_data['id'], $form_data );
+			}
+
+			return $this->get_choices( $form_data['id'], $field );
+		}
+
+		if ( $type === 'file-upload' ) {
+			$max_file_number = [
+				$this->get_max_files( $form_data['id'], $field['id'] ),
+				$field['max_file_number'],
+			];
+
+			$count = max( $max_file_number );
+
+			// Return array with exactly the same number of elements as max_file_number.
+			$columns = array_fill( 0, $count, [] );
+
+			return array_map(
+				static function ( $column, $index ) use ( $field ) {
+
+					$modified = $field['max_file_number'] < $index + 1 ? __( ' (modified)', 'wpforms' ) : '';
+
+					$column['label'] = sprintf( '%s #%d%s', __( 'File', 'wpforms' ), $index + 1, $modified );
+
+					return $column;
+				},
+				$columns,
+				array_keys( $columns )
+			);
+		}
+
+		if ( $type === 'likert_scale' ) {
+			return $this->get_likert_scale_columns( $field, $form_data );
+		}
+
+		if ( $type === 'name' ) {
+			return $field['format'] === 'first-last' ?
+			    [
+					[ 'label' => __( 'First', 'wpforms' ) ],
+					[ 'label' => __( 'Last', 'wpforms' ) ],
+				] :
+				[
+					[ 'label' => __( 'First', 'wpforms' ) ],
+					[ 'label' => __( 'Middle', 'wpforms' ) ],
+					[ 'label' => __( 'Last', 'wpforms' ) ],
+				];
+		}
+
+		if ( $type === 'address' ) {
+			return [
+				[ 'label' => __( 'Address Line 1', 'wpforms' ) ],
+				[ 'label' => __( 'Address Line 2', 'wpforms' ) ],
+				[ 'label' => __( 'City', 'wpforms' ) ],
+				[ 'label' => __( 'State', 'wpforms' ) ],
+				[ 'label' => __( 'Zip/Postal Code', 'wpforms' ) ],
+				[ 'label' => __( 'Country', 'wpforms' ) ],
+			];
+		}
+
+		return [];
+	}
+
+	/**
+	 * Get Likert Scale field columns.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param array $field     Field data.
+	 * @param array $form_data Form data.
+	 *
+	 * @return array
+	 */
+	private function get_likert_scale_columns( $field, $form_data ) {
+
+		// Get all values from database.
+		$values = $this->get_entry_fields_values( $form_data['id'], $field['id'] );
+		$keys   = [];
+
+		foreach ( $values as $value ) {
+			$value = json_decode( $value, true );
+
+			$value = explode( "\n", $value['value'] );
+			$value = array_map( 'trim', $value );
+
+			$value = $this->get_likert_scale_field_value( $value );
+
+			$value_keys = array_keys( $value );
+
+			foreach ( $value_keys as $value_key ) {
+				$keys[] = $value_key;
+			}
+		}
+
+		$keys = array_unique( $keys );
+
+		// Get modified columns.
+		$modified_columns = array_diff( $keys, $field['columns'] );
+
+		// Add (modified) to column label.
+		$modified_columns = array_map(
+			static function ( $column ) {
+
+				return $column . __( ' (modified)', 'wpforms' );
+			},
+			$modified_columns
+		);
+
+		// Add modified columns to columns array.
+		$field['columns'] = array_merge( $field['columns'], $modified_columns );
+
+		$columns = array_map(
+			static function ( $column ) {
+
+				return [ 'label' => $column ];
+			},
+			$field['columns']
+		);
+
+		return array_values( $columns );
+	}
+
+	/**
+	 * Get field choices.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param int   $form_id Form ID.
+	 * @param array $field   Field data.
+	 *
+	 * @return array Choices.
+	 */
+	private function get_choices( $form_id, $field ) {
+
+		$field_choices = $field['choices'];
+		$field_id      = $field['id'];
+
+		foreach ( $field_choices as $key => $choice ) {
+			// Check if choice label not empty.
+			if ( ! empty( $choice['label'] ) ) {
+				continue;
+			}
+
+			// If choice has no label, set default label.
+			$choice['label'] = sprintf( /* translators: %d - choice ID. */
+				esc_html__( 'Choice %d', 'wpforms' ),
+				$key
+			);
+
+			$field_choices[ $key ] = $choice;
+		}
+
+		$labels = array_column( $field_choices, 'label' );
+
+		$choices = $this->get_all_existing_choices( $form_id, $field_id );
+
+		foreach ( $choices as $choice ) {
+			// Check if choice already exists.
+			if ( in_array( $choice, $labels, true ) ) {
+				continue;
+			}
+
+			// Add modified choice to choices array.
+			$field_choices[] = [
+				'label'    => $choice,
+				'modified' => true,
+			];
+		}
+
+		return array_values( $field_choices );
+	}
+
+	/**
+	 * Get all existing choices from database.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param int $form_id  Form ID.
+	 * @param int $field_id Field ID.
+	 *
+	 * @return array Choices.
+	 */
+	private function get_all_existing_choices( $form_id, $field_id ) {
+
+		$entry_fields_values = $this->get_entry_fields_values( $form_id, $field_id );
+
+		$choices = [];
+
+		foreach ( $entry_fields_values as $row_value ) {
+			$values = explode( "\n", $row_value );
+
+			$values = array_filter( $values );
+
+			foreach ( $values as $value ) {
+				$choices[] = $value;
+			}
+		}
+
+		return array_unique( $choices );
+	}
+
+	/**
+	 * Get max files number.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param int $form_id  Form ID.
+	 * @param int $field_id Field ID.
+	 *
+	 * @return int
+	 */
+	private function get_max_files( $form_id, $field_id ) {
+
+		$entry_fields_values = $this->get_entry_fields_values( $form_id, $field_id );
+
+		$counts = [];
+
+		foreach ( $entry_fields_values as $row_value ) {
+			$values = explode( "\n", $row_value );
+
+			$counts[] = count( array_filter( $values ) );
+		}
+
+		return max( $counts );
+	}
+
+	/**
+	 * Get entry fields values.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @param int $form_id  Form ID.
+	 * @param int $field_id Field ID.
+	 *
+	 * @return array
+	 */
+	private function get_entry_fields_values( $form_id, $field_id ) {
+
+		global $wpdb;
+
+		$table_name = wpforms()->get( 'entry_fields' )->table_name;
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+		$sql = $wpdb->prepare(
+			"SELECT DISTINCT `value` FROM $table_name WHERE `form_id` = %d AND `field_id` = %d",
+			$form_id,
+			$field_id
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_col( $sql );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 	}
 }

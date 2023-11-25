@@ -222,8 +222,9 @@ class EntriesCount {
 		}
 
 		// Exclude spam entries.
-		$sql           .= ' AND status != %s';
+		$sql           .= ' AND status NOT IN ( %s, %s )';
 		$placeholders[] = SpamEntry::ENTRY_STATUS;
+		$placeholders[] = 'trash';
 
 		return $wpdb->prepare( $sql, $placeholders ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	}

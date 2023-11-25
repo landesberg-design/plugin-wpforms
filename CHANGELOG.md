@@ -1,6 +1,54 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.5.2] - 2023-11-21
+### Fixed
+- Weekly Summary email used plain text formatting when one of the new email templates was selected on the WPForms Settings > Email page.
+- There was no way to customize a footer text in email notifications when one of the new email templates was selected.
+- Email template specified on a per-form/notification basis wasn't respected when the Plain Text template was selected on the WPForms Settings > Email page.
+- First paragraph's bottom margin was missing in new email notification templates.
+- Custom date range selection was hidden on the Tools > Export page for entries coming from forms without any payment fields.
+
+## [1.8.5.1] - 2023-11-14
+### Fixed
+- There was a conflict with 3rd-party plugins that use the Stripe PHP library.
+
+## [1.8.5] - 2023-11-08
+### Added
+- New email templates are ready to use!
+- Email template can now be customized and previewed on the Settings.
+- Allow an email template to be specified on a per-form/notification basis.
+- Added the ability to trash entries instead of directly deleting them.
+- Prefix all 3rd-party libraries to avoid compatibility issues with other plugins using different versions of the same libraries.
+- Entry export now displays payment details separately from other form fields.
+- Entry export now allows exporting only entries with certain status(es).
+- Multiple choice entry values can now be exported as separate columns.
+- Added two new links, Form Edit and View Entries on the WPForms Block in Gutenberg.
+- Added new filter making it possible to customize styles for the Stripe Credit Card field when Payment Elements are used.
+- WPCode integration.
+
+### Changed
+- Updated DOMPurify library to 3.0.6.
+- Improved significantly the performance of frontend email validation.
+
+### Fixed
+- Addressed a few compatibility issues and deprecation errors with PHP 8.1 and newer versions.
+- Stripe Credit Card field error was not visible on multipage forms in some cases.
+- Search didn't work on the Form Templates screen if a template name contained the dash symbol.
+- Stripe Credit Card field duplicate button was visible in the Form Builder in some cases.
+- Stripe webhook requests triggered a PHP error and returned the wrong response in some cases.
+- The single entry view was broken when HTML field had broken syntax.
+- The entry meta box on the single entry view page was broken with IPV6.
+- Image choices had some styling glitches in the builder preview.
+- Akismet protection didn't work when Email Confirmation was enabled for the Email field.
+- Translated strings weren't shown in the WPForms block in some cases.
+- In rare cases Turnstile Captcha was not displayed correctly when it expired and was refreshed.
+- Empty pages on multipage forms are no longer displayed if all fields are hidden with conditional logic.
+- The attached files were not deleted from the Media Library when deleting spam entries.
+- Some styles were missing for the File Upload field in the Divi page builder.
+- The rich text field elements had alignment issues on certain pages.
+- Custom styles were overwritten for the Stripe Credit Card field when the Modern Markup setting was used.
+
 ## [1.8.4.1] - 2023-10-24
 ### Fixed
 - A fatal error was thrown when using the WP-CLI command with the --context=admin parameter.

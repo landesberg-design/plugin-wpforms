@@ -96,7 +96,7 @@ class DidYouKnow implements EducationInterface {
 				'item' => 1,
 			],
 			[
-				'desc' => esc_html__( 'You can easily integrate your forms with 5,000+ useful apps by using WPForms + Zapier.', 'wpforms' ),
+				'desc' => esc_html__( 'You can easily integrate your forms with 6,000+ useful apps by using WPForms + Zapier.', 'wpforms' ),
 				'more' => 'https://wpforms.com/addons/zapier-addon/',
 				'item' => 2,
 			],

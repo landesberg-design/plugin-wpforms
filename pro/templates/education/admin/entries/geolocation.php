@@ -14,6 +14,8 @@
  * @var string $url           Download URL.
  */
 
+use WPForms\Admin\Education\Helpers;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -60,9 +62,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php
 					esc_html_e( 'Geolocation', 'wpforms' );
 					if ( ! $plugin_allow ) {
-						?>
-						<span class="badge"></span>
-					<?php } ?>
+						Helpers::print_badge( 'Pro', 'sm', 'inline', 'platinum' );
+					}
+					?>
 				</h2>
 				<p><?php esc_html_e( 'Geolocation allows you to quickly see where your visitors are located!', 'wpforms' ); ?></p>
 				<?php if ( $plugin_allow ) { ?>

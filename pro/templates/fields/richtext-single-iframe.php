@@ -36,6 +36,22 @@ $version = 'ver=' . get_bloginfo( 'version' );
 			white-space: pre !important;
 			overflow-x: auto !important;
 		}
+
+		li {
+			list-style-position: inside;
+		}
+
+		p img {
+			display: block;
+		}
+
+		.aligncenter,
+		.alignnone {
+			clear: both;
+			/* Make the same margins as alingleft/alignright. */
+			margin-top: 0.5em;
+			margin-bottom: 0.5em;
+		}
 	</style>
 </head>
 <body class="mce-content-body">
