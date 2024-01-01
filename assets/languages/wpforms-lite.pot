@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms Lite 1.8.5.2\n"
+"Project-Id-Version: WPForms Lite 1.8.5.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms-lite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-11-20T18:30:40+00:00\n"
+"POT-Creation-Date: 2023-12-26T16:00:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.6.0\n"
+"X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: wpforms-lite\n"
 
 #. Plugin Name of the plugin
@@ -1086,6 +1086,7 @@ msgid "Unfortunately, the %s field is not available and will be ignored on the f
 msgstr ""
 
 #: includes/admin/builder/panels/class-fields.php:516
+#: includes/admin/class-settings.php:127
 #: includes/fields/class-internal-information.php:290
 #: includes/fields/class-internal-information.php:420
 #: includes/fields/class-internal-information.php:610
@@ -1143,7 +1144,7 @@ msgstr ""
 #: src/Admin/Builder/Help.php:152
 #: src/Admin/Forms/Views.php:444
 #: src/Admin/Payments/Payments.php:173
-#: src/Admin/Payments/Views/Overview/Page.php:141
+#: src/Admin/Payments/Views/Overview/Page.php:142
 #: src/Admin/Settings/Payments.php:47
 #: src/Admin/Settings/Payments.php:78
 msgid "Payments"
@@ -1254,8 +1255,8 @@ msgstr ""
 
 #: includes/admin/builder/panels/class-settings.php:45
 #: includes/admin/builder/panels/class-settings.php:130
-#: includes/admin/class-settings.php:200
-#: includes/admin/class-settings.php:277
+#: includes/admin/class-settings.php:293
+#: includes/admin/class-settings.php:370
 #: includes/fields/class-base.php:948
 msgid "General"
 msgstr ""
@@ -1920,7 +1921,7 @@ msgstr ""
 
 #: includes/admin/class-about.php:1296
 #: includes/admin/class-about.php:1303
-msgid "Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Brevo, Drip, and MailerLite"
+msgid "Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Brevo, Drip, MailerLite, and ConvertKit"
 msgstr ""
 
 #: includes/admin/class-about.php:1306
@@ -1939,7 +1940,7 @@ msgstr ""
 #: includes/admin/class-about.php:1317
 #: includes/admin/class-about.php:1331
 #: includes/admin/class-about.php:1345
-msgid "ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, and MailerLite"
+msgid "ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, MailerLite, and ConvertKit"
 msgstr ""
 
 #: includes/admin/class-about.php:1360
@@ -2023,7 +2024,7 @@ msgid "Pro Addons Included"
 msgstr ""
 
 #: includes/admin/class-about.php:1485
-msgid "Calculations, Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Google Sheets, Coupons, and more (28 total)"
+msgid "Calculations, Form Abandonment, Conversational Forms, Lead Forms, Frontend Post Submission, User Registration, Geolocation, Google Sheets, Coupons, and more (30 total)"
 msgstr ""
 
 #: includes/admin/class-about.php:1491
@@ -2323,13 +2324,18 @@ msgstr ""
 msgid "Made with ♥ by the WPForms Team"
 msgstr ""
 
-#: includes/admin/class-settings.php:176
+#. translators: %1$s - WPForms.com doc page URL; %2$s - button text.
+#: includes/admin/class-settings.php:114
+msgid "It looks like you've downgraded to an older version of WPForms. We recommend always using the latest version as some features may not function as expected in older versions. <a href=\"%1$s\" target=\"_blank\" rel=\"noopener\">%2$s</a>"
+msgstr ""
+
+#: includes/admin/class-settings.php:269
 msgid "Settings were successfully saved."
 msgstr ""
 
-#: includes/admin/class-settings.php:202
-#: includes/admin/class-settings.php:207
-#: includes/admin/class-settings.php:222
+#: includes/admin/class-settings.php:295
+#: includes/admin/class-settings.php:300
+#: includes/admin/class-settings.php:315
 #: src/Admin/Settings/Captcha/Page.php:124
 #: src/Admin/Settings/Email.php:119
 #: src/Admin/Settings/Payments.php:49
@@ -2337,101 +2343,101 @@ msgstr ""
 msgid "Save Settings"
 msgstr ""
 
-#: includes/admin/class-settings.php:205
+#: includes/admin/class-settings.php:298
 msgid "Validation"
 msgstr ""
 
-#: includes/admin/class-settings.php:210
-#: includes/admin/class-settings.php:440
-#: includes/admin/class-settings.php:447
+#: includes/admin/class-settings.php:303
+#: includes/admin/class-settings.php:539
+#: includes/admin/class-settings.php:546
 msgid "Integrations"
 msgstr ""
 
-#: includes/admin/class-settings.php:215
+#: includes/admin/class-settings.php:308
 #: includes/admin/class-welcome.php:275
 #: templates/education/admin/settings/geolocation/heading.php:19
 msgid "Geolocation"
 msgstr ""
 
-#: includes/admin/class-settings.php:220
+#: includes/admin/class-settings.php:313
 msgid "Misc"
 msgstr ""
 
-#: includes/admin/class-settings.php:265
+#: includes/admin/class-settings.php:358
 msgid "License"
 msgstr ""
 
-#: includes/admin/class-settings.php:265
+#: includes/admin/class-settings.php:358
 msgid "Your license key provides access to updates and addons."
 msgstr ""
 
-#: includes/admin/class-settings.php:272
+#: includes/admin/class-settings.php:365
 msgid "License Key"
 msgstr ""
 
-#: includes/admin/class-settings.php:284
+#: includes/admin/class-settings.php:377
 msgid "Include Form Styling"
 msgstr ""
 
 #. translators: %s - WPForms.com form styling setting URL.
-#: includes/admin/class-settings.php:287
+#: includes/admin/class-settings.php:380
 msgid "Determines which CSS files to load and use for the site. \"Base and Form Theme Styling\" is recommended, unless you are experienced with CSS or instructed by support to change settings. <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"wpforms-learn-more\">Learn More</a>"
 msgstr ""
 
-#: includes/admin/class-settings.php:303
+#: includes/admin/class-settings.php:396
 msgid "Base and form theme styling"
 msgstr ""
 
-#: includes/admin/class-settings.php:304
+#: includes/admin/class-settings.php:397
 msgid "Base styling only"
 msgstr ""
 
-#: includes/admin/class-settings.php:305
+#: includes/admin/class-settings.php:398
 msgid "No styling"
 msgstr ""
 
-#: includes/admin/class-settings.php:310
+#: includes/admin/class-settings.php:403
 msgid "Load Assets Globally"
 msgstr ""
 
-#: includes/admin/class-settings.php:311
+#: includes/admin/class-settings.php:404
 msgid "Load WPForms assets site-wide. Only check if your site is having compatibility issues or instructed to by support."
 msgstr ""
 
-#: includes/admin/class-settings.php:317
+#: includes/admin/class-settings.php:410
 msgid "GDPR"
 msgstr ""
 
-#: includes/admin/class-settings.php:324
+#: includes/admin/class-settings.php:417
 msgid "GDPR Enhancements"
 msgstr ""
 
 #. translators: %s - WPForms.com GDPR documentation URL.
-#: includes/admin/class-settings.php:327
+#: includes/admin/class-settings.php:420
 msgid "Enable GDPR related features and enhancements. <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"wpforms-learn-more\">Learn More</a>"
 msgstr ""
 
 #. translators: %s - WPForms.com smart tags documentation URL.
-#: includes/admin/class-settings.php:348
+#: includes/admin/class-settings.php:441
 msgid "%1$s These messages are displayed to the users as they fill out a form in real-time. Messages can include plain text and/or %2$sSmart Tags%3$s."
 msgstr ""
 
-#: includes/admin/class-settings.php:349
+#: includes/admin/class-settings.php:442
 msgid "Validation Messages"
 msgstr ""
 
-#: includes/admin/class-settings.php:360
+#: includes/admin/class-settings.php:453
 #: includes/fields/class-base.php:1050
 msgid "Required"
 msgstr ""
 
-#: includes/admin/class-settings.php:362
+#: includes/admin/class-settings.php:455
 #: includes/functions/escape-sanitize.php:442
 #: src/Frontend/Frontend.php:1786
 msgid "This field is required."
 msgstr ""
 
-#: includes/admin/class-settings.php:366
+#: includes/admin/class-settings.php:459
 #: includes/fields/class-email.php:41
 #: includes/fields/class-email.php:135
 #: includes/fields/class-email.php:471
@@ -2443,136 +2449,144 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: includes/admin/class-settings.php:368
+#: includes/admin/class-settings.php:461
 #: src/Frontend/Frontend.php:1787
 msgid "Please enter a valid email address."
 msgstr ""
 
-#: includes/admin/class-settings.php:372
+#: includes/admin/class-settings.php:465
 msgid "Email Suggestion"
 msgstr ""
 
 #. translators: %s - suggested email address.
-#: includes/admin/class-settings.php:375
+#: includes/admin/class-settings.php:468
 #: src/Frontend/Frontend.php:1791
 msgid "Did you mean %s?"
 msgstr ""
 
-#: includes/admin/class-settings.php:381
+#: includes/admin/class-settings.php:474
 msgid "Email Restricted"
 msgstr ""
 
-#: includes/admin/class-settings.php:383
+#: includes/admin/class-settings.php:476
 #: includes/fields/class-email.php:638
 #: includes/fields/class-email.php:646
 #: src/Frontend/Frontend.php:1796
 msgid "This email address is not allowed."
 msgstr ""
 
-#: includes/admin/class-settings.php:387
+#: includes/admin/class-settings.php:480
 msgid "Number"
 msgstr ""
 
-#: includes/admin/class-settings.php:389
+#: includes/admin/class-settings.php:482
 #: includes/fields/class-number.php:168
 #: src/Frontend/Frontend.php:1797
 msgid "Please enter a valid number."
 msgstr ""
 
-#: includes/admin/class-settings.php:393
+#: includes/admin/class-settings.php:486
 msgid "Number Positive"
 msgstr ""
 
-#: includes/admin/class-settings.php:395
+#: includes/admin/class-settings.php:488
 #: src/Frontend/Frontend.php:1798
 msgid "Please enter a valid positive number."
 msgstr ""
 
-#: includes/admin/class-settings.php:399
+#: includes/admin/class-settings.php:492
+msgid "Minimum Price"
+msgstr ""
+
+#: includes/admin/class-settings.php:494
+msgid "Amount entered is less than the required minimum."
+msgstr ""
+
+#: includes/admin/class-settings.php:498
 msgid "Confirm Value"
 msgstr ""
 
-#: includes/admin/class-settings.php:401
+#: includes/admin/class-settings.php:500
 #: src/Frontend/Frontend.php:1799
 msgid "Field values do not match."
 msgstr ""
 
-#: includes/admin/class-settings.php:405
+#: includes/admin/class-settings.php:504
 msgid "Input Mask Incomplete"
 msgstr ""
 
-#: includes/admin/class-settings.php:407
+#: includes/admin/class-settings.php:506
 #: src/Frontend/Frontend.php:1819
 msgid "Please fill out the field in required format."
 msgstr ""
 
-#: includes/admin/class-settings.php:411
+#: includes/admin/class-settings.php:510
 msgid "Checkbox Selection Limit"
 msgstr ""
 
-#: includes/admin/class-settings.php:413
+#: includes/admin/class-settings.php:512
 #: includes/fields/class-checkbox.php:635
 #: src/Frontend/Frontend.php:1800
 msgid "You have exceeded the number of allowed selections: {#}."
 msgstr ""
 
-#: includes/admin/class-settings.php:417
+#: includes/admin/class-settings.php:516
 msgid "Character Limit"
 msgstr ""
 
 #. translators: %1$s - characters limit, %2$s - number of characters left.
-#: includes/admin/class-settings.php:420
+#: includes/admin/class-settings.php:519
 msgid "Limit is %1$s characters. Characters remaining: %2$s."
 msgstr ""
 
-#: includes/admin/class-settings.php:427
+#: includes/admin/class-settings.php:526
 msgid "Word Limit"
 msgstr ""
 
 #. translators: %1$s - words limit, %2$s - number of words left.
-#: includes/admin/class-settings.php:430
+#: includes/admin/class-settings.php:529
 msgid "Limit is %1$s words. Words remaining: %2$s."
 msgstr ""
 
-#: includes/admin/class-settings.php:440
-#: includes/admin/class-settings.php:447
+#: includes/admin/class-settings.php:539
+#: includes/admin/class-settings.php:546
 msgid "Manage integrations with popular providers such as Constant Contact, Mailchimp, Zapier, and more."
 msgstr ""
 
-#: includes/admin/class-settings.php:456
+#: includes/admin/class-settings.php:555
 msgid "Miscellaneous"
 msgstr ""
 
-#: includes/admin/class-settings.php:463
+#: includes/admin/class-settings.php:562
 msgid "Hide Announcements"
 msgstr ""
 
-#: includes/admin/class-settings.php:464
+#: includes/admin/class-settings.php:563
 msgid "Hide plugin announcements and update details."
 msgstr ""
 
-#: includes/admin/class-settings.php:470
+#: includes/admin/class-settings.php:569
 msgid "Hide Admin Bar Menu"
 msgstr ""
 
-#: includes/admin/class-settings.php:471
+#: includes/admin/class-settings.php:570
 msgid "Hide the WPForms admin bar menu."
 msgstr ""
 
-#: includes/admin/class-settings.php:477
+#: includes/admin/class-settings.php:576
 msgid "Uninstall WPForms"
 msgstr ""
 
-#: includes/admin/class-settings.php:506
-#: includes/admin/class-settings.php:510
+#: includes/admin/class-settings.php:605
+#: includes/admin/class-settings.php:609
 msgid "Remove ALL WPForms data upon plugin deletion."
 msgstr ""
 
-#: includes/admin/class-settings.php:507
+#: includes/admin/class-settings.php:606
 msgid "All forms and settings will be unrecoverable."
 msgstr ""
 
-#: includes/admin/class-settings.php:511
+#: includes/admin/class-settings.php:610
 msgid "All forms, entries, and uploaded files will be unrecoverable."
 msgstr ""
 
@@ -6671,31 +6685,31 @@ msgstr[1] ""
 msgid "Empty Trash"
 msgstr ""
 
-#: src/Admin/Helpers/Datepicker.php:349
+#: src/Admin/Helpers/Datepicker.php:408
 msgid "Today"
 msgstr ""
 
-#: src/Admin/Helpers/Datepicker.php:350
+#: src/Admin/Helpers/Datepicker.php:409
 msgid "Yesterday"
 msgstr ""
 
-#: src/Admin/Helpers/Datepicker.php:351
+#: src/Admin/Helpers/Datepicker.php:410
 msgid "Last 7 days"
 msgstr ""
 
-#: src/Admin/Helpers/Datepicker.php:352
+#: src/Admin/Helpers/Datepicker.php:411
 msgid "Last 30 days"
 msgstr ""
 
-#: src/Admin/Helpers/Datepicker.php:353
+#: src/Admin/Helpers/Datepicker.php:412
 msgid "Last 90 days"
 msgstr ""
 
-#: src/Admin/Helpers/Datepicker.php:354
+#: src/Admin/Helpers/Datepicker.php:413
 msgid "Last 1 year"
 msgstr ""
 
-#: src/Admin/Helpers/Datepicker.php:355
+#: src/Admin/Helpers/Datepicker.php:414
 #: src/Admin/Traits/FormTemplates.php:291
 msgid "Custom"
 msgstr ""
@@ -7130,7 +7144,7 @@ msgid "Viewing Test Data"
 msgstr ""
 
 #: src/Admin/Payments/Views/Overview/Chart.php:167
-#: src/Admin/Payments/Views/Overview/Page.php:145
+#: src/Admin/Payments/Views/Overview/Page.php:146
 msgid "No payments for selected period"
 msgstr ""
 
@@ -7172,48 +7186,48 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
-#: src/Admin/Payments/Views/Overview/Page.php:142
+#: src/Admin/Payments/Views/Overview/Page.php:143
 #: src/Providers/Provider/Settings/FormBuilder.php:230
 #: templates/admin/payments/single/details.php:79
 msgid "Delete"
 msgstr ""
 
-#: src/Admin/Payments/Views/Overview/Page.php:146
+#: src/Admin/Payments/Views/Overview/Page.php:147
 msgid "No sales for selected period"
 msgstr ""
 
-#: src/Admin/Payments/Views/Overview/Page.php:147
+#: src/Admin/Payments/Views/Overview/Page.php:148
 msgid "No refunds for selected period"
 msgstr ""
 
-#: src/Admin/Payments/Views/Overview/Page.php:148
+#: src/Admin/Payments/Views/Overview/Page.php:149
 msgid "No new subscriptions for selected period"
 msgstr ""
 
-#: src/Admin/Payments/Views/Overview/Page.php:149
+#: src/Admin/Payments/Views/Overview/Page.php:150
 msgid "No subscription renewals for the selected period"
 msgstr ""
 
-#: src/Admin/Payments/Views/Overview/Page.php:150
+#: src/Admin/Payments/Views/Overview/Page.php:151
 msgid "No coupons applied during the selected period"
 msgstr ""
 
-#: src/Admin/Payments/Views/Overview/Page.php:313
+#: src/Admin/Payments/Views/Overview/Page.php:314
 msgid "First you need to set up a payment gateway. We've partnered with <strong>Stripe</strong> to bring easy payment forms to everyone.&nbsp;"
 msgstr ""
 
 #. translators: %s - WPForms Addons admin page URL.
-#: src/Admin/Payments/Views/Overview/Page.php:316
+#: src/Admin/Payments/Views/Overview/Page.php:317
 msgid "Other payment gateways such as <strong>PayPal</strong> and <strong>Square</strong> can be installed from the <a href=\"%s\">Addons screen</a>."
 msgstr ""
 
 #. translators: %s - WPForms.com Upgrade page URL.
-#: src/Admin/Payments/Views/Overview/Page.php:327
+#: src/Admin/Payments/Views/Overview/Page.php:328
 msgid "If you'd like to use another payment gateway, please consider <a href='%s'>upgrading to WPForms Pro</a>."
 msgstr ""
 
 #. translators: WPForms.com docs page URL.
-#: src/Admin/Payments/Views/Overview/Page.php:444
+#: src/Admin/Payments/Views/Overview/Page.php:445
 msgid "Deleting one or more selected payments may prevent processing of future subscription renewals. Payment filtering may also be affected. <a href=\"%1$s\" rel=\"noopener\" target=\"_blank\">Learn More</a>"
 msgstr ""
 

@@ -271,6 +271,10 @@ class Loader {
 			[
 				'name' => 'Emails\Preview',
 				'hook' => 'admin_init',
+			],
+			[
+				'name' => 'Admin\Addons\GoogleSheets',
+				'hook' => 'admin_init',
 			]
 		);
 	}

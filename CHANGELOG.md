@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.5.4] - 2023-12-27
+### Changed
+- The `Chart.js` library has been updated to v2.9.4.
+
+### Fixed
+- Security fixes.
+- The date format in the Chart tooltip does not consider site settings.
+- Email Summary header image did not honor max width setting.
+- Highlighted integration on Settings > Integrations tab no longer locks other integrations after page reload.
+
+## [1.8.5.3] - 2023-12-13
+### Fixed
+- Better compatibility with default Block themes.
+- Form Embed Wizard was loaded on the YOOtheme Builder page.
+
 ## [1.8.5.2] - 2023-11-21
 ### Fixed
 - Weekly Summary email used plain text formatting when one of the new email templates was selected on the WPForms Settings > Email page.

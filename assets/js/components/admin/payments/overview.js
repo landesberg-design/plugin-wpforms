@@ -96,6 +96,13 @@ const WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( do
 		delimiter: l10n.delimiter,
 
 		/**
+		 * The Moment.js compatible format string to use for the tooltip.
+		 *
+		 * @since 1.8.5.4
+		 */
+		tooltipFormat: l10n.date_format,
+
+		/**
 		 * The current page URI.
 		 *
 		 * @since 1.8.2
@@ -294,6 +301,7 @@ const WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( do
 								maxBarThickness: 100,
 								time: {
 									unit: 'day',
+									tooltipFormat: this.tooltipFormat,
 									displayFormats: {
 										day: this.xAxesDisplayFormat,
 									},
@@ -301,7 +309,6 @@ const WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( do
 								distribution: 'series',
 								ticks: {
 									beginAtZero: true,
-									source: 'labels',
 									padding: 10,
 									fontColor: '#a7aaad',
 									labelOffset: 10,

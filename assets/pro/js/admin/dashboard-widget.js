@@ -111,6 +111,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 						type        : 'time',
 						time        : {
 							unit: 'day',
+							tooltipFormat: wpforms_dashboard_widget.date_format,
 						},
 						distribution: 'series',
 						ticks       : {

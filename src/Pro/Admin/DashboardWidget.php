@@ -8,6 +8,7 @@ use DateTime;
 use Exception;
 use WP_Post;
 use WPForms\Admin\Dashboard\Widget;
+use WPForms\Admin\Helpers\Datepicker;
 use WPForms\Pro\Reports\EntriesCount;
 
 /**
@@ -178,7 +179,7 @@ class DashboardWidget extends Widget {
 			'wpforms-chart',
 			WPFORMS_PLUGIN_URL . 'assets/lib/chart.min.js',
 			[ 'moment' ],
-			'2.7.2',
+			'2.9.4',
 			true
 		);
 
@@ -196,6 +197,7 @@ class DashboardWidget extends Widget {
 			[
 				'nonce'            => wp_create_nonce( 'wpforms_' . static::SLUG . '_nonce' ),
 				'slug'             => static::SLUG,
+				'date_format'      => sanitize_text_field( Datepicker::get_wp_date_format_for_momentjs() ),
 				'empty_chart_html' => $this->get_empty_chart_html(),
 				'chart_data'       => $this->get_entries_count_by(
 					'date',

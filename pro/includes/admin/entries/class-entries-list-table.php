@@ -1974,6 +1974,9 @@ class WPForms_Entries_Table extends WP_List_Table {
 		$value = array_slice( $lines, 0, $lines_limit );
 		$value = implode( PHP_EOL, $value );
 
+		// Encode HTML entities back to prevent XSS.
+		$value = htmlentities( $value, ENT_COMPAT, 'UTF-8' );
+
 		if ( strlen( $value ) > $chars_limit ) {
 			return mb_substr( $value, 0, $chars_limit ) . '&hellip;';
 		}

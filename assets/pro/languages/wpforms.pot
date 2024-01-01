@@ -1,22 +1,22 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms 1.8.5.2\n"
+"Project-Id-Version: WPForms 1.8.5.4\n"
 "Report-Msgid-Bugs-To: https://wpforms.com/support/\n"
 "Last-Translator: WPForms <support@wpforms.com>\n"
 "Language-Team: WPForms <support@wpforms.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-11-20T18:30:47+00:00\n"
+"POT-Creation-Date: 2023-12-26T16:00:12+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.6.0\n"
+"X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: wpforms\n"
 
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: src/Pro/Access/Integrations.php:101
 #: src/Pro/Access/Integrations.php:158
-#: src/Pro/Admin/DashboardWidget.php:231
+#: src/Pro/Admin/DashboardWidget.php:233
 #: src/Pro/Admin/SiteHealth.php:37
 msgid "WPForms"
 msgstr ""
@@ -139,8 +139,8 @@ msgstr ""
 #: pro/includes/admin/class-license.php:607
 #: pro/templates/education/admin/did-you-know.php:30
 #: src/Pro/Admin/Builder/LicenseAlert.php:134
-#: src/Pro/Admin/DashboardWidget.php:303
-#: src/Pro/Admin/DashboardWidget.php:632
+#: src/Pro/Admin/DashboardWidget.php:305
+#: src/Pro/Admin/DashboardWidget.php:634
 #: src/Pro/Forms/Fields/Layout/Builder.php:245
 msgid "Learn More"
 msgstr ""
@@ -260,8 +260,8 @@ msgid "Field #%d"
 msgstr ""
 
 #: pro/includes/admin/entries/class-entries-list-table.php:466
-#: pro/includes/admin/entries/class-entries-list-table.php:2010
-#: pro/includes/admin/entries/class-entries-list-table.php:2019
+#: pro/includes/admin/entries/class-entries-list-table.php:2013
+#: pro/includes/admin/entries/class-entries-list-table.php:2022
 #: pro/includes/admin/entries/class-entries-single.php:1680
 #: src/Pro/Admin/Entries/Export/Ajax.php:976
 msgid "N/A"
@@ -554,9 +554,9 @@ msgstr ""
 #: pro/includes/admin/entries/class-entries-list.php:1090
 #: pro/wpforms-pro.php:639
 #: src/Pro/Admin/AdminBarMenu.php:96
-#: src/Pro/Admin/DashboardWidget.php:211
-#: src/Pro/Admin/Entries/Overview/Page.php:125
-#: src/Pro/Admin/Entries/Overview/Page.php:182
+#: src/Pro/Admin/DashboardWidget.php:213
+#: src/Pro/Admin/Entries/Overview/Page.php:126
+#: src/Pro/Admin/Entries/Overview/Page.php:183
 #: src/Pro/Admin/Settings/Access.php:372
 msgid "Entries"
 msgstr ""
@@ -2665,6 +2665,24 @@ msgstr ""
 msgid "Delete Others' Forms Entries"
 msgstr ""
 
+#: src/Pro/Admin/Addons/GoogleSheets.php:101
+msgid "Important Update for Google Sheets Addon Users"
+msgstr ""
+
+#. translators: %1$s - Google Sheets Re-Authentication doc link.
+#: src/Pro/Admin/Addons/GoogleSheets.php:104
+msgid "The Google Sheets addon for WPForms will be updated soon. All users who are sending entries to Google Sheets will need to <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">update the addon and re-authenticate their Google connection</a> as soon as version 2.0 becomes available to avoid interruptions in service."
+msgstr ""
+
+#: src/Pro/Admin/Addons/GoogleSheets.php:124
+msgid "Urgent Action Required for Google Sheets Addon Users"
+msgstr ""
+
+#. translators: %1$s - Google Sheets Re-Authentication doc link.
+#: src/Pro/Admin/Addons/GoogleSheets.php:127
+msgid "WPForms Google Sheets addon version 2.0 is now available. All users who are sending entries to Google Sheets need to <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">update the addon and re-authenticate their Google connection</a> as soon as possible to avoid interruptions in service."
+msgstr ""
+
 #: src/Pro/Admin/Builder/AntiSpam.php:47
 msgid "Your keyword filter list has been reformatted. Please save these changes."
 msgstr ""
@@ -2764,84 +2782,84 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:207
-#: src/Pro/Admin/DashboardWidget.php:595
+#: src/Pro/Admin/DashboardWidget.php:209
+#: src/Pro/Admin/DashboardWidget.php:597
 msgid "Show More"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:208
+#: src/Pro/Admin/DashboardWidget.php:210
 msgid "Show Less"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:210
-#: src/Pro/Admin/DashboardWidget.php:323
-#: src/Pro/Admin/DashboardWidget.php:371
-#: src/Pro/Admin/Entries/Overview/Page.php:285
+#: src/Pro/Admin/DashboardWidget.php:212
+#: src/Pro/Admin/DashboardWidget.php:325
+#: src/Pro/Admin/DashboardWidget.php:373
+#: src/Pro/Admin/Entries/Overview/Page.php:286
 msgid "Total Entries"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:212
+#: src/Pro/Admin/DashboardWidget.php:214
 msgid "Form Entries"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:292
+#: src/Pro/Admin/DashboardWidget.php:294
 msgid "Sullie the WPForms mascot"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:293
+#: src/Pro/Admin/DashboardWidget.php:295
 msgid "Create Your First Form to Start Collecting Leads"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:294
+#: src/Pro/Admin/DashboardWidget.php:296
 msgid "You can use WPForms to build contact forms, surveys, payment forms, and more with just a few clicks."
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:298
+#: src/Pro/Admin/DashboardWidget.php:300
 msgid "Create Your Form"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:343
-#: src/Pro/Admin/Entries/Overview/Page.php:237
+#: src/Pro/Admin/DashboardWidget.php:345
+#: src/Pro/Admin/Entries/Overview/Page.php:238
 #: src/Pro/Admin/Entries/Overview/Table.php:319
 msgid "Reset chart to display all forms"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:418
+#: src/Pro/Admin/DashboardWidget.php:420
 msgid "No entries for selected period."
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:548
+#: src/Pro/Admin/DashboardWidget.php:550
 #: src/Pro/Admin/Entries/Overview/Table.php:323
 msgid "Display only this form data in the graph"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:552
+#: src/Pro/Admin/DashboardWidget.php:554
 msgid "Reset graph to display all forms"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:594
+#: src/Pro/Admin/DashboardWidget.php:596
 msgid "Show all forms"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:624
+#: src/Pro/Admin/DashboardWidget.php:626
 msgid "Recommended Plugin:"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:629
+#: src/Pro/Admin/DashboardWidget.php:631
 msgid "Install"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:635
+#: src/Pro/Admin/DashboardWidget.php:637
 msgid "Dismiss recommended plugin"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:654
-#: src/Pro/Admin/Entries/Overview/Page.php:287
+#: src/Pro/Admin/DashboardWidget.php:656
+#: src/Pro/Admin/Entries/Overview/Page.php:288
 msgid "No entries for selected period"
 msgstr ""
 
-#: src/Pro/Admin/DashboardWidget.php:655
-#: src/Pro/Admin/Entries/Overview/Page.php:288
+#: src/Pro/Admin/DashboardWidget.php:657
+#: src/Pro/Admin/Entries/Overview/Page.php:289
 msgid "Please select a different period or check back later."
 msgstr ""
 
@@ -3414,11 +3432,11 @@ msgstr ""
 msgid "IP Address"
 msgstr ""
 
-#: src/Pro/Admin/Entries/Overview/Page.php:161
+#: src/Pro/Admin/Entries/Overview/Page.php:162
 msgid "Number of forms per page:"
 msgstr ""
 
-#: src/Pro/Admin/Entries/Overview/Page.php:236
+#: src/Pro/Admin/Entries/Overview/Page.php:237
 msgid "All Forms"
 msgstr ""
 

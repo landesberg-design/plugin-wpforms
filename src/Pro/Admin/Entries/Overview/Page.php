@@ -105,7 +105,7 @@ class Page {
 			'wpforms-chart',
 			WPFORMS_PLUGIN_URL . 'assets/lib/chart.min.js',
 			[ 'moment' ],
-			'2.7.2',
+			'2.9.4',
 			true
 		);
 
@@ -118,10 +118,11 @@ class Page {
 		);
 
 		$admin_l10n = [
-			'settings'  => $this->get_chart_settings(),
-			'locale'    => sanitize_key( wpforms_get_language_code() ),
-			'delimiter' => Datepicker::TIMESPAN_DELIMITER,
-			'i18n'      => [
+			'settings'    => $this->get_chart_settings(),
+			'locale'      => sanitize_key( wpforms_get_language_code() ),
+			'date_format' => sanitize_text_field( Datepicker::get_wp_date_format_for_momentjs() ),
+			'delimiter'   => Datepicker::TIMESPAN_DELIMITER,
+			'i18n'        => [
 				'label' => esc_html__( 'Entries', 'wpforms' ),
 			],
 		];

@@ -100,6 +100,13 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		delimiter: l10n.delimiter,
 
 		/**
+		 * The Moment.js compatible format string to use for the tooltip.
+		 *
+		 * @since 1.8.5.4
+		 */
+		tooltipFormat: l10n.date_format,
+
+		/**
 		 * Table heading. Possible options are "All Forms" or particular form name.
 		 *
 		 * @since 1.8.2
@@ -236,6 +243,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 								maxBarThickness: 100,
 								time: {
 									unit: 'day',
+									tooltipFormat: this.tooltipFormat,
 									displayFormats: {
 										day: this.xAxesDisplayFormat,
 									},
