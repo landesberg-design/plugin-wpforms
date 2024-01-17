@@ -11,6 +11,13 @@ use WPForms\Admin\Notice;
 class WPForms_License {
 
 	/**
+	 * License update time option name.
+	 *
+	 * @since 1.8.6
+	 */
+	const LICENSE_UPDATE_TIME_OPTION = 'wpforms_license_updates';
+
+	/**
 	 * Store any license error messages.
 	 *
 	 * @since 1.0.0
@@ -184,34 +191,37 @@ class WPForms_License {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return void Return early if the transient has not expired yet.
+	 * @return void Return early if the license update time has not expired yet.
 	 */
 	public function maybe_validate_key() {
 
 		$key = $this->get();
 
 		if ( ! $key ) {
-			// Flush timestamp interval when key is missing or not available.
-			delete_option( 'wpforms_license_updates' );
+			// Prevent one extra DB request on delete_option() when it does not exist.
+			if ( false !== get_option( self::LICENSE_UPDATE_TIME_OPTION ) ) {
+				// Flush timestamp interval when key is missing or not available.
+				delete_option( self::LICENSE_UPDATE_TIME_OPTION );
+			}
 
 			return;
 		}
 
 		// Perform a request to validate the key once a day.
-		$timestamp = get_option( 'wpforms_license_updates' );
+		$time = time();
 
-		if ( ! $timestamp ) {
-			$timestamp = strtotime( '+24 hours' );
-			update_option( 'wpforms_license_updates', $timestamp );
+		if ( $time < (int) get_option( self::LICENSE_UPDATE_TIME_OPTION ) ) {
+			return;
+		}
+
+		$update = update_option( self::LICENSE_UPDATE_TIME_OPTION, strtotime( '+24 hours' ) );
+
+		// Get option again to check that update_option was successful, and the option was not altered by any filters.
+		if (
+			$update &&
+			$time < (int) get_option( self::LICENSE_UPDATE_TIME_OPTION )
+		) {
 			$this->validate_key( $key );
-		} else {
-			$current_timestamp = time();
-			if ( $current_timestamp < $timestamp ) {
-				return;
-			} else {
-				update_option( 'wpforms_license_updates', strtotime( '+24 hours' ) );
-				$this->validate_key( $key );
-			}
 		}
 	}
 
@@ -497,18 +507,20 @@ class WPForms_License {
 		// If there is no license key, output nag about ensuring key is set for automatic updates.
 		if ( ! $key ) {
 			$notice = sprintf(
-				wp_kses( /* translators: %s - plugin settings page URL. */
-					__( 'Please <a href="%s">enter and activate</a> your license key for WPForms to enable automatic updates.', 'wpforms' ),
+				wp_kses( /* translators: %s - Link to the Settings > General screen in the plugin, where users can enter their license key. */
+					__( 'To access addons and enable automatic updates, please <a href="%s" target="_blank">enter and activate your license key.</a>', 'wpforms' ),
 					[
 						'a' => [
-							'href' => [],
+							'href'   => [],
+							'target' => [],
+							'rel'    => [],
 						],
 					]
 				),
-				esc_url( add_query_arg( [ 'page' => 'wpforms-settings' ], admin_url( 'admin.php' ) ) )
+				esc_url( admin_url( 'admin.php?page=wpforms-settings' ) )
 			);
 
-			Notice::info(
+			Notice::error(
 				$notice,
 				[ 'class' => $class ]
 			);
@@ -527,7 +539,7 @@ class WPForms_License {
 			'https://wpforms.com/account/licenses/'
 		);
 
-		// Set the learn more url.
+		// Set the "Learn more" url.
 		$learn_more_url = add_query_arg(
 			[
 				'utm_source'   => 'WordPress',

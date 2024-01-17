@@ -61,7 +61,7 @@ class Divi extends \WPForms\Integrations\Divi\Divi {
 		}
 
 		wp_enqueue_style(
-			"wpforms-pro-{$styles_name}",
+			"wpforms-divi-pro-{$styles_name}",
 			WPFORMS_PLUGIN_URL . "assets/pro/css/integrations/divi/wpforms-{$styles_name}{$min}.css",
 			[],
 			WPFORMS_VERSION

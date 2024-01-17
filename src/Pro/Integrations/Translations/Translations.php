@@ -25,6 +25,15 @@ class Translations implements IntegrationInterface {
 	private $plugins = [];
 
 	/**
+	 * List of wpforms addons.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @var array
+	 */
+	private $addons = [];
+
+	/**
 	 * List of installed translations.
 	 *
 	 * @since 1.6.5
@@ -146,7 +155,11 @@ class Translations implements IntegrationInterface {
 	 */
 	private function is_wpforms_plugin( $slug ) {
 
-		return strpos( $slug, 'wpforms' ) === 0 && $slug !== 'wpforms-lite';
+		if ( empty( $this->addons ) ) {
+			$this->addons = wpforms()->get( 'addons_cache' )->get();
+		}
+
+		return array_key_exists( $slug, $this->addons ) || $slug === 'wpforms';
 	}
 
 	/**
@@ -318,6 +331,12 @@ class Translations implements IntegrationInterface {
 		}
 
 		set_site_transient( $this->get_cache_key( $slug ), $translations );
+
+		wpforms_log(
+			'Fetched translations',
+			[ 'slug' => $slug ],
+			[ 'type' => 'translation' ]
+		);
 
 		return $translations;
 	}

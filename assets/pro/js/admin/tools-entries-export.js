@@ -32,6 +32,7 @@ const WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document
 		$optionFields            : $( '#wpforms-tools-entries-export-options-type-info' ),
 		$selectStatuses          : $( '#wpforms-tools-entries-export-select-statuses' ),
 		$optionStatuses          : $( '#wpforms-tools-entries-export-options-status' ),
+		$clearDateButton         : $( '.wpforms-clear-datetime-field' ),
 	};
 
 	/**
@@ -137,6 +138,16 @@ const WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document
 			// Display dynamic columns notice.
 			$( document ).on( 'change', '#wpforms-tools-entries-export-options-type-info input', function() {
 				app.switchDynamicColumnsNotice( $( this ) );
+			} );
+
+			// Clear date field.
+			$( document ).on( 'click', '.wpforms-clear-datetime-field', function( e ) {
+				e.preventDefault();
+				el.$dateFlatpickr.flatpickr().clear();
+				$( this ).addClass( 'wpforms-hidden' );
+
+				// Reinitialization date range input to correct work after clear.
+				app.initDateRange();
 			} );
 		},
 
@@ -249,7 +260,7 @@ const WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document
 					}
 				} )
 				.fail( function( jqXHR, textStatus, errorThrown ) {
-					app.displayFormsMessage( i18n.error_prefix + ':<br>' + errorThrown );
+					app.displayFormsMessage( i18n.error_prefix + '<br>' + errorThrown );
 					el.$expOptions.addClass( 'hidden' );
 				} )
 				.always( function() {
@@ -289,7 +300,7 @@ const WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document
 				} )
 				.fail( function( jqXHR, textStatus, errorThrown ) {
 					clearTimeout( vars.timerId );
-					app.displaySubmitMessage( i18n.error_prefix + ':<br>' + errorThrown, 'error' );
+					app.displaySubmitMessage( i18n.error_prefix + '<br>' + errorThrown, 'error' );
 				} )
 				.always( function() {
 					app.displaySubmitSpinner( false );
@@ -468,6 +479,9 @@ const WPFormsEntriesExport = window.WPFormsEntriesExport || ( function( document
 				locale: flatpickrLocale,
 				mode: 'range',
 				defaultDate: wpforms_tools_entries_export.dates,
+				onChange( selectedDates ) {
+					el.$clearDateButton.toggleClass( 'wpforms-hidden', selectedDates.length !== 2 );
+				},
 			} );
 		},
 

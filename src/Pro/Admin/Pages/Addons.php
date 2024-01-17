@@ -2,6 +2,8 @@
 
 namespace WPForms\Pro\Admin\Pages;
 
+use WPForms\Admin\Notice;
+
 /**
  * Addons page for Pro.
  *
@@ -155,60 +157,64 @@ class Addons {
 		}
 
 		?>
-		<div id="wpforms-admin-addons" class="wrap wpforms-admin-wrap">
+		<div id="wpforms-admin-addons" class="wrap wpforms-admin-wrap wpforms-addons">
+			<h1 class="wpforms-addons-header">
+				<span class="wpforms-addons-header-title">
+					<?php esc_html_e( 'WPForms Addons', 'wpforms' ); ?>
 
-			<h1 class="page-title">
-				<?php esc_html_e( 'WPForms Addons', 'wpforms' ); ?>
-				<a href="<?php echo esc_url_raw( add_query_arg( [ 'wpforms_refresh_addons' => '1' ] ) ); ?>" class="page-title-action wpforms-btn add-new-h2 wpforms-btn-orange" data-action="update">
-					<svg viewBox="0 0 20 14" class="page-title-action-icon">
-						<path d="M10.2 0a7.3 7.3 0 0 1 7.22 6.25h2.16l-3.64 4.17-3.65-4.17h2.42a4.62 4.62 0 0 0-4.5-3.6c-1.51 0-2.84.75-3.69 1.86L4.74 2.48A7.26 7.26 0 0 1 10.21 0Zm-.4 14a7.3 7.3 0 0 1-7.22-6.25H.42l3.64-4.17 3.65 4.17H5.29a4.62 4.62 0 0 0 4.5 3.6c1.51 0 2.85-.75 3.69-1.86l1.78 2.03A7.24 7.24 0 0 1 9.79 14Z"/>
-					</svg>
-					<span class="page-title-action-text"><?php esc_html_e( 'Refresh Addons', 'wpforms' ); ?></span>
-				</a>
-				<input type="search" placeholder="<?php esc_attr_e( 'Search Addons', 'wpforms' ); ?>" id="wpforms-admin-addons-search">
+					<a href="<?php echo esc_url( add_query_arg( [ 'wpforms_refresh_addons' => '1' ] ) ); ?>" class="wpforms-addons-link" data-action="update">
+						<?php esc_html_e( 'Refresh Addons', 'wpforms' ); ?>
+					</a>
+				</span>
+
+				<span class="wpforms-addons-header-search">
+					<input type="search" placeholder="<?php esc_attr_e( 'Search Addons', 'wpforms' ); ?>" id="wpforms-addons-search">
+				</span>
 			</h1>
 
 			<?php
-
 			if ( empty( $this->addons ) ) {
 				echo '</div>';
 
 				return;
 			}
 
-			echo '<div class="wpforms-admin-content">';
+			$installed_addons = $this->get_addons_grid( 'activated' );
+			$all_addons       = $this->get_addons_grid( 'all' );
 
-				if ( ! empty( $this->license_type ) ) {
+			?>
 
-					if ( ! $this->refresh ) {
-						echo '<p class="intro">' .
-							sprintf(
-								wp_kses(
-									/* translators: %s - refresh addons page URL. */
-									__( 'Improve your forms with our premium addons. Missing an addon that you think you should be able to see? Click the <a href="%s">Refresh Addons</a> button above.', 'wpforms' ),
-									[
-										'a' => [
-											'href' => [],
-										],
-									]
-								),
-								esc_url_raw( add_query_arg( [ 'wpforms_refresh_addons' => '1' ] ) )
-							) .
-							'</p>';
-					}
+				<div class="wpforms-admin-content">
+					<?php if ( $installed_addons ) : ?>
+						<div id="wpforms-addons-list-section-installed" class="wpforms-addons-list-section">
+							<h3 class="wpforms-addons-list-section-title">
+								<?php esc_html_e( 'Activated Addons', 'wpforms' ); ?>
+							</h3>
 
-					echo '<h4 id="addons-heading" data-text="' . esc_attr__( 'Available Addons', 'wpforms' ) . '">' . esc_html__( 'Available Addons', 'wpforms' ) . '</h4>';
-				}
+							<div class="list wpforms-addons-list">
+								<?php echo $installed_addons; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</div>
+						</div>
+					<?php endif; ?>
 
-				echo '<div id="wpforms-admin-addons-list">';
+					<?php if ( $all_addons ) : ?>
+						<div id="wpforms-addons-list-section-all" class="wpforms-addons-list-section">
+							<h3 class="wpforms-addons-list-section-title">
+								<?php esc_html_e( 'All Addons', 'wpforms' ); ?>
+							</h3>
 
-				$this->print_addons_list();
+							<div class="list wpforms-addons-list">
+								<?php echo $all_addons; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</div>
+						</div>
+					<?php endif; ?>
 
-				echo '</div>';
-
-			echo '</div>';
-
-		echo '</div>';
+					<div id="wpforms-addons-no-results">
+						<?php esc_html_e( 'Sorry, we didn\'t find any addons that match your criteria.', 'wpforms' ); ?>
+					</div>
+				</div>
+			</div>
+		<?php
 	}
 
 	/**
@@ -221,102 +227,20 @@ class Addons {
 		$errors = wpforms()->get( 'license' )->get_errors();
 
 		if ( empty( $this->addons ) ) {
-			\WPForms\Admin\Notice::error( esc_html__( 'There was an issue retrieving Addons for this site. Please click on the button above to refresh.', 'wpforms' ) );
+			Notice::error( esc_html__( 'There was an issue retrieving Addons for this site. Please click on the button above to refresh.', 'wpforms' ) );
 
 			return;
 		}
 
 		if ( ! empty( $errors ) ) {
-			\WPForms\Admin\Notice::error( esc_html__( 'In order to get access to Addons, you need to resolve your license key errors.', 'wpforms' ) );
+			Notice::error( esc_html__( 'In order to get access to Addons, you need to resolve your license key errors.', 'wpforms' ) );
 
 			return;
 		}
 
 		if ( $this->refresh ) {
-			\WPForms\Admin\Notice::success( esc_html__( 'Addons have successfully been refreshed.', 'wpforms' ) );
+			Notice::success( esc_html__( 'Addons have successfully been refreshed.', 'wpforms' ) );
 		}
-
-		if ( empty( $this->license_type ) ) {
-			\WPForms\Admin\Notice::error(
-				sprintf(
-					wp_kses( /* translators: %s - WPForms plugin settings URL. */
-						__( 'To access addons please enter and activate your WPForms license key in the plugin <a href="%s">settings</a>.', 'wpforms' ),
-						[
-							'a' => [
-								'href' => [],
-							],
-						]
-					),
-					esc_url_raw( add_query_arg( [ 'page' => 'wpforms-settings' ], admin_url( 'admin.php' ) ) )
-				)
-			);
-		}
-	}
-
-	/**
-	 * Print addons list.
-     *
-     * @since 1.6.7
-     */
-	private function print_addons_list() {
-
-		$type = wpforms_get_license_type();
-
-		if ( ! $type ) :
-
-			$this->print_addons_grid( $this->addons, [ 'basic', 'plus', 'pro', 'agency' ] );
-
-		elseif ( $type === 'basic' ) :
-
-			$this->print_addons_grid( $this->addons, [ 'basic' ] );
-			$this->print_unlock_features();
-			$this->print_addons_grid( $this->addons, [ 'plus', 'pro', 'agency' ] );
-
-		elseif ( $type === 'plus' ) :
-
-			$this->print_addons_grid( $this->addons, [ 'basic', 'plus' ] );
-			$this->print_unlock_features();
-			$this->print_addons_grid( $this->addons, [ 'pro', 'agency' ] );
-
-		elseif ( $type === 'pro' ) :
-
-			$this->print_addons_grid( $this->addons, [ 'basic', 'plus', 'pro' ] );
-			$this->print_unlock_features();
-			$this->print_addons_grid( $this->addons, [ 'agency' ] );
-
-		elseif ( in_array( $type, [ 'elite', 'agency', 'ultimate' ], true ) ) :
-
-			$this->print_addons_grid( $this->addons, [ 'basic', 'plus', 'pro', 'agency' ] );
-
-		endif;
-	}
-
-	/**
-	 * Print unlock features message.
-     *
-     * @since 1.6.7
-     */
-	private function print_unlock_features() {
-
-		echo '<div class="unlock-msg">';
-			echo '<h4>' . esc_html__( 'Unlock More Features...', 'wpforms' ) . '</h4>';
-			echo '<p>' .
-				sprintf(
-					wp_kses(
-						/* translators: %s - WPForms.com Account page URL. */
-						__( 'Want to get even more features? <a href="%s" target="_blank" rel="noopener noreferrer">Upgrade your WPForms account</a> and unlock the following extensions.', 'wpforms' ),
-						[
-							'a' => [
-								'href'   => [],
-								'target' => [],
-								'rel'    => [],
-							],
-						]
-					),
-					esc_url( wpforms_utm_link( 'https://wpforms.com/account/', 'addons', 'Upgrade For More Addons' ) )
-				) .
-			'</p>';
-		echo '</div>';
 	}
 
 	/**
@@ -324,28 +248,54 @@ class Addons {
 	 *
      * @since 1.6.7
 	 *
-	 * @param array $addons    List of addons.
-	 * @param array $type_show License type to show.
+	 * @param string $section Section name.
 	 */
-	public function print_addons_grid( $addons, $type_show ) {
+	public function get_addons_grid( string $section ) {
 
-		echo '<div class="list">';
+		ob_start();
 
-		foreach ( $addons as $id => $addon ) {
+		foreach ( $this->addons as $id => $addon ) {
 			$addon = (array) $addon;
+			$addon = wpforms()->get( 'addons' )->get_addon( $addon['slug'] );
 
-			if ( ! $this->is_allow_to_show( $addon['license'], $type_show ) ) {
+			if ( ! $this->should_display_addon( $addon, $section ) ) {
 				continue;
 			}
 
-			$this->print_addon( $addon );
-
-			if ( ! empty( $this->addons[ $id ] ) ) {
+			if ( $section === 'activated' ) {
 				unset( $this->addons[ $id ] );
 			}
+
+			$this->print_addon( $addon );
 		}
 
-		echo '</div>';
+		return ob_get_clean();
+	}
+
+	/**
+	 * Determine if addon should be displayed.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @param array  $addon   Addon information.
+	 * @param string $section Section name.
+	 */
+	private function should_display_addon( array $addon, string $section ): bool {
+
+		$should_display = false;
+
+		if ( $section === 'activated' ) {
+			$allowed_statuses     = [ 'active' ];
+			$current_license_type = wpforms_get_license_type();
+
+			$should_display = in_array( $addon['status'], $allowed_statuses, true ) && in_array( $current_license_type, $addon['license'], true );
+		} elseif ( $section === 'all' ) {
+			$allowed_statuses = [ 'active', 'installed', 'missing' ];
+
+			$should_display = in_array( $addon['status'], $allowed_statuses, true );
+		}
+
+		return $should_display;
 	}
 
 	/**
@@ -357,7 +307,6 @@ class Addons {
 	 */
 	private function print_addon( $addon ) {
 
-		$addon = wpforms()->get( 'addons' )->get_addon( $addon['slug'] );
 		$image = ! empty( $addon['icon'] ) ? $addon['icon'] : 'sullie.png';
 		$url   = add_query_arg(
 			[
@@ -376,12 +325,13 @@ class Addons {
 		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			'admin/addons-item',
 			[
-				'addon'        => $addon,
-				'status_label' => $this->get_addon_status_label( $addon['status'] ),
-				'image'        => WPFORMS_PLUGIN_URL . 'assets/images/' . $image,
-				'url'          => $url,
-				'button'       => $this->get_addon_button_html( $addon ),
-				'recommended'  => isset( $addon['recommended'] ) ? $addon['recommended'] : false,
+				'addon'             => $addon,
+				'image'             => WPFORMS_PLUGIN_URL . 'assets/images/' . $image,
+				'url'               => $url,
+				'button'            => $this->get_addon_button_html( $addon ),
+				'recommended'       => isset( $addon['recommended'] ) ? $addon['recommended'] : false,
+				'has_settings_link' => $this->has_settings_link( $addon['slug'] ),
+				'settings_url'      => $this->get_settings_link( $addon['slug'] ),
 			],
 			true
 		);
@@ -400,7 +350,7 @@ class Addons {
 
 		if ( $addon['action'] === 'upgrade' || $addon['action'] === 'license' || ! $addon['plugin_allow'] ) {
 			return sprintf(
-				'<a href="%1$s" target="_blank" rel="noopener noreferrer" class="wpforms-btn wpforms-btn-orange">%2$s</a>',
+				'<a href="%1$s" target="_blank" rel="noopener noreferrer" class="button button-secondary wpforms-upgrade-modal">%2$s</a>',
 				add_query_arg(
 					[
 						'utm_content' => $addon['title'],
@@ -411,75 +361,190 @@ class Addons {
 			);
 		}
 
-		$html = '';
+		ob_start();
 
-		switch ( $addon['status'] ) {
-			case 'active':
-				$html  = '<button class="status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_attr( $addon['path'] ) . '" data-type="addon">';
-				$html .= '<i class="fa fa-toggle-on" aria-hidden="true"></i>';
-				$html .= esc_html__( 'Deactivate', 'wpforms' );
-				$html .= '</button>';
-				break;
+		?>
+			<span class="wpforms-toggle-control">
+				<label for="wpforms-addons-toggle-<?php echo esc_attr( $addon['slug'] ); ?>" class="wpforms-toggle-control-status" data-on="<?php esc_attr_e( 'Activated', 'wpforms' ); ?>" data-off="<?php esc_attr_e( 'Deactivated', 'wpforms' ); ?>">
+					<?php if ( $addon['status'] === 'active' ) : ?>
+						<?php esc_html_e( 'Activated', 'wpforms' ); ?>
+					<?php else : ?>
+						<?php esc_html_e( 'Deactivated', 'wpforms' ); ?>
+					<?php endif; ?>
+				</label>
+				<input type="checkbox" id="wpforms-addons-toggle-<?php echo esc_attr( $addon['slug'] ); ?>" name="wpforms-addons-toggle" value="1" <?php echo checked( $addon['status'] === 'active' ); ?>>
+				<label class="wpforms-toggle-control-icon" for="wpforms-addons-toggle-<?php echo esc_attr( $addon['slug'] ); ?>"></label>
+			</span>
 
-			case 'installed':
-				$html  = '<button class="status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_attr( $addon['path'] ) . '" data-type="addon">';
-				$html .= '<i class="fa fa-toggle-on fa-flip-horizontal" aria-hidden="true"></i>';
-				$html .= esc_html__( 'Activate', 'wpforms' );
-				$html .= '</button>';
-				break;
+			<?php if ( $addon['status'] === 'missing' && $this->can_install ) : ?>
+				<button class="status-missing button button-secondary">
+					<?php esc_html_e( 'Install Addon', 'wpforms' ); ?>
+				</button>
+			<?php endif; ?>
+		<?php
 
-			case 'missing':
-				if ( ! $this->can_install ) {
-					break;
-				}
-				$html  = '<button class="status-' . esc_attr( $addon['status'] ) . '" data-plugin="' . esc_url( $addon['url'] ) . '" data-type="addon">';
-				$html .= '<i class="fa fa-cloud-download" aria-hidden="true"></i>';
-				$html .= esc_html__( 'Install Addon', 'wpforms' );
-				$html .= '</button>';
-				break;
-		}
-
-		return $html;
+		return ob_get_clean();
 	}
 
 	/**
-	 * Is allow to show.
+	 * Determine if addon has settings link.
 	 *
-	 * @since 1.6.7
+	 * @since 1.8.6
 	 *
-	 * @param array $types     List of addon license types.
-	 * @param array $type_show List of license types to show.
+	 * @param string $slug Addon slug.
 	 *
 	 * @return bool
 	 */
-	private function is_allow_to_show( $types, $type_show ) {
+	private function has_settings_link( string $slug ): bool {
 
-		foreach ( $types as $type ) {
-			if ( in_array( $type, $type_show, true ) ) {
-				return true;
+		$addons_with_link = $this->get_addons_with_settings_link();
+
+		$has_settings_link = false;
+
+		foreach ( $addons_with_link as $addons ) {
+			if ( in_array( $slug, $addons, true ) ) {
+				$has_settings_link = true;
+
+				break;
 			}
 		}
 
-		return false;
+		return $has_settings_link;
 	}
 
 	/**
-     * Get addon status label.
-     *
-     * @since 1.6.7
-     *
-	 * @param string $status Addon status.
+	 * Get addons with settings link.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @return array
+	 */
+	private function get_addons_with_settings_link(): array {
+
+		return [ // phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+			'tab'          => [
+				'wpforms-geolocation',
+			],
+			'integrations' => [
+				'wpforms-aweber',
+				'wpforms-mailchimp',
+				'wpforms-google-sheets',
+				'wpforms-sendinblue',
+				'wpforms-zapier',
+				'wpforms-activecampaign',
+				'wpforms-campaign-monitor',
+				'wpforms-drip',
+				'wpforms-getresponse',
+				'wpforms-hubspot',
+				'wpforms-mailerlite',
+				'wpforms-salesforce',
+			],
+			'payments'     => [
+				'wpforms-stripe',
+				'wpforms-paypal-commerce',
+				'wpforms-square',
+				'wpforms-authorize-net',
+			],
+		];
+	}
+
+	/**
+	 * Get addon settings link.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @param string $slug Addon slug.
 	 *
 	 * @return string
 	 */
-	private function get_addon_status_label( $status ) {
+	private function get_settings_link( string $slug ): string {
 
-		$label = [
-			'active'    => esc_html__( 'Active', 'wpforms' ),
-			'installed' => esc_html__( 'Inactive', 'wpforms' ),
-			'missing'   => esc_html__( 'Not Installed', 'wpforms' ),
-		];
+		$addons_with_link = $this->get_addons_with_settings_link();
+		$addon_section    = $this->get_settings_link_section( $slug, $addons_with_link );
+		$clear_slug       = $this->get_clean_slug( $slug );
 
-		return isset( $label[ $status ] ) ? $label[ $status ] : '';
+		switch ( $addon_section ) {
+			case 'tab':
+				$link = add_query_arg(
+					[
+						'page' => 'wpforms-settings',
+						'view' => $clear_slug,
+					],
+					admin_url( 'admin.php' )
+				);
+				break;
+
+			case 'integrations':
+				$link = add_query_arg(
+					[
+						'page'  => 'wpforms-settings',
+						'view'  => 'integrations',
+						'addon' => $clear_slug,
+					],
+					admin_url( 'admin.php' )
+				);
+				break;
+
+			case 'payments':
+				$link = add_query_arg(
+					[
+						'page' => 'wpforms-settings',
+						'view' => 'payments',
+					],
+					admin_url( "admin.php#wpforms-setting-row-{$clear_slug}-heading" )
+				);
+				break;
+
+			default:
+				$link = '';
+				break;
+		}
+
+		return $link;
+	}
+
+	/**
+	 * Get addon settings link section.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @param string $slug             Addon slug.
+	 * @param array  $addons_with_link Addons with settings link.
+	 *
+	 * @return string
+	 */
+	private function get_settings_link_section( string $slug, array $addons_with_link ): string {
+
+		$addon_section = '';
+
+		foreach ( $addons_with_link as $section => $addons ) {
+			if ( in_array( $slug, $addons, true ) ) {
+				$addon_section = $section;
+
+				break;
+			}
+		}
+
+		return $addon_section;
+	}
+
+	/**
+	 * Get clean addon slug.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @param string $slug Addon slug.
+	 *
+	 * @return string
+	 */
+	private function get_clean_slug( string $slug ): string {
+
+		$clean_slug = str_replace( 'wpforms-', '', $slug );
+
+		if ( $clean_slug === 'authorize-net' ) {
+			$clean_slug = 'authorize_net';
+		}
+
+		return $clean_slug;
 	}
 }

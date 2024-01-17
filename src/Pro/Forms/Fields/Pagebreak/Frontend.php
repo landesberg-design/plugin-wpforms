@@ -46,21 +46,37 @@ class Frontend extends FrontendBase {
 		$filtered_field = apply_filters( 'wpforms_pagedivider_field_display', $field, [], $form_data ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 		$field          = wpforms_list_intersect_key( (array) $filtered_field, $field );
 
-		$frontend_obj = wpforms()->get( 'frontend' );
-		$top          = ! empty( $frontend_obj->pages['top'] ) ? $frontend_obj->pages['top'] : [];
-		$next         = ! empty( $field['next'] ) ? $field['next'] : '';
-		$prev         = ! empty( $field['prev'] ) ? $field['prev'] : '';
-		$align        = ! empty( $top['nav_align'] ) ? 'wpforms-pagebreak-' . $top['nav_align'] : 'wpforms-pagebreak-center';
+		$next = ! empty( $field['next'] ) ? $field['next'] : '';
+		$prev = ! empty( $field['prev'] ) ? $field['prev'] : '';
+
+		if ( ! $this->has_page_button( 'prev', $prev ) && ! $this->has_page_button( 'next', $next ) ) {
+			return;
+		}
 
 		printf(
 			'<div class="wpforms-clear %s">',
-			sanitize_html_class( $align )
+			sanitize_html_class( $this->get_align_buttons_class() )
 		);
 
 		$this->display_page_button( 'prev', $prev, $form_data );
 		$this->display_page_button( 'next', $next, $form_data );
 
 		echo '</div>';
+	}
+
+	/**
+	 * Get align buttons class.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @return string
+	 */
+	private function get_align_buttons_class(): string {
+
+		$frontend_obj = wpforms()->get( 'frontend' );
+		$top          = ! empty( $frontend_obj->pages['top'] ) ? $frontend_obj->pages['top'] : [];
+
+		return ! empty( $top['nav_align'] ) ? 'wpforms-pagebreak-' . $top['nav_align'] : 'wpforms-pagebreak-center';
 	}
 
 	/**
@@ -76,13 +92,8 @@ class Frontend extends FrontendBase {
 
 		$frontend_obj = wpforms()->get( 'frontend' );
 		$current      = $frontend_obj->pages['current'];
-		$total        = $frontend_obj->pages['total'];
 
-		if (
-			empty( $caption ) ||
-			( $action === 'prev' && $current <= 1 ) ||
-			( $action === 'next' && $current >= $total )
-		) {
+		if ( ! $this->has_page_button( $action, $caption ) ) {
 			return;
 		}
 
@@ -101,6 +112,33 @@ class Frontend extends FrontendBase {
 
 		/** This action is documented in includes/class-frontend.php. */
 		do_action( 'wpforms_display_submit_after', $form_data, 'next' ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+	}
+
+	/**
+	 * Is a button visible for the page?
+	 *
+	 * @since 1.8.6
+	 *
+	 * @param string $action  Prev or next action.
+	 * @param string $caption Button caption.
+	 *
+	 * @return bool
+	 */
+	private function has_page_button( string $action, string $caption ): bool {
+
+		$frontend_obj = wpforms()->get( 'frontend' );
+		$current      = $frontend_obj->pages['current'];
+		$total        = $frontend_obj->pages['total'];
+
+		if ( empty( $caption ) ) {
+			return false;
+		}
+
+		if ( $action === 'prev' && $current <= 1 ) {
+			return false;
+		}
+
+		return ! ( $action === 'next' && $current >= $total );
 	}
 
 	/**

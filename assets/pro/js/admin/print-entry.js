@@ -312,6 +312,12 @@ const WPFormsPrintEntryPage = window.WPFormsPrintEntryPage || ( function( docume
 				'*:last-child {' +
 				'	margin-bottom: 0' +
 				'}' +
+				'ul, ol {' +
+				'	padding-inline-start: 30px;' +
+				'}' +
+				'li {' +
+				'	list-style-position: outside;' +
+				'}' +
 				'pre {' +
 				'	white-space: pre !important;' +
 				'	overflow-x: auto !important;' +

@@ -137,7 +137,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 
 		add_filter( 'wpforms_entry_table_column_value', [ $this, 'entry_table_value' ], 10, 4 );
 
-		add_action( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
+		add_filter( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
 
 		add_filter( "wpforms_pro_fields_entry_preview_get_field_value_{$this->type}_field_after", [ $this, 'entry_preview' ], 10, 3 );
 

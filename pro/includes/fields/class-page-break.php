@@ -111,8 +111,8 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	 *
 	 * @since 1.2.0
 	 *
-	 * @param string $css
-	 * @param array $field
+	 * @param string $css   CSS classes.
+	 * @param array  $field Field data and settings.
 	 *
 	 * @return string
 	 */
@@ -143,7 +143,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 	 */
 	public function display_page_indicator( $form_data ) {
 
-		$top = ! empty( wpforms()->frontend->pages['top'] ) ? wpforms()->frontend->pages['top'] : false;
+		$top = ! empty( wpforms()->get( 'frontend' )->pages['top'] ) ? wpforms()->get( 'frontend' )->pages['top'] : false;
 
 		if ( empty( $top['indicator'] ) ) {
 			return;
@@ -152,7 +152,7 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		$pagebreak = [
 			'indicator' => sanitize_html_class( $top['indicator'] ),
 			'color'     => wpforms_sanitize_hex_color( $top['indicator_color'] ),
-			'pages'     => array_merge( [ wpforms()->frontend->pages['top'] ], wpforms()->frontend->pages['pages'] ),
+			'pages'     => array_merge( [ wpforms()->get( 'frontend' )->pages['top'] ], wpforms()->get( 'frontend' )->pages['pages'] ),
 			'scroll'    => empty( $top['scroll_disabled'] ),
 		];
 		$p         = 1;
@@ -307,12 +307,12 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 			$prev = ! empty( $form_data['settings']['pagebreak_prev'] ) ? $form_data['settings']['pagebreak_prev'] : esc_html__( 'Previous', 'wpforms' );
 
 			echo '<div class="wpforms-field wpforms-field-pagebreak">';
-				printf(
-					'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%d">%s</button>',
-					absint( wpforms()->get( 'frontend' )->pages['current'] + 1 ),
-					absint( $form_data['id'] ),
-					esc_html( $prev )
-				);
+			printf(
+				'<button class="wpforms-page-button wpforms-page-prev" data-action="prev" data-page="%d" data-formid="%d">%s</button>',
+				absint( wpforms()->get( 'frontend' )->pages['current'] + 1 ),
+				absint( $form_data['id'] ),
+				esc_html( $prev )
+			);
 			echo '</div>';
 		}
 
@@ -699,16 +699,19 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		 *
 		 * @since 1.7.9
 		 *
-		 * @param array $form_data  Form data and settings.
-		 * @param array $field      Field data.
+		 * @param array $form_data Form data and settings.
+		 * @param array $field     Field data.
 		 */
 		do_action( 'wpforms_field_page_break_field_preview_before', $this->form_data, $field );
 
 		if ( 'top' !== $position ) {
 			if ( empty( $this->form_data ) ) {
-				$this->form_data = wpforms()->form->get( $this->form_id, [
-					'content_only' => true,
-				] );
+				$this->form_data = wpforms()->get( 'form' )->get(
+					$this->form_id,
+					[
+						'content_only' => true,
+					]
+				);
 			}
 
 			if ( empty( $this->pagebreak ) ) {
@@ -720,38 +723,38 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 			}
 
 			echo '<div class="wpforms-pagebreak-buttons ' . sanitize_html_class( $nav_align ) . '">';
+			printf(
+				'<button class="wpforms-pagebreak-button wpforms-pagebreak-prev %s">%s</button>',
+				sanitize_html_class( $prev_class ),
+				esc_html( $prev )
+			);
+
+			if ( $position !== 'bottom' ) {
 				printf(
-					'<button class="wpforms-pagebreak-button wpforms-pagebreak-prev %s">%s</button>',
-					sanitize_html_class( $prev_class ),
-					esc_html( $prev )
+					'<button class="wpforms-pagebreak-button wpforms-pagebreak-next %s">%s</button>',
+					sanitize_html_class( $next_class ),
+					esc_html( $next )
 				);
 
-				if ( $position !== 'bottom' ) {
-					printf(
-						'<button class="wpforms-pagebreak-button wpforms-pagebreak-next %s">%s</button>',
-						sanitize_html_class( $next_class ),
-						esc_html( $next )
-					);
+				if ( $next_class !== 'wpforms-hidden' ) {
 
-					if ( $next_class !== 'wpforms-hidden' ) {
-
-						/** This action is documented in includes/class-frontend.php. */
-						do_action( 'wpforms_display_submit_after', $this->form_data, 'next' ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
-					}
+					/** This action is documented in includes/class-frontend.php. */
+					do_action( 'wpforms_display_submit_after', $this->form_data, 'next' ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 				}
+			}
 			echo '</div>';
 		}
 
 		// Visual divider.
 		echo '<div class="wpforms-pagebreak-divider">';
-			if ( $position !== 'bottom' ) {
-				printf(
-					'<span class="pagebreak-label">%s <span class="wpforms-pagebreak-title">%s</span></span>',
-					esc_html( $label ),
-					esc_html( $title )
-				);
-			}
-			echo '<span class="line"></span>';
+		if ( $position !== 'bottom' ) {
+			printf(
+				'<span class="pagebreak-label">%s <span class="wpforms-pagebreak-title">%s</span></span>',
+				esc_html( $label ),
+				esc_html( $title )
+			);
+		}
+		echo '<span class="line"></span>';
 		echo '</div>';
 
 		/**
@@ -759,8 +762,8 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		 *
 		 * @since 1.7.9
 		 *
-		 * @param array $form_data  Form data and settings.
-		 * @param array $field      Field data.
+		 * @param array $form_data Form data and settings.
+		 * @param array $field     Field data.
 		 */
 		do_action( 'wpforms_field_page_break_field_preview_after', $this->form_data, $field );
 	}
@@ -811,9 +814,9 @@ class WPForms_Field_Page_Break extends WPForms_Field {
 		$filtered_field = apply_filters( 'wpforms_pagedivider_field_display', $field, $field_atts, $form_data );
 		$field          = wpforms_list_intersect_key( (array) $filtered_field, $field );
 
-		$total   = wpforms()->frontend->pages['total'];
-		$current = wpforms()->frontend->pages['current'];
-		$top     = wpforms()->frontend->pages['top'];
+		$total   = wpforms()->get( 'frontend' )->pages['total'];
+		$current = wpforms()->get( 'frontend' )->pages['current'];
+		$top     = wpforms()->get( 'frontend' )->pages['top'];
 		$next    = ! empty( $field['next'] ) ? $field['next'] : '';
 		$prev    = ! empty( $field['prev'] ) ? $field['prev'] : '';
 		$align   = 'wpforms-pagebreak-center';

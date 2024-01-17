@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use WPForms\Admin\Payments\Views\Overview\Helpers;
 use WPForms\Db\Payments\ValueValidator;
+use WPForms\Pro\Admin\Entries\Page;
 
 /**
  * Display information about a single form entry.
@@ -228,7 +229,7 @@ class WPForms_Entries_Single {
 		// Check for starring.
 		if ( ! empty( $_GET['entry_id'] ) && ! empty( $_GET['action'] ) && 'star' === $_GET['action'] ) {
 
-			wpforms()->entry->update(
+			wpforms()->get( 'entry' )->update(
 				absint( $_GET['entry_id'] ),
 				[
 					'starred' => '1',
@@ -236,7 +237,7 @@ class WPForms_Entries_Single {
 			);
 
 			if ( ! empty( $_GET['form'] ) ) {
-				wpforms()->entry_meta->add(
+				wpforms()->get( 'entry_meta' )->add(
 					[
 						'entry_id' => absint( $_GET['entry_id'] ),
 						'form_id'  => absint( $_GET['form'] ),
@@ -260,7 +261,7 @@ class WPForms_Entries_Single {
 		// Check for unstarring.
 		if ( ! empty( $_GET['entry_id'] ) && ! empty( $_GET['action'] ) && 'unstar' === $_GET['action'] ) {
 
-			wpforms()->entry->update(
+			wpforms()->get( 'entry' )->update(
 				absint( $_GET['entry_id'] ),
 				[
 					'starred' => '0',
@@ -268,7 +269,7 @@ class WPForms_Entries_Single {
 			);
 
 			if ( ! empty( $_GET['form'] ) ) {
-				wpforms()->entry_meta->add(
+				wpforms()->get( 'entry_meta' )->add(
 					[
 						'entry_id' => absint( $_GET['entry_id'] ),
 						'form_id'  => absint( $_GET['form'] ),
@@ -322,7 +323,7 @@ class WPForms_Entries_Single {
 			return;
 		}
 
-		$is_success = wpforms()->entry->update(
+		$is_success = wpforms()->get( 'entry' )->update(
 			$entry_id,
 			[
 				'viewed' => '0',
@@ -334,7 +335,7 @@ class WPForms_Entries_Single {
 		}
 
 		if ( ! empty( $_GET['form'] ) ) {
-			wpforms()->entry_meta->add(
+			wpforms()->get( 'entry_meta' )->add(
 				[
 					'entry_id' => $entry_id,
 					'form_id'  => absint( $_GET['form'] ),
@@ -529,7 +530,7 @@ class WPForms_Entries_Single {
 		$fields    = wpforms_decode( $this->entry->fields );
 		$form_data = wpforms_decode( $this->form->post_content );
 
-		wpforms()->process->entry_email( $fields, [], $form_data, $this->entry->entry_id );
+		wpforms()->get( 'process' )->entry_email( $fields, [], $form_data, $this->entry->entry_id );
 
 		$this->alerts[] = [
 			'type'    => 'success',
@@ -576,7 +577,7 @@ class WPForms_Entries_Single {
 		}
 
 		// Check if entry has trash status.
-		if ( $entry->status === WPForms_Entries_List::TRASH_ENTRY_STATUS ) {
+		if ( $entry->status === Page::TRASH_ENTRY_STATUS ) {
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			$this->abort_message = esc_html__( 'You can\'t view this entry because it\'s in the trash.', 'wpforms' );
 			$this->abort         = true;
@@ -2323,7 +2324,7 @@ class WPForms_Entries_Single {
 				: $choice['label'];
 		}
 
-		$label = isset( $choice['label'] ) ? $choice['label'] : '';
+		$label = $choice['label'] ?? '';
 		/* translators: %s - item number. */
 		$label = $label !== '' ? $label : sprintf( esc_html__( 'Item %s', 'wpforms' ), $key );
 
@@ -2331,8 +2332,9 @@ class WPForms_Entries_Single {
 			return $label;
 		}
 
-		$value  = ! empty( $choice['value'] ) ? $choice['value'] : 0;
-		$amount = wpforms_format_amount( wpforms_sanitize_amount( $value ), true );
+		$value    = $choice['value'] ?? 0;
+		$currency = $field['currency'] ?? '';
+		$amount   = wpforms_format_amount( wpforms_sanitize_amount( $value, $currency ), true, $currency );
 
 		return $amount ? $label . ' - ' . $amount : $label;
 	}

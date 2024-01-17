@@ -155,7 +155,7 @@ class Upgrade143 extends UpgradeBase {
 
 			wp_send_json_success(
 				[
-					'total'    => wpforms()->entry->get_entries( [], true ),
+					'total'    => wpforms()->get( 'entry' )->get_entries( [], true ),
 					'upgraded' => $upgraded,
 				]
 			);
@@ -170,7 +170,7 @@ class Upgrade143 extends UpgradeBase {
 			update_option( self::FIELDS_UPDATE_OPTION, self::INCOMPLETE );
 
 			// Fetch the first 10 entries.
-			$entries = wpforms()->entry->get_entries(
+			$entries = wpforms()->get( 'entry' )->get_entries(
 				[
 					'number' => 10,
 					'order'  => 'ASC',
@@ -201,7 +201,7 @@ class Upgrade143 extends UpgradeBase {
 				if ( ! empty( $fields ) ) {
 					foreach ( $fields as $field ) {
 						if ( isset( $field['id'] ) && isset( $field['value'] ) && $field['value'] !== '' ) {
-							wpforms()->entry_fields->add(
+							wpforms()->get( 'entry_fields' )->add(
 								[
 									'entry_id' => absint( $entry->entry_id ),
 									'form_id'  => absint( $entry->form_id ),

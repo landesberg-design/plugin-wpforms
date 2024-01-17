@@ -300,13 +300,16 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 * Get last entry of a specific form.
 	 *
 	 * @since 1.5.0
+	 * @since 1.8.6 Added `$status` and `$order_by` parameters.
 	 *
-	 * @param int $form_id Form ID.
+	 * @param int    $form_id  Form ID.
+	 * @param string $status   Entry status.
+	 * @param string $order_by Order by.
 	 *
 	 * @return object|null Object from DB values or null.
 	 * @noinspection PhpUnused
 	 */
-	public function get_last( $form_id ) {
+	public function get_last( $form_id, string $status = '', string $order_by = '' ) {
 
 		global $wpdb;
 
@@ -314,15 +317,24 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return null;
 		}
 
+		if ( empty( $order_by ) ) {
+			$order_by = $this->primary_key;
+		}
+
+		$where_status = $this->get_status_where_clause( $status );
+
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
 		return $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT * FROM $this->table_name
 				WHERE `form_id` = %d
-				ORDER BY $this->primary_key DESC
+				{$where_status}
+				ORDER BY $order_by DESC
 				LIMIT 1;",
-				(int) $form_id
+				[
+					(int) $form_id,
+				]
 			)
 		);
 		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared

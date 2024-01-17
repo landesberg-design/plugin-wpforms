@@ -49,7 +49,7 @@ class WPForms_Field_Password extends WPForms_Field {
 		add_action( 'wpforms_frontend_js', [ $this, 'enqueue_frontend_js' ] );
 
 		// Add frontend strings.
-		add_action( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
+		add_filter( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
 
 		add_action( 'wpforms_pro_fields_entry_preview_get_field_value_password_field', [ $this, 'modify_entry_preview_value' ], 10, 3 );
 
@@ -487,22 +487,22 @@ class WPForms_Field_Password extends WPForms_Field {
 
 			// Required check.
 			if ( ! empty( $fields[ $field_id ]['required'] ) && wpforms_is_empty_string( $field_submit ) ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ] = $required;
 			}
 		} else {
 
 			if ( ! empty( $fields[ $field_id ]['required'] ) && isset( $field_submit['primary'] ) && wpforms_is_empty_string( $field_submit['primary'] ) ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['primary'] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['primary'] = $required;
 			}
 
 			// Required check, secondary confirmation field.
 			if ( ! empty( $fields[ $field_id ]['required'] ) && isset( $field_submit['secondary'] ) && wpforms_is_empty_string( $field_submit['secondary'] ) ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['secondary'] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['secondary'] = $required;
 			}
 
 			// Fields need to match.
 			if ( $field_submit['primary'] !== $field_submit['secondary'] ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['secondary'] = esc_html__( 'Field values do not match.', 'wpforms' );
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['secondary'] = esc_html__( 'Field values do not match.', 'wpforms' );
 			}
 		}
 
@@ -519,7 +519,7 @@ class WPForms_Field_Password extends WPForms_Field {
 			$strength       = ( new \ZxcvbnPhp\Zxcvbn() )->passwordStrength( $password_value );
 
 			if ( isset( $strength['score'] ) && $strength['score'] < (int) $fields[ $field_id ]['password-strength-level'] ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ] = $this->strength_error_message();
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ] = $this->strength_error_message();
 			}
 		}
 	}
@@ -545,11 +545,12 @@ class WPForms_Field_Password extends WPForms_Field {
 		$name = ! wpforms_is_empty_string( $form_data['fields'][ $field_id ] ['label'] ) ? $form_data['fields'][ $field_id ]['label'] : '';
 
 		// Set final field details.
-		wpforms()->process->fields[ $field_id ] = [
-			'name'  => sanitize_text_field( $name ),
-			'value' => sanitize_text_field( $value ),
-			'id'    => absint( $field_id ),
-			'type'  => $this->type,
+		wpforms()->get( 'process' )->fields[ $field_id ] = [
+			'name'      => sanitize_text_field( $name ),
+			'value'     => sanitize_text_field( $value ),
+			'value_raw' => $value, // This is necessary for the login form to work correctly, it will be deleted before saving the entry.
+			'id'        => absint( $field_id ),
+			'type'      => $this->type,
 		];
 	}
 
@@ -562,7 +563,7 @@ class WPForms_Field_Password extends WPForms_Field {
 	 */
 	public function enqueue_frontend_css( $forms ) {
 
-		if ( ! $this->strength_enabled( $forms ) && ! wpforms()->frontend->assets_global() ) {
+		if ( ! $this->strength_enabled( $forms ) && ! wpforms()->get( 'frontend' )->assets_global() ) {
 			return;
 		}
 
@@ -585,7 +586,7 @@ class WPForms_Field_Password extends WPForms_Field {
 	 */
 	public function enqueue_frontend_js( $forms ) {
 
-		if ( ! $this->strength_enabled( $forms ) && ! wpforms()->frontend->assets_global() ) {
+		if ( ! $this->strength_enabled( $forms ) && ! wpforms()->get( 'frontend' )->assets_global() ) {
 			return;
 		}
 

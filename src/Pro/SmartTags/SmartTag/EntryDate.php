@@ -28,7 +28,7 @@ class EntryDate extends SmartTag {
 			return '';
 		}
 
-		$entry = wpforms()->entry->get( $entry_id );
+		$entry = wpforms()->get( 'entry' )->get( $entry_id );
 
 		if ( ! $entry || ! property_exists( $entry, 'date' ) ) {
 			return '';

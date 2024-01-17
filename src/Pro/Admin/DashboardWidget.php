@@ -31,10 +31,11 @@ class DashboardWidget extends Widget {
 	 * Runtime values.
 	 *
 	 * @since 1.5.5
+	 * @deprecated 1.8.6
 	 *
 	 * @var array
 	 */
-	public $runtime_data;
+	public $runtime_data = [];
 
 	/**
 	 * Entries count.
@@ -712,12 +713,6 @@ class DashboardWidget extends Widget {
 	 */
 	public function get_days_interval( $days = 0 ) {
 
-		if ( empty( $days ) ) {
-			$days = $this->runtime_data['days'];
-		} else {
-			$this->runtime_data['days'] = $days;
-		}
-
 		// PHP DateTime supported string (http://php.net/manual/en/datetime.formats.php).
 		$date_end_str  = $this->settings['date_end_str'];
 		$modify_offset = (float) get_option( 'gmt_offset' ) * 60 . ' minutes';
@@ -760,34 +755,30 @@ class DashboardWidget extends Widget {
 	 */
 	public function get_entries_count_by( $param, $days = 0, $form_id = 0 ) {
 
-		$widget_slug    = static::SLUG;
-		$allowed_params = [ 'date', 'form' ];
-
-		if ( ! in_array( $param, $allowed_params, true ) ) {
+		// Allow only 'date' and 'form' params.
+		if ( ! in_array( $param, [ 'date', 'form' ], true ) ) {
 			return [];
 		}
 
-		$dates = $this->get_days_interval( $days );
-		$cache = false;
-
 		// Allow results caching to reduce DB load.
-		$allow_caching  = $this->settings['allow_data_caching'];
-		$transient_name = "wpforms_{$widget_slug}_pro_entries_by_{$param}_{$days}";
-
-		$transient_name .= ! empty( $form_id ) ? '_' . $form_id : '';
+		$allow_caching = $this->settings['allow_data_caching'];
 
 		if ( $allow_caching ) {
+			$widget_slug    = static::SLUG;
+			$transient_name = $this->get_entries_transient_name( $param, $days, $form_id );
+
 			$cache = get_transient( $transient_name );
 
 			// Filter the cache to clear or alter its data.
 			// phpcs:ignore WPForms.Comments.PHPDocHooks.RequiredHookDocumentation, WPForms.PHP.ValidateHooks.InvalidHookName
 			$cache = apply_filters( "wpforms_{$widget_slug}_cached_data", $cache, $param, $days, $form_id );
+
+			if ( is_array( $cache ) && count( $cache ) > 0 ) {
+				return $cache;
+			}
 		}
 
-		// is_array() detects cached empty searches.
-		if ( $allow_caching && is_array( $cache ) ) {
-			return $cache;
-		}
+		$dates = $this->get_days_interval( $days );
 
 		switch ( $param ) {
 			case 'date':
@@ -1123,5 +1114,24 @@ class DashboardWidget extends Widget {
 				'%wpforms_' . $wpdb->esc_like( static::SLUG ) . '_pro_entries_by_%'
 			)
 		);
+	}
+
+	/**
+	 * Get transient name for entries count by $param.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @param string $param   Possible value: 'date' or 'form'.
+	 * @param int    $days    Timespan (in days) to fetch the data for.
+	 * @param int    $form_id Form ID to fetch the data for.
+	 *
+	 * @return string
+	 */
+	private function get_entries_transient_name( $param, $days, $form_id ): string {
+
+		$widget_slug = static::SLUG;
+		$user_id     = get_current_user_id();
+
+		return "wpforms_{$widget_slug}_pro_entries_by_{$param}_{$days}_user_{$user_id}_form_{$form_id}";
 	}
 }

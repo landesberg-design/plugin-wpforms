@@ -14,6 +14,7 @@ use WPForms\Admin\Helpers\Datepicker;
 use WP_List_Table;
 use WP_Post;
 use WPForms\Pro\AntiSpam\SpamEntry;
+use WPForms_Entries_List;
 use WPForms_Entry_Handler;
 
 /**
@@ -218,7 +219,7 @@ class Table extends WP_List_Table {
 	 */
 	public function column_last_entry( $form ) {
 
-		$last_entry = wpforms()->get( 'entry' )->get_last( $form->ID );
+		$last_entry = wpforms()->get( 'entry' )->get_last( $form->ID, '', 'date' );
 
 		if ( ! $last_entry ) {
 			return self::PLACEHOLDER;
@@ -592,7 +593,17 @@ class Table extends WP_List_Table {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
-			"SELECT DISTINCT form_id FROM {$this->entry_handler->table_name} GROUP BY form_id ORDER BY entry_id {$order}"
+			$wpdb->prepare(
+				"SELECT form_id
+				FROM {$this->entry_handler->table_name}
+				WHERE status NOT IN ( %s, %s )
+				GROUP BY form_id
+				ORDER BY MAX(date) {$order}",
+				[
+					SpamEntry::ENTRY_STATUS,
+					WPForms_Entries_List::TRASH_ENTRY_STATUS,
+				]
+			)
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 

@@ -552,7 +552,7 @@ class WPForms_Rating_Text extends WPForms_Field {
 		}
 
 		// Set final field details.
-		wpforms()->process->fields[ $field_id ] = [
+		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $value ),
 			'id'    => absint( $field_id ),

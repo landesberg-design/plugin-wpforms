@@ -190,10 +190,10 @@ class WPForms_Entries_Export {
 		// entry object. For multiple entry export we get the fields from the
 		// form.
 		if ( $this->is_single_entry() ) {
-			$this->entry  = wpforms()->entry->get( $this->entry_type );
+			$this->entry  = wpforms()->get( 'entry' )->get( $this->entry_type );
 			$this->fields = wpforms_decode( $this->entry->fields );
 		} else {
-			$this->form_data = wpforms()->form->get(
+			$this->form_data = wpforms()->get( 'form' )->get(
 				$this->form_id,
 				[
 					'content_only' => true,
@@ -271,7 +271,7 @@ class WPForms_Entries_Export {
 				//'entry_id' => is_array( $this->entry_type ) ? $this->entry_type : '', @todo
 				'form_id' => $this->form_id,
 			];
-			$entries     = wpforms()->entry->get_entries( $args );
+			$entries     = wpforms()->get( 'entry' )->get_entries( $args );
 			$form_fields = $this->form_data['fields'];
 
 			foreach ( $entries as $entry ) {

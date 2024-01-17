@@ -99,9 +99,22 @@ class Admin {
 
 					<section class="wp-clearfix" id="wpforms-tools-entries-export-options-date">
 						<h5><?php esc_html_e( 'Custom Date Range', 'wpforms' ); ?></h5>
-						<input type="text" name="date" class="wpforms-date-selector"
-							id="wpforms-tools-entries-export-options-date-flatpickr"
-							placeholder="<?php esc_attr_e( 'Select a date range', 'wpforms' ); ?>">
+						<div class="wpforms-tools-export-date-selector-container">
+							<input
+								type="text"
+								name="date"
+								class="wpforms-date-selector"
+								id="wpforms-tools-entries-export-options-date-flatpickr"
+								placeholder="<?php esc_attr_e( 'Select a date range', 'wpforms' ); ?>"
+							>
+							<button
+								type="button"
+								class="wpforms-clear-datetime-field wpforms-hidden"
+								title="<?php esc_html_e( 'Clear Start Date', 'wpforms' ); ?>"
+							>
+								<i class="fa fa-times-circle fa-lg"></i>
+							</button>
+						</div>
 					</section>
 
 					<?php $this->display_search_statuses_block(); ?>

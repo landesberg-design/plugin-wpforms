@@ -129,7 +129,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				'wpforms-field-date-time-date',
 				'wpforms-datepicker',
 				! empty( $field_required ) ? 'wpforms-field-required' : '',
-				! empty( wpforms()->process->errors[ $form_id ][ $field_id ]['date'] ) ? 'wpforms-error' : '',
+				! empty( wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['date'] ) ? 'wpforms-error' : '',
 			],
 			'data'      => [
 				'date-format' => $date_format,
@@ -176,7 +176,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				'wpforms-field-date-time-time',
 				'wpforms-timepicker',
 				! empty( $field_required ) ? 'wpforms-field-required' : '',
-				! empty( wpforms()->process->errors[ $form_id ][ $field_id ]['time'] ) ? 'wpforms-error' : '',
+				! empty( wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['time'] ) ? 'wpforms-error' : '',
 			],
 			'data'      => [
 				'time-format' => $time_format,
@@ -1200,7 +1200,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		$atts['class']   = isset( $properties['class'] ) ? $properties['class'] : [];
 		$atts['class'][] = 'wpforms-field-date-time-date-' . $element;
 		$atts['class'][] = ! empty( $field_required ) ? 'wpforms-field-required' : '';
-		$atts['class'][] = ! empty( wpforms()->process->errors[ $form_id ][ $field['id'] ]['date'] ) ? 'wpforms-error' : '';
+		$atts['class'][] = ! empty( wpforms()->get( 'process' )->errors[ $form_id ][ $field['id'] ]['date'] ) ? 'wpforms-error' : '';
 
 		$atts['data'] = isset( $properties['data'] ) ? $properties['data'] : [];
 		$atts['attr'] = isset( $properties['attr'] ) ? $properties['attr'] : [];
@@ -1364,7 +1364,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				} else {
 					// So we are missing some of the values.
 					// We can't process date further, as we won't be able to retrieve its unix time.
-					wpforms()->process->fields[ $field_id ] = [
+					wpforms()->get( 'process' )->fields[ $field_id ] = [
 						'name'  => sanitize_text_field( $name ),
 						'value' => sanitize_text_field( $value ),
 						'id'    => absint( $field_id ),
@@ -1413,7 +1413,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			$unix = strtotime( trim( "$date $time" ) );
 		}
 
-		wpforms()->process->fields[ $field_id ] = [
+		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $value ),
 			'id'    => absint( $field_id ),

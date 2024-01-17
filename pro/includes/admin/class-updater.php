@@ -119,9 +119,18 @@ class WPForms_Updater {
 		}
 
 		// Load the updater hooks and filters.
-		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'update_plugins_filter' ] );
-		add_filter( 'http_request_args', [ $this, 'http_request_args' ], 10, 2 );
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.8.6
+	 */
+	private function hooks() {
+
 		add_filter( 'plugins_api', [ $this, 'plugins_api' ], 10, 3 );
+		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'update_plugins_filter' ] );
 	}
 
 	/**
@@ -129,56 +138,98 @@ class WPForms_Updater {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param object $value The WordPress update object.
+	 * @param object $update_obj The WordPress update object.
 	 *
 	 * @return object $value Amended WordPress update object on success, default if object is empty.
 	 */
-	public function update_plugins_filter( $value ) {
+	public function update_plugins_filter( $update_obj ) {
 
 		// If no update object exists or given value is not an object type, return early.
-		if ( empty( $value ) || ! is_object( $value ) ) {
-			return $value;
+		if ( empty( $update_obj ) || ! is_object( $update_obj ) ) {
+			return $update_obj;
 		}
 
+		$is_license_empty = empty( $this->key );
+
 		// Run update check by pinging the external API. If it fails, return the default update object.
-		if ( ! $this->update ) {
+		if ( ! $is_license_empty && ! $this->update ) {
 			$this->update = $this->perform_remote_request( 'get-plugin-update', [ 'tgm-updater-plugin' => $this->plugin_slug ] );
+		}
 
-			// No update is available.
-			if ( ! $this->update || ! empty( $this->update->error ) ) {
-				$this->update = false;
+		// For core plugin, if the license key is empty, we need to get the update from the cached core.json file.
+		if ( $is_license_empty && $this->plugin_slug === 'wpforms' && ! $this->update ) {
+			$this->update = $this->get_update_from_cached_core_json_file();
+		}
 
-				$value->no_update[ $this->plugin_path ] = $this->get_no_update();
+		// No update is available.
+		if ( ! $this->update || ! empty( $this->update->error ) ) {
+			$this->update = false;
 
-				return $value;
-			}
+			$update_obj->no_update[ $this->plugin_path ] = $this->get_no_update();
+
+			return $update_obj;
 		}
 
 		// Infuse the update object with our data if the version from the remote API is newer.
 		if ( isset( $this->update->new_version ) && version_compare( $this->version, $this->update->new_version, '<' ) ) {
+
 			// The $this->update object contains new_version, package, slug and last_update keys.
-			$this->update->old_version             = $this->version;
-			$this->update->plugin                  = $this->plugin_path;
-			$value->response[ $this->plugin_path ] = $this->update;
-		} else {
-			$value->no_update[ $this->plugin_path ] = $this->get_no_update();
+			$this->update->old_version                  = $this->version;
+			$this->update->plugin                       = $this->plugin_path;
+			$update_obj->response[ $this->plugin_path ] = $this->update;
+
+			return $update_obj;
 		}
 
+		$update_obj->no_update[ $this->plugin_path ] = $this->get_no_update();
+
 		// Return the update object.
-		return $value;
+		return $update_obj;
+	}
+
+	/**
+	 * Get the update object with details from the cached `core.json` file.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @return object
+	 */
+	private function get_update_from_cached_core_json_file() {
+
+		$core_info_obj = wpforms()->get( 'core_info_cache' );
+		$core_info     = $core_info_obj ? $core_info_obj->get() : [];
+
+		// Mock the update object of the WPForms Pro plugin.
+		return (object) [
+			'id'           => $core_info['id'] ?? $this->plugin_path,
+			'slug'         => $this->plugin_slug,
+			'plugin'       => $this->plugin_path,
+			'new_version'  => $core_info['version'] ?? $this->version,
+			'tested'       => '',
+			'requires_php' => $core_info['required_versions']['php'] ?? '7.0',
+			'package'      => '',
+			'download_url' => '',
+			'icons'        => $core_info['icons'] ?? [],
+			'banners'      => [],
+			'banners_rtl'  => [],
+		];
 	}
 
 	/**
 	 * Disable SSL verification to prevent download package failures.
 	 *
 	 * @since 2.0.0
+	 * @deprecated 1.8.6
 	 *
 	 * @param array  $args Array of request args.
 	 * @param string $url  The URL to be pinged.
 	 *
 	 * @return array $args Amended array of request args.
 	 */
-	public function http_request_args( $args, $url ) {
+	public function http_request_args( $args, $url ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+
+		_deprecated_function( __METHOD__, '1.8.6 of the WPForms plugin' );
+
 		return $args;
 	}
 
@@ -196,7 +247,7 @@ class WPForms_Updater {
 	 */
 	public function plugins_api( $api, $action = '', $args = null ) {
 
-		$plugin = ( 'plugin_information' === $action ) && isset( $args->slug ) && ( $this->plugin_slug === $args->slug );
+		$plugin = ( $action === 'plugin_information' ) && isset( $args->slug ) && ( $this->plugin_slug === $args->slug );
 
 		// If our plugin matches the request, set our own plugin data, else return the default response.
 		if ( $plugin ) {
@@ -230,18 +281,18 @@ class WPForms_Updater {
 
 		// Create a new stdClass object and populate it with our plugin information.
 		$api                        = new stdClass();
-		$api->name                  = isset( $this->info->name ) ? $this->info->name : '';
-		$api->slug                  = isset( $this->info->slug ) ? $this->info->slug : '';
-		$api->version               = isset( $this->info->version ) ? $this->info->version : '';
-		$api->author                = isset( $this->info->author ) ? $this->info->author : '';
-		$api->author_profile        = isset( $this->info->author_profile ) ? $this->info->author_profile : '';
-		$api->requires              = isset( $this->info->requires ) ? $this->info->requires : '';
-		$api->tested                = isset( $this->info->tested ) ? $this->info->tested : '';
-		$api->last_updated          = isset( $this->info->last_updated ) ? $this->info->last_updated : '';
-		$api->homepage              = isset( $this->info->homepage ) ? $this->info->homepage : '';
-		$api->sections['changelog'] = isset( $this->info->changelog ) ? $this->info->changelog : '';
-		$api->download_link         = isset( $this->info->download_link ) ? $this->info->download_link : '';
-		$api->active_installs       = isset( $this->info->active_installs ) ? $this->info->active_installs : '';
+		$api->name                  = $this->info->name ?? '';
+		$api->slug                  = $this->info->slug ?? '';
+		$api->version               = $this->info->version ?? '';
+		$api->author                = $this->info->author ?? '';
+		$api->author_profile        = $this->info->author_profile ?? '';
+		$api->requires              = $this->info->requires ?? '';
+		$api->tested                = $this->info->tested ?? '';
+		$api->last_updated          = $this->info->last_updated ?? '';
+		$api->homepage              = $this->info->homepage ?? '';
+		$api->sections['changelog'] = $this->info->changelog ?? '';
+		$api->download_link         = $this->info->download_link ?? '';
+		$api->active_installs       = $this->info->active_installs ?? '';
 		$api->banners               = isset( $this->info->banners ) ? (array) $this->info->banners : '';
 
 		// Return the new API object with our custom data.
@@ -315,7 +366,7 @@ class WPForms_Updater {
 	 *
 	 * @return object
 	 */
-	protected function get_no_update() {
+	public function get_no_update() {
 
 		return (object) [
 			'id'            => $this->plugin_path,

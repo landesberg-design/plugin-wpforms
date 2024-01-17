@@ -84,6 +84,12 @@ class EntriesCount {
 		$table_name = wpforms()->get( 'entry' )->table_name;
 		$forms      = $this->get_allowed_forms( $form_id );
 
+		$access_obj = wpforms()->get( 'access' );
+
+		if ( $access_obj ) {
+			$forms = $access_obj->filter_forms_by_current_user_capability( $forms, 'view_entries_form_single' );
+		}
+
 		if ( empty( $forms ) ) {
 			return [];
 		}

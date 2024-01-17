@@ -5,18 +5,15 @@
  * @since 1.5.0
  */
 
-'use strict';
-
-var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( document, window, $ ) {
-
+const WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( document, window, $ ) {
 	/**
 	 * Elements reference.
 	 *
 	 * @since 1.5.0
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
-	var el = {
+	const el = {
 		$widget              : $( '#wpforms_reports_widget_pro' ),
 		$chartResetBtn       : $( '#wpforms-dash-widget-reset-chart' ),
 		$DaysSelect          : $( '#wpforms-dash-widget-timespan' ),
@@ -33,7 +30,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 	 *
 	 * @type {{pointBackgroundColor: string, backgroundColor: string, borderColor: string}}
 	 */
-	let wpformsColors = {
+	const wpformsColors = {
 		backgroundColor      : 'rgb(226, 119, 48)',
 		hoverBackgroundColor : '#da691f',
 		borderColor          : 'rgb(226, 119, 48)',
@@ -48,7 +45,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 	 *
 	 * @type {{pointBackgroundColor: string, backgroundColor: string, borderColor: string}}
 	 */
-	let wpColors = {
+	const wpColors = {
 		backgroundColor      : 'rgba(34, 113, 177, 1)',
 		hoverBackgroundColor : '#135e96',
 		borderColor          : 'rgba(34, 113, 177, 1)',
@@ -57,7 +54,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 	};
 
 	if ( wpforms_dashboard_widget.chart_type === 'line' ) {
-		wpColors.backgroundColor      = '#E2ECF5';
+		wpColors.backgroundColor = '#E2ECF5';
 		wpformsColors.backgroundColor = 'rgba(255, 129, 0, 0.135)';
 	}
 
@@ -68,16 +65,16 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 	 *
 	 * @type {{pointBackgroundColor: string, backgroundColor: string, borderColor: string}}
 	 */
-	let colorScheme = wpforms_dashboard_widget.color_scheme === 'wp' ? wpColors : wpformsColors;
+	const colorScheme = wpforms_dashboard_widget.color_scheme === 'wp' ? wpColors : wpformsColors;
 
 	/**
 	 * Chart.js functions and properties.
 	 *
 	 * @since 1.5.0
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
-	var chart = {
+	const chart = {
 
 		/**
 		 * Chart.js instance.
@@ -120,10 +117,9 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 							padding    : 10,
 							minRotation: 25,
 							maxRotation: 25,
-							callback   : function( value, index, values ) {
-
+							callback( value, index, values ) {
 								// Distribute the ticks equally starting from a right side of xAxis.
-								var gap = Math.floor( values.length / 7 );
+								const gap = Math.floor( values.length / 7 );
 
 								if ( gap < 1 ) {
 									return value;
@@ -139,8 +135,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 							beginAtZero  : true,
 							maxTicksLimit: 6,
 							padding      : 20,
-							callback     : function( value ) {
-
+							callback( value ) {
 								// Make sure the tick value has no decimals.
 								if ( Math.floor( value ) === value ) {
 									return value;
@@ -175,15 +170,12 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 */
-		init: function() {
-
-			var ctx;
-
+		init() {
 			if ( ! el.$canvas.length ) {
 				return;
 			}
 
-			ctx = el.$canvas[ 0 ].getContext( '2d' );
+			const ctx = el.$canvas[ 0 ].getContext( '2d' );
 
 			chart.instance = new Chart( ctx, chart.settings );
 
@@ -195,18 +187,19 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {Number} days Timespan (in days) to fetch the data for.
-		 * @param {Number} formId
+		 * @param {number} days   Timespan (in days) to fetch the data for.
+		 * @param {number} formId Form ID to fetch the data for.
 		 */
-		ajaxUpdate: function( days, formId ) {
-
-			var data = {
+		ajaxUpdate( days, formId ) {
+			const data = {
 				_wpnonce: wpforms_dashboard_widget.nonce,
 				action  : 'wpforms_' + wpforms_dashboard_widget.slug + '_get_chart_data',
-				days    : days,
+				days,
+				// eslint-disable-next-line camelcase
 				form_id : formId,
 			};
 
+			// eslint-disable-next-line no-use-before-define
 			app.addOverlay( $( chart.instance.canvas ) );
 
 			$.post( ajaxurl, data, function( response ) {
@@ -219,10 +212,10 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {object} data Dataset for the chart.
+		 * @param {Object} data Dataset for the chart.
 		 */
-		updateUI: function( data ) {
-
+		updateUI( data ) {
+			// eslint-disable-next-line no-use-before-define
 			app.removeOverlay( el.$canvas );
 
 			if ( $.isEmptyObject( data ) ) {
@@ -244,10 +237,9 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {object} data Dataset for the chart.
+		 * @param {Object} data Dataset for the chart.
 		 */
-		updateData: function( data ) {
-
+		updateData( data ) {
 			chart.settings.data.labels = [];
 			chart.settings.data.datasets[ 0 ].data = [];
 
@@ -259,17 +251,15 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.7.4
 		 *
-		 * @param {object} data Dataset for the chart.
+		 * @param {Object} data Dataset for the chart.
 		 */
-		updateTotal: function( data ) {
-
+		updateTotal( data ) {
 			let totalCount = 0;
 
 			$.each( data, function( index, value ) {
-
 				totalCount = Number( totalCount ) + Number( value.count );
 
-				var date = moment( value.day );
+				const date = moment( value.day );
 
 				chart.settings.data.labels.push( date );
 				chart.settings.data.datasets[ 0 ].data.push( {
@@ -285,21 +275,19 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 */
-		updateWithDummyData: function() {
-
+		updateWithDummyData() {
 			chart.settings.data.labels = [];
 			chart.settings.data.datasets[ 0 ].data = [];
 
-			var end = moment().startOf( 'day' );
-			var days = el.$DaysSelect.val() || 7;
-			var date;
+			const end = moment().startOf( 'day' );
+			const days = el.$DaysSelect.val() || 7;
+			let date;
 
-			var minY = 5;
-			var maxY = 20;
-			var i;
+			const minY = 5;
+			const maxY = 20;
+			let i;
 
-			for ( i = 1; i <= days; i ++ ) {
-
+			for ( i = 1; i <= days; i++ ) {
 				date = end.clone().subtract( i, 'days' );
 
 				chart.settings.data.labels.push( date );
@@ -315,8 +303,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 */
-		showEmptyDataMessage: function() {
-
+		showEmptyDataMessage() {
 			chart.removeEmptyDataMessage();
 			el.$canvas.after( wpforms_dashboard_widget.empty_chart_html );
 		},
@@ -326,8 +313,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 */
-		removeEmptyDataMessage: function() {
-
+		removeEmptyDataMessage() {
 			el.$canvas.siblings( '.wpforms-error' ).remove();
 		},
 
@@ -343,12 +329,12 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 			 *
 			 * @since 1.5.0
 			 */
-			daysChanged: function() {
-
-				var days = el.$DaysSelect.val();
-				var formId = el.$DaysSelect.attr( 'data-active-form-id' ) || 0;
+			daysChanged() {
+				const days = el.$DaysSelect.val();
+				const formId = el.$DaysSelect.attr( 'data-active-form-id' ) || 0;
 
 				chart.ajaxUpdate( days, formId );
+				// eslint-disable-next-line no-use-before-define
 				app.saveWidgetMeta( 'timespan', days );
 			},
 
@@ -357,15 +343,14 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 			 *
 			 * @since 1.5.0
 			 *
-			 * @param {object} $el Forms list "single form chart" button jQuery element.
+			 * @param {Object} $el Forms list "single form chart" button jQuery element.
 			 */
-			singleFormView: function( $el ) {
-
+			singleFormView( $el ) {
 				$( '.wpforms-dash-widget-single-chart-btn' ).show();
 
-				var days = el.$DaysSelect.val();
-				var formId = $el.closest( 'tr' ).attr( 'data-form-id' );
-				var formTitle = $el.closest( 'tr' ).find( '.wpforms-dash-widget-form-title' ).text();
+				const days = el.$DaysSelect.val();
+				const formId = $el.closest( 'tr' ).attr( 'data-form-id' );
+				const formTitle = $el.closest( 'tr' ).find( '.wpforms-dash-widget-form-title' ).text();
 
 				$( '#wpforms-dash-widget-chart-title' ).text( formTitle );
 
@@ -378,6 +363,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 				$( '#entry-count-text' ).text( wpforms_dashboard_widget.i18n.form_entries );
 
 				chart.ajaxUpdate( days, formId );
+				// eslint-disable-next-line no-use-before-define
 				app.saveWidgetMeta( 'active_form_id', formId );
 			},
 
@@ -386,9 +372,8 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 			 *
 			 * @since 1.5.0
 			 */
-			resetToGeneralView: function() {
-
-				var days = el.$DaysSelect.val();
+			resetToGeneralView() {
+				const days = el.$DaysSelect.val();
 
 				el.$DaysSelect.removeAttr( 'data-active-form-id' );
 				el.$chartResetBtn.hide();
@@ -399,6 +384,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 				$( '#wpforms-dash-widget-chart-title' ).text( wpforms_dashboard_widget.i18n.total_entries );
 
 				chart.ajaxUpdate( days, 0 );
+				// eslint-disable-next-line no-use-before-define
 				app.saveWidgetMeta( 'active_form_id', 0 );
 			},
 		},
@@ -409,23 +395,23 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 	 *
 	 * @since 1.5.0
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
-	var app = {
+	const app = {
 
 		/**
 		 * Publicly accessible Chart.js functions and properties.
 		 *
 		 * @since 1.5.0
 		 */
-		chart: chart,
+		chart,
 
 		/**
 		 * Start the engine.
 		 *
 		 * @since 1.5.0
 		 */
-		init: function() {
+		init() {
 			$( app.ready );
 		},
 
@@ -434,8 +420,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 */
-		ready: function() {
-
+		ready() {
 			chart.init();
 			app.events();
 			app.graphSettings();
@@ -446,15 +431,12 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.7.4
 		 */
-		graphSettings: function() {
-
+		graphSettings() {
 			el.$settingsBtn.on( 'click', function() {
-
 				$( this ).siblings( '.wpforms-dash-widget-settings-menu' ).toggle();
 			} );
 
 			el.$widget.find( '.wpforms-dash-widget-settings-menu-save' ).on( 'click', function() {
-
 				app.saveSettings();
 			} );
 		},
@@ -464,8 +446,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.7.4
 		 */
-		saveSettings: function() {
-
+		saveSettings() {
 			const style = el.$widget.find( '.wpforms-dash-widget-settings-menu input[name=wpforms-style]:checked' ).val();
 			const color = el.$widget.find( '.wpforms-dash-widget-settings-menu input[name=wpforms-color]:checked' ).val();
 
@@ -473,11 +454,11 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 				app.saveWidgetMeta( 'graph_style', style );
 				if ( style === '2' ) {
 					chart.settings.type = 'line';
-					wpColors.backgroundColor      = 'rgba(34, 113, 177, 0.135)';
+					wpColors.backgroundColor = 'rgba(34, 113, 177, 0.135)';
 					wpformsColors.backgroundColor = 'rgba(255, 129, 0, 0.135)';
 				} else {
 					chart.settings.type = 'bar';
-					wpColors.backgroundColor      = 'rgba(34, 113, 177, 1)';
+					wpColors.backgroundColor = 'rgba(34, 113, 177, 1)';
 					wpformsColors.backgroundColor = '#E27730';
 				}
 			}
@@ -501,8 +482,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 */
-		events: function() {
-
+		events() {
 			app.chartEvents();
 			app.formsListEvents();
 			app.miscEvents();
@@ -513,8 +493,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 */
-		chartEvents: function() {
-
+		chartEvents() {
 			el.$DaysSelect.on( 'change', function() {
 				chart.events.daysChanged();
 			} );
@@ -525,14 +504,13 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 */
-		formsListEvents: function() {
-
+		formsListEvents() {
 			el.$DaysSelect.on( 'change', function() {
 				app.updateFormsList( $( this ).val() );
 			} );
 
 			el.$widget.on( 'click', '.wpforms-dash-widget-single-chart-btn', function() {
-				var $t = $( this ),
+				const $t = $( this ),
 					$tr = $t.closest( 'tr' );
 				chart.events.singleFormView( $t );
 				$tr.closest( 'table' ).find( 'tr.wpforms-dash-widget-form-active' ).removeClass( 'wpforms-dash-widget-form-active' );
@@ -543,7 +521,6 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 				$( '.wpforms-dash-widget-reset-chart' ).hide();
 				chart.events.resetToGeneralView();
 				el.$formsListBlock.find( 'tr.wpforms-dash-widget-form-active' ).removeClass( 'wpforms-dash-widget-form-active' );
-
 			} );
 
 			el.$widget.on( 'click', '#wpforms-dash-widget-forms-more', function() {
@@ -556,8 +533,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0.4
 		 */
-		miscEvents: function() {
-
+		miscEvents() {
 			el.$recomBlockDismissBtn.on( 'click', function() {
 				app.dismissRecommendedBlock();
 			} );
@@ -568,20 +544,18 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {Number} days Timespan (in days) to fetch the data for.
+		 * @param {number} days Timespan (in days) to fetch the data for.
 		 */
-		updateFormsList: function( days ) {
-
-			var data = {
+		updateFormsList( days ) {
+			const data = {
 				_wpnonce: wpforms_dashboard_widget.nonce,
 				action  : 'wpforms_' + wpforms_dashboard_widget.slug + '_get_forms_list',
-				days    : days,
+				days,
 			};
 
 			app.addOverlay( el.$formsListBlock.children().first() );
 
 			$.post( ajaxurl, data, function( response ) {
-
 				el.$formsListBlock.html( response );
 				app.saveWidgetMeta( 'timespan', days );
 			} );
@@ -592,8 +566,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0.4
 		 */
-		toggleCompleteFormsList: function() {
-
+		toggleCompleteFormsList() {
 			$( '#wpforms-dash-widget-forms-list-table .wpforms-dash-widget-forms-list-hidden-el' ).toggle();
 			$( '#wpforms-dash-widget-forms-more' ).html( function( i, html ) {
 				return html === wpforms_dashboard_widget.show_less_html ? wpforms_dashboard_widget.show_more_html : wpforms_dashboard_widget.show_less_html;
@@ -605,16 +578,15 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {string} meta Meta name to save.
+		 * @param {string} meta  Meta name to save.
 		 * @param {number} value Value to save.
 		 */
-		saveWidgetMeta: function( meta, value ) {
-
-			var data = {
+		saveWidgetMeta( meta, value ) {
+			const data = {
 				_wpnonce: wpforms_dashboard_widget.nonce,
 				action  : 'wpforms_' + wpforms_dashboard_widget.slug + '_save_widget_meta',
-				meta    : meta,
-				value   : value,
+				meta,
+				value,
 			};
 
 			$.post( ajaxurl, data );
@@ -625,10 +597,9 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {object} $el jQuery element inside a widget block.
+		 * @param {Object} $el jQuery element inside a widget block.
 		 */
-		addOverlay: function( $el ) {
-
+		addOverlay( $el ) {
 			if ( ! $el.parent().closest( '.wpforms-dash-widget-block' ).length ) {
 				return;
 			}
@@ -642,9 +613,9 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0
 		 *
-		 * @param {object} $el jQuery element inside a widget block.
+		 * @param {Object} $el jQuery element inside a widget block.
 		 */
-		removeOverlay: function( $el ) {
+		removeOverlay( $el ) {
 			$el.siblings( '.wpforms-dash-widget-overlay' ).remove();
 		},
 
@@ -653,8 +624,7 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 		 *
 		 * @since 1.5.0.4
 		 */
-		dismissRecommendedBlock: function() {
-
+		dismissRecommendedBlock() {
 			$( '.wpforms-dash-widget-recommended-plugin-block' ).remove();
 			app.saveWidgetMeta( 'hide_recommended_block', 1 );
 		},
@@ -662,7 +632,6 @@ var WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docume
 
 	// Provide access to public functions/properties.
 	return app;
-
 }( document, window, jQuery ) );
 
 // Initialize.

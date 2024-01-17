@@ -41,8 +41,8 @@ class Core extends \WPForms\Admin\Education\Core {
 		$strings = parent::get_js_strings();
 
 		$strings['addon_error'] = sprintf(
-			wp_kses( /* translators: %1$s - addon download URL, %2$s - link to manual installation guide. */
-				__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpforms.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>.', 'wpforms' ),
+			wp_kses( /* translators: %1$s - addon download URL, %2$s - link to manual installation guide, %3$s - link to contact support. */
+				__( 'Could not install the addon. Please <a href="%1$s" target="_blank" rel="noopener noreferrer">download it from wpforms.com</a> and <a href="%2$s" target="_blank" rel="noopener noreferrer">install it manually</a>, or <a href="%3$s" target="_blank" rel="noopener noreferrer">contact support</a> for assistance.', 'wpforms' ),
 				[
 					'a' => [
 						'href'   => true,
@@ -52,7 +52,8 @@ class Core extends \WPForms\Admin\Education\Core {
 				]
 			),
 			esc_url( wpforms_utm_link( 'https://wpforms.com/account/licenses/', 'builder-modal', 'Addon Install Failure' ) ),
-			esc_url( wpforms_utm_link( 'https://wpforms.com/docs/how-to-manually-install-addons-in-wpforms/', 'builder-modal', 'Addon Install Failure' ) )
+			esc_url( wpforms_utm_link( 'https://wpforms.com/docs/how-to-manually-install-addons-in-wpforms/', 'builder-modal', 'Addon Install Failure' ) ),
+			esc_url( wpforms_utm_link( 'https://wpforms.com/contact/', 'builder-modal', 'Addon Install Failure' ) )
 		);
 
 		$license_key = wpforms_get_license_key();

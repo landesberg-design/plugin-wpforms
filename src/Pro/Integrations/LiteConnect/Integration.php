@@ -3,7 +3,7 @@
 namespace WPForms\Pro\Integrations\LiteConnect;
 
 use WPForms\Emails\Mailer;
-use WPForms\Emails\Templates\General;
+use WPForms\Emails\Helpers as EmailHelpers;
 use WPForms\Helpers\Crypto;
 use WPForms\Helpers\Transient;
 
@@ -483,29 +483,52 @@ class Integration extends \WPForms\Integrations\LiteConnect\Integration {
 	 */
 	private function send_email_notification() {
 
-		$to_email = self::get_enabled_email();
-		$subject  = esc_html__( 'Your form entries have been restored successfully!', 'wpforms' );
-
-		$message = sprintf(
-			'<strong>%s</strong><br><br>',
-			$subject
+		$to_email    = self::get_enabled_email();
+		$subject     = esc_html__( 'Your form entries have been restored successfully!', 'wpforms' );
+		$entries_url = admin_url( 'admin.php?page=wpforms-entries' );
+		$message     = sprintf(
+			'<tr><td class="field-name field-value"><strong>%s</strong><br/><br/>%s</td></tr>',
+			$subject,
+			sprintf(
+				wp_kses( /* translators: %1$s - WPForms Entries Overview admin page URL. */
+					__( 'You can view your form entries inside the WordPress Dashboard from the <a href="%s" rel="noreferrer noopener" target="_blank">Entries Overview report</a>.', 'wpforms' ),
+					[
+						'a' => [
+							'href'   => [],
+							'rel'    => [],
+							'target' => [],
+						],
+					]
+				),
+				$entries_url
+			)
 		);
 
-		$message .= sprintf(
-			wp_kses( /* translators: %s - WPForms Entries Overview admin page URL. */
-				__( 'You can view your form entries inside the WordPress Dashboard from the <a href="%s" rel="noreferrer noopener" target="_blank">Entries Overview report</a>.', 'wpforms' ),
-				[
-					'a' => [
-						'href'   => [],
-						'rel'    => [],
-						'target' => [],
-					],
-				]
-			),
-			admin_url( 'admin.php?page=wpforms-entries' )
-		);
+		// If it's a plain text template, replace break tags.
+		if ( EmailHelpers::is_plain_text_template() ) {
+			// Replace <br/> tags with line breaks.
+			$message = str_replace( '<br/>', "\r\n", $message );
+			// Add the entries URL to the end of the message.
+			$message .= "\r\n\r\n" . $entries_url;
+		}
 
-		$template = new General( $message );
+		// Create an arguments array for the template.
+		$args = [
+			'body' => [
+				'message' => $message,
+			],
+		];
+
+		/**
+		 * Filter to customize the email template name independently of the global setting.
+		 *
+		 * @since 1.8.6
+		 *
+		 * @param string $template_name The template name to be used.
+		 */
+		$template_name  = apply_filters( 'wpforms_pro_integrations_lite_connect_integration_email_template_name', EmailHelpers::get_current_template_name() );
+		$template_class = EmailHelpers::get_current_template_class( $template_name );
+		$template       = ( new $template_class() )->set_args( $args );
 
 		( new Mailer() )
 			->template( $template )

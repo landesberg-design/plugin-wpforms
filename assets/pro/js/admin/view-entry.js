@@ -208,12 +208,16 @@ var WPFormsViewEntry = window.WPFormsViewEntry || ( function( document, window, 
 		 *
 		 * @since 1.7.0
 		 *
-		 * @param {object} obj Iframe element.
+		 * @param {Object} obj Iframe element.
 		 */
-		loadRichTextField: function( obj ) {
+		loadRichTextField( obj ) {
+			const $contents = $( obj.contentWindow.document.documentElement );
 
 			// Replicate `font-family` from the admin page to the iframe document.
-			$( obj.contentWindow.document.documentElement ).find( 'body' ).css( 'font-family', $( 'body' ).css( 'font-family' ) );
+			$contents.find( 'body' ).css( 'font-family', $( 'body' ).css( 'font-family' ) );
+			// Adjust list styles.
+			$contents.find( 'ul, ol' ).css( 'padding-inline-start', '30px' );
+			$contents.find( 'li' ).css( 'list-style-position', 'outside' );
 
 			app.resizeRichTextField( obj );
 			app.addLinksAttr( obj );

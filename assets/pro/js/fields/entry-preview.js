@@ -155,13 +155,15 @@ var WPFormsEntryPreview = window.WPFormsEntryPreview || ( function( document, wi
 			var doc = iframe.contentWindow.document,
 				head = doc.querySelector( 'head' ),
 				style = doc.createElement( 'style' ),
-				font = $( 'body' ).css( 'font-family' );
+				font = $( 'body' ).css( 'font-family' ),
+				color = $( '.wpforms-entry-preview-wrapper' ).is( ':visible' ) ? $( '.wpforms-entry-preview-value' ).css( 'color' ) : 'inherit'; // add color on entry preview field.
 
 			style.setAttribute( 'type', 'text/css' );
 			style.innerHTML = 'body.mce-content-body {' +
 				'	margin: 0 !important;' +
 				'	background-color: transparent !important;' +
 				'	font-family: ' + font + ';' +
+				'	color: ' + color + ';' +
 				'}' +
 				'*:first-child {' +
 				'	margin-top: 0' +

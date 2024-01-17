@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WPForms\Pro\Integrations\LiteConnect\Integration;
+use WPForms\Admin\Builder\TemplatesCache;
 use WPForms\Admin\Builder\TemplateSingleCache;
 
 /**
@@ -57,7 +58,6 @@ class WPForms_Pro {
 		if ( is_admin() || wp_doing_cron() || wpforms_doing_wp_cli() ) {
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/ajax-actions.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/entries/class-entries-single.php';
-			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/entries/class-entries-list.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/class-updater.php';
 			require_once WPFORMS_PLUGIN_DIR . 'pro/includes/admin/class-license.php';
 		}
@@ -115,7 +115,7 @@ class WPForms_Pro {
 		wpforms()->entry_fields = new WPForms_Entry_Fields_Handler();
 		wpforms()->entry_meta   = new WPForms_Entry_Meta_Handler();
 
-		if ( is_admin() && ! wpforms()->license instanceof WPForms_License ) {
+		if ( is_admin() && ! wpforms()->get( 'license' ) instanceof WPForms_License ) {
 			wpforms()->license = new WPForms_License();
 		}
 	}
@@ -133,12 +133,8 @@ class WPForms_Pro {
 
 		$key = wpforms_get_license_key();
 
-		if ( ! $key ) {
-			return;
-		}
-
 		// Go ahead and initialize the updater.
-		new \WPForms_Updater(
+		$updater_obj = new WPForms_Updater(
 			[
 				'plugin_name' => 'WPForms',
 				'plugin_slug' => 'wpforms',
@@ -149,6 +145,9 @@ class WPForms_Pro {
 				'key'         => $key,
 			]
 		);
+
+		// Register the updater instance.
+		wpforms()->register_instance( 'updater', $updater_obj );
 
 		// Fire a hook for Addons to register their updater since we know the key is present.
 		do_action( 'wpforms_updater', $key );
@@ -188,6 +187,11 @@ class WPForms_Pro {
 		// Restart the import flags for Lite Connect if needed.
 		if ( class_exists( Integration::class ) ) {
 			Integration::maybe_restart_import_flag();
+		}
+
+		// Wipe templates content cache.
+		if ( class_exists( TemplatesCache::class ) ) {
+			( new TemplatesCache() )->wipe_content_cache();
 		}
 
 		// Wipe cache of an empty templates.
@@ -267,15 +271,15 @@ class WPForms_Pro {
 
 		$custom = [];
 
-		unset( $links['pro'], $links['docs'] );
+		unset( $links['wpforms-pro'], $links['wpforms-docs'] );
 
-		if ( isset( $links['settings'] ) ) {
-			$custom['settings'] = $links['settings'];
+		if ( isset( $links['wpforms-settings'] ) ) {
+			$custom['wpforms-settings'] = $links['wpforms-settings'];
 
-			unset( $links['settings'] );
+			unset( $links['wpforms-settings'] );
 		}
 
-		$custom['support'] = sprintf(
+		$custom['wpforms-support'] = sprintf(
 			'<a href="%1$s" aria-label="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a>',
 			esc_url(
 				add_query_arg(
@@ -292,7 +296,7 @@ class WPForms_Pro {
 			esc_html__( 'Support', 'wpforms' )
 		);
 
-		$custom['docs'] = sprintf(
+		$custom['wpforms-docs'] = sprintf(
 			'<a href="%1$s" aria-label="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a>',
 			esc_url(
 				add_query_arg(
@@ -468,18 +472,6 @@ class WPForms_Pro {
 			'type'    => 'text',
 			'default' => esc_html__( 'Please enter time between {minTime} and {maxTime}.', 'wpforms' ),
 		];
-		$settings['validation']['validation-requiredpayment']  = [
-			'id'      => 'validation-requiredpayment',
-			'name'    => esc_html__( 'Payment Required', 'wpforms' ),
-			'type'    => 'text',
-			'default' => esc_html__( 'Payment is required.', 'wpforms' ),
-		];
-		$settings['validation']['validation-creditcard']       = [
-			'id'      => 'validation-creditcard',
-			'name'    => esc_html__( 'Credit Card', 'wpforms' ),
-			'type'    => 'text',
-			'default' => esc_html__( 'Please enter a valid credit card number.', 'wpforms' ),
-		];
 		$settings['validation']['validation-post_max_size']    = [
 			'id'      => 'validation-post_max_size',
 			'name'    => esc_html__( 'File Upload Total Size', 'wpforms' ),
@@ -636,7 +628,9 @@ class WPForms_Pro {
 
 		// The label for the "Entries" column is already defined in the "Lite" version.
 		// The primary reason for leaving this here is to continue loading the translation equivalent associated with the PRO version text-domain.
-		$columns['entries'] = esc_html__( 'Entries', 'wpforms' );
+		if ( isset( $columns['entries'] ) ) {
+			$columns['entries'] = esc_html__( 'Entries', 'wpforms' );
+		}
 
 		return $columns;
 	}
@@ -1218,7 +1212,7 @@ class WPForms_Pro {
 						$settings->form_data,
 						esc_html__( 'Confirmation Page', 'wpforms' ),
 						[
-							'class'       => 'wpforms-panel-field-confirmations-page-choicesjs-unflippable',
+							'class'       => 'wpforms-panel-field-confirmations-page-choicesjs',
 							'options'     => wpforms_builder_form_settings_confirmation_get_pages( $settings->form_data, $field_id ),
 							'input_id'    => 'wpforms-panel-field-confirmations-page-' . $field_id,
 							'input_class' => 'wpforms-panel-field-confirmations-page',
@@ -1321,8 +1315,6 @@ class WPForms_Pro {
 		// disable the setting, otherwise enable it.
 		$strings['uuid_cookie'] = ! wpforms_setting( 'gdpr-disable-uuid', false );
 
-		$strings['val_requiredpayment'] = wpforms_setting( 'validation-requiredpayment', esc_html__( 'Payment is required.', 'wpforms' ) );
-		$strings['val_creditcard']      = wpforms_setting( 'validation-creditcard', esc_html__( 'Please enter a valid credit card number.', 'wpforms' ) );
 		$strings['val_post_max_size']   = wpforms_setting(
 			'validation-post_max_size',
 			sprintf( /* translators: %1$s - total size of the selected files in megabytes, %2$s - allowed file upload limit in megabytes. */
@@ -1651,7 +1643,7 @@ class WPForms_Pro {
 	protected function get_wpforms_plugins() {
 
 		$plugins = [];
-		$license = wpforms()->license;
+		$license = wpforms()->get( 'license' );
 
 		if ( empty( $license ) ) {
 			return $plugins;

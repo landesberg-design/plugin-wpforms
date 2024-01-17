@@ -156,12 +156,19 @@ class WPForms_Field_URL extends WPForms_Field {
 
 		// Basic required check - If field is marked as required, check for entry data.
 		if ( empty( $field_submit ) && ! empty( $form_data['fields'][ $field_id ]['required'] ) ) {
-			wpforms()->process->errors[ $form_id ][ $field_id ] = wpforms_get_required_label();
+			wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ] = wpforms_get_required_label();
 		}
 
 		// Check that URL is in the valid format.
 		if ( ! empty( $field_submit ) && ! wpforms_is_url( $field_submit ) ) {
-			wpforms()->process->errors[ $form_id ][ $field_id ] = apply_filters( 'wpforms_valid_url_label', esc_html__( 'Please enter a valid URL.', 'wpforms' ) );
+			/**
+			 * Filters the URL field error message.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param string $message Error message.
+			 */
+			wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ] = apply_filters( 'wpforms_valid_url_label', esc_html__( 'Please enter a valid URL.', 'wpforms' ) ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 		}
 	}
 
@@ -177,7 +184,7 @@ class WPForms_Field_URL extends WPForms_Field {
 	public function format( $field_id, $field_submit, $form_data ) {
 
 		// Set field details.
-		wpforms()->process->fields[ $field_id ] = [
+		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => ! empty( $form_data['fields'][ $field_id ]['label'] ) ? sanitize_text_field( $form_data['fields'][ $field_id ]['label'] ) : '',
 			'value' => trim( $field_submit ),
 			'id'    => absint( $field_id ),

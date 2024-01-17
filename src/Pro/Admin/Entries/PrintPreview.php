@@ -485,7 +485,7 @@ class PrintPreview {
 				: $choice['label'];
 		}
 
-		$label = isset( $choice['label'] ) ? $choice['label'] : '';
+		$label = $choice['label'] ?? '';
 		/* translators: %s - item number. */
 		$label = $label !== '' ? $label : sprintf( esc_html__( 'Item %s', 'wpforms' ), $key );
 
@@ -493,8 +493,9 @@ class PrintPreview {
 			return $label;
 		}
 
-		$value  = ! empty( $choice['value'] ) ? $choice['value'] : 0;
-		$amount = wpforms_format_amount( wpforms_sanitize_amount( $value ), true );
+		$value    = $choice['value'] ?? 0;
+		$currency = $field['currency'] ?? '';
+		$amount   = wpforms_format_amount( wpforms_sanitize_amount( $value, $currency ), true, $currency );
 
 		return $amount ? $label . ' - ' . $amount : $label;
 	}
@@ -600,12 +601,27 @@ class PrintPreview {
 	 * Check if field is allowed to be displayed.
 	 *
 	 * @since 1.8.1.2
+	 * @since 1.8.6 Internal Information and Entry Preview fields are not allowed.
 	 *
 	 * @param array $field Field data.
 	 *
 	 * @return bool
 	 */
 	public function is_field_allowed( $field ) {
+
+		if ( empty( $field['type'] ) ) {
+			return false;
+		}
+
+		// These fields should never be displayed on the Print page.
+		$ignore = [
+			'internal-information',
+			'entry-preview',
+		];
+
+		if ( in_array( $field['type'], $ignore, true ) ) {
+			return false;
+		}
 
 		$is_dynamic = ! empty( $field['dynamic'] );
 

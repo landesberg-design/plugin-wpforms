@@ -156,7 +156,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 				$field_data['ext']           = '';
 			}
 
-			wpforms()->process->fields[ $field_id ] = $field_data;
+			wpforms()->get( 'process' )->fields[ $field_id ] = $field_data;
 
 			return;
 		}
@@ -165,7 +165,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 			$field_data['value_raw'] = '';
 			$field_data['value']     = '';
 
-			wpforms()->process->fields[ $field_id ] = $field_data;
+			wpforms()->get( 'process' )->fields[ $field_id ] = $field_data;
 
 			return;
 		}
@@ -174,7 +174,7 @@ class EntriesEdit extends \WPForms\Pro\Forms\Fields\Base\EntriesEdit {
 
 		$field_data['value'] = implode( "\n", array_column( $field_data['value_raw'], 'value' ) );
 
-		wpforms()->process->fields[ $field_id ] = $field_data;
+		wpforms()->get( 'process' )->fields[ $field_id ] = $field_data;
 	}
 
 	/**

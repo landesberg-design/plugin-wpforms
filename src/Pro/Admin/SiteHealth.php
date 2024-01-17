@@ -48,7 +48,7 @@ class SiteHealth extends \WPForms\Admin\SiteHealth {
 	 */
 	public function license_check() {
 
-		$license = wpforms()->license;
+		$license = wpforms()->get( 'license' );
 
 		if ( empty( $license ) || ! $license->get() ) {
 			$status = __( 'not detected', 'wpforms' );

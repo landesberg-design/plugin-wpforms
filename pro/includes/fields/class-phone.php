@@ -16,7 +16,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 *
 	 * @since 1.6.3
 	 */
-	const INTL_VERSION = '18.2.1';
+	const INTL_VERSION = '18.3.3';
 
 	/**
 	 * Primary class constructor.
@@ -43,7 +43,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 		add_action( 'wpforms_frontend_js', [ $this, 'enqueue_frontend_js' ] );
 
 		// Add frontend strings.
-		add_action( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
+		add_filter( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
 	}
 
 	/**
@@ -90,7 +90,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 */
 	public function enqueue_frontend_css( $forms ) {
 
-		if ( ! wpforms()->frontend->assets_global() && ! $this->has_smart_format( $forms ) ) {
+		if ( ! wpforms()->get( 'frontend' )->assets_global() && ! $this->has_smart_format( $forms ) ) {
 			return;
 		}
 
@@ -114,7 +114,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 */
 	public function enqueue_frontend_js( $forms ) {
 
-		if ( ! wpforms()->frontend->assets_global() && ! $this->has_smart_format( $forms ) ) {
+		if ( ! wpforms()->get( 'frontend' )->assets_global() && ! $this->has_smart_format( $forms ) ) {
 			return;
 		}
 
@@ -341,7 +341,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 			! empty( $form_data['fields'][ $field_id ]['required'] ) &&
 			empty( $value )
 		) {
-			wpforms()->process->errors[ $form_id ][ $field_id ] = wpforms_get_required_label();
+			wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ] = wpforms_get_required_label();
 		}
 
 		if (
@@ -361,7 +361,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 		}
 
 		if ( $error ) {
-			wpforms()->process->errors[ $form_id ][ $field_id ] = wpforms_setting( 'validation-phone', esc_html__( 'Please enter a valid phone number.', 'wpforms' ) );
+			wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ] = wpforms_setting( 'validation-phone', esc_html__( 'Please enter a valid phone number.', 'wpforms' ) );
 		}
 	}
 
@@ -379,7 +379,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 		$name = ! empty( $form_data['fields'][ $field_id ]['label'] ) ? $form_data['fields'][ $field_id ]['label'] : '';
 
 		// Set final field details.
-		wpforms()->process->fields[ $field_id ] = [
+		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => $this->sanitize_value( $field_submit ),
 			'id'    => absint( $field_id ),

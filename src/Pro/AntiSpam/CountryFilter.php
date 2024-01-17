@@ -554,7 +554,9 @@ class CountryFilter {
 
 		// Get a filtered form content.
 		$form_data     = json_decode( stripslashes( $form['post_content'] ), true );
-		$country_codes = json_decode( $form_data['settings']['anti_spam']['country_filter']['country_codes'], true );
+		$country_codes = isset( $data['settings']['anti_spam']['country_filter'] ) ?
+			json_decode( $data['settings']['anti_spam']['country_filter']['country_codes'], true ) :
+			[];
 
 		if ( ! is_array( $country_codes ) ) {
 			$country_codes = [];

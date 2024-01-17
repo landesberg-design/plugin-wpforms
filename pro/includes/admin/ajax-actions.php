@@ -33,7 +33,7 @@ function wpforms_entry_list_star() {
 	$is_success = false;
 
 	if ( 'star' === $task ) {
-		$is_success = wpforms()->entry->update(
+		$is_success = wpforms()->get( 'entry' )->update(
 			$entry_id,
 			[
 				'starred' => '1',
@@ -43,7 +43,7 @@ function wpforms_entry_list_star() {
 		$note_data = esc_html__( 'Entry starred.', 'wpforms' );
 
 	} elseif ( 'unstar' === $task ) {
-		$is_success = wpforms()->entry->update(
+		$is_success = wpforms()->get( 'entry' )->update(
 			$entry_id,
 			[
 				'starred' => '0',
@@ -56,7 +56,7 @@ function wpforms_entry_list_star() {
 	if ( $is_success ) {
 
 		// Add an entry note about Star/Unstar action.
-		wpforms()->entry_meta->add(
+		wpforms()->get( 'entry_meta' )->add(
 			[
 				'entry_id' => $entry_id,
 				'form_id'  => $form_id,
@@ -103,7 +103,7 @@ function wpforms_entry_list_read() {
 	$note_data  = '';
 
 	if ( 'read' === $task ) {
-		$is_success = wpforms()->entry->update(
+		$is_success = wpforms()->get( 'entry' )->update(
 			$entry_id,
 			[
 				'viewed' => '1',
@@ -113,7 +113,7 @@ function wpforms_entry_list_read() {
 		$note_data = esc_html__( 'Entry read.', 'wpforms' );
 
 	} elseif ( 'unread' === $task ) {
-		$is_success = wpforms()->entry->update(
+		$is_success = wpforms()->get( 'entry' )->update(
 			$entry_id,
 			[
 				'viewed' => '0',
@@ -126,7 +126,7 @@ function wpforms_entry_list_read() {
 	if ( $is_success && ! empty( $note_data ) ) {
 
 		// Add an entry note about Star/Unstar action.
-		wpforms()->entry_meta->add(
+		wpforms()->get( 'entry_meta' )->add(
 			[
 				'entry_id' => $entry_id,
 				'form_id'  => $form_id,

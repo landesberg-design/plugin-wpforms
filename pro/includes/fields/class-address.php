@@ -102,6 +102,7 @@ class WPForms_Field_Address extends WPForms_Field {
 
 		// Determine scheme we should use moving forward.
 		$scheme = 'us';
+
 		if ( ! empty( $field['scheme'] ) ) {
 			$scheme = esc_attr( $field['scheme'] );
 		} elseif ( ! empty( $field['format'] ) ) {
@@ -115,8 +116,17 @@ class WPForms_Field_Address extends WPForms_Field {
 
 		$form_id   = absint( $form_data['id'] );
 		$field_id  = absint( $field['id'] );
-		$countries = isset( $this->schemes[ $scheme ]['countries'] ) ? $this->schemes[ $scheme ]['countries'] : [];
+		$countries = $this->schemes[ $scheme ]['countries'] ?? [];
+
 		asort( $countries );
+
+		$states            = $this->schemes[ $scheme ]['states'] ?? '';
+		$state_placeholder = ! empty( $field['state_placeholder'] ) ? $field['state_placeholder'] : '';
+
+		// Set placeholder for state dropdown.
+		if ( is_array( $states ) && ! $state_placeholder ) {
+			$state_placeholder = $this->dropdown_empty_value( 'state' );
+		}
 
 		// Properties shared by both core schemes.
 		$props      = [
@@ -184,7 +194,7 @@ class WPForms_Field_Address extends WPForms_Field {
 					'attr'     => [
 						'name'        => "wpforms[fields][{$field_id}][state]",
 						'value'       => ! empty( $field['state_default'] ) ? wpforms_process_smart_tags( $field['state_default'], $form_data ) : '',
-						'placeholder' => ! empty( $field['state_placeholder'] ) ? $field['state_placeholder'] : '',
+						'placeholder' => $state_placeholder,
 					],
 					'block'    => [
 						'wpforms-field-row-block',
@@ -195,7 +205,7 @@ class WPForms_Field_Address extends WPForms_Field {
 					],
 					'data'     => [],
 					'id'       => "wpforms-{$form_id}-field_{$field_id}-state",
-					'options'  => isset( $this->schemes[ $scheme ]['states'] ) ? $this->schemes[ $scheme ]['states'] : '',
+					'options'  => $states,
 					'required' => ! empty( $field['required'] ) ? 'required' : '',
 					'sublabel' => [
 						'hidden' => ! empty( $field['sublabel_hide'] ),
@@ -229,7 +239,7 @@ class WPForms_Field_Address extends WPForms_Field {
 					'attr'     => [
 						'name'        => "wpforms[fields][{$field_id}][country]",
 						'value'       => ! empty( $field['country_default'] ) ? wpforms_process_smart_tags( $field['country_default'], $form_data ) : '',
-						'placeholder' => ! empty( $field['country_placeholder'] ) ? $field['country_placeholder'] : '',
+						'placeholder' => ! empty( $field['country_placeholder'] ) ? $field['country_placeholder'] : $this->dropdown_empty_value( 'country' ),
 					],
 					'block'    => [
 						'wpforms-field-row-block',
@@ -1018,27 +1028,27 @@ class WPForms_Field_Address extends WPForms_Field {
 
 			// Require Address Line 1.
 			if ( isset( $field_submit['address1'] ) && wpforms_is_empty_string( $field_submit['address1'] ) ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['address1'] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['address1'] = $required;
 			}
 
 			// Require City.
 			if ( isset( $field_submit['city'] ) && wpforms_is_empty_string( $field_submit['city'] ) ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['city'] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['city'] = $required;
 			}
 
 			// Require ZIP/Postal.
 			if ( isset( $this->schemes[ $scheme ]['postal_label'], $field_submit['postal'] ) && empty( $form_data['fields'][ $field_id ]['postal_hide'] ) && wpforms_is_empty_string( $field_submit['postal'] ) ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['postal'] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['postal'] = $required;
 			}
 
 			// Required State.
 			if ( isset( $this->schemes[ $scheme ]['states'], $field_submit['state'] ) && wpforms_is_empty_string( $field_submit['state'] ) ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['state'] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['state'] = $required;
 			}
 
 			// Required Country.
 			if ( isset( $this->schemes[ $scheme ]['countries'], $field_submit['country'] ) && empty( $form_data['fields'][ $field_id ]['country_hide'] ) && wpforms_is_empty_string( $field_submit['country'] ) ) {
-				wpforms()->process->errors[ $form_id ][ $field_id ]['country'] = $required;
+				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['country'] = $required;
 			}
 		}
 	}
@@ -1087,7 +1097,7 @@ class WPForms_Field_Address extends WPForms_Field {
 			$value = '';
 		}
 
-		wpforms()->process->fields[ $field_id ] = [
+		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'     => sanitize_text_field( $name ),
 			'value'    => $value,
 			'id'       => absint( $field_id ),

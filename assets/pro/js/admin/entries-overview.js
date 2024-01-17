@@ -15,7 +15,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 	 *
 	 * @since 1.8.2
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
 	const el = {};
 
@@ -24,7 +24,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 	 *
 	 * @since 1.8.2
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
 	const vars = {
 
@@ -135,7 +135,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @returns {object} Localized strings.
+		 * @return {Object} Localized strings.
 		 */
 		get i18n() {
 
@@ -147,7 +147,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @returns {object} Localized strings.
+		 * @return {Object} Localized strings.
 		 */
 		get xAxesDisplayFormat() {
 
@@ -175,7 +175,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @returns {object} Colors object specified for the graph.
+		 * @return {Object} Colors object specified for the graph.
 		 */
 		get colors() {
 
@@ -205,7 +205,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @returns {object} Scriptable options as a function which is called for each data.
+		 * @return {Object} Scriptable options as a function which is called for each data.
 		 */
 		get settings() { /* eslint max-lines-per-function: ["error", 100] */
 
@@ -221,7 +221,8 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 							borderWidth: 2,
 							pointRadius: 4,
 							pointBorderWidth: 1,
-							...this.colors[this.theme],
+							maxBarThickness: 100,
+							...this.colors[ this.theme ],
 						},
 					],
 				},
@@ -240,7 +241,6 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 							{
 								type: 'time',
 								offset: this.type === 'bar',
-								maxBarThickness: 100,
 								time: {
 									unit: 'day',
 									tooltipFormat: this.tooltipFormat,
@@ -452,7 +452,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} event An event which takes place in the DOM.
+		 * @param {Object} event An event which takes place in the DOM.
 		 */
 		handleOnResetDatepicker: function( event ) {
 
@@ -473,7 +473,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object}  event         An event which takes place in the DOM.
+		 * @param {Object}  event         An event which takes place in the DOM.
 		 * @param {boolean} isCustomDates Determine whether a custom date range is provided.
 		 */
 		handleOnUpdateDatepicker: function( event = {}, isCustomDates = false ) {
@@ -520,7 +520,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} event An event which takes place in the DOM.
+		 * @param {Object} event An event which takes place in the DOM.
 		 */
 		handleOnShowChart: function( event ) {
 
@@ -545,7 +545,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} event An event which takes place in the DOM.
+		 * @param {Object} event An event which takes place in the DOM.
 		 */
 		handleOnResetChart: function( event ) {
 
@@ -582,7 +582,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} event An event which takes place in the DOM.
+		 * @param {Object} event An event which takes place in the DOM.
 		 */
 		handleOnSaveSettings: function( event ) {
 
@@ -622,7 +622,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} event An event which takes place in the DOM.
+		 * @param {Object} event An event which takes place in the DOM.
 		 */
 		handleOnToggle: function( event ) {
 
@@ -650,7 +650,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} event An event which takes place in the DOM.
+		 * @param {Object} event An event which takes place in the DOM.
 		 */
 		handleOnClickOutside: function( event ) {
 
@@ -670,9 +670,9 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} data Chart dataset data.
+		 * @param {Object} data Chart dataset data.
 		 *
-		 * @returns {object} Labels and dataset data object.
+		 * @return {Object} Labels and dataset data object.
 		 */
 		processDatasetData: function( data ) {
 
@@ -815,7 +815,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} $this Reference to the DOM element.
+		 * @param {Object} $this Reference to the DOM element.
 		 */
 		maybeCleanupChart: function( $this ) {
 
@@ -835,7 +835,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} $this Reference to the DOM element.
+		 * @param {Object} $this Reference to the DOM element.
 		 */
 		selectDatepickerChoice: function( $this ) {
 
@@ -858,7 +858,7 @@ let WPFormsEntriesOverview = window.WPFormsEntriesOverview || ( function( docume
 		 *
 		 * @since 1.8.2
 		 *
-		 * @param {object} $elm Reference to the DOM element.
+		 * @param {Object} $elm Reference to the DOM element.
 		 */
 		hideElm: function( $elm ) {
 

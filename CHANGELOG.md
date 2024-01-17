@@ -1,6 +1,108 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.6.2] - 2024-01-16
+### Fixed
+- PHP warning was thrown for legacy subscription Stripe payment form.
+- PHP warning was thrown while connecting the Jetpack plugin account.
+- The layout of some fields was broken on the Entry Edit page.
+- Likert Scale with single-row rating scale were exported incorrectly.
+
+## [1.8.6.1] - 2024-01-10
+### Fixed
+- A fatal error was thrown in rare cases when running background jobs due to a conflict with some 3rd-party plugins.
+- An Error Handler was throwing a TypeError in some rare cases.
+
+## [1.8.6] - 2024-01-09
+### Added
+- New column selector and column reordering on the Forms Overview and Form Entries page.
+- New right-click context menu in the Form Builder.
+- Forms can now be imported programmatically.
+- New Empty Trash button for table navigation on the Entries Trash view screen.
+- New filter `wpforms_pro_admin_entries_export_skip_not_selected_choices` to skip not selected choices in the entries export.
+- Payment Checkboxes fields can now be exported as separate columns.
+- New minimum price option for the Payment Single Item field that can help protect your forms against card testing by fraudsters.
+- Caching to the templates list markup on the Templates page and in the Form Builder for improved performance.
+- Customer name can now be configured on the Form Builder > Payments > Stripe screen.
+- Dark Mode support for email notifications. Users are now able to customize styling for each appearance theme.
+
+### Changed
+- The `intl-tel-input` library has been updated to v18.3.3.
+- Improved compatibility with the Apple Pay feature for Stripe payments.
+- Updated the design of the Addons page in the admin dashboard.
+- Delete All button renamed to Empty Trash on the Entries Trash view screen.
+- Improved the look of the View Options menu on the single entry view page.
+- Improved compatibility with latest versions of Divi theme.
+- Improved compatibility with OceanWP theme.
+- Improved compatibility with the Hello Elementor theme.
+- Improved styles of various Lite Connect settings.
+- Improved behavior of various Email settings on the WPForms Settings page.
+- Improved form templates search.
+- Significantly improved performance of the Form Builder when opening existing forms.
+- Display a link to the manual installation in case automatic addon installation fails.
+- Restrict media files to only valid image types for the Header Image field on the Email page, and Image Choices options in the Builder.
+- Improved handling of empty choice labels of the Dropdown, Checkboxes, and Multiple Choice fields.
+- Improved various messages across the admin area.
+- Email templates support for Lite Connect imported entries notification.
+- Custom Date Range picker on Export tab can now be cleared.
+- State and Country subfields of the Address Fields now have no default value selected on the frontend.
+- Styles customizations of email notifications on the WPForms Settings page can now be previewed without saving them.
+- Optimized the entry export process to prevent memory issues when exporting many entries for complex forms.
+- Stripe library updated to the latest version.
+- When WPForms plugin is downgraded, a helpful warning message is now displayed.
+- Improved Section Divider field appearance.
+- The Authorize.Net logo was updated.
+
+### Fixed
+- Star icon misaligned on the single entry view page.
+- Lead Forms notice displayed on the Print Preview page if the entry was edited manually.
+- Remove empty Page Break field from the last page if previous page button is disabled.
+- Pressing Apply with no selected action on the Payments Overview page triggered WordPress' die screen.
+- Elementor widget preview is not properly updated after editing the form in the builder popup.
+- Rich Text field is rendered incorrectly on Elementor editor preview.
+- Plugin prefix added to all action links on the plugins page to prevent collisions with third-party CSS code.
+- Stripe Credit Card field styles are not applied in WordPress Site Customizer.
+- Dashboard widget displayed incorrect entry counts for users with access restrictions.
+- Stripe Elements field had too much spacing around the Submit button with Modern styles applied.
+- Sorting forms by last entry worked incorrectly in some cases.
+- Trashed forms not removed during the plugin deletion process.
+- An empty value from the Dropdown field is saved if the choice with empty label is selected.
+- Multiple notices reminding to enter your license key could be displayed at the same time on Addons page.
+- Some styles were incorrect for the Form Selector widget in Block Editor, Elementor and Divi.
+- Confirmation Page dropdown is not completely visible in some cases on smaller screens.
+- PHP warning about undefined country filter key.
+- Header Image Size dropdown appeared on the Email Settings page even though there is no image set for the Email Header.
+- Scroll to the error message when the form is submitted with an error not working in some cases.
+- Some 3rd-party plugins could be included in the translation files check.
+- Email notification not rendered correctly if multiple smart tags are used.
+- Inconsistent display of the currency value on existing Entry view and print if the currency has been changed.
+- PHP deprecation warning logged when the Weekly Summary email is triggered via cron on PHP 8.2.
+- Regular Stripe card number field not inheriting colors correctly from the Lead Forms settings.
+- The encoded value of the Password field did not work with WPForm's custom User Login Page.
+- Date and time format in Entry Export should not contain `at` to be recognized as a cell of date type.
+- Exported Address field values contain incorrect values if the form is submitted with empty address data.
+- Dropdown preview in the Form Builder not updated correctly.
+- Entry Preview field unreadable on some default Block themes.
+- Fields and a submit button not aligned properly on single line form layout.
+- Checkbox and multiple dropdown values displayed in one line with new email templates.
+- List of countries not fully displayed in the phone field when editing an entry.
+- Do not display the "Install and Activate" button on the Geolocation and Coupons pages for Lite users if plugin installation is not allowed.
+- Read-only Number fields should not display spin buttons.
+- Previous button not displayed in certain cases in the Form Builder when the Entry Preview field is added.
+- Incorrect error text displayed when uploading a file of an illegal format in the Form Builder.
+- Incorrect error messages displayed for the required Payment Total and Stripe Credit Card fields.
+- Prevent form pagination if the form is invalid.
+- PHP Warning on the Form Entries admin page when non-standard date format is used.
+- Date/Time fields in narrow columns displayed incorrectly in the Form Builder and Divi Builder.
+- Field validation error icon positioned incorrectly when a form inherited content centering from the theme.
+- Email addresses containing special characters are incorrectly validated against allow/deny list.
+- Fields with subfields displayed incorrectly on the frontend in latest Safari and other browsers using WebKit.
+- Email notifications using Plain Text format has some special characters that are converted into their HTML entities.
+- Stripe integration with incomplete configuration generates console errors on the Conversational Forms page.
+- JavaScript deprecation notices in the browser's console when the Bar graph style is used on the Payments or Entries Overview pages.
+- Richtext field list styles affecting list styles in other instances of TinyMCE editor.
+- Stripe subscriptions paid by Link were unable to be renewed.
+
 ## [1.8.5.4] - 2023-12-27
 ### Changed
 - The `Chart.js` library has been updated to v2.9.4.

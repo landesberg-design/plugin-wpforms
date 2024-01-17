@@ -7,6 +7,7 @@ use Exception;
 use WP_Filesystem_Base;
 use WPForms\Helpers\Transient;
 use WPForms\Vendor\XLSXWriter;
+use WPForms\Pro\Admin\Entries\Export\Traits\Export as ExportTrait;
 
 /**
  * File-related routines.
@@ -14,6 +15,8 @@ use WPForms\Vendor\XLSXWriter;
  * @since 1.5.5
  */
 class File {
+
+	use ExportTrait;
 
 	/**
 	 * Instance of Export Class.
@@ -364,6 +367,8 @@ class File {
 
 			$this->export->ajax->request_data = $request_data;
 
+			$request_data = $this->exclude_unselected_choices( $request_data );
+
 			if ( empty( $request_data['type'] ) || $request_data['type'] === 'csv' ) {
 				$this->write_csv( $request_data );
 			} elseif ( $request_data['type'] === 'xlsx' ) {
@@ -382,6 +387,39 @@ class File {
 
 			\WPForms\Admin\Notice::error( $error );
 		}
+	}
+
+	/**
+	 * Exclude unselected choices from the export.
+	 *
+	 * @since 1.8.6
+	 *
+	 * @param array $request_data Request data array.
+	 *
+	 * @return array Request data array.
+	 */
+	private function exclude_unselected_choices( array $request_data ): array {
+
+		// Skip if not AJAX request.
+		if ( wpforms_is_ajax() ) {
+			return $request_data;
+		}
+
+		$entry = wpforms()->get( 'entry' )->get( $request_data['db_args']['entry_id'] );
+
+		$fields = $this->export->ajax->get_entry_fields_data( $entry );
+
+		foreach ( $request_data['columns_row'] as $col_id => $col_label ) {
+			if ( strpos( $col_id, 'multiple_field_' ) !== false ) {
+				$col_value = $this->export->ajax->get_multiple_row_value( $fields, $col_id );
+
+				if ( $this->is_skip_value( $col_value, $fields, $col_id ) ) {
+					unset( $request_data['columns_row'][ $col_id ] );
+				}
+			}
+		}
+
+		return $request_data;
 	}
 
 	/**
