@@ -1123,7 +1123,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			[
 				'months'       => range( 1, 12 ),
 				'days'         => range( 1, 31 ),
-				'years'        => range( date( 'Y' ), 1920 ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+				'years'        => range( date( 'Y' ) + 1, 1920 ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 				'months_label' => esc_html__( 'MM', 'wpforms' ),
 				'days_label'   => esc_html__( 'DD', 'wpforms' ),
 				'years_label'  => esc_html__( 'YYYY', 'wpforms' ),

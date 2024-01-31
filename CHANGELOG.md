@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.6.4] - 2024-01-31
+### Fixed
+- Term notice was removed under the Stripe Credit Card field when Payment Elements were used.
+- An additional spinner appeared when the Setup panel button was clicked again.
+- The first year in date dropdown has been set to 1 year ahead.
+- Overflow of `img`, `video`, `canvas` and `svg` tags has been set to `clip` by default, as recommended by Google PageSpeed Insights.
+
+## [1.8.6.3] - 2024-01-19
+### Fixed
+- The Name field was not clickable with Classic Markup and Base Styles.
+
 ## [1.8.6.2] - 2024-01-16
 ### Fixed
 - PHP warning was thrown for legacy subscription Stripe payment form.

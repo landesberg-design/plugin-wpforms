@@ -83,7 +83,14 @@ WPForms.Admin.Builder.PanelLoader = WPForms.Admin.Builder.PanelLoader || ( funct
 		events() {
 			// Panel switching.
 			el.$builder.on( 'wpformsPanelSwitch', function( e, panel ) {
-				// Skip if the panel is already loaded.
+				// Skip if the panel is still loading.
+				if ( el.$builder.find( `.wpforms-panel-${ panel }-button .wpforms-loading-spinner` ).length ) {
+					e.preventDefault();
+
+					return;
+				}
+
+				// Open the panel if it is already loaded.
 				if ( el.$panels.find( '#wpforms-panel-' + panel ).length ) {
 					return;
 				}

@@ -232,7 +232,6 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 					// See min amount for different currencies https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts.
 					amount: 77777,
 					loader: 'always',
-					setupFutureUsage: 'off_session',
 					locale: wpforms_stripe.data.element_locale,
 					appearance: app.getElementAppearanceOptions( $form ),
 				} );
