@@ -77,6 +77,9 @@ class Field extends \WPForms_Field {
 
 		// Form frontend JS enqueues.
 		add_action( 'wpforms_frontend_js', [ $this, 'enqueue_frontend_js' ] );
+
+		// Customize HTML field value.
+		add_filter( 'wpforms_html_field_value', [ $this, 'field_html_value' ], 10, 4 );
 	}
 
 	/**
@@ -159,6 +162,10 @@ class Field extends \WPForms_Field {
 			in_array( $field['style'], [ self::STYLE_CLASSIC, self::STYLE_MODERN ], true )
 		) {
 			$properties['container']['class'][] = "wpforms-field-select-style-{$field['style']}";
+		}
+
+		if ( $this->is_payment_quantities_enabled( $field ) ) {
+			$properties['container']['class'][] = ' wpforms-payment-quantities-enabled';
 		}
 
 		return $properties;
@@ -246,6 +253,9 @@ class Field extends \WPForms_Field {
 		];
 
 		$this->field_element( 'row', $field, $args );
+
+		// Quantity.
+		$this->field_option( 'quantity', $field );
 
 		// Description.
 		$this->field_option( 'description', $field );
@@ -339,6 +349,9 @@ class Field extends \WPForms_Field {
 
 		// Choices.
 		$this->field_preview_option( 'choices', $field, $args );
+
+		// Quantity.
+		$this->field_preview_option( 'quantity', $field );
 
 		// Description.
 		$this->field_preview_option( 'description', $field );
@@ -437,6 +450,8 @@ class Field extends \WPForms_Field {
 		}
 
 		echo '</select>';
+
+		$this->display_quantity_dropdown( $field );
 	}
 
 	/**
@@ -494,7 +509,7 @@ class Field extends \WPForms_Field {
 			$value        = $choice_label . ' - ' . $value;
 		}
 
-		wpforms()->get( 'process' )->fields[ $field_id ] = [
+		$field_data = [
 			'name'         => $name,
 			'value'        => $value,
 			'value_choice' => $choice_label,
@@ -505,6 +520,12 @@ class Field extends \WPForms_Field {
 			'id'           => absint( $field_id ),
 			'type'         => sanitize_key( $this->type ),
 		];
+
+		if ( $this->is_payment_quantities_enabled( $field ) ) {
+			$field_data['quantity'] = $this->get_submitted_field_quantity( $field, $form_data );
+		}
+
+		wpforms()->get( 'process' )->fields[ $field_id ] = $field_data;
 	}
 
 	/**

@@ -87,7 +87,7 @@ class Locator {
 	const BLOCK_WIDGET_PREFIX = self::BLOCK_WIDGET_NAME . '-';
 
 	/**
-	 * Block widgets option name.
+	 * Block widgets' option name.
 	 *
 	 * @since 1.7.4
 	 */
@@ -114,6 +114,13 @@ class Locator {
 	 * @since 1.7.4.1
 	 */
 	const WP_TEMPLATE_PART = 'wp_template_part';
+
+	/**
+	 * Standalone location types.
+	 *
+	 * @since 1.8.7
+	 */
+	const STANDALONE_LOCATION_TYPES = [ 'form_pages', 'conversational_forms' ];
 
 	/**
 	 * Default title for WPForms widget.
@@ -210,7 +217,7 @@ class Locator {
 	}
 
 	/**
-	 * Add locations column to the view.
+	 * Add locations' column to the view.
 	 *
 	 * @since 1.7.4
 	 * @deprecated 1.8.6
@@ -332,7 +339,7 @@ class Locator {
 			),
 		];
 
-		// Insert Locations action before the first available position in the positions list or at the end of $row_actions.
+		// Insert Locations action before the first available position in the positions' list or at the end of $row_actions.
 		$positions = [
 			'preview_',
 			'duplicate',
@@ -355,7 +362,7 @@ class Locator {
 	}
 
 	/**
-	 * Localize overview script to pass translation strings.
+	 * Localize the overview script to pass translation strings.
 	 *
 	 * @since 1.7.4
 	 */
@@ -372,7 +379,7 @@ class Locator {
 	}
 
 	/**
-	 * Get id of the sidebar where widget is positioned.
+	 * Get id of the sidebar where the widget is positioned.
 	 *
 	 * @since 1.7.4
 	 *
@@ -396,7 +403,7 @@ class Locator {
 	}
 
 	/**
-	 * Get name of the sidebar where widget is positioned.
+	 * Get the name of the sidebar where the widget is positioned.
 	 *
 	 * @since 1.7.4
 	 *
@@ -474,11 +481,10 @@ class Locator {
 		}
 
 		return $title;
-
 	}
 
 	/**
-	 * Whether locations type is WP Template.
+	 * Whether locations' type is WP Template.
 	 *
 	 * @since 1.7.4.1
 	 *
@@ -489,6 +495,20 @@ class Locator {
 	private function is_wp_template( $location_type ) {
 
 		return in_array( $location_type, [ self::WP_TEMPLATE, self::WP_TEMPLATE_PART ], true );
+	}
+
+	/**
+	 * Whether a location type is standalone.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string $location_type Location type.
+	 *
+	 * @return bool
+	 */
+	private function is_standalone( string $location_type ): bool {
+
+		return in_array( $location_type, self::STANDALONE_LOCATION_TYPES, true );
 	}
 
 	/**
@@ -509,7 +529,7 @@ class Locator {
 		$sidebar_name = $this->get_widget_sidebar_name( $form_location['id'] );
 
 		if ( ! $sidebar_name ) {
-			// Widget not found.
+			// The widget is not found.
 			return '';
 		}
 
@@ -544,6 +564,11 @@ class Locator {
 			return '';
 		}
 
+		// Get standalone url.
+		if ( $this->is_standalone( $form_location['type'] ) ) {
+			return $form_location['url'];
+		}
+
 		// Get post url.
 		if ( ! $this->is_post_visible( $form_location ) ) {
 			return '';
@@ -561,11 +586,23 @@ class Locator {
 	 *
 	 * @return string
 	 */
-	private function get_location_edit_url( $form_location ) {
+	private function get_location_edit_url( array $form_location ): string {
 
 		// Get widget url.
 		if ( $form_location['type'] === self::WIDGET ) {
 			return current_user_can( 'edit_theme_options' ) ? admin_url( 'widgets.php' ) : '';
+		}
+
+		// Get standalone url.
+		if ( $this->is_standalone( $form_location['type'] ) ) {
+			return add_query_arg(
+				[
+					'page'    => 'wpforms-builder',
+					'view'    => 'settings',
+					'form_id' => $form_location['form_id'],
+				],
+				admin_url( 'admin.php' )
+			);
 		}
 
 		// Get post url.
@@ -658,7 +695,7 @@ class Locator {
 
 		uasort(
 			$rows,
-			static function( $a, $b ) {
+			static function ( $a, $b ) {
 				$pattern = '/href=".+widgets.php">(.+?)</i';
 
 				$widget_title_a = preg_match( $pattern, $a, $ma ) ? $ma[1] : '';
@@ -789,13 +826,7 @@ class Locator {
 		$option  = $params[ $type ]['option'];
 		$content = $params[ $type ]['content'];
 
-		if ( $widgets === null ) {
-			$widgets = get_option( $option );
-		}
-
-		if ( ! is_array( $widgets ) ) {
-			return [];
-		}
+		$widgets = $widgets ?? (array) get_option( $option, [] );
 
 		return array_filter(
 			$widgets,
@@ -912,7 +943,7 @@ class Locator {
 	}
 
 	/**
-	 * Get difference of two arrays containing locations.
+	 * Get the difference of two arrays containing locations.
 	 *
 	 * @since 1.7.4
 	 *
@@ -1031,7 +1062,7 @@ class Locator {
 	 *
 	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function permalink_structure_changed( $old_permalink_structure, $permalink_structure ) {
+	public function permalink_structure_changed( $old_permalink_structure, $permalink_structure ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
 		/**
 		 * Run Forms Locator delete action.
@@ -1065,7 +1096,7 @@ class Locator {
 		$form_ids_to_remove = array_diff( $form_ids_before, $form_ids_after );
 		$form_ids_to_add    = array_diff( $form_ids_after, $form_ids_before );
 
-		// Loop through each form ID to remove the locations meta.
+		// Loop through each form ID to remove the locations' meta.
 		foreach ( $form_ids_to_remove as $form_id ) {
 			update_post_meta(
 				$form_id,
@@ -1075,8 +1106,8 @@ class Locator {
 		}
 
 		// Determine the titles and slugs.
-		$old_title = $post_before ? $post_before->post_title : '';
-		$old_slug  = $post_before ? $post_before->post_name : '';
+		$old_title = $post_before->post_title ?? '';
+		$old_slug  = $post_before->post_name ?? '';
 		$new_title = $post_after->post_title;
 		$new_slug  = $post_after->post_name;
 
@@ -1198,7 +1229,7 @@ class Locator {
 	}
 
 	/**
-	 * Get form locations without current post.
+	 * Get form locations without a current post.
 	 *
 	 * @since 1.7.4
 	 *
@@ -1270,5 +1301,121 @@ class Locator {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Build a standalone location.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param int    $form_id   The form ID.
+	 * @param array  $form_data Form data.
+	 * @param string $status    Form status.
+	 *
+	 * @return array Location.
+	 */
+	public function build_standalone_location( int $form_id, array $form_data, string $status = 'publish' ): array {
+
+		if ( empty( $form_id ) || empty( $form_data ) ) {
+			return [];
+		}
+
+		foreach ( self::STANDALONE_LOCATION_TYPES as $location_type ) {
+			if ( empty( $form_data['settings'][ "{$location_type}_enable" ] ) ) {
+				continue;
+			}
+
+			$title_key = "{$location_type}_title";
+			$slug_key  = "{$location_type}_page_slug";
+			$title     = $form_data['settings'][ $title_key ] ?? '';
+			$slug      = $form_data['settings'][ $slug_key ] ?? '';
+
+			// Return the location array.
+			return [
+				'type'    => $location_type,
+				'title'   => $title,
+				'form_id' => (int) $form_data['id'],
+				'id'      => $form_id,
+				'status'  => $status,
+				'url'     => '/' . $slug . '/',
+			];
+		}
+
+		return [];
+	}
+
+	/**
+	 * Add standalone form locations to post meta.
+	 *
+	 * Post meta is used to store all forms' locations,
+	 * which is displayed on the WPForms Overview page.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param int   $form_id Form ID.
+	 * @param array $data    Form data.
+	 */
+	public function add_standalone_location_to_locations_meta( int $form_id, array $data ) {
+
+		// Build standalone location.
+		$location = $this->build_standalone_location( $form_id, $data );
+
+		// No location? Bail.
+		if ( empty( $location ) ) {
+			return;
+		}
+
+		// Setup data.
+		$new_location[] = $location;
+		$post_meta      = get_post_meta( $form_id, self::LOCATIONS_META, true );
+
+		// If there is post meta, merge it with the new location.
+		if ( ! empty( $post_meta ) ) {
+
+			// Remove any previously set standalone locations.
+			$post_meta = $this->remove_standalone_location_from_array( $form_id, $post_meta );
+
+			// Merge locations and remove duplicates.
+			$new_location = array_unique( array_merge( $post_meta, $new_location ), SORT_REGULAR );
+		}
+
+		// Update post meta.
+		update_post_meta( $form_id, self::LOCATIONS_META, $new_location );
+	}
+
+	/**
+	 * Remove a form page from an array.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param int   $form_id   The form ID.
+	 * @param array $post_meta The post meta.
+	 *
+	 * @return array $post_meta Filtered post meta.
+	 */
+	private function remove_standalone_location_from_array( int $form_id, array $post_meta ): array {
+
+		// No form ID or post meta? Bail.
+		if ( empty( $form_id ) || empty( $post_meta ) ) {
+			return [];
+		}
+
+		// Loop over all locations.
+		foreach ( $post_meta as $key => $location ) {
+
+			// Verify the location keys exist.
+			if ( ! isset( $location['form_id'], $location['type'] ) ) {
+				continue;
+			}
+
+			// If the form ID and location type match.
+			if ( $location['form_id'] === $form_id && $this->is_standalone( $location['type'] ) ) {
+
+				// Unset the form page location.
+				unset( $post_meta[ $key ] );
+			}
+		}
+
+		return $post_meta;
 	}
 }

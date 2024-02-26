@@ -219,9 +219,9 @@ class Addons {
 
 	/**
 	 * Notices.
-     *
-     * @since 1.6.7
-     */
+	 *
+	 * @since 1.6.7
+	 */
 	public function notices() {
 
 		$errors = wpforms()->get( 'license' )->get_errors();
@@ -246,7 +246,7 @@ class Addons {
 	/**
 	 * Render grid of addons.
 	 *
-     * @since 1.6.7
+	 * @since 1.6.7
 	 *
 	 * @param string $section Section name.
 	 */
@@ -332,6 +332,7 @@ class Addons {
 				'recommended'       => isset( $addon['recommended'] ) ? $addon['recommended'] : false,
 				'has_settings_link' => $this->has_settings_link( $addon['slug'] ),
 				'settings_url'      => $this->get_settings_link( $addon['slug'] ),
+				'has_cap'           => current_user_can( 'manage_options' ),
 			],
 			true
 		);
@@ -343,8 +344,8 @@ class Addons {
 	 * @since 1.6.7
 	 *
 	 * @param array $addon Prepared addon data.
- 	 *
- 	 * @return string
+	 *
+	 * @return string
 	 */
 	private function get_addon_button_html( $addon ) {
 
@@ -421,7 +422,7 @@ class Addons {
 	 */
 	private function get_addons_with_settings_link(): array {
 
-		return [ // phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+		return [
 			'tab'          => [
 				'wpforms-geolocation',
 			],

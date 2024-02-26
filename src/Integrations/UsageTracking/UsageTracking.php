@@ -167,7 +167,7 @@ class UsageTracking implements IntegrationInterface {
 			'theme_name'                     => $theme_data->name,
 			'theme_version'                  => $theme_data->version,
 			'locale'                         => get_locale(),
-			'timezone_offset'                => $this->get_timezone_offset(),
+			'timezone_offset'                => wp_timezone_string(),
 			// WPForms-specific data.
 			'wpforms_version'                => WPFORMS_VERSION,
 			'wpforms_license_key'            => wpforms_get_license_key(),
@@ -327,46 +327,6 @@ class UsageTracking implements IntegrationInterface {
 
 		// Add favorite templates to the settings array.
 		return array_merge( $data, $this->get_favorite_templates() );
-	}
-
-	/**
-	 * Get timezone offset.
-	 * We use `wp_timezone_string()` when it's available (WP 5.3+),
-	 * otherwise fallback to the same code, copy-pasted.
-	 *
-	 * @see wp_timezone_string()
-	 *
-	 * @since 1.6.1
-	 *
-	 * @return string
-	 */
-	private function get_timezone_offset() {
-
-		// It was added in WordPress 5.3.
-		if ( function_exists( 'wp_timezone_string' ) ) {
-			return wp_timezone_string();
-		}
-
-		/*
-		 * The code below is basically a copy-paste from that function.
-		 */
-
-		$timezone_string = get_option( 'timezone_string' );
-
-		if ( $timezone_string ) {
-			return $timezone_string;
-		}
-
-		$offset  = (float) get_option( 'gmt_offset' );
-		$hours   = (int) $offset;
-		$minutes = ( $offset - $hours );
-
-		$sign      = ( $offset < 0 ) ? '-' : '+';
-		$abs_hour  = abs( $hours );
-		$abs_mins  = abs( $minutes * 60 );
-		$tz_offset = sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
-
-		return $tz_offset;
 	}
 
 	/**

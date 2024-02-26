@@ -29,6 +29,8 @@ class CSSVars {
 		'button-border-radius'    => '3px',
 		'button-background-color' => '#066aab',
 		'button-text-color'       => '#ffffff',
+
+		'page-break-color'        => '#066aab',
 	];
 
 	/**

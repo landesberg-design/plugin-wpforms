@@ -22,7 +22,11 @@ class AuthorDisplay extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		$name = get_the_author();
+		$form_id = $form_data['id'] ?? 0;
+
+		$author = $this->get_author( $form_id );
+
+		$name = $author->display_name ?? '';
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( empty( $name ) && ! empty( $_POST['wpforms']['author'] ) ) {

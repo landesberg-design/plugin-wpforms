@@ -488,7 +488,7 @@ class Notifications {
 
 		wp_enqueue_script(
 			'wpforms-admin-notifications',
-			WPFORMS_PLUGIN_URL . "assets/js/admin-notifications{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/admin-notifications{$min}.js",
 			[ 'jquery', 'wpforms-lity' ],
 			WPFORMS_VERSION,
 			true

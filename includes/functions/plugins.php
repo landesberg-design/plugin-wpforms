@@ -18,7 +18,6 @@ use WPForms\Requirements\Requirements;
  */
 function wpforms_requirements( array $requirements ): bool {
 
-	// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
 	return Requirements::get_instance()->validate( $requirements );
 }
 

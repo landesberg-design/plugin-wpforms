@@ -36,6 +36,18 @@ abstract class Widget {
 	}
 
 	/**
+	 * Check if need to show welcome block.
+	 *
+	 * @since 1.8.7
+	 */
+	public function show_welcome_block(): bool {
+
+		$splash_version = get_option( 'wpforms_splash_data_version', '' );
+
+		return $splash_version === WPFORMS_VERSION;
+	}
+
+	/**
 	 * Get/set a widget meta.
 	 *
 	 * @since 1.7.4
@@ -58,6 +70,7 @@ abstract class Widget {
 			'timespan'               => $this->get_timespan_default(),
 			'active_form_id'         => 0,
 			'hide_recommended_block' => 0,
+			'hide_welcome_block'     => 0,
 			'hide_graph'             => 0,
 			'color_scheme'           => 1, // 1 - wpforms, 2 - wp
 			'graph_style'            => 2, // 1 - bar, 2 - line

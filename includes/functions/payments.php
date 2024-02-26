@@ -537,6 +537,11 @@ function wpforms_get_total_payment( $fields ) {
 	foreach ( $fields as $field ) {
 		if ( ! empty( $field['amount'] ) ) {
 			$amount = wpforms_sanitize_amount( $field['amount'] );
+
+			if ( ! empty( $field['quantity'] ) ) {
+				$amount *= (int) $field['quantity'];
+			}
+
 			$total += $amount;
 		}
 	}
@@ -568,12 +573,71 @@ function wpforms_get_payment_items( $fields = [] ) {
 			empty( $field['type'] ) ||
 			empty( $field['amount'] ) ||
 			! in_array( $field['type'], $payment_fields, true ) ||
-			empty( wpforms_sanitize_amount( $field['amount'] ) )
+			empty( wpforms_sanitize_amount( $field['amount'] ) ) ||
+			( isset( $field['quantity'] ) && ! $field['quantity'] )
 		) {
-			// Remove all non-payment fields as well as payment fields with no amount.
+			// Remove all non-payment fields as well as payment fields with no amount or empty quantity.
 			unset( $fields[ $id ] );
 		}
 	}
 
 	return $fields;
+}
+
+/**
+ * Determine if field has quantity enabled.
+ *
+ * @since 1.8.7
+ *
+ * @param array $field     Field data.
+ * @param array $form_data Form data.
+ *
+ * @return bool
+ */
+function wpforms_payment_has_quantity( array $field, array $form_data ): bool {
+
+	if ( empty( $field ) ) {
+		return false;
+	}
+
+	if ( isset( $field['quantity'] ) ) {
+		return true;
+	}
+
+	$field_settings = $form_data['fields'][ $field['id'] ] ?? [];
+
+	if ( empty( $field_settings['enable_quantity'] ) ) {
+		return false;
+	}
+
+	// Quantity is available only for `single` format of the Single payment field.
+	if ( $field_settings['type'] === 'payment-single' && $field_settings['format'] !== 'single' ) {
+		return false;
+	}
+
+	// Otherwise return true.
+	// It covers the Dropdown Items field (and others where the quantity will be supported).
+	return true;
+}
+
+/**
+ * Formatted payment field value with quantity.
+ *
+ * @since 1.8.7
+ *
+ * @param array $field Field data.
+ *
+ * @return string
+ */
+function wpforms_payment_format_quantity( array $field ): string {
+
+	if ( empty( $field['value'] ) ) {
+		return '';
+	}
+
+	return sprintf( /* translators: %1$s - payment amount; %2$d - payment quantity. */
+		esc_html__( '%1$s &times; %2$d', 'wpforms-lite' ),
+		$field['value'],
+		$field['quantity'] ?? 1
+	);
 }

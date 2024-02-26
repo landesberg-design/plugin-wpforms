@@ -70,7 +70,7 @@ class Templates {
 
 		wp_enqueue_script(
 			'wpforms-admin-form-templates',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/pages/form-templates{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/pages/form-templates{$min}.js",
 			[],
 			WPFORMS_VERSION,
 			true

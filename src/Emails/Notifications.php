@@ -420,7 +420,7 @@ class Notifications extends Mailer {
 	 *
 	 * @return string
 	 */
-	private function process_plain_message( $show_empty_fields = false ) {
+	private function process_plain_message( $show_empty_fields = false ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity
 
 		$message = '';
 
@@ -433,6 +433,11 @@ class Notifications extends Mailer {
 			$field_name = isset( $field['name'] ) ? $field['name'] : '';
 			$field_val  = empty( $field['value'] ) && ! is_numeric( $field['value'] ) ? esc_html__( '(empty)', 'wpforms-lite' ) : $field['value'];
 
+			// Add quantity for the field.
+			if ( wpforms_payment_has_quantity( $field, $this->form_data ) ) {
+				$field_val = wpforms_payment_format_quantity( $field );
+			}
+
 			// Set a default field name if empty.
 			if ( empty( $field_name ) && $field_name !== null ) {
 				$field_name = $this->get_default_field_name( $field['id'] );
@@ -444,13 +449,30 @@ class Notifications extends Mailer {
 			/**
 			 * Filter the field value before it is added to the email message.
 			 *
-			 * @since 1.8.5
+			 * @since      1.8.5
+			 * @deprecated 1.8.7
 			 *
 			 * @param string $field_value Field value.
 			 * @param array  $field       Field data.
 			 * @param array  $form_data   Form data.
 			 */
-			$message .= apply_filters( 'wpforms_emails_notifications_plaintext_field_value', $field_value, $field, $this->form_data );
+			$field_value = apply_filters_deprecated( // phpcs:disable WPForms.Comments.ParamTagHooks.InvalidParamTagsQuantity
+				'wpforms_emails_notifications_plaintext_field_value',
+				[ $field_value, $field, $this->form_data ],
+				'1.8.7 of the WPForms plugin',
+				'wpforms_plaintext_field_value'
+			);
+
+			/** This filter is documented in /includes/emails/class-emails.php */
+			$field_value = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+				'wpforms_plaintext_field_value',
+				$field_value,
+				$field,
+				$this->form_data
+			);
+
+			// Append the filtered field value to the message.
+			$message .= $field_value;
 		}
 
 		// Trim the message and return.
@@ -532,6 +554,13 @@ class Notifications extends Mailer {
 			// Replace new lines with <br/> tags.
 			$field_val = str_replace( [ "\r\n", "\r", "\n" ], '<br/>', $field_val );
 
+			// Replace the payment total value if an order summary is enabled.
+			// Ideally, it could be done through the `wpforms_html_field_value` filter,
+			// but needed data is missed there, e.g. entry data ($this->fields).
+			if ( $field_type === 'payment-total' && ! empty( $field['summary'] ) ) {
+				$field_val = $this->process_tag( '{order_summary}' );
+			}
+
 			// Append the field item to the message.
 			$message .= str_replace(
 				[ '{field_type}', '{field_name}', '{field_value}' ],
@@ -554,7 +583,7 @@ class Notifications extends Mailer {
 	 */
 	private function process_tag( $input = '' ) {
 
-		return wpforms_process_smart_tags( $input, $this->form_data, $this->fields, $this->entry_id );
+		return wpforms_process_smart_tags( $input, $this->form_data, $this->fields, $this->entry_id, 'notification' );
 	}
 
 	/**

@@ -331,6 +331,8 @@ class Ajax {
 
 			$columns_labels = wp_list_pluck( $fields, 'label', 'id' );
 
+			$entry_id = $request_data['db_args']['entry_id'] ?? 0;
+
 			foreach ( $request_data['fields'] as $field_id ) {
 				if ( ! isset( $columns_labels[ $field_id ] ) ) {
 					continue;
@@ -357,6 +359,11 @@ class Ajax {
 					// Add dynamic columns for each multiple field value.
 					foreach ( $columns as $key => $column ) {
 						$is_modified = $column['modified'] ?? false;
+
+						// Skip modified columns if export single entry.
+						if ( $is_modified && ! empty( $entry_id ) ) {
+							continue;
+						}
 
 						$columns_row[ "multiple_field_{$field_id}_{$key}" ] = sprintf(
 							'%s: %s%s',
@@ -549,6 +556,11 @@ class Ajax {
 				continue;
 			}
 
+			// Get row value for field with quantity enabled.
+			if ( isset( $field['quantity'], $values[ $multiple_value_id ] ) ) {
+				return $values[ $multiple_value_id ];
+			}
+
 			$labels = array_column( $choices, 'label' );
 
 			// Try to find value index in choices array.
@@ -617,7 +629,16 @@ class Ajax {
 	private function get_field_values( $field ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		// Get field value.
-		$value = $field['value'] ?? '';
+		$value  = $field['value'] ?? '';
+		$values = [];
+
+		// For Quantity enabled field.
+		if ( isset( $field['quantity'] ) ) {
+			$values[] = $field['value'];
+			$values[] = ! empty( $field['value'] ) ? $field['quantity'] : '';
+
+			return $values;
+		}
 
 		// For Payment Checkbox field.
 		if ( isset( $field['value_choice'] ) ) {
@@ -1292,11 +1313,13 @@ class Ajax {
 		$type = $field['type'];
 
 		if ( in_array( $type, [ 'select', 'checkbox', 'payment-checkbox' ], true ) ) {
+			$field_choices = $field['choices'];
+
 			if ( $this->is_dynamic_choices( $field ) && $is_dynamic_columns ) {
-				return wpforms_get_field_dynamic_choices( $field, $form_data['id'], $form_data );
+				$field_choices = wpforms_get_field_dynamic_choices( $field, $form_data['id'], $form_data );
 			}
 
-			return $this->get_choices( $form_data['id'], $field );
+			return $this->get_choices( $form_data['id'], $field, $field_choices );
 		}
 
 		if ( $type === 'file-upload' ) {
@@ -1349,6 +1372,13 @@ class Ajax {
 				[ 'label' => __( 'State', 'wpforms' ) ],
 				[ 'label' => __( 'Zip/Postal Code', 'wpforms' ) ],
 				[ 'label' => __( 'Country', 'wpforms' ) ],
+			];
+		}
+
+		if ( in_array( $type, [ 'payment-single', 'payment-select' ], true ) ) {
+			return [
+				[ 'label' => __( 'Value', 'wpforms' ) ],
+				[ 'label' => __( 'Quantity', 'wpforms' ) ],
 			];
 		}
 
@@ -1425,16 +1455,17 @@ class Ajax {
 	 * Get field choices.
 	 *
 	 * @since 1.8.5
+	 * @since 1.8.7 Add $field_choices parameter.
 	 *
-	 * @param int   $form_id Form ID.
-	 * @param array $field   Field data.
+	 * @param int   $form_id       Form ID.
+	 * @param array $field         Field data.
+	 * @param array $field_choices Field choices.
 	 *
 	 * @return array Choices.
 	 */
-	private function get_choices( $form_id, $field ) {
+	private function get_choices( $form_id, $field, $field_choices ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$field_choices = $field['choices'];
-		$field_id      = $field['id'];
+		$field_id = $field['id'];
 
 		foreach ( $field_choices as $key => $choice ) {
 			// Check if choice label not empty.
@@ -1452,10 +1483,18 @@ class Ajax {
 		}
 
 		$labels = array_column( $field_choices, 'label' );
+		$labels = array_map( 'trim', $labels );
 
 		$choices = $this->get_all_existing_choices( $form_id, $field_id, $field['type'] );
 
+		$is_ajax = wp_doing_ajax();
+
 		foreach ( $choices as $choice ) {
+			// Skip modified choices for single entry export.
+			if ( ! $is_ajax ) {
+				continue;
+			}
+
 			$label = $choice['label'] ?? $choice;
 			// Check if choice already exists.
 			if ( in_array( $label, $labels, true ) ) {

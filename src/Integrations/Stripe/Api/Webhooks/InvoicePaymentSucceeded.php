@@ -3,6 +3,7 @@
 namespace WPForms\Integrations\Stripe\Api\Webhooks;
 
 use RuntimeException;
+use Stripe\Exception\ApiErrorException;
 use WPForms\Db\Payments\Queries;
 use WPForms\Integrations\Stripe\Helpers;
 use WPForms\Vendor\Stripe\PaymentIntent;
@@ -72,32 +73,20 @@ class InvoicePaymentSucceeded extends Base {
 	 *
 	 * @param int $renewal_id Renewal ID.
 	 *
-	 * @return array
+	 * @noinspection PhpMissingParamTypeInspection
 	 */
 	private function copy_meta_from_payment_intent( $renewal_id ) {
 
-		$payment_intent = PaymentIntent::retrieve( $this->data->payment_intent, Helpers::get_auth_opts() );
+		try {
+			$payment_intent = PaymentIntent::retrieve( $this->data->payment_intent, Helpers::get_auth_opts() );
+		} catch ( ApiErrorException $e ) {
+			$payment_intent = null;
+		}
 
 		if ( ! isset( $payment_intent->charges->data[0]->payment_method_details ) ) {
 			return;
 		}
 
-		$details = $payment_intent->charges->data[0]->payment_method_details;
-
-		if ( ! empty( $details->card->last4 ) ) {
-			if ( ! empty( $details->type ) ) {
-				$meta['method_type'] = sanitize_text_field( $details->type );
-			} else {
-				$meta['method_type'] = 'card';
-			}
-
-			$meta['credit_card_last4']   = $details->card->last4;
-			$meta['credit_card_method']  = $details->card->brand;
-			$meta['credit_card_expires'] = $details->card->exp_month . '/' . $details->card->exp_year;
-		} else {
-			$meta['method_type'] = 'link';
-		}
-
-		wpforms()->get( 'payment_meta' )->bulk_add( $renewal_id, $meta );
+		$this->update_payment_method_details( $renewal_id, $payment_intent->charges->data[0]->payment_method_details );
 	}
 }

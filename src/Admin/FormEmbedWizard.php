@@ -101,7 +101,7 @@ class FormEmbedWizard {
 
 		wp_enqueue_script(
 			'wpforms-admin-form-embed-wizard',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/form-embed-wizard{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/form-embed-wizard{$min}.js",
 			[ 'jquery', 'underscore' ],
 			WPFORMS_VERSION
 		);

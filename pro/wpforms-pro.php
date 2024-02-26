@@ -101,6 +101,7 @@ class WPForms_Pro {
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueues' ] );
 		add_filter( 'wpforms_helpers_templates_get_theme_template_paths', [ $this, 'add_templates' ] );
 		add_filter( 'wpforms_integrations_usagetracking_is_enabled', '__return_true' );
+		add_filter( 'wpforms_updater_perform_remote_request_before_response', [ $this, 'get_updater_response_from_cache' ], 10, 3 );
 	}
 
 	/**
@@ -253,6 +254,34 @@ class WPForms_Pro {
 		$paths[102] = trailingslashit( __DIR__ . '/templates' );
 
 		return $paths;
+	}
+
+	/**
+	 * Get cached updater response.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param object $response WPForms Updater response object before request has been sent. Empty object by default.
+	 * @param string $action   Action name.
+	 * @param array  $body     Request body.
+	 *
+	 * @return object
+	 */
+	public function get_updater_response_from_cache( $response, string $action, array $body ) {
+
+		if ( ! isset( $body['tgm-updater-plugin'] ) || $body['tgm-updater-plugin'] !== 'wpforms' ) {
+			return $response;
+		}
+
+		if ( $action === 'get-plugin-update' ) {
+			return (object) wpforms()->get( 'license_api_plugin_update_cache' )->get();
+		}
+
+		if ( $action === 'get-plugin-info' ) {
+			return (object) wpforms()->get( 'license_api_plugin_info_cache' )->get();
+		}
+
+		return $response;
 	}
 
 	/**

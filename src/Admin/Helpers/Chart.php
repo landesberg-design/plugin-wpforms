@@ -46,7 +46,7 @@ class Chart {
 		}
 
 		$dataset        = [];
-		$timezone       = wpforms_get_timezone(); // Retrieve the timezone object for the site.
+		$timezone       = wp_timezone(); // Retrieve the timezone object for the site.
 		$mysql_timezone = timezone_open( 'UTC' ); // In the database, all datetime are stored in UTC.
 
 		foreach ( $query as $row ) {

@@ -22,6 +22,12 @@ class PageId extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
+		$page_id = $this->get_meta( $entry_id, 'page_id' );
+
+		if ( ! empty( $page_id ) ) {
+			return absint( $page_id );
+		}
+
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( ! empty( $_POST['page_id'] ) ) {
 			return absint( $_POST['page_id'] );

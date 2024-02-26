@@ -230,7 +230,7 @@ class Columns extends ColumnsBase {
 	 * @return string
 	 */
 	public static function sanitize_column_key( string $key ): string {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return sanitize_key( $key );
 	}
 
@@ -277,7 +277,7 @@ class Columns extends ColumnsBase {
 	 * @return array
 	 */
 	private static function get_readonly_columns_keys(): array {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		$readonly = array_filter(
 			self::get_all(),
 			static function ( $column ) {
@@ -299,7 +299,7 @@ class Columns extends ColumnsBase {
 	 * @return array
 	 */
 	private static function set_columns_data_defaults( array $columns_data ): array {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return array_map(
 			static function ( $column ) {
 				$column['type']       = $column['type'] ?? '';

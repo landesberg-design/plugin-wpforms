@@ -1467,9 +1467,9 @@ class WPForms_About {
 					],
 				],
 				'basic'    => [
-					'status' => 'partial',
+					'status' => 'none',
 					'text'   => [
-						'<strong>' . esc_html__( 'Custom Captcha Addon included', 'wpforms-lite' ) . '</strong>',
+						'<strong>' . esc_html__( 'No Addons Included', 'wpforms-lite' ) . '</strong>',
 					],
 				],
 				'plus'     => [

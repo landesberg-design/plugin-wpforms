@@ -477,15 +477,17 @@ function wpforms_get_captcha_settings() {
  * Process smart tags.
  *
  * @since 1.7.1
+ * @since 1.8.7 Added `$context` parameter.
  *
  * @param string $content   Content.
  * @param array  $form_data Form data.
  * @param array  $fields    List of fields.
  * @param string $entry_id  Entry ID.
+ * @param string $context   Context.
  *
  * @return string
  */
-function wpforms_process_smart_tags( $content, $form_data, $fields = [], $entry_id = '' ) {
+function wpforms_process_smart_tags( $content, $form_data, $fields = [], $entry_id = '', $context = '' ) {
 
 	// Skip it if variables have invalid format.
 	if ( ! is_string( $content ) || ! is_array( $form_data ) || ! is_array( $fields ) ) {
@@ -496,13 +498,15 @@ function wpforms_process_smart_tags( $content, $form_data, $fields = [], $entry_
 	 * Process smart tags.
 	 *
 	 * @since 1.4.0
+	 * @since 1.8.7 Added $context parameter.
 	 *
 	 * @param string $content   Content.
 	 * @param array  $form_data Form data.
 	 * @param array  $fields    List of fields.
 	 * @param string $entry_id  Entry ID.
+	 * @param string $context   Context.
 	 *
 	 * @return string
 	 */
-	return apply_filters( 'wpforms_process_smart_tags',  $content, $form_data, $fields, $entry_id );
+	return apply_filters( 'wpforms_process_smart_tags',  $content, $form_data, $fields, $entry_id, $context );
 }

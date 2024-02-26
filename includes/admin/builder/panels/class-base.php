@@ -179,7 +179,7 @@ abstract class WPForms_Builder_Panel {
 
 		wp_enqueue_script(
 			'wpforms-builder-panel-loader',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/panel-loader{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/panel-loader{$min}.js",
 			[ 'wpforms-builder' ],
 			WPFORMS_VERSION,
 			true

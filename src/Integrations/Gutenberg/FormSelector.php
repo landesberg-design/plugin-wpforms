@@ -40,6 +40,7 @@ class FormSelector implements IntegrationInterface {
 		'buttonBackgroundColor' => CSSVars::ROOT_VARS['button-background-color'],
 		'buttonTextColor'       => CSSVars::ROOT_VARS['button-text-color'],
 		'copyPasteJsonValue'    => '',
+		'pageBreakColor'        => CSSVars::ROOT_VARS['page-break-color'],
 	];
 
 	/**
@@ -206,6 +207,9 @@ class FormSelector implements IntegrationInterface {
 			'copyPasteJsonValue'    => [
 				'type' => 'string',
 			],
+			'pageBreakColor'        => [
+				'type' => 'string',
+			],
 		];
 
 		$this->register_styles();
@@ -277,7 +281,7 @@ class FormSelector implements IntegrationInterface {
 
 		wp_enqueue_script(
 			'wpforms-gutenberg-form-selector',
-			WPFORMS_PLUGIN_URL . 'assets/js/components/admin/gutenberg/' . $script,
+			WPFORMS_PLUGIN_URL . 'assets/js/admin/gutenberg/' . $script,
 			[ 'wp-blocks', 'wp-i18n', 'wp-element', 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -294,7 +298,7 @@ class FormSelector implements IntegrationInterface {
 		if ( $this->render_engine === 'modern' ) {
 			wp_enqueue_script(
 				'wpforms-modern',
-				WPFORMS_PLUGIN_URL . "assets/js/wpforms-modern{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/js/frontend/wpforms-modern{$min}.js",
 				[ 'wpforms-gutenberg-form-selector' ],
 				WPFORMS_VERSION,
 				true
@@ -374,7 +378,6 @@ class FormSelector implements IntegrationInterface {
 				esc_html__( 'form', 'wpforms-lite' ),
 				esc_html__( 'contact', 'wpforms-lite' ),
 				esc_html__( 'survey', 'wpforms-lite' ),
-				'the dude',
 			],
 			'form_select'                  => esc_html__( 'Select a Form', 'wpforms-lite' ),
 			'form_settings'                => esc_html__( 'Form Settings', 'wpforms-lite' ),
@@ -425,17 +428,18 @@ class FormSelector implements IntegrationInterface {
 			'wpforms_empty_info'           => sprintf( esc_html__( 'You can use %1$sWPForms%2$s to build contact forms, surveys, payment forms, and more with just a few clicks.', 'wpforms-lite' ), '<strong>','</strong>' ),
 			// Translators: %1$s: Opening anchor tag, %2$s: Closing achor tag.
 			'wpforms_empty_help'           => sprintf( esc_html__( 'Need some help? Check out our %1$scomprehensive guide.%2$s', 'wpforms-lite' ), '<a target="_blank" href="' . esc_url( wpforms_utm_link( 'https://wpforms.com/docs/creating-first-form/', 'gutenberg', 'Create Your First Form Documentation' ) ) . '">','</a>' ),
+			'other_styles'                 => esc_html__( 'Other Styles', 'wpforms-lite' ),
+			'page_break'                   => esc_html__( 'Page Break', 'wpforms-lite' ),
 		];
-
-		if ( version_compare( $GLOBALS['wp_version'], '5.1.1', '<=' ) ) {
-			array_pop( $strings['form_keywords'] );
-		}
 
 		$forms = wpforms()->get( 'form' )->get( '', [ 'order' => 'DESC' ] );
 		$forms = ! empty( $forms ) ? $forms : [];
 		$forms = array_map(
 			static function ( $form ) {
 				$form->post_title = htmlspecialchars_decode( $form->post_title, ENT_QUOTES );
+				$max_length       = 47;
+				$form->post_title = trim( mb_substr( trim( $form->post_title ), 0, $max_length ) );
+				$form->post_title = mb_strlen( $form->post_title ) === $max_length ? $form->post_title . '…' : $form->post_title;
 
 				return $form;
 			},

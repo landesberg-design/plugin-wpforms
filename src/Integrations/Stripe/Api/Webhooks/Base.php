@@ -130,4 +130,34 @@ abstract class Base {
 
 		return true;
 	}
+
+	/**
+	 * Update payment method details.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param int   $payment_id Payment ID.
+	 * @param array $details    Charge details.
+	 *
+	 * @noinspection PhpMissingParamTypeInspection
+	 */
+	protected function update_payment_method_details( $payment_id, $details ) {
+
+		$meta['method_type'] = ! empty( $details->type ) ? sanitize_text_field( $details->type ) : '';
+
+		if ( ! empty( $details->card->last4 ) ) {
+			$meta['method_type']         = $meta['method_type'] ?? 'card';
+			$meta['credit_card_last4']   = $details->card->last4;
+			$meta['credit_card_method']  = $details->card->brand;
+			$meta['credit_card_expires'] = $details->card->exp_month . '/' . $details->card->exp_year;
+		}
+
+		$payment_meta_obj = wpforms()->get( 'payment_meta' );
+
+		if ( ! $payment_meta_obj ) {
+			return;
+		}
+
+		$payment_meta_obj->bulk_add( $payment_id, $meta );
+	}
 }

@@ -123,7 +123,7 @@ class Page implements PaymentsViewsInterface {
 
 		wp_enqueue_script(
 			'wpforms-admin-payments-overview',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/payments/overview{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/payments/overview{$min}.js",
 			[ 'jquery', 'wpforms-flatpickr', 'wpforms-chart' ],
 			WPFORMS_VERSION,
 			true

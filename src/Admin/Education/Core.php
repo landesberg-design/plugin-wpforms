@@ -63,7 +63,7 @@ class Core {
 
 		wp_enqueue_script(
 			'wpforms-admin-education-core',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/education/core{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/education/core{$min}.js",
 			[ 'jquery', 'jquery-confirm' ],
 			WPFORMS_VERSION,
 			true

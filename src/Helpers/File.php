@@ -19,6 +19,7 @@ class File {
 	 * @param string $str String to process.
 	 *
 	 * @return string
+	 * @noinspection SpellCheckingInspection
 	 */
 	public static function remove_utf8_bom( $str ): string {
 
@@ -114,7 +115,36 @@ class File {
 	}
 
 	/**
-	 * Get cache directory path.
+	 * Get the upload directory path.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @return string
+	 */
+	public static function get_upload_dir(): string {
+
+		static $upload_dir;
+
+		if ( $upload_dir ) {
+			/**
+			 * Since wpforms_upload_dir() relies on hooks, and hooks can be added unpredictably,
+			 * we need to cache the result of this method.
+			 * Otherwise, it is the risk to save cache file to one dir and try to get from another.
+			 */
+			return $upload_dir;
+		}
+
+		$wpforms_upload_dir  = wpforms_upload_dir();
+		$wpforms_upload_path = ! empty( $wpforms_upload_dir['path'] )
+			? $wpforms_upload_dir['path']
+			: WP_CONTENT_DIR . '/uploads/wpforms';
+		$upload_dir          = trailingslashit( wp_normalize_path( $wpforms_upload_path ) );
+
+		return $upload_dir;
+	}
+
+	/**
+	 * Get the cache directory path.
 	 *
 	 * @since 1.8.6
 	 *
@@ -133,13 +163,76 @@ class File {
 			return $cache_dir;
 		}
 
-		$upload_dir  = wpforms_upload_dir();
-		$upload_path = ! empty( $upload_dir['path'] )
-			? trailingslashit( wp_normalize_path( $upload_dir['path'] ) )
-			: trailingslashit( WP_CONTENT_DIR ) . 'uploads/wpforms/';
-
-		$cache_dir = $upload_path . 'cache/';
+		$cache_dir = self::get_upload_dir() . 'cache/';
 
 		return $cache_dir;
+	}
+
+	/**
+	 * Check whether the file is already updated.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string $filename  Filename.
+	 * @param string $cache_key Cache key.
+	 *
+	 * @return bool
+	 */
+	public static function is_file_updated( string $filename, string $cache_key = '' ): bool {
+
+		$filename  = wp_normalize_path( $filename );
+		$cache_key = $cache_key ? $cache_key : 'wpforms_' . $filename . '_file';
+
+		if ( ! is_file( $filename ) ) {
+			return false;
+		}
+
+		$cached_stat = Transient::get( $cache_key );
+		$stat        = array_intersect_key(
+			stat( $filename ),
+			[
+				'size'  => 0,
+				'mtime' => 0,
+				'ctime' => 0,
+			]
+		);
+
+		if ( $cached_stat === $stat ) {
+			return true;
+		}
+
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.unlink_unlink
+		@unlink( $filename );
+
+		return false;
+	}
+
+	/**
+	 * Save file updated stat.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string $filename  Filename.
+	 * @param string $cache_key Cache key.
+	 *
+	 * @return void
+	 */
+	public static function save_file_updated_stat( string $filename, string $cache_key = '' ) {
+
+		$filename  = wp_normalize_path( $filename );
+		$cache_key = $cache_key ? $cache_key : 'wpforms_' . $filename . '_file';
+
+		clearstatcache( true, $filename );
+
+		$stat = array_intersect_key(
+			stat( $filename ),
+			[
+				'size'  => 0,
+				'mtime' => 0,
+				'ctime' => 0,
+			]
+		);
+
+		Transient::set( $cache_key, $stat );
 	}
 }

@@ -25,6 +25,7 @@ class Registration extends \WPForms\Vendor\Stripe\ApiResource
     const OBJECT_NAME = 'tax.registration';
     use \WPForms\Vendor\Stripe\ApiOperations\All;
     use \WPForms\Vendor\Stripe\ApiOperations\Create;
+    use \WPForms\Vendor\Stripe\ApiOperations\Retrieve;
     use \WPForms\Vendor\Stripe\ApiOperations\Update;
     const STATUS_ACTIVE = 'active';
     const STATUS_EXPIRED = 'expired';

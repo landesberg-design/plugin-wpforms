@@ -165,7 +165,7 @@ class Templates {
 
 		wp_enqueue_script(
 			'wpforms-form-templates',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/form-templates{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/form-templates{$min}.js",
 			[ 'listjs' ],
 			WPFORMS_VERSION,
 			true

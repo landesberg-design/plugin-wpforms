@@ -50,7 +50,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 		wp_enqueue_script(
 			'wpforms-builder-drag-fields',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/drag-fields{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/drag-fields{$min}.js",
 			[ 'wpforms-builder' ],
 			WPFORMS_VERSION,
 			true
@@ -58,7 +58,7 @@ class WPForms_Builder_Panel_Fields extends WPForms_Builder_Panel {
 
 		wp_enqueue_script(
 			'wpforms-builder-search-fields',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/search-fields{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/search-fields{$min}.js",
 			[ 'wpforms-builder' ],
 			WPFORMS_VERSION,
 			true

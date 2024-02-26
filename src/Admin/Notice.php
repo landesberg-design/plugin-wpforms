@@ -112,7 +112,7 @@ class Notice {
 
 		wp_enqueue_script(
 			'wpforms-admin-notices',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/notices{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/notices{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true

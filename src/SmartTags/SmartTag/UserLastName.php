@@ -24,7 +24,7 @@ class UserLastName extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		$current_user = wp_get_current_user();
+		$current_user = $this->get_user( $entry_id );
 
 		if ( ! $current_user instanceof WP_User ) {
 			return '';

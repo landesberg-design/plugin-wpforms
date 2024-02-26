@@ -22,9 +22,15 @@ class PageTitle extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
+		$page_title = $this->get_meta( $entry_id, 'page_title' );
+
+		if ( ! empty( $page_title ) ) {
+			return wp_kses_post( $page_title );
+		}
+
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		if ( ! empty( $_POST['page_title'] ) ) {
-			return sanitize_text_field( wp_unslash( $_POST['page_title'] ) );
+			return wp_kses_post( wp_unslash( $_POST['page_title'] ) );
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
@@ -37,7 +43,7 @@ class PageTitle extends SmartTag {
 			return wp_kses_post( is_page() ? get_the_title( get_the_ID() ) : get_bloginfo( 'name' ) );
 		}
 
-		return $this->get_wp_title();
+		return wp_kses_post( $this->get_wp_title() );
 	}
 
 	/**

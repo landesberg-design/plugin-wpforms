@@ -15,9 +15,10 @@ $field_description = isset( $form_data['fields'][ $field['id'] ]['description'] 
 $is_toggled_field  = in_array( $field['type'], [ 'divider', 'pagebreak', 'html', 'content' ], true );
 $is_choices_field  = in_array( $field['type'], [ 'radio', 'checkbox', 'payment-checkbox', 'payment-multiple' ], true );
 $is_empty_field    = $is_choices_field ? wpforms_is_empty_string( $field['value'] ) : wpforms_is_empty_string( $field['formatted_value'] );
+$is_empty_quantity = isset( $field['quantity'] ) && ! $field['quantity'];
 $field_class       = [ 'print-item', 'field', 'wpforms-field-' . $field['type'] ];
 
-if ( ! $is_toggled_field && $is_empty_field ) {
+if ( ! $is_toggled_field && ( $is_empty_field || $is_empty_quantity ) ) {
 	$field_class[] = 'wpforms-field-empty';
 }
 ?>

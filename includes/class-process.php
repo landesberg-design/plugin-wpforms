@@ -537,6 +537,16 @@ class WPForms_Process {
 		// Add payment to database.
 		$payment_id = $this->payment_save( $entry );
 
+		$this->form_data['entry_meta'] = [
+			'page_url'   => isset( $_POST['page_url'] ) ? esc_url_raw( wp_unslash( $_POST['page_url'] ) ) : '',
+			'page_title' => isset( $_POST['page_title'] ) ? sanitize_text_field( wp_unslash( $_POST['page_title'] ) ) : '',
+			'page_id'    => isset( $_POST['page_id'] ) ? absint( wp_unslash( $_POST['page_id'] ) ) : '',
+			'referer'    => esc_url_raw( (string) wp_get_referer() ),
+		];
+
+		// Save meta data.
+		$this->save_meta( $this->entry_id, $this->form_data['id'] );
+
 		/**
 		 * Runs right after adding entry to the database.
 		 *
@@ -579,6 +589,37 @@ class WPForms_Process {
 		}
 
 		$this->entry_confirmation_redirect( $this->form_data );
+	}
+
+	/**
+	 * Save entry meta data.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param int $entry_id Entry ID.
+	 * @param int $form_id  Form ID.
+	 */
+	protected function save_meta( $entry_id, $form_id ) {
+
+		if ( ! wpforms()->is_pro() ) {
+			return;
+		}
+
+		$meta_data  = $this->form_data['entry_meta'];
+		$entry_meta = wpforms()->get( 'entry_meta' );
+
+		foreach ( $meta_data as $type => $value ) {
+			$entry_meta->add(
+				[
+					'entry_id' => $entry_id,
+					'form_id'  => $form_id,
+					'user_id'  => get_current_user_id(),
+					'type'     => $type,
+					'data'     => $value,
+				],
+				'entry_meta'
+			);
+		}
 	}
 
 	/**
@@ -1216,7 +1257,7 @@ class WPForms_Process {
 			return '';
 		}
 
-		$confirmation_message = wpforms_process_smart_tags( $this->confirmation_message, $form_data, $fields, $entry_id );
+		$confirmation_message = wpforms_process_smart_tags( $this->confirmation_message, $form_data, $fields, $entry_id, 'confirmation' );
 		$confirmation_message = apply_filters( 'wpforms_frontend_confirmation_message', wpautop( $confirmation_message ), $form_data, $fields, $entry_id );
 
 		return $confirmation_message;

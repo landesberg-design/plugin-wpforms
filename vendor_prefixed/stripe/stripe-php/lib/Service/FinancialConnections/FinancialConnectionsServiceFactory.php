@@ -8,13 +8,14 @@ namespace WPForms\Vendor\Stripe\Service\FinancialConnections;
  *
  * @property AccountService $accounts
  * @property SessionService $sessions
+ * @property TransactionService $transactions
  */
 class FinancialConnectionsServiceFactory extends \WPForms\Vendor\Stripe\Service\AbstractServiceFactory
 {
     /**
      * @var array<string, string>
      */
-    private static $classMap = ['accounts' => AccountService::class, 'sessions' => SessionService::class];
+    private static $classMap = ['accounts' => AccountService::class, 'sessions' => SessionService::class, 'transactions' => TransactionService::class];
     protected function getServiceClass($name)
     {
         return \array_key_exists($name, self::$classMap) ? self::$classMap[$name] : null;

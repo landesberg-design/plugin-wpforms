@@ -116,7 +116,7 @@ class Analytics {
 
 		wp_enqueue_script(
 			'wpforms-admin-page-analytics',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/pages/mi-analytics{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/pages/mi-analytics{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -236,7 +236,7 @@ class Analytics {
 					<li>%5$s</li>
 					<li>%6$s</li>
 					<li>%7$s</li>
-				</ul>			
+				</ul>
 			</section>',
 			esc_url( WPFORMS_PLUGIN_URL . 'assets/images/analytics/screenshot-tnail.jpg' ),
 			esc_attr__( 'Analytics screenshot', 'wpforms-lite' ),
@@ -335,7 +335,7 @@ class Analytics {
 					<h2>%4$s</h2>
 					<p>%5$s</p>
 					<button class="button %6$s" data-url="%7$s">%8$s</button>
-				</div>		
+				</div>
 			</section>',
 			esc_attr( $step['section_class'] ),
 			esc_url( WPFORMS_PLUGIN_URL . 'assets/images/' . $step['icon'] ),
@@ -371,7 +371,7 @@ class Analytics {
 					<h2>%4$s</h2>
 					<p>%5$s</p>
 					<button class="button %6$s" data-url="%7$s">%8$s</button>
-				</div>		
+				</div>
 			</section>',
 			esc_attr( $step['section_class'] ),
 			esc_url( WPFORMS_PLUGIN_URL . 'assets/images/step-3.svg' ),

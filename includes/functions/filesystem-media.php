@@ -5,6 +5,8 @@
  * @since 1.8.0
  */
 
+use WPForms\Helpers\File;
+
 /**
  * Get WPForms upload root path (e.g. /wp-content/uploads/wpforms).
  *
@@ -75,49 +77,74 @@ function wpforms_create_index_html_file( $path ) {
 }
 
 /**
+ * Create index.php file in the specified directory if it doesn't exist.
+ *
+ * @since 1.8.7
+ *
+ * @param string $path Path to the directory.
+ *
+ * @return int|false Number of bytes that were written to the file, or false on failure.
+ */
+function wpforms_create_index_php_file( string $path ) {
+
+	if ( ! is_dir( $path ) || is_link( $path ) ) {
+		return false;
+	}
+
+	$index_file = wp_normalize_path( trailingslashit( $path ) . 'index.php' );
+
+	// Do nothing if index.php exists in the directory.
+	if ( file_exists( $index_file ) ) {
+		return false;
+	}
+
+	$data = '<?php
+header( $_SERVER[\'SERVER_PROTOCOL\'] . \' 404 Not Found\' );
+header( \'Status: 404 Not Found\' );
+';
+
+	// Create index.php.
+	return file_put_contents( $index_file, $data ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+}
+
+/**
  * Create .htaccess file in the WPForms upload directory.
  *
  * @since 1.6.1
  *
  * @return bool True when the .htaccess file exists, false on failure.
  */
-function wpforms_create_upload_dir_htaccess_file() {
+function wpforms_create_upload_dir_htaccess_file(): bool {
 
+	/**
+	 * Whether to create upload dir .htaccess file.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param bool $allow True or false.
+	 */
 	if ( ! apply_filters( 'wpforms_create_upload_dir_htaccess_file', true ) ) {
 		return false;
 	}
 
-	$upload_dir = wpforms_upload_dir();
-
-	if ( ! empty( $upload_dir['error'] ) ) {
-		return false;
-	}
-
-	$htaccess_file = wp_normalize_path( trailingslashit( $upload_dir['path'] ) . '.htaccess' );
+	$htaccess_file = File::get_upload_dir() . '.htaccess';
 	$cache_key     = 'wpforms_htaccess_file';
 
-	if ( is_file( $htaccess_file ) ) {
-		$cached_stat = get_transient( $cache_key );
-		$stat        = array_intersect_key(
-			stat( $htaccess_file ),
-			[
-				'size'  => 0,
-				'mtime' => 0,
-				'ctime' => 0,
-			]
-		);
-
-		if ( $cached_stat === $stat ) {
-			return true;
-		}
-
-		@unlink( $htaccess_file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	if ( File::is_file_updated( $htaccess_file, $cache_key ) ) {
+		return true;
 	}
 
 	if ( ! function_exists( 'insert_with_markers' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/misc.php';
 	}
 
+	/**
+	 * Filters upload dir .htaccess file content.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param bool $allow True or false.
+	 */
 	$contents = apply_filters(
 		'wpforms_create_upload_dir_htaccess_file_content',
 		'# Disable PHP and Python scripts parsing.
@@ -144,17 +171,67 @@ function wpforms_create_upload_dir_htaccess_file() {
 	$created = insert_with_markers( $htaccess_file, 'WPForms', $contents );
 
 	if ( $created ) {
-		clearstatcache( true, $htaccess_file );
-		$stat = array_intersect_key(
-			stat( $htaccess_file ),
-			[
-				'size'  => 0,
-				'mtime' => 0,
-				'ctime' => 0,
-			]
-		);
+		File::save_file_updated_stat( $htaccess_file, $cache_key );
+	}
 
-		set_transient( $cache_key, $stat );
+	return $created;
+}
+
+/**
+ * Create .htaccess file in the WPForms cache directory.
+ *
+ * @since 1.8.7
+ *
+ * @return bool True when the .htaccess file exists, false on failure.
+ */
+function wpforms_create_cache_dir_htaccess_file(): bool {
+
+	/**
+	 * Whether to create cache dir .htaccess file.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param bool $allow True or false.
+	 */
+	if ( ! apply_filters( 'wpforms_create_cache_dir_htaccess_file', true ) ) {
+		return false;
+	}
+
+	$htaccess_file = File::get_cache_dir() . '.htaccess';
+
+	if ( File::is_file_updated( $htaccess_file ) ) {
+		return true;
+	}
+
+	if ( ! function_exists( 'insert_with_markers' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+	}
+
+	/**
+	 * Filters cache dir .htaccess file content.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param bool $allow True or false.
+	 */
+	$contents = apply_filters(
+		'wpforms_create_cache_dir_htaccess_file_content',
+		'# Disable access for any file in the cache dir.
+# Apache 2.2
+<IfModule !authz_core_module>
+	Deny from all
+</IfModule>
+
+# Apache 2.4+
+<IfModule authz_core_module>
+	Require all denied
+</IfModule>'
+	);
+
+	$created = insert_with_markers( $htaccess_file, 'WPForms', $contents );
+
+	if ( $created ) {
+		File::save_file_updated_stat( $htaccess_file );
 	}
 
 	return $created;

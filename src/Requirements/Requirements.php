@@ -59,7 +59,7 @@ class Requirements {
 	const SHOW_ADDON_NOTICE = true;
 
 	/**
-	 * Keys of the requirements arrays.
+	 * Keys of the requirements' arrays.
 	 *
 	 * @since 1.8.2.2
 	 */
@@ -68,10 +68,12 @@ class Requirements {
 	const WP                     = 'wp';
 	const WPFORMS                = 'wpforms';
 	const LICENSE                = 'license';
+	const PRIORITY               = 'priority';
 	const ADDON                  = 'addon';
 	const ADDON_VERSION_CONSTANT = 'addon_version_constant';
 	const VERSION                = 'version';
 	const COMPARE                = 'compare';
+	const COMPARE_DEFAULT        = '>=';
 
 	/**
 	 * Development version of WPForms. Can be specified in an addon.
@@ -112,10 +114,11 @@ class Requirements {
 	 * @var string[]
 	 */
 	private $defaults = [
-		self::PHP     => '7.0',
-		self::WP      => '5.5',
-		self::WPFORMS => self::WPFORMS_DEV_VERSION_IN_ADDON,
-		self::LICENSE => self::PRO_AND_TOP,
+		self::PHP      => '7.0',
+		self::WP       => '5.5',
+		self::WPFORMS  => self::WPFORMS_DEV_VERSION_IN_ADDON,
+		self::LICENSE  => self::PRO_AND_TOP,
+		self::PRIORITY => 10,
 	];
 
 	/**
@@ -124,7 +127,7 @@ class Requirements {
 	 * @todo Add custom message for form-templates-pack.
 	 */
 
-	// phpcs:disable
+	// phpcs:disable WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned, WordPress.Arrays.MultipleStatementAlignment.LongIndexSpaceBeforeDoubleArrow
 	/**
 	 * Addon requirements.
 	 *
@@ -132,29 +135,35 @@ class Requirements {
 	 * The requirement array can have the following keys:
 	 * self::PHP ('php') for the minimal PHP version required,
 	 * self::EXT ('ext') for the PHP extensions required,
+	 * self::WP ('wp') for the minimal WordPress version required,
 	 * self::WPFORMS ('wpforms') for the minimal WPForms version required,
-	 * self::LICENSE ('license') for the license required,
+	 * self::LICENSE ('license') for the license level required,
 	 * self::ADDON ('addon') for the minimal addon version required,
 	 * self::ADDON_VERSION_CONSTANT ('addon_version_constant') for the addon version constant.
+	 * self::PRIORITY ('priority') for the priority of the current requirements.
 	 *
 	 * 'php' value can be string like '5.6' or an array like 'php' => [ 'version' => '7.2', compare => '=' ].
 	 * 'ext' value can be string like 'curl' or an array like 'ext' => [ 'curl', 'mbstring' ].
-	 * 'wpforms' value can be string like '1.8.2' or an array like 'wpforms' => [ 'version' => '1.7.5' ].
-	 * When 'wpforms' value is '{WPFORMS_VERSION}', it is not checked. Should be used for development purposes.
-	 * 'license' value can be string like 'elite, agency, ultimate', an array like 'license' => [ 'elite', 'agency', 'ultimate' ], or any empty value.
-	 *  When 'license' value is empty like null, false, [], it is not checked.
+	 * 'wp' value can be string like '5.5' or an array like 'wp' => [ 'version' => '6.4', compare => '=' ].
+	 * 'wpforms' value can be string like '1.8.2' or an array like 'wpforms' => [ 'version' => '1.7.5', compare => '=' ].
+	 *   When 'wpforms' value is '{WPFORMS_VERSION}', it is not checked and should be used for development.
+	 * 'license' value can be string like 'elite, agency, ultimate', an array like 'license' => [ 'elite', 'agency', 'ultimate' ].
+	 *    When 'license' value is an empty like null, false, [], it is not checked.
 	 * 'addon' value can be string like '2.0.1' or an array like 'addon' => [ 'version' => '2.0.1', 'compare' => '<=' ].
-	 * 'addon_version_constant' must a string like 'WPFORMS_ACTIVECAMPAIGN_VERSION'.
-	 * By default, compare is '>='.
+	 * 'addon_version_constant' must be a string like 'WPFORMS_ACTIVECAMPAIGN_VERSION'.
+	 * 'priority' must be an integer like 20. By default, it is 10.
+	 *
+	 * By default, 'compare' is '>='.
 	 *
 	 * Default addon version constant is formed from addon directory name like this:
 	 * wpforms-activecampaign -> WPFORMS_ACTIVECAMPAIGN_VERSION.
 	 *
 	 * Requirements can be specified here or in the addon as a parameter of wpforms_requirements().
-	 * The priorities from lower to higher:
+	 * The priorities from lower to higher (if PRIORITY is not set or equal):
 	 * 1. Default parameters from $this->defaults.
 	 * 2. Current array $this->requirements.
 	 * 3. Parameter of wpforms_requirements() call in the addon.
+	 * Settings with a higher priority overwrite lower priority settings.
 	 *
 	 * Minimal required version of WPForms should be specified in the addons.
 	 * Minimal required version of addons should be specified here, in $this->requirements array.
@@ -164,9 +173,9 @@ class Requirements {
 	 * we should add to the addon-related requirement array the line like
 	 * self::ADDON => '1.x.x' or
 	 * self::ADDON => '{WPFORMS_ACTIVECAMPAIGN_VERSION}'.
-	 * Here 1.x.x is the specific addon version and
+	 * Here 1.x.x is the specific addon version, and
 	 * WPFORMS_ACTIVECAMPAIGN_VERSION is the addon version constant name.
-	 * Addon version constant name will be replaced by the script during the addon release.
+	 * The script will replace the addon version constant name during the addon release.
 	 *
 	 * @since 1.8.2.2
 	 *
@@ -187,12 +196,17 @@ class Requirements {
 			self::LICENSE => self::PLUS_PRO_AND_TOP,
 		],
 		'wpforms-captcha/wpforms-captcha.php'                           => [
-			self::LICENSE => 'basic, plus, pro, elite, agency, ultimate',
+			self::LICENSE  => 'basic, plus, pro, elite, agency, ultimate',
+			self::WPFORMS  => [
+				self::VERSION  => [ '1.8.3', '1.8.7' ],
+				self::COMPARE  => [ '>=', '<' ],
+			],
+			self::PRIORITY => 20,
 		],
 		'wpforms-conversational-forms/wpforms-conversational-forms.php' => [],
 		'wpforms-convertkit/wpforms-convertkit.php'                     => [
 			self::LICENSE => self::PLUS_PRO_AND_TOP,
-			self::PHP 	  => '7.4',
+			self::PHP     => '7.4',
 		],
 		'wpforms-coupons/wpforms-coupons.php'                           => [],
 		'wpforms-drip/wpforms-drip.php'                                 => [
@@ -237,7 +251,7 @@ class Requirements {
 		],
 		'wpforms-signatures/wpforms-signatures.php'                     => [],
 		'wpforms-square/wpforms-square.php'                             => [
-			self::PHP => '7.2'
+			self::PHP => '7.2',
 		],
 		'wpforms-stripe/wpforms-stripe.php'                             => [],
 		'wpforms-surveys-polls/wpforms-surveys-polls.php'               => [],
@@ -248,7 +262,7 @@ class Requirements {
 		],
 		'wpforms-zapier/wpforms-zapier.php'                             => [],
 	];
-	// phpcs:enable
+	// phpcs:enable WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned, WordPress.Arrays.MultipleStatementAlignment.LongIndexSpaceBeforeDoubleArrow
 
 	/**
 	 * Addon requirements.
@@ -344,7 +358,7 @@ class Requirements {
 
 		$this->addon_requirements = $addon_requirements;
 
-		// Requirements array must contain the addon main filename.
+		// Requirements' array must contain the addon main filename.
 		if ( ! isset( $this->addon_requirements['file'] ) ) {
 			return false;
 		}
@@ -353,7 +367,7 @@ class Requirements {
 
 		$this->init_addon_requirements( $this->basename );
 
-		$this->addon_requirements = array_merge(
+		$this->addon_requirements = $this->merge_requirements(
 			$this->defaults,
 			$this->requirements[ $this->basename ],
 			$this->addon_requirements
@@ -373,6 +387,32 @@ class Requirements {
 		$this->requirements[ $this->basename ] = $this->addon_requirements;
 
 		return empty( $this->not_validated[ $this->basename ] );
+	}
+
+	/**
+	 * Merge requirements by priority.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param array $defaults           Default requirements.
+	 * @param array $requirements       Requirements.
+	 * @param array $addon_requirements Addon requirements.
+	 *
+	 * @return array
+	 */
+	private function merge_requirements( array $defaults, array $requirements, array $addon_requirements ): array {
+
+		$chunks = [ $defaults, $requirements, $addon_requirements ];
+
+		usort(
+			$chunks,
+			static function ( $chunk1, $chunk2 ) {
+				// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.AddEmptyLineBeforeReturnStatement
+				return ( $chunk1[ self::PRIORITY ] ?? 10 ) <=> ( $chunk2[ self::PRIORITY ] ?? 10 );
+			}
+		);
+
+		return array_merge( ...$chunks );
 	}
 
 	/**
@@ -413,7 +453,7 @@ class Requirements {
 	}
 
 	/**
-	 * Check whether plugin is a wpforms addon.
+	 * Check whether a plugin is a wpforms addon.
 	 *
 	 * @since 1.8.2.2
 	 *
@@ -429,8 +469,8 @@ class Requirements {
 		}
 
 		/**
-		 * There are some forks of our plugins having the wpforms- prefix.
-		 * We have to check Author name in the plugin header.
+		 * There are some forks of our plugins having the 'wpforms-' prefix.
+		 * We have to check the Author name in the plugin header.
 		 */
 		$plugin_data   = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
 		$plugin_author = isset( $plugin_data['Author'] ) ? strtolower( $plugin_data['AuthorName'] ) : '';
@@ -478,7 +518,7 @@ class Requirements {
 	 *
 	 * @param string $key Requirements key.
 	 *
-	 * @return string[]
+	 * @return array[]
 	 */
 	private function normalize_version_requirement( string $key ): array {
 
@@ -488,14 +528,18 @@ class Requirements {
 			return [];
 		}
 
-		$requirement = array_map(
-			'trim',
-			(array) $this->addon_requirements[ $key ]
-		);
+		$requirement = (array) $this->addon_requirements[ $key ];
 
-		$version = isset( $requirement[0] ) ? trim( $requirement[0] ) : '';
-		$version = isset( $requirement[ self::VERSION ] ) ? trim( $requirement[ self::VERSION ] ) : $version;
-		$compare = isset( $requirement[ self::COMPARE ] ) ? trim( $requirement[ self::COMPARE ] ) : '>=';
+		$version = isset( $requirement[0] ) ?
+			array_map( 'trim', (array) $requirement[0] ) :
+			[ '' ];
+		$version = isset( $requirement[ self::VERSION ] ) ?
+			array_map( 'trim', (array) $requirement[ self::VERSION ] ) :
+			$version;
+		$compare = isset( $requirement[ self::COMPARE ] ) ?
+			array_map( 'trim', (array) $requirement[ self::COMPARE ] ) :
+			[ self::COMPARE_DEFAULT ];
+		$compare = array_pad( $compare, count( $version ), self::COMPARE_DEFAULT );
 
 		$requirement = [
 			self::VERSION => $version,
@@ -557,7 +601,7 @@ class Requirements {
 
 		if (
 			$php[ self::VERSION ] &&
-			! version_compare( PHP_VERSION, $php[ self::VERSION ], $php[ self::COMPARE ] )
+			! $this->version_compare( PHP_VERSION, $php )
 		) {
 			$this->not_validated[ $this->basename ][] = self::PHP;
 
@@ -606,7 +650,7 @@ class Requirements {
 
 		if (
 			$wp[ self::VERSION ] &&
-			! version_compare( $wp_version, $wp[ self::VERSION ], $wp[ self::COMPARE ] )
+			! $this->version_compare( $wp_version, $wp )
 		) {
 			$this->not_validated[ $this->basename ][] = self::WP;
 
@@ -637,11 +681,36 @@ class Requirements {
 
 		if (
 			$wpforms[ self::VERSION ] &&
-			! version_compare( wpforms()->version, $wpforms[ self::VERSION ], $wpforms[ self::COMPARE ] )
+			! $this->version_compare( wpforms()->version, $wpforms )
 		) {
 			$this->not_validated[ $this->basename ][] = self::WPFORMS;
 
 			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Version compare.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string $version     Version to compare.
+	 * @param array  $requirement Requirement.
+	 *
+	 * @return bool
+	 */
+	private function version_compare( string $version, array $requirement ): bool {
+
+		$compare_arr = $this->get_compare_array( $requirement );
+
+		foreach ( $compare_arr as $version2 => $compare ) {
+			$result = version_compare( $version, $version2, $compare );
+
+			if ( ! $result ) {
+				return false;
+			}
 		}
 
 		return true;
@@ -687,13 +756,13 @@ class Requirements {
 			return true;
 		}
 
-		if ( preg_match( '/{.+_VERSION}/', $addon[ self::VERSION ] ) ) {
+		if ( preg_grep( '/{.+_VERSION}/', $addon[ self::VERSION ] ) ) {
 			return true;
 		}
 
 		if (
 			$addon[ self::VERSION ] &&
-			! version_compare( constant( $addon_version_constant ), $addon[ self::VERSION ], $addon[ self::COMPARE ] )
+			! $this->version_compare( constant( $addon_version_constant ), $addon )
 		) {
 			$this->not_validated[ $this->basename ][] = self::ADDON;
 
@@ -795,6 +864,18 @@ class Requirements {
 				$notice .= ' ' . $read_more;
 			}
 
+			/**
+			 * Filter the requirements notice.
+			 *
+			 * @since 1.8.7
+			 *
+			 * @param string $notice       Notice.
+			 * @param array  $errors       Validation errors.
+			 * @param string $basename     Plugin basename.
+			 * @param array  $requirements Addon requirements.
+			 */
+			$notice = apply_filters( 'wpforms_requirements_notice', $notice, $errors, $basename, $this->requirements[ $basename ] );
+
 			$notices[] = $notice;
 		}
 
@@ -802,7 +883,7 @@ class Requirements {
 	}
 
 	/**
-	 * Get validation message.
+	 * Get a validation message.
 	 *
 	 * @since 1.8.2.2
 	 *
@@ -1009,7 +1090,7 @@ class Requirements {
 	}
 
 	/**
-	 * Get comma-separated list string from requirements array.
+	 * Get comma-separated list string from requirements' array.
 	 *
 	 * @since 1.8.2.2
 	 *
@@ -1036,15 +1117,36 @@ class Requirements {
 	 *
 	 * @since 1.8.2.2
 	 *
-	 * @param array $arr Array containing a version.
+	 * @param array $requirement Array containing a requirement.
 	 *
 	 * @return string
 	 */
-	private function list_version( array $arr ): string {
+	private function list_version( array $requirement ): string {
 
-		$compare = (string) $arr[ self::COMPARE ];
-		$compare = $compare === '>=' ? '' : $compare . ' ';
+		$compare_arr = $this->get_compare_array( $requirement );
+		$list        = [];
 
-		return $compare . $arr[ self::VERSION ];
+		foreach ( $compare_arr as $version2 => $compare ) {
+			$list[] = $compare . $version2;
+		}
+
+		return implode( ', ', $list );
+	}
+
+	/**
+	 * Get a compare array in the following format: [ 'version' => 'compare', ... ].
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param array $requirement Requirement.
+	 *
+	 * @return array
+	 */
+	public function get_compare_array( array $requirement ): array {
+
+		$versions = $requirement[ self::VERSION ];
+		$compares = $requirement[ self::COMPARE ];
+
+		return array_combine( $versions, $compares );
 	}
 }

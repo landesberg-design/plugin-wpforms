@@ -33,7 +33,7 @@ $form_title = isset( $form_data['settings']['form_title'] ) ? ucfirst( $form_dat
 	<script type="text/javascript" src="<?php echo esc_url( includes_url( 'js/utils.js' ) ); ?>"></script>
 	<script type="text/javascript" src="<?php echo esc_url( includes_url( 'js/jquery/jquery.js' ) ); ?>"></script>
 	<script type="text/javascript"
-			src="<?php echo esc_url( WPFORMS_PLUGIN_URL . "assets/pro/js/admin/print-entry{$min}.js" ); ?>"></script>
+			src="<?php echo esc_url( WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries/print-entry{$min}.js" ); ?>"></script>
 	<meta name="robots" content="noindex,nofollow,noarchive">
 	<?php // phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet, WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>
 	<?php

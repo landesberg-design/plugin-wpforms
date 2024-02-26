@@ -2,6 +2,8 @@
 
 namespace WPForms\Logger;
 
+use WPForms\Helpers\DB;
+
 /**
  * Class Repository.
  *
@@ -30,7 +32,7 @@ class Repository {
 	 *
 	 * @since 1.6.3
 	 *
-	 * @var \WPForms\Logger\Records
+	 * @var Records
 	 */
 	private $records;
 
@@ -64,7 +66,7 @@ class Repository {
 	 *
 	 * @return string
 	 */
-	public static function get_table_name() {
+	public static function get_table_name(): string {
 
 		global $wpdb;
 
@@ -72,7 +74,7 @@ class Repository {
 	}
 
 	/**
-	 * Create table for database.
+	 * Create table in the database.
 	 *
 	 * @since 1.6.3
 	 */
@@ -86,7 +88,7 @@ class Repository {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE $table (
+		$sql = "CREATE TABLE IF NOT EXISTS $table (
 			id BIGINT(20) NOT NULL AUTO_INCREMENT,
 			title VARCHAR(255) NOT NULL,
 			message LONGTEXT NOT NULL,
@@ -98,7 +100,7 @@ class Repository {
 			PRIMARY KEY (id)
 		) $charset_collate;";
 
-		maybe_create_table( $table, $sql );
+		dbDelta( $sql );
 	}
 
 	/**
@@ -130,7 +132,7 @@ class Repository {
 	 * @param string $search Search.
 	 * @param string $type   Type of records.
 	 *
-	 * @return \WPForms\Logger\Records
+	 * @return Records
 	 */
 	public function records( $limit, $offset = 0, $search = '', $type = '' ) {
 
@@ -237,7 +239,7 @@ class Repository {
 	}
 
 	/**
-	 * Check if the database table exist.
+	 * Check if the database table exists.
 	 *
 	 * @since 1.6.4
 	 *
@@ -245,13 +247,7 @@ class Repository {
 	 */
 	public function table_exists() {
 
-		global $wpdb;
-
-		$table = self::get_table_name();
-
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return $wpdb->get_var( "SHOW TABLES LIKE $table" ) === $table;
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return DB::table_exists( self::get_table_name() );
 	}
 
 	/**
@@ -292,5 +288,4 @@ class Repository {
 		//phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
 		//phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
 	}
-
 }

@@ -324,7 +324,10 @@ WPFormsEducation.proCore = window.WPFormsEducation.proCore || ( function( docume
 					}
 
 					// In the case of error.
-					WPFormsEducation.core.errorModal( false, res.data );
+					const errorTitle = res.data.header ?? false,
+						errorMessage = res.data.msg ?? res.data;
+
+					WPFormsEducation.core.errorModal( errorTitle, errorMessage );
 				}
 			);
 		},

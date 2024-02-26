@@ -22,7 +22,11 @@ class AuthorEmail extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		$email = get_the_author_meta( 'user_email' );
+		$form_id = $form_data['id'] ?? 0;
+
+		$author = $this->get_author( $form_id );
+
+		$email = $author->user_email ?? '';
 
 		if ( empty( $email ) && ! empty( $_POST['wpforms']['author'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$email = get_the_author_meta( 'user_email', absint( $_POST['wpforms']['author'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing

@@ -121,7 +121,6 @@ class WPForms_Field_Layout extends WPForms_Field {
 		add_filter( 'wpforms_entry_single_data', [ $this, 'filter_fields_remove_layout' ], 1000, 3 );
 		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
 		add_filter( 'wpforms_pro_admin_entries_print_preview_fields', [ $this, 'filter_entries_print_preview_fields' ] );
-		add_action( 'enqueue_block_editor_assets', [ $this, 'gutenberg_enqueues' ] );
 		add_filter( 'register_block_type_args', [ $this, 'register_block_type_args' ], 20, 2 );
 		add_filter( 'wpforms_conversational_form_detected', [ $this, 'cf_frontend_hooks' ], 10, 2 );
 	}
@@ -370,12 +369,11 @@ class WPForms_Field_Layout extends WPForms_Field {
 	 * Load enqueues for the Gutenberg editor in WP version < 5.5.
 	 *
 	 * @since 1.7.7
+	 * @deprecated 1.8.7
 	 */
 	public function gutenberg_enqueues() {
 
-		if ( version_compare( get_bloginfo( 'version' ), '5.5', '>=' ) ) {
-			return;
-		}
+		_deprecated_function( __METHOD__, '1.8.7 of the WPForms plugin' );
 
 		$min = wpforms_get_min_suffix();
 

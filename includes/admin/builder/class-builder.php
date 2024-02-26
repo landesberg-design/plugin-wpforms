@@ -371,18 +371,19 @@ class WPForms_Builder {
 			'4.2.6'
 		);
 
+		// jQuery.Confirm Reloaded.
 		wp_enqueue_style(
 			'jquery-confirm',
 			WPFORMS_PLUGIN_URL . 'assets/lib/jquery.confirm/jquery-confirm.min.css',
 			null,
-			'3.3.4'
+			'1.0.0'
 		);
 
 		wp_enqueue_style(
 			'minicolors',
 			WPFORMS_PLUGIN_URL . 'assets/lib/jquery.minicolors/jquery.minicolors.min.css',
 			null,
-			'2.2.6'
+			'2.3.6'
 		);
 
 		// Remove TinyMCE editor styles from third-party themes and plugins.
@@ -403,11 +404,12 @@ class WPForms_Builder {
 			'4.2.6'
 		);
 
+		// jQuery.Confirm Reloaded.
 		wp_enqueue_script(
 			'jquery-confirm',
 			WPFORMS_PLUGIN_URL . 'assets/lib/jquery.confirm/jquery-confirm.min.js',
 			[ 'jquery' ],
-			'3.3.4'
+			'1.0.0'
 		);
 
 		wp_enqueue_script(
@@ -421,7 +423,7 @@ class WPForms_Builder {
 			'minicolors',
 			WPFORMS_PLUGIN_URL . 'assets/lib/jquery.minicolors/jquery.minicolors.min.js',
 			[ 'jquery' ],
-			'2.2.6'
+			'2.3.6'
 		);
 
 		wp_enqueue_script(
@@ -449,7 +451,7 @@ class WPForms_Builder {
 			'dom-purify',
 			WPFORMS_PLUGIN_URL . 'assets/lib/purify.min.js',
 			[],
-			'3.0.6'
+			'3.0.8'
 		);
 
 		if ( wp_is_mobile() ) {
@@ -458,14 +460,14 @@ class WPForms_Builder {
 
 		wp_enqueue_script(
 			'wpforms-utils',
-			WPFORMS_PLUGIN_URL . "assets/js/admin-utils{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/share/admin-utils{$min}.js",
 			[ 'jquery', 'dom-purify' ],
 			WPFORMS_VERSION
 		);
 
 		wp_enqueue_script(
 			'wpforms-generic-utils',
-			WPFORMS_PLUGIN_URL . "assets/js/utils{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/share/utils{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION
 		);
@@ -479,7 +481,7 @@ class WPForms_Builder {
 
 		wp_enqueue_script(
 			'wpforms-admin-builder-dropdown-list',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/dropdown-list{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/dropdown-list{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -487,7 +489,7 @@ class WPForms_Builder {
 
 		wp_enqueue_script(
 			'wpforms-builder',
-			WPFORMS_PLUGIN_URL . "assets/js/admin-builder{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/admin-builder{$min}.js",
 			[
 				'wpforms-utils',
 				'wpforms-admin-builder-templates',
@@ -503,7 +505,7 @@ class WPForms_Builder {
 
 		wp_enqueue_script(
 			'wpforms-admin-builder-templates',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/templates{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/templates{$min}.js",
 			[ 'wp-util' ],
 			WPFORMS_VERSION,
 			true
@@ -683,7 +685,7 @@ class WPForms_Builder {
 			'upload_image_extensions_error'           => esc_html__( 'You tried uploading a file type that is not allowed. Please try again.', 'wpforms-lite' ),
 			'provider_add_new_acc_btn'                => esc_html__( 'Add', 'wpforms-lite' ),
 			'pro'                                     => wpforms()->is_pro(),
-			'is_gutenberg'                            => version_compare( get_bloginfo( 'version' ), '5.0', '>=' ) && ! is_plugin_active( 'classic-editor/classic-editor.php' ),
+			'is_gutenberg'                            => ! is_plugin_active( 'classic-editor/classic-editor.php' ),
 			'cl_fields_supported'                     => wpforms_get_conditional_logic_form_fields_supported(),
 			'redirect_url_field_error'                => esc_html__( 'You should enter a valid absolute address to the Confirmation Redirect URL field.', 'wpforms-lite' ),
 			'add_custom_value_label'                  => esc_html__( 'Add Custom Value', 'wpforms-lite' ),

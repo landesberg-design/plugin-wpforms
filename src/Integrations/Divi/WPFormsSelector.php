@@ -50,8 +50,8 @@ class WPFormsSelector extends ET_Builder_Module {
 		if ( ! empty( $forms ) ) {
 			$forms         = wp_list_pluck( $forms, 'post_title', 'ID' );
 			$forms         = array_map(
-				function ( $form ) {
-					// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+				static function ( $form ) {
+
 					return htmlspecialchars_decode( $form, ENT_QUOTES );
 				},
 				$forms

@@ -238,7 +238,8 @@ function wpforms_is_ajax() {
 	}
 
 	// Make sure the request targets admin-ajax.php.
-	if ( isset( $_SERVER['SCRIPT_FILENAME'] ) && basename( sanitize_text_field( wp_unslash( $_SERVER['SCRIPT_FILENAME'] ) ) ) !== 'admin-ajax.php' ) {
+	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	if ( isset( $_SERVER['SCRIPT_FILENAME'] ) && basename( sanitize_text_field( wp_normalize_path( $_SERVER['SCRIPT_FILENAME'] ) ) ) !== 'admin-ajax.php' ) {
 		return false;
 	}
 
@@ -335,34 +336,18 @@ function wpforms_is_admin_ajax() {
  * @since 1.6.2
  *
  * @return bool True if Gutenberg is active.
+ * @noinspection PhpUndefinedFunctionInspection
  */
-function wpforms_is_gutenberg_active() {
+function wpforms_is_gutenberg_active(): bool {
 
-	$gutenberg    = false;
-	$block_editor = false;
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-	if ( has_filter( 'replace_editor', 'gutenberg_init' ) ) {
-		// Gutenberg is installed and activated.
-		$gutenberg = true;
+	if ( is_plugin_active( 'classic-editor/classic-editor.php' ) ) {
+		return in_array( get_option( 'classic-editor-replace' ), [ 'no-replace', 'block' ], true );
 	}
-
-	if ( version_compare( $GLOBALS['wp_version'], '5.0-beta', '>' ) ) {
-		// Block editor.
-		$block_editor = true;
-	}
-
-	if ( ! $gutenberg && ! $block_editor ) {
-		return false;
-	}
-
-	include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 	if ( is_plugin_active( 'disable-gutenberg/disable-gutenberg.php' ) ) {
 		return ! disable_gutenberg();
-	}
-
-	if ( is_plugin_active( 'classic-editor/classic-editor.php' ) ) {
-		return get_option( 'classic-editor-replace' ) === 'block';
 	}
 
 	return true;

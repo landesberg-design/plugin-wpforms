@@ -92,7 +92,7 @@ class Helpers {
 	 * @return string HTML markup for the icon element.
 	 */
 	public static function get_inline_icon( string $name ): string {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return sprintf( '<i class="fa %1$s" aria-hidden="true"></i>', esc_attr( $name ) );
 	}
 }

@@ -49,7 +49,7 @@ class EmailTemplate {
 
 		wp_enqueue_script(
 			'wpforms-builder-email-template',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/email-template{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/email-template{$min}.js",
 			[ 'jquery', 'jquery-confirm', 'wpforms-builder' ],
 			WPFORMS_VERSION,
 			true

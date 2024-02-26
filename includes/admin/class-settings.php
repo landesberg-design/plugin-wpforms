@@ -146,7 +146,9 @@ class WPForms_Settings {
 	private function is_downgraded_version(): bool {
 
 		// Get all installed versions.
-		$installed_versions = wpforms()->is_pro() ? (array) get_option( Migrations::MIGRATED_OPTION_NAME, [] ) : (array) get_option( LiteMigration::MIGRATED_OPTION_NAME, [] );
+		$installed_versions = wpforms()->is_pro() ?
+			(array) get_option( Migrations::MIGRATED_OPTION_NAME, [] ) :
+			(array) get_option( LiteMigration::MIGRATED_OPTION_NAME, [] );
 
 		// Get the most recent installed version.
 		$db_latest = array_keys( $installed_versions )[ count( $installed_versions ) - 1 ];

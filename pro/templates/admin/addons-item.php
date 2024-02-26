@@ -12,6 +12,7 @@
  * @var bool   $recommended       Flag for recommended addons.
  * @var bool   $has_settings_link Flag for addons with settings link.
  * @var string $settings_url      Addon settings link.
+ * @var bool   $has_cap           Check is user has capability to manage addon.
  */
 
 use WPForms\Admin\Education\Helpers;
@@ -56,21 +57,23 @@ $image_alt                = sprintf( /* translators: %s - addon title. */
 		</div>
 	</div>
 
-	<div class="wpforms-addons-list-item-footer wpforms-addons-list-item-footer-<?php echo esc_attr( $addon['status'] ); ?>" data-plugin="<?php echo esc_attr( $addon['status'] === 'missing' ? $addon['url'] : $addon['path'] ); ?>" data-type="addon">
-		<div>
-			<?php if ( $addon['action'] === 'upgrade' ) : ?>
-				<?php Helpers::print_badge( $minimum_required_license, 'lg' ); ?>
-			<?php endif; ?>
+	<?php if ( $has_cap ) : ?>
+		<div class="wpforms-addons-list-item-footer wpforms-addons-list-item-footer-<?php echo esc_attr( $addon['status'] ); ?>" data-plugin="<?php echo esc_attr( $addon['status'] === 'missing' ? $addon['url'] : $addon['path'] ); ?>" data-type="addon">
+			<div>
+				<?php if ( $addon['action'] === 'upgrade' ) : ?>
+					<?php Helpers::print_badge( $minimum_required_license, 'lg' ); ?>
+				<?php endif; ?>
 
-			<?php if ( $has_settings_link && $addon['action'] !== 'upgrade' ) : ?>
-				<a href="<?php echo esc_url( $settings_url ); ?>" class="wpforms-addons-list-item-footer-settings-link">
-					<?php esc_html_e( 'Settings', 'wpforms' ); ?>
-				</a>
-			<?php endif; ?>
-		</div>
+				<?php if ( $has_settings_link && $addon['action'] !== 'upgrade' ) : ?>
+					<a href="<?php echo esc_url( $settings_url ); ?>" class="wpforms-addons-list-item-footer-settings-link">
+						<?php esc_html_e( 'Settings', 'wpforms' ); ?>
+					</a>
+				<?php endif; ?>
+			</div>
 
-		<div class="wpforms-addons-list-item-footer-actions">
-			<?php echo $button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<div class="wpforms-addons-list-item-footer-actions">
+				<?php echo $button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</div>
 		</div>
-	</div>
+	<?php endif; ?>
 </div>

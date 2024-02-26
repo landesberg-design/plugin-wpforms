@@ -123,29 +123,13 @@ function wpforms_get_day_period_date( $period, $timestamp = '', $format = 'Y-m-d
  * Timezone can be based on a PHP timezone string or a ±HH:MM offset.
  *
  * @since 1.6.6
+ * @deprecated 1.8.7
  *
  * @return DateTimeZone Timezone object.
  */
 function wpforms_get_timezone() {
 
-	if ( function_exists( 'wp_timezone' ) ) {
-		return wp_timezone();
-	}
+	_deprecated_function( __FUNCTION__, '1.8.7 of the WPForms plugin', 'wp_timezone' );
 
-	// Fallback for WordPress version < 5.3.
-	$timezone_string = get_option( 'timezone_string' );
-
-	if ( ! $timezone_string ) {
-		$offset  = (float) get_option( 'gmt_offset' );
-		$hours   = (int) $offset;
-		$minutes = ( $offset - $hours );
-
-		$sign     = ( $offset < 0 ) ? '-' : '+';
-		$abs_hour = abs( $hours );
-		$abs_mins = abs( $minutes * 60 );
-
-		$timezone_string = sprintf( '%s%02d:%02d', $sign, $abs_hour, $abs_mins );
-	}
-
-	return timezone_open( $timezone_string );
+	return wp_timezone();
 }

@@ -22,6 +22,12 @@ class UrlReferer extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
+		$referer = $this->get_meta( $entry_id, 'referer' );
+
+		if ( ! empty( $referer ) ) {
+			return esc_url( $referer );
+		}
+
 		return esc_url( (string) wp_get_referer() );
 	}
 }

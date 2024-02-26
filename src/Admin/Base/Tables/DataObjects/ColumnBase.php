@@ -101,7 +101,7 @@ abstract class ColumnBase {
 	 * @return string
 	 */
 	public function get_label(): string {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return $this->label;
 	}
 
@@ -113,7 +113,7 @@ abstract class ColumnBase {
 	 * @return string
 	 */
 	public function get_label_html(): string {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return $this->label_html;
 	}
 
@@ -125,7 +125,7 @@ abstract class ColumnBase {
 	 * @return string
 	 */
 	public function get_type(): string {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return $this->type;
 	}
 
@@ -137,7 +137,7 @@ abstract class ColumnBase {
 	 * @return bool
 	 */
 	public function is_draggable(): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return $this->is_draggable;
 	}
 
@@ -149,7 +149,7 @@ abstract class ColumnBase {
 	 * @return bool
 	 */
 	public function is_readonly(): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return $this->readonly;
 	}
 }

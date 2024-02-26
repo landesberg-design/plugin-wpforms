@@ -16,7 +16,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 *
 	 * @since 1.6.3
 	 */
-	const INTL_VERSION = '18.3.3';
+	const INTL_VERSION = '19.2.16';
 
 	/**
 	 * Primary class constructor.

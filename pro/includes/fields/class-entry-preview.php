@@ -98,7 +98,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 
 		wp_enqueue_script(
 			'wpforms-entry-preview',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/fields/entry-preview{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/entry-preview{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -499,7 +499,6 @@ class WPForms_Entry_Preview extends WPForms_Field {
 	 */
 	private static function get_ignored_fields() {
 
-		// TODO: 'captcha' should be dropped from the list when the WPForms Captcha 1.3.2/1.4 is released.
 		$ignored_fields = [ 'hidden', 'captcha' ];
 
 		/**
@@ -511,7 +510,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 		 *
 		 * @return array
 		 */
-		return (array) apply_filters( 'wpforms_pro_fields_entry_preview_get_ignored_fields', $ignored_fields );
+		return (array) apply_filters( 'wpforms_pro_fields_entry_preview_get_ignored_fields', $ignored_fields ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**

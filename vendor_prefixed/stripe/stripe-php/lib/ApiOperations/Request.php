@@ -40,6 +40,29 @@ trait Request
         return [$resp->json, $options];
     }
     /**
+     * @param string $url URL for the request
+     * @param class-string< \Stripe\SearchResult|\Stripe\Collection > $resultClass indicating what type of paginated result is returned
+     * @param null|array $params list of parameters for the request
+     * @param null|array|string $options
+     * @param string[] $usage names of tracked behaviors associated with this request
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return \Stripe\Collection|\Stripe\SearchResult
+     */
+    protected static function _requestPage($url, $resultClass, $params = null, $options = null, $usage = [])
+    {
+        self::_validateParams($params);
+        list($response, $opts) = static::_staticRequest('get', $url, $params, $options, $usage);
+        $obj = \WPForms\Vendor\Stripe\Util\Util::convertToStripeObject($response->json, $opts);
+        if (!$obj instanceof $resultClass) {
+            throw new \WPForms\Vendor\Stripe\Exception\UnexpectedValueException('Expected type ' . $resultClass . ', got "' . \get_class($obj) . '" instead.');
+        }
+        $obj->setLastResponse($response);
+        $obj->setFilters($params);
+        return $obj;
+    }
+    /**
      * @param 'delete'|'get'|'post' $method HTTP method ('get', 'post', etc.)
      * @param string $url URL for the request
      * @param callable $readBodyChunk function that will receive chunks of data from a successful request body

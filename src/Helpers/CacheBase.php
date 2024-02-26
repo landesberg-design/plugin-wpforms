@@ -3,7 +3,6 @@
 namespace WPForms\Helpers;
 
 use WPForms\Tasks\Tasks;
-use WPForms\Helpers\File;
 
 /**
  * Remote data cache handler.
@@ -15,13 +14,27 @@ use WPForms\Helpers\File;
 abstract class CacheBase {
 
 	/**
+	 * Encrypt cached file.
+	 *
+	 * @since 1.8.7
+	 */
+	const ENCRYPT = false;
+
+	/**
+	 * Request lock time, min.
+	 *
+	 * @since 1.8.7
+	 */
+	const REQUEST_LOCK_TIME = 15;
+
+	/**
 	 * Indicates whether the cache was updated during the current run.
 	 *
 	 * @since 1.6.8
 	 *
 	 * @var bool
 	 */
-	protected static $updated = false;
+	protected $updated = false;
 
 	/**
 	 * Settings.
@@ -86,7 +99,7 @@ abstract class CacheBase {
 			return;
 		}
 
-		// Quit if settings wasn't provided.
+		// Quit if settings weren't provided.
 		if (
 			empty( $this->settings['remote_source'] ) ||
 			empty( $this->settings['cache_file'] )
@@ -138,6 +151,8 @@ abstract class CacheBase {
 			// Scheduled update action.
 			// For instance: 'wpforms_admin_addons_cache_update'.
 			'update_action' => '',
+			// Additional query args for the remote source URL.
+			'query_args'    => [],
 		];
 
 		$this->settings = wp_parse_args( $this->setup(), $default_settings );
@@ -153,7 +168,7 @@ abstract class CacheBase {
 	abstract protected function setup();
 
 	/**
-	 * Get cache directory path.
+	 * Get a cache directory path.
 	 *
 	 * @since 1.6.8
 	 *
@@ -173,9 +188,13 @@ abstract class CacheBase {
 	 */
 	public function get() {
 
-		if ( $this->is_invalid_cache() || $this->is_expired_cache() ) {
-			$this->update();
+		$cache = $this->get_from_cache();
+
+		if ( ! empty( $cache ) && ! $this->is_expired_cache() ) {
+			return $cache;
 		}
+
+		$this->update();
 
 		return $this->get_from_cache();
 	}
@@ -188,20 +207,8 @@ abstract class CacheBase {
 	 * @return bool
 	 */
 	private function is_expired_cache(): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return $this->cache_time() + $this->settings['cache_ttl'] < time();
-	}
-
-	/**
-	 * Determine if the cache is expired.
-	 *
-	 * @since 1.8.2
-	 *
-	 * @return bool
-	 */
-	private function is_invalid_cache() {
-
-		return empty( $this->get_from_cache() );
 	}
 
 	/**
@@ -235,13 +242,20 @@ abstract class CacheBase {
 	 *
 	 * @return array
 	 */
-	private function get_from_cache() {
+	private function get_from_cache(): array {
 
 		if ( ! $this->exists() ) {
 			return [];
 		}
 
-		return (array) json_decode( File::get_contents( $this->cache_file ), true );
+		$content = File::get_contents( $this->cache_file );
+
+		// Do not decrypt non-encrypted legacy files, they will be encrypted on the scheduled update.
+		if ( static::ENCRYPT && ! wpforms_is_json( $content ) ) {
+			$content = Crypto::decrypt( $content );
+		}
+
+		return (array) json_decode( $content, true );
 	}
 
 	/**
@@ -253,11 +267,11 @@ abstract class CacheBase {
 	 *
 	 * @return bool
 	 */
-	public function update( $force = false ) {
+	public function update( bool $force = false ): bool {
 
 		if (
 			! $force &&
-			time() < $this->cache_time() + 15 * MINUTE_IN_SECONDS
+			time() < $this->cache_time() + self::REQUEST_LOCK_TIME * MINUTE_IN_SECONDS
 		) {
 			return false;
 		}
@@ -268,14 +282,20 @@ abstract class CacheBase {
 			return false;
 		}
 
-		$data = $this->perform_remote_request();
+		$data    = $this->perform_remote_request();
+		$content = wp_json_encode( $data );
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
-		if ( File::put_contents( $this->cache_file, wp_json_encode( $data ) ) === false ) {
+		$this->maybe_update_transient( $data );
+
+		if ( static::ENCRYPT ) {
+			$content = Crypto::encrypt( $content );
+		}
+
+		if ( ! File::put_contents( $this->cache_file, $content ) ) {
 			return false;
 		}
 
-		self::$updated = true;
+		$this->updated = true;
 
 		return true;
 	}
@@ -321,12 +341,17 @@ abstract class CacheBase {
 	 *
 	 * @return array
 	 */
-	private function perform_remote_request() {
+	private function perform_remote_request(): array {
 
 		$wpforms_key = wpforms()->is_pro() ? wpforms_get_license_key() : 'lite';
 
+		$query_args = array_merge(
+			[ 'tgm-updater-key' => $wpforms_key ],
+			$this->settings['query_args'] ?? []
+		);
+
 		$request = wp_remote_get(
-			add_query_arg( 'tgm-updater-key', $wpforms_key, $this->settings['remote_source'] ),
+			add_query_arg( $query_args, $this->settings['remote_source'] ),
 			[
 				'timeout'    => 10,
 				'user-agent' => wpforms_get_default_user_agent(),
@@ -380,12 +405,24 @@ abstract class CacheBase {
 	 */
 	public function cache_dir_complete() {
 
-		if ( ! self::$updated ) {
+		if ( ! $this->updated ) {
 			return;
 		}
 
 		wpforms_create_upload_dir_htaccess_file();
+		wpforms_create_cache_dir_htaccess_file();
 		wpforms_create_index_html_file( $this->cache_dir );
+		wpforms_create_index_php_file( $this->cache_dir );
+	}
+
+	/**
+	 * Invalidate cache.
+	 *
+	 * @since 1.8.7
+	 */
+	public function invalidate_cache() {
+
+		Transient::delete( $this->cache_key );
 	}
 
 	/**
@@ -393,15 +430,32 @@ abstract class CacheBase {
 	 *
 	 * @since 1.6.8
 	 *
-	 * @param array $data Raw data received by the remote request.
+	 * @param array|mixed $data Raw data received by the remote request.
 	 *
 	 * @return array Prepared data for caching.
 	 */
-	protected function prepare_cache_data( $data ) {
+	protected function prepare_cache_data( $data ): array {
 
 		if ( empty( $data ) || ! is_array( $data ) ) {
 			return [];
 		}
+
+		return $data;
+	}
+
+	/**
+	 * Maybe update transient duration time.
+	 *
+	 * Allows updating transient duration time if it's less than expiration time.
+	 * To do this, overwrite this method in child classes.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param array $data Data received by the remote request.
+	 *
+	 * @return bool|array
+	 */
+	protected function maybe_update_transient( array $data ) {
 
 		return $data;
 	}

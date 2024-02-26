@@ -3,6 +3,7 @@
 namespace WPForms\Admin\Tools\Views;
 
 use WPForms\Logger\Log;
+use WPForms\Logger\ListTable;
 
 /**
  * Class Logs.
@@ -25,7 +26,7 @@ class Logs extends View {
 	 *
 	 * @since 1.6.6
 	 *
-	 * @var \WPForms\Logger\ListTable
+	 * @var ListTable
 	 */
 	private $list_table = [];
 
@@ -68,12 +69,16 @@ class Logs extends View {
 	 *
 	 * @since 1.6.6
 	 *
-	 * @return \WPForms\Logger\ListTable
+	 * @return ListTable
 	 */
-	private function get_list_table() {
+	private function get_list_table(): ListTable {
 
 		if ( empty( $this->list_table ) ) {
-			$this->list_table = wpforms()->get( 'log' )->get_list_table();
+			$log_obj = wpforms()->get( 'log' );
+
+			if ( $log_obj ) {
+				$this->list_table = $log_obj->get_list_table();
+			}
 		}
 
 		return $this->list_table;
@@ -144,8 +149,9 @@ class Logs extends View {
 	private function types_block() {
 		?>
 
-		<div class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear"
-			 id="wpforms-setting-row-log-types">
+		<div
+				class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear"
+			 	id="wpforms-setting-row-log-types">
 			<div class="wpforms-setting-label">
 				<label for="wpforms-setting-logs-types"><?php esc_html_e( 'Log Types', 'wpforms-lite' ); ?></label>
 			</div>
@@ -177,8 +183,9 @@ class Logs extends View {
 	private function user_roles_block() {
 		?>
 
-		<div class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear"
-			 id="wpforms-setting-row-log-user-roles">
+		<div
+				class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear"
+			 	id="wpforms-setting-row-log-user-roles">
 			<div class="wpforms-setting-label">
 				<label for="wpforms-setting-logs-user-roles"><?php esc_html_e( 'User Roles', 'wpforms-lite' ); ?></label>
 			</div>
@@ -216,8 +223,9 @@ class Logs extends View {
 	private function users_block() {
 		?>
 
-		<div class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear"
-			 id="wpforms-setting-row-log-users">
+		<div
+				class="wpforms-setting-row tools wpforms-setting-row-select wpforms-clear"
+			 	id="wpforms-setting-row-log-users">
 			<div class="wpforms-setting-label">
 				<label for="wpforms-setting-logs-users"><?php esc_html_e( 'Users', 'wpforms-lite' ); ?></label>
 			</div>
@@ -255,24 +263,8 @@ class Logs extends View {
 	 */
 	private function logs_controller() {
 
-		$log = wpforms()->get( 'log' );
-
-		$log->create_table();
 		if ( $this->verify_nonce() ) {
-			$settings                = get_option( 'wpforms_settings' );
-			$was_enabled             = ! empty( $settings['logs-enable'] ) ? $settings['logs-enable'] : 0;
-			$settings['logs-enable'] = filter_input( INPUT_POST, 'logs-enable', FILTER_VALIDATE_BOOLEAN );
-			$logs_types              = filter_input( INPUT_POST, 'logs-types', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
-			$logs_user_roles         = filter_input( INPUT_POST, 'logs-user-roles', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
-			$logs_users              = filter_input( INPUT_POST, 'logs-users', FILTER_SANITIZE_NUMBER_INT, FILTER_REQUIRE_ARRAY );
-
-			if ( $was_enabled ) {
-				$settings['logs-types']      = $logs_types ? $logs_types : [];
-				$settings['logs-user-roles'] = $logs_user_roles ? $logs_user_roles : [];
-				$settings['logs-users']      = $logs_users ? array_map( 'absint', $logs_users ) : [];
-			}
-
-			wpforms_update_settings( $settings );
+			$this->update_settings();
 		}
 
 		$logs_list_table = $this->get_list_table();
@@ -280,4 +272,28 @@ class Logs extends View {
 		$logs_list_table->process_admin_ui();
 	}
 
+	/**
+	 * Update settings.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @return void
+	 */
+	public function update_settings() {
+
+		$settings                = get_option( 'wpforms_settings' );
+		$was_enabled             = ! empty( $settings['logs-enable'] ) ? $settings['logs-enable'] : 0;
+		$settings['logs-enable'] = filter_input( INPUT_POST, 'logs-enable', FILTER_VALIDATE_BOOLEAN );
+		$logs_types              = filter_input( INPUT_POST, 'logs-types', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
+		$logs_user_roles         = filter_input( INPUT_POST, 'logs-user-roles', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY );
+		$logs_users              = filter_input( INPUT_POST, 'logs-users', FILTER_SANITIZE_NUMBER_INT, FILTER_REQUIRE_ARRAY );
+
+		if ( $was_enabled ) {
+			$settings['logs-types']      = $logs_types ? $logs_types : [];
+			$settings['logs-user-roles'] = $logs_user_roles ? $logs_user_roles : [];
+			$settings['logs-users']      = $logs_users ? array_map( 'absint', $logs_users ) : [];
+		}
+
+		wpforms_update_settings( $settings );
+	}
 }

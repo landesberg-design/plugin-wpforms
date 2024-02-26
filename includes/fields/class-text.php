@@ -474,7 +474,7 @@ class WPForms_Field_Text extends WPForms_Field {
 
 			wp_enqueue_script(
 				'wpforms-text-limit',
-				WPFORMS_PLUGIN_URL . "assets/js/text-limit.es5{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/js/frontend/fields/text-limit.es5{$min}.js",
 				[],
 				WPFORMS_VERSION,
 				true

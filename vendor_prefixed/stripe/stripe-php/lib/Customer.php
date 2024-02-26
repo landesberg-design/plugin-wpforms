@@ -116,7 +116,7 @@ class Customer extends ApiResource
     public static function search($params = null, $opts = null)
     {
         $url = '/v1/customers/search';
-        return self::_searchResource($url, $params, $opts);
+        return static::_requestPage($url, \WPForms\Vendor\Stripe\SearchResult::class, $params, $opts);
     }
     const PATH_CASH_BALANCE = '/cash_balance';
     /**

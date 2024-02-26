@@ -2,6 +2,8 @@
 
 namespace WPForms\SmartTags\SmartTag;
 
+use WP_User;
+
 /**
  * Class SmartTag.
  *
@@ -20,6 +22,15 @@ abstract class SmartTag {
 	protected $smart_tag;
 
 	/**
+	 * Context usage.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @var string
+	 */
+	protected $context;
+
+	/**
 	 * List of attributes.
 	 *
 	 * @since 1.6.7
@@ -32,12 +43,15 @@ abstract class SmartTag {
 	 * SmartTag constructor.
 	 *
 	 * @since 1.6.7
+	 * @since 1.8.7 Added $context parameter.
 	 *
 	 * @param string $smart_tag Full smart tag.
+	 * @param string $context   Context usage.
 	 */
-	public function __construct( $smart_tag ) {
+	public function __construct( $smart_tag, $context = '' ) {
 
 		$this->smart_tag = $smart_tag;
+		$this->context   = $context;
 	}
 
 	/**
@@ -77,5 +91,96 @@ abstract class SmartTag {
 		$this->attributes = array_combine( $attributes[1], $attributes[3] );
 
 		return $this->attributes;
+	}
+
+	/**
+	 * Get current user.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string|int $entry_id Entry ID.
+	 *
+	 * @return WP_User|string
+	 */
+	public function get_user( $entry_id ) {
+
+		if ( is_user_logged_in() ) {
+			return wp_get_current_user();
+		}
+
+		if ( empty( $entry_id ) ) {
+			return '';
+		}
+
+		// If user is not logged in, try to get the user from the entry.
+		// Needed if we try to get the user during cron.
+		$entry = wpforms()->get( 'entry' );
+
+		if ( empty( $entry ) ) {
+			return '';
+		}
+
+		$user          = null;
+		$entry_data    = $entry->get( $entry_id );
+		$entry_user_id = $entry_data->user_id ?? 0;
+
+		if ( ! empty( $entry_user_id ) ) {
+			$user = get_user_by( 'id', $entry_user_id );
+		}
+
+		if ( ! $user instanceof WP_User ) {
+			return '';
+		}
+
+		return $user;
+	}
+
+	/**
+	 * Get author.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param int $form_id Form ID.
+	 *
+	 * @return WP_User|false WP_User object on success, false on failure.
+	 */
+	public function get_author( $form_id ) {
+
+		$author_id = get_post_field( 'post_author', $form_id );
+
+		return get_user_by( 'id', $author_id );
+	}
+
+	/**
+	 * Get entry meta.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string|int $entry_id Entry ID.
+	 * @param string     $meta_key Meta key.
+	 *
+	 * @return string Meta value.
+	 */
+	public function get_meta( $entry_id, string $meta_key ) {
+
+		if ( empty( $entry_id ) ) {
+			return '';
+		}
+
+		$entry_meta = wpforms()->get( 'entry_meta' );
+
+		if ( empty( $entry_meta ) ) {
+			return '';
+		}
+
+		$meta = $entry_meta->get_meta(
+			[
+				'entry_id' => $entry_id,
+				'type'     => $meta_key,
+				'number'   => 1,
+			]
+		);
+
+		return $meta[0]->data ?? '';
 	}
 }

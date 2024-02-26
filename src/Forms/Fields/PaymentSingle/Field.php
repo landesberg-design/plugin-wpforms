@@ -75,6 +75,9 @@ class Field extends \WPForms_Field {
 
 		add_action( 'wpforms_display_field_after', [ $this, 'field_minimum_price_description' ], 10, 2 );
 		add_filter( 'wpforms_field_preview_class', [ $this, 'preview_field_class' ], 10, 2 );
+
+		// Customize HTML field value.
+		add_filter( 'wpforms_html_field_value', [ $this, 'field_html_value' ], 10, 4 );
 	}
 
 	/**
@@ -143,6 +146,10 @@ class Field extends \WPForms_Field {
 			$properties['container']['class'][] = 'wpforms-field-hidden';
 		}
 
+		if ( $this->is_payment_quantities_enabled( $field ) ) {
+			$properties['container']['class'][] = ' wpforms-payment-quantities-enabled';
+		}
+
 		return $properties;
 	}
 
@@ -201,6 +208,7 @@ class Field extends \WPForms_Field {
 		$this->price_option( $field );
 		$this->format_option( $field );
 		$this->min_price_option( $field );
+		$this->field_option( 'quantity', $field, [ 'hidden' => ! $this->is_single_item( $field ) ] );
 		$this->field_option( 'required', $field );
 		$this->field_option( 'basic-options', $field, [ 'markup' => 'close' ] );
 		$this->field_option( 'advanced-options', $field, [ 'markup' => 'open' ] );
@@ -418,6 +426,10 @@ class Field extends \WPForms_Field {
 		);
 		echo '</p>';
 
+		$hidden = ! $this->is_single_item( $field ) ? 'wpforms-hidden' : '';
+
+		$this->field_preview_option( 'quantity', $field, [ 'class' => $hidden ] );
+
 		echo '<div class="single-item-user-defined-block">';
 
 		printf(
@@ -484,12 +496,17 @@ class Field extends \WPForms_Field {
 				if ( $field_format === self::FORMAT_SINGLE ) {
 					$price = ! empty( $field['price'] ) ? $field['price'] : 0;
 
-					echo '<div class="wpforms-single-item-price">';
+					echo '<div class="wpforms-single-item-price-content">';
+					echo '<div class="wpforms-single-item-price ' . wpforms_sanitize_classes( $primary['class'], true ) . '">';
 					printf(
 					/* translators: %s - price amount. */
 						esc_html__( 'Price: %s', 'wpforms-lite' ),
 						'<span class="wpforms-price">' . esc_html( wpforms_format_amount( wpforms_sanitize_amount( $price ), true ) ) . '</span>'
 					);
+					echo '</div>';
+
+					$this->display_quantity_dropdown( $field );
+
 					echo '</div>';
 				}
 
@@ -607,7 +624,7 @@ class Field extends \WPForms_Field {
 			$amount = wpforms_sanitize_amount( $field['price'] );
 		}
 
-		wpforms()->get( 'process' )->fields[ $field_id ] = [
+		$field_data = [
 			'name'       => $name,
 			'value'      => wpforms_format_amount( $amount, true ),
 			'amount'     => wpforms_format_amount( $amount ),
@@ -616,6 +633,12 @@ class Field extends \WPForms_Field {
 			'id'         => absint( $field_id ),
 			'type'       => sanitize_key( $this->type ),
 		];
+
+		if ( $this->is_payment_quantities_enabled( $field ) ) {
+			$field_data['quantity'] = $this->get_submitted_field_quantity( $field, $form_data );
+		}
+
+		wpforms()->get( 'process' )->fields[ $field_id ] = $field_data;
 	}
 
 	/**
@@ -655,6 +678,12 @@ class Field extends \WPForms_Field {
 	 */
 	public function preview_field_class( $css, $field ) {
 
+		$css = parent::preview_field_class( $css, $field );
+
+		if ( $field['type'] !== $this->type ) {
+			return $css;
+		}
+
 		if ( ! $this->is_user_defined( $field ) ) {
 			return $css;
 		}
@@ -680,6 +709,20 @@ class Field extends \WPForms_Field {
 	private function is_user_defined( $field ) {
 
 		return ! empty( $field['format'] ) && $field['format'] === self::FORMAT_USER;
+	}
+
+	/**
+	 * Define if format of field is Single Item.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param array $field Field data.
+	 *
+	 * @return bool
+	 */
+	private function is_single_item( $field ) {
+
+		return empty( $field['format'] ) || $field['format'] === self::FORMAT_SINGLE;
 	}
 
 	/**

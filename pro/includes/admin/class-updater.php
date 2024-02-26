@@ -304,15 +304,91 @@ class WPForms_Updater {
 	 *
 	 * @since 2.0.0
 	 * @since 1.7.2 Switch from POST to GET request.
+	 * @since 1.8.7 Added caching.
 	 *
 	 * @param string $action        The name of the request action var.
 	 * @param array  $body          The GET query attributes.
 	 * @param array  $headers       The headers to send to the remote URL.
 	 * @param string $return_format The format for returning content from the remote URL.
 	 *
-	 * @return string|bool          Json decoded response on success, false on failure.
+	 * @return object               Json decoded response on success, false on failure.
+	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function perform_remote_request( $action, $body = [], $headers = [], $return_format = 'json' ) {
+	public function perform_remote_request( string $action, array $body = [], array $headers = [], string $return_format = 'json' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+		/**
+		 * Filter an empty response object before the request execution.
+		 *
+		 * Allows loading cached response if it exists.
+		 *
+		 * @see WPForms_Pro::get_updater_response_from_cache as an example.
+		 *
+		 * @since 1.8.7
+		 *
+		 * @param object $response_body The response body, empty by default.
+		 * @param string $action        The name of the request action var.
+		 * @param array  $body          The GET query attributes.
+		 * @param array  $headers       The headers to send to the remote URL.
+		 *
+		 * @return object
+		 */
+		$response_body = (object) apply_filters(
+			'wpforms_updater_perform_remote_request_before_response',
+			new stdClass(),
+			$action,
+			$body,
+			$headers
+		);
+
+		if ( empty( $response_body->package ) ) {
+			$response_body = $this->get_real_remote_response( $action, $body, $headers );
+		}
+
+		// Return the json decoded content.
+		return $this->repack_response( $response_body );
+	}
+
+	/**
+	 * Repack the response body to match the expected format.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param object $response_body The response body.
+	 *
+	 * @return object
+	 */
+	private function repack_response( $response_body ) {
+
+		// If the package is empty, return the response body early.
+		if ( empty( $response_body->package ) ) {
+			return $response_body;
+		}
+
+		// Convert icons from an object to an array if they exist.
+		if ( ! empty( $response_body->icons ) ) {
+			$response_body->icons = (array) $response_body->icons;
+		}
+
+		// Convert banners from an object to an array if they exist.
+		if ( ! empty( $response_body->banners ) ) {
+			$response_body->banners = (array) $response_body->banners;
+		}
+
+		return $response_body;
+	}
+
+	/**
+	 * Perform the remote request to the API.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string $action  The name of the request action var.
+	 * @param array  $body    The GET query attributes.
+	 * @param array  $headers The headers to send to the remote URL.
+	 *
+	 * @return bool|mixed     Json decoded response on success, false on failure.
+	 */
+	private function get_real_remote_response( string $action, array $body = [], array $headers = [] ) {
 
 		// Request query parameters.
 		$query_params = wp_parse_args(
@@ -321,7 +397,7 @@ class WPForms_Updater {
 				'tgm-updater-action'      => $action,
 				'tgm-updater-key'         => $this->key,
 				'tgm-updater-wp-version'  => get_bloginfo( 'version' ),
-				'tgm-updater-php-version' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . '.' . PHP_RELEASE_VERSION,
+				'tgm-updater-php-version' => PHP_VERSION,
 				'tgm-updater-referer'     => site_url(),
 			]
 		);
@@ -341,21 +417,7 @@ class WPForms_Updater {
 			return false;
 		}
 
-		$response_body = json_decode( $response_body, false );
-
-		// A few items need to be converted from an object to an array as that
-		// is what WordPress expects.
-		if ( ! empty( $response_body->package ) ) {
-			if ( ! empty( $response_body->icons ) ) {
-				$response_body->icons = (array) $response_body->icons;
-			}
-			if ( ! empty( $response_body->banners ) ) {
-				$response_body->banners = (array) $response_body->banners;
-			}
-		}
-
-		// Return the json decoded content.
-		return $response_body;
+		return json_decode( $response_body, false );
 	}
 
 	/**

@@ -1629,7 +1629,7 @@ class Frontend {
 
 		wp_enqueue_script(
 			'wpforms-generic-utils',
-			WPFORMS_PLUGIN_URL . "assets/js/utils{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/share/utils{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -1638,7 +1638,7 @@ class Frontend {
 		// Load base JS.
 		wp_enqueue_script(
 			'wpforms',
-			WPFORMS_PLUGIN_URL . "assets/js/wpforms{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/frontend/wpforms{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -1648,7 +1648,7 @@ class Frontend {
 		if ( $this->render_engine === 'modern' ) {
 			wp_enqueue_script(
 				'wpforms-modern',
-				WPFORMS_PLUGIN_URL . "assets/js/wpforms-modern{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/js/frontend/wpforms-modern{$min}.js",
 				[ 'wpforms' ],
 				WPFORMS_VERSION,
 				true
@@ -1730,7 +1730,7 @@ class Frontend {
 		if ( ! $this->amp_obj->is_amp() ) {
 			wp_enqueue_script(
 				'wpforms-confirmation',
-				WPFORMS_PLUGIN_URL . "assets/js/wpforms-confirmation{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/js/frontend/wpforms-confirmation{$min}.js",
 				[ 'jquery' ],
 				WPFORMS_VERSION,
 				true

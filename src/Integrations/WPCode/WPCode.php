@@ -111,7 +111,6 @@ class WPCode implements IntegrationInterface {
 	 */
 	public function is_plugin_installed(): bool {
 
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
 		return $this->is_pro_installed() || $this->is_lite_installed();
 	}
 
@@ -124,7 +123,6 @@ class WPCode implements IntegrationInterface {
 	 */
 	public function is_pro_installed(): bool {
 
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
 		return array_key_exists( $this->pro_plugin_slug, get_plugins() );
 	}
 
@@ -137,7 +135,6 @@ class WPCode implements IntegrationInterface {
 	 */
 	public function is_lite_installed(): bool {
 
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
 		return array_key_exists( $this->lite_plugin_slug, get_plugins() );
 	}
 
@@ -150,7 +147,6 @@ class WPCode implements IntegrationInterface {
 	 */
 	public function is_plugin_active(): bool {
 
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
 		return function_exists( 'wpcode' );
 	}
 

@@ -217,12 +217,12 @@ trait FormTemplates {
 			$count = isset( $templates_count[ $slug ] ) ? $templates_count[ $slug ] : '0';
 
 			printf(
-				'<li data-category="%1$s"%2$s><div>%3$s<span>%4$s</span></div>%5$s</li>',
+				'<li data-category="%1$s"%2$s><div>%3$s<span>%4$s</span><i class="fa fa-chevron-down chevron"></i></div>%5$s</li>',
 				esc_attr( $slug ),
 				$class, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				esc_html( $name ),
 				esc_html( $count ),
-				$this->output_subcategories( $all_subcategories, $slug ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				$this->output_subcategories( $all_subcategories, $slug, $templates_count['subcategories'] ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			);
 		}
 	}
@@ -235,7 +235,7 @@ trait FormTemplates {
 	 * @param array $all_subcategories Subcategories list.
 	 * @param array $parent_slug       Parent category slug.
 	 */
-	private function output_subcategories( $all_subcategories, $parent_slug ) {
+	private function output_subcategories( $all_subcategories, $parent_slug, $subcategories_count ) {
 
 		$subcategories = [];
 		$output        = '';
@@ -250,10 +250,13 @@ trait FormTemplates {
 			$output .= '<ul class="wpforms-setup-templates-subcategories">';
 
 			foreach ( $subcategories as $slug => $subcategory ) {
+				$count = $subcategories_count[ $slug ] ?? '0';
+
 				$output .= sprintf(
-					'<li data-subcategory="%1$s"><i class="fa fa-angle-right"></i><span>%2$s</span></li>',
+					'<li data-subcategory="%1$s"><span>%2$s</span><span>%3$s</span></li>',
 					esc_attr( $slug ),
-					esc_html( $subcategory['name'] )
+					esc_html( $subcategory['name'] ),
+					esc_html( $count )
 				);
 			}
 
@@ -357,6 +360,7 @@ trait FormTemplates {
 		$args['badge_text']  = $args['selected'] ? esc_html__( 'Selected', 'wpforms-lite' ) : $args['badge_text'];
 		$args['badge_class'] = ! empty( $args['badge_text'] ) ? ' badge' : '';
 		$args['template']    = $template;
+		$args['can_create']  = wpforms_current_user_can( 'create_forms' );
 
 		return $args;
 	}
@@ -563,11 +567,38 @@ trait FormTemplates {
 			$all_categories[] = $categories;
 		}
 
-		$categories_count              = array_count_values( $all_categories );
-		$categories_count['all']       = count( $this->prepared_templates );
-		$categories_count['available'] = $available_templates_count;
-		$categories_count['favorites'] = $favorites_templates_count;
+		$categories_count                  = array_count_values( $all_categories );
+		$categories_count['all']           = count( $this->prepared_templates );
+		$categories_count['available']     = $available_templates_count;
+		$categories_count['favorites']     = $favorites_templates_count;
+		$categories_count['subcategories'] = $this->get_count_in_subcategories();
 
 		return $categories_count;
+	}
+
+	/**
+	 * Get subcategories templates count.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @return array
+	 */
+	private function get_count_in_subcategories(): array {
+
+		$all_subcategories = [];
+
+		foreach ( $this->prepared_templates as $template_data ) {
+
+			$subcategories = explode( ',', $template_data['subcategories'] );
+
+			if ( is_array( $subcategories ) ) {
+				array_push( $all_subcategories, ...$subcategories );
+				continue;
+			}
+
+			$all_subcategories[] = $subcategories;
+		}
+
+		return array_count_values( $all_subcategories );
 	}
 }

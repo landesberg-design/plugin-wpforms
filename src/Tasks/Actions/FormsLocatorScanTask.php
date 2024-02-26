@@ -135,7 +135,7 @@ class FormsLocatorScanTask extends Task {
 		$this->locator = wpforms()->get( 'locator' );
 
 		/**
-		 * Give developers an ability to modify task interval.
+		 * Allow developers to modify the task interval.
 		 *
 		 * @since 1.7.4
 		 *
@@ -239,7 +239,7 @@ class FormsLocatorScanTask extends Task {
 			return;
 		}
 
-		// Bail out if scan is already in progress.
+		// Bail out if the scan is already in progress.
 		if ( self::SCAN_STATUS_IN_PROGRESS === (string) get_option( self::SCAN_STATUS ) ) {
 			return;
 		}
@@ -250,11 +250,12 @@ class FormsLocatorScanTask extends Task {
 		$this->log( 'Forms Locator scan action started.' );
 
 		// This part of the scan shouldn't take more than 1 second even on big sites.
-		$post_ids            = $this->search_in_posts();
-		$post_locations      = $this->get_form_locations( $post_ids );
-		$widget_locations    = $this->locator->search_in_widgets();
-		$locations           = array_merge( $post_locations, $widget_locations );
-		$form_location_metas = $this->get_form_location_metas( $locations );
+		$post_ids             = $this->search_in_posts();
+		$post_locations       = $this->get_form_locations( $post_ids );
+		$widget_locations     = $this->locator->search_in_widgets();
+		$standalone_locations = $this->search_in_standalone_forms();
+		$locations            = array_merge( $post_locations, $widget_locations, $standalone_locations );
+		$form_location_metas  = $this->get_form_location_metas( $locations );
 
 		/**
 		 * This part of the scan can take a while.
@@ -383,7 +384,7 @@ class FormsLocatorScanTask extends Task {
 
 	/**
 	 * Filters the SELECT clause of the query.
-	 * Get minimal set of fields from the post record.
+	 * Get a minimal set of fields from the post record.
 	 *
 	 * @since 1.7.4
 	 *
@@ -493,6 +494,52 @@ class FormsLocatorScanTask extends Task {
 	}
 
 	/**
+	 * Search in standalone forms.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @return array
+	 */
+	private function search_in_standalone_forms(): array {
+
+		global $wpdb;
+
+		$location_types = [];
+
+		foreach ( Locator::STANDALONE_LOCATION_TYPES as $location_type ) {
+			$location_types[] = '"' . $location_type . '_enable":"1"';
+		}
+
+		$regexp = implode( '|', $location_types );
+
+		$post_statuses = wpforms_wpdb_prepare_in( $this->locator->get_post_statuses() );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$standalone_forms = $wpdb->get_results(
+			"SELECT ID, post_content, post_status
+					FROM $wpdb->posts
+					WHERE post_status IN ( $post_statuses ) AND
+					      post_type = 'wpforms' AND
+					      post_content REGEXP '$regexp';"
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+		$locations = [];
+
+		foreach ( $standalone_forms as $standalone_form ) {
+			$form_data = json_decode( $standalone_form->post_content, true );
+
+			$locations[] = $this->locator->build_standalone_location(
+				(int) $standalone_form->ID,
+				$form_data,
+				$standalone_form->post_status
+			);
+		}
+
+		return $locations;
+	}
+
+	/**
 	 * Get form location metas.
 	 *
 	 * @param array $locations Locations.
@@ -506,6 +553,11 @@ class FormsLocatorScanTask extends Task {
 		$metas = [];
 
 		foreach ( $locations as $location ) {
+
+			if ( empty( $location['form_id'] ) ) {
+				continue;
+			}
+
 			$metas[ $location['form_id'] ][] = $location;
 		}
 
@@ -520,6 +572,7 @@ class FormsLocatorScanTask extends Task {
 	 * @param string $message The error message that should be logged.
 	 *
 	 * @noinspection ForgottenDebugOutputInspection
+	 * @noinspection PhpUndefinedConstantInspection
 	 */
 	private function log( $message ) {
 

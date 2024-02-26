@@ -58,7 +58,7 @@ class Help {
 
 		wp_enqueue_script(
 			'wpforms-builder-help',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/help{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/help{$min}.js",
 			[ 'wpforms-builder' ],
 			WPFORMS_VERSION,
 			true

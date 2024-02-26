@@ -557,6 +557,11 @@ class EntryCsvAttachment {
 					continue;
 				}
 
+				// Add quantity for the field.
+				if ( wpforms_payment_has_quantity( $entry_field, $form_data ) ) {
+					$entry_field['value'] = wpforms_payment_format_quantity( $entry_field );
+				}
+
 				$output['header'][] = $this->csv->escape_value( $entry_field['name'] );
 				$output['body'][]   = $this->csv->escape_value( $entry_field['value'] );
 

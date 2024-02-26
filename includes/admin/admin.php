@@ -24,12 +24,12 @@ function wpforms_admin_styles() {
 
 	$min = wpforms_get_min_suffix();
 
-	// jQuery confirm.
+	// jQuery.Confirm Reloaded.
 	wp_enqueue_style(
 		'jquery-confirm',
 		WPFORMS_PLUGIN_URL . 'assets/lib/jquery.confirm/jquery-confirm.min.css',
 		[],
-		'3.3.4'
+		'1.0.0'
 	);
 
 	// Minicolors (color picker).
@@ -37,7 +37,7 @@ function wpforms_admin_styles() {
 		'minicolors',
 		WPFORMS_PLUGIN_URL . 'assets/lib/jquery.minicolors/jquery.minicolors.min.css',
 		[],
-		'2.2.6'
+		'2.3.6'
 	);
 
 	// FontAwesome.
@@ -93,12 +93,12 @@ function wpforms_admin_scripts() {
 
 	wp_enqueue_media();
 
-	// jQuery confirm.
+	// jQuery.Confirm Reloaded.
 	wp_enqueue_script(
 		'jquery-confirm',
 		WPFORMS_PLUGIN_URL . 'assets/lib/jquery.confirm/jquery-confirm.min.js',
 		[ 'jquery' ],
-		'3.3.4',
+		'1.0.0',
 		false
 	);
 
@@ -107,7 +107,7 @@ function wpforms_admin_scripts() {
 		'minicolors',
 		WPFORMS_PLUGIN_URL . 'assets/lib/jquery.minicolors/jquery.minicolors.min.js',
 		[ 'jquery' ],
-		'2.2.6',
+		'2.3.6',
 		false
 	);
 
@@ -131,7 +131,7 @@ function wpforms_admin_scripts() {
 
 	wp_enqueue_script(
 		'wpforms-generic-utils',
-		WPFORMS_PLUGIN_URL . "assets/js/utils{$min}.js",
+		WPFORMS_PLUGIN_URL . "assets/js/share/utils{$min}.js",
 		[ 'jquery' ],
 		WPFORMS_VERSION,
 		true
@@ -140,7 +140,7 @@ function wpforms_admin_scripts() {
 	// Load admin utils JS.
 	wp_enqueue_script(
 		'wpforms-admin-utils',
-		WPFORMS_PLUGIN_URL . "assets/js/admin-utils{$min}.js",
+		WPFORMS_PLUGIN_URL . "assets/js/admin/share/admin-utils{$min}.js",
 		[ 'jquery' ],
 		WPFORMS_VERSION,
 		true
@@ -149,7 +149,7 @@ function wpforms_admin_scripts() {
 	// Main admin script.
 	wp_enqueue_script(
 		'wpforms-admin',
-		WPFORMS_PLUGIN_URL . "assets/js/admin{$min}.js",
+		WPFORMS_PLUGIN_URL . "assets/js/admin/admin{$min}.js",
 		[ 'jquery' ],
 		WPFORMS_VERSION,
 		false

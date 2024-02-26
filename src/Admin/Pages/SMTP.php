@@ -66,6 +66,7 @@ class SMTP {
 
 		if ( wp_doing_ajax() ) {
 			add_action( 'wp_ajax_wpforms_smtp_page_check_plugin_status', [ $this, 'ajax_check_plugin_status' ] );
+			add_action( 'wpforms_plugin_activated', [ $this, 'smtp_activated' ] );
 		}
 
 		// Check what page we are on.
@@ -112,7 +113,7 @@ class SMTP {
 
 		wp_enqueue_script(
 			'wpforms-admin-page-smtp',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/pages/smtp{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/pages/smtp{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -123,6 +124,22 @@ class SMTP {
 			'wpforms_pluginlanding',
 			$this->get_js_strings()
 		);
+	}
+
+	/**
+	 * Set wp_mail_smtp_source option to 'wpforms' on WP Mail SMTP plugin activation.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string $plugin_basename Plugin basename.
+	 */
+	public function smtp_activated( $plugin_basename ) {
+
+		if ( $plugin_basename !== $this->config['lite_plugin'] ) {
+			return;
+		}
+
+		update_option( 'wp_mail_smtp_source', 'wpforms' );
 	}
 
 	/**
@@ -471,48 +488,11 @@ class SMTP {
 	 *
 	 * @since 1.5.7
 	 * @since 1.6.1.2 Conditionally returns $phpmailer v5 or v6.
+	 * @since 1.8.7 Use always $phpmailer v6.
 	 *
 	 * @return \PHPMailer|\PHPMailer\PHPMailer\PHPMailer Instance of PHPMailer.
 	 */
 	protected function get_phpmailer() {
-
-		if ( version_compare( get_bloginfo( 'version' ), '5.5-alpha', '<' ) ) {
-			$phpmailer = $this->get_phpmailer_v5();
-		} else {
-			$phpmailer = $this->get_phpmailer_v6();
-		}
-
-		return $phpmailer;
-	}
-
-	/**
-	 * Get $phpmailer v5 instance.
-	 *
-	 * @since 1.6.1.2
-	 *
-	 * @return \PHPMailer Instance of PHPMailer.
-	 */
-	private function get_phpmailer_v5() {
-
-		global $phpmailer;
-
-		if ( ! ( $phpmailer instanceof \PHPMailer ) ) {
-			require_once ABSPATH . WPINC . '/class-phpmailer.php';
-			require_once ABSPATH . WPINC . '/class-smtp.php';
-			$phpmailer = new \PHPMailer( true ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-		}
-
-		return $phpmailer;
-	}
-
-	/**
-	 * Get $phpmailer v6 instance.
-	 *
-	 * @since 1.6.1.2
-	 *
-	 * @return \PHPMailer\PHPMailer\PHPMailer Instance of PHPMailer.
-	 */
-	private function get_phpmailer_v6() {
 
 		global $phpmailer;
 

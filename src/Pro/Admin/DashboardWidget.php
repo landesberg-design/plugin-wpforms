@@ -260,11 +260,21 @@ class DashboardWidget extends Widget {
 
 		echo '<div class="wpforms-dash-widget wpforms-pro">';
 
+		$hide_welcome = $this->widget_meta( 'get', 'hide_welcome_block' );
+
+		if ( ! $hide_welcome && $this->show_welcome_block() ) {
+			$this->welcome_block_html();
+		}
+
+		echo '<div class="wpforms-dash-widget-content">';
+
 		if ( empty( $forms ) ) {
 			$this->widget_content_no_forms_html();
 		} else {
 			$this->widget_content_html();
 		}
+
+		echo '</div><!-- .wpforms-dash-widget-content -->';
 
 		$plugin           = $this->get_recommended_plugin();
 		$hide_recommended = $this->widget_meta( 'get', 'hide_recommended_block' );
@@ -635,7 +645,55 @@ class DashboardWidget extends Widget {
 					<a href="<?php echo esc_url( $plugin['more'] ); ?>?utm_source=wpformsplugin&utm_medium=link&utm_campaign=wpformsdashboardwidget"><?php esc_html_e( 'Learn More', 'wpforms' ); ?></a>
 				</span>
 			</span>
-			<button type="button" id="wpforms-dash-widget-dismiss-recommended-plugin-block" class="wpforms-dash-widget-dismiss-recommended-plugin-block" title="<?php esc_html_e( 'Dismiss recommended plugin', 'wpforms' ); ?>">
+			<button type="button" id="wpforms-dash-widget-dismiss-recommended-plugin-block" class="wpforms-dash-widget-dismiss-icon" title="<?php esc_html_e( 'Dismiss recommended plugin', 'wpforms' ); ?>">
+				<span class="dashicons dashicons-no-alt"></span>
+			</button>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Welcome block HTML.
+	 *
+	 * @since 1.8.7
+	 */
+	public function welcome_block_html() {
+
+		?>
+		<div class="wpforms-dash-widget-block wpforms-dash-widget-welcome-block">
+			<span class="wpforms-dash-widget-welcome">
+				<?php
+				$welcome_message = sprintf(
+					wp_kses(
+					/* translators: %s - WPForms version. */
+						__( 'Welcome to <strong>WPForms %s</strong>', 'wpforms' ),
+						[
+							'strong' => [],
+						]
+					),
+					WPFORMS_VERSION
+				);
+
+				echo wp_kses(
+				/**
+				 * Filters the welcome message in the Dashboard Widget.
+				 *
+				 * @since 1.8.7
+				 *
+				 * @param string $welcome_message Welcome message.
+				 */
+					apply_filters( 'wpforms_pro_admin_dashboard_widget_welcome_block_html_message', $welcome_message ),
+					[
+						'a'      => [
+							'href'  => [],
+							'class' => [],
+						],
+						'strong' => [],
+					]
+				);
+				?>
+			</span>
+			<button type="button" class="wpforms-dash-widget-dismiss-icon" title="<?php esc_html_e( 'Dismiss recommended plugin', 'wpforms' ); ?>" data-field="hide_welcome_block">
 				<span class="dashicons dashicons-no-alt"></span>
 			</button>
 		</div>

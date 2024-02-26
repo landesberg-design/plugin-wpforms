@@ -116,21 +116,6 @@ class AntiSpam {
 	}
 
 	/**
-	 * Check if it is a new setup.
-	 *
-	 * @since 1.8.3
-	 *
-	 * @return bool
-	 */
-	private function is_new_setup() {
-
-		$form_counts = wp_count_posts( 'wpforms' );
-		$form_counts = array_filter( (array) $form_counts );
-
-		return empty( $form_counts );
-	}
-
-	/**
 	 * Output the *CAPTCHA settings.
 	 *
 	 * @since 1.7.8
@@ -195,10 +180,11 @@ class AntiSpam {
 	 */
 	public function store_spam_entries_settings() {
 
-		// Enable storing entries by default for new setup.
-		$store_spam_entries = ! empty( $this->form_data['settings']['store_spam_entries'] )
-			? $this->form_data['settings']['store_spam_entries']
-			: $this->is_new_setup();
+		if ( ! wpforms()->is_pro() ) {
+			return;
+		}
+
+		$disable_entries = $this->form_data['settings']['disable_entries'] ?? 0;
 
 		wpforms_panel_field(
 			'toggle',
@@ -207,7 +193,8 @@ class AntiSpam {
 			$this->form_data,
 			__( 'Store spam entries in the database', 'wpforms-lite' ),
 			[
-				'value' => $store_spam_entries,
+				'value' => $this->form_data['settings']['store_spam_entries'] ?? 0,
+				'class' => $disable_entries ? 'wpforms-hidden' : '',
 			]
 		);
 	}

@@ -39,7 +39,7 @@ class Column extends ColumnBase {
 	 * @return bool
 	 */
 	public function is_entry_meta(): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return ! $this->is_form_field;
 	}
 
@@ -51,7 +51,7 @@ class Column extends ColumnBase {
 	 * @return bool
 	 */
 	public function is_form_field(): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return $this->is_form_field;
 	}
 
@@ -63,7 +63,7 @@ class Column extends ColumnBase {
 	 * @return string
 	 */
 	public function get_slug(): string {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return $this->slug;
 	}
 }

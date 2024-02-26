@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60
+class ComposerStaticInit442e1bed2aa18b86bf336ec7d585e591
 {
     public static $files = array (
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
@@ -98,6 +98,7 @@ class ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60
         'WPForms\\Vendor\\Stripe\\Customer' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Customer.php',
         'WPForms\\Vendor\\Stripe\\CustomerBalanceTransaction' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/CustomerBalanceTransaction.php',
         'WPForms\\Vendor\\Stripe\\CustomerCashBalanceTransaction' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/CustomerCashBalanceTransaction.php',
+        'WPForms\\Vendor\\Stripe\\CustomerSession' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/CustomerSession.php',
         'WPForms\\Vendor\\Stripe\\Discount' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Discount.php',
         'WPForms\\Vendor\\Stripe\\Dispute' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Dispute.php',
         'WPForms\\Vendor\\Stripe\\EphemeralKey' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/EphemeralKey.php',
@@ -133,6 +134,7 @@ class ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60
         'WPForms\\Vendor\\Stripe\\FinancialConnections\\AccountOwner' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/FinancialConnections/AccountOwner.php',
         'WPForms\\Vendor\\Stripe\\FinancialConnections\\AccountOwnership' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/FinancialConnections/AccountOwnership.php',
         'WPForms\\Vendor\\Stripe\\FinancialConnections\\Session' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/FinancialConnections/Session.php',
+        'WPForms\\Vendor\\Stripe\\FinancialConnections\\Transaction' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/FinancialConnections/Transaction.php',
         'WPForms\\Vendor\\Stripe\\FundingInstructions' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/FundingInstructions.php',
         'WPForms\\Vendor\\Stripe\\HttpClient\\ClientInterface' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/HttpClient/ClientInterface.php',
         'WPForms\\Vendor\\Stripe\\HttpClient\\CurlClient' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/HttpClient/CurlClient.php',
@@ -202,6 +204,7 @@ class ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60
         'WPForms\\Vendor\\Stripe\\Service\\CouponService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/CouponService.php',
         'WPForms\\Vendor\\Stripe\\Service\\CreditNoteService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/CreditNoteService.php',
         'WPForms\\Vendor\\Stripe\\Service\\CustomerService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/CustomerService.php',
+        'WPForms\\Vendor\\Stripe\\Service\\CustomerSessionService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/CustomerSessionService.php',
         'WPForms\\Vendor\\Stripe\\Service\\DisputeService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/DisputeService.php',
         'WPForms\\Vendor\\Stripe\\Service\\EphemeralKeyService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/EphemeralKeyService.php',
         'WPForms\\Vendor\\Stripe\\Service\\EventService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/EventService.php',
@@ -211,6 +214,7 @@ class ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60
         'WPForms\\Vendor\\Stripe\\Service\\FinancialConnections\\AccountService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/FinancialConnections/AccountService.php',
         'WPForms\\Vendor\\Stripe\\Service\\FinancialConnections\\FinancialConnectionsServiceFactory' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/FinancialConnections/FinancialConnectionsServiceFactory.php',
         'WPForms\\Vendor\\Stripe\\Service\\FinancialConnections\\SessionService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/FinancialConnections/SessionService.php',
+        'WPForms\\Vendor\\Stripe\\Service\\FinancialConnections\\TransactionService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/FinancialConnections/TransactionService.php',
         'WPForms\\Vendor\\Stripe\\Service\\Identity\\IdentityServiceFactory' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/Identity/IdentityServiceFactory.php',
         'WPForms\\Vendor\\Stripe\\Service\\Identity\\VerificationReportService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/Identity/VerificationReportService.php',
         'WPForms\\Vendor\\Stripe\\Service\\Identity\\VerificationSessionService' => __DIR__ . '/../..' . '/vendor_prefixed/stripe/stripe-php/lib/Service/Identity/VerificationSessionService.php',
@@ -449,9 +453,9 @@ class ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitb4819db6ac3adf440bb861aadbfcbf60::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit442e1bed2aa18b86bf336ec7d585e591::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit442e1bed2aa18b86bf336ec7d585e591::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit442e1bed2aa18b86bf336ec7d585e591::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -4,6 +4,7 @@ namespace WPForms {
 
 	use AllowDynamicProperties;
 	use stdClass;
+	use WPForms\Helpers\DB;
 	use WPForms_Form_Handler;
 	use WPForms_Process;
 
@@ -287,6 +288,13 @@ namespace WPForms {
 		 * @since 1.5.7
 		 *
 		 * @param array $class_data Class registration info.
+		 *
+		 * $class_data array accepts these params: name, id, hook, run, condition.
+		 * - name: required -- class name to register.
+		 * - id: optional -- class ID to register.
+		 * - hook: optional -- hook to register the class on -- default wpforms_loaded.
+		 * - run: optional -- method to run on class instantiation -- default init.
+		 * - condition: optional -- condition to check before registering the class.
 		 */
 		public function register( $class_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded, WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
@@ -394,13 +402,10 @@ namespace WPForms {
 		 *
 		 * @return array List of table names.
 		 */
-		public function get_existing_custom_tables() {
+		public function get_existing_custom_tables(): array {
 
-			global $wpdb;
-
-			$tables = $wpdb->get_results( "SHOW TABLES LIKE '{$wpdb->prefix}wpforms_%'", 'ARRAY_N' ); // phpcs:ignore
-
-			return ! empty( $tables ) ? wp_list_pluck( $tables, 0 ) : [];
+			// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+			return DB::get_existing_custom_tables();
 		}
 
 		/**

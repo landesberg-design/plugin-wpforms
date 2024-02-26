@@ -38,7 +38,7 @@ class WPForms_Builder_Panel_Providers extends WPForms_Builder_Panel {
 
 		wp_enqueue_script(
 			'wpforms-builder-providers',
-			WPFORMS_PLUGIN_URL . "assets/js/admin-builder-providers{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/admin-builder-providers{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			false

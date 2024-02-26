@@ -175,7 +175,7 @@ class Challenge {
 
 			wp_enqueue_script(
 				'wpforms-challenge-admin',
-				WPFORMS_PLUGIN_URL . "assets/js/components/admin/challenge/challenge-admin{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/js/admin/challenge/challenge-admin{$min}.js",
 				[ 'jquery' ],
 				WPFORMS_VERSION,
 				true
@@ -211,7 +211,7 @@ class Challenge {
 
 			wp_enqueue_script(
 				'wpforms-challenge-core',
-				WPFORMS_PLUGIN_URL . "assets/js/components/admin/challenge/challenge-core{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/js/admin/challenge/challenge-core{$min}.js",
 				[ 'jquery', 'tooltipster', 'wpforms-challenge-admin' ],
 				WPFORMS_VERSION,
 				true
@@ -222,7 +222,7 @@ class Challenge {
 
 			wp_enqueue_script(
 				'wpforms-challenge-builder',
-				WPFORMS_PLUGIN_URL . "assets/js/components/admin/challenge/challenge-builder{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/js/admin/challenge/challenge-builder{$min}.js",
 				[ 'jquery', 'tooltipster', 'wpforms-challenge-core', 'wpforms-builder' ],
 				WPFORMS_VERSION,
 				true
@@ -240,7 +240,7 @@ class Challenge {
 
 			wp_enqueue_script(
 				'wpforms-challenge-embed',
-				WPFORMS_PLUGIN_URL . "assets/js/components/admin/challenge/challenge-embed{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/js/admin/challenge/challenge-embed{$min}.js",
 				[ 'jquery', 'tooltipster', 'wpforms-challenge-core' ],
 				WPFORMS_VERSION,
 				true

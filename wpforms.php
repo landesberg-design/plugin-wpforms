@@ -7,7 +7,7 @@
  * Requires PHP:      7.0
  * Author:            WPForms
  * Author URI:        https://wpforms.com
- * Version:           1.8.6.4
+ * Version:           1.8.7.1
  * Text Domain:       wpforms-lite
  * Domain Path:       assets/languages
  *
@@ -30,13 +30,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( is_multisite() ) {
+	$is_pro = file_exists( __DIR__ . '/pro/wpforms-pro.php' );
+
+	if ( ! $is_pro ) { // <- is lite.
+		$lite_base = plugin_basename( __FILE__ );
+
+		$active_plugins         = get_option( 'active_plugins', [] );
+		$active_network_plugins = get_site_option( 'active_sitewide_plugins' );
+
+		if (
+			isset( $active_network_plugins[ $lite_base ] )
+			&& preg_grep( '/\/wpforms.php/', $active_plugins )
+		) {
+			// Keep plugin active but silent.
+			return;
+		}
+	}
+}
+
 if ( ! defined( 'WPFORMS_VERSION' ) ) {
 	/**
 	 * Plugin version.
 	 *
 	 * @since 1.0.0
 	 */
-	define( 'WPFORMS_VERSION', '1.8.6.4' );
+	define( 'WPFORMS_VERSION', '1.8.7.1' );
 }
 
 // Plugin Folder Path.
@@ -64,14 +83,16 @@ if ( function_exists( 'wpforms' ) ) {
 		 * 2) register option which help to run all activation process for Pro version (custom tables creation, etc.).
 		 *
 		 * @since 1.6.2
+		 * @deprecated 1.8.7
 		 */
 		function wpforms_pro_just_activated() {
+
+			_deprecated_function( __METHOD__, '1.8.7 of the WPForms plugin' );
 
 			wpforms_deactivate();
 			add_option( 'wpforms_install', 1 );
 		}
 	}
-	add_action( 'activate_wpforms/wpforms.php', 'wpforms_pro_just_activated' );
 
 	if ( ! function_exists( 'wpforms_lite_just_activated' ) ) {
 		/**
@@ -85,8 +106,8 @@ if ( function_exists( 'wpforms' ) ) {
 
 			set_transient( 'wpforms_lite_just_activated', true );
 		}
+		add_action( 'activate_wpforms-lite/wpforms.php', 'wpforms_lite_just_activated' );
 	}
-	add_action( 'activate_wpforms-lite/wpforms.php', 'wpforms_lite_just_activated' );
 
 	if ( ! function_exists( 'wpforms_lite_just_deactivated' ) ) {
 		/**
@@ -95,8 +116,11 @@ if ( function_exists( 'wpforms' ) ) {
 		 * so it is available through the request. Remove from the storage.
 		 *
 		 * @since 1.5.8
+		 * @deprecated 1.8.7
 		 */
 		function wpforms_lite_just_deactivated() {
+
+			_deprecated_function( __METHOD__, '1.8.7 of the WPForms plugin' );
 
 			global $wpforms_lite_just_activated, $wpforms_lite_just_deactivated;
 
@@ -106,7 +130,6 @@ if ( function_exists( 'wpforms' ) ) {
 			delete_transient( 'wpforms_lite_just_activated' );
 		}
 	}
-	add_action( 'deactivate_wpforms-lite/wpforms.php', 'wpforms_lite_just_deactivated' );
 
 	if ( ! function_exists( 'wpforms_deactivate' ) ) {
 		/**
@@ -116,11 +139,31 @@ if ( function_exists( 'wpforms' ) ) {
 		 */
 		function wpforms_deactivate() {
 
-			$plugin = 'wpforms-lite/wpforms.php';
+			$pro_file  = wpforms()->is_pro() ? WPFORMS_PLUGIN_FILE : __FILE__;
+			$lite_file = wpforms()->is_pro() ? __FILE__ : WPFORMS_PLUGIN_FILE;
 
-			deactivate_plugins( $plugin );
+			$lite_base = plugin_basename( $lite_file );
+			$pro_base  = plugin_basename( $pro_file );
 
-			do_action( 'wpforms_plugin_deactivated', $plugin );
+			if (
+				! is_multisite()
+				|| is_plugin_active_for_network( $pro_base )
+				|| ( ! is_plugin_active_for_network( $pro_base ) && ! is_plugin_active_for_network( $lite_base ) )
+			) {
+				deactivate_plugins( $lite_base );
+
+				/**
+				 * Fires on plugin deactivation.
+				 *
+				 * @since 1.6.3.1
+				 *
+				 * @param string $plugin_basename The plugin basename.
+				 */
+				do_action( 'wpforms_plugin_deactivated', $lite_base );
+
+				// Run the installation on the next admin visit.
+				add_option( 'wpforms_install', 1 );
+			}
 		}
 	}
 	add_action( 'admin_init', 'wpforms_deactivate' );
@@ -134,36 +177,51 @@ if ( function_exists( 'wpforms' ) ) {
 		 */
 		function wpforms_lite_notice() {
 
-			global $wpforms_lite_just_activated, $wpforms_lite_just_deactivated;
+			$pro_file  = wpforms()->is_pro() ? WPFORMS_PLUGIN_FILE : __FILE__;
+			$lite_file = wpforms()->is_pro() ? __FILE__ : WPFORMS_PLUGIN_FILE;
 
-			if (
-				empty( $wpforms_lite_just_activated ) ||
-				empty( $wpforms_lite_just_deactivated )
-			) {
+			$lite_base = plugin_basename( $lite_file );
+			$pro_base  = plugin_basename( $pro_file );
+
+			// Do not show the notice if upgrade from Lite to Pro.
+			if ( (bool) get_transient( 'wpforms_lite_just_activated' ) === false ) {
 				return;
 			}
 
-			// Currently tried to activate Lite with Pro still active, so display the message.
-			printf(
-				'<div class="notice wpforms-notice notice-warning wpforms-license-notice" id="wpforms-notice-pro-active">
+			if (
+				! is_multisite()
+				|| is_plugin_active_for_network( $pro_base )
+				|| ( ! is_plugin_active_for_network( $pro_base ) && ! is_plugin_active_for_network( $lite_base ) )
+			) {
+				$message = sprintf(
+				/* translators: %s - Path to installed plugins. */
+					__( 'Your site already has WPForms Pro activated. If you want to switch to WPForms Lite, please first go to %s and deactivate WPForms. Then, you can activate WPForms Lite.', 'wpforms-lite' ),
+					is_multisite() ? __( 'Network Admin → Plugins → Installed Plugins', 'wpforms-lite' ) : __( 'Plugins → Installed Plugins', 'wpforms-lite' )
+				);
+
+				// Currently tried to activate Lite with Pro still active, so display the message.
+				printf(
+					'<div class="notice wpforms-notice notice-warning wpforms-license-notice" id="wpforms-notice-pro-active">
 					<h3 style="margin: .75em 0 0 0;">
 						<img src="%1$s" style="vertical-align: text-top; width: 20px; margin-right: 7px;">%2$s
 					</h3>
 					<p>%3$s</p>
 				</div>',
-				esc_url( WPFORMS_PLUGIN_URL . 'assets/images/exclamation-triangle.svg' ),
-				esc_html__( 'Heads up!', 'wpforms-lite' ),
-				esc_html__( 'Your site already has WPForms Pro activated. If you want to switch to WPForms Lite, please first go to Plugins → Installed Plugins and deactivate WPForms. Then, you can activate WPForms Lite.', 'wpforms-lite' )
-			);
+					esc_url( WPFORMS_PLUGIN_URL . 'assets/images/exclamation-triangle.svg' ),
+					esc_html__( 'Heads up!', 'wpforms-lite' ),
+					esc_html( $message )
+				);
 
-			if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				unset( $_GET['activate'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				delete_transient( 'wpforms_lite_just_activated' );
+
+				if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					unset( $_GET['activate'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				}
 			}
-
-			unset( $wpforms_lite_just_activated, $wpforms_lite_just_deactivated );
 		}
 	}
 	add_action( 'admin_notices', 'wpforms_lite_notice' );
+	add_action( 'network_admin_notices', 'wpforms_lite_notice' );
 
 	// Do not process the plugin code further.
 	return;

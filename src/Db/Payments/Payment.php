@@ -142,7 +142,50 @@ class Payment extends WPForms_DB {
 			return null;
 		}
 
-		return parent::get( $payment_id );
+		$payment = parent::get( $payment_id );
+
+		return $payment ? $this->cast_amounts_to_float( $payment ) : null;
+	}
+
+	/**
+	 * Retrieve a row based on column value.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param string     $column Column name.
+	 * @param int|string $value  Column value.
+	 *
+	 * @return object|null Database query result, object or null on failure.
+	 */
+	public function get_by( $column, $value ) {
+
+		$payment = parent::get_by( $column, $value );
+
+		return $payment ? $this->cast_amounts_to_float( $payment ) : null;
+	}
+
+	/**
+	 * Cast amounts to float in the given payment data object.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param object $payment Payment ID.
+	 *
+	 * @return object
+	 */
+	private function cast_amounts_to_float( $payment ) {
+
+		if ( empty( $payment ) || ! is_object( $payment ) ) {
+			return $payment;
+		}
+
+		// Amounts is stored in DB as decimal(26,8), but appear here as strings.
+		// Therefore, they should be cast to float to avoid further multi-time currency conversion.
+		$payment->subtotal_amount = $payment->subtotal_amount ? (float) $payment->subtotal_amount : 0;
+		$payment->discount_amount = $payment->discount_amount ? (float) $payment->discount_amount : 0;
+		$payment->total_amount    = $payment->total_amount ? (float) $payment->total_amount : 0;
+
+		return $payment;
 	}
 
 	/**

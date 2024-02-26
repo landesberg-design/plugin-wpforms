@@ -28,7 +28,7 @@ class Token {
 	 */
 	public function hooks() {
 
-		add_filter( 'wpforms_frontend_form_atts', [ $this, 'add_token_to_form_atts' ], 10, 2 );
+		add_action( 'wpforms_display_submit_before', [ $this, 'spam_protection_field' ] );
 	}
 
 	/**
@@ -89,6 +89,7 @@ class Token {
 		$valid_token_times_before = apply_filters(
 			'wpforms_form_token_check_before_today',
 			[
+				( 3 * DAY_IN_SECONDS ), // Three days ago.
 				( 2 * DAY_IN_SECONDS ), // Two days ago.
 				( 1 * DAY_IN_SECONDS ), // One day ago.
 			]
@@ -148,6 +149,7 @@ class Token {
 	 *
 	 * @since 1.6.2
 	 * @since 1.7.1 Added the $form_data argument.
+	 * @since 1.8.7 Deprecated in favor of direct printing hidden field with spam_protection_field method.
 	 *
 	 * @param array $attrs     Form attributes.
 	 * @param array $form_data Form data and settings.
@@ -156,9 +158,25 @@ class Token {
 	 */
 	public function add_token_to_form_atts( array $attrs, array $form_data ) {
 
+		_deprecated_function( __METHOD__, '1.8.7 of the WPForms plugin', 'WPForms\Forms\Token::spam_protection_field' );
+
 		$attrs['atts']['data-token'] = $this->get( true, $form_data );
 
 		return $attrs;
+	}
+
+	/**
+	 * Add the token to the form as a hidden field.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param array|mixed $form_data Form data and settings.
+	 */
+	public function spam_protection_field( $form_data ) {
+
+		$token = $this->get( true, (array) $form_data );
+
+		echo '<input type="hidden" class="wpforms-token" name="wpforms[token]" value="' . esc_attr( $token ) . '" />';
 	}
 
 	/**

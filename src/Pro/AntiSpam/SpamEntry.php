@@ -63,6 +63,9 @@ class SpamEntry {
 
 		// Additional wrap classes.
 		add_filter( 'wpforms_entries_list_list_all_wrap_classes', [ $this, 'add_wrap_classes' ] );
+
+		// Enable storing spam entries for new setup.
+		add_filter( 'wpforms_create_form_args', [ $this, 'enable_store_spam_entries' ], 15 );
 	}
 
 	/**
@@ -620,6 +623,32 @@ class SpamEntry {
 		}
 
 		return $classes;
+	}
+
+	/**
+	 * Enable storing entries for new setup.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param array $args Form args.
+	 */
+	public function enable_store_spam_entries( $args ) {
+
+		if ( ! wpforms()->is_pro() ) {
+			return $args;
+		}
+
+		$post_content = $args['post_content'] ?? '';
+
+		if ( ! empty( $post_content ) ) {
+			$post_content = json_decode( wp_unslash( $post_content ), true );
+
+			$post_content['settings']['store_spam_entries'] = 1;
+
+			$args['post_content'] = wpforms_encode( $post_content );
+		}
+
+		return $args;
 	}
 
 	/**

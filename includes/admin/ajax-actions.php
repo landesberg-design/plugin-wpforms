@@ -135,6 +135,12 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
+	// Prevent second form creating if user has no licence set.
+	// Redirect will lead to the warning page.
+	if ( wpforms()->is_pro() && empty( wpforms_get_license_type() ) && wp_count_posts( 'wpforms' )->publish >= 1 ) {
+		wp_send_json_success( [ 'redirect' => admin_url( 'admin.php?page=wpforms-builder&view=setup' ) ] );
+	}
+
 	if ( empty( $_POST['title'] ) ) {
 		wp_send_json_error(
 			[

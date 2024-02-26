@@ -113,9 +113,8 @@ class AdminBarMenu {
 	 */
 	public function enqueue_js() {
 
-		// In WordPress 5.3.1 the `admin-bar.js` file was rewritten and removed all jQuery dependencies.
-		$is_wp_531_plus = version_compare( get_bloginfo( 'version' ), '5.3.1', '>=' );
-		$inline_script  = sprintf(
+		wp_add_inline_script(
+			'admin-bar',
 			"( function() {
 				function wpforms_admin_bar_menu_init() {
 					var template = document.getElementById( 'tmpl-wpforms-admin-menubar-data' ),
@@ -137,12 +136,10 @@ class AdminBarMenu {
 						notifications.insertAdjacentHTML( 'afterend', template.innerHTML );
 					}
 				};
-				%s
+				document.addEventListener( 'DOMContentLoaded', wpforms_admin_bar_menu_init );
 			}() );",
-			$is_wp_531_plus ? "document.addEventListener( 'DOMContentLoaded', wpforms_admin_bar_menu_init );" : "if ( typeof( jQuery ) != 'undefined' ) { jQuery( wpforms_admin_bar_menu_init ); } else { document.addEventListener( 'DOMContentLoaded', wpforms_admin_bar_menu_init ); }"
+			'before'
 		);
-
-		wp_add_inline_script( 'admin-bar', $inline_script, 'before' );
 	}
 
 	/**

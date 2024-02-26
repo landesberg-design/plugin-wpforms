@@ -111,7 +111,7 @@ class Page {
 
 		wp_enqueue_script(
 			'wpforms-admin-entries-overview',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries-overview{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries/entries-overview{$min}.js",
 			[ 'jquery', 'wpforms-flatpickr', 'wpforms-chart' ],
 			WPFORMS_VERSION,
 			true

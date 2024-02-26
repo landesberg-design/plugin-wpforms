@@ -28,7 +28,7 @@ class SmartTags {
 	 */
 	public function hooks() {
 
-		add_filter( 'wpforms_process_smart_tags', [ $this, 'process' ], 10, 4 );
+		add_filter( 'wpforms_process_smart_tags', [ $this, 'process' ], 10, 5 );
 		add_filter( 'wpforms_builder_enqueues_smart_tags', [ $this, 'builder' ] );
 	}
 
@@ -133,6 +133,7 @@ class SmartTags {
 			'url_lost_password' => esc_html__( 'Lost Password URL', 'wpforms-lite' ),
 			'unique_value'      => esc_html__( 'Unique Value', 'wpforms-lite' ),
 			'site_name'         => esc_html__( 'Site Name', 'wpforms-lite' ),
+			'order_summary'     => esc_html__( 'Order Summary', 'wpforms-lite' ),
 		];
 	}
 
@@ -163,15 +164,17 @@ class SmartTags {
 	 * Process smart tags.
 	 *
 	 * @since 1.6.7
+	 * @since 1.8.7 Added `$context` parameter.
 	 *
 	 * @param string $content   Content.
 	 * @param array  $form_data Form data.
 	 * @param array  $fields    List of fields.
 	 * @param string $entry_id  Entry ID.
+	 * @param string $context   Context.
 	 *
 	 * @return string
 	 */
-	public function process( $content, $form_data, $fields = [], $entry_id = '' ) {
+	public function process( $content, $form_data, $fields = [], $entry_id = '', $context = '' ) {
 
 		$smart_tags = $this->get_all_smart_tags( $content );
 
@@ -181,7 +184,7 @@ class SmartTags {
 
 		foreach ( $smart_tags as $smart_tag => $tag_name ) {
 			$class_name       = $this->get_smart_tag_class_name( $tag_name );
-			$smart_tag_object = new $class_name( $smart_tag );
+			$smart_tag_object = new $class_name( $smart_tag, $context );
 
 			/**
 			 * Modify the smart tag value.

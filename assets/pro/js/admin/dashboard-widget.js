@@ -20,7 +20,7 @@ const WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docu
 		$settingsBtn         : $( '#wpforms-dash-widget-settings-button' ),
 		$canvas              : $( '#wpforms-dash-widget-chart' ),
 		$formsListBlock      : $( '#wpforms-dash-widget-forms-list-block' ),
-		$recomBlockDismissBtn: $( '#wpforms-dash-widget-dismiss-recommended-plugin-block' ),
+		$dismissButton:        $( '.wpforms-dash-widget-dismiss-icon' ),
 	};
 
 	/**
@@ -534,8 +534,8 @@ const WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docu
 		 * @since 1.5.0.4
 		 */
 		miscEvents() {
-			el.$recomBlockDismissBtn.on( 'click', function() {
-				app.dismissRecommendedBlock();
+			el.$dismissButton.on( 'click', function() {
+				app.dismissWidgetBlock( $( this ) );
 			} );
 		},
 
@@ -623,10 +623,28 @@ const WPFormsDashboardWidget = window.WPFormsDashboardWidget || ( function( docu
 		 * Dismiss recommended plugin block.
 		 *
 		 * @since 1.5.0.4
+		 * @since 1.8.7 Deprecated.
+		 *
+		 * @deprecated Use WPFormsDashboardWidget.dismissWidgetBlock() instead.
 		 */
 		dismissRecommendedBlock() {
+			// eslint-disable-next-line no-console
+			console.warn( 'WARNING! WPFormsDashboardWidget.dismissRecommendedBlock() has been deprecated, please use WPFormsDashboardWidget.dismissWidgetBlock() instead.' );
+
 			$( '.wpforms-dash-widget-recommended-plugin-block' ).remove();
 			app.saveWidgetMeta( 'hide_recommended_block', 1 );
+		},
+
+		/**
+		 * Dismiss widget block.
+		 *
+		 * @since 1.8.7
+		 *
+		 * @param {Object} $clickedButton jQuery object of the clicked button.
+		 */
+		dismissWidgetBlock( $clickedButton ) {
+			$clickedButton.closest( '.wpforms-dash-widget-block' ).remove();
+			app.saveWidgetMeta( $clickedButton.data( 'field' ), 1 );
 		},
 	};
 

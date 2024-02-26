@@ -177,7 +177,7 @@ class WPForms_Entries_Single {
 
 		wp_enqueue_script(
 			'wpforms-admin-view-entry',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/view-entry{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries/view-entry{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -1175,12 +1175,14 @@ class WPForms_Entries_Single {
 		$hide_choice_value = $is_choices_field && $this->entry_view_settings['fields']['show_unselected_choices']['value'] === 1 ? ' wpforms-hide' : '';
 
 		if ( $field['type'] === 'html' ) {
-			$value = force_balance_tags( $value );
+			$value = make_clickable( force_balance_tags( $value ) );
+		} else {
+			$value = nl2br( make_clickable( $value ) );
 		}
 
 		echo '<div class="wpforms-entry-field-value' . esc_attr( $hide_choice_value ) . '">';
 			echo ! wpforms_is_empty_string( $value )
-				? wp_kses_post( nl2br( make_clickable( $value ) ) )
+				? wp_kses_post( $value )
 				: esc_html__( 'Empty', 'wpforms' );
 		echo '</div>';
 	}
@@ -1209,7 +1211,10 @@ class WPForms_Entries_Single {
 			"wpforms-field-entry-{$field['type']}",
 		];
 
-		if ( ! isset( $field_value ) || wpforms_is_empty_string( trim( $field_value ) ) ) {
+		$is_empty_quantity = isset( $field['quantity'] ) && ! $field['quantity'];
+		$is_empty          = ! isset( $field_value ) || wpforms_is_empty_string( trim( $field_value ) ) || $is_empty_quantity;
+
+		if ( $is_empty ) {
 			$field_classes[] = 'empty';
 		}
 
@@ -1221,7 +1226,7 @@ class WPForms_Entries_Single {
 			$field_classes[] = 'wpforms-field-entry-toggle';
 		}
 
-		if ( ( ! isset( $field_value ) || wpforms_is_empty_string( trim( $field_value ) ) ) && $this->entry_view_settings['fields']['show_empty_fields']['value'] !== 1 ) {
+		if ( $is_empty && $this->entry_view_settings['fields']['show_empty_fields']['value'] !== 1 ) {
 			$field_classes[] = 'wpforms-hide';
 		}
 
@@ -2178,6 +2183,10 @@ class WPForms_Entries_Single {
 			return $this->get_choices_field_value( $field, $field_value );
 		}
 
+		if ( wpforms_payment_has_quantity( $field, $this->form_data ) ) {
+			return wpforms_payment_format_quantity( $field );
+		}
+
 		return $field_value;
 	}
 
@@ -2232,7 +2241,7 @@ class WPForms_Entries_Single {
 	 *
 	 * @return string
 	 */
-	private function get_formatted_field_label( $field ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	public function get_formatted_field_label( $field ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		$field_label = isset( $field['name'] ) ? $field['name'] : '';
 
@@ -2313,7 +2322,7 @@ class WPForms_Entries_Single {
 	 *
 	 * @return string
 	 */
-	private function get_choice_label( $field, $choice, $key ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+	public function get_choice_label( $field, $choice, $key ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		$is_payment = strpos( $field['type'], 'payment-' ) === 0;
 
@@ -2353,9 +2362,17 @@ class WPForms_Entries_Single {
 	 */
 	private function is_checked_choice( $field, $choice, $key, $is_dynamic ) {
 
-		$is_payment     = strpos( $field['type'], 'payment-' ) === 0;
-		$separator      = $is_payment || $is_dynamic ? ',' : "\n";
-		$active_choices = explode( $separator, $field['value_raw'] );
+		$is_payment  = strpos( $field['type'], 'payment-' ) === 0;
+		$separator   = $is_payment || $is_dynamic ? ',' : "\n";
+		$show_values = ! empty( $this->form_data['fields'][ $field['id'] ]['show_values'] );
+		$value       = $field['value_raw'] ?? ( $field['value'] ?? '' );
+
+		// Case when field is using custom values, see 'wpforms_fields_show_options_setting' filter.
+		if ( $show_values && ! $is_dynamic ) {
+			$value = $field['value'] ?? '';
+		}
+
+		$active_choices = explode( $separator, $value );
 
 		if ( $is_dynamic ) {
 			$active_choices = array_map( 'absint', $active_choices );

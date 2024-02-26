@@ -74,7 +74,7 @@ class AddonsCache extends CacheBase {
 	 *
 	 * @return array Prepared data for caching (with icons).
 	 */
-	protected function prepare_cache_data( $data ) {
+	protected function prepare_cache_data( $data ): array {
 
 		if ( empty( $data ) || ! is_array( $data ) ) {
 			return [];

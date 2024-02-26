@@ -293,7 +293,7 @@ class Edit {
 		// Load admin utils JS.
 		wp_enqueue_script(
 			'wpforms-admin-utils',
-			WPFORMS_PLUGIN_URL . "assets/js/admin-utils{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/share/admin-utils{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -310,7 +310,7 @@ class Edit {
 		if ( wpforms_has_field_type( 'richtext', $this->form ) ) {
 			wp_enqueue_script(
 				'wpforms-richtext-field',
-				WPFORMS_PLUGIN_URL . "assets/pro/js/fields/richtext{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/richtext{$min}.js",
 				[ 'jquery' ],
 				WPFORMS_VERSION,
 				true
@@ -319,7 +319,7 @@ class Edit {
 
 		wp_enqueue_script(
 			'wpforms-generic-utils',
-			WPFORMS_PLUGIN_URL . "assets/js/utils{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/share/utils{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -328,7 +328,7 @@ class Edit {
 		// Load frontend base JS.
 		wp_enqueue_script(
 			'wpforms-frontend',
-			WPFORMS_PLUGIN_URL . "assets/js/wpforms{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/frontend/wpforms{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -337,7 +337,7 @@ class Edit {
 		// Load admin JS.
 		wp_enqueue_script(
 			'wpforms-admin-edit-entry',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/edit-entry{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries/edit-entry{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -1109,7 +1109,7 @@ class Edit {
 			$dbdata_fields = array_map( 'get_object_vars', $dbdata_fields );
 		}
 
-		$this->date_modified = current_time( 'Y-m-d H:i:s' );
+		$this->date_modified = current_time( 'Y-m-d H:i:s', true );
 
 		foreach ( $this->fields as $field ) {
 			$save_field          = apply_filters( 'wpforms_entry_save_fields', $field, $this->form_data, $this->entry_id );

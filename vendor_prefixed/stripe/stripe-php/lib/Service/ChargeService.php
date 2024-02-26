@@ -44,10 +44,10 @@ class ChargeService extends \WPForms\Vendor\Stripe\Service\AbstractService
         return $this->request('post', $this->buildPath('/v1/charges/%s/capture', $id), $params, $opts);
     }
     /**
-     * Use the <a href="/docs/api/payment_intents">Payment Intents API</a> to initiate
-     * a new payment instead of using this method. Confirmation of the PaymentIntent
-     * creates the <code>Charge</code> object used to request payment, so this method
-     * is limited to legacy integrations.
+     * This method is no longer recommended—use the <a
+     * href="/docs/api/payment_intents">Payment Intents API</a> to initiate a new
+     * payment instead. Confirmation of the PaymentIntent creates the
+     * <code>Charge</code> object used to request payment.
      *
      * @param null|array $params
      * @param null|array|\Stripe\Util\RequestOptions $opts

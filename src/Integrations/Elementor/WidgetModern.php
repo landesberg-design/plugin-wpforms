@@ -390,7 +390,8 @@ class WidgetModern extends Widget {
 		static $is_root_vars_displayed = false;
 		$widget_id                     = $this->get_id();
 
-		if ( ! $is_root_vars_displayed ) {
+		// Do not output root CSS variables more than once or if it is a library template preview.
+		if ( ! $is_root_vars_displayed && ! isset( $_GET['elementor_library'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$this->css_vars_obj->output_root( true );
 			$is_root_vars_displayed = true;
 		}

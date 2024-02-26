@@ -22,6 +22,8 @@ class UserId extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		return is_user_logged_in() ? get_current_user_id() : '';
+		$user = $this->get_user( $entry_id );
+
+		return absint( $user->ID ) ?? '';
 	}
 }

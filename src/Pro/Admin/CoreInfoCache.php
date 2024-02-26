@@ -19,7 +19,7 @@ class CoreInfoCache extends CacheBase {
 	 * @return bool
 	 */
 	protected function allow_load(): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return is_admin() || wp_doing_cron() || wpforms_doing_wp_cli();
 	}
 
@@ -31,7 +31,7 @@ class CoreInfoCache extends CacheBase {
 	 * @return array Settings array.
 	 */
 	protected function setup(): array {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return [
 
 			// Remote source URL.

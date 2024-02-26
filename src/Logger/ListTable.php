@@ -96,7 +96,7 @@ class ListTable extends WP_List_Table {
 	 */
 	public function has_items() {
 
-		// We can't use the empty function because it doesn't work with Countable object.
+		// We can't use the empty function because it doesn't work with the Countable object.
 		return (bool) count( $this->items );
 	}
 
@@ -278,7 +278,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Return the columns names for rendering.
+	 * Return the columns' names for rendering.
 	 *
 	 * @since 1.6.3
 	 *
@@ -308,7 +308,7 @@ class ListTable extends WP_List_Table {
 				<?php if ( $this->get_request_search_query() ) { ?>
 					<span class="subtitle">
 				<?php
-				echo sprintf( /* translators: %s - search query. */
+				printf( /* translators: %s - search query. */
 					esc_html__( 'Search results for "%s"', 'wpforms-lite' ),
 					esc_html( $this->get_request_search_query() )
 				);
@@ -551,13 +551,19 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Check if the database table exist.
+	 * Check if the database table exists.
 	 *
 	 * @since 1.6.4
+	 * @deprecated 1.8.7
 	 *
 	 * @return bool
+	 * @noinspection PhpMissingReturnTypeInspection
+	 * @noinspection ReturnTypeCanBeDeclaredInspection
 	 */
 	public function table_exists() {
+
+		// Deprecated as unused.
+		_deprecated_function( __METHOD__, '1.8.7 of the WPForms plugin' );
 
 		return $this->repository->table_exists();
 	}

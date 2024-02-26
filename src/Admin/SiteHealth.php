@@ -10,29 +10,11 @@ namespace WPForms\Admin;
 class SiteHealth {
 
 	/**
-	 * Indicate if Site Health is allowed to load.
-	 *
-	 * @since 1.5.5
-	 *
-	 * @return bool
-	 */
-	private function allow_load() {
-
-		global $wp_version;
-
-		return version_compare( $wp_version, '5.2', '>=' );
-	}
-
-	/**
 	 * Init Site Health.
 	 *
 	 * @since 1.5.5
 	 */
 	final public function init() {
-
-		if ( ! $this->allow_load() ) {
-			return;
-		}
 
 		$this->hooks();
 	}

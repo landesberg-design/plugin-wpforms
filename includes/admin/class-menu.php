@@ -106,7 +106,7 @@ class WPForms_Admin_Menu {
 			'wpforms-overview',
 			esc_html__( 'WPForms Templates', 'wpforms-lite' ),
 			esc_html__( 'Form Templates', 'wpforms-lite' ),
-			$access->get_menu_cap( 'create_forms' ),
+			$access->get_menu_cap( 'edit_forms' ),
 			'wpforms-templates',
 			[ $this, 'admin_page' ]
 		);
@@ -146,7 +146,7 @@ class WPForms_Admin_Menu {
 			'wpforms-overview',
 			esc_html__( 'WPForms Addons', 'wpforms-lite' ),
 			'<span style="color:#f18500">' . esc_html__( 'Addons', 'wpforms-lite' ) . '</span>',
-			$manage_cap,
+			$access->get_menu_cap( 'edit_forms' ),
 			'wpforms-addons',
 			[ $this, 'admin_page' ]
 		);

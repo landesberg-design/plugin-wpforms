@@ -1,8 +1,12 @@
 <?php
 
 // phpcs:disable WPForms.Comments.PHPDocHooks.RequiredHookDocumentation, WPForms.PHP.ValidateHooks.InvalidHookName
-// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+// phpcs:disable Generic.Commenting.DocComment.MissingShort
 /** @noinspection AutoloadingIssuesInspection */
+/** @noinspection PhpIllegalPsrClassPathInspection */
+// phpcs:disable Generic.Commenting.DocComment.MissingShort
+
+use WPForms\Helpers\DB;
 
 /**
  * DB class.
@@ -10,7 +14,7 @@
  * This handy class originated from Pippin's Easy Digital Downloads.
  * https://github.com/easydigitaldownloads/easy-digital-downloads/blob/master/includes/class-edd-db.php
  *
- * Sub-classes should define $table_name, $version, and $primary_key in __construct() method.
+ * Subclasses should define $table_name, $version, and $primary_key in __construct() method.
  *
  * @since 1.1.6
  */
@@ -20,7 +24,7 @@ abstract class WPForms_DB {
 	 * Maximum length of index key.
 	 *
 	 * Indexes have a maximum size of 767 bytes. Historically, we haven't needed to be concerned about that.
-	 * As of WP 4.2, however, WP moved to utf8mb4, which uses 4 bytes per character. This means that an index which
+	 * As of WP 4.2, however, WP moved to utf8mb4, which uses 4 bytes per character. This means that an index, which
 	 * used to have room for floor(767/3) = 255 characters, now only has room for floor(767/4) = 191 characters.
 	 *
 	 * @since 1.8.2
@@ -212,7 +216,7 @@ abstract class WPForms_DB {
 	 * @param array  $data Column data.
 	 * @param string $type Optional. Data type context.
 	 *
-	 * @return int ID for the newly inserted record. 0 otherwise.
+	 * @return int ID for the newly inserted record. Zero otherwise.
 	 */
 	public function add( $data, $type = '' ) {
 
@@ -226,10 +230,10 @@ abstract class WPForms_DB {
 		// Initialise column format array.
 		$column_formats = $this->get_columns();
 
-		// Force fields to lower case.
+		// Force fields to lower a case.
 		$data = array_change_key_case( $data );
 
-		// White list columns.
+		// Whitelist columns.
 		$data = array_intersect_key( $data, $column_formats );
 
 		// Reorder $column_formats to match the order of columns given in $data.
@@ -292,10 +296,10 @@ abstract class WPForms_DB {
 		// Initialise column format array.
 		$column_formats = $this->get_columns();
 
-		// Force fields to lower case.
+		// Force fields to the lower case.
 		$data = array_change_key_case( $data );
 
-		// White list columns.
+		// Whitelist columns.
 		$data = array_intersect_key( $data, $column_formats );
 
 		// Reorder $column_formats to match the order of columns given in $data.
@@ -325,7 +329,7 @@ abstract class WPForms_DB {
 
 		global $wpdb;
 
-		// Row ID must be positive integer.
+		// Row ID must be a positive integer.
 		$row_id = absint( $row_id );
 
 		if ( empty( $row_id ) ) {
@@ -468,18 +472,11 @@ abstract class WPForms_DB {
 	 *
 	 * @return bool If the table name exists.
 	 */
-	public function table_exists( $table = '' ) {
+	public function table_exists( string $table = '' ): bool {
 
-		global $wpdb;
+		$table = ! empty( $table ) ? sanitize_text_field( $table ) : $this->table_name;
 
-		if ( ! empty( $table ) ) {
-			$table = sanitize_text_field( $table );
-		} else {
-			$table = $this->table_name;
-		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
-		return $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table;
+		return DB::table_exists( $table );
 	}
 
 	/**

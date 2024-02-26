@@ -1,5 +1,8 @@
 <?php
 
+use WPForms\Helpers\DB;
+use WPForms\Helpers\Transient;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -186,8 +189,10 @@ class WPForms_Install {
 	 */
 	private function maybe_create_tables() {
 
+		Transient::delete( DB::EXISTING_TABLES_TRANSIENT_NAME );
+
 		array_map(
-			static function( $handler ) {
+			static function ( $handler ) {
 
 				if ( ! method_exists( $handler, 'table_exists' ) ) {
 					return;
@@ -203,6 +208,7 @@ class WPForms_Install {
 				wpforms()->get( 'tasks_meta' ),
 				wpforms()->get( 'payment' ),
 				wpforms()->get( 'payment_meta' ),
+				wpforms()->get( 'log' ),
 			]
 		);
 	}

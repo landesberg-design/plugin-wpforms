@@ -92,6 +92,8 @@ trait Export {
 			'file-upload',
 			'likert_scale',
 			'payment-checkbox',
+			'payment-single',
+			'payment-select',
 		];
 
 		if ( ! in_array( $type, $available_types, true ) ) {
@@ -115,6 +117,11 @@ trait Export {
 
 		// The rest of the fields are multiple choice by default.
 		if ( in_array( $type, [ 'checkbox', 'payment-checkbox', 'likert_scale', 'address' ], true ) ) {
+			return true;
+		}
+
+		// Check if quantity is enabled.
+		if ( in_array( $type, [ 'payment-select', 'payment-single' ], true ) && $this->is_payment_quantities_enabled( $field ) ) {
 			return true;
 		}
 
@@ -240,5 +247,29 @@ trait Export {
 		$skip_not_selected_choices = apply_filters( 'wpforms_pro_admin_entries_export_skip_not_selected_choices', false ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 		return empty( $value ) && $skip_not_selected_choices;
+	}
+
+	/**
+	 * Determine if payment quantities enabled.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param array $field Field settings.
+	 *
+	 * @return bool
+	 */
+	private function is_payment_quantities_enabled( $field ) {
+
+		if ( empty( $field['enable_quantity'] ) ) {
+			return false;
+		}
+
+		// Quantity available only for `single` format of the Single payment field.
+		if ( $field['type'] === 'payment-single' && $field['format'] !== 'single' ) {
+			return false;
+		}
+
+		// Otherwise return true.
+		return true;
 	}
 }

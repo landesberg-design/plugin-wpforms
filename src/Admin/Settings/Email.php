@@ -93,7 +93,7 @@ class Email {
 
 		wp_enqueue_script(
 			'wpforms-contrast-checker',
-			WPFORMS_PLUGIN_URL . "assets/js/wpforms-contrast-checker{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/share/contrast-checker{$min}.js",
 			[],
 			WPFORMS_VERSION,
 			true
@@ -101,7 +101,7 @@ class Email {
 
 		wp_enqueue_script(
 			'wpforms-xor',
-			WPFORMS_PLUGIN_URL . "assets/js/wpforms-xor{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/share/xor{$min}.js",
 			[],
 			WPFORMS_VERSION,
 			true
@@ -109,7 +109,7 @@ class Email {
 
 		wp_enqueue_script(
 			'wpforms-admin-email-settings',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/email/settings{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/email/settings{$min}.js",
 			[ 'jquery', 'wpforms-admin', 'wp-escape-html', 'wp-url', 'choicesjs', 'wpforms-contrast-checker', 'wpforms-xor' ],
 			WPFORMS_VERSION,
 			true

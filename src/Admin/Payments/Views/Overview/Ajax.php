@@ -516,27 +516,27 @@ class Ajax {
 				continue;
 			}
 
-			// Format the given amount and split the input by space.
-			$results[ $key ] = wpforms_format_amount( $value, true );
-
-			// If the given stat card doesn't have a count, leave early.
-			if ( empty( $this->stat_cards[ $key ]['has_count'] ) ) {
-				continue;
-			}
-
 			// Split the input by space to look for the count.
 			$input_arr = (array) explode( ' ', $value );
 
-			// If the input array doesn't have a second element, leave early.
-			if ( ! isset( $input_arr[1] ) ) {
+			// If the given stat card doesn't have a count, leave early.
+			if ( empty( $this->stat_cards[ $key ]['has_count'] ) || ! isset( $input_arr[1] ) ) {
+				// Format the given amount and split the input by space.
+				$results[ $key ] = wpforms_format_amount( $value, true );
+
 				continue;
 			}
+
+			// The fields are stored as a `decimal` in the DB, and appears here as the string.
+			// But all strings values, passed to wpforms_format_amount() are sanitized.
+			// There is no need to sanitize it, as it is already a regular numeric string.
+			$amount = wpforms_format_amount( (float) ( $input_arr[0] ?? $value ), true );
 
 			// Format the amount with the concatenation of count in parentheses.
 			// Example: 2185.52000000 (79).
 			$results[ $key ] = sprintf(
 				'%s <span>%s</span>',
-				esc_html( $results[ $key ] ),
+				esc_html( $amount ),
 				esc_html( $input_arr[1] ) // 1: Would be count of the records.
 			);
 		}

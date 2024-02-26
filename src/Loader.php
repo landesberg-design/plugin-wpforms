@@ -40,6 +40,7 @@ class Loader {
 		$this->populate_common();
 		$this->populate_frontend();
 		$this->populate_admin();
+		$this->populate_caches();
 		$this->populate_fields();
 		$this->populate_forms_overview();
 		$this->populate_entries();
@@ -275,8 +276,50 @@ class Loader {
 				'hook' => 'admin_init',
 			],
 			[
+				'name' => 'Admin\Addons\Calculations',
+				'id'   => 'calculations',
+			],
+			[
 				'name' => 'Admin\PluginList',
 				'hook' => 'admin_init',
+			],
+			[
+				'name' => 'Admin\Splash\SplashScreen',
+				'id'   => 'splash_screen',
+				'hook' => 'admin_init',
+			],
+			[
+				'name' => 'Admin\Splash\SplashCache',
+				'id'   => 'splash_cache',
+			],
+			[
+				'name' => 'Admin\Splash\SplashUpgrader',
+				'id'   => 'splash_upgrader',
+				'hook' => 'plugins_loaded',
+			]
+		);
+	}
+
+	/**
+	 * Populate Caches related classes.
+	 *
+	 * @since 1.8.7
+	 */
+	private function populate_caches() {
+
+		array_push(
+			$this->classes,
+			[
+				'name' => 'LicenseApi\PluginUpdateCache',
+				'id'   => 'license_api_plugin_update_cache',
+			],
+			[
+				'name' => 'LicenseApi\PluginInfoCache',
+				'id'   => 'license_api_plugin_info_cache',
+			],
+			[
+				'name' => 'LicenseApi\ValidateKeyCache',
+				'id'   => 'license_api_validate_key_cache',
 			]
 		);
 	}
@@ -311,6 +354,11 @@ class Loader {
 		$this->classes[] = [
 			'name' => 'Forms\Fields\PaymentTotal\Field',
 			'hook' => 'init',
+		];
+
+		// Load custom captcha field class.
+		$this->classes[] = [
+			'name' => 'Forms\Fields\CustomCaptcha\Field',
 		];
 	}
 
@@ -448,6 +496,7 @@ class Loader {
 			[
 				'name' => 'Admin\Builder\ContextMenu',
 				'hook' => 'wpforms_builder_init',
+				'id'   => 'context_menu',
 			],
 			[
 				'name' => 'Admin\Builder\Notifications\Advanced\Settings',

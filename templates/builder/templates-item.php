@@ -21,6 +21,7 @@
  * @var array  $template             Template data.
  * @var string $action_text          Template action button text.
  * @var string $badge_class          Badge class in case if there is any badge text exists.
+ * @var bool   $can_create           Capability.
  */
 
 use WPForms\Admin\Education\Helpers;
@@ -53,8 +54,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</h3>
 
 	<span class="wpforms-template-favorite">
-		<i class="fa fa-heart <?php echo $template['favorite'] ? '' : 'wpforms-hidden'; ?>" title="<?php esc_attr_e( 'Remove from Favorites', 'wpforms-lite' ); ?>"></i>
-		<i class="fa fa-heart-o <?php echo $template['favorite'] ? 'wpforms-hidden' : ''; ?>" title="<?php esc_attr_e( 'Mark as Favorite', 'wpforms-lite' ); ?>"></i>
+		<?php if ( $can_create ) : ?>
+			<i class="fa fa-heart <?php echo $template['favorite'] ? '' : 'wpforms-hidden'; ?>" title="<?php esc_attr_e( 'Remove from Favorites', 'wpforms-lite' ); ?>"></i>
+			<i class="fa fa-heart-o <?php echo $template['favorite'] ? 'wpforms-hidden' : ''; ?>" title="<?php esc_attr_e( 'Mark as Favorite', 'wpforms-lite' ); ?>"></i>
+		<?php endif; ?>
 	</span>
 
 	<?php
@@ -67,22 +70,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<p class="wpforms-template-desc"><?php echo esc_html( $template['description'] ); ?></p>
 	<?php endif; ?>
 
-	<div class="wpforms-template-buttons">
-		<a href="#" class="wpforms-template-select wpforms-btn wpforms-btn-md wpforms-btn-orange<?php echo esc_attr( $education_class ); ?>"
-			data-template-name-raw="<?php echo esc_attr( $template['name'] ); ?>"
-			data-template="<?php echo esc_attr( $template_id ); ?>"
-			data-slug="<?php echo esc_attr( $template['slug'] ); ?>"
-			<?php echo $education_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<?php echo $addons_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-			<?php echo esc_html( $action_text ); ?>
-		</a>
-		<?php if ( $template['url'] !== '' ) : ?>
-			<a class="wpforms-template-demo wpforms-btn wpforms-btn-md wpforms-btn-light-grey"
-				href="<?php echo esc_url( $demo_url ); ?>"
-				target="_blank" rel="noopener noreferrer">
-				<?php esc_html_e( 'View Demo', 'wpforms-lite' ); ?>
+	<?php if ( $can_create ) : ?>
+		<div class="wpforms-template-buttons">
+			<a href="#" class="wpforms-template-select wpforms-btn wpforms-btn-md wpforms-btn-orange<?php echo esc_attr( $education_class ); ?>"
+				data-template-name-raw="<?php echo esc_attr( $template['name'] ); ?>"
+				data-template="<?php echo esc_attr( $template_id ); ?>"
+				data-slug="<?php echo esc_attr( $template['slug'] ); ?>"
+				<?php echo $education_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo $addons_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				<?php echo esc_html( $action_text ); ?>
 			</a>
-		<?php endif; ?>
-	</div>
+			<?php if ( $template['url'] !== '' ) : ?>
+				<a class="wpforms-template-demo wpforms-btn wpforms-btn-md wpforms-btn-light-grey"
+					href="<?php echo esc_url( $demo_url ); ?>"
+					target="_blank" rel="noopener noreferrer">
+					<?php esc_html_e( 'View Demo', 'wpforms-lite' ); ?>
+				</a>
+			<?php endif; ?>
+		</div>
+	<?php else : ?>
+		<span class="wpforms-template-select" data-template="<?php echo esc_attr( $template_id ); ?>"></span>
+	<?php endif; ?>
 
 </div>

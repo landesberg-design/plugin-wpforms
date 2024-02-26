@@ -590,16 +590,15 @@ class WPForms_Field_Password extends WPForms_Field {
 			return;
 		}
 
-		$min = \wpforms_get_min_suffix();
+		$min = wpforms_get_min_suffix();
 
 		wp_enqueue_script(
 			'wpforms-password-field',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/fields/password{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/password{$min}.js",
 			[ 'jquery', 'password-strength-meter' ],
 			WPFORMS_VERSION,
 			true
 		);
-
 	}
 
 	/**

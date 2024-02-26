@@ -28,14 +28,19 @@ class UserMeta extends SmartTag {
 			return '';
 		}
 
-		return is_user_logged_in() ?
-			wp_kses_post(
-				get_user_meta(
-					get_current_user_id(),
-					sanitize_text_field( $attributes['key'] ),
-					true
-				)
-			) :
-			'';
+		$user    = $this->get_user( $entry_id );
+		$user_id = $user->ID ?? 0;
+
+		if ( ! $user_id ) {
+			return '';
+		}
+
+		return wp_kses_post(
+			get_user_meta(
+				$user_id,
+				sanitize_text_field( $attributes['key'] ),
+				true
+			)
+		);
 	}
 }

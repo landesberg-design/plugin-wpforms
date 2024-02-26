@@ -77,7 +77,7 @@ class WPForms_Conditional_Logic_Core {
 		// JavaScript.
 		wp_enqueue_script(
 			'wpforms-builder-conditionals',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/builder-conditional-logic-core{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/builder/conditional-logic-core{$min}.js",
 			[ 'jquery', 'wpforms-utils', 'wpforms-builder' ],
 			WPFORMS_VERSION,
 			false

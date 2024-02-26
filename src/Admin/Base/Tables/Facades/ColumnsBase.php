@@ -21,7 +21,7 @@ abstract class ColumnsBase {
 	 * @return array Array of columns as objects.
 	 */
 	protected static function get_all(): array {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return [];
 	}
 
@@ -36,7 +36,7 @@ abstract class ColumnsBase {
 	 * @return array
 	 */
 	public static function get_selected_columns_keys(): array {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return [];
 	}
 
@@ -48,7 +48,7 @@ abstract class ColumnsBase {
 	 * @return bool
 	 */
 	public static function has_selected_columns(): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return ! empty( static::get_selected_columns_keys() );
 	}
 
@@ -79,7 +79,7 @@ abstract class ColumnsBase {
 	 * @return bool
 	 */
 	public static function validate_column_key( $key ): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return isset( static::get_all()[ $key ] );
 	}
 }

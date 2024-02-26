@@ -341,7 +341,7 @@ class ListTable extends WP_List_Table {
 	 * @return array Array of all the list table columns.
 	 */
 	public function get_columns(): array {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return Columns::get_list_table_columns( $this );
 	}
 

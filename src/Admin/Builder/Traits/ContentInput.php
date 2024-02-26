@@ -267,13 +267,13 @@ trait ContentInput {
 	 *
 	 * @noinspection PhpUnusedParameterInspection, PhpUnnecessaryCurlyVarSyntaxInspection
 	 */
-	public function builder_enqueues( $view ) {
+	public function builder_enqueues( $view ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 
 		$min = wpforms_get_min_suffix();
 
 		wp_enqueue_script(
 			'wpforms-content-field',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/fields/content-field{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/builder/fields/content{$min}.js",
 			[ 'wpforms-builder', 'editor', 'quicktags' ],
 			WPFORMS_VERSION,
 			true

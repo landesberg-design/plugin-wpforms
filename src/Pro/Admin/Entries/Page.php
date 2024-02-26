@@ -324,7 +324,7 @@ class Page {
 
 		wp_enqueue_script(
 			'wpforms-admin-list-table-ext',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/list-table-ext{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/share/list-table-ext{$min}.js",
 			[ 'jquery', 'wpforms-multiselect-checkboxes' ],
 			WPFORMS_VERSION,
 			true
@@ -332,7 +332,7 @@ class Page {
 
 		wp_enqueue_script(
 			'wpforms-admin-entries',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries/entries{$min}.js",
 			[ 'jquery', 'wpforms-flatpickr' ],
 			WPFORMS_VERSION,
 			true

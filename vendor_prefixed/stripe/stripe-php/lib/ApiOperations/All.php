@@ -19,15 +19,7 @@ trait All
      */
     public static function all($params = null, $opts = null)
     {
-        self::_validateParams($params);
         $url = static::classUrl();
-        list($response, $opts) = static::_staticRequest('get', $url, $params, $opts);
-        $obj = \WPForms\Vendor\Stripe\Util\Util::convertToStripeObject($response->json, $opts);
-        if (!$obj instanceof \WPForms\Vendor\Stripe\Collection) {
-            throw new \WPForms\Vendor\Stripe\Exception\UnexpectedValueException('Expected type ' . \WPForms\Vendor\Stripe\Collection::class . ', got "' . \get_class($obj) . '" instead.');
-        }
-        $obj->setLastResponse($response);
-        $obj->setFilters($params);
-        return $obj;
+        return static::_requestPage($url, \WPForms\Vendor\Stripe\Collection::class, $params, $opts);
     }
 }

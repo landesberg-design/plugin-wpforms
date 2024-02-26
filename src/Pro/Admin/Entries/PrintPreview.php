@@ -28,6 +28,15 @@ class PrintPreview {
 	public $form_data;
 
 	/**
+	 * Instance of `WPForms_Entries_Single` class.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @var WPForms_Entries_Single
+	 */
+	private $entries_single;
+
+	/**
 	 * The array of bulk entries.
 	 *
 	 * @since 1.8.2
@@ -46,6 +55,8 @@ class PrintPreview {
 		if ( ! $this->is_print_page() ) {
 			return;
 		}
+
+		$this->entries_single = new \WPForms_Entries_Single(); // phpcs:ignore WPForms.PHP.BackSlash.RemoveBackslash
 
 		if ( ! $this->is_valid_request() ) {
 			wp_safe_redirect( admin_url( 'admin.php?page=wpforms-entries' ) );
@@ -73,7 +84,7 @@ class PrintPreview {
 		do_action( 'wpforms_pro_admin_entries_print_preview_entry', $this->entry, $this->form_data );
 
 		add_action( 'admin_init', [ $this, 'print_html' ], 1 );
-		add_filter( 'wpforms_entry_single_data', [ $this, 'add_hidden_data' ], 1010, 3 );
+		add_filter( 'wpforms_entry_single_data', [ $this->entries_single, 'add_hidden_data' ], 1010, 3 );
 	}
 
 	/**
@@ -324,7 +335,7 @@ class PrintPreview {
 	private function add_formatted_data( $field ) {
 
 		$field['formatted_value'] = $this->get_formatted_field_value( $field );
-		$field['formatted_label'] = $this->get_formatted_field_label( $field );
+		$field['formatted_label'] = $this->entries_single->get_formatted_field_label( $field );
 
 		return $field;
 	}
@@ -382,34 +393,6 @@ class PrintPreview {
 	}
 
 	/**
-	 * Get formatted field value.
-	 *
-	 * @since 1.8.1
-	 *
-	 * @param array $field Entry field.
-	 *
-	 * @return string
-	 */
-	private function get_formatted_field_label( $field ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-
-		$field_label = isset( $field['name'] ) ? $field['name'] : '';
-
-		if ( $field['type'] === 'divider' ) {
-			$field_label = isset( $field['label'] ) && ! wpforms_is_empty_string( $field['label'] ) ? $field['label'] : esc_html__( 'Section Divider', 'wpforms' );
-		}
-
-		if ( $field['type'] === 'pagebreak' ) {
-			$field_label = isset( $field['title'] ) && ! wpforms_is_empty_string( $field['title'] ) ? $field['title'] : esc_html__( 'Page Break', 'wpforms' );
-		}
-
-		if ( $field['type'] === 'content' ) {
-			$field_label = esc_html__( 'Content Field', 'wpforms' );
-		}
-
-		return $field_label;
-	}
-
-	/**
 	 * Get field value for checkbox and radio fields.
 	 *
 	 * @since 1.8.1
@@ -439,7 +422,7 @@ class PrintPreview {
 			$is_checked = $this->is_checked_choice( $field, $choice, $key, $is_dynamic );
 
 			if ( ! $is_dynamic ) {
-				$choice['label'] = $this->get_choice_label( $field, $choice, $key );
+				$choice['label'] = $this->entries_single->get_choice_label( $field, $choice, $key );
 			}
 
 			$choices_html .= wpforms_render(
@@ -464,43 +447,6 @@ class PrintPreview {
 	}
 
 	/**
-	 * Get value for a choice item.
-	 *
-	 * @since 1.8.1.2
-	 *
-	 * @param array $field  Entry field.
-	 * @param array $choice Choice settings.
-	 * @param int   $key    Choice number.
-	 *
-	 * @return string
-	 */
-	private function get_choice_label( $field, $choice, $key ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
-
-		$is_payment = strpos( $field['type'], 'payment-' ) === 0;
-
-		if ( ! $is_payment ) {
-			return ! isset( $choice['label'] ) || wpforms_is_empty_string( $choice['label'] )
-				/* translators: %s - choice number. */
-				? sprintf( esc_html__( 'Choice %s', 'wpforms' ), $key )
-				: $choice['label'];
-		}
-
-		$label = $choice['label'] ?? '';
-		/* translators: %s - item number. */
-		$label = $label !== '' ? $label : sprintf( esc_html__( 'Item %s', 'wpforms' ), $key );
-
-		if ( empty( $this->form_data['fields'][ $field['id'] ]['show_price_after_labels'] ) ) {
-			return $label;
-		}
-
-		$value    = $choice['value'] ?? 0;
-		$currency = $field['currency'] ?? '';
-		$amount   = wpforms_format_amount( wpforms_sanitize_amount( $value, $currency ), true, $currency );
-
-		return $amount ? $label . ' - ' . $amount : $label;
-	}
-
-	/**
 	 * Is the choice item checked?
 	 *
 	 * @since 1.8.1.2
@@ -514,9 +460,17 @@ class PrintPreview {
 	 */
 	private function is_checked_choice( $field, $choice, $key, $is_dynamic ) {
 
-		$is_payment     = strpos( $field['type'], 'payment-' ) === 0;
-		$separator      = $is_payment || $is_dynamic ? ',' : "\n";
-		$active_choices = explode( $separator, $field['value_raw'] );
+		$is_payment  = strpos( $field['type'], 'payment-' ) === 0;
+		$separator   = $is_payment || $is_dynamic ? ',' : "\n";
+		$show_values = ! empty( $this->form_data['fields'][ $field['id'] ]['show_values'] );
+		$value       = $field['value_raw'] ?? ( $field['value'] ?? '' );
+
+		// Case when field is using custom values, see 'wpforms_fields_show_options_setting' filter.
+		if ( $show_values && ! $is_dynamic ) {
+			$value = $field['value'] ?? '';
+		}
+
+		$active_choices = explode( $separator, $value );
 
 		if ( $is_dynamic ) {
 			$active_choices = array_map( 'absint', $active_choices );
@@ -542,6 +496,7 @@ class PrintPreview {
 	 * Add HTML entries, dividers to entry.
 	 *
 	 * @since 1.6.7
+	 * @deprecated 1.8.7
 	 *
 	 * @param array  $fields    Form fields.
 	 * @param object $entry     Entry fields.
@@ -550,6 +505,8 @@ class PrintPreview {
 	 * @return array
 	 */
 	public function add_hidden_data( $fields, $entry, $form_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		_deprecated_function( __METHOD__, '1.8.7 of the WPForms', 'WPForms_Entries_Single::get_choice_label()' );
 
 		$settings = ! empty( $form_data['fields'] ) ? $form_data['fields'] : [];
 

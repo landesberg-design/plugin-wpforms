@@ -25,16 +25,31 @@ class TemplatesCache extends CacheBase {
 	];
 
 	/**
+	 * List of plugins that can use the templates cache.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @var array
+	 */
+	const PLUGINS = [
+		'wpforms',
+		'wpforms-lite',
+	];
+
+	/**
 	 * Determine if the class is allowed to load.
 	 *
 	 * @since 1.6.8
 	 *
 	 * @return bool
 	 */
-	protected function allow_load() {
+	protected function allow_load(): bool {
 
 		$has_permissions  = wpforms_current_user_can( [ 'create_forms', 'edit_forms' ] );
-		$allowed_requests = wpforms_is_admin_ajax() || wpforms_is_admin_page( 'builder' ) || wpforms_is_admin_page( 'templates' );
+		$allowed_requests = wpforms_is_admin_ajax() ||
+		                    wpforms_is_admin_page( 'builder' ) ||
+		                    wpforms_is_admin_page( 'templates' ) ||
+		                    wpforms_is_admin_page( 'tools', 'action-scheduler' );
 		$allow            = wp_doing_cron() || wpforms_doing_wp_cli() || ( $has_permissions && $allowed_requests );
 
 		/**
@@ -45,6 +60,59 @@ class TemplatesCache extends CacheBase {
 		 * @param bool $allow True or false.
 		 */
 		return (bool) apply_filters( 'wpforms_admin_builder_templatescache_allow_load', $allow ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+	}
+
+	/**
+	 * Initialize the class.
+	 *
+	 * @since 1.8.7
+	 */
+	public function init() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
+
+		parent::init();
+
+		// Upgrade cached templates data after the plugin update.
+		add_action( 'upgrader_process_complete', [ $this, 'upgrade_templates' ] );
+	}
+
+	/**
+	 * Upgrade cached templates data after the plugin update.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param object $upgrader WP_Upgrader instance.
+	 */
+	public function upgrade_templates( $upgrader ) {
+
+		if ( $this->allow_update_cache( $upgrader ) ) {
+			$this->update( true );
+		}
+	}
+
+	/**
+	 * Determine if allowed to update the cache.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @param object $upgrader WP_Upgrader instance.
+	 *
+	 * @return bool
+	 */
+	private function allow_update_cache( $upgrader ): bool {
+
+		$result = $upgrader->result ?? null;
+
+		// Check if plugin was updated.
+		if ( ! $result ) {
+			return false;
+		}
+
+		// Check if updated plugin is WPForms.
+		if ( ! in_array( $result['destination_name'], self::PLUGINS, true ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -91,7 +159,7 @@ class TemplatesCache extends CacheBase {
 	 *
 	 * @return array Prepared data for caching.
 	 */
-	protected function prepare_cache_data( $data ) {
+	protected function prepare_cache_data( $data ): array {
 
 		if (
 			empty( $data ) ||
@@ -122,7 +190,7 @@ class TemplatesCache extends CacheBase {
 	 *
 	 * @return bool
 	 */
-	public function update( $force = false ): bool {
+	public function update( bool $force = false ): bool {
 
 		$result = parent::update( $force );
 
@@ -143,7 +211,8 @@ class TemplatesCache extends CacheBase {
 	 * @return string
 	 */
 	public function get_content_cache(): string {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement, Universal.Operators.DisallowShortTernary.Found
+
+		// phpcs:ignore Universal.Operators.DisallowShortTernary.Found
 		return File::get_contents( $this->get_content_cache_file() ) ?: '';
 	}
 
@@ -157,7 +226,7 @@ class TemplatesCache extends CacheBase {
 	 * @return bool
 	 */
 	public function save_content_cache( $content ): bool {
-		// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.RemoveEmptyLineBeforeReturnStatement
+
 		return File::put_contents( $this->get_content_cache_file(), (string) $content );
 	}
 

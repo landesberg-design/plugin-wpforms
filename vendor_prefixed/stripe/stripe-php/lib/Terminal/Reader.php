@@ -35,6 +35,8 @@ class Reader extends \WPForms\Vendor\Stripe\ApiResource
     const DEVICE_TYPE_SIMULATED_WISEPOS_E = 'simulated_wisepos_e';
     const DEVICE_TYPE_STRIPE_M2 = 'stripe_m2';
     const DEVICE_TYPE_VERIFONE_P400 = 'verifone_P400';
+    const STATUS_OFFLINE = 'offline';
+    const STATUS_ONLINE = 'online';
     /**
      * @param null|array $params
      * @param null|array|string $opts

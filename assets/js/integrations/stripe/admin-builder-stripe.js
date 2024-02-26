@@ -181,7 +181,7 @@ const WPFormsStripe = window.WPFormsStripe || ( function( document, window, $ ) 
 		},
 
 		/**
-		 * Determinate is legacy settings is loaded.
+		 * Determine is legacy settings is loaded.
 		 *
 		 * @since 1.8.4
 		 *

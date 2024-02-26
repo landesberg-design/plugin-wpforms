@@ -56,9 +56,7 @@ class UncannyAutomator implements IntegrationInterface {
 	 */
 	public function allow_load() {
 
-		global $wp_version;
-
-		return PHP_VERSION_ID >= 50600 && version_compare( $wp_version, '5.3', '>=' ) && ! function_exists( 'Automator' );
+		return ! function_exists( 'Automator' );
 	}
 
 	/**

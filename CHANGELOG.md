@@ -1,6 +1,96 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.7.1] - 2024-02-22
+### Fixed
+- The form submission was not working if the customer used a snippet for the phone field.
+- The form submission triggered an error on sites with long-term page caching.
+- Page URL smart tag value was incorrect in some cases.
+
+## [1.8.7] - 2024-02-20
+### Added
+- Product Quantity can now be configured for Single Item and Dropdown Items payment fields!
+- A new Gutenberg option for selecting Page Break color.
+- The Announcements block in the Community page.
+- New way to expand the Form Templates subcategories in the templates list sidebar.
+- Support for locations of Form Pages and Conversational Forms.
+- New splash screen outlining notable features and changes in the release.
+- The user can see an overview of what they are purchasing by enabling the Order Summary for the Total payment field.
+- New `{order_summary}` smart tag.
+
+### Changed
+- Improved compatibility with Twenty Twenty-Three theme.
+- Improved plugin activation on WordPress multisite setups with both Lite and Pro versions installed.
+- Improved support of sites hosted in the Azure platform using IIS.
+- Updated DOMPurify library to 3.0.8.
+- Removed `jquery-confirm` library in favor of jQuery.Confirm Reloaded drop-in replacement.
+- Spam protection token is valid now for 3 days instead of 2.
+- Spam protection token is no longer loaded with JS to avoid fails caused by script errors.
+- Storing spam entries is now enabled by default for new forms.
+- Users with limited capabilities are allowed to view the Forms Templates and Addons pages.
+- The Custom Captcha field is now available and the respective addon is no longer needed.
+- Updated `intl-tel-input` library to v19.2.16.
+- Updated `tijsverkoyen/css-to-inline-style` library to v2.2.7.
+- Updated `symphony/polyfill-iconv` library to v1.19.0.
+- Updated `symphony/polyfill-mbstring` library to v1.19.0.
+- Updated `woocommerce/action-scheduler` library to v3.7.1.
+- Updated `stripe/stripe-php` library to v13.9.0.
+
+### Fixed
+- Some background actions could fail if triggered by WP-CLI via server cron.
+- Checkbox fields with Dynamic Choices were exported incorrectly if the labels were previously modified.
+- Items of the unordered list in the Entry Note had no bullets.
+- Limit Length validation was working incorrectly for the Paragraph Text field if the field display was managed by Conditional Logic.
+- Fatal error may occur in rare cases during migrations if they were triggered manually.
+- Read-only Number fields should not display spin buttons.
+- The File Upload field was incorrectly displayed when placed within the Layout field.
+- The Icons Choices field with a Large size was not centered in the Block Editor and Elementor.
+- Rich Text field menu elements were visible through the Phone field's dropdown menu.
+- Two messages appeared when clicking on the reCAPTCHA field after searching the fields in the Builder.
+- Tables in emails were visually broken on mobile phones when the Compact email template was used.
+- A form with a long title expanded the form selector dropdown in the Block Editor.
+- The entry modification date was presented with a doubled timezone offset.
+- Some payment-related elements were aligned to the left when a right-to-left language was used.
+- Rich Text was displayed incorrectly when using Elementor after the Block Editor.
+- The long field names were breaking the Entries List Table layout.
+- CSS Styles were not applied if Global Colors were already selected in Elementor Builder.
+- Signature field background color was incorrect in the Block Editor with Modern markup.
+- Payment method details were not stored for Stripe renewals.
+- In some cases, transients were not deleted on entry deletion.
+- The template page had style issues in the German language.
+- The Elementor popup preview had broken WPForms styles.
+- Forcing the license key refresh worked with significant delay due to caching.
+- In some situations, payment amounts were improperly sanitized.
+- Some modals across the admin area were not responsive and did not fit on smaller screen sizes.
+- Currency symbol could wrap into the next line on the Entries Overview page.
+- Templates' cache wasn't updated after the plugin update.
+- RTL support for WPForms Settings page.
+- RTL support for the Form Builder.
+- Some frontend fields were improperly rendered for RTL.
+- The user interface had different other issues when RTL language was in use.
+- The Form Builder settings screen had multiple visual issues when RTL language was used.
+- The PayPal button was overlapped by modern Dropdown items.
+- AJAX calls didn't work on servers with empty `$_SERVER['HTTP_REFERER']` value.
+- PHP warning was thrown in rare cases when using a certain template with conditional logic and Save and Resume functionality.
+- Improved Entries overview page display on mobile devices.
+- Improved Forms overview page display on mobile devices.
+- Improved Tools pages display on mobile devices.
+- Custom Captcha settings were duplicated on the Form Builder when the field was added through the Settings > Spam and Security screen.
+- Jetpack has been adding its custom buttons to the Content Field editor.
+- Localization issues were present on the Get Started screen.
+- Selected values were not displayed on the entry view and print pages if custom values were enabled via `wpforms_fields_show_options_setting` filter.
+- Rich Text field was not rendered properly in the Elementor popup.
+- Subscriptions made by the Stripe Link payment method before 1.8.6.
+- Some non-optimized MySQL requests locked the database for seconds on huge sites with thousands of tables.
+- The Appearance of multiple dropdown values was incorrect.
+- Some information was missing if Smart Tags were processed in the background via cron.
+- The recent Chrome version for Windows was not displaying the custom scrollbars correctly.
+- Payment fields were missing from the search filter on the Entries Export.
+- `wpforms_plaintext_field_value` filter was unavailable since 1.8.5 version.
+- Images inside the Content field were incorrectly overlapping other fields in the Single Entry Page.
+- Date Range filter for Entries Export could stop working after resetting the filter if the previous search returned no results.
+- The HTML field had incorrect spacing in the Single Entry Page.
+
 ## [1.8.6.4] - 2024-01-31
 ### Fixed
 - Term notice was removed under the Stripe Credit Card field when Payment Elements were used.

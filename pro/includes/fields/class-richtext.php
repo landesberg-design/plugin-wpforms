@@ -473,8 +473,9 @@ class WPForms_Field_Richtext extends WPForms_Field {
 
 		// Make sure that the "editor.css" style is not dequeued by the Divi builder.
 		if ( ! wp_style_is( 'editor-buttons' ) ) {
+			// Added "wpforms" prefix to the handle to avoid conflicts between the Gutenberg and Elementor #9064.
 			wp_enqueue_style(
-				'editor-buttons',
+				'wpforms-editor-buttons',
 				includes_url( "css/editor{$min}.css" ),
 				[ 'dashicons' ]
 			);
@@ -538,7 +539,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 
 		wp_enqueue_script(
 			'wpforms-richtext-field',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/fields/richtext{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/richtext{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
 			true
@@ -1526,7 +1527,6 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		$version = 'ver=' . get_bloginfo( 'version' );
 		$min     = wpforms_get_min_suffix();
 
-		$strings['richtext_add_media_button']   = version_compare( get_bloginfo( 'version' ), '5.0', '<' );
 		$strings['entry_preview_iframe_styles'] = [
 			esc_url( includes_url( "js/tinymce/skins/lightgray/content.min.css?{$version}" ) ),
 			esc_url( includes_url( "css/dashicons{$min}.css?{$version}" ) ),

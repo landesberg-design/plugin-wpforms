@@ -47,17 +47,12 @@ class DefaultContent implements IntegrationInterface {
 	 */
 	public function modify_starter_content( $content, $config ) {
 
-		global $wp_version;
-
 		if ( ! isset( $content['posts']['contact'] ) ) {
 			return $content;
 		}
 
-		// Use Paragraph blocks for WP 5.0+.
-		$format = version_compare( $wp_version, '5.0', '>=' ) ? "<!-- wp:paragraph -->\n<p>%s</p>\n<!-- /wp:paragraph -->" : '<p>%s</p>';
-
 		$content['posts']['contact']['post_content'] .= sprintf(
-			$format,
+			"<!-- wp:paragraph -->\n<p>%s</p>\n<!-- /wp:paragraph -->",
 			wp_kses(
 				sprintf( /* translators: %s - forms overview page URL. */
 					_x( 'Create your <a href="%s" target="_blank" rel="noopener noreferrer">contact form</a> with WPForms in minutes.', 'Theme starter content', 'wpforms-lite' ),

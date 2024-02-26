@@ -110,9 +110,6 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		// Form frontend CSS.
 		add_action( 'wpforms_frontend_css', [ $this, 'frontend_css' ] );
 
-		// Field styles for Gutenberg.
-		add_action( 'enqueue_block_editor_assets', [ $this, 'gutenberg_enqueues' ] );
-
 		// Field styles for Gutenberg. Register after wpforms-pro-integrations.
 		add_action( 'init', [ $this, 'register_gutenberg_styles' ], 20 );
 
@@ -199,7 +196,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 			wp_enqueue_script(
 				'wpforms-file-upload',
-				WPFORMS_PLUGIN_URL . "assets/pro/js/wpforms-file-upload.es5{$min}.js",
+				WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/file-upload.es5{$min}.js",
 				[ 'wpforms', 'wp-util', self::HANDLE ],
 				WPFORMS_VERSION,
 				true
@@ -307,12 +304,11 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 * Load enqueues for the Gutenberg editor.
 	 *
 	 * @since 1.5.6
+	 * @deprecated 1.8.7
 	 */
 	public function gutenberg_enqueues() {
 
-		if ( version_compare( get_bloginfo( 'version' ), '5.5', '>=' ) ) {
-			return;
-		}
+		_deprecated_function( __METHOD__, '1.8.7 of the WPForms plugin' );
 
 		wp_enqueue_style( self::HANDLE );
 	}

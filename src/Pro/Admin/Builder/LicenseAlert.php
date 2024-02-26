@@ -160,8 +160,8 @@ class LicenseAlert {
 			);
 			$data['heading']              = __( 'Heads up! A WPForms license key is required.', 'wpforms' );
 			$data['description']          = __( 'To create more forms, please verify your WPForms license.', 'wpforms' );
-			$data['button-primary']       = __( 'Enter license key', 'wpforms' );
-			$data['button-secondary']     = __( 'Get WPForms pro', 'wpforms' );
+			$data['button-primary']       = __( 'Enter License Key', 'wpforms' );
+			$data['button-secondary']     = __( 'Get WPForms Pro', 'wpforms' );
 			$data['button-x']             = __( 'Close', 'wpforms' );
 			$data['button-x-class']       = 'close';
 		}

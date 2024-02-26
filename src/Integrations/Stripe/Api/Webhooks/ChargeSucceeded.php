@@ -2,6 +2,7 @@
 
 namespace WPForms\Integrations\Stripe\Api\Webhooks;
 
+use WPForms\Db\Payments\Queries;
 use WPForms\Integrations\Stripe\Helpers;
 use RuntimeException;
 
@@ -28,7 +29,24 @@ class ChargeSucceeded extends Base {
 		$this->set_payment();
 
 		if ( ! $this->db_payment ) {
+
+			// Handle a case when charge.succeeded was sent before invoice.payment_succeeded to update a payment method details.
+			if ( ! empty( $this->data->invoice ) ) {
+				$db_renewal = ( new Queries() )->get_renewal_by_invoice_id( $this->data->invoice );
+
+				if ( is_null( $db_renewal ) || empty( $this->data->payment_method_details ) ) {
+					return false;
+				}
+
+				$this->update_payment_method_details( $db_renewal->id, $this->data->payment_method_details );
+			}
+
 			return false;
+		}
+
+		// Update payment method details to keep them up to date.
+		if ( ! empty( $this->data->payment_method_details ) ) {
+			$this->update_payment_method_details( $this->db_payment->id, $this->data->payment_method_details );
 		}
 
 		if ( $this->db_payment->status !== 'processed' ) {

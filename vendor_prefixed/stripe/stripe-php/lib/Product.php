@@ -55,6 +55,6 @@ class Product extends ApiResource
     public static function search($params = null, $opts = null)
     {
         $url = '/v1/products/search';
-        return self::_searchResource($url, $params, $opts);
+        return static::_requestPage($url, \WPForms\Vendor\Stripe\SearchResult::class, $params, $opts);
     }
 }

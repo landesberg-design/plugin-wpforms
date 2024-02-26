@@ -65,7 +65,7 @@ class WPForms_Builder_Panel_Settings extends WPForms_Builder_Panel {
 
 		wp_enqueue_script(
 			'wpforms-builder-settings',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/settings{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/settings{$min}.js",
 			[ 'wpforms-builder' ],
 			WPFORMS_VERSION,
 			true

@@ -139,7 +139,7 @@ class TemplateSingleCache extends CacheBase {
 
 		$data = parent::get();
 
-		if ( parent::$updated === false ) {
+		if ( ! $this->updated ) {
 			$this->update_usage_tracking();
 		}
 
@@ -196,7 +196,7 @@ class TemplateSingleCache extends CacheBase {
 	 *
 	 * @return array Prepared data for caching.
 	 */
-	protected function prepare_cache_data( $data ) {
+	protected function prepare_cache_data( $data ): array {
 
 		if (
 			empty( $data ) ||

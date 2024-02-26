@@ -41,7 +41,7 @@ class ContextMenu {
 
 		wp_enqueue_script(
 			'wpforms-builder-context-menu',
-			WPFORMS_PLUGIN_URL . "assets/js/components/admin/builder/context-menu{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/js/admin/builder/context-menu{$min}.js",
 			[ 'wpforms-builder' ],
 			WPFORMS_VERSION,
 			true

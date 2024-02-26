@@ -148,7 +148,7 @@ const WPFormsStripeModernBuilder = window.WPFormsStripeModernBuilder || ( functi
 		},
 
 		/**
-		 * Determinate is legacy settings is loaded.
+		 * Determine is legacy settings is loaded.
 		 *
 		 * @since 1.8.4
 		 *
@@ -195,7 +195,7 @@ const WPFormsStripeModernBuilder = window.WPFormsStripeModernBuilder || ( functi
 		},
 
 		/**
-		 * Determinate if field type is Stripe credit card.
+		 * Determine if field type is Stripe credit card.
 		 *
 		 * @since 1.8.4
 		 *

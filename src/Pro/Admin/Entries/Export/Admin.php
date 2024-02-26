@@ -374,13 +374,14 @@ class Admin {
 		$search           = $this->export->data['get_args']['search'];
 		$form_data        = $this->export->data['form_data'];
 		$advanced_options = Helpers::get_search_fields_advanced_options();
+		$form_fields      = $form_data['fields'] ?? [];
+		$payment_fields   = $form_data['payment_fields'] ?? [];
 		?>
 		<select name="search[field]" class="wpforms-search-box-field" id="wpforms-tools-entries-export-options-search-field">
-			<optgroup label="<?php esc_attr_e( 'Form fields', 'wpforms' ); ?>">
-				<option value="any" <?php selected( 'any', $search['field'], true ); ?>><?php esc_html_e( 'Any form field', 'wpforms' ); ?></option>
+			<optgroup label="<?php esc_attr_e( 'Form fields', 'wpforms' ); ?>" data-type="form-fields">
+				<option value="any" <?php selected( 'any', $search['field'] ); ?>><?php esc_html_e( 'Any form field', 'wpforms' ); ?></option>
 				<?php
-				if ( ! empty( $form_data['fields'] ) ) {
-					foreach ( $form_data['fields'] as $id => $field ) {
+					foreach ( $form_fields as $id => $field ) {
 						if ( in_array( $field['type'], $this->export->configuration['disallowed_fields'], true ) ) {
 							continue;
 						}
@@ -398,7 +399,33 @@ class Admin {
 							esc_html( $name )
 						);
 					}
-				}
+				?>
+			</optgroup>
+			<optgroup label="<?php esc_attr_e( 'Payment fields', 'wpforms' ); ?>" data-type="payment-fields">
+				<?php
+					// If no payment fields found, display a disabled option with placeholder text.
+					if ( empty( $payment_fields ) ) {
+						printf(
+							'<option value="" disabled>%s</option>',
+							esc_html__( 'No payment fields found', 'wpforms' )
+						);
+					}
+
+					foreach ( $payment_fields as $id => $field ) {
+						$name = ! empty( $field['label'] ) ?
+							wp_strip_all_tags( $field['label'] ) :
+							sprintf( /* translators: %d - field ID. */
+								esc_html__( 'Field #%d', 'wpforms' ),
+								(int) $id
+							);
+
+						printf(
+							'<option value="%d" %s>%s</option>',
+							(int) $id,
+							esc_attr( selected( $id, $search['field'], false ) ),
+							esc_html( $name )
+						);
+					}
 				?>
 			</optgroup>
 			<?php if ( ! empty( $advanced_options ) ) : ?>
@@ -465,7 +492,7 @@ class Admin {
 
 		wp_register_script(
 			'wpforms-tools-entries-export',
-			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/tools-entries-export{$min}.js",
+			WPFORMS_PLUGIN_URL . "assets/pro/js/admin/entries/tools-entries-export{$min}.js",
 			[ 'jquery', 'wpforms-flatpickr' ],
 			WPFORMS_VERSION,
 			true

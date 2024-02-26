@@ -6,6 +6,7 @@ use stdClass;
 use Language_Pack_Upgrader;
 use Automatic_Upgrader_Skin;
 use WPForms\Integrations\IntegrationInterface;
+use WPForms\Admin\Addons\AddonsCache;
 
 /**
  * Main Translations library.
@@ -156,10 +157,26 @@ class Translations implements IntegrationInterface {
 	private function is_wpforms_plugin( $slug ) {
 
 		if ( empty( $this->addons ) ) {
-			$this->addons = wpforms()->get( 'addons_cache' )->get();
+			$this->addons = $this->get_addons();
 		}
 
 		return array_key_exists( $slug, $this->addons ) || $slug === 'wpforms';
+	}
+
+	/**
+	 * Get a list of all WPForms addons.
+	 *
+	 * @since 1.8.7
+	 *
+	 * @return array List of addons.
+	 */
+	private function get_addons(): array {
+
+		$addons = new AddonsCache();
+
+		$addons->init();
+
+		return $addons->get();
 	}
 
 	/**
