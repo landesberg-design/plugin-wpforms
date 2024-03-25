@@ -66,7 +66,9 @@ class SplashScreen {
 
 			$this->splash_data = wp_parse_args( $cached_data, $default_data );
 
-			$this->update_splash_data_version( WPFORMS_VERSION );
+			$version = $this->get_major_version( WPFORMS_VERSION );
+
+			$this->update_splash_data_version( $version );
 		}
 	}
 
@@ -213,7 +215,13 @@ class SplashScreen {
 	 */
 	public function add_splash_link( $content ): string {
 
-		if ( $this->get_splash_data_version() !== WPFORMS_VERSION || $this->is_splash_empty() ) {
+		// Return if splash data is empty.
+		if ( $this->is_splash_empty() ) {
+			return (string) $content;
+		}
+
+		// Return if splash data version is not the same as current plugin major version.
+		if ( $this->get_splash_data_version() !== $this->get_major_version( WPFORMS_VERSION ) ) {
 			return (string) $content;
 		}
 
@@ -256,7 +264,7 @@ class SplashScreen {
 
 		$splash_version = $this->get_latest_splash_version();
 
-		// Allow if splash version not the same as current plugin version.
-		return $splash_version !== WPFORMS_VERSION;
+		// Allow if splash version not the same as current plugin major version.
+		return $splash_version !== $this->get_major_version( WPFORMS_VERSION );
 	}
 }

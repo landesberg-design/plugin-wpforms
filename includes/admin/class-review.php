@@ -109,15 +109,7 @@ class WPForms_Review {
 		ob_start();
 
 		// We have a candidate! Output a review message.
-		?>
-		<p><?php esc_html_e( 'Hey, I noticed you collected over 50 entries from WPForms - that’s awesome! Could you please do me a BIG favor and give it a 5-star rating on WordPress to help us spread the word and boost our motivation?', 'wpforms-lite' ); ?></p>
-		<p><strong><?php echo wp_kses( __( '~ Syed Balkhi<br>Co-Founder of WPForms', 'wpforms-lite' ), [ 'br' => [] ] ); ?></strong></p>
-		<p>
-			<a href="https://wordpress.org/support/plugin/wpforms-lite/reviews/?filter=5#new-post" class="wpforms-notice-dismiss wpforms-review-out" target="_blank" rel="noopener"><?php esc_html_e( 'Ok, you deserve it', 'wpforms-lite' ); ?></a><br>
-			<a href="#" class="wpforms-notice-dismiss" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Nope, maybe later', 'wpforms-lite' ); ?></a><br>
-			<a href="#" class="wpforms-notice-dismiss" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'I already did', 'wpforms-lite' ); ?></a>
-		</p>
-		<?php
+		$this->review_content();
 
 		\WPForms\Admin\Notice::info(
 			ob_get_clean(),
@@ -172,15 +164,7 @@ class WPForms_Review {
 		ob_start();
 
 		// We have a candidate! Output a review message.
-		?>
-		<p><?php esc_html_e( 'Hey, I noticed you created a contact form with WPForms - that’s awesome! Could you please do me a BIG favor and give it a 5-star rating on WordPress to help us spread the word and boost our motivation?', 'wpforms-lite' ); ?></p>
-		<p><strong><?php echo wp_kses( __( '~ Syed Balkhi<br>Co-Founder of WPForms', 'wpforms-lite' ), [ 'br' => [] ] ); ?></strong></p>
-		<p>
-			<a href="https://wordpress.org/support/plugin/wpforms-lite/reviews/?filter=5#new-post" class="wpforms-notice-dismiss wpforms-review-out" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Ok, you deserve it', 'wpforms-lite' ); ?></a><br>
-			<a href="#" class="wpforms-notice-dismiss" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Nope, maybe later', 'wpforms-lite' ); ?></a><br>
-			<a href="#" class="wpforms-notice-dismiss" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'I already did', 'wpforms-lite' ); ?></a>
-		</p>
-		<?php
+		$this->review_content();
 
 		\WPForms\Admin\Notice::info(
 			ob_get_clean(),
@@ -191,6 +175,22 @@ class WPForms_Review {
 				'class'   => 'wpforms-review-notice',
 			]
 		);
+	}
+
+	/**
+	 * Output the review content.
+	 *
+	 * @since 1.8.7.2
+	 */
+	private function review_content() {
+		?>
+		<p><?php esc_html_e( 'Hey, there! It looks like you enjoy creating forms with WPForms. Would you do us a favor and take a few seconds to give us a 5-star review? We’d love to hear from you.', 'wpforms-lite' ); ?></p>
+		<p>
+			<a href="https://wordpress.org/support/plugin/wpforms-lite/reviews/?filter=5#new-post" class="wpforms-notice-dismiss wpforms-review-out" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Ok, you deserve it', 'wpforms-lite' ); ?></a><br>
+			<a href="#" class="wpforms-notice-dismiss" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Nope, maybe later', 'wpforms-lite' ); ?></a><br>
+			<a href="#" class="wpforms-notice-dismiss" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'I already did', 'wpforms-lite' ); ?></a>
+		</p>
+		<?php
 	}
 
 	/**

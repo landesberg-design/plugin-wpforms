@@ -36,18 +36,6 @@ abstract class Widget {
 	}
 
 	/**
-	 * Check if need to show welcome block.
-	 *
-	 * @since 1.8.7
-	 */
-	public function show_welcome_block(): bool {
-
-		$splash_version = get_option( 'wpforms_splash_data_version', '' );
-
-		return $splash_version === WPFORMS_VERSION;
-	}
-
-	/**
 	 * Get/set a widget meta.
 	 *
 	 * @since 1.7.4

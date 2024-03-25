@@ -80,7 +80,9 @@ class SplashUpgrader {
 			return;
 		}
 
-		// Store updated plugin version.
+		$version = $this->get_major_version( $version );
+
+		// Store updated plugin major version.
 		$this->update_splash_data_version( $version );
 
 		// Force update splash data cache.

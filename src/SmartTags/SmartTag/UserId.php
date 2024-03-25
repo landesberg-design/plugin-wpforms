@@ -2,6 +2,8 @@
 
 namespace WPForms\SmartTags\SmartTag;
 
+use WP_User;
+
 /**
  * Class UserId.
  *
@@ -22,8 +24,12 @@ class UserId extends SmartTag {
 	 */
 	public function get_value( $form_data, $fields = [], $entry_id = '' ) {
 
-		$user = $this->get_user( $entry_id );
+		$current_user = $this->get_user( $entry_id );
 
-		return absint( $user->ID ) ?? '';
+		if ( ! $current_user instanceof WP_User ) {
+			return '';
+		}
+
+		return $current_user->exists() ? $current_user->ID : '';
 	}
 }

@@ -47,7 +47,7 @@ trait SplashTrait {
 	 */
 	private function update_splash_version() {
 
-		update_option( 'wpforms_splash_version', WPFORMS_VERSION );
+		update_option( 'wpforms_splash_version', $this->get_major_version( WPFORMS_VERSION ) );
 	}
 
 	/**
@@ -168,5 +168,27 @@ trait SplashTrait {
 		}
 
 		return $layout;
+	}
+
+	/**
+	 * Get major version.
+	 *
+	 * @since 1.8.7.2
+	 *
+	 * @param string $version Version.
+	 *
+	 * @return string Major version.
+	 */
+	private function get_major_version( $version ): string {
+
+		// Get version parts.
+		$version_parts = explode( '.', $version );
+
+		// If version has more than 3 parts - use only first 3. Get block data only for major versions.
+		if ( count( $version_parts ) > 3 ) {
+			$version = implode( '.', array_slice( $version_parts, 0, 3 ) );
+		}
+
+		return $version;
 	}
 }

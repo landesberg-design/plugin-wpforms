@@ -262,7 +262,7 @@ class DashboardWidget extends Widget {
 
 		$hide_welcome = $this->widget_meta( 'get', 'hide_welcome_block' );
 
-		if ( ! $hide_welcome && $this->show_welcome_block() ) {
+		if ( ! $hide_welcome ) {
 			$this->welcome_block_html();
 		}
 
@@ -632,7 +632,7 @@ class DashboardWidget extends Widget {
 		);
 		?>
 
-		<div class="wpforms-dash-widget-recommended-plugin-block">
+		<div class="wpforms-dash-widget-block wpforms-dash-widget-recommended-plugin-block">
 			<span class="wpforms-dash-widget-recommended-plugin">
 				<span class="recommended"><?php esc_html_e( 'Recommended Plugin:', 'wpforms' ); ?></span>
 				<strong><?php echo esc_html( $plugin['name'] ); ?></strong>
@@ -645,7 +645,7 @@ class DashboardWidget extends Widget {
 					<a href="<?php echo esc_url( $plugin['more'] ); ?>?utm_source=wpformsplugin&utm_medium=link&utm_campaign=wpformsdashboardwidget"><?php esc_html_e( 'Learn More', 'wpforms' ); ?></a>
 				</span>
 			</span>
-			<button type="button" id="wpforms-dash-widget-dismiss-recommended-plugin-block" class="wpforms-dash-widget-dismiss-icon" title="<?php esc_html_e( 'Dismiss recommended plugin', 'wpforms' ); ?>">
+			<button type="button" id="wpforms-dash-widget-dismiss-recommended-plugin-block" class="wpforms-dash-widget-dismiss-icon" title="<?php esc_html_e( 'Dismiss recommended plugin', 'wpforms' ); ?>" data-field="hide_recommended_block">
 				<span class="dashicons dashicons-no-alt"></span>
 			</button>
 		</div>

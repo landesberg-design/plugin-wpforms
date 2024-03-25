@@ -112,7 +112,9 @@ class SplashCache extends CacheBase {
 	 */
 	private function prepare_blocks( array $data ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$version        = $this->get_splash_data_version();
+		$version = $this->get_splash_data_version();
+		$version = $this->get_major_version( $version );
+
 		$latest_version = $this->get_latest_splash_version();
 
 		// If latest version is bigger than current or empty - set latest version to current.
@@ -146,9 +148,6 @@ class SplashCache extends CacheBase {
 
 				// Set layout based on image type.
 				$block['layout'] = $this->get_block_layout( $block['img'] );
-
-				// Set image position based on index.
-				$block['position'] = $index % 2 === 0 ? 'left' : 'right';
 
 				unset( $block['btns'] );
 

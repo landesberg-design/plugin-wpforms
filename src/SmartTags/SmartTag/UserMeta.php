@@ -2,6 +2,8 @@
 
 namespace WPForms\SmartTags\SmartTag;
 
+use WP_User;
+
 /**
  * Class UserMeta.
  *
@@ -28,16 +30,15 @@ class UserMeta extends SmartTag {
 			return '';
 		}
 
-		$user    = $this->get_user( $entry_id );
-		$user_id = $user->ID ?? 0;
+		$current_user = $this->get_user( $entry_id );
 
-		if ( ! $user_id ) {
+		if ( ! $current_user instanceof WP_User ) {
 			return '';
 		}
 
 		return wp_kses_post(
 			get_user_meta(
-				$user_id,
+				$current_user->ID,
 				sanitize_text_field( $attributes['key'] ),
 				true
 			)

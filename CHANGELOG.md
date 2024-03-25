@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.7.2] - 2024-02-29
+### Changed
+- "What's New" modal should be displayed based on the major version of the plugin.
+- Improved Akismet integration efficiency.
+
+### Fixed
+- Antispam token was passed as a simple form field, not protected from spam bots.
+- PHP warning was thrown in case of anonymous form submission when User ID smart tag was used.
+- Image positioning in the "What's New" blocks wasn't always correct.
+- The recommended plugin block in the Dashboard widget could not be dismissed.
+- Modal windows were not displayed on small screens.
+- The animation for opening the "What's New" modal worked improperly when the modal had small content.
+- The background was not entirely dimmed when scrolling the "What's New" popup.
+
 ## [1.8.7.1] - 2024-02-22
 ### Fixed
 - The form submission was not working if the customer used a snippet for the phone field.

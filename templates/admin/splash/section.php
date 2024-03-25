@@ -10,7 +10,6 @@
  * @var string $new Is new feature.
  * @var array $buttons Section buttons.
  * @var string $layout Section layout.
- * @var string $position Section image position.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,7 +19,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 $classes = [
 	'wpforms-splash-section',
 	'wpforms-splash-section-' . $layout,
-	'wpforms-splash-section-image-position-' . $position,
 ];
 ?>
 

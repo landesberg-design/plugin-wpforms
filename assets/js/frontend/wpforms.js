@@ -591,7 +591,11 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 										altText = $submit.data( 'alt-text' ),
 										recaptchaID = $submit.get( 0 ).recaptchaID;
 
-									app.addTokenHiddenInput( $form );
+									if ( $form.data( 'token' ) && 0 === $( '.wpforms-token', $form ).length ) {
+										$( '<input type="hidden" class="wpforms-token" name="wpforms[token]" />' )
+											.val( $form.data( 'token' ) )
+											.appendTo( $form );
+									}
 
 									$form.find( '#wpforms-field_recaptcha-error' ).remove();
 									$submit.prop( 'disabled', true );
@@ -3443,26 +3447,6 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		isModernMarkupEnabled: function() {
 
 			return !! wpforms_settings.isModernMarkupEnabled;
-		},
-
-		/**
-		 * Add anti-spam token hidden field to the form.
-		 *
-		 * @since 1.8.7
-		 *
-		 * @param {jQuery} $form Current form element.
-		 */
-		addTokenHiddenInput( $form ) {
-			if (
-				! $form.data( 'token' ) ||
-				$( '.wpforms-token', $form ).length > 0
-			) {
-				return;
-			}
-
-			$( '<input type="hidden" class="wpforms-token" name="wpforms[token]" />' )
-				.val( $form.data( 'token' ) )
-				.appendTo( $form );
 		},
 	};
 

@@ -68,6 +68,9 @@ const WPSplash = window.WPSplash || ( function( document, window, $ ) {
 				backgroundDismiss: true,
 				offsetTop: 50,
 				offsetBottom: 50,
+				animation: 'opacity',
+				closeAnimation: 'opacity',
+				animateFromElement: false,
 				onOpenBefore() {
 					$( 'body' ).addClass( 'wpforms-splash-modal' );
 					$( '.wpforms-challenge-popup-container' ).addClass( 'wpforms-invisible' );
