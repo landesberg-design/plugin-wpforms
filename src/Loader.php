@@ -68,6 +68,10 @@ class Loader {
 			'name' => 'API',
 			'id'   => 'api',
 		];
+
+		$this->classes[] = [
+			'name' => 'Emails\Summaries',
+		];
 	}
 
 	/**
@@ -204,6 +208,14 @@ class Loader {
 				'hook' => 'admin_init',
 			],
 			[
+				'name' => 'Admin\Forms\UserTemplates',
+				'id'   => 'user_templates',
+			],
+			[
+				'name' => 'Admin\Forms\Page',
+				'id'   => 'forms_overview',
+			],
+			[
 				'name' => 'Admin\Challenge',
 				'id'   => 'challenge',
 			],
@@ -291,6 +303,7 @@ class Loader {
 			[
 				'name' => 'Admin\Splash\SplashCache',
 				'id'   => 'splash_cache',
+				'hook' => 'plugins_loaded',
 			],
 			[
 				'name' => 'Admin\Splash\SplashUpgrader',
@@ -376,10 +389,6 @@ class Loader {
 		array_push(
 			$this->classes,
 			[
-				'name' => 'Admin\Forms\Page',
-				'id'   => 'forms_overview',
-			],
-			[
 				'name' => 'Admin\Forms\Ajax\Columns',
 				'id'   => 'forms_columns_ajax',
 			],
@@ -426,7 +435,7 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\Entries\Overview\Page',
-				'hook' => 'admin_init',
+				'id'   => 'entries_overview',
 			],
 			[
 				'name'      => 'Admin\Entries\Overview\Ajax',
@@ -487,6 +496,10 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\Builder\AntiSpam',
+				'hook' => 'wpforms_builder_init',
+			],
+			[
+				'name' => 'Admin\Builder\Settings\Themes',
 				'hook' => 'wpforms_builder_init',
 			],
 			[
@@ -639,7 +652,17 @@ class Loader {
 	private function populate_education() {
 
 		// Kill switch.
-		if ( ! (bool) apply_filters( 'wpforms_admin_education', true ) ) {
+
+		/**
+		 * Filters admin education status.
+		 *
+		 * @since 1.6.6
+		 *
+		 * @param bool $status Current admin education status.
+		 *
+		 * @return bool
+		 */
+		if ( ! apply_filters( 'wpforms_admin_education', true ) ) { // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 			return;
 		}
 
@@ -669,6 +692,11 @@ class Loader {
 			[
 				'name' => 'Admin\Education\Admin\EditPost',
 				'hook' => 'load-post.php',
+			],
+			[
+				'name'     => 'Admin\Education\Pointers\Payment',
+				'hook'     => 'admin_init',
+				'priority' => 20,
 			]
 		);
 

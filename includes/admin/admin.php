@@ -233,6 +233,7 @@ function wpforms_admin_scripts() {
 		'form_delete_n_confirm'           => esc_html__( 'Are you sure you want to delete the selected forms and all their entries?', 'wpforms-lite' ),
 		'form_delete_all_confirm'         => esc_html__( 'Are you sure you want to delete ALL the forms in the trash and all their entries?', 'wpforms-lite' ),
 		'form_duplicate_confirm'          => esc_html__( 'Are you sure you want to duplicate this form?', 'wpforms-lite' ),
+		'template_duplicate_confirm'      => esc_html__( 'Are you sure you want to duplicate this template?', 'wpforms-lite' ),
 		'heads_up'                        => esc_html__( 'Heads up!', 'wpforms-lite' ),
 		'importer_forms_required'         => esc_html__( 'Please select at least one form to import.', 'wpforms-lite' ),
 		'isPro'                           => wpforms()->is_pro(),
@@ -297,8 +298,8 @@ function wpforms_admin_scripts() {
 		'something_went_wrong'            => esc_html__( 'Something went wrong', 'wpforms-lite' ),
 		'success'                         => esc_html__( 'Success', 'wpforms-lite' ),
 		'loading'                         => esc_html__( 'Loading...', 'wpforms-lite' ),
-		'use_simple_contact_form'         => esc_html__( 'Use Simple Contact Form Template', 'wpforms-lite' ),
-		'error_select_template'           => esc_html__( 'Please close the form builder and try again. If the error persists, contact our support team.', 'wpforms-lite' ),
+		'use_default_template'            => esc_html__( 'Use Default Template', 'wpforms-lite' ),
+		'error_select_template'           => esc_html__( 'Something went wrong while applying the form template. Please try again. If the error persists, contact our support team.', 'wpforms-lite' ),
 		'try_again'                       => sprintf(
 			wp_kses( /* translators: %s - link to WPForms.com docs page. */
 				__( 'Something went wrong. Please try again, and if the problem persists, <a href="%1$s" target="_blank" rel="noopener noreferrer">contact our support team</a>.', 'wpforms-lite' ),

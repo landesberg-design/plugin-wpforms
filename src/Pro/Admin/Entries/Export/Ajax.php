@@ -239,6 +239,15 @@ class Ajax {
 			]
 		);
 
+		/**
+		 * Filter the form data before exporting.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array $form_data Form data.
+		 */
+		$form_data = apply_filters( 'wpforms_pro_admin_entries_export_ajax_form_data', $form_data );
+
 		// Prepare get entries args for further steps.
 		unset( $db_args['select'] );
 

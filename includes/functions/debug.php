@@ -67,10 +67,10 @@ function wpforms_debug_data( $data, $echo = true ) {
 				box-sizing: border-box;
 			}
 			.postbox .wpforms-debug {
-				padding-top: 12px;
+				padding: 6px;
 			}
-			.postbox .wpforms-debug:first-of-type {
-				padding-top: 6px;
+			.postbox .wpforms-debug:not(:first-of-type) {
+				padding-top: 0;
 			}
 			.postbox .wpforms-debug textarea {
 				margin-top: 0 !important;

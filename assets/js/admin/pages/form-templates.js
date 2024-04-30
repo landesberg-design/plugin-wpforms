@@ -60,17 +60,22 @@ var WPFormsAdminFormTemplates = window.WPFormsAdminFormTemplates || ( function( 
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {object} e Event object.
+		 * @param {Object} event Event object.
 		 */
-		selectTemplate: function( e ) {
+		selectTemplate( event ) {
+			event.preventDefault();
 
-			e.preventDefault();
-
-			let $button = $( this ),
-				spinner = '<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
+			const $button = $( this );
+			const spinner = '<i class="wpforms-loading-spinner wpforms-loading-white wpforms-loading-inline"></i>';
 
 			// Don't do anything for templates that trigger education modal OR addons-modal.
 			if ( $button.hasClass( 'education-modal' ) ) {
+				return;
+			}
+
+			// User templates are applied differently for new forms.
+			if ( $button.data( 'template' ).match( /wpforms-user-template-(\d+)/ ) && $button.data( 'create-url' ) ) {
+				window.location.href = $button.data( 'create-url' );
 				return;
 			}
 
@@ -150,28 +155,24 @@ var WPFormsAdminFormTemplates = window.WPFormsAdminFormTemplates || ( function( 
 		 * @param {string} errorMessage Error message.
 		 * @param {string} formName     Name of the form.
 		 */
-		selectTemplateProcessInvalidTemplateError: function( errorMessage, formName ) {
-
+		selectTemplateProcessInvalidTemplateError( errorMessage, formName ) {
 			$.alert( {
 				title: wpforms_admin.heads_up,
 				content: errorMessage,
 				icon: 'fa fa-exclamation-circle',
 				type: 'orange',
-				boxWidth: '600px',
 				buttons: {
 					confirm: {
-						text: wpforms_admin.use_simple_contact_form,
+						text: wpforms_admin.use_default_template,
 						btnClass: 'btn-confirm',
 						keys: [ 'enter' ],
-						action: function() {
-
+						action() {
 							app.selectTemplateProcessAjax( formName, 'simple-contact-form-template' );
 						},
 					},
 					cancel: {
 						text: wpforms_admin.cancel,
-						action: function() {
-
+						action() {
 							WPFormsFormTemplates.selectTemplateCancel();
 						},
 					},
@@ -183,16 +184,14 @@ var WPFormsAdminFormTemplates = window.WPFormsAdminFormTemplates || ( function( 
 		 * Select template AJAX call error modal.
 		 *
 		 * @since 1.7.7
+		 * @since 1.8.8 Replaced error message with error title.
 		 *
-		 * @param {string} error Error message.
+		 * @param {string} errorTitle Error title.
 		 */
-		selectTemplateProcessError: function( error ) {
-
-			var content = error && error.length ? '<p>' + error + '</p>' : '';
-
+		selectTemplateProcessError( errorTitle ) {
 			$.alert( {
-				title: wpforms_admin.heads_up,
-				content: wpforms_admin.error_select_template + content,
+				title: errorTitle,
+				content: wpforms_admin.error_select_template,
 				icon: 'fa fa-exclamation-circle',
 				type: 'orange',
 				buttons: {
@@ -200,8 +199,7 @@ var WPFormsAdminFormTemplates = window.WPFormsAdminFormTemplates || ( function( 
 						text: wpforms_admin.ok,
 						btnClass: 'btn-confirm',
 						keys: [ 'enter' ],
-						action: function() {
-
+						action() {
 							WPFormsFormTemplates.selectTemplateCancel();
 						},
 					},

@@ -1427,7 +1427,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			var hint = document.getElementById( 'wpforms-number-slider-hint-' + fieldID );
 
 			if ( hint ) {
-				hint.innerHTML = wpf.sanitizeHTML( hint.dataset.hint ).replace( '{value}', '<b>' + value + '</b>' );
+				hint.innerHTML = wpf.sanitizeHTML( hint.dataset.hint ).replaceAll( '{value}', '<b>' + value + '</b>' );
 			}
 
 			return this;
@@ -1830,18 +1830,22 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			} );
 
 			// Form field preview clicking.
-			$builder.on( 'click', '.wpforms-field', function( e ) {
-
+			$builder.on( 'click', '.wpforms-field', function( event ) {
 				if ( app.isFieldPreviewActionsDisabled( this ) ) {
 					return;
 				}
 
 				// Allow clicking on the dismiss button inside the field.
-				if ( e.target.classList.contains( 'wpforms-dismiss-button' ) ) {
+				if ( event.target.classList.contains( 'wpforms-dismiss-button' ) ) {
 					return;
 				}
 
-				e.stopPropagation();
+				// Dismiss the main context menu, if it's open.
+				if ( WPForms.Admin.Builder.ContextMenu ) {
+					WPForms.Admin.Builder.ContextMenu.hideMainContextMenu( event );
+				}
+
+				event.stopPropagation();
 
 				app.fieldTabToggle( $( this ).data( 'field-id' ) );
 			} );
@@ -1863,7 +1867,9 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					return;
 				}
 
-				WPForms.Admin.Builder.ContextMenu.hideMenu();
+				if ( WPForms.Admin.Builder.ContextMenu ) {
+					WPForms.Admin.Builder.ContextMenu.hideMenu();
+				}
 
 				app.fieldDelete( $( this ).parent().data( 'field-id' ) );
 			} );
@@ -1878,7 +1884,9 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					return;
 				}
 
-				WPForms.Admin.Builder.ContextMenu.hideMenu();
+				if ( WPForms.Admin.Builder.ContextMenu ) {
+					WPForms.Admin.Builder.ContextMenu.hideMenu();
+				}
 
 				app.fieldDuplicate( $( this ).parent().data( 'field-id' ) );
 			} );
@@ -2511,10 +2519,14 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					$sublabelToggle.addClass( 'wpforms-hidden' );
 				}
 
+				// Hide the label field if it's not a single item.
+				$( `#wpforms-field-option-row-${ id }-price_label` ).toggleClass( 'wpforms-hidden', value !== 'single' );
+
 				// Toggle options based on Single Item "Format".
 				if ( [ 'single', 'user', 'hidden' ].includes( value ) ) {
 					const isUserDefined = value === 'user',
 						isSingle = value === 'single',
+						isHidden = value === 'hidden',
 						isQuantityEnabled = $( '#wpforms-field-option-' + id + '-enable_quantity' ).is( ':checked' ),
 						$minPriceOption = $( '#wpforms-field-option-' + id + '-min_price' ),
 						minPrice = wpf.amountSanitize( $minPriceOption.val() ),
@@ -2522,7 +2534,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						$minPriceOptionRow = $( '#wpforms-field-option-row-' + id + '-min_price' );
 
 					// Toggle Placeholder option.
-					$( '#wpforms-field-option-row-' + id + '-placeholder' ).toggleClass( 'wpforms-hidden', isUserDefined );
+					$( '#wpforms-field-option-row-' + id + '-placeholder' ).toggleClass( 'wpforms-hidden', ! isUserDefined );
 
 					// Toggle Quantity options.
 					$( '#wpforms-field-option-row-' + id + '-enable_quantity' ).toggleClass( 'wpforms-hidden', ! isSingle );
@@ -2536,6 +2548,10 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					$preview.find( '.item-min-price' ).toggleClass( 'wpforms-hidden', isUserDefined && minPrice <= 0 );
 					$preview.toggleClass( 'min-price-warning', ! isValidMinPrice );
 					$preview.find( '.fa-exclamation-triangle' ).toggleClass( 'wpforms-hidden', isValidMinPrice );
+
+					// Toggle the label
+					$( `#wpforms-field-${ id } .item-price-single` ).toggleClass( 'wpforms-hidden', ! isSingle );
+					$( `#wpforms-field-${ id } .item-price-hidden` ).toggleClass( 'wpforms-hidden', ! isHidden );
 				}
 			} );
 
@@ -2819,6 +2835,23 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				}
 
 				$preview.find( '.min-price' ).text( wpf.amountFormatCurrency( amount ) );
+			} );
+
+			// Real-time updates for price label for single item field.
+			$builder.on( 'input', '.wpforms-single-item-price-label-display', function() {
+				const $this = $( this ),
+					value = wpf.sanitizeHTML( $this.val(), '<>' ),
+					id = $this.parent().data( 'field-id' ),
+					$preview = $( `#wpforms-field-${ id }` ),
+					$price = wpf.amountFormatCurrency( $( `#wpforms-field-option-${ id }-price` ).val() );
+
+				if ( ! value ) {
+					$this.val( '{price}' );
+					$preview.find( '.price-label' ).html( `<span class="price"> ${ $price }  </span>` );
+					return;
+				}
+
+				$preview.find( '.price-label' ).html( value.replaceAll( '{price}', `<span class="price"> ${ $price }  </span>` ) );
 			} );
 
 			// Real-time updates for payment CC icons
@@ -3398,12 +3431,12 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * @param {string} type     Field type (deprecated)
 		 * @param {int}    duration Duration of animation.
 		 */
-		fieldDeleteById: function( id, type = '', duration = 400 ) {
+		fieldDeleteById( id, type = '', duration = 400 ) {
+			$( `#wpforms-field-${ id }` ).fadeOut( duration, function() {
+				const $field = $( this );
+				const $layoutParents = $field.parents( '.wpforms-field-layout-columns' );
 
-			$( `#wpforms-field-${id}` ).fadeOut( duration, function() {
-
-				const $field = $( this ),
-					type = $field.data( 'field-type' );
+				type = $field.data( 'field-type' );
 
 				$builder.trigger( 'wpformsBeforeFieldDelete', [ id, type ] );
 
@@ -3427,7 +3460,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 					$submitButton.hide();
 				}
 
-				$builder.trigger( 'wpformsFieldDelete', [ id, type ] );
+				$builder.trigger( 'wpformsFieldDelete', [ id, type, $layoutParents ] );
 			} );
 		},
 
@@ -4546,7 +4579,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			}
 			id++;
 			$parent.parent().attr( 'data-next-id', id );
-			$builder.trigger( 'wpformsFieldChoiceAdd' );
+			$builder.trigger( 'wpformsFieldChoiceAdd', [ fieldID ] );
 			app.fieldChoiceUpdate( type, fieldID );
 		},
 
@@ -4577,7 +4610,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				var deleteChoice = function() {
 					$this.parent().remove();
 					app.fieldChoiceUpdate( $list.data( 'field-type' ), $list.data( 'field-id' ) );
-					$builder.trigger( 'wpformsFieldChoiceDelete' );
+					$builder.trigger( 'wpformsFieldChoiceDelete', [ $list.data( 'field-id' ) ] );
 				};
 
 				if ( ! fieldData.trigger ) {
@@ -5164,7 +5197,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			app.fieldDynamicChoiceToggleIconChoices();
 
 			// Fire an event when a field's dynamic choices option was changed.
-			$builder.trigger( 'wpformsFieldDynamicChoiceToggle' );
+			$builder.trigger( 'wpformsFieldDynamicChoiceToggle', [ id ] );
 
 			// Loading
 			wpf.fieldOptionLoading( $thisOption );
@@ -6931,7 +6964,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				e.preventDefault();
 
-				if ( $( this ).hasClass( 'wpforms-disabled' ) ) {
+				if ( $( this ).hasClass( 'wpforms-disabled' ) || $( this ).hasClass( 'wpforms-btn-light-grey-disabled' ) ) {
 					return;
 				}
 

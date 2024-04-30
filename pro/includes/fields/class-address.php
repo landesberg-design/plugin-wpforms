@@ -915,6 +915,11 @@ class WPForms_Field_Address extends WPForms_Field {
 			// State.
 			if ( isset( $this->schemes[ $scheme ]['states'] ) && isset( $state['options'] ) ) {
 
+				// Remove placeholder attribute from <select>.
+				$placeholder = ! empty( $state['attr']['placeholder'] ) ? $state['attr']['placeholder'] : '';
+
+				unset( $state['attr']['placeholder'] );
+
 				echo '<div ' . wpforms_html_attributes( false, $state['block'] ) . '>';
 					$this->field_display_sublabel( 'state', 'before', $field );
 					if ( empty( $state['options'] ) ) {
@@ -929,8 +934,8 @@ class WPForms_Field_Address extends WPForms_Field {
 							wpforms_html_attributes( $state['id'], $state['class'], $state['data'], $state['attr'] ),
 							! empty( $state['required'] ) ? 'required' : ''
 						);
-							if ( ! empty( $state['attr']['placeholder'] ) && empty( $state['attr']['value'] ) ) {
-								printf( '<option class="placeholder" value="" selected disabled>%s</option>', esc_html( $state['attr']['placeholder'] ) );
+							if ( ! empty( $placeholder ) && empty( $state['attr']['value'] ) ) {
+								printf( '<option class="placeholder" value="" selected disabled>%s</option>', esc_html( $placeholder ) );
 							}
 							foreach ( $state['options'] as $state_key => $state_label ) {
 								printf(
@@ -973,6 +978,11 @@ class WPForms_Field_Address extends WPForms_Field {
 				// Country.
 				if ( isset( $country['options'] ) && empty( $country['hidden'] ) ) {
 
+					// Remove placeholder attribute from <select>.
+					$placeholder = ! empty( $country['attr']['placeholder'] ) ? $country['attr']['placeholder'] : '';
+
+					unset( $country['attr']['placeholder'] );
+
 					echo '<div ' . wpforms_html_attributes( false, $country['block'] ) . '>';
 						$this->field_display_sublabel( 'country', 'before', $field );
 						if ( empty( $country['options'] ) ) {
@@ -986,8 +996,8 @@ class WPForms_Field_Address extends WPForms_Field {
 								wpforms_html_attributes( $country['id'], $country['class'], $country['data'], $country['attr'] ),
 								! empty( $country['required'] ) ? 'required' : ''
 							);
-								if ( ! empty( $country['attr']['placeholder'] ) && empty( $country['attr']['value'] ) ) {
-									printf( '<option class="placeholder" value="" selected disabled>%s</option>', esc_html( $country['attr']['placeholder'] ) );
+								if ( ! empty( $placeholder ) && empty( $country['attr']['value'] ) ) {
+									printf( '<option class="placeholder" value="" selected disabled>%s</option>', esc_html( $placeholder ) );
 								}
 								foreach ( $country['options'] as $country_key => $country_label ) {
 									printf(

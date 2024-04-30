@@ -118,35 +118,6 @@ class Customer extends ApiResource
         $url = '/v1/customers/search';
         return static::_requestPage($url, \WPForms\Vendor\Stripe\SearchResult::class, $params, $opts);
     }
-    const PATH_CASH_BALANCE = '/cash_balance';
-    /**
-     * @param string $id the ID of the customer to which the cash balance belongs
-     * @param null|array $params
-     * @param null|array|string $opts
-     * @param mixed $cashBalanceId
-     *
-     * @throws \Stripe\Exception\ApiErrorException if the request fails
-     *
-     * @return \Stripe\CashBalance
-     */
-    public static function retrieveCashBalance($id, $cashBalanceId, $params = null, $opts = null)
-    {
-        return self::_retrieveNestedResource($id, static::PATH_CASH_BALANCE, $params, $opts);
-    }
-    /**
-     * @param string $id the ID of the customer to which the cash balance belongs
-     * @param null|array $params
-     * @param null|array|string $opts
-     * @param mixed $cashBalanceId
-     *
-     * @throws \Stripe\Exception\ApiErrorException if the request fails
-     *
-     * @return \Stripe\CashBalance
-     */
-    public static function updateCashBalance($id, $cashBalanceId, $params = null, $opts = null)
-    {
-        return self::_updateNestedResource($id, static::PATH_CASH_BALANCE, $params, $opts);
-    }
     const PATH_BALANCE_TRANSACTIONS = '/balance_transactions';
     /**
      * @param string $id the ID of the customer on which to retrieve the customer balance transactions
@@ -298,6 +269,35 @@ class Customer extends ApiResource
     public static function updateSource($id, $sourceId, $params = null, $opts = null)
     {
         return self::_updateNestedResource($id, static::PATH_SOURCES, $sourceId, $params, $opts);
+    }
+    const PATH_CASH_BALANCE = '/cash_balance';
+    /**
+     * @param string $id the ID of the customer to which the cash balance belongs
+     * @param null|array $params
+     * @param null|array|string $opts
+     * @param mixed $cashBalanceId
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return \Stripe\CashBalance
+     */
+    public static function retrieveCashBalance($id, $cashBalanceId, $params = null, $opts = null)
+    {
+        return self::_retrieveNestedResource($id, static::PATH_CASH_BALANCE, $params, $opts);
+    }
+    /**
+     * @param string $id the ID of the customer to which the cash balance belongs
+     * @param null|array $params
+     * @param null|array|string $opts
+     * @param mixed $cashBalanceId
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return \Stripe\CashBalance
+     */
+    public static function updateCashBalance($id, $cashBalanceId, $params = null, $opts = null)
+    {
+        return self::_updateNestedResource($id, static::PATH_CASH_BALANCE, $params, $opts);
     }
     const PATH_TAX_IDS = '/tax_ids';
     /**

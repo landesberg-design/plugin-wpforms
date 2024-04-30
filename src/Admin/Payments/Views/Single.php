@@ -1178,7 +1178,7 @@ class Single implements PaymentsViewsInterface {
 				break;
 
 			case 'square':
-				$link = $is_test_mode ? 'https://squareupsandbox.com/dashboard/' : 'https://squareup.com/dashboard/';
+				$link = $is_test_mode ? 'https://squareupsandbox.com/dashboard/' : 'https://squareup.com/t/cmtp_performance/pr_developers/d_partnerships/p_WPForms/?route=dashboard/';
 				break;
 
 			default:

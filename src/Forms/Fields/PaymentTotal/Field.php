@@ -85,6 +85,9 @@ class Field extends \WPForms_Field {
 			$properties['container']['class'][] = 'wpforms-summary-enabled';
 		}
 
+		// Unset for attribute for label.
+		unset( $properties['label']['attr']['for'] );
+
 		return $properties;
 	}
 
@@ -290,6 +293,9 @@ class Field extends \WPForms_Field {
 			$attrs['style']    = 'position:absolute!important;clip:rect(0,0,0,0)!important;height:1px!important;width:1px!important;border:0!important;overflow:hidden!important;padding:0!important;margin:0!important;';
 			$attrs['readonly'] = 'readonly';
 		}
+
+		// aria-errormessage attribute is not allowed for hidden inputs.
+		unset( $attrs['aria-errormessage'] );
 
 		$is_summary_enabled = $this->is_summary_enabled( $field );
 

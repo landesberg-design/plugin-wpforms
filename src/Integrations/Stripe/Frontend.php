@@ -125,11 +125,21 @@ class Frontend {
 	 */
 	public function enqueue_assets() {
 
+		$min = wpforms_get_min_suffix();
+
 		if ( ! Helpers::has_stripe_keys() ) {
 			return;
 		}
 
 		$config = $this->api->get_config();
+
+		wp_enqueue_script(
+			'wpforms-generic-utils',
+			WPFORMS_PLUGIN_URL . "assets/js/share/utils{$min}.js",
+			[ 'jquery' ],
+			WPFORMS_VERSION,
+			true
+		);
 
 		wp_enqueue_script(
 			'stripe-js',
@@ -140,7 +150,7 @@ class Frontend {
 		wp_enqueue_script(
 			self::HANDLE,
 			$config['local_js_url'],
-			[ 'jquery', 'stripe-js' ],
+			[ 'jquery', 'stripe-js', 'wpforms-generic-utils' ],
 			WPFORMS_VERSION
 		);
 

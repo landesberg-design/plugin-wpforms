@@ -87,7 +87,7 @@ class Notifications {
 	 */
 	public function has_access() {
 
-		$has_access = ! wpforms_setting( 'hide-announcements' );
+		$has_access = ! wpforms_setting( 'hide-announcements', false );
 
 		if ( ! wp_doing_cron() && ! wpforms_doing_wp_cli() ) {
 			$has_access = $has_access && wpforms_current_user_can( 'view_forms' );
@@ -518,6 +518,11 @@ class Notifications {
 	 */
 	public function output() {
 
+		// Leave early if there are no forms.
+		if ( ! wpforms()->get( 'form' )->forms_exist() ) {
+			return;
+		}
+
 		$notifications = $this->get();
 
 		if ( empty( $notifications ) ) {
@@ -526,23 +531,7 @@ class Notifications {
 
 		$notifications_html   = '';
 		$current_class        = ' current';
-		$content_allowed_tags = [
-			'br'     => [],
-			'em'     => [],
-			'strong' => [],
-			'span'   => [
-				'style' => [],
-			],
-			'p'      => [
-				'id'    => [],
-				'class' => [],
-			],
-			'a'      => [
-				'href'   => [],
-				'target' => [],
-				'rel'    => [],
-			],
-		];
+		$content_allowed_tags = $this->get_allowed_tags();
 
 		foreach ( $notifications as $notification ) {
 
@@ -594,6 +583,34 @@ class Notifications {
 			],
 			true
 		);
+	}
+
+	/**
+	 * Get the allowed HTML tags and their attributes.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @return array
+	 */
+	public function get_allowed_tags(): array {
+
+		return [
+			'br'     => [],
+			'em'     => [],
+			'strong' => [],
+			'span'   => [
+				'style' => [],
+			],
+			'p'      => [
+				'id'    => [],
+				'class' => [],
+			],
+			'a'      => [
+				'href'   => [],
+				'target' => [],
+				'rel'    => [],
+			],
+		];
 	}
 
 	/**

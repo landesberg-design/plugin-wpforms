@@ -66,6 +66,9 @@ class SpamEntry {
 
 		// Enable storing spam entries for new setup.
 		add_filter( 'wpforms_create_form_args', [ $this, 'enable_store_spam_entries' ], 15 );
+
+		// Akismet submit ham.
+		add_action( 'wpforms_pro_anti_spam_entry_set_as_not_spam', [ $this, 'maybe_akismet_submit_ham' ], 10, 2 );
 	}
 
 	/**
@@ -476,6 +479,16 @@ class SpamEntry {
 			'entry_meta'
 		);
 
+		/**
+		 * Fires after the entry is set as not spam.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param int $entry_id Entry ID.
+		 * @param int $form_id  Form ID.
+		 */
+		do_action( 'wpforms_pro_anti_spam_entry_set_as_not_spam', $entry->entry_id, $entry->form_id );
+
 		$this->delete_spam_reason( $entry->entry_id );
 	}
 
@@ -643,7 +656,8 @@ class SpamEntry {
 		if ( ! empty( $post_content ) ) {
 			$post_content = json_decode( wp_unslash( $post_content ), true );
 
-			$post_content['settings']['store_spam_entries'] = 1;
+			// New forms created from templates may explicitly set it to 0|false, we must respect that.
+			$post_content['settings']['store_spam_entries'] = $post_content['settings']['store_spam_entries'] ?? 1;
 
 			$args['post_content'] = wpforms_encode( $post_content );
 		}
@@ -669,6 +683,50 @@ class SpamEntry {
 		}
 
 		return $url;
+	}
+
+	/**
+	 * Submit Akismet ham (false positives) after marking entry as not spam.
+	 *
+	 * This call is intended for the submission of false positives –
+	 * items that were incorrectly classified as spam by Akismet.
+	 *
+	 * See docs: https://akismet.com/developers/detailed-docs/submit-ham-false-positives/
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param int $entry_id Entry ID.
+	 * @param int $form_id  Form ID.
+	 */
+	public function maybe_akismet_submit_ham( $entry_id, $form_id ) {
+
+		$spam_reason = $this->get_spam_reason( $entry_id );
+
+		if ( $spam_reason !== 'Akismet' ) {
+			return;
+		}
+
+		$form_data = wpforms()->get( 'form' )->get(
+			$form_id,
+			[
+				'content_only' => true,
+			]
+		);
+
+		$entry = wpforms()->get( 'entry' )->get( $entry_id );
+
+		if ( ! $entry ) {
+			return;
+		}
+
+		$entry_fields = wpforms_decode( $entry->fields );
+
+		$entry_data = [
+			'entry_id' => $entry_id,
+			'fields'   => $entry_fields,
+		];
+
+		wpforms()->get( 'akismet' )->set_entry_not_spam( $form_data, $entry_data );
 	}
 
 	/**

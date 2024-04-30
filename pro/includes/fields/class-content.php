@@ -271,8 +271,9 @@ class WPForms_Field_Content extends WPForms_Field {
 		}
 
 		// Define data.
-		$primary            = $field['properties']['inputs']['primary'];
-		$primary['class'][] = 'wpforms-field-row';
+		$primary                 = $field['properties']['inputs']['primary'];
+		$primary['class'][]      = 'wpforms-field-row';
+		$primary['attr']['name'] = '';
 
 		printf(
 			'<div %s>%s<div class="wpforms-field-content-display-frontend-clear"></div></div>',

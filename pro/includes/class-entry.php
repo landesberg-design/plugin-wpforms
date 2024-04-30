@@ -1426,7 +1426,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 */
 	private function get_condition_value( array $args ) {
 
-		$escaped_value = esc_sql( htmlentities( $args['value'] ) );
+		$escaped_value = esc_sql( $args['value'] );
 
 		$condition_values = [
 			'is'           => " = '$escaped_value'",

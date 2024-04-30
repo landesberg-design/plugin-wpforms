@@ -532,7 +532,7 @@ class WPForms_Conditional_Logic_Core {
 												} else {
 
 													printf(
-														'<select name="%1$s[conditionals][%2$s][%3$s][value]" class="wpforms-conditional-value" %4$d>',
+														'<select name="%1$s[conditionals][%2$s][%3$s][value]" class="wpforms-conditional-value" %4$s>',
 														esc_attr( $field_name ),
 														esc_attr( $group_id ),
 														esc_attr( $rule_id ),

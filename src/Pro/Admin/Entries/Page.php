@@ -858,8 +858,9 @@ class Page {
 			$forms = wpforms()->get( 'form' )->get(
 				'',
 				[
-					'orderby' => 'ID',
-					'order'   => 'ASC',
+					'orderby'   => 'ID',
+					'order'     => 'ASC',
+					'post_type' => wpforms()->get( 'entries_overview' )->overview_show_form_templates() ? wpforms()->get( 'form' )::POST_TYPES : 'wpforms',
 				]
 			);
 
@@ -1281,6 +1282,13 @@ class Page {
 					$this->form_id
 				);
 		}
+
+		$is_form_template  = wpforms_is_form_template( $this->form_id );
+		$form_title_suffix = '';
+
+		if ( $is_form_template ) {
+			$form_title_suffix = sprintf( '<span> — %s</span>', esc_html__( 'Template', 'wpforms' ) );
+		}
 		?>
 
 		<div class="form-details">
@@ -1289,7 +1297,7 @@ class Page {
 
 			<h3 class="form-details-title">
 				<?php
-				echo esc_html( wp_strip_all_tags( $form_title ) );
+				echo esc_html( wp_strip_all_tags( $form_title ) ) . wp_kses( $form_title_suffix, [ 'span' => [] ] );
 				$this->form_selector_html();
 				?>
 			</h3>
@@ -1313,22 +1321,23 @@ class Page {
 				<?php if ( wpforms_current_user_can( 'edit_form_single', $this->form_id ) ) : ?>
 					<a href="<?php echo esc_url( $edit_url ); ?>" class="form-details-actions-edit">
 						<span class="dashicons dashicons-edit"></span>
-						<?php esc_html_e( 'Edit This Form', 'wpforms' ); ?>
+						<?php $is_form_template ? esc_html_e( 'Edit This Template', 'wpforms' ) : esc_html_e( 'Edit This Form', 'wpforms' ); ?>
 					</a>
 				<?php endif; ?>
 
 				<?php if ( wpforms_current_user_can( 'view_form_single', $this->form_id ) ) : ?>
 					<a href="<?php echo esc_url( $preview_url ); ?>" class="form-details-actions-preview" target="_blank" rel="noopener noreferrer">
 						<span class="dashicons dashicons-visibility"></span>
-						<?php esc_html_e( 'Preview Form', 'wpforms' ); ?>
+						<?php $is_form_template ? esc_html_e( 'Preview Template', 'wpforms' ) : esc_html_e( 'Preview Form', 'wpforms' ); ?>
 					</a>
 				<?php endif; ?>
 
-
-				<a href="<?php echo esc_url( $export_url ); ?>" class="form-details-actions-export">
-					<span class="dashicons dashicons-migrate"></span>
-					<?php echo $this->is_list_filtered() ? esc_html__( 'Export Filtered', 'wpforms' ) : esc_html__( 'Export All', 'wpforms' ); ?>
-				</a>
+				<?php if ( ! $is_form_template ) : ?>
+					<a href="<?php echo esc_url( $export_url ); ?>" class="form-details-actions-export">
+						<span class="dashicons dashicons-migrate"></span>
+						<?php echo $this->is_list_filtered() ? esc_html__( 'Export Filtered', 'wpforms' ) : esc_html__( 'Export All', 'wpforms' ); ?>
+					</a>
+				<?php endif; ?>
 
 				<a href="<?php echo esc_url( $read_url ); ?>" class="form-details-actions-read">
 					<span class="dashicons dashicons-marker"></span>
@@ -1372,6 +1381,10 @@ class Page {
 				<ul>
 					<?php
 					foreach ( $this->forms as $key => $form ) {
+						if ( $this->form_id === $form->ID ) {
+							continue;
+						}
+
 						$form_url = add_query_arg(
 							[
 								'page'    => 'wpforms-entries',
@@ -1381,7 +1394,11 @@ class Page {
 							admin_url( 'admin.php' )
 						);
 
-						echo '<li><a href="' . esc_url( $form_url ) . '">' . esc_html( $form->post_title ) . '</a></li>';
+						$form_title = $form->post_type === 'wpforms-template'
+							? $form->post_title . ' – ' . __( 'Template', 'wpforms' )
+							: $form->post_title;
+
+						printf( '<li><a href="%s">%s</a></li>', esc_url( $form_url ), esc_html( $form_title ) );
 					}
 					?>
 				</ul>

@@ -225,10 +225,12 @@ class Capabilities {
 			return $caps;
 		}
 
-		$form_id = isset( $args[0] ) ? \absint( $args[0] ) : 0;
+		$form_id = isset( $args[0] ) ? absint( $args[0] ) : 0;
 		$form_id = $this->map_meta_cap_id( $form_id, $cap );
 
-		$form = wpforms()->get( 'form' )->get( $form_id, [ 'cap' => false ] );
+		$form_handler = wpforms()->get( 'form' );
+
+		$form = $form_handler->get( $form_id, [ 'cap' => false ] );
 
 		if ( ! $form ) {
 			return $caps;
@@ -238,7 +240,9 @@ class Capabilities {
 			return $caps;
 		}
 
-		if ( 'wpforms' !== $form->post_type ) {
+		$allowed_post_types = $form_handler::POST_TYPES;
+
+		if ( ! in_array( $form->post_type, $allowed_post_types, true ) ) {
 			return $caps;
 		}
 
@@ -410,11 +414,14 @@ class Capabilities {
 			return $this->current_user_can( $args['cap'] ) ? $where : $empty_where;
 		}
 
-		$allowed_forms = wpforms()->get( 'form' )->get(
+		$form_handler = wpforms()->get( 'form' );
+
+		$allowed_forms = $form_handler->get(
 			'',
 			[
-				'fields' => 'ids',
-				'cap'    => $args['cap'],
+				'fields'    => 'ids',
+				'post_type' => $form_handler::POST_TYPES,
+				'cap'       => $args['cap'],
 			]
 		);
 

@@ -398,8 +398,7 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 		$primary = $field['properties']['inputs']['primary'];
 
 		$value_display = isset( $field['value_display'] ) ? esc_attr( $field['value_display'] ) : esc_html__( 'Selected Value: {value}', 'wpforms-lite' );
-		$default_value = ! empty( $field['default_value'] ) ? (float) $field['default_value'] : 0;
-		$hint_value    = ! empty( $primary['attr']['value'] ) ? (float) $primary['attr']['value'] : $default_value;
+		$hint_value    = ! empty( $primary['attr']['value'] ) ? (float) $primary['attr']['value'] : 0;
 
 		$hint = str_replace( '{value}', '<b>' . $hint_value . '</b>', $value_display );
 
@@ -410,7 +409,6 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 				'atts'          => $primary['attr'],
 				'class'         => $primary['class'],
 				'datas'         => $primary['data'],
-				'default_value' => $default_value,
 				'id'            => $primary['id'],
 				'max'           => isset( $field['max'] ) && is_numeric( $field['max'] ) ? (float) $field['max'] : self::SLIDER_MAX,
 				'min'           => isset( $field['min'] ) && is_numeric( $field['min'] ) ? (float) $field['min'] : self::SLIDER_MIN,

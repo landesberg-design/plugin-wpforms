@@ -341,7 +341,7 @@ abstract class CacheBase {
 	 *
 	 * @return array
 	 */
-	private function perform_remote_request(): array {
+	private function perform_remote_request(): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
 		$wpforms_key = wpforms()->is_pro() ? wpforms_get_license_key() : 'lite';
 
@@ -350,25 +350,94 @@ abstract class CacheBase {
 			$this->settings['query_args'] ?? []
 		);
 
-		$request = wp_remote_get(
-			add_query_arg( $query_args, $this->settings['remote_source'] ),
+		$request_url = add_query_arg( $query_args, $this->settings['remote_source'] );
+		$user_agent  = wpforms_get_default_user_agent();
+		$request     = wp_remote_get(
+			$request_url,
 			[
 				'timeout'    => 10,
-				'user-agent' => wpforms_get_default_user_agent(),
+				'user-agent' => $user_agent,
 			]
 		);
 
-		if ( is_wp_error( $request ) ) {
+		$request_url_log   = remove_query_arg( [ 'tgm-updater-key' ], $request_url );
+		$response          = $request['http_response'] ?? null;
+		$response_code     = $response ? $response->get_status() : '';
+		$response_headers  = wp_remote_retrieve_headers( $request )->getAll();
+		$response_body     = wp_remote_retrieve_body( $request );
+		$response_body_len = strlen( $response_body );
+		$response_body_log = $response_body_len > 1024 ? "(First 1 kB):\n" . substr( trim( $response_body ), 0, 1024 ) . '...' : trim( $response_body );
+		$response_body_log = esc_html( $response_body_log );
+		$is_wp_error       = is_wp_error( $request );
+
+		// Log the response details in debug mode.
+		if ( wpforms_debug() ) {
+			wpforms_log(
+				'Cached data: Response details',
+				[
+					'class'          => static::class,
+					'request_url'    => $request_url_log,
+					'code'           => $response_code,
+					'headers'        => $response_headers,
+					'content_length' => $response_body_len,
+					'body'           => $response_body_log,
+				],
+				[
+					'type' => [ 'log' ],
+				]
+			);
+		}
+
+		// Log the error if any.
+		if ( $response_code > 399 || $is_wp_error ) {
+			wpforms_log(
+				'Cached data: HTTP request error',
+				[
+					'class'          => static::class,
+					'request_url'    => $request_url_log,
+					'is_wp_error'    => $is_wp_error ? 'Yes' : 'No',
+					'error_message'  => $is_wp_error ? $request->get_error_message() : '',
+					'code'           => $response_code,
+					'headers'        => $response_headers,
+					'content_length' => $response_body_len,
+					'body'           => $response_body_log,
+					'error_data'     => $is_wp_error ? $request->get_all_error_data() : '',
+				],
+				[
+					'type' => [ 'error' ],
+				]
+			);
+
 			return [];
 		}
 
-		$json = wp_remote_retrieve_body( $request );
+		$json = trim( $response_body );
+		$data = json_decode( $json, true );
 
-		if ( empty( $json ) ) {
+		if ( empty( $data ) ) {
+			$message = $data === null ? 'Invalid JSON' : 'Empty JSON';
+
+			wpforms_log(
+				'Cached data: ' . $message,
+				[
+					'class'          => static::class,
+					'cache_file'     => $this->settings['cache_file'],
+					'remote_source'  => $this->settings['remote_source'],
+					'json_result'    => $message,
+					'code'           => $response_code,
+					'headers'        => $response_headers,
+					'content_length' => $response_body_len,
+					'body'           => $response_body_log,
+				],
+				[
+					'type' => [ 'error' ],
+				]
+			);
+
 			return [];
 		}
 
-		return $this->prepare_cache_data( json_decode( $json, true ) );
+		return $this->prepare_cache_data( $data );
 	}
 
 	/**

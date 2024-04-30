@@ -105,7 +105,14 @@ class SingleActionsHandler {
 			wp_send_json_error( [ 'message' => esc_html__( 'Payment not found in the database.', 'wpforms-lite' ) ] );
 		}
 
-		$refund = $this->payment_intents->refund_payment( $payment_db->transaction_id );
+		$args = [
+			'metadata' => [
+				'refunded_by' => 'wpforms_dashboard',
+			],
+			'reason'   => 'requested_by_customer',
+		];
+
+		$refund = $this->payment_intents->refund_payment( $payment_db->transaction_id, $args );
 
 		if ( ! $refund ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Refund failed.', 'wpforms-lite' ) ] );

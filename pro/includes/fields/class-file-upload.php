@@ -1553,9 +1553,11 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 */
 	public function ajax_modern_remove() {
 
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		$default_error = esc_html__( 'Something went wrong while removing the file.', 'wpforms' );
 
 		$validated_form_field = $this->ajax_validate_form_field_modern();
+
 		if ( empty( $validated_form_field ) ) {
 			wp_send_json_error( $default_error, 400 );
 		}
@@ -1564,19 +1566,9 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wp_send_json_error( $default_error, 403 );
 		}
 
-		$file     = sanitize_file_name( wp_unslash( $_POST['file'] ) );
-		$tmp_path = wp_normalize_path( $this->get_tmp_dir() . '/' . $file );
-
-		// Requested file does not exist, which is good.
-		if ( ! is_file( $tmp_path ) ) {
-			wp_send_json_success( $file );
-		}
-
-		if ( @unlink( $tmp_path ) ) {
-			wp_send_json_success( $file );
-		}
-
-		wp_send_json_error( $default_error, 400 );
+		// Don't actually delete the file - it will get removed through the clean_tmp_files() method later.
+		wp_send_json_success( sanitize_file_name( wp_unslash( $_POST['file'] ) ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**

@@ -192,6 +192,7 @@ class Requirements {
 			self::EXT     => 'curl',
 			self::LICENSE => self::PLUS_PRO_AND_TOP,
 		],
+		'wpforms-calculations/wpforms-calculations.php'                 => [],
 		'wpforms-campaign-monitor/wpforms-campaign-monitor.php'         => [
 			self::LICENSE => self::PLUS_PRO_AND_TOP,
 		],
@@ -1121,7 +1122,7 @@ class Requirements {
 	 *
 	 * @return string
 	 */
-	private function list_version( array $requirement ): string {
+	public function list_version( array $requirement ): string {
 
 		$compare_arr = $this->get_compare_array( $requirement );
 		$list        = [];
@@ -1148,5 +1149,17 @@ class Requirements {
 		$compares = $requirement[ self::COMPARE ];
 
 		return array_combine( $versions, $compares );
+	}
+
+	/**
+	 * Get requirements.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @return array
+	 */
+	public function get_requirements(): array {
+
+		return $this->requirements;
 	}
 }

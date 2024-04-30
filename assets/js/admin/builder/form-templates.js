@@ -108,7 +108,8 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 		 */
 		events() {
 			$( document )
-				.on( 'click', '#wpforms-setup-templates-list .wpforms-template-favorite i', app.selectFavorite );
+				.on( 'click', '#wpforms-setup-templates-list .wpforms-template-favorite i', app.selectFavorite )
+				.on( 'click', '#wpforms-setup-templates-list .wpforms-template-remove i', app.removeTemplate );
 		},
 
 		/**
@@ -188,6 +189,82 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 			}
 
 			unMarkFavorite();
+		},
+
+		/**
+		 * Remove Template.
+		 *
+		 * @since 1.8.8
+		 */
+		removeTemplate() {
+			const $trashIcon = $( this ),
+				$template = $trashIcon.closest( '.wpforms-template-remove' ),
+				$templateId = $template.data( 'template' );
+
+			$.alert( {
+				title: wpforms_form_templates.delete_template_title,
+				content: wpforms_form_templates.delete_template_content,
+				icon: 'fa fa-exclamation-circle',
+				type: 'red',
+				buttons: {
+					confirm: {
+						text: wpforms_form_templates.delete_template,
+						btnClass: 'btn-confirm',
+						keys: [ 'enter' ],
+						action() {
+							app.removeUserTemplate( $templateId );
+						},
+					},
+					cancel: {
+						text: wpforms_form_templates.cancel,
+					},
+				},
+			} );
+		},
+
+		/**
+		 * Remove User Template.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param {number} templateId Template ID.
+		 */
+		removeUserTemplate( templateId ) {
+			vars.templateList.remove( 'slug', 'wpforms-user-template-' + templateId );
+
+			$.post( wpforms_form_templates.ajaxurl, {
+				action: 'wpforms_user_template_remove',
+				template: templateId,
+				nonce: wpforms_form_templates.nonce,
+			}, function( res ) {
+				if ( res.success ) {
+					$( '#wpforms-template-wpforms-user-template-' + templateId ).remove();
+
+					app.updateCategoryCount( 'all' );
+					app.updateCategoryCount( 'user' );
+				}
+			} );
+		},
+
+		/**
+		 * Update category count.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param {string} category Category name.
+		 */
+		updateCategoryCount( category ) {
+			const categoriesList = $( '.wpforms-setup-templates-categories' ),
+				$category = categoriesList.find( `[data-category='${ category }']` ),
+				$count = $category.find( 'span' ),
+				count = parseInt( $count.html(), 10 );
+
+			$count.html( count - 1 );
+			$category.data( 'count', count - 1 );
+
+			if ( count - 1 === 0 && category === 'user' && $category.hasClass( 'active' ) ) {
+				$( '.wpforms-user-templates-empty-state' ).removeClass( 'wpforms-hidden' );
+			}
 		},
 
 		/**
@@ -295,6 +372,7 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 			const $item = $( this ).parent(),
 				$active = $item.closest( 'ul' ).find( '.active' ),
 				category = $item.data( 'category' ),
+				count = $item.data( 'count' ),
 				searchQuery = $( '#wpforms-setup-template-search' ).val();
 
 			$active.removeClass( 'active' );
@@ -311,6 +389,9 @@ var WPFormsFormTemplates = window.WPFormsFormTemplates || ( function( document, 
 
 				return category === 'all' || item.values().categories.split( ',' ).indexOf( category ) > -1;
 			} );
+
+			// Display/hide User Templates empty state message.
+			$( '.wpforms-user-templates-empty-state' ).toggleClass( 'wpforms-hidden', category !== 'user' || count !== 0 );
 
 			if ( searchQuery !== '' ) {
 				app.performSearch( searchQuery );

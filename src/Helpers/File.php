@@ -41,6 +41,12 @@ class File {
 
 		global $wp_filesystem;
 
+		static $is_filesystem_setup;
+
+		if ( $is_filesystem_setup ) {
+			return $wp_filesystem;
+		}
+
 		// We have to start the buffer to prevent output
 		// when the file system is ssh/FTP but not configured.
 		ob_start();
@@ -65,6 +71,8 @@ class File {
 
 			return null;
 		}
+
+		$is_filesystem_setup = true;
 
 		return $wp_filesystem;
 	}
@@ -112,6 +120,99 @@ class File {
 		}
 
 		return $filesystem->put_contents( $file, $content );
+	}
+
+	/**
+	 * Move a file or files from source to destination.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param string $source      Source file or glob pattern.
+	 * @param string $destination Destination file or directory.
+	 *
+	 * @return bool
+	 */
+	public static function move( string $source, string $destination ): bool {
+
+		$filesystem = self::get_filesystem();
+
+		if ( ! $filesystem ) {
+			return false;
+		}
+
+		foreach ( glob( $source ) as $filename ) {
+			$move = $filesystem->move( $filename, $destination . basename( $filename ), true );
+
+			if ( ! $move ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Delete a file or directory.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param string $file Path to the file or directory.
+	 *
+	 * @return bool
+	 */
+	public static function delete( string $file ): bool {
+
+		$filesystem = self::get_filesystem();
+
+		if ( ! $filesystem ) {
+			return false;
+		}
+
+		return $filesystem->delete( $file, true );
+	}
+
+	/**
+	 * Create a directory.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param string $dir Path directory.
+	 *
+	 * @return bool True on success, false on failure. If the directory already exists, this method will return true.
+	 */
+	public static function mkdir( string $dir ): bool {
+
+		$filesystem = self::get_filesystem();
+
+		if ( ! $filesystem ) {
+			return false;
+		}
+
+		if ( $filesystem->is_dir( $dir ) ) {
+			return true;
+		}
+
+		return $filesystem->mkdir( $dir );
+	}
+
+	/**
+	 * Gets details for files in a directory or a specific file.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param string $dir Path directory.
+	 *
+	 * @return array|bool
+	 */
+	public static function dirlist( string $dir ) {
+
+		$filesystem = self::get_filesystem();
+
+		if ( ! $filesystem || ! $filesystem->is_dir( $dir ) ) {
+			return false;
+		}
+
+		return $filesystem->dirlist( $dir, false );
 	}
 
 	/**

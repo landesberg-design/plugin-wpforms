@@ -165,8 +165,13 @@ class Ajax {
 
 		global $wpdb;
 
+		$args = [
+			'fields'    => 'ids',
+			'post_type' => wpforms()->get( 'entries_overview' )->overview_show_form_templates() ? wpforms()->get( 'form' )::POST_TYPES : 'wpforms',
+		];
+
 		// Retrieve all forms from which a user can access their entries when no form id is specified.
-		$form = wpforms()->get( 'form' )->get( $form_id, [ 'fields' => 'ids' ] );
+		$form = wpforms()->get( 'form' )->get( $form_id, $args );
 
 		// A single form object could be returned, so check that.
 		if ( $form instanceof WP_Post && $form->post_status === 'publish' ) {

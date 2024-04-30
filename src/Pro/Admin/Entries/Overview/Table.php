@@ -137,6 +137,7 @@ class Table extends WP_List_Table {
 		$one_published_form = wpforms()->get( 'form' )->get(
 			'',
 			[
+				'post_type'              => wpforms()->get( 'form' )::POST_TYPES,
 				'fields'                 => 'ids',
 				'post_status'            => 'publish',
 				'numberposts'            => 1,
@@ -191,7 +192,13 @@ class Table extends WP_List_Table {
 
 		$name = ! empty( $form->post_title ) ? $form->post_title : $form->post_name;
 
-		return $this->get_form_entries_url( $form, $name );
+		$link = $this->get_form_entries_url( $form, $name );
+
+		if ( wpforms_is_form_template( $form ) ) {
+			$link .= _post_states( $form, false );
+		}
+
+		return $link;
 	}
 
 	/**
@@ -491,6 +498,7 @@ class Table extends WP_List_Table {
 			'',
 			[
 				'orderby'                => 'post__in',
+				'post_type'              => wpforms()->get( 'form' )::POST_TYPES,
 				'post__in'               => $form_ids,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
@@ -527,9 +535,13 @@ class Table extends WP_List_Table {
 			$exclude = $this->sort_by_last_entry( $order );
 		}
 
-		$form_ids = (array) wpforms()->get( 'form' )->get(
+		$form_handler = wpforms()->get( 'form' );
+		$post_type    = wpforms()->get( 'entries_overview' )->overview_show_form_templates() ? $form_handler::POST_TYPES : [ 'wpforms' ];
+
+		$form_ids = (array) $form_handler->get(
 			'',
 			[
+				'post_type'              => $post_type,
 				'fields'                 => 'ids',
 				'order'                  => $order,
 				'orderby'                => $orderby,

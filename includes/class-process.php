@@ -540,7 +540,7 @@ class WPForms_Process {
 		$this->form_data['entry_meta'] = [
 			'page_url'   => isset( $_POST['page_url'] ) ? esc_url_raw( wp_unslash( $_POST['page_url'] ) ) : '',
 			'page_title' => isset( $_POST['page_title'] ) ? sanitize_text_field( wp_unslash( $_POST['page_title'] ) ) : '',
-			'page_id'    => isset( $_POST['page_id'] ) ? absint( wp_unslash( $_POST['page_id'] ) ) : '',
+			'page_id'    => isset( $_POST['page_id'] ) ? absint( $_POST['page_id'] ) : '',
 			'referer'    => esc_url_raw( (string) wp_get_referer() ),
 		];
 

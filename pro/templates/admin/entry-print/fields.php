@@ -27,16 +27,27 @@ if ( empty( $fields ) ) {
 
 foreach ( $fields as $field ) {
 	if ( $field['type'] === 'layout' ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo wpforms_render(
-			'admin/entry-print/layout-field',
-			[
-				'entry'     => $entry,
-				'form_data' => $form_data,
-				'field'     => $field,
-			],
-			true
-		);
+		if ( isset( $field['display'] ) && $field['display'] === 'rows' ) {
+			echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				'admin/entry-print/layout-field-row',
+				[
+					'entry'     => $entry,
+					'form_data' => $form_data,
+					'field'     => $field,
+				],
+				true
+			);
+		} else {
+			echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				'admin/entry-print/layout-field-column',
+				[
+					'entry'     => $entry,
+					'form_data' => $form_data,
+					'field'     => $field,
+				],
+				true
+			);
+		}
 
 		continue;
 	}

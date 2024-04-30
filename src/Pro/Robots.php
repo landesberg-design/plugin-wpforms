@@ -47,6 +47,15 @@ class Robots {
 			$upload_root = $site_url_parts['path'] . $upload_root;
 		}
 
+		/**
+		 * By default, Allow/Disallow rules should be appended on the `robots_txt` filter to WordPress's default rules.
+		 * However, some customers were reporting that the default rules were not present in the output.
+		 * In this case, we need to add a User-agent rule manually to make robots.txt valid.
+		 */
+		if ( strpos( $output, 'User-agent:' ) === false ) {
+			$output .= "User-agent: *\n";
+		}
+
 		$output .= "Disallow: $upload_root\n";
 
 		return $output;

@@ -197,7 +197,16 @@ class WPForms_Entry_Preview extends WPForms_Field {
 			wp_send_json_error();
 		}
 
-		$form_data = wpforms()->get( 'form' )->get( $form_id, [ 'content_only' => true ] );
+		/**
+		 * Allow modifying the form data before the entry preview is generated.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array $form_data Form data and settings.
+		 *
+		 * @return array
+		 */
+		$form_data = apply_filters( 'wpforms_entry_preview_form_data', wpforms()->get( 'form' )->get( $form_id, [ 'content_only' => true ] ) );
 
 		if ( ! $form_data ) {
 			wp_send_json_error();

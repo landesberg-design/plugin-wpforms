@@ -1,7 +1,13 @@
-/* global wpforms_gutenberg_form_selector */
+/* global wpforms_gutenberg_form_selector, JSX */
 /* jshint es3: false, esversion: 6 */
 
-'use strict';
+/**
+ * @param strings.update_wp_notice_head
+ * @param strings.update_wp_notice_text
+ * @param strings.update_wp_notice_link
+ * @param strings.wpforms_empty_help
+ * @param strings.wpforms_empty_info
+ */
 
 const { serverSideRender: ServerSideRender = wp.components.ServerSideRender } = wp;
 const { createElement, Fragment } = wp.element;
@@ -22,7 +28,7 @@ const wpformsIcon = createElement( 'svg', { width: 20, height: 20, viewBox: '0 0
  *
  * @since 1.8.3
  *
- * @type {object}
+ * @type {Object}
  */
 let $popup = {};
 
@@ -34,7 +40,6 @@ let $popup = {};
  * @param {string} clientID Block Client ID.
  */
 const builderCloseButtonEvent = function( clientID ) {
-
 	$popup
 		.off( 'wpformsBuilderInPopupClose' )
 		.on( 'wpformsBuilderInPopupClose', function( e, action, formId, formTitle ) {
@@ -53,7 +58,6 @@ const builderCloseButtonEvent = function( clientID ) {
 			// Insert a new block.
 			wp.data.dispatch( 'core/block-editor' ).removeBlock( clientID );
 			wp.data.dispatch( 'core/block-editor' ).insertBlocks( newBlock );
-
 		} );
 };
 
@@ -65,10 +69,9 @@ const builderCloseButtonEvent = function( clientID ) {
  * @param {string} clientID Block Client ID.
  */
 const openBuilderPopup = function( clientID ) {
-
 	if ( jQuery.isEmptyObject( $popup ) ) {
-		let tmpl = jQuery( '#wpforms-gutenberg-popup' );
-		let parent = jQuery( '#wpwrap' );
+		const tmpl = jQuery( '#wpforms-gutenberg-popup' );
+		const parent = jQuery( '#wpwrap' );
 
 		parent.after( tmpl );
 
@@ -117,7 +120,7 @@ registerBlockType( 'wpforms/form-selector', {
 	},
 	edit( props ) { // eslint-disable-line max-lines-per-function
 		const { attributes: { formId = '', displayTitle = false, displayDesc = false, preview = false }, setAttributes } = props;
-		const formOptions = wpforms_gutenberg_form_selector.forms.map( value => (
+		const formOptions = wpforms_gutenberg_form_selector.forms.map( ( value ) => (
 			{ value: value.ID, label: value.post_title }
 		) );
 
@@ -143,19 +146,19 @@ registerBlockType( 'wpforms/form-selector', {
 		 *
 		 * @since 1.8.3
 		 *
-		 * @param {object} props Block properties.
-		 * @returns {JSX.Element} Block empty JSX code.
+		 * @param {Object} blockProps Block properties.
+		 *
+		 * @return {JSX.Element} Block empty JSX code.
 		 */
-		function getEmptyFormsPreview( props ) {
-
-			const clientId = props.clientId;
+		function getEmptyFormsPreview( blockProps ) {
+			const clientId = blockProps.clientId;
 
 			return (
 				<Fragment
 					key="wpforms-gutenberg-form-selector-fragment-block-empty">
 					<div className="wpforms-no-form-preview">
-						<img src={ wpforms_gutenberg_form_selector.block_empty_url } />
-						<p dangerouslySetInnerHTML={{ __html: strings.wpforms_empty_info }}></p>
+						<img src={ wpforms_gutenberg_form_selector.block_empty_url } alt="" />
+						<p dangerouslySetInnerHTML={ { __html: strings.wpforms_empty_info } }></p>
 						<button type="button" className="get-started-button components-button is-button is-primary"
 							onClick={
 								() => {
@@ -165,11 +168,11 @@ registerBlockType( 'wpforms/form-selector', {
 						>
 							{ __( 'Get Started', 'wpforms-lite' ) }
 						</button>
-						<p className="empty-desc" dangerouslySetInnerHTML={{ __html: strings.wpforms_empty_help }}></p>
+						<p className="empty-desc" dangerouslySetInnerHTML={ { __html: strings.wpforms_empty_help } }></p>
 
-						{/* Template for popup with builder iframe */}
+						{ /* Template for popup with builder iframe */ }
 						<div id="wpforms-gutenberg-popup" className="wpforms-builder-popup">
-							<iframe src="about:blank" width="100%" height="100%" id="wpforms-builder-iframe"></iframe>
+							<iframe src="about:blank" width="100%" height="100%" id="wpforms-builder-iframe" title="wpforms-gutenberg-popup"></iframe>
 						</div>
 					</div>
 				</Fragment>
@@ -183,13 +186,13 @@ registerBlockType( 'wpforms/form-selector', {
 		 *
 		 * @param {string} clientId Block client ID.
 		 *
-		 * @returns {JSX.Element} Field styles JSX code.
+		 * @return {JSX.Element} Field styles JSX code.
 		 */
 		function printEmptyFormsNotice( clientId ) {
 			return (
 				<InspectorControls key="wpforms-gutenberg-form-selector-inspector-main-settings">
 					<PanelBody className="wpforms-gutenberg-panel" title={ strings.form_settings }>
-						<p className="wpforms-gutenberg-panel-notice wpforms-warning wpforms-empty-form-notice" style={{ display: 'block' }}>
+						<p className="wpforms-gutenberg-panel-notice wpforms-warning wpforms-empty-form-notice" style={ { display: 'block' } }>
 							<strong>{ __( 'You haven’t created a form, yet!', 'wpforms-lite' ) }</strong>
 							{ __( 'What are you waiting for?', 'wpforms-lite' ) }
 						</p>
@@ -207,9 +210,39 @@ registerBlockType( 'wpforms/form-selector', {
 			);
 		}
 
+		/**
+		 * Get styling panels preview.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @return {JSX.Element} JSX code.
+		 */
+		function getStylingPanelsPreview() {
+			return (
+				<Fragment>
+					<PanelBody className="wpforms-gutenberg-panel disabled_panel" title={ strings.themes }>
+						<div className="wpforms-panel-preview wpforms-panel-preview-themes"></div>
+					</PanelBody>
+					<PanelBody className="wpforms-gutenberg-panel disabled_panel" title={ strings.field_styles }>
+						<div className="wpforms-panel-preview wpforms-panel-preview-field"></div>
+					</PanelBody>
+					<PanelBody className="wpforms-gutenberg-panel disabled_panel" title={ strings.label_styles }>
+						<div className="wpforms-panel-preview wpforms-panel-preview-label"></div>
+					</PanelBody>
+					<PanelBody className="wpforms-gutenberg-panel disabled_panel" title={ strings.button_styles }>
+						<div className="wpforms-panel-preview wpforms-panel-preview-button"></div>
+					</PanelBody>
+					<PanelBody className="wpforms-gutenberg-panel disabled_panel" title={ strings.container_styles }>
+						<div className="wpforms-panel-preview wpforms-panel-preview-container"></div>
+					</PanelBody>
+					<PanelBody className="wpforms-gutenberg-panel disabled_panel" title={ strings.background_styles }>
+						<div className="wpforms-panel-preview wpforms-panel-preview-background"></div>
+					</PanelBody>
+				</Fragment>
+			);
+		}
 
 		if ( ! hasForms() ) {
-
 			jsx = [ printEmptyFormsNotice( props.clientId ) ];
 
 			jsx.push( getEmptyFormsPreview( props ) );
@@ -235,12 +268,12 @@ registerBlockType( 'wpforms/form-selector', {
 						checked={ displayDesc }
 						onChange={ toggleDisplayDesc }
 					/>
-					<p className="wpforms-gutenberg-panel-notice">
+					<p className="wpforms-gutenberg-panel-notice wpforms-warning">
 						<strong>{ strings.update_wp_notice_head }</strong>
-						{ strings.update_wp_notice_text } <a href={strings.update_wp_notice_link} rel="noreferrer" target="_blank">{ strings.learn_more }</a>
+						{ strings.update_wp_notice_text } <a href={ strings.update_wp_notice_link } rel="noreferrer" target="_blank">{ strings.learn_more }</a>
 					</p>
-
 				</PanelBody>
+				{ getStylingPanelsPreview() }
 			</InspectorControls>,
 		];
 
@@ -256,7 +289,7 @@ registerBlockType( 'wpforms/form-selector', {
 			jsx.push(
 				<Fragment
 					key="wpforms-gutenberg-form-selector-fragment-block-preview">
-					<img src={ wpforms_gutenberg_form_selector.block_preview_url } style={{ width: '100%' }}/>
+					<img src={ wpforms_gutenberg_form_selector.block_preview_url } style={ { width: '100%' } } alt="" />
 				</Fragment>
 			);
 		} else {
@@ -264,7 +297,7 @@ registerBlockType( 'wpforms/form-selector', {
 				<Placeholder
 					key="wpforms-gutenberg-form-selector-wrap"
 					className="wpforms-gutenberg-form-selector-wrap">
-					<img src={ wpforms_gutenberg_form_selector.logo_url }/>
+					<img src={ wpforms_gutenberg_form_selector.logo_url } alt="" />
 					<SelectControl
 						key="wpforms-gutenberg-form-selector-select-control"
 						value={ formId }

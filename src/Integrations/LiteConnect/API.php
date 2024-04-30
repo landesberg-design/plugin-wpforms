@@ -264,11 +264,20 @@ class API {
 		$url        = $this->api_url . $uri;
 		$user_agent = 'WPForms/' . WPFORMS_VERSION . '; ' . home_url();
 
+		/**
+		 * Allow to filter Lite Connect request timeout.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param int $timeout Timeout value in seconds.
+		 */
+		$timeout = (int) apply_filters( 'wpforms_integrations_lite_connect_api_request_timeout', 60 );
+
 		$response = wp_remote_post(
 			$url,
 			[
 				'method'     => 'POST',
-				'timeout'    => 15,
+				'timeout'    => $timeout,
 				'headers'    => $headers,
 				'body'       => $body,
 				'user-agent' => $user_agent,

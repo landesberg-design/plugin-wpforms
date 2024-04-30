@@ -74,10 +74,8 @@ class InvoiceCreated extends Base {
 	 */
 	private function insert_renewal( $original_subscription ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$currency       = strtoupper( $this->data->currency );
-		$amount         = $this->data->amount_due / Helpers::get_decimals_amount( $currency );
-		$customer_name  = isset( $this->data->customer_name ) ? $this->data->customer_name : '';
-		$customer_email = isset( $this->data->customer_email ) ? $this->data->customer_email : '';
+		$currency = strtoupper( $this->data->currency );
+		$amount   = $this->data->amount_due / Helpers::get_decimals_amount( $currency );
 
 		return wpforms()->get( 'payment' )->add(
 			[
@@ -87,7 +85,7 @@ class InvoiceCreated extends Base {
 				'status'           => 'pending',
 				'type'             => 'renewal',
 				'gateway'          => 'stripe',
-				'title'            => $customer_name ? $customer_name : $customer_email,
+				'title'            => $original_subscription->title,
 				'subtotal_amount'  => $amount,
 				'total_amount'     => $amount,
 				'currency'         => $currency,
@@ -161,7 +159,7 @@ class InvoiceCreated extends Base {
 			$invoice = new Invoice();
 			$invoice = $invoice->retrieve( $this->data->id, Helpers::get_auth_opts() );
 
-			if ( $invoice->finalized_at === null ) {
+			if ( empty( $invoice->finalized_at ) ) {
 				$invoice->finalizeInvoice();
 			}
 		} catch ( Exception $e ) {

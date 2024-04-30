@@ -157,6 +157,12 @@ if ( ! empty( $translations ) ) {
 // Remove plugin cron jobs.
 wp_clear_scheduled_hook( 'wpforms_email_summaries_cron' );
 
+// Check if the event is scheduled before attempting to clear it.
+// This event is only registered for the Lite edition of the plugin.
+if ( wp_next_scheduled( 'wpforms_weekly_entries_count_cron' ) ) {
+	wp_clear_scheduled_hook( 'wpforms_weekly_entries_count_cron' );
+}
+
 // Un-schedule all plugin ActionScheduler actions.
 // Don't use wpforms() because 'tasks' in core are registered on `init` hook,
 // which is not executed on uninstallation.

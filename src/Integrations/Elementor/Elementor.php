@@ -57,6 +57,8 @@ class Elementor implements IntegrationInterface {
 			add_action( 'elementor/widgets/widgets_registered', [ $this, 'register_widget' ] );
 
 		add_action( 'wp_ajax_wpforms_admin_get_form_selector_options', [ $this, 'ajax_get_form_selector_options' ] );
+
+		add_filter( 'wpforms_integrations_gutenberg_form_selector_allow_render', [ $this, 'disable_gutenberg_block_render' ] );
 	}
 
 	/**
@@ -64,7 +66,7 @@ class Elementor implements IntegrationInterface {
 	 *
 	 * @since 1.6.0
 	 */
-	public function init() {
+	public function init() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		/**
 		 * Allow developers to determine whether the compatibility layer should be applied.
@@ -74,7 +76,7 @@ class Elementor implements IntegrationInterface {
 		 *
 		 * @param bool $use_compat Use compatibility.
 		 */
-		$use_compat = (bool) apply_filters( 'wpforms_apply_elementor_preview_compat', true );
+		$use_compat = (bool) apply_filters( 'wpforms_apply_elementor_preview_compat', true ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 		if ( $use_compat !== true ) {
 			return;
@@ -243,5 +245,25 @@ class Elementor implements IntegrationInterface {
 	protected function is_modern_widget() {
 
 		return wpforms_get_render_engine() === 'modern' && (int) wpforms_setting( 'disable-css', '1' ) === 1;
+	}
+
+	/**
+	 * Disable the block render for pages built in Elementor.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param bool $allow_render Whether to allow the block render.
+	 *
+	 * @return bool Whether to disable the block render.
+	 */
+	public function disable_gutenberg_block_render( $allow_render ): bool {
+
+		$document = ElementorPlugin::$instance->documents->get( get_the_ID() );
+
+		if ( $document && $document->is_built_with_elementor() ) {
+			return false;
+		}
+
+		return $allow_render;
 	}
 }

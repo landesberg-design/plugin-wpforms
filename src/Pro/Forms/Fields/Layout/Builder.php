@@ -78,6 +78,9 @@ class Builder {
 	 */
 	public function field_options( $field ) {
 
+		// Defaults.
+		$display = isset( $field['display'] ) ? esc_attr( $field['display'] ) : 'columns';
+
 		$this->field_option_columns_json( $field );
 
 		// Options open markup.
@@ -98,6 +101,39 @@ class Builder {
 		);
 
 		$this->field_option_preset_selector( $field );
+
+		$output = $this->field_obj->field_element(
+			'label',
+			$field,
+			[
+				'slug'  => 'display',
+				'value' => esc_html__( 'Display', 'wpforms' ),
+			],
+			false
+		);
+
+		$output .= $this->field_obj->field_element(
+			'select',
+			$field,
+			[
+				'slug'    => 'display',
+				'value'   => $display,
+				'options' => [
+					'rows'    => esc_html__( 'Rows - fields are ordered from left to right', 'wpforms' ),
+					'columns' => esc_html__( 'Columns - fields are ordered from top to bottom', 'wpforms' ),
+				],
+			],
+			false
+		);
+
+		$this->field_obj->field_element(
+			'row',
+			$field,
+			[
+				'slug'    => 'display',
+				'content' => $output,
+			]
+		);
 
 		// Options close markup.
 		$this->field_obj->field_option(
@@ -134,6 +170,9 @@ class Builder {
 	 */
 	private function field_option_preset_selector( $field ) {
 
+		// Defaults.
+		$display = isset( $field['display'] ) ? esc_attr( $field['display'] ) : 'columns';
+
 		$presets = $this->field_obj->get_presets();
 
 		$this->field_obj->field_element(
@@ -164,6 +203,7 @@ class Builder {
 			[
 				'slug'    => 'preset',
 				'content' => $inputs,
+				'class'   => $display === 'rows' ? 'wpforms-layout-display-rows' : '',
 			]
 		);
 	}
@@ -180,12 +220,10 @@ class Builder {
 		// Label.
 		$this->field_obj->field_preview_option( 'label', $field );
 
-		// Notice.
-		$this->field_preview_notice();
-
 		// Columns.
-		$columns      = isset( $field['columns'] ) && is_array( $field['columns'] ) ? $field['columns'] : $this->field_obj->defaults['columns'];
-		$columns_html = '';
+		$columns       = isset( $field['columns'] ) && is_array( $field['columns'] ) ? $field['columns'] : $this->field_obj->defaults['columns'];
+		$columns_class = ! empty( $field['display'] ) ? ' wpforms-layout-display-' . esc_attr( $field['display'] ) : '';
+		$columns_html  = '';
 
 		foreach ( $columns as $column ) {
 
@@ -201,50 +239,13 @@ class Builder {
 		}
 
 		printf(
-			'<div class="wpforms-field-layout-columns">%1$s</div>',
+			'<div class="wpforms-field-layout-columns%1$s">%2$s</div>',
+			esc_attr( $columns_class ),
 			$columns_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
 
 		// Description.
 		$this->field_obj->field_preview_option( 'description', $field );
-	}
-
-	/**
-	 * Display dismissible notice inside the Layout field preview.
-	 *
-	 * @since 1.7.7
-	 */
-	private function field_preview_notice() {
-
-		$dismissed = get_user_meta( get_current_user_id(), 'wpforms_dismissed', true );
-
-		if ( ! empty( $dismissed['edu-builder-layout-field-alert'] ) ) {
-			return;
-		}
-
-		printf(
-			'<div class="wpforms-alert wpforms-alert-info wpforms-alert-dismissible wpforms-dismiss-container wpforms-dismiss-out">
-				<div class="wpforms-alert-message">
-					<p>
-						%1$s
-						<a href="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a>
-					</p>
-				</div>
-				<div class="wpforms-alert-buttons">
-					<button type="button" class="wpforms-dismiss-button" title="%4$s" data-section="builder-layout-field-alert"></button>
-				</div>
-			</div>',
-			esc_html__( 'Drag and drop fields into the columns below, or click a column to make it active. You may then click on new fields to easily place them directly into the active column.', 'wpforms' ),
-			esc_url(
-				wpforms_utm_link(
-					'https://wpforms.com/docs/how-to-use-the-layout-field-in-wpforms/',
-					'Builder Notice',
-					'Layout Field Documentation'
-				)
-			),
-			esc_html__( 'Learn More', 'wpforms' ),
-			esc_attr__( 'Dismiss this message.', 'wpforms' )
-		);
 	}
 
 	/**
@@ -383,15 +384,13 @@ class Builder {
 	private function get_field_preview_column_plus_placeholder_template() {
 
 		return sprintf(
-			'<div class="wpforms-layout-column-placeholder" title="%s">
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="normal-icon">
-					<path d="M18.2 11.71a.62.62 0 0 0-.59-.58h-4.74V6.39a.62.62 0 0 0-.58-.58h-.58a.59.59 0 0 0-.58.58v4.74H6.39a.59.59 0 0 0-.58.58v.58c0 .34.24.58.58.58h4.74v4.74c0 .34.24.58.58.58h.58c.3 0 .58-.24.58-.58v-4.74h4.74c.3 0 .58-.24.58-.58v-.58ZM24 12a12 12 0 1 0-24 0 12 12 0 0 0 24 0Zm-1.55 0a10.44 10.44 0 1 1-20.9 0C1.55 6.29 6.19 1.55 12 1.55A10.5 10.5 0 0 1 22.45 12Z" class="wpforms-plus-path"/>
+			'<div class="wpforms-layout-column-placeholder">
+				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14" fill="none">
+					<path id="fa-caret-square-o-up" d="M11.25 14H0.75C0.3125 14 0 13.6875 0 13.25V13.5C0 13.0938 0.3125 12.75 0.75 12.75H11.25C11.6562 12.75 12 13.0938 12 13.5V13.25C12 13.6875 11.6562 14 11.25 14ZM4 0.75C4 0.34375 4.3125 0 4.75 0H7.25C7.65625 0 8 0.34375 8 0.75V5H10.7188C11.2812 5 11.5625 5.6875 11.1562 6.09375L6.40625 10.8438C6.1875 11.0625 5.78125 11.0625 5.5625 10.8438L0.8125 6.09375C0.40625 5.6875 0.6875 5 1.25 5H4V0.75Z" fill="#A6A6A6" class="wpforms-plus-path"/>
 				</svg>
-				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="active-icon">
-					<path d="M12 24a12 12 0 1 0 0-24 12 12 0 0 0 0 24ZM1.55 12C1.55 6.29 6.19 1.55 12 1.55A10.5 10.5 0 0 1 22.45 12a10.44 10.44 0 1 1-20.9 0ZM6 11.42a.56.56 0 0 0 0 .82l.34.34c.24.24.58.24.82 0l4.02-4.16v9.2c0 .33.24.57.58.57h.48c.3 0 .58-.24.58-.58v-9.2l3.97 4.17c.24.24.58.24.82 0l.34-.34a.56.56 0 0 0 0-.82L12.4 5.85a.56.56 0 0 0-.83 0L6 11.42Z" class="wpforms-plus-path"/>
-				</svg>
+				<span>%1$s</span>
 			</div>',
-			esc_attr__( 'Click to set this column as default. Click again to unset.', 'wpforms' )
+			esc_html__( 'Add Fields', 'wpforms' )
 		);
 	}
 

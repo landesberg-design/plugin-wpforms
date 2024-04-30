@@ -452,6 +452,20 @@ class Captcha {
 			};
 		';
 
+		$sync = /** @lang JavaScript */
+			'const wpformsRecaptchaSync = ( func ) => {
+				return function() {
+					const context = this;
+					const args = arguments;
+
+					// Sync with jQuery ready event.
+					jQuery( document ).ready( function() {
+						func.apply( context, args );
+					} );
+				}
+			};
+		';
+
 		if ( $captcha_settings['provider'] === 'hcaptcha' ) {
 			$data  = $dispatch;
 			$data .= $callback;
@@ -474,7 +488,6 @@ class Captcha {
 		}
 
 		if ( $captcha_settings['provider'] === 'turnstile' ) {
-
 			$data  = $dispatch;
 			$data .= $callback;
 			$data .= $turnstile_update_class;
@@ -525,9 +538,10 @@ class Captcha {
 		} elseif ( $captcha_settings['recaptcha_type'] === 'invisible' ) {
 			$data  = $polyfills;
 			$data .= $dispatch;
+			$data .= $sync;
 
 			$data .= /** @lang JavaScript */
-				'var wpformsRecaptchaLoad = function () {
+				'var wpformsRecaptchaLoad = wpformsRecaptchaSync( function () {
 					Array.prototype.forEach.call(document.querySelectorAll(".g-recaptcha"), function (el) {
 						try {
 							var recaptchaID = grecaptcha.render(el, {
@@ -542,7 +556,7 @@ class Captcha {
 						} catch (error) {}
 					});
 					wpformsDispatchEvent(document, "wpformsRecaptchaLoaded", true);
-				};
+				} );
 				var wpformsRecaptchaCallback = function (el) {
 					var $form = el.closest("form");
 					if (typeof wpforms.formSubmit === "function") {

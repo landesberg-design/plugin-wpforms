@@ -104,16 +104,30 @@ abstract class SmartTag {
 	 */
 	public function get_user( $entry_id ) {
 
-		if ( is_user_logged_in() ) {
-			return wp_get_current_user();
+		$user = $this->get_entry_user( $entry_id );
+
+		if ( ! empty( $user ) ) {
+			return $user;
 		}
+
+		return is_user_logged_in() ? wp_get_current_user() : '';
+	}
+
+	/**
+	 * Get user from the entry.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param string|int $entry_id Entry ID.
+	 *
+	 * @return WP_User|string
+	 */
+	private function get_entry_user( $entry_id ) {
 
 		if ( empty( $entry_id ) ) {
 			return '';
 		}
 
-		// If user is not logged in, try to get the user from the entry.
-		// Needed if we try to get the user during cron.
 		$entry = wpforms()->get( 'entry' );
 
 		if ( empty( $entry ) ) {
@@ -140,15 +154,46 @@ abstract class SmartTag {
 	 *
 	 * @since 1.8.7
 	 *
-	 * @param int $form_id Form ID.
+	 * @param int $post_id Submitted post ID.
 	 *
 	 * @return WP_User|false WP_User object on success, false on failure.
 	 */
-	public function get_author( $form_id ) {
+	public function get_author( $post_id ) {
 
-		$author_id = get_post_field( 'post_author', $form_id );
+		$author_id = get_post_field( 'post_author', $post_id );
 
 		return get_user_by( 'id', $author_id );
+	}
+
+	/**
+	 * Get author property.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param int|string $entry_id Entry ID.
+	 * @param string     $meta_key User property.
+	 *
+	 * @return string
+	 */
+	protected function get_author_meta( $entry_id, string $meta_key ): string {
+
+		if ( empty( $entry_id ) ) {
+			return '';
+		}
+
+		$page_id = $this->get_meta( $entry_id, 'page_id' );
+
+		if ( empty( $page_id ) ) {
+			return '';
+		}
+
+		$author = $this->get_author( $page_id );
+
+		if ( ! $author ) {
+			return '';
+		}
+
+		return $author->{$meta_key} ?? '';
 	}
 
 	/**

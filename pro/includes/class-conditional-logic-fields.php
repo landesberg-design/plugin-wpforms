@@ -549,11 +549,13 @@ class WPForms_Conditional_Logic_Fields {
 	 *
 	 * @since 1.8.7
 	 *
-	 * @param array $form_data Form data.
+	 * @param array|mixed $form_data Form data.
 	 *
 	 * @return array
 	 */
 	public function detect_payment_conditionals( $form_data ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		$form_data = (array) $form_data;
 
 		if ( empty( $form_data['payments'] ) || ! is_array( $form_data['payments'] ) ) {
 			return $form_data;

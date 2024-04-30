@@ -12,6 +12,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WPForms_Builder_Panel_Revisions extends WPForms_Builder_Panel {
 
 	/**
+	 * Panel title.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @var string
+	 */
+	private $title;
+
+	/**
 	 * All systems go.
 	 *
 	 * @since 1.7.3
@@ -24,6 +33,10 @@ class WPForms_Builder_Panel_Revisions extends WPForms_Builder_Panel {
 		$this->icon    = 'fa-history';
 		$this->order   = 10;
 		$this->sidebar = true;
+
+		$this->title = $this->form && $this->form->post_type === 'wpforms-template' ?
+			__( 'Form Template Revisions', 'wpforms-lite' ) :
+			__( 'Form Revisions', 'wpforms-lite' );
 
 		$this->hooks();
 	}
@@ -79,7 +92,7 @@ class WPForms_Builder_Panel_Revisions extends WPForms_Builder_Panel {
 			$badge,
 			esc_attr( $this->icon ),
 			esc_html( $this->name ),
-			esc_html__( 'Form Revisions', 'wpforms-lite' )
+			esc_html( $this->title )
 		);
 	}
 
@@ -100,7 +113,7 @@ class WPForms_Builder_Panel_Revisions extends WPForms_Builder_Panel {
 				<h3>%s</h3>
 				<p>%s</p>
 			</div>',
-			esc_html__( 'Form Revisions', 'wpforms-lite' ),
+			esc_html( $this->title ),
 			esc_html__( 'Select a revision to roll back to that version. All changes, including settings, will be reverted.', 'wpforms-lite' )
 		);
 

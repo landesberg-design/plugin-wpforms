@@ -53,6 +53,7 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			app.setup();
 			app.initLabels();
 			app.events();
+			app.rowDisplayHeightBalance( $( '.wpforms-field-layout-columns.wpforms-layout-display-rows' ) );
 		},
 
 		/**
@@ -75,11 +76,10 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 */
-		events: function() {
-
+		events() {
 			el.$builder
-				.on( 'click', '.wpforms-layout-column-placeholder', app.columnPlaceholderClick )
 				.on( 'change', '.wpforms-field-option-row-preset input', app.presetChange )
+				.on( 'change', '.wpforms-field-option-row-display select', app.displayChange )
 				.on( 'mouseenter', '.wpforms-field-layout .wpforms-field', app.subfieldMouseEnter )
 				.on( 'mouseleave', '.wpforms-field-layout .wpforms-field', app.subfieldMouseLeave )
 				.on( 'wpformsFieldAddDragStart', app.fieldCantAddModal )
@@ -91,29 +91,151 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 				.on( 'wpformsFieldOptionTabToggle', app.fieldOptionsUpdate )
 				.on( 'wpformsFieldMoveRejected', app.fieldMoveRejected )
 				.on( 'wpformsBeforeFieldDuplicate', app.beforeFieldDuplicate )
-				.on( 'wpformsFieldDuplicated', app.fieldDuplicated );
+				.on( 'wpformsFieldDuplicated', app.fieldDuplicated )
+				.on( 'wpformsFieldDelete', app.handleFieldDelete )
+				.on( 'wpformsFieldAdd wpformsFieldChoiceAdd wpformsFieldChoiceDelete wpformsFieldDynamicChoiceToggle wpformsFieldLayoutChangeDisplay', app.handleFieldOperations )
+				.on( 'wpformsFieldMoveRejected', app.handleFieldMoveRejected )
+				.on( 'wpformsFieldMove', app.handleFieldMove )
+				.on( 'wpformsFieldDragOver wpformsFieldDragChange', app.handleFieldDrag );
 		},
 
 		/**
-		 * Column placeholder click event handler.
+		 * Field delete event handler.
 		 *
-		 * @since 1.7.7
+		 * @since 1.8.8
 		 *
-		 * @param {object} e Event object.
+		 * @param {Object} e                   Event object.
+		 * @param {string} fieldID             Field ID.
+		 * @param {string} fieldType           Field type.
+		 * @param {jQuery} $fieldLayoutWrapper Field layout wrapper.
 		 */
-		columnPlaceholderClick: function( e ) {
+		handleFieldDelete( e, fieldID, fieldType, $fieldLayoutWrapper ) {
+			if ( $fieldLayoutWrapper.length === 0 || ! $fieldLayoutWrapper.hasClass( 'wpforms-layout-display-rows' ) ) {
+				return;
+			}
 
-			e.stopPropagation();
+			app.rowDisplayHeightBalance( $fieldLayoutWrapper );
+		},
 
-			const $placeholder = $( this ),
-				$column = $placeholder.closest( '.wpforms-layout-column' ),
-				isActive = $column.hasClass( 'wpforms-fields-sortable-default' ),
-				$allColumns = el.$sortableFieldsWrap.find( '.wpforms-layout-column' );
+		/**
+		 * Field operations event handler.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param {Object} e       Event object.
+		 * @param {string} fieldID Field ID.
+		 */
+		handleFieldOperations( e, fieldID ) {
+			const $field = $( `#wpforms-field-${ fieldID }` );
 
-			$allColumns.removeClass( 'wpforms-fields-sortable-default' );
-			$column.toggleClass( 'wpforms-fields-sortable-default', ! isActive );
+			if ( $field.find( '.wpforms-layout-display-rows' ).length === 0 ) {
+				return;
+			}
 
-			WPFormsBuilder.fieldTabToggle( 'add-fields' );
+			app.rowDisplayHeightBalance( $field.find( '.wpforms-layout-display-rows' ) );
+		},
+
+		/**
+		 * Field move rejected event handler.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param {Object} e              Event object.
+		 * @param {jQuery} $rejectedField Rejected field object.
+		 */
+		handleFieldMoveRejected( e, $rejectedField ) {
+			const fieldID = $rejectedField.prev( '.wpforms-field, .wpforms-alert' ).data( 'field-id' );
+			const $field = $( `#wpforms-field-${ fieldID }` );
+
+			if ( $field.find( '.wpforms-layout-display-rows' ).length === 0 ) {
+				return;
+			}
+
+			app.rowDisplayHeightBalance( $field.find( '.wpforms-layout-display-rows' ) );
+		},
+
+		/**
+		 * Field move event handler.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param {Object} e  Event object.
+		 * @param {Object} ui UI object.
+		 */
+		handleFieldMove( e, ui ) {
+			const $field = ui.item.first();
+
+			if ( $field.parents( '.wpforms-layout-display-rows' ).length === 0 ) {
+				return;
+			}
+
+			app.rowDisplayHeightBalance( $field.parents( '.wpforms-layout-display-rows' ) );
+		},
+
+		/**
+		 * Field drag event handler.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param {Object} e       Event object.
+		 * @param {string} fieldID Field ID.
+		 * @param {jQuery} $target Target element.
+		 */
+		handleFieldDrag( e, fieldID, $target ) {
+			if ( ! $target.hasClass( 'wpforms-layout-column' ) ) {
+				return;
+			}
+
+			app.rowDisplayHeightBalance( $target.parents( '.wpforms-layout-display-rows' ) );
+		},
+
+		/**
+		 * Display option event handler.
+		 *
+		 * @since 1.8.8
+		 */
+		displayChange() {
+			const $select = $( this );
+			const display = $select.val();
+			const fieldId = $select.closest( '.wpforms-field-option-row-display' ).data( 'field-id' );
+			const $fieldPreviewColumns = $( `#wpforms-field-${ fieldId }` ).find( '.wpforms-field-layout-columns' );
+
+			$select.closest( '.wpforms-field-option-row-display' ).parent().find( '.wpforms-field-option-row-preset' )
+				.toggleClass( 'wpforms-layout-display-rows', display === 'rows' );
+
+			$fieldPreviewColumns
+				.toggleClass( 'wpforms-layout-display-rows', display === 'rows' )
+				.toggleClass( 'wpforms-layout-display-columns', display === 'columns' )
+				.find( '.wpforms-field' ).css( 'margin-bottom', display === 'columns' ? 5 : '' );
+
+			el.$builder.trigger( 'wpformsFieldLayoutChangeDisplay', [ fieldId ] );
+		},
+
+		/**
+		 * Display row fields height balance.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param {Object} $rows Rows container.
+		 */
+		rowDisplayHeightBalance( $rows ) {
+			$rows.each( function() {
+				const $wrapper = $( this );
+				const data = [];
+
+				$wrapper.find( '.wpforms-field, .wpforms-field-drag-placeholder' ).each( function() {
+					const $field = $( this );
+					const index = $field.index();
+
+					data[ index ] = Math.max( data[ index ] || 0, $field.outerHeight() );
+				} );
+
+				$wrapper.find( '.wpforms-field, .wpforms-field-drag-placeholder' ).each( function() {
+					const $field = $( this );
+
+					$field.css( 'margin-bottom', data[ $field.index() ] - $field.outerHeight() + 5 );
+				} );
+			} );
 		},
 
 		/**

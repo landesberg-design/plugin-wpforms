@@ -757,7 +757,7 @@ class WPForms_About {
 
 		<div class="wpforms-admin-about-section wpforms-admin-about-section-squashed wpforms-admin-about-section-hero wpforms-admin-about-section-table">
 
-			<div class="wpforms-admin-about-section-hero-main wpforms-admin-columns">
+			<div class="wpforms-admin-about-section-hero-main no-border wpforms-admin-columns">
 				<div class="wpforms-admin-column-33">
 					<h3 class="no-margin">
 						<?php esc_html_e( 'Feature', 'wpforms-lite' ); ?>

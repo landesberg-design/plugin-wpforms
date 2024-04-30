@@ -37,6 +37,8 @@ class PaymentElementCreditCard extends WPForms_Field {
 		// Save form data for future usage in the class.
 		$this->form_data = $form_data;
 
+		unset( $properties['label']['attr']['for'] );
+
 		return $properties;
 	}
 

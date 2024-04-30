@@ -149,7 +149,7 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 				revert: true,
 				axis: 'y',
 				delay: 100,
-				opacity: 0.75,
+				opacity: 1,
 				cursor: 'move',
 				start: function( event, ui ) {
 
@@ -274,7 +274,7 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 				items: '> .wpforms-field:not(.wpforms-field-stick):not(.no-fields-preview)',
 				connectWith: '.wpforms-field-wrap, .wpforms-layout-column',
 				delay: 100,
-				opacity: 0.75,
+				opacity: 1,
 				cursor: 'move',
 				cancel: '.wpforms-field-not-draggable',
 				placeholder: 'wpforms-field-drag-placeholder',
@@ -282,8 +282,7 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 				zindex: 10000,
 				tolerance: 'pointer',
 				distance: 1,
-				start: function( e, ui ) {
-
+				start( e, ui ) {
 					fieldId = ui.item.data( 'field-id' );
 					fieldType = ui.item.data( 'field-type' );
 					isNewField = typeof fieldId === 'undefined';
@@ -293,9 +292,10 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 					vars.fieldRejected = false;
 					vars.$sortableStart = $sortable;
 					vars.startPosition = ui.item.first().index();
-				},
-				beforeStop: function( e, ui ) {
 
+					el.$builder.trigger( 'wpformsFieldDragStart', [ fieldId ] );
+				},
+				beforeStop() {
 					if ( ! vars.glitchChange ) {
 						return;
 					}
@@ -305,8 +305,7 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 						vars.fieldRejected = true;
 					}
 				},
-				stop: function( e, ui ) {
-
+				stop( e, ui ) {
 					const $field = ui.item.first();
 
 					ui.placeholder.removeClass( 'wpforms-field-drag-not-allowed' );
@@ -357,8 +356,7 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 
 					vars.fieldReceived = false;
 				},
-				over: function( e, ui ) { // eslint-disable-line complexity
-
+				over( e, ui ) { // eslint-disable-line complexity
 					const $field = ui.item.first(),
 						$target = $( e.target ),
 						$placeholder = $target.find( '.wpforms-field-drag-placeholder' ),
@@ -384,15 +382,15 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 					$field
 						.addClass( 'wpforms-field-dragging' + targetClass )
 						.css( {
-							'width': isColumn ? helper.width - 5 : helper.width,
-							'height': 'auto',
+							width: isColumn ? helper.width - 5 : helper.width,
+							height: 'auto',
 						} );
 
 					// Adjust placeholder height according to the height of the helper.
 					$placeholder
 						.removeClass( 'wpforms-field-drag-not-allowed' )
 						.css( {
-							'height': isNewField ? helper.height + 18 : helper.height,
+							height: isNewField ? helper.height + 18 : helper.height,
 						} );
 
 					// Drop to this place is not allowed.
@@ -404,6 +402,8 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 						$field.addClass( 'wpforms-field-drag-not-allowed' );
 					}
 
+					el.$builder.trigger( 'wpformsFieldDragOver', [ fieldId, $target ] );
+
 					// Skip if it is the existing field.
 					if ( ! isNewField ) {
 						return;
@@ -413,10 +413,11 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 						.addClass( 'wpforms-field-drag-over' )
 						.removeClass( 'wpforms-field-drag-out' );
 				},
-				out: function( e, ui ) {
-
+				out( e, ui ) {
 					const $field = ui.item.first(),
+						// eslint-disable-next-line no-shadow
 						fieldId = $field.data( 'field-id' ),
+						// eslint-disable-next-line no-shadow
 						isNewField = typeof fieldId === 'undefined';
 
 					$field
@@ -434,7 +435,6 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 
 					// Skip if it is the existing field.
 					if ( ! isNewField ) {
-
 						// Remove extra class from the parent layout field.
 						// Fixes disappearing of duplicate/delete field icons
 						// after moving the field outside the layout field.
@@ -449,13 +449,13 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 						.addClass( 'wpforms-field-drag-out' )
 						.removeClass( 'wpforms-field-drag-over' );
 				},
-				receive: function( e, ui ) { // eslint-disable-line complexity
-
+				receive( e, ui ) { // eslint-disable-line complexity
 					const $field = $( ui.helper || ui.item );
 
 					fieldId = $field.data( 'field-id' );
 					fieldType = $field.data( 'field-type' ) || vars.fieldType;
 
+					// eslint-disable-next-line no-shadow
 					const isNewField = typeof fieldId === 'undefined',
 						isColumn = $sortable.hasClass( 'wpforms-layout-column' );
 
@@ -485,7 +485,7 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 					}
 
 					// Add new field.
-					let position = $sortable.data( 'ui-sortable' ).currentItem.index();
+					const position = $sortable.data( 'ui-sortable' ).currentItem.index();
 
 					$field
 						.addClass( 'wpforms-field-drag-over wpforms-field-drag-pending' )
@@ -500,15 +500,15 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 						{
 							position: isColumn ? position - 1 : position,
 							placeholder: $field,
-							$sortable: $sortable,
+							$sortable,
 						}
 					);
 
 					vars.fieldType = undefined;
 				},
-				change: function( e, ui ) {
-
+				change( e, ui ) {
 					const $placeholderSortable = ui.placeholder.parent();
+					const $targetSortable = $( e.target );
 
 					vars.glitchChange = false;
 
@@ -521,9 +521,10 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 					) {
 						vars.glitchChange = true;
 					}
-				},
-				sort: function( e, ui ) {
 
+					el.$builder.trigger( 'wpformsFieldDragChange', [ fieldId, $targetSortable ] );
+				},
+				sort( e ) {
 					if ( currentlyScrolling ) {
 						return;
 					}
@@ -577,7 +578,7 @@ WPForms.Admin.Builder.DragFields = WPForms.Admin.Builder.DragFields || ( functio
 				delay: 200,
 				cancel: false,
 				scroll: false,
-				opacity: 0.75,
+				opacity: 1,
 				appendTo: '#wpforms-panel-fields',
 				zindex: 10000,
 				helper() {

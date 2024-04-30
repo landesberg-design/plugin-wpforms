@@ -19,7 +19,23 @@ class Settings extends \WPForms\Vendor\Stripe\SingletonApiResource
 {
     const OBJECT_NAME = 'tax.settings';
     use \WPForms\Vendor\Stripe\ApiOperations\SingletonRetrieve;
-    use \WPForms\Vendor\Stripe\ApiOperations\Update;
     const STATUS_ACTIVE = 'active';
     const STATUS_PENDING = 'pending';
+    /**
+     * @param null|array $params
+     * @param null|array|string $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return static the updated resource
+     */
+    public static function update($params = null, $opts = null)
+    {
+        self::_validateParams($params);
+        $url = '/v1/tax/settings';
+        list($response, $opts) = static::_staticRequest('post', $url, $params, $opts);
+        $obj = \WPForms\Vendor\Stripe\Util\Util::convertToStripeObject($response->json, $opts);
+        $obj->setLastResponse($response);
+        return $obj;
+    }
 }

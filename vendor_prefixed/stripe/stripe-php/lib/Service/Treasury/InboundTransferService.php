@@ -3,13 +3,19 @@
 // File generated from our OpenAPI spec
 namespace WPForms\Vendor\Stripe\Service\Treasury;
 
+/**
+ * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ */
+/**
+ * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
+ */
 class InboundTransferService extends \WPForms\Vendor\Stripe\Service\AbstractService
 {
     /**
      * Returns a list of InboundTransfers sent from the specified FinancialAccount.
      *
      * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
@@ -24,7 +30,7 @@ class InboundTransferService extends \WPForms\Vendor\Stripe\Service\AbstractServ
      *
      * @param string $id
      * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
@@ -38,7 +44,7 @@ class InboundTransferService extends \WPForms\Vendor\Stripe\Service\AbstractServ
      * Creates an InboundTransfer.
      *
      * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *
@@ -53,7 +59,7 @@ class InboundTransferService extends \WPForms\Vendor\Stripe\Service\AbstractServ
      *
      * @param string $id
      * @param null|array $params
-     * @param null|array|\Stripe\Util\RequestOptions $opts
+     * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
      *
      * @throws \Stripe\Exception\ApiErrorException if the request fails
      *

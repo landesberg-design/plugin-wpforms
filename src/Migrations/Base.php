@@ -30,6 +30,20 @@ abstract class Base {
 	const CURRENT_VERSION = WPFORMS_VERSION;
 
 	/**
+	 * WP option name to store the upgraded from version number.
+	 *
+	 * @since 1.8.8
+	 */
+	const UPGRADED_FROM_OPTION_NAME = 'wpforms_version_upgraded_from';
+
+	/**
+	 * WP option name to store the previous plugin version.
+	 *
+	 * @since 1.8.8
+	 */
+	const PREVIOUS_CORE_VERSION_OPTION_NAME = 'wpforms_version_previous';
+
+	/**
 	 * Name of the core plugin used in log messages.
 	 *
 	 * @since 1.7.5
@@ -143,10 +157,10 @@ abstract class Base {
 	 *
 	 * @noinspection NotOptimalIfConditionsInspection
 	 */
-	public function migrate() {
+	public function migrate() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$classes   = $this->get_upgrade_classes();
-		$namespace = $this->reflector->getNamespaceName() . '\\';
+		$classes    = $this->get_upgrade_classes();
+		$namespace  = $this->reflector->getNamespaceName() . '\\';
 
 		foreach ( $classes as $class ) {
 			$upgrade_version = $this->get_upgrade_version( $class );
@@ -170,7 +184,8 @@ abstract class Base {
 			}
 
 			// Run upgrade.
-			$migrated = ( new $class( $this ) )->run();
+			$migrated   = ( new $class( $this ) )->run();
+			$is_upgrade = true;
 
 			// Some migration methods can be called several times to support AS action,
 			// so do not log their completion here.
@@ -182,6 +197,35 @@ abstract class Base {
 
 			$this->log_migration_message( $migrated, $plugin_name, $upgrade_version );
 		}
+	}
+
+	/**
+	 * Runs when the core plugin has been upgraded.
+	 *
+	 * @since 1.8.8
+	 */
+	private function core_upgraded() {
+
+		if ( ! $this->is_core_plugin() ) {
+			return;
+		}
+
+		// Store the previous version from which the core plugin was upgraded.
+		$upgraded_from = get_option( static::UPGRADED_FROM_OPTION_NAME, '' );
+
+		// Store the previous core version in the option.
+		update_option( static::PREVIOUS_CORE_VERSION_OPTION_NAME, $upgraded_from );
+
+		/**
+		 * Fires after the core plugin has been upgraded.
+		 * Please note: some of the migrations that run via Active Scheduler can be not completed yet.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param string $upgraded_from The version from which the core plugin was upgraded.
+		 * @param Base   $migration_obj The migration class instance.
+		 */
+		do_action( 'wpforms_migrations_base_core_upgraded', $upgraded_from, $this );
 	}
 
 	/**
@@ -201,8 +245,8 @@ abstract class Base {
 		 */
 		$migrated[ static::CURRENT_VERSION ] = $migrated[ static::CURRENT_VERSION ] ?? time();
 
-		ksort( $last_migrated );
-		ksort( $migrated );
+		uksort( $last_migrated, 'version_compare' );
+		uksort( $migrated, 'version_compare' );
 
 		if ( $migrated === $last_migrated ) {
 			return;
@@ -244,7 +288,10 @@ abstract class Base {
 			return;
 		}
 
-		update_option( 'wpforms_version_upgraded_from', $this->get_max_version( $last_completed ) );
+		// Store the current core version in the option.
+		update_option( static::UPGRADED_FROM_OPTION_NAME, $this->get_max_version( $last_completed ) );
+
+		$this->core_upgraded();
 	}
 
 	/**
@@ -274,12 +321,20 @@ abstract class Base {
 	 */
 	protected function get_upgrade_version( string $class_name ): string {
 
-		// Find only the digits to get version number.
-		if ( ! preg_match( '/\d+/', $class_name, $matches ) ) {
+		// Find only the digits and underscores to get version number.
+		if ( ! preg_match( '/(\d_?)+/', $class_name, $matches ) ) {
 			return '';
 		}
 
-		return implode( '.', str_split( $matches[0] ) );
+		$raw_version = $matches[0];
+
+		if ( strpos( $raw_version, '_' ) ) {
+			// Modern notation: 1_10_0_3 means 1.10.0.3 version.
+			return str_replace( '_', '.', $raw_version );
+		}
+
+		// Legacy notation, with 1-digit subversion numbers: 1751 means 1.7.5.1 version.
+		return implode( '.', str_split( $raw_version ) );
 	}
 
 	/**

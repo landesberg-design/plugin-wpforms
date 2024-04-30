@@ -172,17 +172,20 @@ class Templates {
 		);
 
 		$strings = [
-			'ajaxurl'               => admin_url( 'admin-ajax.php' ),
-			'admin_nonce'           => wp_create_nonce( 'wpforms-admin' ),
-			'nonce'                 => wp_create_nonce( 'wpforms-form-templates' ),
-			'can_install_addons'    => wpforms_can_install( 'addon' ),
-			'activating'            => esc_html__( 'Activating', 'wpforms-lite' ),
-			'cancel'                => esc_html__( 'Cancel', 'wpforms-lite' ),
-			'heads_up'              => esc_html__( 'Heads Up!', 'wpforms-lite' ),
-			'install_confirm'       => esc_html__( 'Install and activate', 'wpforms-lite' ),
-			'ok'                    => esc_html__( 'Ok', 'wpforms-lite' ),
-			'template_addons_error' => esc_html__( 'Could not install OR activate all the required addons. Please download from wpforms.com and install them manually. Would you like to use the template anyway?', 'wpforms-lite' ),
-			'use_template'          => esc_html__( 'Yes, use template', 'wpforms-lite' ),
+			'ajaxurl'                 => admin_url( 'admin-ajax.php' ),
+			'admin_nonce'             => wp_create_nonce( 'wpforms-admin' ),
+			'nonce'                   => wp_create_nonce( 'wpforms-form-templates' ),
+			'can_install_addons'      => wpforms_can_install( 'addon' ),
+			'activating'              => esc_html__( 'Activating', 'wpforms-lite' ),
+			'cancel'                  => esc_html__( 'Cancel', 'wpforms-lite' ),
+			'heads_up'                => esc_html__( 'Heads Up!', 'wpforms-lite' ),
+			'install_confirm'         => esc_html__( 'Install and activate', 'wpforms-lite' ),
+			'ok'                      => esc_html__( 'Ok', 'wpforms-lite' ),
+			'template_addons_error'   => esc_html__( 'Could not install OR activate all the required addons. Please download from wpforms.com and install them manually. Would you like to use the template anyway?', 'wpforms-lite' ),
+			'use_template'            => esc_html__( 'Yes, use template', 'wpforms-lite' ),
+			'delete_template'         => esc_html__( 'Yes, Delete', 'wpforms-lite' ),
+			'delete_template_title'   => esc_html__( 'Delete Form Template', 'wpforms-lite' ),
+			'delete_template_content' => esc_html__( 'Are you sure you want to delete this form template? This cannot be undone.', 'wpforms-lite' ),
 		];
 
 		if ( $strings['can_install_addons'] ) {
@@ -720,7 +723,7 @@ class Templates {
 			return $args;
 		}
 
-		$template['data']['meta']['template'] = $template['id'];
+		$template['data']['meta']['template'] = $template['id'] ?? $template['slug'];
 
 		// Enable Notifications by default.
 		$template['data']['settings']['notification_enable'] = isset( $template['data']['settings']['notification_enable'] )
@@ -788,13 +791,21 @@ class Templates {
 		}
 
 		// Compile the new form data preserving needed data from the existing form.
-		$new                     = $template['data'];
-		$new['id']               = isset( $form['ID'] ) ? $form['ID'] : 0;
-		$new['field_id']         = isset( $form_data['field_id'] ) ? $form_data['field_id'] : 0;
-		$new['settings']         = isset( $form_data['settings'] ) ? $form_data['settings'] : [];
-		$new['payments']         = isset( $form_data['payments'] ) ? $form_data['payments'] : [];
-		$new['meta']             = isset( $form_data['meta'] ) ? $form_data['meta'] : [];
-		$new['meta']['template'] = $template['id'];
+		$new             = $template['data'];
+		$new['id']       = $form['ID'] ?? 0;
+		$new['field_id'] = $form_data['field_id'] ?? 0;
+		$new['settings'] = $form_data['settings'] ?? [];
+		$new['payments'] = $form_data['payments'] ?? [];
+		$new['meta']     = $form_data['meta'] ?? [];
+
+		$template_id = $template['id'] ?? '';
+
+		// Preserve template ID `wpforms-user-template-{$form_id}` when overwriting it with another template.
+		if ( wpforms_is_form_template( $form['ID'] ) ) {
+			$template_id = $form_data['meta']['template'] ?? '';
+		}
+
+		$new['meta']['template'] = $template_id;
 
 		/**
 		 * Allow modifying form data when a new template is applied.
@@ -805,7 +816,7 @@ class Templates {
 		 * @param array $form_data Current form data.
 		 * @param array $template  Template data.
 		 */
-		$new = (array) apply_filters( 'wpforms_admin_builder_templates_apply_to_existing_form_modify_data',  $new, $form_data, $template );
+		$new = (array) apply_filters( 'wpforms_admin_builder_templates_apply_to_existing_form_modify_data', $new, $form_data, $template );
 
 		// Update the form with new data.
 		$form['post_content'] = wpforms_encode( $new );

@@ -1,6 +1,95 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.8.3] - 2024-04-26
+### Changed
+- Updated jQuery.Validate library to v1.20.0.
+
+### Fixed
+- Screen Options on the Forms Overview and Entries Overview pages could cause PHP error in rare cases due to conflict with 3rd-party code.
+- Post Statuses on legacy Nav Menu management page could cause PHP error in rare cases due to conflict with 3rd-party code.
+- Users couldn't duplicate their forms.
+
+## [1.8.8.2] - 2024-04-23
+### Fixed
+- Improved handling of corrupted payment submission data.
+- Fixed renaming of custom themes on the Full Site Editor.
+
+## [1.8.8.1] - 2024-04-17
+- Fixed console error on the `Widgets` admin page.
+
+## [1.8.8] - 2024-04-16
+### Added
+- Forms can now be saved as user templates for future use.
+- New `Price Display` option was added for Single Item payment field.
+- Shipping and Billing addresses can now be configured on the Form Builder > Payments > Stripe screen.
+- New filter `wpforms_integrations_stripe_api_common_create_plan_name` to filter Stripe subscription plan name.
+- New filter `wpforms_integrations_lite_connect_api_request_timeout` to filter Lite Connect request timeout.
+- New filter `wpforms_pro_integrations_lite_connect_api_batch_size` to filter batch size for retrieving site entries from the Lite Connect API.
+- New `Row/Column` display option was added for the Layout field.
+- New styling/theming settings in the Block editor.
+- New context menu in the Form Builder for quick actions.
+
+### Changed
+- New design for the Email Summaries email template with a weekly total and entry submission trends.
+- The state of selected stat cards on the Payments Overview chart is preserved when applying date filtering.
+- Updated `stripe/stripe-php` library to v13.15.0.
+- Updated `woocommerce/action-scheduler` library to v3.7.2.
+- Updated DOMPurify library to 3.0.9.
+- Updated intl-tel-input library to v20.1.0.
+- Adjusted notifications on the empty forms screen.
+- HTML tags are allowed in the Order Summary for the Total payment field.
+- Improved the logic of displaying valid provider connections in the form builder.
+- When the entry is marked as not spam, submit data to Akismet for learning and help make the Web a better place for everyone.
+- Improved error handling when creating or updating a form.
+- Improved fields layout on the frontend for better user experience on mobile devices.
+- Bring the frontend markup of the form more in line with the W3C standards to reduce validator errors.
+- Removed remove file action.
+
+### Fixed
+- Automatic and unintentional popup of the "What's New" modal on the WordPress admin dashboard.
+- Various visual issues with the "What's New" modal.
+- Various RTL problems in the admin dashboard, form builder and a form preview page.
+- Various responsive issues on admin pages.
+- The Paragraph field was allowed horizontal resizing.
+- Make sure we output valid robots.txt file rules if the file is empty.
+- PHP notices were thrown in some cases when Stripe subscription renewals were created.
+- Customer email was shown instead of customer name on the Payments Overview screen for Stipe subscription renewals in some cases.
+- Forms having many fields with conditional logic loaded slowly on the frontend.
+- The builder sidebar was hidden on the context menu edit actions.
+- File Upload field keyboard issue on some mobile devices.
+- Fatal error was thrown on the frontend with corrupted form data.
+- `0` (zero) as a choices field raw value was not saved.
+- The payment single field had the wrong spacing with enabled quantities.
+- JavaScript error when conditional logic "Show if not empty" is applied to a dropdown field.
+- Various layout and validation issues on Edit Entry page.
+- Long placeholders being broken into multiple lines after Safari 17.3.1 update.
+- Media upload did not work in some cases on mobile devices.
+- Placeholder option was hidden for the Single Item field with 'user defined' type.
+- Incorrect prices in the Order Summary table when items in the Checkbox Items field had the hyphen symbol.
+- Improved Select a date range field on mobile devices on the Form Entries page.
+- Entries search didn't work for non-UTF8 charsets.
+- Modern multiple select fields with long placeholder text overlapped a drop-down arrow.
+- The password field overlapped the Phone field dropdown.
+- Infinite loading button was shown on mobile devices in some cases.
+- Incorrect value was displayed for the Date / Time field with the Time format and configured Limit Hours on the Edit Entry screen.
+- Multisite activation: plugin should stay activated on a single site after user activated it on a network level.
+- It was impossible to modify entry values of some fields on the Single Entry screen using the `wpforms_html_field_value` filter.
+- After updating a form entry, the date format of the modified date was different.
+- Incorrect value was displayed for Number Slider field in case of using multiple {value} tags.
+- There was a race condition with invisible reCaptcha v2, preventing form submission in some edge cases.
+- Elementor widget styles were broken due to a conflict with the Gutenberg block.
+- In some cases addon was not marked as connected in the form builder despite having configured connection.
+- Time showing incorrectly on the Edit Entry screen for the Date / Time field when the time format was 24h.
+- Edited entry data was not saved on some server configurations.
+- Some unnecessary inline styles were applied for email notifications with HTML tags.
+- Payment fields weren't reflected properly in the Order Summary table in some cases.
+- The content field had a visual issue when the expanded editor was used in some cases.
+- WPCode Install/Activate modal and Entries Education Modal now look better on mobile screens.
+- `{author_*}` and `{page_*}` smart tags were returning incorrect results in some cases.
+- The form was not sent if it was in an Elementor popup with a phone field.
+- Incorrect styles were applied for "Order Summary" table in some cases.
+
 ## [1.8.7.2] - 2024-02-29
 ### Changed
 - "What's New" modal should be displayed based on the major version of the plugin.

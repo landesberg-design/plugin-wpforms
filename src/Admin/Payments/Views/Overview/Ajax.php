@@ -92,7 +92,7 @@ class Ajax {
 		$results = $this->get_payments_in_timespan( $utc_start_date, $utc_end_date, $report );
 
 		// In case the database's results were empty, leave early.
-		if ( empty( $results ) ) {
+		if ( $report === Chart::ACTIVE_REPORT && empty( $results ) ) {
 			wp_send_json_error( $fallback );
 		}
 

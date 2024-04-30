@@ -17,6 +17,16 @@ class WPForms_Form_Handler {
 	const TAGS_TAXONOMY = 'wpforms_form_tag';
 
 	/**
+	 * Allowed post types.
+	 *
+	 * @since 1.8.8
+	 */
+	const POST_TYPES = [
+		'wpforms',
+		'wpforms-template',
+	];
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 1.0.0
@@ -40,6 +50,9 @@ class WPForms_Form_Handler {
 		// Add wpforms to new-content admin bar menu.
 		add_action( 'admin_bar_menu', [ $this, 'admin_bar' ], 99 );
 		add_action( 'wpforms_create_form', [ $this, 'track_first_form' ], 10, 3 );
+
+		// @WPFormsBackCompat Support Zapier v1.5.0 and earlier.
+		add_filter( 'wpforms_form_handler_add_notices', [ $this, '_zapier_disconnected_on_duplication' ], 10, 3 );
 	}
 
 	/**
@@ -181,7 +194,7 @@ class WPForms_Form_Handler {
 	 *
 	 * @return array|bool|null|WP_Post
 	 */
-	public function get( $id = '', $args = [] ) {
+	public function get( $id = '', array $args = [] ) {
 
 		if ( $id === false ) {
 			return false;
@@ -223,24 +236,36 @@ class WPForms_Form_Handler {
 	 *
 	 * @return array|bool|null|WP_Post
 	 */
-	protected function get_single( $id = '', $args = [] ) {
+	protected function get_single( $id = '', array $args = [] ) {
 
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+
+		/**
+		 * Allow developers to filter the get_single() arguments.
+		 *
+		 * @since 1.5.8
+		 *
+		 * @param array      $args Arguments array, same as for `get_post()` function.
+		 * @param string|int $id   Form ID.
+		 */
 		$args = apply_filters( 'wpforms_get_single_form_args', $args, $id );
+
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
 		if ( ! isset( $args['cap'] ) && wpforms()->get( 'access' )->init_allowed() ) {
 			$args['cap'] = 'view_form_single';
 		}
 
-		 if ( ! empty( $args['cap'] ) && ! wpforms_current_user_can( $args['cap'], $id ) ) {
+		if ( ! empty( $args['cap'] ) && ! wpforms_current_user_can( $args['cap'], $id ) ) {
 			return false;
-		 }
+		}
 
 		// @todo add $id array support
 		// If ID is provided, we get a single form
 		$form = get_post( absint( $id ) );
 
 		if ( ! empty( $args['content_only'] ) ) {
-			$form = ! empty( $form ) && $form->post_type === 'wpforms' ? wpforms_decode( $form->post_content ) : false;
+			$form = ! empty( $form ) && in_array( $form->post_type, self::POST_TYPES, true ) ? wpforms_decode( $form->post_content ) : false;
 		}
 
 		return $form;
@@ -256,7 +281,9 @@ class WPForms_Form_Handler {
 	 *
 	 * @return array
 	 */
-	protected function get_multiple( $args = [] ) {
+	protected function get_multiple( array $args = [] ): array {
+
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
 
 		/**
 		 * Allow developers to filter the get_multiple() arguments.
@@ -269,6 +296,8 @@ class WPForms_Form_Handler {
 		 */
 		$args = (array) apply_filters( 'wpforms_get_multiple_forms_args', $args );
 
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+
 		// No ID provided, get multiple forms.
 		$defaults = [
 			'orderby'          => 'id',
@@ -280,7 +309,13 @@ class WPForms_Form_Handler {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$args['post_type'] = 'wpforms';
+		$post_type = $args['post_type'] ?? [];
+
+		// Post type should be one of the allowed post types.
+		$post_type = array_intersect( (array) $post_type, self::POST_TYPES );
+
+		// If no valid (allowed) post types are provided, use the default one.
+		$args['post_type'] = ! empty( $post_type ) ? $post_type : 'wpforms';
 
 		/**
 		 * Allow developers to execute some code before get_posts() call inside \WPForms_Form_Handler::get_multiple().
@@ -379,6 +414,7 @@ class WPForms_Form_Handler {
 
 		$forms = $this->get_multiple(
 			[
+				'post_type'        => self::POST_TYPES,
 				'post_status'      => 'trash',
 				'fields'           => 'ids',
 				'suppress_filters' => true,
@@ -614,6 +650,9 @@ class WPForms_Form_Handler {
 
 		$data['field_id'] = ! empty( $data['field_id'] ) ? absint( $data['field_id'] ) : '0';
 
+		// Preserve explicit "Do not store spam entries" state.
+		$data['settings']['store_spam_entries'] = $data['settings']['store_spam_entries'] ?? '0';
+
 		// Preserve form meta.
 		$meta = $this->get_meta( $form_id );
 
@@ -638,6 +677,15 @@ class WPForms_Form_Handler {
 			$data['settings']['notifications'] = $this->update__sanitize_notifications_names( $data['settings']['notifications'] );
 		}
 		unset( $notification );
+
+		if ( wpforms_is_form_template( $form_id ) ) {
+			$form_title = $data['settings']['form_title'];
+
+			// Set form slugs.
+			// We need setup slugs for the form template because these fields are hidden in the form builder.
+			$data['settings']['form_pages_page_slug']           = sanitize_title( $form_title );
+			$data['settings']['conversational_forms_page_slug'] = sanitize_title( $form_title );
+		}
 
 		$form = apply_filters(
 			'wpforms_save_form_args',
@@ -673,6 +721,7 @@ class WPForms_Form_Handler {
 		foreach ( $fields as $i => $field_data ) {
 			if ( isset( $field_data['id'] ) ) {
 				$field_meta = $this->get_field_meta( $form_id, $field_data['id'] );
+
 				if ( $field_meta ) {
 					$fields[ $i ]['meta'] = $field_meta;
 				}
@@ -706,12 +755,13 @@ class WPForms_Form_Handler {
 	 * Duplicate forms.
 	 *
 	 * @since 1.1.4
+	 * @since 1.8.8 Return array of new form IDs instead of true.
 	 *
-	 * @param array $ids Form IDs to duplicate.
+	 * @param array|string $ids Form IDs to duplicate.
 	 *
-	 * @return bool
+	 * @return bool|array Array of new form IDs or false.
 	 */
-	public function duplicate( $ids = [] ) {
+	public function duplicate( $ids ) { // phpcs:disable WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks, Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		// Check for permissions.
 		if ( ! wpforms_current_user_can( 'create_forms' ) ) {
@@ -730,6 +780,8 @@ class WPForms_Form_Handler {
 
 		$ids = array_map( 'absint', $ids );
 
+		$duplicate_ids = [];
+
 		foreach ( $ids as $id ) {
 
 			// Get original entry.
@@ -740,7 +792,7 @@ class WPForms_Form_Handler {
 			}
 
 			// Confirm form exists.
-			if ( ! $form || empty( $form ) ) {
+			if ( empty( $form ) ) {
 				return false;
 			}
 
@@ -750,6 +802,18 @@ class WPForms_Form_Handler {
 			// Remove form ID from title if present.
 			$new_form_data['settings']['form_title'] = str_replace( '(ID #' . absint( $id ) . ')', '', $new_form_data['settings']['form_title'] );
 
+			// Remove '(copy)' from the form template title if present.
+			$new_form_data['settings']['form_title'] = str_replace( __( '(copy)', 'wpforms-lite' ), '', $new_form_data['settings']['form_title'] );
+
+			// Remove trailing spaces.
+			$new_form_data['settings']['form_title'] = rtrim( $new_form_data['settings']['form_title'] );
+
+			// Remove `-template` suffix and all after it from the post name.
+			$post_name = preg_replace( '/-template(-\d+)?/', '', $form->post_name );
+
+			// Add some notice messages before form preview area.
+			$new_form_data = $this->add_notices( $new_form_data, (int) $id );
+
 			// Create the duplicate form.
 			$new_form    = [
 				'post_content' => wpforms_encode( $new_form_data ),
@@ -757,6 +821,7 @@ class WPForms_Form_Handler {
 				'post_status'  => $form->post_status,
 				'post_title'   => $new_form_data['settings']['form_title'],
 				'post_type'    => $form->post_type,
+				'post_name'    => wpforms_is_form_template( $id ) ? $post_name . '-template' : $post_name,
 			];
 			$new_form_id = wp_insert_post( $new_form );
 
@@ -765,7 +830,9 @@ class WPForms_Form_Handler {
 			}
 
 			// Set new form name.
-			$new_form_data['settings']['form_title'] .= ' (ID #' . absint( $new_form_id ) . ')';
+			$new_form_data['settings']['form_title'] .= $form->post_type === 'wpforms-template' ?
+				' ' . __( '(copy)', 'wpforms-lite' ) :
+				' (ID #' . absint( $new_form_id ) . ')';
 
 			// Set new form ID.
 			$new_form_data['id'] = absint( $new_form_id );
@@ -796,9 +863,183 @@ class WPForms_Form_Handler {
 			 * @param array $new_form_data New form data.
 			 */
 			do_action( 'wpforms_form_handler_duplicate_form', $id, $new_form_id, $new_form_data );
+
+			$duplicate_ids[] = $new_form_id;
 		}
 
-		return true;
+		return $duplicate_ids;
+	}
+
+	/**
+	 * Convert form to a template and vice versa.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param string|int $form_id    Form ID.
+	 * @param string     $convert_to Convert to, `form` or `template`.
+	 *
+	 * @return false|int New object ID or false on failure.
+	 */
+	public function convert( $form_id, string $convert_to ) {
+
+		if ( ! in_array( $convert_to, [ 'form', 'template' ], true ) ) {
+			return false;
+		}
+
+		// Duplicate the form.
+		$ids = $this->duplicate( $form_id );
+
+		if ( empty( $ids ) ) {
+			return false;
+		}
+
+		$new_form_id = current( $ids );
+		$form        = get_post( $new_form_id );
+		$form_data   = wpforms_decode( $form->post_content );
+
+		/**
+		 * Filters the form data before converting it to a template or vice versa.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array      $form_data   Form data.
+		 * @param string|int $form_id     Form ID.
+		 * @param string     $convert_to  Convert to, `form` or `template`.
+		 */
+		$form_data = apply_filters( 'wpforms_form_handler_convert_form_data', $form_data, $form_id, $convert_to );
+
+		// Set default post type.
+		$post_type = 'wpforms';
+
+		// Remove numeric suffix from the post name.
+		// Duplication always adds `-{numeric}` suffix.
+		$post_name = preg_replace( '/-\d+$/', '', $form->post_name );
+
+		// Remove `-template` suffix and all after it from the post name.
+		$post_name = preg_replace( '/-template(-\d+)?/', '', $post_name );
+
+		// Remove (copy) from the form title, if present.
+		$form_data['settings']['form_title'] = str_replace( __( '(copy)', 'wpforms-lite' ), '', $form_data['settings']['form_title'] );
+
+		// Remove trailing spaces.
+		$form_data['settings']['form_title'] = rtrim( $form_data['settings']['form_title'] );
+
+		// Remove template description.
+		unset( $form_data['settings']['template_description'] );
+
+		if ( $convert_to === 'template' ) {
+			$post_type = 'wpforms-template';
+
+			// Remove (ID #<Form ID>) from the form title, if present.
+			$form_data['settings']['form_title'] = preg_replace( '/\(ID #\d+\)/', '', $form_data['settings']['form_title'] );
+
+			// Set empty template description.
+			$form_data['settings']['template_description'] = '';
+
+			// Remove traces of any other template that may have been used to create the original form by setting itself as a template.
+			$form_data['meta']['template'] = 'wpforms-user-template-' . $new_form_id;
+
+			// Add `-template` suffix to the post name.
+			$post_name .= '-template';
+		}
+
+		wp_update_post(
+			[
+				'ID'           => $new_form_id,
+				'post_title'   => $form_data['settings']['form_title'],
+				'post_type'    => $post_type,
+				'post_content' => wpforms_encode( $form_data ),
+				'post_name'    => $post_name,
+			]
+		);
+
+		return $new_form_id;
+	}
+
+	/**
+	 * Append notice(s) before form preview, if needed.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param array $new_form_data New form data.
+	 * @param int   $form_id       Original form ID.
+	 *
+	 * @return array
+	 */
+	private function add_notices( array $new_form_data, int $form_id ): array {
+
+		/**
+		 * Add custom notices to be displayed in the preview area of the Form Builder
+		 * after a form or a form template has been duplicated or converted.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array $notices       Array of notices.
+		 * @param array $new_form_data Form data of the newly duplicated form or form template.
+		 * @param int   $form_id       Original form ID.
+		 */
+		$notices = apply_filters( 'wpforms_form_handler_add_notices', [], $new_form_data, $form_id );
+
+		if ( empty( $notices ) ) {
+			return $new_form_data;
+		}
+
+		$next_field_id = max( array_keys( $new_form_data['fields'] ) ) + 1;
+
+		$warning[ $next_field_id ] = [
+			'id'          => $next_field_id,
+			'type'        => 'internal-information',
+			'description' => '',
+		];
+
+		foreach ( $notices as $notice ) {
+			$warning[ $next_field_id ]['description'] .= ! empty( $notice['title'] ) ? '<strong>' . esc_html( $notice['title'] ) . '</strong>' : '';
+			$warning[ $next_field_id ]['description'] .= ! empty( $notice['message'] ) ? '<p>' . wp_kses_post( $notice['message'] ) . '</p>' : '';
+		}
+
+		if ( empty( $warning[ $next_field_id ]['description'] ) ) {
+			return $new_form_data;
+		}
+
+		$new_form_data['fields'] = $warning + $new_form_data['fields'];
+
+		// Update next field ID to be used for future created fields. Otherwise, IIF field would be overwritten.
+		$new_form_data['field_id'] = $next_field_id + 1;
+
+		return $new_form_data;
+	}
+
+	/**
+	 * Add a notice about Zapier zaps disconnected after form being duplicated or converted to/from template.
+	 *
+	 * @WPFormsBackCompat Support Zapier v1.5.0 and earlier.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param array $notices       Array of notices.
+	 * @param array $new_form_data Form data.
+	 * @param int   $form_id       Original form ID.
+	 *
+	 * @return array
+	 */
+	public function _zapier_disconnected_on_duplication( $notices, array $new_form_data, int $form_id ): array { // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+
+		// Check if original form had any Zaps connected.
+		$is_zapier_connected = get_post_meta( $form_id, 'wpforms_zapier', true );
+
+		if ( ! $is_zapier_connected ) {
+			return $notices;
+		}
+
+		$notices['zapier'] = [
+			'title'   => esc_html__( 'Zaps Have Been Disabled', 'wpforms-lite' ),
+			'message' => sprintf( /* translators: %s - URL the to list of Zaps. */
+				__( 'Head over to the Zapier settings in the Marketing tab or visit your <a href="%s" target="_blank" rel="noopener noreferrer">Zapier account</a> to restore them.', 'wpforms-lite' ),
+				esc_url( 'https://zapier.com/app/zaps' )
+			),
+		];
+
+		return $notices;
 	}
 
 	/**
@@ -1053,5 +1294,49 @@ class WPForms_Form_Handler {
 		}
 
 		return isset( $field['meta'] ) ? $field['meta'] : false;
+	}
+
+	/**
+	 * Checks if any forms are present on the site.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @retun bool
+	 */
+	public function forms_exist(): bool {
+
+		return (bool) $this->get(
+			'',
+			[
+				'numberposts'            => 1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'suppress_filters'       => true,
+				'nopaging'               => false,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			]
+		);
+	}
+
+	/**
+	 * Get forms count per page.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @return int
+	 */
+	public function get_count_per_page(): int {
+
+		// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
+		/**
+		 * Give developers an ability to modify number of forms per page.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array $count Forms count per page.
+		 */
+		return (int) apply_filters( 'wpforms_forms_per_page', 20 );
+		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 }

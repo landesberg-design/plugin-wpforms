@@ -141,13 +141,19 @@ WPFormsForms.Overview = WPFormsForms.Overview || ( function( document, window, $
 
 			var $link = $( this ),
 				url = $link.attr( 'href' ),
-				msg = $link.hasClass( 'delete-all' ) ?  wpforms_admin.form_delete_all_confirm : '';
+				msg = $link.hasClass( 'delete-all' ) ? wpforms_admin.form_delete_all_confirm : '',
+				type = $link.data( 'type' ) ?? '';
 
 			if ( msg === '' ) {
-				msg = $link.parent().hasClass( 'delete' ) ? wpforms_admin.form_delete_confirm : wpforms_admin.form_duplicate_confirm;
+				let duplicateMsg = wpforms_admin.form_duplicate_confirm;
+				if ( type === 'template' ) {
+					duplicateMsg = wpforms_admin.template_duplicate_confirm;
+				}
+
+				msg = $link.parent().hasClass( 'delete' ) ? wpforms_admin.form_delete_confirm : duplicateMsg;
 			}
 
-			app.confirmModal( msg, { 'url': url } );
+			app.confirmModal( msg, { url } );
 		},
 
 		/**

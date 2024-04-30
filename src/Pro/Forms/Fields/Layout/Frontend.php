@@ -57,6 +57,12 @@ class Frontend {
 		add_filter( 'wpforms_process_after_filter', [ $this->field_obj, 'filter_fields_remove_layout' ], PHP_INT_MAX, 3 );
 		add_filter( 'wpforms_pro_fields_entry_preview_print_entry_preview_exclude_field', [ $this, 'entry_preview_exclude_field' ], 10, 3 );
 		add_filter( 'wpforms_frontend_output_form_is_empty', [ $this, 'filter_output_form_is_empty' ], 10, 2 );
+
+		add_filter( 'wpforms_pro_admin_entries_export_ajax_form_data', [ Helpers::class, 'reorder_fields_within_rows' ] );
+		add_filter( 'wpforms_process_before_form_data', [ Helpers::class, 'reorder_fields_within_rows' ] );
+		add_filter( 'wpforms_emails_notifications_form_data', [ Helpers::class, 'reorder_fields_within_rows' ] );
+		add_filter( 'wpforms_pro_admin_entries_edit_form_data', [ Helpers::class, 'reorder_fields_within_rows' ] );
+		add_filter( 'wpforms_entry_preview_form_data', [ Helpers::class, 'reorder_fields_within_rows' ] );
 	}
 
 	/**
@@ -95,11 +101,89 @@ class Frontend {
 	 *
 	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function field_display( $field, $form_data ) {
+	public function field_display( array $field, array $form_data ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+		if ( isset( $field['display'] ) && $field['display'] === 'rows' ) {
+			$this->display_rows( $field );
+		} else {
+			$this->display_columns( $field );
+		}
+	}
+
+	/**
+	 * Display rows layout.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param array $field Field settings.
+	 */
+	private function display_rows( array $field ) {
+
+		$rows_html = '';
+		$rows      = isset( $field['columns'] ) && is_array( $field['columns'] ) ? Helpers::get_row_data( $field ) : [];
+
+		foreach ( $rows as $row ) {
+			$rows_html .= sprintf(
+				'<div class="wpforms-layout-row">%1$s</div>',
+				$this->get_column_row_content( $row )
+			);
+		}
+
+		printf(
+			'<div class="wpforms-field-layout-rows">%1$s</div>',
+			$rows_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		);
+	}
+
+	/**
+	 * Get column content HTML.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param array $row Row data.
+	 *
+	 * @return string
+	 */
+	public function get_column_row_content( array $row ): string {
+
+		$form_data = $this->field_obj->form_data;
+
+		// Bail if we don't have the column fields data for some reason.
+		if ( empty( $form_data['fields'] ) || empty( $row ) ) {
+			return '';
+		}
+
+		ob_start();
+
+		foreach ( $row as $data ) {
+			$field = $form_data['fields'][ $data['field'] ] ?? false;
+
+			$column_preset_class = ' wpforms-layout-column-' . (int) $data['width_preset'];
+			$style_width         = ! empty( $row['width_custom'] ) ? ' style="width: ' . (int) $row['width_custom'] . '%;"' : '';
+
+			echo '<div class="wpforms-layout-column' . esc_attr( $column_preset_class ) . '"' . $style_width . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			if ( $field ) {
+				$this->frontend->render_field( $form_data, $field );
+			}
+			echo '</div>';
+		}
+
+		return ob_get_clean();
+	}
+
+
+	/**
+	 * Display columns layout.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param array $field Field settings.
+	 */
+	private function display_columns( array $field ) {
 
 		$columns_html = '';
 		$columns      = isset( $field['columns'] ) && is_array( $field['columns'] ) ? $field['columns'] : [];
-		$preset_class = isset( $field['preset'] ) ? $field['preset'] : $this->field_obj->defaults['preset'];
+		$preset_class = $field['preset'] ?? $this->field_obj->defaults['preset'];
 
 		foreach ( $columns as $column ) {
 

@@ -133,7 +133,7 @@ class WPForms_Field_Number extends WPForms_Field {
 
 		// Primary field.
 		printf(
-			'<input type="number" pattern="\d*" %s %s>',
+			'<input type="number" %s %s>',
 			wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
 			esc_attr( $primary['required'] )
 		);

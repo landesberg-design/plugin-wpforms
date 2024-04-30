@@ -515,6 +515,15 @@ class Notifications extends Mailer {
 			$this
 		);
 
+		/**
+		 * Filter the form data before it is used to generate the email message.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array $form_data Form data.
+		 */
+		$this->form_data = apply_filters( 'wpforms_emails_notifications_form_data', $this->form_data );
+
 		foreach ( $this->form_data['fields'] as $field_id => $field ) {
 			$field_type = ! empty( $field['type'] ) ? $field['type'] : '';
 

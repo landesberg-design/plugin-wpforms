@@ -72,14 +72,23 @@ const WPSplash = window.WPSplash || ( function( document, window, $ ) {
 				closeAnimation: 'opacity',
 				animateFromElement: false,
 				onOpenBefore() {
-					$( 'body' ).addClass( 'wpforms-splash-modal' );
+					const scrollbarWidth = ( window.innerWidth - document.body.clientWidth ) + 'px';
+
+					$( 'body' ).addClass( 'wpforms-splash-modal' )
+						.css( '--wpforms-body-scrollbar-width', scrollbarWidth );
+
 					$( '.wpforms-challenge-popup-container' ).addClass( 'wpforms-invisible' );
+
+					setTimeout( () => {
+						$( '.jconfirm-box-container' ).css( 'padding-top', '50px' ).animate( { opacity: 1 }, 30 );
+					}, 0 );
 				},
 				onOpen() {
 					$( '.jconfirm' ).css( 'bottom', 0 );
 				},
 				onDestroy() {
-					$( 'body' ).removeClass( 'wpforms-splash-modal' );
+					$( 'body' ).removeClass( 'wpforms-splash-modal' )
+						.css( '--wpforms-body-scrollbar-width', null );
 				},
 			} );
 		},

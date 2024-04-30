@@ -14,6 +14,13 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		cache: {},
 
 		/**
+		 * Is updating token via ajax flag.
+		 *
+		 * @since 1.8.8
+		 */
+		isUpdatingToken: false,
+
+		/**
 		 * Start the engine.
 		 *
 		 * @since 1.2.3
@@ -59,6 +66,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			app.loadPayments();
 			app.loadMailcheck();
 			app.loadChoicesJS();
+			app.initTokenUpdater();
 
 			// Randomize elements.
 			$( '.wpforms-randomize' ).each( function() {
@@ -452,8 +460,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 					var $el = $( element );
 
-					return $el.val().trim() === '' && ! $el.hasClass( 'wpforms-field-required' ) || // Don't check the password strength for empty fields which is set as not required.
-						WPFormsPasswordField.passwordStrength( value, element ) >= Number( $el.data( 'password-strength-level' ) );
+					return WPFormsPasswordField.passwordStrength( value, element ) >= Number( $el.data( 'password-strength-level' ) );
 				}, wpforms_settings.val_password_strength );
 
 				// Finally load jQuery Validation library for our forms.
@@ -1001,7 +1008,19 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 						};
 					}
 
+					// Retrieve the value from the input element.
+					const inputValue = element.val();
+
 					element.timepicker( properties );
+
+					// Check if a value is available.
+					if ( inputValue ) {
+						// Set the input element's value to the retrieved value.
+						element.val( inputValue );
+
+						// Trigger the 'changeTime' event to update the timepicker after programmatically setting the value.
+						element.trigger( 'changeTime' );
+					}
 				} );
 			}
 		},
@@ -1094,14 +1113,21 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			}
 
 			// Set default country.
-			inputOptions.initialCountry = wpforms_settings.gdpr && countryCode ? countryCode : 'auto';
+			inputOptions.initialCountry = wpforms_settings.gdpr && countryCode ? countryCode.toLowerCase() : 'auto';
 
 			$( '.wpforms-smart-phone-field' ).each( function( i, el ) {
 				const $el = $( el );
 
+				// Prevent initialization if the popup is hidden.
+				if ( $el.parents( '.elementor-location-popup' ).is( ':hidden' ) ) {
+					return false;
+				}
+
 				// Hidden input allows to include country code into submitted data.
 				inputOptions.hiddenInput = function( telInputName ) {
-					return telInputName;
+					return {
+						phone: telInputName,
+					};
 				};
 				inputOptions.utilsScript = wpforms_settings.wpforms_plugin_url + 'assets/pro/lib/intl-tel-input/jquery.intl-tel-input-utils.min.js';
 
@@ -1571,7 +1597,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 			$document.on( 'change input', '.wpforms-field-number-slider input[type=range]', function( event ) {
 				var hintEl = $( event.target ).siblings( '.wpforms-field-number-slider-hint' );
 
-				hintEl.html( hintEl.data( 'hint' ).replace( '{value}', '<b>' + event.target.value + '</b>' ) );
+				hintEl.html( hintEl.data( 'hint' ).replaceAll( '{value}', '<b>' + event.target.value + '</b>' ) );
 			} );
 
 			// Enter key event.
@@ -2231,29 +2257,25 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 				fieldId = $field.data( 'field-id' ),
 				type = $paymentField.prop( 'type' );
 
-			if ( type === 'checkbox' || type === 'radio' || type === 'select-one' ) {
-				const choiceId = $paymentField.val(),
-					$item = $summary.find( `tr[data-field="${ fieldId }"][data-choice="${ choiceId }"]` );
+			if ( type === 'checkbox' ) {
+				$summary.find( `tr[data-field="${ fieldId }"][data-choice="${ $paymentField.val() }"]` ).toggle( $paymentField.is( ':checked' ) );
+			} else if ( type === 'radio' || type === 'select-one' ) {
+				// Show only selected items.
+				$summary.find( `tr[data-field="${ fieldId }"]` ).each( function() {
+					const choiceID = $( this ).data( 'choice' );
 
-				// Hide previously selected items.
-				if ( type !== 'checkbox' ) {
-					$summary.find( `tr[data-field="${ fieldId }"]` ).each( function() {
-						$( this ).hide();
-					} );
-				}
-
-				if ( type === 'select-one' ) {
-					$item.show();
-				} else {
-					$item.toggle( $paymentField.is( ':checked' ) );
-				}
+					if ( type === 'radio' ) {
+						$( this ).toggle( $field.find( `input[value="${ choiceID }"]` ).is( ':checked' ) );
+					} else {
+						$( this ).toggle( choiceID === parseInt( $field.find( 'select' ).val(), 10 ) );
+					}
+				} );
 			} else {
 				const $item = $summary.find( `tr[data-field="${ fieldId }"]` ),
 					amount = $paymentField.val();
 
 				$item.find( '.wpforms-order-summary-item-price' ).text( app.amountFormatSymbol( amount ) );
-
-				$item.toggle( $field.is( ':visible' ) );
+				$item.toggle( $field.css( 'display' ) === 'block' );
 			}
 
 			if ( ! $field.hasClass( 'wpforms-payment-quantities-enabled' ) ) {
@@ -3209,9 +3231,6 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 
 			formData = new FormData( $form.get( 0 ) );
 			formData.append( 'action', 'wpforms_submit' );
-			formData.append( 'page_url', window.location.href );
-			formData.append( 'page_title', wpforms_settings.page_title );
-			formData.append( 'page_id', wpforms_settings.page_id );
 			formData.append( 'start_timestamp', $form.data( 'timestamp' ) );
 			formData.append( 'end_timestamp', Date.now() );
 
@@ -3447,6 +3466,58 @@ var wpforms = window.wpforms || ( function( document, window, $ ) {
 		isModernMarkupEnabled: function() {
 
 			return !! wpforms_settings.isModernMarkupEnabled;
+		},
+
+		/**
+		 * Initialize token updater.
+		 *
+		 * Maybe update token via AJAX if it's looks like outdated.
+		 *
+		 * @since 1.8.8
+		 */
+		initTokenUpdater() {
+			// The focusin event occurs at any interaction with the form.
+			$( '.wpforms-form' ).on( 'focusin', function( event ) {
+				const $form = $( this ),
+					timestamp = Date.now(),
+					tokenTime = $form.attr( 'data-token-time' ) ?? 0,
+					diff = timestamp - ( tokenTime * 1000 );
+
+				// Skip if the token is not expired OR the token is updating.
+				if ( diff < wpforms_settings.token_cache_lifetime * 1000 || app.isUpdatingToken ) {
+					return;
+				}
+
+				// Update token if it was created more than 24 hours ago.
+				const formId = $form.data( 'formid' ),
+					$submitBtn = $form.find( '.wpforms-submit' );
+
+				app.isUpdatingToken = true;
+
+				$submitBtn.prop( 'disabled', true );
+
+				$.post( wpforms_settings.ajaxurl, {
+					action: 'wpforms_get_token',
+					formId,
+				} ).
+					done( ( response ) => {
+						if ( ! response.success ) {
+							return;
+						}
+
+						$form.attr( 'data-token-time', timestamp );
+						$form.attr( 'data-token', response.data.token );
+						$submitBtn.prop( 'disabled', false );
+
+						if ( event.target === $submitBtn[ 0 ] ) {
+							$submitBtn.trigger( 'click' );
+						}
+					} ).
+					always( () => {
+						// Reset flag after AJAX request.
+						app.isUpdatingToken = false;
+					} );
+			} );
 		},
 	};
 

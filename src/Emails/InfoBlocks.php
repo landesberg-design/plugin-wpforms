@@ -121,7 +121,9 @@ class InfoBlocks {
 			return $filtered;
 		}
 
-		$license_type = \wpforms_setting( 'type', false, 'wpforms_license' );
+		// When there is no license, we assume it's a Lite version.
+		// This is needed to show blocks for Lite users, as they don't have a license type.
+		$license_type = wpforms_setting( 'type', 'lite', 'wpforms_license' );
 
 		foreach ( $data as $key => $item ) {
 

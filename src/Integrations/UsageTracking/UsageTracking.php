@@ -191,6 +191,7 @@ class UsageTracking implements IntegrationInterface {
 			'wpforms_multiple_notifications' => count( $this->get_forms_with_multiple_notifications( $forms ) ),
 			'wpforms_ajax_form_submissions'  => count( $this->get_ajax_form_submissions( $forms ) ),
 			'wpforms_notification_count'     => wpforms()->get( 'notifications' )->get_count(),
+			'wpforms_stats'                  => $this->get_additional_stats(),
 		];
 
 		if ( ! empty( $first_form_date ) ) {
@@ -744,5 +745,64 @@ class UsageTracking implements IntegrationInterface {
 
 		// We are all set. Confirm the connection.
 		return true;
+	}
+
+	/**
+	 * Retrieves additional statistics.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @return array
+	 */
+	private function get_additional_stats(): array {
+
+		// Initialize an empty array to store the statistics.
+		$stats = [];
+
+		return $this->get_admin_pointer_stats( $stats );
+	}
+
+	/**
+	 * Retrieves statistics for admin pointers.
+	 * This function retrieves statistics for admin pointers based on their engagement or dismissal status.
+	 *
+	 * Note: Pointers can only be engaged (interacted with) or dismissed.
+	 *
+	 * - If the value is 1 or true, it means the pointer is shown and interacted with (engaged).
+	 * - If the value is 0 or false, it means the pointer is dismissed.
+	 * - If there is no pointer ID in the stats, it means the user hasn't seen the pointer yet.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param array $stats An array containing existing statistics.
+	 *
+	 * @return array
+	 */
+	private function get_admin_pointer_stats( array $stats ): array {
+
+		$pointers = get_option( 'wpforms_pointers', [] );
+
+		// If there are no pointers, return empty statistics.
+		if ( empty( $pointers ) ) {
+			return $stats;
+		}
+
+		// Pointers can only be interacted with or dismissed.
+
+		// If there are engagement pointers, process them.
+		if ( isset( $pointers['engagement'] ) ) {
+			foreach ( $pointers['engagement'] as $pointer ) {
+				$stats[ sanitize_key( $pointer ) ] = true;
+			}
+		}
+
+		// If there are dismiss pointers, process them.
+		if ( isset( $pointers['dismiss'] ) ) {
+			foreach ( $pointers['dismiss'] as $pointer ) {
+				$stats[ sanitize_key( $pointer ) ] = false;
+			}
+		}
+
+		return $stats;
 	}
 }

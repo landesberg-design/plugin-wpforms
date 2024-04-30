@@ -92,6 +92,7 @@ class WPForms_Field_Layout extends WPForms_Field {
 			'label_hide'  => '1',
 			'size'        => 'large',
 			'preset'      => '50-50',
+			'display'     => 'rows',
 			'columns'     => [
 				0 => [
 					'width_custom' => '',
@@ -123,6 +124,26 @@ class WPForms_Field_Layout extends WPForms_Field {
 		add_filter( 'wpforms_pro_admin_entries_print_preview_fields', [ $this, 'filter_entries_print_preview_fields' ] );
 		add_filter( 'register_block_type_args', [ $this, 'register_block_type_args' ], 20, 2 );
 		add_filter( 'wpforms_conversational_form_detected', [ $this, 'cf_frontend_hooks' ], 10, 2 );
+		add_filter( 'wpforms_field_properties_layout', [ $this, 'field_properties' ], 5, 3 );
+	}
+
+	/**
+	 * Define additional field properties.
+	 *
+	 * @since 1.8.8
+	 *
+	 * @param array $properties Field properties.
+	 * @param array $field      Field settings.
+	 * @param array $form_data  Form data and settings.
+	 *
+	 * @return array
+	 */
+	public function field_properties( $properties, $field, $form_data ) {
+
+		// Null 'for' value for label as there no input for it.
+		unset( $properties['label']['attr']['for'] );
+
+		return $properties;
 	}
 
 	/**

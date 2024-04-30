@@ -241,11 +241,6 @@ namespace WPForms {
 			);
 
 			/*
-			 * Load email subsystem.
-			 */
-			add_action( 'wpforms_loaded', [ '\WPForms\Emails\Summaries', 'get_instance' ] );
-
-			/*
 			 * Load admin components. Exclude from frontend.
 			 */
 			if ( is_admin() ) {

@@ -151,6 +151,10 @@ class ListTable extends WP_List_Table {
 
 			case 'shortcode':
 				$value = '[wpforms id="' . $form->ID . '"]';
+
+				if ( wpforms_is_form_template( $form->ID ) ) {
+					$value = __( 'N/A', 'wpforms-lite' );
+				}
 				break;
 
 			// This slug is not changed to 'date' for backward compatibility.
@@ -262,8 +266,14 @@ class ListTable extends WP_List_Table {
 	 */
 	public function column_name( $form ) {
 
+		$title = $this->get_column_name_title( $form );
+
+		$states = _post_states( $form, false );
+
+		$actions = $this->get_column_name_row_actions( $form );
+
 		// Build the row action links and return the value.
-		return $this->get_column_name_title( $form ) . $this->get_column_name_row_actions( $form );
+		return $title . $states . $actions;
 	}
 
 	/**
@@ -437,7 +447,9 @@ class ListTable extends WP_List_Table {
 	 */
 	public function no_items() {
 
-		esc_html_e( 'No forms found.', 'wpforms-lite' );
+		wpforms()->get( 'forms_views' )->get_current_view() === 'templates' ?
+			esc_html_e( 'No form templates found.', 'wpforms-lite' ) :
+			esc_html_e( 'No forms found.', 'wpforms-lite' );
 	}
 
 	/**

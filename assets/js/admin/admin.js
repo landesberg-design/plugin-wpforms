@@ -52,6 +52,9 @@
 
 			// Upgrades (Tools view).
 			WPFormsAdmin.initUpgrades();
+
+			// Tab menu.
+			WPFormsAdmin.initScrollableMenu();
 		},
 
 		/**
@@ -1315,7 +1318,6 @@
 		//--------------------------------------------------------------------//
 		// Settings.
 		//--------------------------------------------------------------------//
-
 		/**
 		 * Element bindings for Settings page.
 		 *
@@ -2627,6 +2629,33 @@
 				content : wpforms_admin.entry_trash_n_confirm,
 				action : 'trash',
 			};
+		},
+
+		/**
+		 * Show/hide the right arrow for the scrollable menu on mobile devices.
+		 *
+		 * @since 1.8.8
+		 */
+		initScrollableMenu() {
+			$( document ).on( 'wpformsReady', function() {
+				const $menu = $( '.wpforms-admin-tabs' );
+
+				if ( ! $menu.length ) {
+					return;
+				}
+
+				const $lastMenuItem = $menu.find( 'li:last-child' );
+
+				// The last item of the menu is not visible - show the right arrow as an indicator of a scrollable menu.
+				if ( ! wpf.isInViewport( $lastMenuItem ) ) {
+					$menu.addClass( 'wpforms-admin-tabs--scrollable' );
+				}
+
+				// Listen to `scroll` event in order to hide the right arrow when the last item is visible.
+				$menu.on( 'scroll', function() {
+					$menu.toggleClass( 'wpforms-admin-tabs--scrollable', ! wpf.isInViewport( $lastMenuItem ) );
+				} );
+			} );
 		},
 	};
 

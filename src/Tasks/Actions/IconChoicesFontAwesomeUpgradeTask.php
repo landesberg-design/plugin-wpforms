@@ -105,8 +105,10 @@ class IconChoicesFontAwesomeUpgradeTask extends Task {
 	 */
 	public function upgrade() {
 
-		$icon_choices    = wpforms()->get( 'icon_choices' );
-		$icons_data_file = $icon_choices->get_icons_data_file();
+		$upload_dir      = wpforms_upload_dir();
+		$tmp_base_path   = $upload_dir['path'] . '/icon-choices-tmp';
+		$cache_base_path = $upload_dir['path'] . '/icon-choices';
+		$icons_data_file = $cache_base_path . '/icons.json';
 
 		if ( ! file_exists( $icons_data_file ) ) {
 			$this->log( 'Library is not present, nothing to upgrade.' );
@@ -115,10 +117,6 @@ class IconChoicesFontAwesomeUpgradeTask extends Task {
 			return;
 		}
 
-		$upload_dir      = wpforms_upload_dir();
-		$tmp_base_path   = $upload_dir['path'] . '/icon-choices-tmp';
-		$cache_base_path = $upload_dir['path'] . '/icon-choices';
-
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 
 		WP_Filesystem();
@@ -126,7 +124,7 @@ class IconChoicesFontAwesomeUpgradeTask extends Task {
 		global $wp_filesystem;
 
 		$wp_filesystem->rmdir( $tmp_base_path, true );
-		$icon_choices->run_install( $tmp_base_path );
+		wpforms()->get( 'icon_choices' )->run_install( $tmp_base_path );
 
 		if ( is_dir( $tmp_base_path ) ) {
 			// Remove old cache.

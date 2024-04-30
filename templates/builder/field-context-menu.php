@@ -1,6 +1,6 @@
 <?php
 /**
- * WPForms Builder Context Menu Template.
+ * WPForms Builder Field Context Menu (right click) Template.
  *
  * @since 1.8.6
  */
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 
-<div class="wpforms-context-menu">
+<div class="wpforms-context-menu" id="wpforms-field-context-menu">
 	<ul class="wpforms-context-menu-list">
 		<li class="wpforms-context-menu-list-item" data-action="edit">
 			<span class="wpforms-context-menu-list-item-icon">

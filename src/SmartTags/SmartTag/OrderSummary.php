@@ -158,11 +158,12 @@ class OrderSummary extends SmartTag {
 		foreach ( $value_choices as $value_choice ) {
 
 			$choice_data = explode( ' - ', $value_choice );
+			$labels      = array_slice( $choice_data, 0, -1 );
 
 			$items[] = [
-				'label'    => $field['name'] . ' - ' . $choice_data[0],
+				'label'    => $field['name'] . ' - ' . implode( ' - ', $labels ),
 				'quantity' => $quantity,
-				'amount'   => $choice_data[1],
+				'amount'   => end( $choice_data ),
 			];
 		}
 

@@ -145,7 +145,7 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 		wp_send_json_error(
 			[
 				'error_type' => 'missing_form_title',
-				'message'    => esc_html__( 'No form name provided.', 'wpforms-lite' ),
+				'message'    => esc_html__( 'No Form Name Provided', 'wpforms-lite' ),
 			]
 		);
 	}
@@ -202,7 +202,7 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 		wp_send_json_error(
 			[
 				'error_type' => 'cant_create_form',
-				'message'    => esc_html__( 'Error creating form.', 'wpforms-lite' ),
+				'message'    => esc_html__( 'Error Creating Form', 'wpforms-lite' ),
 			]
 		);
 	}
@@ -247,7 +247,7 @@ function wpforms_update_form_template() {
 		wp_send_json_error(
 			[
 				'error_type' => 'invalid_form_id',
-				'message'    => esc_html__( 'No form ID provided.', 'wpforms-lite' ),
+				'message'    => esc_html__( 'No Form ID Provided', 'wpforms-lite' ),
 			]
 		);
 	}
@@ -356,7 +356,7 @@ function wpforms_update_form_template() {
 	wp_send_json_error(
 		[
 			'error_type' => 'cant_update',
-			'message'    => esc_html__( 'Error updating form template.', 'wpforms-lite' ),
+			'message'    => esc_html__( 'Error Updating Template', 'wpforms-lite' ),
 		]
 	);
 }

@@ -474,7 +474,7 @@ class WPForms_Field_Select extends WPForms_Field {
 		// Build the select options.
 		foreach ( $choices as $key => $choice ) {
 			$label = $this->get_choices_label( $choice['label']['text'] ?? '', $key );
-			$value = ! empty( $choice['attr']['value'] ) ? $choice['attr']['value'] : $label;
+			$value = isset( $choice['attr']['value'] ) && ! wpforms_is_empty_string( $choice['attr']['value'] ) ? $choice['attr']['value'] : $label;
 
 			printf(
 				'<option value="%s" %s>%s</option>',

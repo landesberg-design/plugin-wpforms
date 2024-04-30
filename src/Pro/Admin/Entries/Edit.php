@@ -442,8 +442,15 @@ class Edit {
 			exit;
 		}
 
-		// Form data.
-		$form_data              = wpforms_decode( $form->post_content );
+		/**
+		 * Filter the form data before it's used in the entry edit page.
+		 *
+		 * @since 1.8.8
+		 *
+		 * @param array $form_data Form data.
+		 */
+		$form_data = apply_filters( 'wpforms_pro_admin_entries_edit_form_data', wpforms_decode( $form->post_content ) );
+
 		$form->form_entries_url = add_query_arg(
 			[
 				'page'    => 'wpforms-entries',
@@ -1069,9 +1076,12 @@ class Edit {
 
 		array_map( [ $this, 'add_removed_file_meta' ], $removed_files );
 
-		$datetime_offset = get_option( 'gmt_offset' ) * 3600;
-		$response        = [
-			'modified' => wpforms_datetime_format( $this->date_modified, '', true ),
+		$response = [
+			'modified' => sprintf( /* translators: %1$s - formatted date, %2$s - formatted time. */
+				__( '%1$s at %2$s', 'wpforms' ),
+				wpforms_date_format( $this->date_modified, 'M j, Y', true ),
+				wpforms_time_format( $this->date_modified, '', true )
+			),
 		];
 
 		do_action( 'wpforms_pro_admin_entries_edit_submit_completed', $this->form_data, $response, $updated_fields, $this->entry );
@@ -1343,7 +1353,7 @@ class Edit {
 		 * @param array $entry_fields Entry fields data.
 		 * @param array $form_data    Form data and settings.
 		 *
-		 * @return bool ____
+		 * @return bool
 		 */
 		return (bool) apply_filters(
 			'wpforms_pro_admin_entries_edit_field_output_editable',
