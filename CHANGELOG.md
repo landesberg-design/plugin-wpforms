@@ -1,6 +1,82 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.9.2] - 2024-06-18
+### Fixed
+- Reply-to field was not returning the correct email address.
+
+## [1.8.9.1] - 2024-06-13
+### Fixed
+- Fatal error was thrown if the Email > Carbon Copy option was enabled and CC field in Notifications contained multiple email addresses.
+
+## [1.8.9] - 2024-06-11
+### Added
+- Repeater field that enables creation of flexible and dynamic forms to collect information in a convenient & variable format.
+- Individual entries can now be manually marked as spam.
+- Complex fields now can have separate error messages for each field.
+- Recommended, New, and Featured addons are now displayed first on the addons page.
+
+### Changed
+- The Campaign Monitor, ConstantContact, GetResponse and ConvertKit logos were updated.
+- Users can now see the category and subcategory of the selected template on the Setup panel.
+- If Akismet is installed and configured for the form, marking entries as spam or not spam helps Akismet learn.
+- Improved the behavior of Tools > Logs page and settings controls.
+- Improved RTL layout of Entries Overview page on small screens.
+- Improved compatibility with the Hello Elementor theme.
+- Process empty selected values for Choices, Checkbox, and Dropdown fields when Show Values option is selected.
+- Choices.js library has been updated to v10.2.0.
+- Modern multiple select field with search enabled now is more user-friendly across the admin area.
+- Improved rendering of Payment Fields according to W3C requirements.
+- Always display templates added by addons, even if the addon is not installed or activated.
+- The form builder now hides the placeholder label for Image and Icon choices when left empty, while retaining the placeholder for Payment Choices and Checkboxes to maintain consistency with frontend behavior.
+- Improved the process of Custom Captcha field validation.
+
+### Fixed
+- Password field with Strength option turned on generated PHP Deprecated notices when submitting the form.
+- Entry Export search by payment field value with currency symbol worked incorrectly for some currencies.
+- Incorrect alert modal was shown on the subscription plan removal in some cases.
+- Various RTL problems on the form builder screen.
+- The minimum payment amount for the Single Item field was not functioning correctly with currencies that use a comma as a decimal separator.
+- Upload field values were broken into two lines on the Single Entry admin page.
+- Validation error for the Postal code of the Stripe Credit Card field displayed twice.
+- Inconsistent spacing of Dropdown field in different browsers on desktop and mobile.
+- There was a scroll jumping when switching between the 'Text' and 'Visual' tabs in the RichText field on mobile devices.
+- A popup about the form containing unsaved changes was displayed after switching to Marketing tab in the Form Builder even if the form was not modified.
+- PHP warnings were reported on Entry Edit page in some cases.
+- Stripe Credit Card field had incorrect placeholder color with Classic Markup.
+- Rich Text field text styles drop-down had unreadable text with dark styles of the Twenty Twenty-Four theme.
+- Updated the WPForms Challenge to only start counting when you actually begin creating a form on the Forms Overview page.
+- The coupon column in the Total field Summary had an incorrect border color with Classic styles applied.
+- User templates were not deleted on plugin uninstall.
+- The radio of the Multiple Choice field wasn't centered in Firefox.
+- Conditional Logic in the Form Builder wouldn't allow the creation of multiple marketing connections.
+- Stripe processing error occurred on a multi-payments form when all credit card fields were hidden by conditional logic.
+- The notice about Custom Captcha being included in the WPForms plugin was not displayed on Network Administration Screens.
+- Console errors occurred in the Block Editor when the Pro license key was empty or expired.
+- Notices about Zapier disconnections could duplicate when creating a form from a template.
+- Color of validation errors was incorrect for the Stripe Credit Card field when Payment Element mode was used.
+- Placeholder of the State sub-filed didn't show for the International Address field.
+- Additional padding was added for the form title on the Forms Overview page on mobile.
+- "Select your layout" setting wasn't shown when a layout was selected.
+- The plugin update process redirected to the Update page and did not redirect back to the Plugins page after the update.
+- The fetching of the new plugin version number and new plugin description has been run not-synchronously.
+- MySQL errors occurred when creating a table in some unique configurations.
+- Multiple Choice field with Icon Choices could not be selected in Firefox after reloading the page.
+- Inline javascript code could be parsed improperly and displayed as text on top pages for some configurations.
+- Cached token was not updated properly.
+- The Spinner layout of the Save button in the Form Builder was not centered.
+- In some exceptions, one-time payments appeared in the Stripe dashboard even though a payment form wasn't submitted.
+- The "Empty Spam" button removed only currently visible entries, not all of them.
+- Adding a table to the Rich Text field resulted in additional HTML spaces appearing in the email notification.
+- Email notifications were not sent when a subject was empty after smart tag processing.
+- Performance improvement of spam entry deletion.
+- PHP warnings might have occurred in some cases on PHP 8.0+.
+- File Upload field required to upload files one more time when a form was submitted with a failed captcha.
+- Upgrade to the Pro link had wrong styling on Bluehost hosted sites.
+- WPForms block in the editor showed an error when the selected form was trashed or deleted.
+- Some Stripe transactions were refunded almost immediately as the transactions were labeled fraudulent.
+- The validation process of Number Slider field could throw a fatal error on PHP 8.0+.
+
 ## [1.8.8.3] - 2024-04-26
 ### Changed
 - Updated jQuery.Validate library to v1.20.0.
@@ -89,6 +165,9 @@ All notable changes to this project will be documented in this file and formatte
 - `{author_*}` and `{page_*}` smart tags were returning incorrect results in some cases.
 - The form was not sent if it was in an Elementor popup with a phone field.
 - Incorrect styles were applied for "Order Summary" table in some cases.
+- Lazy-load YouTube video on the Settings > Themes panel to improve performance of the Form Builder.
+- Advanced settings tab layout of the Date / Time field was partially broken in Firefox browser.
+- Uncaught Error when attempting to fetch remote data and remote request failed.
 
 ## [1.8.7.2] - 2024-02-29
 ### Changed

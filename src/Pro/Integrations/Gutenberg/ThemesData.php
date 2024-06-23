@@ -78,19 +78,24 @@ class ThemesData extends ThemesDataBase {
 	 *
 	 * @return array
 	 */
-	public function get_wpforms_themes(): array {
+	public function get_wpforms_themes(): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		if ( $this->wpforms_themes !== null ) {
 			return $this->wpforms_themes;
 		}
 
-		$path        = $this->is_license_active() ? static::THEMES_WPFORMS_JSON_PATH : static::THEMES_WPFORMS_JSON_PATH_LITE;
+		$path        = static::THEMES_WPFORMS_JSON_PATH;
 		$themes_json = File::get_contents( WPFORMS_PLUGIN_DIR . $path ) ?? '{}';
 		$themes      = json_decode( $themes_json, true );
 
 		$this->wpforms_themes = ! empty( $themes ) ? $themes : [];
+		$is_license_active    = $this->is_license_active();
 
 		foreach ( $this->wpforms_themes as $slug => $theme ) {
+			if ( ! $is_license_active && ! in_array( $slug, [ 'classic', 'default' ], true ) ) {
+				$this->wpforms_themes[ $slug ]['disabled'] = 1;
+			}
+
 			if (
 				empty( $theme['settings']['backgroundUrl'] ) ||
 				$theme['settings']['backgroundUrl'] === 'url()'

@@ -460,7 +460,12 @@ class PaymentIntents extends Common implements ApiInterface {
 
 			if ( isset( $args['customer_email'] ) || isset( $args['customer_name'] ) ) {
 				$this->set_customer( $args['customer_email'] ?? '', $args['customer_name'] ?? '', $args['customer_address'] ?? [] );
-				$this->attach_customer_to_payment();
+
+				// Stop payment processing for all.
+				// Otherwise, it might stop for WPForms, but proceed for Stripe.
+				if ( is_null( $this->attach_customer_to_payment() ) ) {
+					return;
+				}
 
 				$args['customer'] = $this->get_customer( 'id' );
 			}

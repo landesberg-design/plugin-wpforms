@@ -290,7 +290,7 @@ class WPForms_Builder {
 	 *
 	 * The action can be triggered via URL:
 	 *   wp_nonce_url(
-	 *       add_query_arg( [ 'action' => '<action>, 'form_id' => $form_id ] ),
+	 *       add_query_arg( [ 'action' => '<action>', 'form_id' => $form_id ] ),
 	 *      'wpforms_save_as_template_form_nonce'
 	 *   );
 	 *
@@ -544,7 +544,7 @@ class WPForms_Builder {
 			'choicesjs',
 			WPFORMS_PLUGIN_URL . 'assets/lib/choices.min.js',
 			[],
-			'9.0.1'
+			'10.2.0'
 		);
 
 		wp_enqueue_script(
@@ -558,7 +558,7 @@ class WPForms_Builder {
 			'dom-purify',
 			WPFORMS_PLUGIN_URL . 'assets/lib/purify.min.js',
 			[],
-			'3.0.9'
+			'3.0.10'
 		);
 
 		if ( wp_is_mobile() ) {
@@ -742,7 +742,6 @@ class WPForms_Builder {
 			'template_modal_msg'                      => ! empty( $this->template['modal']['message'] ) ? $this->template['modal']['message'] : '',
 			'template_modal_display'                  => ! empty( $this->template['modal_display'] ) ? $this->template['modal_display'] : '',
 			'template_select'                         => esc_html__( 'Use Template', 'wpforms-lite' ),
-			'template_selected_badge'                 => Helpers::get_badge( esc_html__( 'Selected', 'wpforms-lite' ), 'sm', 'corner', 'steel', 'rounded-bl' ),
 			'template_confirm'                        => esc_html__( 'Changing templates on an existing form will DELETE existing form fields. Are you sure you want apply the new template?', 'wpforms-lite' ),
 			'use_default_template'                    => esc_html__( 'Use Default Template', 'wpforms-lite' ),
 			'embed'                                   => esc_html__( 'Embed', 'wpforms-lite' ),
@@ -800,9 +799,12 @@ class WPForms_Builder {
 				esc_html__( 'Choice %s', 'wpforms-lite' ),
 				'{number}'
 			),
+			'payment_choice_empty_label_tpl'          => sprintf( /* translators: %s - choice number. */
+				esc_html__( 'Item %s', 'wpforms-lite' ),
+				'{number}'
+			),
 			'error_save_form'                         => esc_html__( 'Something went wrong while saving the form. Please reload the page and try again.', 'wpforms-lite' ),
 			'error_contact_support'                   => esc_html__( 'Please contact the plugin support team if this behavior persists.', 'wpforms-lite' ),
-			'ms_win_css_url'                          => WPFORMS_PLUGIN_URL . 'assets/css/builder/builder-ms-win.css',
 			'error_select_template'                   => esc_html__( 'Something went wrong while applying the form template. Please try again. If the error persists, contact our support team.', 'wpforms-lite' ),
 			'error_load_templates'                    => esc_html__( 'Couldn\'t load the Setup panel.', 'wpforms-lite' ),
 			'blank_form'                              => esc_html__( 'Blank Form', 'wpforms-lite' ),
@@ -816,6 +818,7 @@ class WPForms_Builder {
 				'{to}'
 			),
 			'form_meta'                               => $this->form_data['meta'] ?? [],
+			'scrollbars_css_url'                      => WPFORMS_PLUGIN_URL . 'assets/css/builder/builder-scrollbars.css',
 		];
 
 		$strings = $this->add_localized_currencies( $strings );
@@ -1079,7 +1082,7 @@ class WPForms_Builder {
 			>
 
 				<input type="hidden" name="id" value="<?php echo esc_attr( $form_id ); ?>">
-				<input type="hidden" value="<?php echo absint( $field_id ); ?>" name="field_id" id="wpforms-field-id">
+				<input type="hidden" value="<?php echo wpforms_validate_field_id( $field_id ); ?>" name="field_id" id="wpforms-field-id">
 
 				<?php echo $before_toolbar; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 

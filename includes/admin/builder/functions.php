@@ -48,16 +48,23 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 		$input_id = esc_attr( $args['input_id'] );
 	}
 
+	// Sanitize the subsection only if it doesn't contain a connection ID tag.
+	if ( strpos( $subsection, '%connection_id%' ) === false ) {
+		$subsection = sanitize_html_class( $subsection );
+	}
+
 	if ( ! empty( $args['smarttags'] ) ) {
-		$type   = ! empty( $args['smarttags']['type'] ) ? esc_attr( $args['smarttags']['type'] ) : 'fields';
-		$fields = ! empty( $args['smarttags']['fields'] ) ? esc_attr( $args['smarttags']['fields'] ) : '';
+		$type                = ! empty( $args['smarttags']['type'] ) ? esc_attr( $args['smarttags']['type'] ) : 'fields';
+		$fields              = ! empty( $args['smarttags']['fields'] ) ? esc_attr( $args['smarttags']['fields'] ) : '';
+		$is_repeater_allowed = ! empty( $args['smarttags']['allow-repeated-fields'] ) ? esc_attr( $args['smarttags']['allow-repeated-fields'] ) : '';
 
 		$smarttags_toggle = sprintf(
-			'<a href="#" class="toggle-smart-tag-display toggle-unfoldable-cont" data-type="%s" data-fields="%s">
-				<i class="fa fa-tags"></i><span>%s</span>
+			'<a href="#" class="toggle-smart-tag-display toggle-unfoldable-cont" data-type="%1$s" data-fields="%2$s" data-allow-repeated-fields="%3$s">
+				<i class="fa fa-tags"></i><span>%4$s</span>
 			</a>',
 			esc_attr( $type ),
 			esc_attr( $fields ),
+			esc_attr( $is_repeater_allowed ),
 			esc_html__( 'Show Smart Tags', 'wpforms-lite' )
 		);
 	}
@@ -71,11 +78,11 @@ function wpforms_panel_field( $option, $panel, $field, $form_data, $label, $args
 		if ( $subsection && ! wpforms_is_empty_string( $index ) ) {
 			$field_name = sprintf( '%s[%s][%s][%s][%s]', $parent, $panel, $subsection, $index, $field );
 			$value      = $form_data[ $parent ][ $panel ][ $subsection ][ $index ][ $field ] ?? $default;
-			$input_id   = sprintf( 'wpforms-panel-field-%s-%s-%s-%s', sanitize_html_class( $panel_id ), sanitize_html_class( $subsection ), sanitize_html_class( $index ), sanitize_html_class( $field ) );
+			$input_id   = sprintf( 'wpforms-panel-field-%s-%s-%s-%s', sanitize_html_class( $panel_id ), $subsection, sanitize_html_class( $index ), sanitize_html_class( $field ) );
 		} elseif ( ! empty( $subsection ) ) {
 			$field_name = sprintf( '%s[%s][%s][%s]', $parent, $panel, $subsection, $field );
 			$value      = $form_data[ $parent ][ $panel ][ $subsection ][ $field ] ?? $default;
-			$input_id   = sprintf( 'wpforms-panel-field-%s-%s-%s', sanitize_html_class( $panel_id ), sanitize_html_class( $subsection ), sanitize_html_class( $field ) );
+			$input_id   = sprintf( 'wpforms-panel-field-%s-%s-%s', sanitize_html_class( $panel_id ), $subsection, sanitize_html_class( $field ) );
 		} else {
 			$field_name = sprintf( '%s[%s][%s]', $parent, $panel, $field );
 			$value      = $form_data[ $parent ][ $panel ][ $field ] ?? $default;

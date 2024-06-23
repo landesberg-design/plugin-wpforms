@@ -113,21 +113,29 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 		 *
 		 * @since 1.6.0.2
 		 *
-		 * @returns {Array} Filtered list of fields.
+		 * @return {Object} Filtered list of fields.
 		 */
-		removeUnsupportedFields: function() {
+		removeUnsupportedFields() {
+			const allowed = wpforms_builder.cl_fields_supported;
 
-			var allowed = wpforms_builder.cl_fields_supported,
-				fields = $.extend( {}, updater.allFields ),
-				key;
+			let fields = { ...updater.allFields };
 
-			for ( key in fields ) {
-				if ( $.inArray( fields[key].type, allowed ) === -1 ) {
-					delete fields[key];
-				} else if ( typeof fields[key].dynamic_choices !== 'undefined' && fields[key].dynamic_choices !== '' ) {
-					delete fields[key];
+			/**
+			 * Filter the fields list before removing unsupported field types.
+			 *
+			 * @since 1.8.9
+			 *
+			 * @param {Object} fields Fields data.
+			 *
+			 * @return {Object} Filtered fields data.
+			 */
+			fields = wp.hooks.applyFilters( 'wpforms.ConditionalLogicCore.BeforeRemoveUnsupportedFields', fields );
+
+			Object.keys( fields ).forEach( ( key ) => {
+				if ( ! allowed.includes( fields[ key ].type ) || fields[ key ].dynamic_choices ) {
+					delete fields[ key ];
 				}
-			}
+			} );
 
 			return fields;
 		},

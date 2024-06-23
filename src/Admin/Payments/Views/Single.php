@@ -5,6 +5,7 @@ namespace WPForms\Admin\Payments\Views;
 use WPForms\Admin\Payments\ScreenOptions;
 use WPForms\Admin\Payments\Views\Overview\Helpers;
 use WPForms\Db\Payments\ValueValidator;
+use WPForms_Field_Layout;
 
 /**
  * Payments Overview Page class.
@@ -823,14 +824,40 @@ class Single implements PaymentsViewsInterface {
 			return;
 		}
 
-		$form_data = wpforms()->get( 'form' )->get( $this->payment->form_id, [ 'content_only' => true ] );
+		/**
+		 * Allow modifying the form data before rendering the entry details.
+		 *
+		 * @since 1.8.9
+		 *
+		 * @param array $form_data Form data.
+		 * @param array $fields    Entry fields.
+		 */
+		$form_data = apply_filters(
+			'wpforms_admin_payments_views_single_form_data',
+			wpforms()->get( 'form' )->get( $this->payment->form_id, [ 'content_only' => true ] ),
+			$fields
+		);
 
 		add_filter( 'wp_kses_allowed_html', [ $this, 'modify_allowed_tags_payment_field_value' ], 10, 2 );
+
+		/**
+		 * Allow modifying the entry fields before rendering the entry details.
+		 *
+		 * @since 1.8.9
+		 *
+		 * @param array $entry_fields Entry fields.
+		 * @param array $form_data    Form data.
+		 */
+		$entry_fields = apply_filters(
+			'wpforms_admin_payments_views_single_fields',
+			$this->prepare_entry_fields( $fields, $form_data ),
+			$form_data
+		);
 
 		$entry_output = wpforms_render(
 			'admin/payments/single/entry-details',
 			[
-				'entry_fields'   => $this->prepare_entry_fields( $fields, $form_data ),
+				'entry_fields'   => $entry_fields,
 				'form_data'      => $form_data,
 				'entry_id_title' => $entry_id_title,
 				'entry_id'       => $this->payment->entry_id,
@@ -865,20 +892,33 @@ class Single implements PaymentsViewsInterface {
 	 */
 	private function prepare_entry_fields( $fields, $form_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded, Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		if ( empty( $fields ) ) {
+		if ( empty( $form_data['fields'] ) || empty( $fields ) ) {
 			return [];
 		}
 
 		$prepared_fields = [];
 
 		// Display the fields and their values.
-		foreach ( $fields as $key => $field ) {
+		foreach ( $form_data['fields'] as $key => $field_data ) {
 
-			if ( empty( $field['type'] ) ) {
+			if ( empty( $field_data['type'] ) ) {
 				continue;
 			}
 
-			$field_type = $field['type'];
+			$field_type = $field_data['type'];
+
+			// Add repeater fields as is.
+			if ( $field_type === 'repeater' && wpforms()->is_pro() ) {
+				$prepared_fields[ $key ] = $field_data;
+
+				continue;
+			}
+
+			$field = $fields[ $field_data['id'] ] ?? [];
+
+			if ( empty( $field ) ) {
+				continue;
+			}
 
 			// phpcs:disable WPForms.PHP.ValidateHooks.InvalidHookName
 			/** This filter is documented in /src/Pro/Admin/Entries/Edit.php */
@@ -892,6 +932,8 @@ class Single implements PaymentsViewsInterface {
 			// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
 			$prepared_fields[ $key ]['field_class'] = sanitize_html_class( 'wpforms-field-' . $field_type );
+			$prepared_fields[ $key ]['type']        = $field_type;
+			$prepared_fields[ $key ]['id']          = $field_data['id'];
 			$prepared_fields[ $key ]['field_name']  = ! empty( $field['name'] )
 				? $field['name']
 				: sprintf( /* translators: %d - field ID. */

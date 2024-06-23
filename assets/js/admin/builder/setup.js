@@ -80,6 +80,7 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 			app.setupTitleFocus();
 			app.setTriggerBlankLink();
 			app.setSelectedTemplate();
+			app.setSelectedCategories();
 			app.events();
 
 			el.$builder.trigger( 'wpformsBuilderSetupReady' );
@@ -107,6 +108,7 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 				$formName: $( '#wpforms-setup-name' ),
 				$panel: $( '#wpforms-panel-setup' ),
 				$categories: $( '#wpforms-panel-setup .wpforms-setup-templates-categories' ),
+				$subcategories: $( '#wpforms-panel-setup .wpforms-setup-templates-subcategories' ),
 			};
 
 			// Other values.
@@ -147,6 +149,8 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 				.on( 'click', '.wpforms-setup-templates-subcategories li', WPFormsFormTemplates.selectSubCategory )
 				.on( 'click', '.wpforms-template-select', app.selectTemplate )
 				.on( 'click', '.wpforms-trigger-blank', app.selectBlankTemplate );
+
+			el.$builder.on( 'wpformsBuilderReady wpformsBuilderPanelLoaded', app.filterTemplatesBySelectedCategory );
 		},
 
 		/**
@@ -165,6 +169,7 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 			app.setup();
 			WPFormsFormTemplates.setup();
 			app.setSelectedTemplate();
+			app.setSelectedCategories();
 
 			app.panelEvents();
 		},
@@ -242,12 +247,55 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 			// Remove existing badge.
 			$template.find( '.wpforms-badge' ).remove();
 
-			// Add "Selected" badge.
-			$template.find( '.wpforms-template-favorite, .wpforms-template-remove' ).after( wpforms_builder.template_selected_badge );
-
 			// Remove edit and delete action buttons from current user template.
 			if ( $template.hasClass( 'wpforms-user-template' ) ) {
 				$template.find( '.wpforms-template-edit, .wpforms-template-remove' ).remove();
+			}
+		},
+
+		/**
+		 * Set category and/or subcategory active if its template was selected.
+		 *
+		 * @since 1.8.9
+		 */
+		setSelectedCategories() {
+			if ( ! el.$panel.length || ! wpforms_builder.form_meta?.category ) {
+				return;
+			}
+
+			const $category = el.$categories.find( `li[data-category="${ wpforms_builder.form_meta.category }"]` );
+
+			if ( ! $category.length ) {
+				return;
+			}
+
+			el.$categories.find( 'li' ).removeClass( 'active opened' );
+			$category.addClass( 'active opened' );
+
+			const $subcategory = el.$subcategories.find( `li[data-subcategory="${ wpforms_builder.form_meta.subcategory }"]` );
+
+			if ( ! $subcategory.length ) {
+				return;
+			}
+
+			el.$subcategories.find( 'li' ).removeClass( 'active' );
+			$subcategory.addClass( 'active' );
+		},
+
+		/**
+		 * Filter templates by selected category and subcategory.
+		 *
+		 * @since 1.8.9
+		 */
+		filterTemplatesBySelectedCategory() {
+			// If subcategory is available, trigger its click it will update and category also.
+			if ( el.$subcategories.find( 'li.active' ).length ) {
+				el.$subcategories.find( ' > li.active' ).trigger( 'click' );
+			}
+
+			// In other case, check by the category.
+			if ( el.$categories.find( 'li.active' ).length && ! el.$subcategories.find( 'li.active' ).length ) {
+				el.$categories.find( ' > li.active div' ).trigger( 'click' );
 			}
 		},
 
@@ -490,19 +538,32 @@ WPForms.Admin.Builder.Setup = WPForms.Admin.Builder.Setup || ( function( documen
 
 			WPFormsBuilder.showLoadingOverlay();
 
-			var data = {
+			const data = {
 				title: formName,
 				action: vars.formID ? 'wpforms_update_form_template' : 'wpforms_new_form',
-				template: template,
+				template,
 				form_id: vars.formID, // eslint-disable-line camelcase
 				nonce: wpforms_builder.nonce,
 			};
 
+			const category = $( '.wpforms-setup-templates-categories li.active' ).data( 'category' );
+			const subcategory = $( '.wpforms-setup-templates-subcategories li.active' ).data( 'subcategory' );
+
+			if ( category ) {
+				data.category = category;
+			}
+
+			if ( subcategory ) {
+				data.subcategory = subcategory;
+			}
+
+			if ( category === 'all' ) {
+				data.subcategory = 'all';
+			}
+
 			$.post( wpforms_builder.ajax_url, data )
 				.done( function( res ) {
-
 					if ( res.success ) {
-
 						// We have already warned the user that unsaved changes will be ignored.
 						WPFormsBuilder.setCloseConfirmation( false );
 

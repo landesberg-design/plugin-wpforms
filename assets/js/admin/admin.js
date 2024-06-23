@@ -219,6 +219,9 @@
 				// Remove "Press to select" text.
 				args.itemSelectText = '';
 
+				// Render HTML in Choices.js.
+				args.allowHTML = true;
+
 				// Function to run once Choices initialises.
 				// We need to reproduce a behaviour like on public-facing area for "Edit Entry" page.
 				args.callbackOnInit = function() {
@@ -232,15 +235,15 @@
 					}
 
 					wpf.initMultipleSelectWithSearch( this );
+					wpf.showMoreButtonForChoices( self.containerOuter.element );
 				};
 
-				$this.data( 'choicesjs', new Choices( $this[0], args ) );
+				$this.data( 'choicesjs', new Choices( $this[ 0 ], args ) );
 			} );
 
 			// Add ability to close the drop-down menu.
 			$( document ).on( 'click', '.choices', function( e ) {
-
-				var $choices =  $( this ),
+				const $choices = $( this ),
 					choicesObj = $choices.find( 'select' ).data( 'choicesjs' );
 
 				if (
@@ -253,6 +256,16 @@
 				) {
 					choicesObj.hideDropdown();
 				}
+			} );
+
+			// Show more button for choices.
+			$( document ).on( 'addItem removeItem', '.choices', function() {
+				wpf.showMoreButtonForChoices( this );
+			} );
+
+			// Remove focus from input when dropdown is hidden.
+			$( document ).on( 'hideDropdown', '.choices', function() {
+				$( this ).find( '.choices__inner input.choices__input' ).trigger( 'blur' );
 			} );
 		},
 

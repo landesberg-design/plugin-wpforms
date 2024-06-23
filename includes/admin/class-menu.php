@@ -287,7 +287,7 @@ class WPForms_Admin_Menu {
 
 		global $submenu;
 
-		// Bail if plugin menu is not registered.
+		// Bail if a plugin menu is not registered.
 		if ( ! isset( $submenu['wpforms-overview'] ) ) {
 			return;
 		}
@@ -297,7 +297,7 @@ class WPForms_Admin_Menu {
 				$submenu['wpforms-overview'],
 				static function( $item ) {
 
-					return strpos( $item[2], 'https://wpforms.com/lite-upgrade' ) !== false;
+					return strpos( urldecode( $item[2] ), 'wpforms.com/lite-upgrade' ) !== false;
 				}
 			)
 		);

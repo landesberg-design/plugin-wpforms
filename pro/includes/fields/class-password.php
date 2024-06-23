@@ -83,7 +83,7 @@ class WPForms_Field_Password extends WPForms_Field {
 		}
 
 		$form_id  = absint( $form_data['id'] );
-		$field_id = absint( $field['id'] );
+		$field_id = wpforms_validate_field_id( $field['id'] );
 
 		// Password confirmation setting enabled.
 		$props      = [
@@ -473,7 +473,7 @@ class WPForms_Field_Password extends WPForms_Field {
 	 * @since 1.3.0
 	 *
 	 * @param int          $field_id     Field ID.
-	 * @param array|string $field_submit Submitted field value.
+	 * @param array|string $field_submit Submitted field value (raw data).
 	 * @param array        $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -549,7 +549,7 @@ class WPForms_Field_Password extends WPForms_Field {
 			'name'      => sanitize_text_field( $name ),
 			'value'     => sanitize_text_field( $value ),
 			'value_raw' => $value, // This is necessary for the login form to work correctly, it will be deleted before saving the entry.
-			'id'        => absint( $field_id ),
+			'id'        => wpforms_validate_field_id( $field_id ),
 			'type'      => $this->type,
 		];
 	}

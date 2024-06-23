@@ -39,6 +39,7 @@ trait CreditCard {
 		add_filter( 'wpforms_pro_fields_entry_preview_is_field_support_preview_stripe-credit-card_field', [ $this, 'entry_preview_availability' ], 10, 4 );
 		add_filter( 'wpforms_field_new_display_duplicate_button', [ $this, 'field_display_duplicate_button' ], 10, 2 );
 		add_filter( 'wpforms_field_preview_display_duplicate_button', [ $this, 'field_display_duplicate_button' ], 10, 2 );
+		add_filter( 'wpforms_field_display_sublabel_skip_for', [ $this, 'skip_sublabel_for_attribute' ], 10, 3 );
 	}
 
 	/**
@@ -274,7 +275,7 @@ trait CreditCard {
 	 * @since 1.8.2
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value.
+	 * @param array $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -373,5 +374,29 @@ trait CreditCard {
 		// phpcs:enable WordPress.Security.NonceVerification
 
 		return $is_gutenberg || $is_elementor || $is_divi;
+	}
+
+	/**
+	 * Do not add the `for` attribute to certain sublabels.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param bool   $skip  Whether to skip the `for` attribute.
+	 * @param string $key   Input key.
+	 * @param array  $field Field data and settings.
+	 *
+	 * @return bool
+	 */
+	public function skip_sublabel_for_attribute( $skip, $key, $field ) {
+
+		if ( $field['type'] !== $this->type ) {
+			return $skip;
+		}
+
+		if ( $key === 'number' ) {
+			return true;
+		}
+
+		return $skip;
 	}
 }

@@ -362,6 +362,10 @@ class IconChoices {
 			$label = $choice['label']['text'];
 		}
 
+		if ( is_array( $choice['label']['class'] ) && wpforms_is_empty_string( $label ) ) {
+			$choice['label']['class'][] = 'wpforms-field-label-inline-empty';
+		}
+
 		printf(
 			'<label %1$s>
 				<span class="wpforms-icon-choices-icon">

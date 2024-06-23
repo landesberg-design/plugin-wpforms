@@ -228,4 +228,59 @@ abstract class SmartTag {
 
 		return $meta[0]->data ?? '';
 	}
+
+	/**
+	 * Get formatted field value.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param int    $field_id  Field ID.
+	 * @param array  $fields    List of fields.
+	 * @param string $field_key Field key to get value from.
+	 *
+	 * @return mixed|string
+	 */
+	protected function get_formatted_field_value( int $field_id, array $fields, string $field_key ) {
+
+		$value = $fields[ $field_id ][ $field_key ] ?? '';
+
+		if ( ! wpforms_is_repeated_field( $field_id, $fields ) ) {
+			return $value;
+		}
+
+		return $this->get_repeated_field_value( $value, $field_id, $fields, $field_key );
+	}
+
+	/**
+	 * Get repeated fields value.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param string $value     Field value.
+	 * @param int    $field_id  Field ID.
+	 * @param array  $fields    List of fields.
+	 * @param string $field_key Field key to get value from.
+	 *
+	 * @return string
+	 */
+	private function get_repeated_field_value( string $value, int $field_id, array $fields, string $field_key ): string {
+
+		$comma_separated_contexts = [ 'notification-send-to-email', 'notification-carboncopy' ];
+		$prefix                   = $field_id . '_';
+		$separator                = in_array( $this->context, $comma_separated_contexts, true ) ? ',' : "\n";
+
+		foreach ( $fields as $key => $field ) {
+			if ( strpos( $key, $prefix ) !== 0 ) {
+				continue;
+			}
+
+			if ( ! isset( $field[ $field_key ] ) ) {
+				continue;
+			}
+
+			$value .= $separator . $field[ $field_key ];
+		}
+
+		return $value;
+	}
 }

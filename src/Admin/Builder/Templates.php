@@ -145,6 +145,7 @@ class Templates {
 		add_action( 'admin_print_scripts', [ $this, 'upgrade_banner_template' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueues' ] );
 		add_action( 'wp_ajax_wpforms_templates_favorite', [ $this, 'ajax_save_favorites' ] );
+		add_filter( 'wpforms_form_templates', [ $this, 'add_addons_templates' ] );
 	}
 
 	/**
@@ -723,7 +724,9 @@ class Templates {
 			return $args;
 		}
 
-		$template['data']['meta']['template'] = $template['id'] ?? $template['slug'];
+		$template['data']['meta']['template']    = $template['id'] ?? $template['slug'];
+		$template['data']['meta']['category']    = $data['category'] ?? 'all';
+		$template['data']['meta']['subcategory'] = $data['subcategory'] ?? 'all';
 
 		// Enable Notifications by default.
 		$template['data']['settings']['notification_enable'] = isset( $template['data']['settings']['notification_enable'] )
@@ -805,7 +808,9 @@ class Templates {
 			$template_id = $form_data['meta']['template'] ?? '';
 		}
 
-		$new['meta']['template'] = $template_id;
+		$new['meta']['template']    = $template_id;
+		$new['meta']['category']    = ! empty( $args['category'] ) ? sanitize_text_field( $args['category'] ) : 'all';
+		$new['meta']['subcategory'] = ! empty( $args['subcategory'] ) ? sanitize_text_field( $args['subcategory'] ) : 'all';
 
 		/**
 		 * Allow modifying form data when a new template is applied.
@@ -1031,5 +1036,157 @@ class Templates {
 			</div>
 		</script>
 		<?php
+	}
+
+	/**
+	 * Add additional addons templates.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $templates Templates list.
+	 *
+	 * @return array
+	 */
+	public function add_addons_templates( array $templates ): array {
+
+		// Add User Registration templates only if the addon is not active.
+		if ( ! wpforms()->get( 'addons' )->is_active( 'user-registration' ) ) {
+			$templates = $this->add_user_registration_templates( $templates );
+		}
+
+		// Add Post Submissions templates only if the addon is not active.
+		if ( ! wpforms()->get( 'addons' )->is_active( 'post-submissions' ) ) {
+			$templates = $this->add_post_submissions_templates( $templates );
+		}
+
+		// Add Survey and Poll templates only if the addon is not active.
+		if ( ! wpforms()->get( 'addons' )->is_active( 'surveys-polls' ) ) {
+			$templates = $this->add_surveys_polls_templates( $templates );
+		}
+
+		return $templates;
+	}
+
+	/**
+	 * Add User Registration templates.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $templates Templates list.
+	 *
+	 * @return array
+	 */
+	private function add_user_registration_templates( array $templates ): array {
+
+		$user_registration_templates = [
+			[
+				'name'        => esc_html__( 'User Registration Form', 'wpforms-lite' ),
+				'slug'        => 'user_registration',
+				'addons'      => [ 'user-registration' ],
+				'license'     => $this->get_license_level( [ 'license' => [ 'pro' ] ] ),
+				'has_access'  => $this->has_access( [ 'license' => [ 'pro' ] ] ),
+				'source'      => 'wpforms-addon',
+				'description' => esc_html__( 'Create customized WordPress user registration forms and add them anywhere on your website.', 'wpforms-lite' ),
+			],
+			[
+				'name'        => esc_html__( 'User Login Form', 'wpforms-lite' ),
+				'slug'        => 'user_login',
+				'addons'      => [ 'user-registration' ],
+				'license'     => $this->get_license_level( [ 'license' => [ 'pro' ] ] ),
+				'has_access'  => $this->has_access( [ 'license' => [ 'pro' ] ] ),
+				'source'      => 'wpforms-addon',
+				'description' => esc_html__( 'Allow your users to easily log in to your site with their username and password.', 'wpforms-lite' ),
+			],
+			[
+				'name'        => esc_html__( 'User Password Reset Form', 'wpforms-lite' ),
+				'slug'        => 'user_reset',
+				'addons'      => [ 'user-registration' ],
+				'license'     => $this->get_license_level( [ 'license' => [ 'pro' ] ] ),
+				'has_access'  => $this->has_access( [ 'license' => [ 'pro' ] ] ),
+				'source'      => 'wpforms-addon',
+				'description' => esc_html__( 'Allow your users to easily reset their password.', 'wpforms-lite' ),
+			],
+		];
+
+		return array_merge( $templates, $user_registration_templates );
+	}
+
+	/**
+	 * Add Post Submissions templates.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $templates Templates list.
+	 *
+	 * @return array
+	 */
+	private function add_post_submissions_templates( array $templates ): array {
+
+		$post_submissions_templates = [
+			[
+				'name'        => esc_html__( 'Blog Post Submission Form', 'wpforms-lite' ),
+				'slug'        => 'post_submission',
+				'addons'      => [ 'post-submissions' ],
+				'license'     => $this->get_license_level( [ 'license' => [ 'pro' ] ] ),
+				'has_access'  => $this->has_access( [ 'license' => [ 'pro' ] ] ),
+				'source'      => 'wpforms-addon',
+				'description' => esc_html__( 'User-submitted content made easy. Allow your users to submit guest blog posts in WordPress. You can add and remove fields as needed.', 'wpforms-lite' ),
+			],
+		];
+
+		return array_merge( $templates, $post_submissions_templates );
+	}
+
+	/**
+	 * Add Surveys and Polls templates.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $templates Templates list.
+	 *
+	 * @return array
+	 */
+	private function add_surveys_polls_templates( array $templates ): array {
+
+		$surveys_polls_templates = [
+			[
+				'name'        => esc_html__( 'Survey Form', 'wpforms-lite' ),
+				'slug'        => 'survey',
+				'addons'      => [ 'surveys-polls' ],
+				'license'     => $this->get_license_level( [ 'license' => [ 'pro' ] ] ),
+				'has_access'  => $this->has_access( [ 'license' => [ 'pro' ] ] ),
+				'source'      => 'wpforms-addon',
+				'description' => esc_html__( 'Collect customer feedback, then generate survey reports to determine satisfaction and spot trends.', 'wpforms-lite' ),
+			],
+			[
+				'name'        => esc_html__( 'Poll Form', 'wpforms-lite' ),
+				'slug'        => 'poll',
+				'addons'      => [ 'surveys-polls' ],
+				'license'     => $this->get_license_level( [ 'license' => [ 'pro' ] ] ),
+				'has_access'  => $this->has_access( [ 'license' => [ 'pro' ] ] ),
+				'source'      => 'wpforms-addon',
+				'description' => esc_html__( 'Ask visitors a question and display the results after they provide an answer.', 'wpforms-lite' ),
+			],
+			[
+				'name'        => esc_html__( 'NPS Survey Simple Form', 'wpforms-lite' ),
+				'slug'        => 'nps-survey-simple',
+				'addons'      => [ 'surveys-polls' ],
+				'license'     => $this->get_license_level( [ 'license' => [ 'pro' ] ] ),
+				'has_access'  => $this->has_access( [ 'license' => [ 'pro' ] ] ),
+				'source'      => 'wpforms-addon',
+				'description' => esc_html__( 'Find out if your clients or customers would recommend you to someone else with this basic Net Promoter Score survey template.', 'wpforms-lite' ),
+			],
+			[
+				'name'        => esc_html__( 'NPS Survey Enhanced Form', 'wpforms-lite' ),
+				'slug'        => 'nps-survey-enhanced',
+				'addons'      => [ 'surveys-polls' ],
+				'license'     => $this->get_license_level( [ 'license' => [ 'pro' ] ] ),
+				'has_access'  => $this->has_access( [ 'license' => [ 'pro' ] ] ),
+				'source'      => 'wpforms-addon',
+				'description' => esc_html__( 'Measure customer loyalty and find out exactly what they are thinking with this enhanced Net Promoter Score survey template.', 'wpforms-lite' ),
+			],
+		];
+
+		return array_merge( $templates, $surveys_polls_templates );
 	}
 }

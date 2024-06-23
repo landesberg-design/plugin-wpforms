@@ -1,26 +1,24 @@
 /* global WPFormsBuilder, wpforms_builder, WPFormsUtils */
 
+// noinspection ES6ConvertVarToLetConst
 /**
  * Form Builder Field Layout module.
  *
  * @since 1.7.7
  */
 
-'use strict';
-
-var WPForms = window.WPForms || {};
+var WPForms = window.WPForms || {}; // eslint-disable-line no-var
 
 WPForms.Admin = WPForms.Admin || {};
 WPForms.Admin.Builder = WPForms.Admin.Builder || {};
 
 WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( function( document, window, $ ) {
-
 	/**
 	 * Elements holder.
 	 *
 	 * @since 1.7.7
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
 	let el = {};
 
@@ -29,17 +27,15 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 	 *
 	 * @since 1.7.7
 	 *
-	 * @type {object}
+	 * @type {Object}
 	 */
 	const app = {
-
 		/**
 		 * Start the engine.
 		 *
 		 * @since 1.7.7
 		 */
-		init: function() {
-
+		init() {
 			$( app.ready );
 		},
 
@@ -48,12 +44,11 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 */
-		ready: function() {
-
+		ready() {
 			app.setup();
 			app.initLabels();
 			app.events();
-			app.rowDisplayHeightBalance( $( '.wpforms-field-layout-columns.wpforms-layout-display-rows' ) );
+			app.rowDisplayHeightBalance( $( '.wpforms-layout-display-rows, .wpforms-layout-display-blocks' ) );
 		},
 
 		/**
@@ -61,8 +56,7 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 */
-		setup: function() {
-
+		setup() {
 			// Cache DOM elements.
 			el = {
 				$builder:            $( '#wpforms-builder' ),
@@ -80,9 +74,8 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			el.$builder
 				.on( 'change', '.wpforms-field-option-row-preset input', app.presetChange )
 				.on( 'change', '.wpforms-field-option-row-display select', app.displayChange )
-				.on( 'mouseenter', '.wpforms-field-layout .wpforms-field', app.subfieldMouseEnter )
-				.on( 'mouseleave', '.wpforms-field-layout .wpforms-field', app.subfieldMouseLeave )
-				.on( 'wpformsFieldAddDragStart', app.fieldCantAddModal )
+				.on( 'mouseenter', '.wpforms-field-layout-columns .wpforms-field', app.subfieldMouseEnter )
+				.on( 'mouseleave', '.wpforms-field-layout-columns .wpforms-field', app.subfieldMouseLeave )
 				.on( 'wpformsFieldAdd', app.fieldAdd )
 				.on( 'wpformsBeforeFieldAddToDOM', app.beforeFieldAddToDOM )
 				.on( 'wpformsBeforeFieldAddOnClick', app.beforeFieldAddOnClick )
@@ -97,6 +90,19 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 				.on( 'wpformsFieldMoveRejected', app.handleFieldMoveRejected )
 				.on( 'wpformsFieldMove', app.handleFieldMove )
 				.on( 'wpformsFieldDragOver wpformsFieldDragChange', app.handleFieldDrag );
+		},
+
+		/**
+		 * Determine whether the field type is a layout-based field.
+		 *
+		 * @since 1.8.9
+		 *
+		 * @param {string} fieldType Field type.
+		 *
+		 * @return {boolean} True if it is the layout-based field.
+		 */
+		isLayoutBasedField( fieldType ) {
+			return [ 'layout', 'repeater' ].includes( fieldType );
 		},
 
 		/**
@@ -127,12 +133,13 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 */
 		handleFieldOperations( e, fieldID ) {
 			const $field = $( `#wpforms-field-${ fieldID }` );
+			const $rows = $field.find( '.wpforms-layout-display-rows, .wpforms-layout-display-blocks' );
 
-			if ( $field.find( '.wpforms-layout-display-rows' ).length === 0 ) {
+			if ( ! $rows.length ) {
 				return;
 			}
 
-			app.rowDisplayHeightBalance( $field.find( '.wpforms-layout-display-rows' ) );
+			app.rowDisplayHeightBalance( $rows );
 		},
 
 		/**
@@ -141,17 +148,18 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 * @since 1.8.8
 		 *
 		 * @param {Object} e              Event object.
-		 * @param {jQuery} $rejectedField Rejected field object.
+		 * @param {jQuery} $rejectedField Rejected a field object.
 		 */
 		handleFieldMoveRejected( e, $rejectedField ) {
 			const fieldID = $rejectedField.prev( '.wpforms-field, .wpforms-alert' ).data( 'field-id' );
 			const $field = $( `#wpforms-field-${ fieldID }` );
+			const $rows = $field.find( '.wpforms-layout-display-rows, .wpforms-layout-display-blocks' );
 
-			if ( $field.find( '.wpforms-layout-display-rows' ).length === 0 ) {
+			if ( ! $rows.length ) {
 				return;
 			}
 
-			app.rowDisplayHeightBalance( $field.find( '.wpforms-layout-display-rows' ) );
+			app.rowDisplayHeightBalance( $rows );
 		},
 
 		/**
@@ -164,12 +172,13 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 */
 		handleFieldMove( e, ui ) {
 			const $field = ui.item.first();
+			const $rows = $field.parents( '.wpforms-layout-display-rows, .wpforms-layout-display-blocks' );
 
-			if ( $field.parents( '.wpforms-layout-display-rows' ).length === 0 ) {
+			if ( ! $rows.length ) {
 				return;
 			}
 
-			app.rowDisplayHeightBalance( $field.parents( '.wpforms-layout-display-rows' ) );
+			app.rowDisplayHeightBalance( $rows );
 		},
 
 		/**
@@ -186,7 +195,13 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 				return;
 			}
 
-			app.rowDisplayHeightBalance( $target.parents( '.wpforms-layout-display-rows' ) );
+			const $rows = $target.parents( '.wpforms-layout-display-rows, .wpforms-layout-display-blocks' );
+
+			if ( ! $rows.length ) {
+				return;
+			}
+
+			app.rowDisplayHeightBalance( $rows );
 		},
 
 		/**
@@ -236,6 +251,15 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 					$field.css( 'margin-bottom', data[ $field.index() ] - $field.outerHeight() + 5 );
 				} );
 			} );
+
+			/**
+			 * The Event fired when the height balance was performed.
+			 *
+			 * @since 1.8.9
+			 *
+			 * @param {Object} data Layout field data object.
+			 */
+			el.$builder.trigger( 'wpformsLayoutAfterHeightBalance', { $rows } );
 		},
 
 		/**
@@ -243,31 +267,28 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {object} e Event object.
+		 * @param {Object} e Event object.
 		 */
-		presetChange: function( e ) {
-
+		presetChange( e ) { // eslint-disable-line no-unused-vars
 			const $input = $( this ),
 				preset = $input.val(),
 				$presetsRow = $input.closest( '.wpforms-field-option-row-preset' ),
 				fieldId = $presetsRow.data( 'field-id' ),
-				$fieldPreview = $( `#wpforms-field-${fieldId}` ),
-				$fieldPreviewColumns = $fieldPreview.find( '.wpforms-field-layout-columns' );
+				$fieldPreview = $( `#wpforms-field-${ fieldId }` ),
+				$fieldPreviewColumns = $fieldPreview.find( '.wpforms-field-layout-columns' ),
+				$columnFields = [];
 
-			let $columnFields = [];
-
-			// Detach and store in array all the fields from columns.
+			// Detach and store in an array all the fields from columns.
 			$fieldPreviewColumns.find( '.wpforms-layout-column' ).each( function( columnIndex ) {
 				$columnFields[ columnIndex ] = $( this ).find( '.wpforms-field' ).detach();
 			} );
 
-			let oldColumnsData = app.getFieldColumnsData( fieldId ),
+			const oldColumnsData = app.getFieldColumnsData( fieldId ),
 				newColumnsData = preset.split( '-' )
 					.map( function( width, i ) {
-
 						return {
-							'width_preset': width,
-							'fields': oldColumnsData[ i ] ? oldColumnsData[ i ].fields : [],
+							width_preset: width, // eslint-disable-line camelcase
+							fields: oldColumnsData[ i ] ? oldColumnsData[ i ].fields : [],
 						};
 					} );
 
@@ -277,16 +298,14 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 
 			// Restore all the fields in new columns.
 			$fieldPreviewColumns.find( '.wpforms-layout-column' ).each( function( columnIndex ) {
-
 				const $column = $( this );
 
 				$column.append( $columnFields[ columnIndex ] );
 				WPForms.Admin.Builder.DragFields.initSortableContainer( $column );
 			} );
 
-			// Continue only if the new preset has fewer columns than the old one.
+			// When the new preset has fewer columns than the old one.
 			if ( newColumnsData.length < oldColumnsData.length ) {
-
 				// Combine all the remaining fields.
 				let $allRemainingFields = $( [] );
 
@@ -294,21 +313,26 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 					$allRemainingFields = $allRemainingFields.add( $columnFields[ i ] );
 				}
 
+				// Remove custom margin-bottom from remaining fields.
+				$allRemainingFields.css( 'margin-bottom', '' );
+
 				// Add all the remaining fields to the base level after the layout field.
 				$fieldPreview.after( $allRemainingFields );
 			}
 
-			// Update the order of the options of the fields inside the Layout field.
+			app.rowDisplayHeightBalance( $fieldPreviewColumns );
+
+			// Update the field options order inside the Layout field.
 			app.reorderLayoutFieldsOptions( $fieldPreview );
 
 			/**
-			 * Event fired at the end of the change of layout preset.
+			 * Event fired at the end of changing the layout preset.
 			 *
 			 * @since 1.7.8
 			 *
-			 * @param {object} data Layout field data object.
+			 * @param {Object} data Layout field data object.
 			 */
-			el.$builder.trigger( 'wpformsLayoutAfterPresetChange', { fieldId: fieldId, preset: preset, newColumnsData: newColumnsData, oldColumnsData: oldColumnsData } );
+			el.$builder.trigger( 'wpformsLayoutAfterPresetChange', { fieldId, preset, newColumnsData, oldColumnsData } );
 		},
 
 		/**
@@ -318,19 +342,17 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @param {Array} columnsData Columns data.
 		 *
-		 * @returns {string} Preview columns HTML.
+		 * @return {string} Preview columns HTML.
 		 */
-		generatePreviewColumns: function( columnsData ) {
-
-			if ( ! columnsData || ! columnsData.length ) {
+		generatePreviewColumns( columnsData ) {
+			if ( ! columnsData?.length ) {
 				return '';
 			}
 
 			const placeholder = wp.template( 'wpforms-layout-field-column-plus-placeholder-template' )();
 			const columnsHTML = columnsData.map( function( column ) {
-
-				return `<div class="wpforms-layout-column wpforms-layout-column-${column['width_preset']}">
-							${placeholder}
+				return `<div class="wpforms-layout-column wpforms-layout-column-${ column.width_preset }">
+							${ placeholder }
 						</div>`;
 			} );
 
@@ -342,14 +364,13 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {integer|number} fieldId Field Id.
+		 * @param {number} fieldId Field Id.
 		 *
-		 * @returns {Array} Columns data.
+		 * @return {Array} Columns data.
 		 */
-		getFieldColumnsData: function( fieldId ) {
-
-			let dataJson = $( `#wpforms-field-option-${fieldId}-columns-json` ).val(),
-				data;
+		getFieldColumnsData( fieldId ) {
+			const dataJson = $( `#wpforms-field-option-${ fieldId }-columns-json` ).val();
+			let	data;
 
 			try {
 				data = JSON.parse( dataJson );
@@ -365,19 +386,18 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.8
 		 *
-		 * @param {int} layoutId The ID of the layout field.
-		 * @param {int} fieldId  The ID of the field to look for.
+		 * @param {number} layoutId The ID of the layout field.
+		 * @param {number} fieldId  The ID of the field to look for.
 		 *
-		 * @returns {boolean} If the field exists in the layout.
+		 * @return {boolean} If the field exists in the layout.
 		 */
-		columnsHasFieldID: function( layoutId, fieldId ) {
-
+		columnsHasFieldID( layoutId, fieldId ) {
 			/*
-			Get field columns data, and filter it to have only those columns, which in column.fields has field ID value.
-			Return true if length of such reduced data is bigger than 0.
+			 * Get field columns data, and filter it to have only those columns, which in column.fields has field ID value.
+			 * Return true if the length of such reduced data is bigger than 0.
 			 */
 			return app.getFieldColumnsData( layoutId ).filter( function( column ) {
-				return column.fields.includes( fieldId );
+				return column.fields && column.fields.includes( fieldId );
 			} ).length > 0;
 		},
 
@@ -387,22 +407,21 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 * @since 1.7.7
 		 * @since 1.7.8 Added new triggers: `wpformsLayoutColumnsDataUpdated`, `wpformsLayoutAfterUpdateColumnsData`.
 		 *
-		 * @param {integer|number} fieldId Field Id.
-		 * @param {Array}          data    Columns data.
+		 * @param {number} fieldId Field ID.
+		 * @param {Array}  data    Columns data.
 		 */
-		updateFieldColumnsData: function( fieldId, data ) {
-
-			const $holder = $( `#wpforms-field-option-${fieldId}-columns-json` ),
+		updateFieldColumnsData( fieldId, data ) {
+			const $holder = $( `#wpforms-field-option-${ fieldId }-columns-json` ),
 				currentColumnsData = $holder.val(),
 				newColumnsData = JSON.stringify( data );
 
 			$holder.val( newColumnsData );
 
 			if ( currentColumnsData !== newColumnsData ) {
-				el.$builder.trigger( 'wpformsLayoutColumnsDataUpdated', { fieldId: fieldId, data: data } );
+				el.$builder.trigger( 'wpformsLayoutColumnsDataUpdated', { fieldId, data } );
 			}
 
-			el.$builder.trigger( 'wpformsLayoutAfterUpdateColumnsData', { fieldId: fieldId, data: data } );
+			el.$builder.trigger( 'wpformsLayoutAfterUpdateColumnsData', { fieldId, data } );
 		},
 
 		/**
@@ -411,13 +430,12 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 * @since 1.7.7
 		 *
 		 * @param {Event}  e           Event.
-		 * @param {object} options     Field add additional options.
+		 * @param {Object} options     Field add additional options.
 		 * @param {jQuery} $newField   New field preview object.
 		 * @param {jQuery} $newOptions New field options object.
 		 * @param {jQuery} $sortable   Sortable container.
 		 */
-		beforeFieldAddToDOM: function( e, options, $newField, $newOptions, $sortable ) {
-
+		beforeFieldAddToDOM( e, options, $newField, $newOptions, $sortable ) {
 			if (
 				! $sortable ||
 				! $sortable.length ||
@@ -427,7 +445,7 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			}
 
 			// This is needed to skip adding the field to the base level.
-			// Corresponding check is in `admin-builder.js` before calling the `app.fieldAddToBaseLevel()`.
+			// The corresponding check is in `admin-builder.js` before calling the `app.fieldAddToBaseLevel()`.
 			e.skipAddFieldToBaseLevel = true;
 
 			// Add the field to the column of the Layout field.
@@ -444,31 +462,30 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {Event}   e       Event.
-		 * @param {integer} fieldId Field id.
-		 * @param {string}  type    Field type.
+		 * @param {Event}  e       Event.
+		 * @param {number} fieldId Field id.
+		 * @param {string} type    Field type.
 		 */
-		fieldAdd: function( e, fieldId, type ) {
-
-			const $fieldOptions = $( `#wpforms-field-option-${fieldId}` ),
+		fieldAdd( e, fieldId, type ) {
+			const $fieldOptions = $( `#wpforms-field-option-${ fieldId }` ),
 				$prevFieldOptions = $fieldOptions.prev(),
 				prevFieldType = $prevFieldOptions.find( '.wpforms-field-option-hidden-type' ).val();
 
 			// In the case of new field was placed right after the Layout field,
 			// we must reorder the options of the fields in the columns of this layout.
-			if ( prevFieldType === 'layout' ) {
+			if ( app.isLayoutBasedField( prevFieldType ) ) {
 				const prevFieldId = $prevFieldOptions.find( '.wpforms-field-option-hidden-id' ).val();
 
 				app.reorderLayoutFieldsOptions(
-					$( `#wpforms-field-${prevFieldId}` )
+					$( `#wpforms-field-${ prevFieldId }` )
 				);
 			}
 
-			if ( type !== 'layout' ) {
+			if ( ! app.isLayoutBasedField( type ) ) {
 				return;
 			}
 
-			el.$builder.find( `#wpforms-field-${fieldId} .wpforms-layout-column` ).each( function() {
+			el.$builder.find( `#wpforms-field-${ fieldId } .wpforms-layout-column` ).each( function() {
 				WPForms.Admin.Builder.DragFields.initSortableContainer( $( this ) );
 			} );
 		},
@@ -482,26 +499,19 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 * @param {string} type   Field type.
 		 * @param {jQuery} $field Field button object
 		 */
-		beforeFieldAddOnClick: function( e, type, $field ) {
-
-			app.fieldCantAddModal( e, type, {} );
-
-			if ( e.isDefaultPrevented() ) {
-				return;
-			}
-
-			if ( app.isFieldAllowedInColum( type ) ) {
-				return;
-			}
-
+		beforeFieldAddOnClick( e, type, $field ) {
 			const $defaultColumn = el.$sortableFieldsWrap.find( '.wpforms-fields-sortable-default' );
 
 			if ( ! $defaultColumn.length ) {
 				return;
 			}
 
+			if ( app.isFieldAllowedInColum( type, $defaultColumn ) ) {
+				return;
+			}
+
 			e.preventDefault();
-			app.fieldMoveRejected( e, $field, null );
+			app.fieldMoveRejected( e, $field, null, null );
 		},
 
 		/**
@@ -509,20 +519,19 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {Event}   e       Event.
-		 * @param {integer} fieldId Field id.
-		 * @param {string}  type    Field type.
+		 * @param {Event}  e       Event.
+		 * @param {number} fieldId Field id.
+		 * @param {string} type    Field type.
 		 */
-		beforeFieldDelete: function( e, fieldId, type ) {
-
-			if ( type !== 'layout' ) {
+		beforeFieldDelete( e, fieldId, type ) {
+			if ( ! app.isLayoutBasedField( type ) ) {
 				app.removeFieldFromColumns( fieldId );
 
-				// When user delete the field in the column, we need to remove
+				// When a user deletes the field in the column, we need to remove
 				// the class `wpforms-field-child-hovered` from the Layout field
-				// in order to bring back the Duplicate and Delete icons.
-				$( `#wpforms-field-${fieldId}` )
-					.closest( '.wpforms-field-layout' )
+				// to bring back the Duplicate and Delete icons.
+				$( `#wpforms-field-${ fieldId }` )
+					.closest( '.wpforms-field' )
 					.removeClass( 'wpforms-field-child-hovered' );
 
 				return;
@@ -532,13 +541,12 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 
 			// Delete all the fields inside columns.
 			columnsData.forEach( function( column ) {
-
 				if ( ! Array.isArray( column.fields ) ) {
 					return;
 				}
 
-				column.fields.forEach( function( fieldId ) {
-					WPFormsBuilder.fieldDeleteById( fieldId );
+				column.fields.forEach( function( columnFieldId ) {
+					WPFormsBuilder.fieldDeleteById( columnFieldId );
 				} );
 			} );
 		},
@@ -548,21 +556,24 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {object} e         Triggered event.
-		 * @param {object} fieldData Field data.
+		 * @param {Object} e         Triggered event.
+		 * @param {Object} fieldData Field data.
 		 * @param {string} type      Field type.
 		 */
-		adjustDeleteFieldAlert: function( e, fieldData, type ) {
-
-			if ( type !== 'layout' ) {
+		adjustDeleteFieldAlert( e, fieldData, type ) {
+			if ( ! app.isLayoutBasedField( type ) ) {
 				return;
 			}
 
 			e.preventDefault();
 
+			const content = wpforms_builder[ type ]?.delete_confirm
+				? wpforms_builder[ type ].delete_confirm
+				: wpforms_builder.layout.delete_confirm;
+
 			$.confirm( {
 				title: false,
-				content: wpforms_builder.layout.delete_confirm,
+				content,
 				icon: 'fa fa-exclamation-circle',
 				type: 'orange',
 				buttons: {
@@ -570,8 +581,7 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 						text: wpforms_builder.ok,
 						btnClass: 'btn-confirm',
 						keys: [ 'enter' ],
-						action: function() {
-
+						action() {
 							WPFormsBuilder.fieldDeleteById( fieldData.id );
 						},
 					},
@@ -588,26 +598,24 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {Event}   e       Event.
-		 * @param {integer} fieldId Field id.
+		 * @param {Event}  e       Event.
+		 * @param {number} fieldId Field id.
 		 */
-		fieldOptionsUpdate: function( e, fieldId ) {
-
+		fieldOptionsUpdate( e, fieldId ) {
 			app.fieldLegacyLayoutSelectorUpdate( fieldId );
 			app.fieldSizeOptionUpdate( fieldId );
 			app.fieldOptionGroupsToggle( fieldId );
 		},
 
 		/**
-		 * Update legacy layout option.
+		 * Update the legacy layout option.
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {integer} fieldId Field Id.
+		 * @param {number} fieldId Field ID.
 		 */
-		fieldLegacyLayoutSelectorUpdate: function( fieldId ) {
-
-			const $fieldLegacyLayoutSelector = $( `#wpforms-field-option-row-${fieldId}-css .layout-selector-display` );
+		fieldLegacyLayoutSelectorUpdate( fieldId ) {
+			const $fieldLegacyLayoutSelector = $( `#wpforms-field-option-row-${ fieldId }-css .layout-selector-display` );
 
 			let	$fieldLegacyLayoutNotice = $fieldLegacyLayoutSelector.find( '.wpforms-alert-layout' );
 
@@ -618,8 +626,8 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			// Add "Layouts Have Moved!" notice.
 			$fieldLegacyLayoutNotice = $( `
 				<div class="wpforms-alert-warning wpforms-alert-layout wpforms-alert wpforms-alert-nomargin">
-					<h4>${wpforms_builder.layout.legacy_layout_notice_title}</h4>
-					<p>${wpforms_builder.layout.legacy_layout_notice_text}</p>
+					<h4>${ wpforms_builder.layout.legacy_layout_notice_title }</h4>
+					<p>${ wpforms_builder.layout.legacy_layout_notice_text }</p>
 				</div>
 			` );
 
@@ -630,36 +638,37 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		},
 
 		/**
-		 * Update Field Size option according to the position of the field.
+		 * Update the Field Size option according to the position of the field.
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {integer} fieldId Field Id.
+		 * @param {number} fieldId Field ID.
 		 */
-		fieldSizeOptionUpdate: function( fieldId ) {
-
-			const $field = $( `#wpforms-field-${fieldId}` ),
+		fieldSizeOptionUpdate( fieldId ) {
+			const $field = $( `#wpforms-field-${ fieldId }` ),
 				type = $field.data( 'field-type' ),
-				isFieldInColumn = $field.closest( '.wpforms-field-layout' ).length > 0,
-				$fieldSizeOptionRow = $( `#wpforms-field-option-row-${fieldId}-size` ),
-				$fieldSizeOptionSelect = $fieldSizeOptionRow.find( 'select' );
-
-			let	$fieldSizeOptionNotice = $fieldSizeOptionRow.find( '.wpforms-notice-field-size' );
+				isFieldInColumn = $field.closest( '.wpforms-layout-column' ).length > 0;
 
 			// Do not touch the Field Size option for certain fields.
 			if ( [ 'textarea', 'richtext' ].indexOf( type ) > -1 ) {
 				return;
 			}
 
+			const $fieldSizeOptionRow = $( `#wpforms-field-option-row-${ fieldId }-size` );
+			let	$fieldSizeOptionNotice = $fieldSizeOptionRow.find( '.wpforms-notice-field-size' );
+
 			// Add "Field size cannot be changed" notice.
 			if ( ! $fieldSizeOptionNotice.length ) {
 				$fieldSizeOptionNotice = $( `
-					<label class="sub-label wpforms-notice-field-size" title="${wpforms_builder.layout.size_notice_tooltip}">
-						${wpforms_builder.layout.size_notice_text}
+					<label class="sub-label wpforms-notice-field-size" title="${ wpforms_builder.layout.size_notice_tooltip }">
+						${ wpforms_builder.layout.size_notice_text }
 					</label>
 				` );
+
 				$fieldSizeOptionRow.append( $fieldSizeOptionNotice );
 			}
+
+			const $fieldSizeOptionSelect = $fieldSizeOptionRow.find( 'select' );
 
 			// Toggle field size selector title attribute.
 			if ( isFieldInColumn ) {
@@ -678,13 +687,13 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {integer} fieldId Field Id.
+		 * @param {number} fieldId Field ID.
 		 */
-		fieldOptionGroupsToggle: function( fieldId ) {
-
-			const $field = $( `#wpforms-field-${fieldId}` ),
+		fieldOptionGroupsToggle( fieldId ) {
+			const $field = $( `#wpforms-field-${ fieldId }` ),
 				type = $field.data( 'field-type' );
 
+			// The Layout field (and only) should not have option group tabs Basic, Advanced, Smart Logic.
 			el.$fieldOptions.toggleClass( 'wpforms-hide-options-groups', type === 'layout' );
 		},
 
@@ -693,12 +702,11 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {integer} fieldId   Field Id.
-		 * @param {integer} position  Field position inside the column.
-		 * @param {jQuery}  $sortable Sortable column container.
-		 **/
-		receiveFieldToColumn: function( fieldId, position, $sortable ) {
-
+		 * @param {number} fieldId   Field ID.
+		 * @param {number} position  Field position inside the column.
+		 * @param {jQuery} $sortable Sortable column container.
+		 */
+		receiveFieldToColumn( fieldId, position, $sortable ) {
 			// Remove the field from all the columns.
 			app.removeFieldFromColumns( fieldId );
 
@@ -711,13 +719,13 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			app.fieldOptionsUpdate( null, fieldId );
 
 			/**
-			 * Trigger on the end of the process of receiving field in layouts column.
+			 * Trigger on the end of the process of receiving field in layout's column.
 			 *
 			 * @since 1.7.8
 			 *
-			 * @param {object} data Field data object.
+			 * @param {Object} data Field data object.
 			 */
-			el.$builder.trigger( 'wpformsLayoutAfterReceiveFieldToColumn', { fieldId: fieldId, position: position, column: $sortable } );
+			el.$builder.trigger( 'wpformsLayoutAfterReceiveFieldToColumn', { fieldId, position, column: $sortable } );
 		},
 
 		/**
@@ -725,26 +733,22 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {integer|number} fieldId Field Id.
-		 **/
-		removeFieldFromColumns: function( fieldId ) {
-
+		 * @param {number} fieldId Field ID.
+		 */
+		removeFieldFromColumns( fieldId ) {
 			fieldId = Number( fieldId );
 
 			el.$builder.find( '.wpforms-field' ).each( function() {
-
 				const $field = $( this );
 
-				if ( $field.data( 'field-type' ) !== 'layout' ) {
+				if ( ! app.isLayoutBasedField( $field.data( 'field-type' ) ) ) {
 					return;
 				}
 
 				const layoutFieldId = Number( $field.data( 'field-id' ) );
-
-				let	columnsData = app.getFieldColumnsData( layoutFieldId );
+				const columnsData = app.getFieldColumnsData( layoutFieldId );
 
 				for ( let i = 0; i < columnsData.length; i++ ) {
-
 					if ( ! Array.isArray( columnsData[ i ].fields ) ) {
 						continue;
 					}
@@ -764,29 +768,28 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {integer|number} fieldId   Field Id.
-		 * @param {integer|number} position  The new position of the field inside the column.
-		 * @param {jQuery}         $sortable Sortable column container.
-		 **/
-		positionFieldInColumn: function( fieldId, position, $sortable ) {
-
+		 * @param {number} fieldId   Field ID.
+		 * @param {number} position  The new position of the field inside the column.
+		 * @param {jQuery} $sortable Sortable column container.
+		 */
+		positionFieldInColumn( fieldId, position, $sortable ) {
 			// Proceed only in the column.
 			if ( ! $sortable || ! $sortable.hasClass( 'wpforms-layout-column' ) ) {
 				return;
 			}
 
-			const $layoutField = $sortable.closest( '.wpforms-field-layout' ),
+			const $layoutField = $sortable.closest( '.wpforms-field' ),
 				layoutFieldId = $layoutField.data( 'field-id' ),
 				columnIndex = $sortable.index();
 
-			let	columnsData = app.getFieldColumnsData( layoutFieldId );
+			const columnsData = app.getFieldColumnsData( layoutFieldId );
 
 			// Skip if there is no data of the column.
 			if ( ! columnsData || ! columnsData[ columnIndex ] ) {
 				return;
 			}
 
-			let column = columnsData[ columnIndex ];
+			const column = columnsData[ columnIndex ];
 
 			column.fields = Array.isArray( column.fields ) ? column.fields : [];
 
@@ -810,27 +813,25 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {integer} layoutFieldId Layout field Id.
-		 **/
-		duplicateLayoutField: function( layoutFieldId ) {
+		 * @param {number} layoutFieldId Layout field ID.
+		 */
+		duplicateLayoutField( layoutFieldId ) {
+			const $layoutField = $( `#wpforms-field-${ layoutFieldId }` );
 
-			const $field = $( `#wpforms-field-${layoutFieldId}` ),
-				preset = $( `#wpforms-field-option-${layoutFieldId} .wpforms-field-option-row-preset input:checked` ).val();
-
-			if ( $field.data( 'field-type' ) !== 'layout' ) {
+			if ( ! app.isLayoutBasedField( $layoutField.data( 'field-type' ) ) ) {
 				return;
 			}
 
 			const columnsData = app.getFieldColumnsData( layoutFieldId ),
 				newLayoutFieldID = WPFormsBuilder.fieldDuplicateRoutine( layoutFieldId ),
-				$newLayoutField = $( `#wpforms-field-${newLayoutFieldID}` ),
-				$newLayoutFieldOptions = $( `#wpforms-field-option-${newLayoutFieldID}` ),
-				$newLayoutFieldColumn = $newLayoutField.find( '.wpforms-layout-column' );
-
-			let	newColumnsData = JSON.parse( JSON.stringify( columnsData ) );
+				$newLayoutField = $( `#wpforms-field-${ newLayoutFieldID }` ),
+				$newLayoutFieldOptions = $( `#wpforms-field-option-${ newLayoutFieldID }` ),
+				$newLayoutFieldColumn = $newLayoutField.find( '.wpforms-layout-column' ),
+				newColumnsData = JSON.parse( JSON.stringify( columnsData ) ),
+				preset = $( `#wpforms-field-option-${ layoutFieldId } .wpforms-field-option-row-preset input:checked` ).val();
 
 			// Duplicate preset option value.
-			$newLayoutFieldOptions.find( `#wpforms-field-option-${newLayoutFieldID}-preset-${preset}` ).prop( 'checked', true );
+			$newLayoutFieldOptions.find( `#wpforms-field-option-${ newLayoutFieldID }-preset-${ preset }` ).prop( 'checked', true );
 
 			// Delete the fields from the columns.
 			$newLayoutField.find( '.wpforms-layout-column .wpforms-field' ).remove();
@@ -839,14 +840,16 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			$newLayoutField.find( '.wpforms-fields-sortable-default' ).removeClass( 'wpforms-fields-sortable-default' );
 
 			columnsData.forEach( function( column, index ) {
-
 				newColumnsData[ index ].fields = [];
 
-				let $newColumn = $newLayoutFieldColumn.eq( index );
+				if ( ! Array.isArray( column.fields ) ) {
+					return;
+				}
+
+				const $newColumn = $newLayoutFieldColumn.eq( index );
 
 				column.fields.forEach( function( fieldId ) {
-
-					const $field = $( `#wpforms-field-${fieldId}` );
+					const $field = $( `#wpforms-field-${ fieldId }` );
 
 					// Skip if there is no field OR duplicate field button.
 					if ( ! $field.length || ! $field.find( '> .wpforms-field-duplicate' ).length ) {
@@ -854,8 +857,8 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 					}
 
 					const newFieldID = WPFormsBuilder.fieldDuplicateRoutine( fieldId ),
-						$newField = $( `#wpforms-field-${newFieldID}` ).detach().removeClass( 'active' ),
-						$newFieldOptions = $( `#wpforms-field-option-${newFieldID}` );
+						$newField = $( `#wpforms-field-${ newFieldID }` ).detach().removeClass( 'active' ),
+						$newFieldOptions = $( `#wpforms-field-option-${ newFieldID }` );
 
 					$newColumn.append( $newField );
 					$newFieldOptions.hide();
@@ -869,7 +872,7 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			// Activate duplicate field to keep consistent behavior with other fields.
 			$newLayoutField.trigger( 'click' );
 
-			WPFormsUtils.triggerEvent( el.$builder, 'wpformsFieldDuplicated', [ layoutFieldId, $field, newLayoutFieldID, $newLayoutField ]  );
+			WPFormsUtils.triggerEvent( el.$builder, 'wpformsFieldDuplicated', [ layoutFieldId, $layoutField, newLayoutFieldID, $newLayoutField ] );
 		},
 
 		/**
@@ -877,11 +880,12 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {object} e Event object.
+		 * @param {Object} e Event object.
 		 */
-		subfieldMouseEnter: function( e ) {
-
-			$( this ).closest( '.wpforms-field-layout' ).addClass( 'wpforms-field-child-hovered' );
+		subfieldMouseEnter( e ) { // eslint-disable-line no-unused-vars
+			$( this )
+				.closest( '.wpforms-field-layout-columns' ).closest( '.wpforms-field' )
+				.addClass( 'wpforms-field-child-hovered' );
 		},
 
 		/**
@@ -889,11 +893,12 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {object} e Event object.
+		 * @param {Object} e Event object.
 		 */
-		subfieldMouseLeave: function( e ) {
-
-			$( this ).closest( '.wpforms-field-layout' ).removeClass( 'wpforms-field-child-hovered' );
+		subfieldMouseLeave( e ) { // eslint-disable-line no-unused-vars
+			$( this )
+				.closest( '.wpforms-field-layout-columns' ).closest( '.wpforms-field' )
+				.removeClass( 'wpforms-field-child-hovered' );
 		},
 
 		/**
@@ -901,8 +906,7 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 */
-		initLabels: function() {
-
+		initLabels() {
 			$( '.wpforms-field-option-layout .wpforms-field-option-row-label input' ).trigger( 'input' );
 		},
 
@@ -911,13 +915,12 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {jQuery}                $newField   New field preview.
-		 * @param {jQuery}                $newOptions New field options.
-		 * @param {integer|number|string} position    New field position.
-		 * @param {jQuery}                $column     Sortable column container.
+		 * @param {jQuery}        $newField   New field preview.
+		 * @param {jQuery}        $newOptions New field options.
+		 * @param {number|string} position    New field position.
+		 * @param {jQuery}        $column     Sortable column container.
 		 */
-		fieldAddToColumn: function( $newField, $newOptions, position,  $column ) {
-
+		fieldAddToColumn( $newField, $newOptions, position, $column ) {
 			const $fields = $column.find( '.wpforms-field' );
 
 			if ( position === 'bottom' ) {
@@ -933,7 +936,7 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 				$column.append( $newField );
 			}
 
-			const $fieldOptionsInPosition = $( `#wpforms-field-option-${fieldInPositionId}` );
+			const $fieldOptionsInPosition = $( `#wpforms-field-option-${ fieldInPositionId }` );
 
 			if ( $fieldOptionsInPosition.length ) {
 				$fieldOptionsInPosition.before( $newOptions );
@@ -958,67 +961,40 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {Event}  e       Event.
-		 * @param {jQuery} $field  Field object.
-		 * @param {object} ui      Sortable ui object.
+		 * @param {Event}  e             Event.
+		 * @param {jQuery} $field        Field object.
+		 * @param {Object} ui            Sortable ui object.
+		 * @param {jQuery} $targetColumn Target column element.
 		 */
-		fieldMoveRejected: function( e, $field, ui ) {
-
+		fieldMoveRejected( e, $field, ui, $targetColumn ) { // eslint-disable-line no-unused-vars
 			const type = $field.data( 'field-type' );
+			const name = type ? $( `#wpforms-add-fields-${ type }` ).text() : $field.text();
 
-			let name = type ? $( `#wpforms-add-fields-${type}` ).text() : $field.text();
-
-			$.confirm( {
+			let modalOptions = {
 				title: wpforms_builder.heads_up,
-				content: wpforms_builder.layout.not_allowed_alert_text.replace( /%s/g, `<strong>${name}</strong>` ),
-				icon: 'fa fa-exclamation-circle',
+				content: wpforms_builder.layout.not_allowed_alert_text.replace( /%s/g, `<strong>${ name }</strong>` ),
 				type: 'red',
-				buttons: {
-					confirm: {
-						text: wpforms_builder.ok,
-						btnClass: 'btn-confirm',
-						keys: [ 'enter' ],
-					},
-				},
-			} );
-		},
+			};
 
-		/**
-		 * Display alert modal when trying to add the Layout field in certain cases.
-		 * For example "The Layout field cannot be used when Conversational Forms is enabled.".
-		 *
-		 * Event `wpformsFieldAddDragStart` handler.
-		 *
-		 * @since 1.7.7
-		 *
-		 * @param {Event}  e    Event.
-		 * @param {string} type SField type.
-		 * @param {object} ui   Sortable ui object.
-		 */
-		fieldCantAddModal: function( e, type, ui ) {
-
-			if ( type !== 'layout' ) {
-				return;
-			}
-
-			let alertMessage = '';
-
-			// Whether the Conversational Forms is enabled.
-			if ( $( '#wpforms-panel-field-settings-conversational_forms_enable' ).is( ':checked' ) ) {
-				alertMessage = wpforms_builder.layout.enabled_cf_alert_text;
-			}
-
-			if ( alertMessage === '' ) {
-				return;
-			}
-
-			e.preventDefault();
+			/**
+			 * Filter the field move rejected alert modal options.
+			 *
+			 * @since 1.8.9
+			 *
+			 * @param {Object} modalOptions  Field move rejected alert modal options.
+			 * @param {jQuery} $field        Field element object.
+			 * @param {Object} ui            Sortable ui object.
+			 * @param {jQuery} $targetColumn Target column element.
+			 *
+			 * @return {string} Filtered the field rejected message.
+			 */
+			modalOptions = wp.hooks.applyFilters( 'wpforms.LayoutField.fieldMoveRejectedModalOptions', modalOptions, $field, ui, $targetColumn );
 
 			$.confirm( {
-				title: wpforms_builder.heads_up,
-				content: alertMessage,
+				title: modalOptions.title,
+				content: modalOptions.content,
 				icon: 'fa fa-exclamation-circle',
-				type: 'orange',
+				type: modalOptions.type,
 				buttons: {
 					confirm: {
 						text: wpforms_builder.ok,
@@ -1037,33 +1013,29 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @param {jQuery} $layoutField Layout field object.
 		 */
-		reorderLayoutFieldsOptions: function( $layoutField ) {
-
-			if ( ! $layoutField || ! $layoutField.length || $layoutField.data( 'field-type' ) !== 'layout' ) {
+		reorderLayoutFieldsOptions( $layoutField ) {
+			if ( ! $layoutField?.length || ! app.isLayoutBasedField( $layoutField.data( 'field-type' ) ) ) {
 				return;
 			}
 
 			const layoutFieldId = $layoutField.data( 'field-id' ),
 				columnsData = app.getFieldColumnsData( layoutFieldId );
 
-			let $lastFieldOptions = $( `#wpforms-field-option-${layoutFieldId}` );
+			let $lastFieldOptions = $( `#wpforms-field-option-${ layoutFieldId }` );
 
 			columnsData.forEach( function( column, c ) {
-
 				if ( ! Array.isArray( column.fields ) ) {
 					return;
 				}
 
-				let fields = column.fields.slice();
+				const fields = column.fields.slice();
 
-				column.fields.forEach( function( fieldId, i ) {
-
-					let $fieldOptions = $( `#wpforms-field-option-${fieldId}` );
+				column.fields.forEach( function( fieldId ) {
+					let $fieldOptions = $( `#wpforms-field-option-${ fieldId }` );
 
 					if ( ! $fieldOptions.length ) {
-
 						// Remove not existing field.
-						let fieldIndex = fields.indexOf( fieldId );
+						const fieldIndex = fields.indexOf( fieldId );
 
 						if ( fieldIndex !== -1 ) {
 							fields.splice( fieldIndex, 1 );
@@ -1091,12 +1063,25 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 * @since 1.7.7
 		 *
 		 * @param {string} fieldType Field type to check.
+		 * @param {jQuery} $target   Target element.
 		 *
-		 * @returns {boolean} True if allowed.
+		 * @return {boolean} True if allowed.
 		 */
-		isFieldAllowedInColum: function( fieldType ) {
+		isFieldAllowedInColum( fieldType, $target ) {
+			const isAllowed = wpforms_builder.layout.not_allowed_fields.indexOf( fieldType ) < 0;
 
-			return wpforms_builder.layout.not_allowed_fields.indexOf( fieldType ) < 0;
+			/**
+			 * Allows developers to determine whether the field is allowed to be in column.
+			 *
+			 * @since 1.8.9
+			 *
+			 * @param {boolean} isAllowed Whether the field is allowed to be placed in the column.
+			 * @param {string}  fieldType Field type.
+			 * @param {jQuery}  $target   Target element.
+			 *
+			 * @return {boolean} True if allowed.
+			 */
+			return wp.hooks.applyFilters( 'wpforms.LayoutField.isFieldAllowedInColumn', isAllowed, fieldType, $target );
 		},
 
 		/**
@@ -1104,13 +1089,13 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {Event}   e       Event.
-		 * @param {integer} fieldId Field Id.
-		 * @param {jQuery}  $field  Field object.
+		 * @param {Event}  e       Event.
+		 * @param {number} fieldId Field Id.
+		 * @param {jQuery} $field  Field object.
 		 */
-		beforeFieldDuplicate: function( e, fieldId, $field ) {
-
-			if ( $field.data( 'field-type' ) !== 'layout' ) {
+		beforeFieldDuplicate( e, fieldId, $field ) {
+			// Run for the Layout-based fields only.
+			if ( ! app.isLayoutBasedField( $field.data( 'field-type' ) ) ) {
 				return;
 			}
 
@@ -1124,16 +1109,15 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		 *
 		 * @since 1.7.7
 		 *
-		 * @param {Event}   e          Event.
-		 * @param {integer} fieldId    Field Id.
-		 * @param {jQuery}  $field     Field object.
-		 * @param {integer} newFieldId New field Id.
-		 * @param {jQuery}  $newField  New field object.
+		 * @param {Event}  e          Event.
+		 * @param {number} fieldId    Field ID.
+		 * @param {jQuery} $field     Field object.
+		 * @param {number} newFieldId New field ID.
+		 * @param {jQuery} $newField  New field object.
 		 */
-		fieldDuplicated: function( e, fieldId, $field, newFieldId, $newField ) {
-
-			// No need to run for the Layout fields.
-			if ( $field.data( 'field-type' ) === 'layout' ) {
+		fieldDuplicated( e, fieldId, $field, newFieldId, $newField ) {
+			// Skip the Layout-based fields.
+			if ( app.isLayoutBasedField( $field.data( 'field-type' ) ) ) {
 				return;
 			}
 
@@ -1147,7 +1131,6 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 
 	// Provide access to public functions/properties.
 	return app;
-
 }( document, window, jQuery ) );
 
 // Initialize.

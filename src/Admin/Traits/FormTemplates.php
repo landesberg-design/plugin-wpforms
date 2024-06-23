@@ -397,7 +397,6 @@ trait FormTemplates {
 		$args['addons_attributes'] = $this->prepare_addons_attributes( $template );
 
 		$args['selected']    = ! empty( $this->form_data['meta']['template'] ) && $this->form_data['meta']['template'] === $args['template_id'];
-		$args['badge_text']  = $args['selected'] ? esc_html__( 'Selected', 'wpforms-lite' ) : $args['badge_text'];
 		$args['badge_class'] = ! empty( $args['badge_text'] ) ? ' badge' : '';
 		$args['template']    = $template;
 

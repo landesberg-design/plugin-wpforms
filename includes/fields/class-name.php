@@ -73,7 +73,7 @@ class WPForms_Field_Name extends WPForms_Field {
 		unset( $properties['inputs']['primary'] );
 
 		$form_id  = absint( $form_data['id'] );
-		$field_id = absint( $field['id'] );
+		$field_id = wpforms_validate_field_id( $field['id'] );
 
 		$props = [
 			'inputs' => [
@@ -512,7 +512,7 @@ class WPForms_Field_Name extends WPForms_Field {
 	 * @since 1.0.0
 	 *
 	 * @param int          $field_id     Field id.
-	 * @param array|string $field_submit Field submit.
+	 * @param array|string $field_submit Submitted field value (raw data).
 	 * @param array        $form_data    Form data.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -566,7 +566,7 @@ class WPForms_Field_Name extends WPForms_Field {
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'   => sanitize_text_field( $name ),
 			'value'  => sanitize_text_field( $value ),
-			'id'     => absint( $field_id ),
+			'id'     => wpforms_validate_field_id( $field_id ),
 			'type'   => $this->type,
 			'first'  => sanitize_text_field( $first ),
 			'middle' => sanitize_text_field( $middle ),

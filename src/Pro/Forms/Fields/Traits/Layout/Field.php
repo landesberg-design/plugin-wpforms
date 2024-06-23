@@ -6,122 +6,32 @@
  * @noinspection PhpPropertyOnlyWrittenInspection
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+namespace WPForms\Pro\Forms\Fields\Traits\Layout;
 
-use WPForms\Pro\Forms\Fields\Layout\Builder;
-use WPForms\Pro\Forms\Fields\Layout\Frontend;
+use WPForms\Pro\Forms\Fields\Layout\Helpers;
 
 /**
- * Layout field.
+ * Layout and Repeater Field trait.
  *
- * @since 1.7.7
+ * @since 1.8.9
  */
-class WPForms_Field_Layout extends WPForms_Field {
-
-	/**
-	 * Handle name for `wp_register_styles`.
-	 *
-	 * @since 1.7.7
-	 *
-	 * @var string
-	 */
-	const STYLE_HANDLE = 'wpforms-layout';
-
-	/**
-	 * Instance of the Builder class for Layout Field.
-	 *
-	 * @since 1.7.7
-	 *
-	 * @var Builder
-	 */
-	private $builder_obj;
-
-	/**
-	 * Layout presets.
-	 *
-	 * @since 1.7.7
-	 *
-	 * @var array
-	 */
-	const PRESETS = [
-		'50-50',
-		'67-33',
-		'33-67',
-		'33-33-33',
-		'50-25-25',
-		'25-25-50',
-		'25-50-25',
-		'25-25-25-25',
-	];
-
-	/**
-	 * Field types that not allowed to drag into the column.
-	 *
-	 * @since 1.7.7
-	 *
-	 * @var array
-	 */
-	const NOT_ALLOWED_FIELDS = [
-		'layout',
-		'pagebreak',
-		'entry-preview',
-	];
-
-	/**
-	 * Primary class constructor.
-	 *
-	 * @since 1.7.7
-	 */
-	public function init() {
-
-		// Define field type information.
-		$this->name     = esc_html__( 'Layout', 'wpforms' );
-		$this->keywords = esc_html__( 'column, row', 'wpforms' );
-		$this->type     = 'layout';
-		$this->icon     = 'fa-columns';
-		$this->order    = 150;
-		$this->group    = 'fancy';
-
-		// Default settings.
-		$this->defaults = [
-			'label'       => $this->name,
-			'name'        => $this->name,
-			'description' => '',
-			'label_hide'  => '1',
-			'size'        => 'large',
-			'preset'      => '50-50',
-			'display'     => 'rows',
-			'columns'     => [
-				0 => [
-					'width_custom' => '',
-					'width_preset' => '50',
-					'fields'       => [],
-				],
-				1 => [
-					'width_custom' => '',
-					'width_preset' => '50',
-					'fields'       => [],
-				],
-			],
-		];
-
-		$this->init_objects();
-		$this->hooks();
-	}
+trait Field {
 
 	/**
 	 * Hooks.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 */
 	private function hooks() {
 
 		add_filter( 'wpforms_field_new_default', [ $this, 'field_new_default' ] );
 		add_filter( 'wpforms_entry_single_data', [ $this, 'filter_fields_remove_layout' ], 1000, 3 );
-		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
+
 		add_filter( 'wpforms_pro_admin_entries_print_preview_fields', [ $this, 'filter_entries_print_preview_fields' ] );
+		add_filter( 'wpforms_pro_admin_entries_edit_form_data', [ $this, 'filter_entries_print_preview_fields' ], 40 );
+		add_filter( 'wpforms_entry_preview_fields', [ $this, 'filter_entries_print_preview_fields' ] );
+		add_filter( 'wpforms_admin_payments_views_single_fields', [ $this, 'filter_entries_print_preview_fields' ] );
+
 		add_filter( 'register_block_type_args', [ $this, 'register_block_type_args' ], 20, 2 );
 		add_filter( 'wpforms_conversational_form_detected', [ $this, 'cf_frontend_hooks' ], 10, 2 );
 		add_filter( 'wpforms_field_properties_layout', [ $this, 'field_properties' ], 5, 3 );
@@ -130,26 +40,28 @@ class WPForms_Field_Layout extends WPForms_Field {
 	/**
 	 * Define additional field properties.
 	 *
-	 * @since 1.8.8
+	 * @since 1.8.9
 	 *
 	 * @param array $properties Field properties.
 	 * @param array $field      Field settings.
 	 * @param array $form_data  Form data and settings.
 	 *
 	 * @return array
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function field_properties( $properties, $field, $form_data ) {
+	public function field_properties( $properties, $field, $form_data ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
 		// Null 'for' value for label as there no input for it.
 		unset( $properties['label']['attr']['for'] );
 
-		return $properties;
+		return (array) $properties;
 	}
 
 	/**
 	 * Initialize sub-objects.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 */
 	private function init_objects() {
 
@@ -167,16 +79,16 @@ class WPForms_Field_Layout extends WPForms_Field {
 	/**
 	 * Define new field defaults.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array $field Field settings.
 	 *
 	 * @return array Field settings.
 	 */
-	public function field_new_default( $field ) {
+	public function field_new_default( $field ): array {
 
-		if ( $field['type'] !== $this->type ) {
-			return $field;
+		if ( $this->type !== ( $field['type'] ?? '' ) ) {
+			return (array) $field;
 		}
 
 		return wp_parse_args( $field, $this->defaults );
@@ -185,45 +97,45 @@ class WPForms_Field_Layout extends WPForms_Field {
 	/**
 	 * Get filtered presets.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @return array Presets array.
 	 */
-	public function get_presets() {
+	public function get_presets(): array {
 
 		/**
-		 * Filters the layout field presets list.
+		 * Filters the Layout or Repeater field's presets' list.
 		 *
-		 * @since 1.7.7
+		 * @since 1.8.9
 		 *
 		 * @param array $presets An array of the layout field presets.
 		 */
-		return (array) apply_filters( 'wpforms_field_layout_get_presets', self::PRESETS );
+		return (array) apply_filters( "wpforms_field_{$this->type}_get_presets", self::PRESETS );
 	}
 
 	/**
-	 * Get filtered not allowed fields list.
+	 * Get filtered not allowed fields' list.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
-	 * @return array Not allowed fields list.
+	 * @return array Not allowed fields' list.
 	 */
-	public function get_not_allowed_fields() {
+	public function get_not_allowed_fields(): array {
 
 		/**
-		 * Filters the list of the fields that not allowed to be placed inside the column.
+		 * Filters the Layout or Repeater field's list of the fields that not allowed to be placed inside the column.
 		 *
-		 * @since 1.7.7
+		 * @since 1.8.9
 		 *
 		 * @param array $not_allowed_fields An array of the not allowed fields types.
 		 */
-		return (array) apply_filters( 'wpforms_field_layout_get_not_allowed_fields', self::NOT_ALLOWED_FIELDS );
+		return (array) apply_filters( "wpforms_field_{$this->type}_get_not_allowed_fields", self::NOT_ALLOWED_FIELDS );
 	}
 
 	/**
 	 * Field options panel inside the builder.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array $field Field settings.
 	 */
@@ -235,7 +147,7 @@ class WPForms_Field_Layout extends WPForms_Field {
 	/**
 	 * Field preview inside the builder.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array $field Field settings.
 	 */
@@ -247,7 +159,7 @@ class WPForms_Field_Layout extends WPForms_Field {
 	/**
 	 * Field display on the form front-end.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array $field      Field settings.
 	 * @param array $deprecated Deprecated.
@@ -261,13 +173,13 @@ class WPForms_Field_Layout extends WPForms_Field {
 	/**
 	 * Filter base level fields.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array $fields Form fields.
 	 *
 	 * @return array Form fields without the fields in the columns.
 	 */
-	public function filter_base_fields( $fields ) {
+	public function filter_base_fields( $fields ): array {
 
 		$fields_in_columns = [];
 
@@ -295,17 +207,21 @@ class WPForms_Field_Layout extends WPForms_Field {
 	}
 
 	/**
-	 * Filter fields data. Remove the Layout fields from the fields list.
+	 * Filter fields data. Remove the Layout or Repeater fields from the fields' list.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array $fields    Fields data.
 	 * @param array $entry     Entry data.
 	 * @param array $form_data Form data.
 	 *
 	 * @return array Fields data without the layout fields.
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function filter_fields_remove_layout( $fields, $entry, $form_data ) {
+	public function filter_fields_remove_layout( $fields, $entry, $form_data ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+		$fields = (array) $fields;
 
 		if ( empty( $fields ) ) {
 			return $fields;
@@ -324,23 +240,33 @@ class WPForms_Field_Layout extends WPForms_Field {
 	}
 
 	/**
-	 * Filter fields data. Add the fields from the columns to the fields list.
+	 * Filter fields data. Add the fields from the columns to the fields' list.
 	 *
-	 * @since 1.8.1.2
+	 * @since 1.8.9
 	 *
-	 * @param array $fields Fields data.
+	 * @param array $data The field list OR column data.
 	 *
 	 * @return array
 	 */
-	public function filter_entries_print_preview_fields( $fields ) { // phpcs:ignore Generic.Metrics.NestingLevel.MaxExceeded
+	public function filter_entries_print_preview_fields( $data ): array { // phpcs:ignore Generic.Metrics.NestingLevel.MaxExceeded, Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		$fields = $data['fields'] ?? $data;
 
 		foreach ( $fields as $key => $field ) {
-			if ( $field['type'] !== $this->type ) {
+			if ( ! isset( $field['type'] ) || ! Helpers::is_layout_based_field( $field['type'] ) ) {
+				continue;
+			}
+
+			if ( ! isset( $field['columns'] ) || ! is_array( $field['columns'] ) ) {
 				continue;
 			}
 
 			foreach ( $field['columns'] as $column_index => $column ) {
 				foreach ( $column['fields'] as $layout_field_index => $layout_field_id ) {
+					if ( is_array( $layout_field_id ) ) {
+						continue;
+					}
+
 					if ( empty( $fields[ $layout_field_id ] ) ) {
 						unset( $fields[ $key ]['columns'][ $column_index ]['fields'][ $layout_field_index ] );
 						continue;
@@ -353,33 +279,42 @@ class WPForms_Field_Layout extends WPForms_Field {
 			}
 		}
 
+		if ( isset( $data['fields'] ) ) {
+			$data['fields'] = $fields;
+
+			return $data;
+		}
+
 		return $fields;
 	}
 
 	/**
 	 * Hooks that must be registered only on the Conversational Forms Frontend page.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array   $form_data Form data.
-	 * @param integer $form_id   Form Id.
+	 * @param integer $form_id   Form ID.
+	 *
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function cf_frontend_hooks( $form_data, $form_id ) { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
+	public function cf_frontend_hooks( $form_data, $form_id ) { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks, Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
 		// This filter is needed to remove the Layout fields from the CF frontend.
 		add_filter( 'wpforms_frontend_form_data', [ $this, 'filter_fields_remove_layout_cf' ] );
 	}
 
 	/**
-	 * Filter fields data. Remove the Layout fields from the fields list in CF.
+	 * Filter fields data. Remove the Layout and Repeater fields from the fields' list in CF.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array $form_data Form data.
 	 *
 	 * @return array Fields data without the layout fields.
 	 */
-	public function filter_fields_remove_layout_cf( $form_data ) {
+	public function filter_fields_remove_layout_cf( $form_data ): array {
 
 		$form_data['fields'] = $this->filter_fields_remove_layout( $form_data['fields'], [], $form_data );
 
@@ -389,7 +324,7 @@ class WPForms_Field_Layout extends WPForms_Field {
 	/**
 	 * Load enqueues for the Gutenberg editor in WP version < 5.5.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 * @deprecated 1.8.7
 	 */
 	public function gutenberg_enqueues() {
@@ -399,7 +334,7 @@ class WPForms_Field_Layout extends WPForms_Field {
 		$min = wpforms_get_min_suffix();
 
 		wp_enqueue_style(
-			self::STYLE_HANDLE,
+			$this->style_handle,
 			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/layout{$min}.css",
 			[],
 			WPFORMS_VERSION
@@ -409,12 +344,14 @@ class WPForms_Field_Layout extends WPForms_Field {
 	/**
 	 * Set editor style handle for block type editor.
 	 *
-	 * @since 1.7.7
+	 * @since 1.8.9
 	 *
 	 * @param array  $args       Array of arguments for registering a block type.
 	 * @param string $block_type Block type name including namespace.
 	 */
-	public function register_block_type_args( $args, $block_type ) {
+	public function register_block_type_args( $args, $block_type ): array {
+
+		$args = (array) $args;
 
 		if ( $block_type !== 'wpforms/form-selector' || ! is_admin() ) {
 			return $args;
@@ -424,37 +361,14 @@ class WPForms_Field_Layout extends WPForms_Field {
 
 		// CSS.
 		wp_register_style(
-			self::STYLE_HANDLE,
-			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/layout{$min}.css",
+			$this->style_handle,
+			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/{$this->type}{$min}.css",
 			[ $args['editor_style'] ],
 			WPFORMS_VERSION
 		);
 
-		$args['editor_style'] = self::STYLE_HANDLE;
+		$args['editor_style'] = $this->style_handle;
 
 		return $args;
 	}
-
-	/**
-	 * Get object.
-	 *
-	 * @since 1.7.7
-	 *
-	 * @param string $class Class name, `Builder` or `Frontend`.
-	 *
-	 * @return object
-	 */
-	private function get_object( $class ) {
-
-		$property   = strtolower( $class ) . '_obj';
-		$fqdn_class = 'WPForms\Pro\Forms\Fields\Layout\\' . $class;
-
-		if ( ! is_a( $this->$property, $fqdn_class ) ) {
-			$this->$property = new $fqdn_class( $this );
-		}
-
-		return $this->$property;
-	}
 }
-
-new WPForms_Field_Layout();

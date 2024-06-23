@@ -35,7 +35,7 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 			'id'       => '',
 			'entry_id' => '%d',
 			'form_id'  => '%d',
-			'field_id' => '%d',
+			'field_id' => '%s',
 			'value'    => '%s',
 			'date'     => '%s',
 		];
@@ -313,7 +313,10 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 		$field = apply_filters( 'wpforms_entry_save_fields', $field, $form_data, $entry_id );
 		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
-		if ( ! isset( $field['id'], $field['value'] ) || $field['value'] === '' ) {
+		$show_values = $form_data['fields'][ $field['id'] ]['show_values'] ?? false;
+		$value       = $show_values ? wpforms_get_choices_value( $field, $form_data ) : ( $field['value'] ?? '' );
+
+		if ( ! isset( $field['id'], $value ) || $value === '' ) {
 			return;
 		}
 
@@ -328,8 +331,8 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 		$data = [
 			'entry_id' => $entry_id,
 			'form_id'  => absint( $form_id ),
-			'field_id' => absint( $field_id ),
-			'value'    => $field['value'],
+			'field_id' => wpforms_validate_field_id( $field_id ),
+			'value'    => $value,
 			'date'     => $date,
 		];
 
@@ -361,7 +364,7 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 		return $wpdb->get_var(
 			$wpdb->prepare(
 				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				"SELECT id FROM $this->table_name WHERE entry_id = %d AND form_id = %d AND field_id = %d LIMIT 1",
+				"SELECT id FROM $this->table_name WHERE entry_id = %d AND form_id = %d AND field_id = %s LIMIT 1",
 				$entry_id,
 				$form_id,
 				$field_id
@@ -382,11 +385,11 @@ class WPForms_Entry_Fields_Handler extends WPForms_DB {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
+		$sql = "CREATE TABLE {$this->table_name} (
 			id bigint(20) NOT NULL AUTO_INCREMENT,
 			entry_id bigint(20) NOT NULL,
 			form_id bigint(20) NOT NULL,
-			field_id int(11) NOT NULL,
+			field_id varchar(16) NOT NULL,
 			value longtext NOT NULL,
 			date datetime NOT NULL,
 			PRIMARY KEY  (id),

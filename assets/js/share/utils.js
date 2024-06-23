@@ -177,6 +177,40 @@ const WPFormsUtils = window.WPFormsUtils || ( function( document, window, $ ) {
 
 				return avg < 128 ? '#ffffff' : '#000000';
 			},
+
+			/**
+			 * Add opacity to color string.
+			 * Supports formats: RGB, RGBA, HEX, HEXA.
+			 *
+			 * If the given color has an alpha channel, the new alpha channel will be calculated according to the given opacity.
+			 *
+			 * @since 1.8.9
+			 *
+			 * @param {string} color   Color.
+			 * @param {string} opacity Opacity.
+			 *
+			 * @return {string} Color in RGBA format with an added alpha channel according to given opacity.
+			 */
+			getColorWithOpacity( color, opacity ) {
+				color = color.trim();
+
+				const rgbArray = app.cssColorsUtils.getColorAsRGBArray( color );
+
+				if ( ! rgbArray ) {
+					return color;
+				}
+
+				// Default opacity is 1.
+				opacity = ! opacity || opacity.length === 0 ? '1' : opacity.toString();
+
+				const alpha = rgbArray.length === 4 ? parseFloat( rgbArray[ 3 ] ) : 1;
+
+				// Calculate new alpha value.
+				const newAlpha = parseFloat( opacity ) * alpha;
+
+				// Combine and return the RGBA color.
+				return `rgba(${ rgbArray[ 0 ] },${ rgbArray[ 1 ] },${ rgbArray[ 2 ] },${ newAlpha })`.replace( /\s+/g, '' );
+			},
 		},
 	};
 

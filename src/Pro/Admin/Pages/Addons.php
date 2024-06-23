@@ -252,24 +252,50 @@ class Addons {
 	 */
 	public function get_addons_grid( string $section ) {
 
+		$addons = $this->get_prepared_addons();
+		$addons = $addons[ $section ] ?? [];
+
 		ob_start();
 
-		foreach ( $this->addons as $id => $addon ) {
-			$addon = (array) $addon;
-			$addon = wpforms()->get( 'addons' )->get_addon( $addon['slug'] );
-
-			if ( ! $this->should_display_addon( $addon, $section ) ) {
-				continue;
-			}
-
-			if ( $section === 'activated' ) {
-				unset( $this->addons[ $id ] );
-			}
-
+		foreach ( $addons as $addon ) {
 			$this->print_addon( $addon );
 		}
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Get prepared addons.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @return array
+	 */
+	private function get_prepared_addons(): array {
+
+		$prepared_addons = [];
+
+		foreach ( $this->addons as $addon ) {
+			$addon = (array) $addon;
+			$addon = wpforms()->get( 'addons' )->get_addon( $addon['slug'] );
+
+			// Prepare activated addons.
+			if ( $this->should_display_addon( $addon, 'activated' ) ) {
+				$prepared_addons['activated'][] = $addon;
+			}
+
+			// Prepare all addons. Not including activated addons.
+			if ( $this->should_display_addon( $addon, 'all' ) && ! in_array( $addon, $prepared_addons['activated'] ?? [], true ) ) {
+				$prepared_addons['all'][] = $addon;
+			}
+		}
+
+		// Sort activated addons by title.
+		if ( ! empty( $prepared_addons['activated'] ) ) {
+			$prepared_addons['activated'] = wp_list_sort( $prepared_addons['activated'], 'title' );
+		}
+
+		return $prepared_addons;
 	}
 
 	/**
@@ -318,10 +344,6 @@ class Addons {
 			! empty( $addon['status'] ) && $addon['status'] === 'active' && $addon['plugin_allow'] ? $addon['doc_url'] : $addon['page_url']
 		);
 
-		if ( $addon['slug'] === 'wpforms-stripe' ) {
-			$addon['recommended'] = true;
-		}
-
 		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			'admin/addons-item',
 			[
@@ -329,7 +351,6 @@ class Addons {
 				'image'             => WPFORMS_PLUGIN_URL . 'assets/images/' . $image,
 				'url'               => $url,
 				'button'            => $this->get_addon_button_html( $addon ),
-				'recommended'       => isset( $addon['recommended'] ) ? $addon['recommended'] : false,
 				'has_settings_link' => $this->has_settings_link( $addon['slug'] ),
 				'settings_url'      => $this->get_settings_link( $addon['slug'] ),
 				'has_cap'           => current_user_can( 'manage_options' ),

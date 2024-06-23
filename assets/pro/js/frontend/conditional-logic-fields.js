@@ -487,7 +487,7 @@
 					console.log( 'Result: ' + pass ); // eslint-disable-line no-console
 				}
 
-				const $fieldContainer = $( `#wpforms-${ formID }-field_${ fieldID }-container` );
+				const $fieldContainer = $( `#wpforms-${ formID }-field_${ fieldID }-container`, $form );
 				const $closestLayoutField = $fieldContainer.closest( '.wpforms-field-layout' );
 
 				if ( ( pass && action === 'hide' ) || ( ! pass && action !== 'hide' ) ) {
@@ -596,7 +596,7 @@
 				'net_promoter_score',
 			].indexOf( rule.type ) > -1 ) {
 				activeSelector = ( 'select' === rule.type ) ? 'option:selected:not(.placeholder)' : 'input:checked';
-				$check = $( `#wpforms-${ formID }-field_${ rule.field }-container ${ activeSelector }` );
+				$check = $( `#wpforms-${ formID }-field_${ rule.field }-container ${ activeSelector }`, $form );
 
 				if ( $check.length ) {
 					val = true;
@@ -604,7 +604,7 @@
 			} else if ( rule.type === 'richtext' ) {
 				return WPFormsConditionals.getRichTextValue( $form, formID, rule.field );
 			} else {
-				val = $( `#wpforms-${ formID }-field_${ rule.field }` ).val();
+				val = $( `#wpforms-${ formID }-field_${ rule.field }`, $form ).val();
 
 				if ( ! val ) {
 					val = '';
@@ -639,7 +639,7 @@
 				'net_promoter_score',
 			].indexOf( rule.type ) > -1 ) {
 				activeSelector = ( 'select' === rule.type ) ? 'option:selected:not(.placeholder)' : 'input:checked';
-				$check = $( `#wpforms-${ formID }-field_${ rule.field }-container ${ activeSelector }` );
+				$check = $( `#wpforms-${ formID }-field_${ rule.field }-container ${ activeSelector }`, $form );
 
 				if ( $check.length ) {
 					let escapeVal;
@@ -660,7 +660,7 @@
 			} else if ( rule.type === 'richtext' ) {
 				return WPFormsConditionals.getRichTextValue( $form, formID, rule.field );
 			} else { // text, textarea, number.
-				val = $( `#wpforms-${ formID }-field_${ rule.field }` ).val();
+				val = $( `#wpforms-${ formID }-field_${ rule.field }`, $form ).val();
 
 				if ( [ 'payment-select' ].indexOf( rule.type ) > -1 ) {
 					val = WPFormsConditionals.escapeText( val );
@@ -682,8 +682,8 @@
 		 * @return {string} Rich Text field value.
 		 */
 		getRichTextValue( $form, formID, fieldID ) {
-			if ( $( `#wpforms-${ formID }-field_${ fieldID }-container .wp-editor-wrap` ).hasClass( 'html-active' ) ) {
-				return $( `#wpforms-${ formID }-field_${ fieldID }` ).val();
+			if ( $( `#wpforms-${ formID }-field_${ fieldID }-container .wp-editor-wrap`, $form ).hasClass( 'html-active' ) ) {
+				return $( `#wpforms-${ formID }-field_${ fieldID }`, $form ).val();
 			}
 
 			const editor = tinyMCE.get( `wpforms-${ formID }-field_${ fieldID }` );

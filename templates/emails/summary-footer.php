@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 												]
 											),
 											'<a href="' . esc_url( home_url() ) . '">' . esc_html( wp_specialchars_decode( get_bloginfo( 'name' ) ) ) . '</a>',
-											'https://wpforms.com/docs/how-to-use-email-summaries/#faq'
+											'https://wpforms.com/docs/how-to-use-email-summaries/#disable-email-summaries'
 										);
 										?>
 									</td>

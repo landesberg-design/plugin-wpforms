@@ -184,6 +184,8 @@ WPForms.Admin.Builder.Providers = WPForms.Admin.Builder.Providers || ( function(
 
 						if ( 'success' === textStatus ) {
 							$lock.val( 0 );
+							// Update the cache when the provider data is unlocked.
+							wpf.savedState = wpf.getFormState( '#wpforms-builder-form' );
 						}
 					} );
 			},

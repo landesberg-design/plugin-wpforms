@@ -614,14 +614,15 @@ class ListTable extends WP_List_Table {
 
 		$field_id     = (int) str_replace( 'wpforms_field_', '', $column_name );
 		$entry_fields = (array) wpforms_decode( $entry->fields );
+		$value        = $entry_fields[ $field_id ]['value'] ?? '';
 
-		if (
-			isset( $entry_fields[ $field_id ]['value'] ) &&
-			! wpforms_is_empty_string( $entry_fields[ $field_id ]['value'] )
-		) {
+		if ( ! wpforms_is_empty_string( $value ) ) {
+			$value = wp_strip_all_tags( trim( $value ) );
+		}
+
+		if ( ! wpforms_is_empty_string( $value ) ) {
 
 			$field_type = $entry_fields[ $field_id ]['type'] ?? '';
-			$value      = wp_strip_all_tags( trim( $entry_fields[ $field_id ]['value'] ) );
 			$value      = $this->truncate_long_value( $value, $field_type );
 			$value      = nl2br( $value );
 
@@ -987,8 +988,8 @@ class ListTable extends WP_List_Table {
 	public function get_bulk_actions() {
 
 		$bulk_actions = [
-			'read'   => esc_html__( 'Mark Read', 'wpforms' ),
-			'unread' => esc_html__( 'Mark Unread', 'wpforms' ),
+			'read'   => esc_html__( 'Mark as Read', 'wpforms' ),
+			'unread' => esc_html__( 'Mark as Unread', 'wpforms' ),
 			'star'   => esc_html__( 'Star', 'wpforms' ),
 			'unstar' => esc_html__( 'Unstar', 'wpforms' ),
 			'print'  => esc_html__( 'Print', 'wpforms' ),
@@ -1026,15 +1027,16 @@ class ListTable extends WP_List_Table {
 
 		$bulk_actions['null'] = esc_html__( '----------', 'wpforms' );
 
-		if ( ! $this->is_trash_list() ) {
-
-			// Add Trash before delete.
-			$bulk_actions['trash'] = esc_html__( 'Move to Trash', 'wpforms' );
+		if ( wpforms()->get( 'spam_entry' )->is_spam_list() ) {
+			$bulk_actions['unspam'] = esc_html__( 'Mark as Not Spam', 'wpforms' );
 		} else {
+			$bulk_actions['spam'] = esc_html__( 'Mark as Spam', 'wpforms' );
+		}
 
-			// Add Restore before delete.
+		if ( $this->is_trash_list() ) {
 			$bulk_actions['restore'] = esc_html__( 'Restore', 'wpforms' );
-
+		} else {
+			$bulk_actions['trash'] = esc_html__( 'Move to Trash', 'wpforms' );
 		}
 
 		$bulk_actions['delete'] = esc_html__( 'Delete', 'wpforms' );
@@ -1108,9 +1110,16 @@ class ListTable extends WP_List_Table {
 			return;
 		}
 
-		// check if it is trash list.
+		// Check if it is Trash list.
 		if ( $this->is_trash_list() ) {
 			$status = Page::TRASH_ENTRY_STATUS;
+		}
+
+		$spam_entry = wpforms()->get( 'spam_entry' );
+
+		// Check if it is Spam list.
+		if ( $spam_entry->is_spam_list() ) {
+			$status = $spam_entry::ENTRY_STATUS;
 		}
 
 		$args = [
@@ -1133,7 +1142,7 @@ class ListTable extends WP_List_Table {
 		 */
 		$entries_list = apply_filters( 'wpforms_entries_table_process_actions_entries_list', $entries_list, $args ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
-		$sendback = remove_query_arg( [ 'read', 'unread', 'starred', 'unstarred', 'print', 'deleted', 'empty_spam', 'trashed', 'restored', 'paged' ], wp_get_referer() );
+		$sendback = remove_query_arg( [ 'read', 'unread', 'spam', 'unspam', 'starred', 'unstarred', 'print', 'deleted', 'empty_spam', 'trashed', 'restored', 'paged' ], wp_get_referer() );
 
 		switch ( $doaction ) {
 			// Mark as read.
@@ -1179,6 +1188,16 @@ class ListTable extends WP_List_Table {
 			// Empty spam.
 			case 'empty_spam':
 				$sendback = $this->process_bulk_action_empty_spam( $sendback );
+				break;
+
+			// Mark as Spam.
+			case 'spam':
+				$sendback = $this->process_bulk_action_single_spam( $entries_list, $ids, $sendback );
+				break;
+
+			// Mark as Not Spam.
+			case 'unspam':
+				$sendback = $this->process_bulk_action_single_unspam( $entries_list, $ids, $sendback );
 				break;
 		}
 
@@ -1307,6 +1326,91 @@ class ListTable extends WP_List_Table {
 		}
 
 		return add_query_arg( 'unread', $unread, $sendback );
+	}
+
+	/**
+	 * Process the bulk action spam.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array  $entries_list Filtered entries list.
+	 * @param array  $ids          IDs to process.
+	 * @param string $sendback     URL query string.
+	 */
+	protected function process_bulk_action_single_spam( $entries_list, $ids, $sendback ) {
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
+
+		if ( empty( $form_id ) ) {
+			return $sendback;
+		}
+
+		$user       = get_user_by( 'id', get_current_user_id() );
+		$entries    = wp_list_pluck( $entries_list, 'status', 'entry_id' );
+		$spam_entry = wpforms()->get( 'spam_entry' );
+		$spam       = 0;
+
+		foreach ( $ids as $id ) {
+
+			if ( ! array_key_exists( $id, $entries ) ) {
+				continue;
+			}
+
+			if ( $entries[ $id ] === $spam_entry::ENTRY_STATUS ) {
+				continue;
+			}
+
+			$spam_entry->set_as_spam( $id, $form_id, $user->display_name );
+
+			++$spam;
+		}
+
+		return add_query_arg( 'spam', $spam, $sendback );
+	}
+
+	/**
+	 * Process the bulk action unspam.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array  $entries_list Filtered entries list.
+	 * @param array  $ids          IDs to process.
+	 * @param string $sendback     URL query string.
+	 *
+	 * @return string
+	 */
+	protected function process_bulk_action_single_unspam( $entries_list, $ids, $sendback ) {
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
+
+		if ( empty( $form_id ) ) {
+			return $sendback;
+		}
+
+		$entries    = wp_list_pluck( $entries_list, 'status', 'entry_id' );
+		$spam_entry = wpforms()->get( 'spam_entry' );
+		$unspam     = 0;
+
+		foreach ( $ids as $id ) {
+
+			if ( ! array_key_exists( $id, $entries ) ) {
+				continue;
+			}
+
+			if ( $entries[ $id ] !== $spam_entry::ENTRY_STATUS ) {
+				continue;
+			}
+
+			$entry = wpforms()->get( 'entry' )->get( $id );
+
+			$spam_entry->set_as_not_spam( $entry );
+
+			++$unspam;
+		}
+
+		return add_query_arg( 'unspam', $unspam, $sendback );
 	}
 
 	/**
@@ -1660,7 +1764,9 @@ class ListTable extends WP_List_Table {
 		$entries = wpforms()->get( 'entry' )->get_entries(
 			[
 				'form_id' => $form_id,
+				'select'  => 'entry_ids',
 				'status'  => 'spam',
+				'number'  => -1,
 			]
 		);
 
@@ -1686,6 +1792,8 @@ class ListTable extends WP_List_Table {
 		$bulk_counts = [
 			'read'      => isset( $_REQUEST['read'] ) ? absint( $_REQUEST['read'] ) : 0,
 			'unread'    => isset( $_REQUEST['unread'] ) ? absint( $_REQUEST['unread'] ) : 0,
+			'spam'      => isset( $_REQUEST['spam'] ) ? absint( $_REQUEST['spam'] ) : 0,
+			'unspam'    => isset( $_REQUEST['unspam'] ) ? absint( $_REQUEST['unspam'] ) : 0,
 			'starred'   => isset( $_REQUEST['starred'] ) ? absint( $_REQUEST['starred'] ) : 0,
 			'unstarred' => isset( $_REQUEST['unstarred'] ) ? absint( $_REQUEST['unstarred'] ) : 0,
 			'deleted'   => isset( $_REQUEST['deleted'] ) ? (int) $_REQUEST['deleted'] : 0,
@@ -1699,6 +1807,10 @@ class ListTable extends WP_List_Table {
 			'read'      => _n( '%d entry was successfully marked as read.', '%d entries were successfully marked as read.', $bulk_counts['read'], 'wpforms' ),
 			/* translators: %d - number of processed entries. */
 			'unread'    => _n( '%d entry was successfully marked as unread.', '%d entries were successfully marked as unread.', $bulk_counts['unread'], 'wpforms' ),
+			/* translators: %d - number of processed entries. */
+			'spam'      => _n( '%d entry was successfully marked as spam.', '%d entries were successfully marked as spam.', $bulk_counts['spam'], 'wpforms' ),
+			/* translators: %d - number of processed entries. */
+			'unspam'    => _n( '%d entry was successfully marked as not spam.', '%d entries were successfully marked as not spam.', $bulk_counts['unspam'], 'wpforms' ),
 			/* translators: %d - number of processed entries. */
 			'starred'   => _n( '%d entry was successfully starred.', '%d entries were successfully starred.', $bulk_counts['starred'], 'wpforms' ),
 			/* translators: %d - number of processed entries. */

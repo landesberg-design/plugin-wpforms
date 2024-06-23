@@ -1,4 +1,4 @@
-/* global wpforms_divi_builder */
+/* global wpforms_divi_builder, WPFormsRepeaterField */
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -181,24 +181,23 @@ jQuery( window )
 	} )
 
 	// Re-initialize WPForms frontend.
-	.on( 'wpformsDiviModuleDisplay', ( event ) => {
+	.on( 'wpformsDiviModuleDisplay', () => {
 		window.wpforms.init();
 	} );
 
-// Make all the modern dropdowns disabled.
 jQuery( document )
-	.on( 'wpformsReady', ( event ) => {
+	.on( 'wpformsReady', function() {
+		const $ = jQuery;
 
-		var $ = jQuery;
-
+		// Make all the modern dropdowns disabled.
 		$( '.choicesjs-select' ).each( function() {
+			const $instance = $( this ).data( 'choicesjs' );
 
-			var $instance = $( this ).data( 'choicesjs' );
-
-			if ( ! $instance || typeof $instance.disable !== 'function' ) {
-				return;
+			if ( $instance && typeof $instance.disable === 'function' ) {
+				$instance.disable();
 			}
-
-			$instance.disable();
 		} );
+
+		// Init Repeater fields.
+		WPFormsRepeaterField?.ready();
 	} );

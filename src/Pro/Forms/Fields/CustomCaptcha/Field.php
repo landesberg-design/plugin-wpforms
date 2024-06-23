@@ -530,7 +530,7 @@ class Field extends \WPForms_Field {
 	 * @since 1.8.7
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value.
+	 * @param array $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -553,7 +553,7 @@ class Field extends \WPForms_Field {
 	 * @since 1.8.7
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value.
+	 * @param array $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	private function validate_qa( $field_id, $field_submit, $form_data ) {
@@ -585,7 +585,7 @@ class Field extends \WPForms_Field {
 	 * @since 1.8.7
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value.
+	 * @param array $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	private function validate_math( $field_id, $field_submit, $form_data ) {
@@ -602,9 +602,9 @@ class Field extends \WPForms_Field {
 			return;
 		}
 
-		$number_1 = $field_submit['n1'];
+		$number_1 = absint( $field_submit['n1'] );
+		$number_2 = absint( $field_submit['n2'] );
 		$operator = $field_submit['cal'];
-		$number_2 = $field_submit['n2'];
 		$answer   = (int) trim( $field_submit['a'] );
 
 		if ( ! in_array( $operator, [ '-', '+', '*' ], true ) ) {

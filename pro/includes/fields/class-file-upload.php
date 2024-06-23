@@ -155,7 +155,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		add_filter( 'wpforms_pro_admin_entries_edit_field_output_editable', [ $this, 'is_editable' ], 10, 4 );
 
-		add_filter( 'wpforms_process_after_filter', [ $this, 'upload_complete' ], 10, 3 );
+		add_filter( 'wpforms_process_after_filter', [ $this, 'upload_complete' ], PHP_INT_MAX, 3 );
 
 		add_filter( 'wpforms_pro_fields_entry_preview_is_field_support_preview_file-upload_field', '__return_false' );
 	}
@@ -375,13 +375,13 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$this->form_data  = (array) $form_data;
 		$this->form_id    = absint( $this->form_data['id'] );
 		$this->field_id   = absint( $field['id'] );
-		$this->field_data = $this->form_data['fields'][ $this->field_id ];
+		$this->field_data = $this->form_data['fields'][ $this->field_id ] ?? [];
 
 		// Input Primary: adjust name.
 		$properties['inputs']['primary']['attr']['name'] = "wpforms_{$this->form_id}_{$this->field_id}";
 
 		// Input Primary: filter files in classic uploader style in files selection window.
-		if ( empty( $this->field_data['style'] ) || self::STYLE_CLASSIC === $this->field_data['style'] ) {
+		if ( empty( $field['style'] ) || $field['style'] === self::STYLE_CLASSIC ) {
 			$properties['inputs']['primary']['attr']['accept'] = rtrim( '.' . implode( ',.', $this->get_extensions() ), ',.' );
 		}
 
@@ -946,7 +946,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	 * @since 1.5.6 Added modern style uploader logic.
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value.
+	 * @param array $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -1781,7 +1781,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$field_id = (int) $_POST['field_id'];
+		$field_id = absint( $_POST['field_id'] );
 
 		if (
 			! isset( $form_data['fields'][ $field_id ]['style'] ) ||

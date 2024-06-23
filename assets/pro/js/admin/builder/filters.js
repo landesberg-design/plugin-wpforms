@@ -142,13 +142,13 @@ WPForms.Admin.Builder.Filters = WPForms.Admin.Builder.Filters || ( function( doc
 
 			el.$countryCodes.data( 'choicesjs', new Choices( el.$countryCodes[0], {
 				shouldSort: false,
+				allowHTML: false, // TODO: Remove after next Choices.js release.
 				removeItemButton: true,
-				fuseOptions:{
-					'threshold':  0.1,
-					'distance': 1000,
+				fuseOptions: {
+					threshold: 0.1,
+					distance: 1000,
 				},
-				callbackOnInit: function() {
-
+				callbackOnInit() {
 					wpf.initMultipleSelectWithSearch( this );
 				},
 			} ) );

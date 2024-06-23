@@ -80,6 +80,10 @@ const WPSplash = window.WPSplash || ( function( document, window, $ ) {
 					$( '.wpforms-challenge-popup-container' ).addClass( 'wpforms-invisible' );
 
 					setTimeout( () => {
+						if ( navigator.userAgent.includes( 'Safari' ) && ! navigator.userAgent.includes( 'Chrome' ) ) {
+							$( 'html, body' ).animate( { scrollTop: 0 }, 0 );
+						}
+
 						$( '.jconfirm-box-container' ).css( 'padding-top', '50px' ).animate( { opacity: 1 }, 30 );
 					}, 0 );
 				},

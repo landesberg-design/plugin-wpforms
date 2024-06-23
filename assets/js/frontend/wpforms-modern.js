@@ -1,4 +1,4 @@
-/* global wpforms_settings */
+/* global wpforms_settings, WPFormsUtils */
 
 /**
  * @param wpforms_settings.css_vars
@@ -389,24 +389,8 @@ WPForms.FrontendModern = WPForms.FrontendModern || ( function( document, window,
 		 * @return {string} Color in RGBA format with an added alpha channel according to given opacity.
 		 */
 		getColorWithOpacity( color, opacity ) {
-			color = color.trim();
-
-			const rgbArray = app.getColorAsRGBArray( color );
-
-			if ( ! rgbArray ) {
-				return color;
-			}
-
-			// Default opacity is 1.
-			opacity = ! opacity || opacity.length === 0 ? '1' : opacity.toString();
-
-			const alpha = rgbArray.length === 4 ? parseFloat( rgbArray[ 3 ] ) : 1;
-
-			// Calculate new alpha value.
-			const newAlpha = parseFloat( opacity ) * alpha;
-
-			// Combine and return the RGBA color.
-			return `rgba(${ rgbArray[ 0 ] },${ rgbArray[ 1 ] },${ rgbArray[ 2 ] },${ newAlpha })`.replace( /\s+/g, '' );
+			// Moved to ../share/utils.js
+			return WPFormsUtils.cssColorsUtils.getColorWithOpacity( color, opacity );
 		},
 
 		/**
@@ -442,13 +426,8 @@ WPForms.FrontendModern = WPForms.FrontendModern || ( function( document, window,
 		 * @return {boolean} True if the given color is a valid CSS color.
 		 */
 		isValidColor( color ) {
-			// Create a temporary DOM element and use `style` property.
-			const s = new Option().style;
-
-			s.color = color;
-
-			// Invalid color leads to the empty color property of DOM element style.
-			return s.color !== '';
+			// Moved to ../share/utils.js
+			return WPFormsUtils.cssColorsUtils.isValidColor( color );
 		},
 
 		/**
@@ -461,30 +440,8 @@ WPForms.FrontendModern = WPForms.FrontendModern || ( function( document, window,
 		 * @return {Array|boolean} Color as an array of RGBA values. False on error.
 		 */
 		getColorAsRGBArray( color ) {
-			// Check if the given color is a valid CSS color.
-			if ( ! app.isValidColor( color ) ) {
-				return false;
-			}
-
-			// Remove # from the beginning of the string and remove whitespaces.
-			color = color.replace( /^#/, '' ).replaceAll( ' ', '' );
-			color = color === 'transparent' ? 'rgba(0,0,0,0)' : color;
-
-			const rgba = color;
-			let rgbArray;
-
-			// Check if color is in HEX(A) format.
-			const isHex = rgba.match( /[0-9a-f]{6,8}$/ig );
-
-			if ( isHex ) {
-				// Search and split HEX(A) color into an array of couples of chars.
-				rgbArray = rgba.match( /\w\w/g ).map( ( x ) => parseInt( x, 16 ) );
-				rgbArray[ 3 ] = rgbArray[ 3 ] || rgbArray[ 3 ] === 0 ? ( rgbArray[ 3 ] / 255 ).toFixed( 2 ) : 1;
-			} else {
-				rgbArray = rgba.split( '(' )[ 1 ].split( ')' )[ 0 ].split( ',' );
-			}
-
-			return rgbArray;
+			// Moved to ../share/utils.js
+			return WPFormsUtils.cssColorsUtils.getColorAsRGBArray( color );
 		},
 
 		/**

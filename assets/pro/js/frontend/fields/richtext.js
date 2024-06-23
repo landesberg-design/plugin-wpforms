@@ -127,13 +127,21 @@ var WPFormsRichTextField = window.WPFormsRichTextField || ( function( document, 
 
 			$document.on( 'click', '.switch-tmce', function( e ) {
 
+				// Prevent the default action of the click event
+				e.preventDefault();
+
 				const $wrap = $( this ).closest( '.wp-editor-wrap' ),
 					textareaId = $wrap.find( '.wp-editor-area' ).attr( 'id' );
 
 				const editor = tinyMCE.get( textareaId );
 
 				if ( editor ) {
-					editor.focus();
+					$wrap.addClass( 'wpforms-focused' );
+
+					// Focus on editor without causing the jump effect.
+					setTimeout( () => {
+						editor.focus( false );
+					}, 0 );
 				}
 			} );
 

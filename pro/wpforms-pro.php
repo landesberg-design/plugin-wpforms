@@ -890,8 +890,9 @@ class WPForms_Pro {
 							'default'    => '{admin_email}',
 							'tooltip'    => esc_html__( 'Enter the email address to receive form entry notifications. For multiple notifications, separate email addresses with a comma.', 'wpforms' ),
 							'smarttags'  => [
-								'type'   => 'fields',
-								'fields' => 'email',
+								'type'                  => 'fields',
+								'fields'                => 'email',
+								'allow-repeated-fields' => true,
 							],
 							'parent'     => 'settings',
 							'subsection' => $id,
@@ -907,9 +908,11 @@ class WPForms_Pro {
 							$settings->form_data,
 							esc_html__( 'CC', 'wpforms' ),
 							[
+								'tooltip'    => esc_html__( 'Enter the email address to add it to the carbon copy of the form entry notifications. For multiple notifications, separate email addresses with a comma.', 'wpforms' ),
 								'smarttags'  => [
 									'type'   => 'fields',
 									'fields' => 'email',
+									'allow-repeated-fields' => true,
 								],
 								'parent'     => 'settings',
 								'subsection' => $id,
@@ -1151,7 +1154,7 @@ class WPForms_Pro {
 			do_action( 'wpforms_form_settings_confirmations_single_before', $settings, $field_id );
 			?>
 
-			<div class="<?php echo esc_attr( $block_classes ); ?>" data-block-type="confirmation" data-block-id="<?php echo absint( $field_id ); ?>">
+			<div class="<?php echo esc_attr( $block_classes ); ?>" data-block-type="confirmation" data-block-id="<?php echo wpforms_validate_field_id( $field_id ); ?>">
 
 				<div class="wpforms-builder-settings-block-header">
 					<div class="wpforms-builder-settings-block-actions">
@@ -1167,7 +1170,7 @@ class WPForms_Pro {
 						<span class="wpforms-builder-settings-block-name"><?php echo esc_html( $name ); ?></span>
 
 						<div class="wpforms-builder-settings-block-name-edit">
-							<input type="text" name="settings[confirmations][<?php echo absint( $field_id ); ?>][name]" value="<?php echo esc_attr( $name ); ?>">
+							<input type="text" name="settings[confirmations][<?php echo wpforms_validate_field_id( $field_id ); ?>][name]" value="<?php echo esc_attr( $name ); ?>">
 						</div>
 						<button class="wpforms-builder-settings-block-edit" title="<?php esc_attr_e( 'Edit', 'wpforms' ); ?>"><i class="fa fa-pencil"></i></button>
 					</div>
@@ -1503,6 +1506,10 @@ class WPForms_Pro {
 			$wpforms_install->entry        = new WPForms_Entry_Handler();
 			$wpforms_install->entry_fields = new WPForms_Entry_Fields_Handler();
 			$wpforms_install->entry_meta   = new WPForms_Entry_Meta_Handler();
+		}
+
+		if ( $this->custom_tables_exist() ) {
+			return;
 		}
 
 		// Entry tables.

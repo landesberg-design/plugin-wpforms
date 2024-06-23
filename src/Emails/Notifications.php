@@ -95,6 +95,22 @@ class Notifications extends Mailer {
 	const LEGACY_TEMPLATE = 'default';
 
 	/**
+	 * Get the instance of a class.
+	 *
+	 * @since 1.8.9
+	 */
+	public static function get_instance() {
+
+		static $instance;
+
+		if ( ! $instance ) {
+			$instance = new self();
+		}
+
+		return $instance;
+	}
+
+	/**
 	 * This method will initialize the class.
 	 *
 	 * Maybe use the old class for backward compatibility.
@@ -420,63 +436,108 @@ class Notifications extends Mailer {
 	 *
 	 * @return string
 	 */
-	private function process_plain_message( $show_empty_fields = false ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity
+	private function process_plain_message( bool $show_empty_fields = false ): string {
+
+		/**
+		 * Filter the form data before it is used to generate the email message.
+		 *
+		 * @since 1.8.9
+		 *
+		 * @param array $form_data Form data.
+		 * @param array $fields    List of submitted fields.
+		 */
+		$this->form_data = apply_filters( 'wpforms_emails_notifications_form_data', $this->form_data, $this->fields );
 
 		$message = '';
 
-		foreach ( $this->fields as $field ) {
-
-			if ( ! $show_empty_fields && ( ! isset( $field['value'] ) || (string) $field['value'] === '' ) ) {
-				continue;
-			}
-
-			$field_name = isset( $field['name'] ) ? $field['name'] : '';
-			$field_val  = empty( $field['value'] ) && ! is_numeric( $field['value'] ) ? esc_html__( '(empty)', 'wpforms-lite' ) : $field['value'];
-
-			// Add quantity for the field.
-			if ( wpforms_payment_has_quantity( $field, $this->form_data ) ) {
-				$field_val = wpforms_payment_format_quantity( $field );
-			}
-
-			// Set a default field name if empty.
-			if ( empty( $field_name ) && $field_name !== null ) {
-				$field_name = $this->get_default_field_name( $field['id'] );
-			}
-
-			$message    .= '--- ' . $field_name . " ---\r\n\r\n";
-			$field_value = wpforms_decode_string( $field_val ) . "\r\n\r\n";
+		foreach ( $this->form_data['fields'] as $field ) {
+			$field_message = $this->get_field_plain( $field, $show_empty_fields );
 
 			/**
-			 * Filter the field value before it is added to the email message.
+			 * Filter the field message before it is added to the email message.
 			 *
-			 * @since      1.8.5
-			 * @deprecated 1.8.7
+			 * @since 1.8.9
 			 *
-			 * @param string $field_value Field value.
-			 * @param array  $field       Field data.
-			 * @param array  $form_data   Form data.
+			 * @param string $field_message     Field message.
+			 * @param array  $field             Field data.
+			 * @param bool   $show_empty_fields Whether to display empty fields in the email.
+			 * @param array  $form_data         Form data.
+			 * @param array  $fields            List of submitted fields.
 			 */
-			$field_value = apply_filters_deprecated( // phpcs:disable WPForms.Comments.ParamTagHooks.InvalidParamTagsQuantity
-				'wpforms_emails_notifications_plaintext_field_value',
-				[ $field_value, $field, $this->form_data ],
-				'1.8.7 of the WPForms plugin',
-				'wpforms_plaintext_field_value'
-			);
-
-			/** This filter is documented in /includes/emails/class-emails.php */
-			$field_value = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
-				'wpforms_plaintext_field_value',
-				$field_value,
-				$field,
-				$this->form_data
-			);
-
-			// Append the filtered field value to the message.
-			$message .= $field_value;
+			$message .= apply_filters( 'wpforms_emails_notifications_field_message_plain', $field_message, $field, $show_empty_fields, $this->form_data, $this->fields );
 		}
 
 		// Trim the message and return.
 		return rtrim( $message, "\r\n" );
+	}
+
+	/**
+	 * Get a single field plain text markup.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $field             Field data.
+	 * @param bool  $show_empty_fields Whether to display empty fields in the email.
+	 *
+	 * @return string
+	 */
+	public function get_field_plain( array $field, bool $show_empty_fields ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity
+
+		$field_id = $field['id'] ?? '';
+
+		$field = $this->fields[ $field_id ] ?? $field;
+
+		$message = '';
+
+		if ( ! $show_empty_fields && ( ! isset( $field['value'] ) || (string) $field['value'] === '' ) ) {
+			return $message;
+		}
+
+		$field_name = $field['name'] ?? '';
+		$field_val  = empty( $field['value'] ) && ! is_numeric( $field['value'] ) ? esc_html__( '(empty)', 'wpforms-lite' ) : $field['value'];
+
+		// Add quantity for the field.
+		if ( wpforms_payment_has_quantity( $field, $this->form_data ) ) {
+			$field_val = wpforms_payment_format_quantity( $field );
+		}
+
+		// Set a default field name if empty.
+		if ( empty( $field_name ) && $field_name !== null ) {
+			$field_name = $this->get_default_field_name( $field['id'] );
+		}
+
+		$message    .= '--- ' . $field_name . " ---\r\n\r\n";
+		$field_value = wpforms_decode_string( $field_val ) . "\r\n\r\n";
+
+		/**
+		 * Filter the field value before it is added to the email message.
+		 *
+		 * @since      1.8.5
+		 * @deprecated 1.8.7
+		 *
+		 * @param string $field_value Field value.
+		 * @param array  $field       Field data.
+		 * @param array  $form_data   Form data.
+		 */
+		$field_value = apply_filters_deprecated( // phpcs:disable WPForms.Comments.ParamTagHooks.InvalidParamTagsQuantity
+			'wpforms_emails_notifications_plaintext_field_value',
+			[ $field_value, $field, $this->form_data ],
+			'1.8.7 of the WPForms plugin',
+			'wpforms_plaintext_field_value'
+		);
+
+		/** This filter is documented in /includes/emails/class-emails.php */
+		$field_value = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+			'wpforms_plaintext_field_value',
+			$field_value,
+			$field,
+			$this->form_data
+		);
+
+		// Append the filtered field value to the message.
+		$message .= $field_value;
+
+		return $message;
 	}
 
 	/**
@@ -509,7 +570,7 @@ class Notifications extends Mailer {
 		);
 
 		/** This filter is documented in /includes/emails/class-emails.php */
-		$other_fields = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+		$other_fields = (array) apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 			'wpforms_email_display_other_fields',
 			[],
 			$this
@@ -519,66 +580,101 @@ class Notifications extends Mailer {
 		 * Filter the form data before it is used to generate the email message.
 		 *
 		 * @since 1.8.8
+		 * @since 1.8.9 The $fields parameter was added.
 		 *
 		 * @param array $form_data Form data.
+		 * @param array $fields    List of submitted fields.
 		 */
-		$this->form_data = apply_filters( 'wpforms_emails_notifications_form_data', $this->form_data );
+		$this->form_data = apply_filters( 'wpforms_emails_notifications_form_data', $this->form_data, $this->fields );
 
-		foreach ( $this->form_data['fields'] as $field_id => $field ) {
-			$field_type = ! empty( $field['type'] ) ? $field['type'] : '';
+		foreach ( $this->form_data['fields'] as $field ) {
+			$field_message = $this->get_field_html( $field, $show_empty_fields, $other_fields );
 
-			// Check if the field is empty in $this->fields.
-			if ( empty( $this->fields[ $field_id ] ) ) {
-				// Check if the field type is in $other_fields, otherwise skip.
-				if ( empty( $other_fields ) || ! in_array( $field_type, $other_fields, true ) ) {
-					continue;
-				}
-
-				// Handle specific field types.
-				list( $field_name, $field_val ) = $this->process_special_field_values( $field );
-			} else {
-				// Handle fields that are not empty in $this->fields.
-				if ( ! $show_empty_fields && ( ! isset( $this->fields[ $field_id ]['value'] ) || (string) $this->fields[ $field_id ]['value'] === '' ) ) {
-					continue;
-				}
-
-				$field_name = isset( $this->fields[ $field_id ]['name'] ) ? $this->fields[ $field_id ]['name'] : '';
-				$field_val  = empty( $this->fields[ $field_id ]['value'] ) && ! is_numeric( $this->fields[ $field_id ]['value'] ) ? '<em>' . esc_html__( '(empty)', 'wpforms-lite' ) . '</em>' : $this->fields[ $field_id ]['value'];
-			}
-
-			// Set a default field name if empty.
-			if ( empty( $field_name ) && $field_name !== null ) {
-				$field_name = $this->get_default_field_name( $field_id );
-			}
-
-			/** This filter is documented in src/SmartTags/SmartTag/FieldHtmlId.php.*/
-			$field_val = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
-				'wpforms_html_field_value',
-				$field_val,
-				isset( $this->fields[ $field_id ] ) ? $this->fields[ $field_id ] : $field,
-				$this->form_data,
-				'email-html'
-			);
-
-			// Replace new lines with <br/> tags.
-			$field_val = str_replace( [ "\r\n", "\r", "\n" ], '<br/>', $field_val );
-
-			// Replace the payment total value if an order summary is enabled.
-			// Ideally, it could be done through the `wpforms_html_field_value` filter,
-			// but needed data is missed there, e.g. entry data ($this->fields).
-			if ( $field_type === 'payment-total' && ! empty( $field['summary'] ) ) {
-				$field_val = $this->process_tag( '{order_summary}' );
-			}
-
-			// Append the field item to the message.
-			$message .= str_replace(
-				[ '{field_type}', '{field_name}', '{field_value}' ],
-				[ $field_type, $field_name, $field_val ],
-				$this->field_template
-			);
+			/**
+			 * Filter the field message before it is added to the email message.
+			 *
+			 * @since 1.8.9
+			 *
+			 * @param string $field_message     Field message.
+			 * @param array  $field             Field data.
+			 * @param bool   $show_empty_fields Whether to display empty fields in the email.
+			 * @param array  $other_fields      List of field types.
+			 * @param array  $form_data         Form data.
+			 * @param array  $fields            List of submitted fields.
+			 */
+			$message .= apply_filters( 'wpforms_emails_notifications_field_message_html', $field_message, $field, $show_empty_fields, $other_fields, $this->form_data, $this->fields );
 		}
 
 		return $message;
+	}
+
+	/**
+	 * Get a single field HTML markup.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $field             Field data.
+	 * @param bool  $show_empty_fields Whether to display empty fields in the email.
+	 * @param array $other_fields      List of field types.
+	 *
+	 * @return string
+	 */
+	public function get_field_html( array $field, bool $show_empty_fields, array $other_fields ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity
+
+		$field_type = ! empty( $field['type'] ) ? $field['type'] : '';
+		$field_id   = $field['id'] ?? '';
+
+		// Check if the field is empty in $this->fields.
+		if ( empty( $this->fields[ $field_id ] ) ) {
+			// Check if the field type is in $other_fields, otherwise skip.
+			if ( empty( $other_fields ) || ! in_array( $field_type, $other_fields, true ) ) {
+				return '';
+			}
+
+			// Handle specific field types.
+			list( $field_name, $field_val ) = $this->process_special_field_values( $field );
+		} else {
+			// Handle fields that are not empty in $this->fields.
+			if ( ! $show_empty_fields && ( ! isset( $this->fields[ $field_id ]['value'] ) || (string) $this->fields[ $field_id ]['value'] === '' ) ) {
+				return '';
+			}
+
+			$field_name = $this->fields[ $field_id ]['name'] ?? '';
+			$field_val  = empty( $this->fields[ $field_id ]['value'] ) && ! is_numeric( $this->fields[ $field_id ]['value'] ) ? '<em>' . esc_html__( '(empty)', 'wpforms-lite' ) . '</em>' : $this->fields[ $field_id ]['value'];
+		}
+
+		// Set a default field name if empty.
+		if ( empty( $field_name ) && $field_name !== null ) {
+			$field_name = $this->get_default_field_name( $field_id );
+		}
+
+		/** This filter is documented in src/SmartTags/SmartTag/FieldHtmlId.php.*/
+		$field_val = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+			'wpforms_html_field_value',
+			$field_val,
+			$this->fields[ $field_id ] ?? $field,
+			$this->form_data,
+			'email-html'
+		);
+
+		// If it's not and RTE field - replace new lines with <br/> tags.
+		if ( $field_type !== 'richtext' ) {
+			$field_val = str_replace( [ "\r\n", "\r", "\n" ], '<br/>', $field_val );
+		}
+
+		// Replace the payment total value if an order summary is enabled.
+		// Ideally, it could be done through the `wpforms_html_field_value` filter,
+		// but needed data is missed there, e.g. entry data ($this->fields).
+		if ( $field_type === 'payment-total' && ! empty( $field['summary'] ) ) {
+			$field_val = $this->process_tag( '{order_summary}' );
+		}
+
+		// Append the field item to the message.
+		return str_replace(
+			[ '{field_type}', '{field_name}', '{field_value}' ],
+			[ $field_type, $field_name, $field_val ],
+			$this->field_template
+		);
 	}
 
 	/**
@@ -807,8 +903,8 @@ class Notifications extends Mailer {
 	private function get_default_field_name( $field_id ) {
 
 		return sprintf( /* translators: %1$d - field ID. */
-			esc_html__( 'Field ID #%1$d', 'wpforms-lite' ),
-			absint( $field_id )
+			esc_html__( 'Field ID #%1$s', 'wpforms-lite' ),
+			wpforms_validate_field_id( $field_id )
 		);
 	}
 

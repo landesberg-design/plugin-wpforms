@@ -79,6 +79,7 @@ class Columns extends ColumnsBase {
 		$default_forbidden_fields = [
 			'divider',
 			'layout',
+			'repeater',
 			'pagebreak',
 			'internal-information',
 			'html',

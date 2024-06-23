@@ -88,7 +88,7 @@ class Repository {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE IF NOT EXISTS $table (
+		$sql = "CREATE TABLE $table (
 			id BIGINT(20) NOT NULL AUTO_INCREMENT,
 			title VARCHAR(255) NOT NULL,
 			message LONGTEXT NOT NULL,

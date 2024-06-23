@@ -520,7 +520,7 @@ class WPForms_About {
 						<?php
 						printf(
 							wp_kses( /* translators: %s - stars. */
-								__( 'We know that you will truly love WPForms. It has over <strong>12,000+ five star ratings</strong> (%s) and is active on over 6 million websites.', 'wpforms-lite' ),
+								__( 'We know that you will truly love WPForms. It has over <strong>13,000+ five star ratings</strong> (%s) and is active on over 6 million websites.', 'wpforms-lite' ),
 								[
 									'strong' => [],
 								]
@@ -544,7 +544,7 @@ class WPForms_About {
 									<?php
 									printf( /* translators: %s - number of templates. */
 										esc_html__( '%s customizable form templates', 'wpforms-lite' ),
-										'1100+'
+										'1800+'
 									);
 									?>
 								</li>
@@ -574,7 +574,7 @@ class WPForms_About {
 							<ul class="list-features list-plain">
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
-									<?php esc_html_e( '6000+ integrations with marketing and payment services', 'wpforms-lite' ); ?>
+									<?php esc_html_e( '7000+ integrations with marketing and payment services', 'wpforms-lite' ); ?>
 								</li>
 								<li>
 									<i class="fa fa-check" aria-hidden="true"></i>
@@ -1238,7 +1238,7 @@ class WPForms_About {
 						'<strong>' .
 						sprintf( /* translators: %s - number of templates. */
 							esc_html__( 'All Form Templates including Bonus %s pre-made form templates', 'wpforms-lite' ),
-							'1100+'
+							'1800+'
 						) .
 						'</strong>',
 					],
@@ -1303,7 +1303,7 @@ class WPForms_About {
 						esc_html__( 'Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Brevo, Drip, MailerLite, and ConvertKit', 'wpforms-lite' ),
 						'',
 						wp_kses(
-							__( '<strong>Bonus:</strong> 6000+ integrations with Zapier.', 'wpforms-lite' ),
+							__( '<strong>Bonus:</strong> 7000+ integrations with Zapier.', 'wpforms-lite' ),
 							[
 								'strong' => [],
 							]
@@ -1317,7 +1317,7 @@ class WPForms_About {
 						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, MailerLite, and ConvertKit', 'wpforms-lite' ),
 						'',
 						wp_kses(
-							__( '<strong>Bonus:</strong> 6000+ integrations with Zapier.', 'wpforms-lite' ),
+							__( '<strong>Bonus:</strong> 7000+ integrations with Zapier.', 'wpforms-lite' ),
 							[
 								'strong' => [],
 							]
@@ -1331,7 +1331,7 @@ class WPForms_About {
 						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, MailerLite, and ConvertKit', 'wpforms-lite' ),
 						'',
 						wp_kses(
-							__( '<strong>Bonus:</strong> 6000+ integrations with Zapier.', 'wpforms-lite' ),
+							__( '<strong>Bonus:</strong> 7000+ integrations with Zapier.', 'wpforms-lite' ),
 							[
 								'strong' => [],
 							]
@@ -1345,7 +1345,7 @@ class WPForms_About {
 						esc_html__( 'ActiveCampaign, Constant Contact, Mailchimp, AWeber, GetResponse, Campaign Monitor, Salesforce, Brevo, HubSpot, Drip, MailerLite, and ConvertKit', 'wpforms-lite' ),
 						'',
 						wp_kses(
-							__( '<strong>Bonus:</strong> 6000+ integrations with Zapier.', 'wpforms-lite' ),
+							__( '<strong>Bonus:</strong> 7000+ integrations with Zapier.', 'wpforms-lite' ),
 							[
 								'strong' => [],
 							]

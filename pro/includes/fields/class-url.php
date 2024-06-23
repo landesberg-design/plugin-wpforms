@@ -147,7 +147,7 @@ class WPForms_Field_URL extends WPForms_Field {
 	 * @since 1.0.0
 	 *
 	 * @param int    $field_id     Field ID.
-	 * @param string $field_submit Submitted value.
+	 * @param string $field_submit Submitted field value (raw data).
 	 * @param array  $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -187,7 +187,7 @@ class WPForms_Field_URL extends WPForms_Field {
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => ! empty( $form_data['fields'][ $field_id ]['label'] ) ? sanitize_text_field( $form_data['fields'][ $field_id ]['label'] ) : '',
 			'value' => trim( $field_submit ),
-			'id'    => absint( $field_id ),
+			'id'    => wpforms_validate_field_id( $field_id ),
 			'type'  => $this->type,
 		];
 	}

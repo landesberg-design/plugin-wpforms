@@ -510,7 +510,7 @@ class WPForms_License {
 		if ( ! $key ) {
 			$notice = sprintf(
 				wp_kses( /* translators: %s - Link to the Settings > General screen in the plugin, where users can enter their license key. */
-					__( 'To access addons and enable automatic updates, please <a href="%s" target="_blank">enter and activate your license key.</a>', 'wpforms' ),
+					__( 'To access all features, addons, and enable automatic updates, please <a href="%s" target="_blank">activate your WPForms license.</a>', 'wpforms' ),
 					[
 						'a' => [
 							'href'   => [],
@@ -522,7 +522,7 @@ class WPForms_License {
 				esc_url( admin_url( 'admin.php?page=wpforms-settings' ) )
 			);
 
-			Notice::error(
+			Notice::warning(
 				$notice,
 				[ 'class' => $class ]
 			);

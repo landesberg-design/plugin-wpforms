@@ -1,5 +1,10 @@
 <?php
 
+// phpcs:disable Generic.Commenting.DocComment.MissingShort
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection AutoloadingIssuesInspection */
+// phpcs:enable Generic.Commenting.DocComment.MissingShort
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -85,7 +90,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		$this->keywords = esc_html__( 'image, text, table, list, heading, wysiwyg, visual', 'wpforms' );
 		$this->type     = 'richtext';
 		$this->icon     = 'fa-pencil-square-o';
-		$this->order    = 133;
+		$this->order    = 170;
 		$this->group    = 'fancy';
 
 		// Init upload files helper.
@@ -167,7 +172,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 */
 	public function customize_tinymc( $in ) {
 
-		// Append custom CSS file to comma seperated list of stylesheets.
+		// Append custom CSS file to a comma seperated list of stylesheets.
 		$current_content_css = ! empty( $in['content_css'] ) ? $in['content_css'] : '';
 		$in['content_css']   = implode( ',', [ $current_content_css, esc_url( $this->get_editor_content_css_url() ) ] );
 
@@ -296,7 +301,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 				<div class="mce-container-body">
 					<div class="mce-toolbar-grp <?php echo esc_attr( $style ); ?> <?php echo esc_attr( $media_enabled ); ?>"></div>
 				</div>
-				<textarea id="wpforms-richtext-<?php echo absint( $field['id'] ); ?>"></textarea>
+				<textarea id="wpforms-richtext-<?php echo wpforms_validate_field_id( $field['id'] ); ?>"></textarea>
 				<div class="mce-statusbar">
 					<i class="mce-ico mce-i-resize"></i>
 				</div>
@@ -317,6 +322,8 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param array $form_data  Form data and settings.
 	 *
 	 * @return array
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function field_properties( $properties, $field, $form_data ) {
 
@@ -373,7 +380,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	}
 
 	/**
-	 * Whether current field can be populated dynamically.
+	 * Whether the current field can be populated dynamically.
 	 *
 	 * @since 1.7.0
 	 *
@@ -407,7 +414,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @since 1.7.0
 	 *
 	 * @param string $raw_value  Value from a GET param, always a string.
-	 * @param string $input      Represent a subfield inside the field. May be empty.
+	 * @param string $input      Represent a subfield inside the field. Maybe empty.
 	 * @param array  $properties Field properties.
 	 * @param array  $field      Current field specific data.
 	 *
@@ -437,7 +444,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 */
 	private function display_editor( $primary, $field, $value ) {
 
-		$this->is_media_enabled = isset( $primary['data']['media_enabled'] ) ? $primary['data']['media_enabled'] : false;
+		$this->is_media_enabled = $primary['data']['media_enabled'] ?? false;
 
 		$this->current_user_can_upload = current_user_can( 'upload_files' );
 
@@ -516,6 +523,9 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @deprecated 1.7.6
 	 *
 	 * @param string $view Current view.
+	 *
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function builder_css( $view ) {
 
@@ -565,7 +575,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 *
 	 * @since 1.7.0
 	 */
-	public function edit_entry_before_enqueues() {
+	public function edit_entry_before_enqueues() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		add_filter( 'media_view_settings', [ $this, 'edit_media_view_settings' ], 10, 2 );
 		add_filter( 'media_view_strings', [ $this, 'edit_media_view_strings' ], 10, 2 );
@@ -577,7 +587,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 *
 	 * @since 1.7.0
 	 */
-	private function before_editor() {
+	private function before_editor() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		add_filter( 'user_can_richedit', '__return_true', 1001 );
 
@@ -625,7 +635,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			'textarea_name'    => "wpforms[fields][{$field['id']}]",
 			'editor_height'    => $this->get_size_value_for_field( $primary['data']['size'] ),
 			'editor_class'     => ! empty( $field['required'] ) ? 'wpforms-field-required' : '',
-			'editor_css'       => '<style>.wpforms-field-richtext .insert-media.add_media { display: none !important; }</style>',
+			'editor_css'       => '<style>.wpforms-field-richtext .insert-media.add_media { display: none !important; } .mce-container * { color: initial; }</style>',
 			'tinymce'          => [
 				'plugins'                      => implode( ',', $this->get_tinymce_plugins( $field['id'], $primary ) ),
 				'toolbar1'                     => implode( ',', $this->get_toolbar1( $field['id'], $primary, $mce_mode ) ),
@@ -663,7 +673,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		 * @param int    $field_id         Field ID.
 		 * @param array  $primary          Field data.
 		 */
-		$settings = (array) apply_filters( 'wpforms_richtext_add_rich_text_editor_field_settings', $settings, $field['id'], $primary );
+		$settings = (array) apply_filters( 'wpforms_richtext_add_rich_text_editor_field_settings', $settings, $field['id'], $primary ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 		wp_editor( $value, $primary['id'], $settings );
 	}
@@ -674,7 +684,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 *
 	 * @since 1.7.0
 	 */
-	private function after_editor() {
+	private function after_editor() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		if ( ! $this->is_media_enabled ) {
 			return;
@@ -708,6 +718,8 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param WP_Post $post     Post object.
 	 *
 	 * @return array Modified media view settings.
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function edit_media_view_settings( $settings, $post ) {
 
@@ -748,7 +760,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		 *
 		 * @return array
 		 */
-		return (array) apply_filters( 'wpforms_richtext_upload_mimes', $mimes, $user, $this->form_data );
+		return (array) apply_filters( 'wpforms_richtext_upload_mimes', $mimes, $user, $this->form_data ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -760,6 +772,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param WP_Post $post    Post object.
 	 *
 	 * @return array Modified media view strings.
+	 * @noinspection SqlResolve
 	 */
 	public function edit_media_view_strings( $strings, $post ) {
 
@@ -794,7 +807,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		 * @param array   $strings Current strings.
 		 * @param WP_Post $post    Post object.
 		 */
-		return (array) apply_filters( 'wpforms_richtext_edit_media_view_strings', $strings, $post );
+		return (array) apply_filters( 'wpforms_richtext_edit_media_view_strings', $strings, $post ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -832,7 +845,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		 * @param int   $field_id Field ID.
 		 * @param array $primary  Field data.
 		 */
-		return (array) apply_filters( 'wpforms_richtext_get_tinymce_plugins', $plugins, $field_id, $primary );
+		return (array) apply_filters( 'wpforms_richtext_get_tinymce_plugins', $plugins, $field_id, $primary ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -896,7 +909,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		 * @param int   $field_id Field ID.
 		 * @param array $primary  Field data.
 		 */
-		return (array) apply_filters( 'wpforms_richtext_get_toolbar1', $toolbar, $field_id, $primary );
+		return (array) apply_filters( 'wpforms_richtext_get_toolbar1', $toolbar, $field_id, $primary ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -939,7 +952,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		 * @param int   $field_id Field ID.
 		 * @param array $primary  Field data.
 		 */
-		return (array) apply_filters( 'wpforms_richtext_get_toolbar2', $toolbar, $field_id, $primary );
+		return (array) apply_filters( 'wpforms_richtext_get_toolbar2', $toolbar, $field_id, $primary ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -966,7 +979,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param mixed $field_submit Field value that was submitted.
 	 * @param array $form_data    Form data and settings.
 	 */
-	public function format( $field_id, $field_submit, $form_data ) {
+	public function format( $field_id, $field_submit, $form_data ) { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		remove_filter( "wpforms_pro_fields_entry_preview_get_field_value_{$this->type}_field_after", 'nl2br', 100 );
 
@@ -977,7 +990,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => ! empty( $form_data['fields'][ $field_id ]['label'] ) ? sanitize_text_field( $form_data['fields'][ $field_id ]['label'] ) : '',
 			'value' => wpforms_sanitize_richtext_field( $field_submit ),
-			'id'    => absint( $field_id ),
+			'id'    => wpforms_validate_field_id( $field_id ),
 			'type'  => $this->type,
 		];
 	}
@@ -988,7 +1001,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @since 1.7.0
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param mixed $field_submit Field value that was submitted.
+	 * @param mixed $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -1117,7 +1130,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		 * @param int    $value Size value.
 		 * @param string $size  Size name.
 		 */
-		return (int) apply_filters( 'wpforms_richtext_get_size_value_for_field', $value, $size );
+		return (int) apply_filters( 'wpforms_richtext_get_size_value_for_field', $value, $size ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 	}
 
 	/**
@@ -1131,6 +1144,8 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param string $context     Value display context.
 	 *
 	 * @return string Entry HTML.
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function allow_tags_for_richtext_entry_view( $field_value, $field, $form_data, $context ) {
 
@@ -1183,7 +1198,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 *
 	 * @return bool Location string if not modified, otherwise false.
 	 */
-	public function override_auth_for_ajax_media_calls( $secure ) {
+	public function override_auth_for_ajax_media_calls( $secure ) { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		if ( ! $this->is_valid_async_upload_request() ) {
 			return $secure;
@@ -1208,7 +1223,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		 *
 		 * @param int $time Time.
 		 */
-		$time = (int) apply_filters( 'wpforms_richtext_override_auth_for_ajax_media_calls_time', time() + 1 * DAY_IN_SECONDS );
+		$time = (int) apply_filters( 'wpforms_richtext_override_auth_for_ajax_media_calls_time', time() + DAY_IN_SECONDS ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 		wpforms()
 			->get( 'tasks' )
@@ -1241,11 +1256,11 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 *
 	 * @return array
 	 */
-	private function upload_attachment() {
+	private function upload_attachment() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		preg_match_all( '/\d+/', sanitize_key( $_POST['post_id'] ), $matches ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotValidated
 		$form_id  = ! empty( $matches[0][0] ) ? absint( $matches[0][0] ) : 0;
-		$field_id = isset( $matches[0][1] ) ? absint( $matches[0][1] ) : 0;
+		$field_id = isset( $matches[0][1] ) ? wpforms_validate_field_id( $matches[0][1] ) : 0;
 
 		if ( empty( $form_id ) || wpforms_is_empty_string( $field_id ) ) {
 			wp_send_json_error();
@@ -1255,7 +1270,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			->get(
 				absint( $form_id ),
 				[
-					'cap' => false, // Allow get the form for non-logged users.
+					'cap' => false, // Allow getting the form for non-logged users.
 				]
 			);
 
@@ -1288,7 +1303,8 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		}
 
 		$file = $this->upload->process_file(
-			$_FILES['async-upload'], // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+			$_FILES['async-upload'],
 			$field_id,
 			$form_data,
 			true
@@ -1324,7 +1340,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 *
 	 * @return array WPForms upload root path (no trailing slash).
 	 */
-	public function modify_upload_directory( $dir ) {
+	public function modify_upload_directory( $dir ) { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 		remove_filter( 'upload_dir', [ $this, 'modify_upload_directory' ], 1 );
 
@@ -1354,6 +1370,8 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param int    $attachment_id Attachment ID.
 	 *
 	 * @return string
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function modify_attached_file_path( $file_path, $attachment_id ) {
 
@@ -1432,7 +1450,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	}
 
 	/**
-	 * Helper to verify 'fields' exists in the field data array and return it.
+	 * Helper to verify that 'fields' exist in the field data array and return it.
 	 *
 	 * @since 1.7.0
 	 *
@@ -1484,14 +1502,14 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			'<iframe data-src="%s" class="wpforms-entry-field-value-richtext"></iframe>',
 			add_query_arg(
 				[
-					'richtext_field_id' => absint( $field['id'] ),
+					'richtext_field_id' => wpforms_validate_field_id( $field['id'] ),
 				]
 			)
 		);
 	}
 
 	/**
-	 * Display trimmed text on the entries overview page.
+	 * Display trimmed text on the entry overview page.
 	 *
 	 * @since 1.7.0
 	 *
@@ -1501,6 +1519,8 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param string $field_type  Field type.
 	 *
 	 * @return string
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function entry_table_value( $value, $entry, $column_name, $field_type ) {
 
@@ -1547,6 +1567,8 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 * @param array  $form_data Form data and settings.
 	 *
 	 * @return string
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function entry_preview( $value, $field, $form_data ) {
 
@@ -1566,7 +1588,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	public function modify_quicktags( $qt_init, $editor_id ) {
 
 		// This callback is executed for all TinyMCE editors, on the Builder page as well.
-		// First conditional check for verifying a prefix of editor ID is not enough
+		// The first conditional check for verifying a prefix of editor ID is not enough
 		// and `link` quick buttons are removed through the Builder page.
 		// That's why we run the second conditional check.
 		if (

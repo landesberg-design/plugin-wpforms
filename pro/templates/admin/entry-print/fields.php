@@ -26,6 +26,20 @@ if ( empty( $fields ) ) {
 }
 
 foreach ( $fields as $field ) {
+	if ( $field['type'] === 'repeater' ) {
+		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'admin/entry-print/repeater',
+			[
+				'entry'     => $entry,
+				'field'     => $field,
+				'form_data' => $form_data,
+			],
+			true
+		);
+
+		continue;
+	}
+
 	if ( $field['type'] === 'layout' ) {
 		if ( isset( $field['display'] ) && $field['display'] === 'rows' ) {
 			echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

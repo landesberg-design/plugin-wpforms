@@ -150,7 +150,7 @@ class Tags {
 			'wpforms-admin-forms-overview-choicesjs',
 			WPFORMS_PLUGIN_URL . 'assets/lib/choices.min.js',
 			[],
-			'9.0.1',
+			'10.2.0',
 			true
 		);
 
@@ -185,6 +185,7 @@ class Tags {
 			'searchFloor'       => 1,
 			'searchResultLimit' => 100,
 			'searchFields'      => [ 'label' ],
+			'allowHTML'         => true,
 			// These `fuseOptions` options enable the search of chars not only from the beginning of the tags.
 			'fuseOptions'       => [
 				'threshold' => 0.1,

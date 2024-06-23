@@ -129,8 +129,13 @@ class WPForms_Review {
 	 */
 	public function review_lite() {
 
+		// Do not show the review request on Entries pages.
+		if ( wpforms_is_admin_page( 'entries' ) ) {
+			return;
+		}
+
 		// Fetch when plugin was initially installed.
-		$activated = get_option( 'wpforms_activated', [] );
+		$activated = (array) get_option( 'wpforms_activated', [] );
 
 		if ( ! empty( $activated['lite'] ) ) {
 			// Only continue if plugin has been installed for at least 14 days.

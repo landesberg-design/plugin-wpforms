@@ -377,6 +377,17 @@ function wpforms_get_form_fields( $form = false, $allowlist = [] ) {
 	$form_fields = $form['fields'];
 
 	foreach ( $form_fields as $id => $form_field ) {
+		// Remove repeater field and its children.
+		if ( $form_field['type'] === 'repeater' ) {
+			foreach ( (array) $form_field['columns'] as $column ) {
+				$column_fields = $column['fields'] ?? [];
+
+				foreach ( $column_fields as $field_id ) {
+					unset( $form_fields[ $field_id ] );
+				}
+			}
+		}
+
 		if ( ! in_array( $form_field['type'], $allowlist, true ) ) {
 			unset( $form_fields[ $id ] );
 		}

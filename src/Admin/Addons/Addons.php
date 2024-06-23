@@ -148,7 +148,50 @@ class Addons {
 		// The Custom Captcha addon will only work on WPForms 1.8.6 and earlier versions.
 		unset( $this->addons['wpforms-captcha'] );
 
-		return $this->addons;
+		return $this->get_sorted_addons();
+	}
+
+	/**
+	 * Get sorted addons data.
+	 * Recommended addons will be displayed first,
+	 * then new addons, then featured addons,
+	 * and then all other addons.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @return array
+	 */
+	private function get_sorted_addons(): array {
+
+		if ( empty( $this->addons ) ) {
+			return [];
+		}
+
+		$recommended = array_filter(
+			$this->addons,
+			static function ( $addon ) {
+
+				return ! empty( $addon['recommended'] );
+			}
+		);
+
+		$new = array_filter(
+			$this->addons,
+			static function ( $addon ) {
+
+				return ! empty( $addon['new'] );
+			}
+		);
+
+		$featured = array_filter(
+			$this->addons,
+			static function ( $addon ) {
+
+				return ! empty( $addon['featured'] );
+			}
+		);
+
+		return array_merge( $recommended, $new, $featured, $this->addons );
 	}
 
 	/**
@@ -277,6 +320,22 @@ class Addons {
 	}
 
 	/**
+	 * Check if addon is active.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param string $slug Addon slug.
+	 *
+	 * @return bool
+	 */
+	public function is_active( string $slug ): bool {
+
+		$addon = $this->get_addon( $slug );
+
+		return isset( $addon['status'] ) && $addon['status'] === 'active';
+	}
+
+	/**
 	 * Get license level of the addon.
 	 *
 	 * @since 1.6.6
@@ -358,7 +417,7 @@ class Addons {
 			$this->available_addons = array_map( [ $this, 'prepare_addon_data' ], $this->addons );
 			$this->available_addons = array_filter(
 				$this->available_addons,
-				static function( $addon ) {
+				static function ( $addon ) {
 
 					return isset( $addon['status'], $addon['plugin_allow'] ) && ( $addon['status'] !== 'active' || ! $addon['plugin_allow'] );
 				}

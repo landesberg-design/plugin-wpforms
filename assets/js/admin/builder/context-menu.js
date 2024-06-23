@@ -1,5 +1,6 @@
 // noinspection ES6ConvertVarToLetConst
 /* global wpf, WPFormsBuilder, WPSplash */
+
 /**
  * Context menu module.
  *
@@ -105,10 +106,10 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 			// Handle clicks on the main menu items.
 			el.$mainContextMenu.on( 'click', '.wpforms-context-menu-list-item', app.mainMenuItemClickAction );
 
-			// Hide the main menu, if it's visible, when clicking outside of it.
+			// Hide the main menu if it's visible when clicking outside it.
 			el.$builder.on( 'click contextmenu', app.hideMainContextMenu );
 
-			// Display a context menu on right-click on the form field in preview area.
+			// Display a context menu on right-click on the form field in the preview area.
 			el.$document.on( 'contextmenu', app.rightClickContextMenuHandler );
 
 			el.$document.on( 'click', app.hideMenuOnClick );
@@ -120,18 +121,22 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		 *
 		 * @since 1.8.8
 		 *
-		 * @param {Event} e Event object.
+		 * @param {KeyboardEvent} e Event object.
 		 */
 		rightClickContextMenuHandler( e ) {
 			const $field = $( e.target ).closest( '.wpforms-field' );
 
-			if ( $( e.target ).closest( app.selectors.contextMenu ).length || ! $field.length || e.ctrlKey ) {
+			if ( $( e.target ).closest( app.selectors.contextMenu ).length || ! $field.length ) {
+				return;
+			}
+
+			app.hideMenu();
+
+			if ( e.ctrlKey ) {
 				return;
 			}
 
 			e.preventDefault();
-
-			app.hideMenu();
 
 			setTimeout( function() {
 				app.checkMenuItemsVisibility( $field );
@@ -143,7 +148,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		},
 
 		/**
-		 * Hide main context menu when clicking outside of it.
+		 * Hide the main context menu when clicking outside it.
 		 *
 		 * @since 1.8.8
 		 *
@@ -350,7 +355,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 				return;
 			}
 
-			// The form does not need to be saved, just open the URL.
+			// The form does not need to be saved, open the URL.
 			if ( ! saveForm ) {
 				newTab ? window.open( actionUrl ) : window.location.assign( actionUrl ); // eslint-disable-line no-unused-expressions
 				return;
@@ -358,7 +363,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 
 			const isModified = wpf.savedState !== wpf.getFormState( '#wpforms-builder-form' );
 
-			// Form was changed and must be saved before following the action URL.
+			// The form was changed and must be saved before following the action URL.
 			if ( isModified ) {
 				el.$builder.on( 'wpformsSaved', () => {
 					newTab ? window.open( actionUrl ) : window.location.assign( actionUrl ); // eslint-disable-line no-unused-expressions
@@ -368,7 +373,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 				return;
 			}
 
-			// Form was not changed, just open the URL.
+			// The form was not changed, open the URL.
 			newTab ? window.open( actionUrl ) : window.location.assign( actionUrl ); // eslint-disable-line no-unused-expressions
 		},
 
@@ -539,7 +544,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		 *
 		 * @param {Object} $field Field object.
 		 *
-		 * @return {boolean} True if should hide.
+		 * @return {boolean} True when should hide.
 		 */
 		shouldHideEdit( $field ) {
 			return $field.hasClass( 'internal-information-not-editable' );
@@ -552,7 +557,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		 *
 		 * @param {Object} $field Field object.
 		 *
-		 * @return {boolean} True if should hide.
+		 * @return {boolean} True when should hide.
 		 */
 		shouldHideDuplicate( $field ) {
 			const $duplicate = $field.find( '.wpforms-field-duplicate' );
@@ -567,7 +572,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		 *
 		 * @param {Object} $field Field object.
 		 *
-		 * @return {boolean} True if should hide.
+		 * @return {boolean} True when should hide.
 		 */
 		shouldHideDelete( $field ) {
 			const $delete = $field.find( '.wpforms-field-delete' );
@@ -576,13 +581,13 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		},
 
 		/**
-		 * Check required visibility.
+		 * Check the required visibility.
 		 *
 		 * @since 1.8.6
 		 *
 		 * @param {string} fieldId Field ID.
 		 *
-		 * @return {boolean} True if should hide.
+		 * @return {boolean} True when should hide.
 		 */
 		shouldHideRequired( fieldId ) {
 			return $( `#wpforms-field-option-${ fieldId }-required[type="checkbox"]` ).length === 0;
@@ -595,7 +600,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		 *
 		 * @param {string} fieldId Field ID.
 		 *
-		 * @return {boolean} True if should hide.
+		 * @return {boolean} True when should hide.
 		 */
 		shouldHideLabel( fieldId ) {
 			const $label = $( `#wpforms-field-option-${ fieldId }-label_hide[type="checkbox"]` );
@@ -611,13 +616,14 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		 * @param {string} fieldId Field ID.
 		 * @param {Object} $field  Field object.
 		 *
-		 * @return {boolean} True if should hide.
+		 * @return {boolean} True when should hide.
 		 */
 		shouldHideFieldSize( fieldId, $field ) {
-			const isFieldInColumn = $field.closest( '.wpforms-field-layout' ).length > 0;
+			const isFieldInColumn = $field.closest( '.wpforms-layout-column' ).length > 0;
+			const isRepeaterField = $field.closest( '.wpforms-field-repeater' ).length > 0;
 			const $size = $( `#wpforms-field-option-${ fieldId }-size` );
 
-			return $size.length === 0 || isFieldInColumn || $size.parent().hasClass( 'wpforms-hidden' );
+			return $size.length === 0 || isFieldInColumn || isRepeaterField || $size.parent().hasClass( 'wpforms-hidden' );
 		},
 
 		/**
@@ -627,7 +633,7 @@ WPForms.Admin.Builder.ContextMenu = WPForms.Admin.Builder.ContextMenu || ( funct
 		 *
 		 * @param {string} fieldId Field ID.
 		 *
-		 * @return {boolean} True if should hide.
+		 * @return {boolean} True when should hide.
 		 */
 		shouldHideSmartLogic( fieldId ) {
 			return $( `#wpforms-field-option-conditionals-${ fieldId }` ).length === 0 && $( `#wpforms-field-option-${ fieldId } .wpforms-field-option-group-conditionals .education-modal` ).length === 0;

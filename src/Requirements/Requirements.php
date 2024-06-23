@@ -250,7 +250,9 @@ class Requirements {
 		'wpforms-sendinblue/wpforms-sendinblue.php'                     => [
 			self::LICENSE => self::PLUS_PRO_AND_TOP,
 		],
-		'wpforms-signatures/wpforms-signatures.php'                     => [],
+		'wpforms-signatures/wpforms-signatures.php'                     => [
+			self::EXT     => 'gd',
+		],
 		'wpforms-square/wpforms-square.php'                             => [
 			self::PHP => '7.2',
 		],
@@ -344,6 +346,7 @@ class Requirements {
 
 		add_action( 'admin_init', [ $this, 'deactivate' ] );
 		add_action( 'admin_notices', [ $this, 'show_notices' ] );
+		add_action( 'network_admin_notices', [ $this, 'show_notices' ] );
 	}
 
 	/**

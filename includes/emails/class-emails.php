@@ -246,6 +246,10 @@ class WPForms_WP_Emails {
 	 */
 	public function get_cc() {
 
+		if ( is_array( $this->cc ) ) {
+			$this->cc = implode( ',', $this->cc );
+		}
+
 		if ( ! empty( $this->cc ) ) {
 
 			$this->cc = $this->process_tag( $this->cc );
@@ -638,8 +642,8 @@ class WPForms_WP_Emails {
 
 				if ( empty( $field_name ) && null !== $field_name ) {
 					$field_name = sprintf( /* translators: %d - field ID. */
-						esc_html__( 'Field ID #%d', 'wpforms-lite' ),
-						absint( $field['id'] )
+						esc_html__( 'Field ID #%s', 'wpforms-lite' ),
+						wpforms_validate_field_id( $field['id'] )
 					);
 				}
 
@@ -683,8 +687,8 @@ class WPForms_WP_Emails {
 
 				if ( empty( $field_name ) ) {
 					$field_name = sprintf( /* translators: %d - field ID. */
-						esc_html__( 'Field ID #%d', 'wpforms-lite' ),
-						absint( $field['id'] )
+						esc_html__( 'Field ID #%s', 'wpforms-lite' ),
+						wpforms_validate_field_id( $field['id'] )
 					);
 				}
 

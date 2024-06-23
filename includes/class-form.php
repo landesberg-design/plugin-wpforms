@@ -648,7 +648,7 @@ class WPForms_Form_Handler {
 		$title = empty( $data['settings']['form_title'] ) ? get_the_title( $form_id ) : $data['settings']['form_title'];
 		$desc  = empty( $data['settings']['form_desc'] ) ? '' : $data['settings']['form_desc'];
 
-		$data['field_id'] = ! empty( $data['field_id'] ) ? absint( $data['field_id'] ) : '0';
+		$data['field_id'] = ! empty( $data['field_id'] ) ? wpforms_validate_field_id( $data['field_id'] ) : '0';
 
 		// Preserve explicit "Do not store spam entries" state.
 		$data['settings']['store_spam_entries'] = $data['settings']['store_spam_entries'] ?? '0';
@@ -658,6 +658,15 @@ class WPForms_Form_Handler {
 
 		if ( $meta ) {
 			$data['meta'] = $meta;
+		}
+
+		// Update category and subcategory only if available.
+		if ( ! empty( $args['category'] ) ) {
+			$data['meta']['category'] = $args['category'];
+		}
+
+		if ( ! empty( $args['subcategory'] ) ) {
+			$data['meta']['subcategory'] = $args['subcategory'];
 		}
 
 		// Preserve fields meta.
@@ -984,27 +993,41 @@ class WPForms_Form_Handler {
 			return $new_form_data;
 		}
 
-		$next_field_id = max( array_keys( $new_form_data['fields'] ) ) + 1;
-
-		$warning[ $next_field_id ] = [
-			'id'          => $next_field_id,
-			'type'        => 'internal-information',
-			'description' => '',
-		];
+		$current_field_id = ! empty( $new_form_data['fields'] ) ? max( array_keys( $new_form_data['fields'] ) ) : 0;
+		$code_fields      = array_column( $new_form_data['fields'], 'code' );
+		$next_field_id    = $current_field_id;
+		$warning          = [];
 
 		foreach ( $notices as $notice ) {
+			// Skip the duplicate notice if it already exists.
+			if ( ! empty( $notice['code'] ) && in_array( $notice['code'], $code_fields, true ) ) {
+				continue;
+			}
+
+			$next_field_id             = ++$current_field_id;
+			$warning[ $next_field_id ] = [
+				'id'          => $next_field_id,
+				'type'        => 'internal-information',
+				'code'        => ! empty( $notice['code'] ) ? esc_attr( $notice['code'] ) : '',
+				'description' => '',
+			];
+
 			$warning[ $next_field_id ]['description'] .= ! empty( $notice['title'] ) ? '<strong>' . esc_html( $notice['title'] ) . '</strong>' : '';
 			$warning[ $next_field_id ]['description'] .= ! empty( $notice['message'] ) ? '<p>' . wp_kses_post( $notice['message'] ) . '</p>' : '';
+
+			// Do not add notice with empty body.
+			if ( empty( $warning[ $next_field_id ]['description'] ) ) {
+				unset( $warning[ $next_field_id ] );
+				--$next_field_id; // Reset next field ID to the previous value.
+			}
 		}
 
-		if ( empty( $warning[ $next_field_id ]['description'] ) ) {
-			return $new_form_data;
+		if ( ! empty( $warning ) ) {
+			$new_form_data['fields'] = $warning + $new_form_data['fields'];
+
+			// Update next field ID to be used for future created fields. Otherwise, IIF field would be overwritten.
+			$new_form_data['field_id'] = $next_field_id + 1;
 		}
-
-		$new_form_data['fields'] = $warning + $new_form_data['fields'];
-
-		// Update next field ID to be used for future created fields. Otherwise, IIF field would be overwritten.
-		$new_form_data['field_id'] = $next_field_id + 1;
 
 		return $new_form_data;
 	}
@@ -1033,6 +1056,7 @@ class WPForms_Form_Handler {
 
 		$notices['zapier'] = [
 			'title'   => esc_html__( 'Zaps Have Been Disabled', 'wpforms-lite' ),
+			'code'    => 'disconnected_on_duplication',
 			'message' => sprintf( /* translators: %s - URL the to list of Zaps. */
 				__( 'Head over to the Zapier settings in the Marketing tab or visit your <a href="%s" target="_blank" rel="noopener noreferrer">Zapier account</a> to restore them.', 'wpforms-lite' ),
 				esc_url( 'https://zapier.com/app/zaps' )
@@ -1078,12 +1102,9 @@ class WPForms_Form_Handler {
 		// We pass the `field_id` after duplicating the Layout field that contains a bunch of fields.
 		// This is needed to avoid multiple AJAX calls after duplicating each field in the Layout.
 		if ( isset( $args['field_id'] ) ) {
-
 			$set_field_id = absint( $args['field_id'] ) - 1;
 			$field_id     = $set_field_id > $max_field_id ? $set_field_id : $max_field_id + 1;
-
 		} elseif ( ! empty( $form['field_id'] ) ) {
-
 			$field_id = absint( $form['field_id'] );
 			$field_id = $max_field_id > $field_id ? $max_field_id + 1 : $field_id;
 		}

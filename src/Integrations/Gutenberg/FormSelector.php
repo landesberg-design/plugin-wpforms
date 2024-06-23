@@ -155,6 +155,8 @@ abstract class FormSelector implements IntegrationInterface {
 		$this->disable_css_setting = (int) wpforms_setting( 'disable-css', '1' );
 		$this->css_vars_obj        = wpforms()->get( 'css_vars' );
 
+		wpforms()->register_instance( 'formselector_themes_data', $this->themes_data_obj );
+
 		$this->hooks();
 	}
 
@@ -373,7 +375,7 @@ abstract class FormSelector implements IntegrationInterface {
 		wp_register_style(
 			'wpforms-integrations',
 			WPFORMS_PLUGIN_URL . "assets/css/admin-integrations{$min}.css",
-			[],
+			[ 'dashicons' ],
 			WPFORMS_VERSION
 		);
 
@@ -639,6 +641,7 @@ abstract class FormSelector implements IntegrationInterface {
 			'page_break'                   => esc_html__( 'Page Break', 'wpforms-lite' ),
 			'rating'                       => esc_html__( 'Rating', 'wpforms-lite' ),
 			'heads_up'                     => esc_html__( 'Heads Up!', 'wpforms-lite' ),
+			'form_not_available_message'   => esc_html__( 'It looks like the form you had selected is in the Trash or has been permanently deleted.', 'wpforms-lite' ),
 		];
 
 		return [

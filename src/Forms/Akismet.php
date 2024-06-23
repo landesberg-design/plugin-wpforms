@@ -203,6 +203,30 @@ class Akismet {
 	}
 
 	/**
+	 * Mark the entry as spam in Akismet.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $form_data Form data for the current form.
+	 * @param array $entry     Entry data for the current entry.
+	 *
+	 * @return bool
+	 */
+	public function submit_missed_spam( array $form_data, array $entry ) {
+
+		if ( ! self::is_configured() ) {
+			return false;
+		}
+
+		$request = $this->get_request_args( $form_data, $entry );
+
+		$response = $this->http_post( $request, 'submit-spam' );
+
+		// Yes, Akismet returns "Thanks for making the web a better place." as the response.
+		return ! empty( $response ) && isset( $response[1] ) && 'Thanks for making the web a better place.' === trim( $response[1] );
+	}
+
+	/**
 	 * Get the request arguments to be sent to Akismet.
 	 *
 	 * @since 1.8.8

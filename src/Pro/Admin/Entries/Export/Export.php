@@ -36,6 +36,7 @@ class Export {
 			'internal-information',
 			'content',
 			'layout',
+			'repeater',
 		],
 	];
 

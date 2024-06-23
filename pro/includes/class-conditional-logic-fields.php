@@ -729,7 +729,7 @@ class WPForms_Conditional_Logic_Fields {
 			// Now we loop through each field inside the form.
 			foreach ( $form['fields'] as $field ) {
 
-				$field_id = absint( $field['id'] );
+				$field_id = wpforms_validate_field_id( $field['id'] );
 
 				// First thing, check if conditional logic is enabled for the field.
 				if (

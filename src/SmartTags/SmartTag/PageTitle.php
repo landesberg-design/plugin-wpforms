@@ -29,7 +29,7 @@ class PageTitle extends SmartTag {
 		}
 
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
-		if ( ! empty( $_POST['page_title'] ) ) {
+		if ( ! empty( $_POST['page_title'] ) && ! is_array( $_POST['page_title'] ) ) {
 			return wp_kses_post( wp_unslash( $_POST['page_title'] ) );
 		}
 		// phpcs:enable WordPress.Security.NonceVerification.Missing

@@ -122,7 +122,7 @@ class Frontend {
 	 */
 	public function field_properties( $properties, $field, $form_data ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
-		$field_id = absint( $field['id'] );
+		$field_id = wpforms_validate_field_id( $field['id'] );
 		$format   = ! empty( $field['format'] ) ? $field['format'] : 'math';
 
 		// Input Primary: adjust name.

@@ -1,6 +1,8 @@
 <?php
 
-namespace WPForms\Admin\Builder\Traits;
+namespace WPForms\Pro\Forms\Fields\Traits;
+
+use WP_Post;
 
 /**
  * Trait ContentInput.

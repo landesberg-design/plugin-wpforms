@@ -24,11 +24,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$preset_width = 66.66666;
 		}
 
-		$custom_width = ! empty( $column['width_custom'] ) ? (int) $column['width_custom'] : 50;
-		$width        = min( $preset_width, $custom_width );
+		if ( ! empty( $column['width_custom'] ) ) {
+			$preset_width = (int) $column['width_custom'];
+		}
 
 		?>
-		<div class="print-item wpforms-field-layout-column" style="width: <?php echo (float) $width; ?>%">
+		<div class="wpforms-field-layout-column" style="width: <?php echo (float) $preset_width; ?>%">
 			<?php
 			foreach ( $column['fields'] as $child_field ) {
 				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

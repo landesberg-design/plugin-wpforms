@@ -12,6 +12,13 @@ use WP_Post;
 class Frontend {
 
 	/**
+	 * Field format.
+	 *
+	 * @since 1.8.9
+	 */
+	const FIELD_FORMAT = 'wpforms-%d-field_%s';
+
+	/**
 	 * Render engine setting value.
 	 *
 	 * @since 1.8.1
@@ -130,7 +137,6 @@ class Frontend {
 		add_action( 'wp_footer', [ $this, 'assets_footer' ], 15 );
 		add_action( 'wp_footer', [ $this, 'missing_assets_error_js' ], 20 );
 		add_action( 'wp_footer', [ $this, 'footer_end' ], 99 );
-		add_action( 'wp_head' , [ $this, 'maybe_reload_page' ] );
 	}
 
 	/**
@@ -835,16 +841,16 @@ class Frontend {
 	public function get_field_attributes( $field, $form_data ): array {
 
 		$form_id    = absint( $form_data['id'] );
-		$field_id   = absint( $field['id'] );
+		$field_id   = wpforms_validate_field_id( $field['id'] );
 		$attributes = [
 			'field_class'       => [ 'wpforms-field', 'wpforms-field-' . sanitize_html_class( $field['type'] ) ],
-			'field_id'          => [ sprintf( 'wpforms-%d-field_%d-container', $form_id, $field_id ) ],
+			'field_id'          => [ sprintf( 'wpforms-%d-field_%s-container', $form_id, $field_id ) ],
 			'field_style'       => '',
 			'label_class'       => [ 'wpforms-field-label' ],
 			'label_id'          => '',
 			'description_class' => [ 'wpforms-field-description' ],
 			'description_id'    => [],
-			'input_id'          => [ sprintf( 'wpforms-%d-field_%d', $form_id, $field_id ) ],
+			'input_id'          => [ sprintf( self::FIELD_FORMAT, $form_id, $field_id ) ],
 			'input_class'       => [],
 			'input_data'        => [],
 		];
@@ -931,7 +937,7 @@ class Frontend {
 		list( $field, $attributes, $error ) = $this->prepare_get_field_properties( $field, $form_data, $attributes );
 
 		$form_id  = absint( $form_data['id'] );
-		$field_id = absint( $field['id'] );
+		$field_id = wpforms_validate_field_id( $field['id'] );
 
 		$properties = [
 			'container'   => [
@@ -944,7 +950,7 @@ class Frontend {
 			],
 			'label'       => [
 				'attr'     => [
-					'for' => sprintf( 'wpforms-%d-field_%d', $form_id, $field_id ),
+					'for' => sprintf( self::FIELD_FORMAT, $form_id, $field_id ),
 				],
 				'class'    => $attributes['label_class'],
 				'data'     => [],
@@ -969,7 +975,7 @@ class Frontend {
 			],
 			'error'       => [
 				'attr'  => [
-					'for' => sprintf( 'wpforms-%d-field_%d', $form_id, $field_id ),
+					'for' => sprintf( self::FIELD_FORMAT, $form_id, $field_id ),
 				],
 				'class' => [ 'wpforms-error' ],
 				'data'  => [],
@@ -1027,7 +1033,7 @@ class Frontend {
 		$attributes = empty( $attributes ) ? $this->get_field_attributes( $field, $form_data ) : $attributes;
 		$field      = $this->filter_field( $field, $form_data, $attributes );
 		$form_id    = absint( $form_data['id'] );
-		$field_id   = absint( $field['id'] );
+		$field_id   = wpforms_validate_field_id( $field['id'] );
 		$error      = ! empty( wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ] ) ? wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ] : '';
 
 		return [ $field, $attributes, $error ];
@@ -2213,38 +2219,5 @@ class Frontend {
 		 * @param array $form_data Form data.
 		 */
 		do_action( 'wpforms_display_field_after', $field, $form_data ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
-	}
-
-	/**
-	 * Reload a webpage when it's loaded from the back/forward cache in the browser (Safari).
-	 *
-	 * @since 1.8.8
-	 */
-	public function maybe_reload_page() {
-
-		/**
-		 * Allows developers to skip applying this solution due to conflicts or other reasons.
-		 *
-		 * @since 1.8.8
-		 *
-		 * @param bool $skip If true, return early and the solution will be ignored. By default, false.
-		 */
-		if ( (bool) apply_filters( 'wpforms_frontend_maybe_reload_page_skip', false ) ) {
-			return;
-		}
-		?>
-		<script>
-			( function() {
-				window.onpageshow = function( event ) {
-					// Defined window.wpforms means that a form exists on a page.
-					// If so and back/forward button has been clicked,
-					// force reload a page to prevent the submit button state stuck.
-					if ( typeof window.wpforms !== 'undefined' && event.persisted ) {
-						window.location.reload();
-					}
-				};
-			}() );
-		</script>
-		<?php
 	}
 }

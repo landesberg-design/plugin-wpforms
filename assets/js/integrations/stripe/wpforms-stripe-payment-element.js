@@ -306,10 +306,11 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 				fontSize: app.getCssPropertyValue( $hiddenInput, 'font-size' ),
 				colorPrimary: app.getCssPropertyValue( $hiddenInput, '--primary-color' ) || app.getCssPropertyValue( $hiddenInput, 'color' ),
 				colorText: app.getCssPropertyValue( $hiddenInput, '--secondary-color' ) || app.getCssPropertyValue( $hiddenInput, 'color' ),
-				colorTextPlaceholder: app.getCssPropertyValue( $hiddenInput, '--secondary-color-50' ) || app.getCssPropertyValue( $hiddenInput, 'color' ),
+				colorTextPlaceholder: app.getCssPropertyValue( $hiddenInput, '--secondary-color-50' ) || WPFormsUtils.cssColorsUtils.getColorWithOpacity( app.getCssPropertyValue( $hiddenInput, 'color' ), '0.5' ),
 				colorBackground: app.getCssPropertyValue( $hiddenInput, '--background-color' ) || app.getCssPropertyValue( $hiddenInput, 'background-color' ),
 				fontFamily: app.getCssPropertyValue( $hiddenInput, 'font-family' ),
 				focusColor: app.getCssPropertyValue( $hiddenInput, '--accent-color' ) || app.getCssPropertyValue( $hiddenInput, 'color' ),
+				errorColor: '#990000',
 			};
 
 			if ( window.WPForms && WPForms.FrontendModern ) {
@@ -324,7 +325,7 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 					colorPrimary: inputStyle.colorPrimary,
 					colorBackground: inputStyle.colorBackground,
 					colorText: inputStyle.colorText,
-					colorDanger: '#990000',
+					colorDanger: inputStyle.errorColor,
 					fontFamily: inputStyle.fontFamily,
 					spacingUnit: '4px',
 					spacingGridRow: '8px',
@@ -388,7 +389,7 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 						backgroundColor: 'transparent',
 					},
 					'.Error, .RedirectText': {
-						color: inputStyle.colorText,
+						color: inputStyle.errorColor,
 					},
 					'.TabIcon--selected': {
 						fill: inputStyle.colorText,
@@ -730,6 +731,7 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 							'incomplete_name',
 							'incomplete_phone_number',
 							'empty_phone_number',
+							'invalid_postal_code',
 						],
 						message = basicErrors.includes( result.error.code ) ? '' : result.error.message;
 

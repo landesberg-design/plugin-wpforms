@@ -116,7 +116,7 @@ class WPForms_Field_Email extends WPForms_Field {
 	 */
 	public function confirmation_field_properties( $properties, $field, $form_data ) {
 		$form_id  = absint( $form_data['id'] );
-		$field_id = absint( $field['id'] );
+		$field_id = wpforms_validate_field_id( $field['id'] );
 
 		// Email confirmation setting enabled.
 		$props = [
@@ -574,7 +574,7 @@ class WPForms_Field_Email extends WPForms_Field {
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $this->decode_punycode( $value ) ),
-			'id'    => absint( $field_id ),
+			'id'    => wpforms_validate_field_id( $field_id ),
 			'type'  => $this->type,
 		];
 	}
@@ -585,7 +585,7 @@ class WPForms_Field_Email extends WPForms_Field {
 	 * @since 1.0.0
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param mixed $field_submit Field value that was submitted.
+	 * @param mixed $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh

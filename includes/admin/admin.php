@@ -116,7 +116,7 @@ function wpforms_admin_scripts() {
 		'choicesjs',
 		WPFORMS_PLUGIN_URL . 'assets/lib/choices.min.js',
 		[],
-		'9.0.1',
+		'10.2.0',
 		false
 	);
 

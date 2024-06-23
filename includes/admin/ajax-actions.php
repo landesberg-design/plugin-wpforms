@@ -152,6 +152,8 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 
 	$form_title    = sanitize_text_field( wp_unslash( $_POST['title'] ) );
 	$form_template = empty( $_POST['template'] ) ? 'blank' : sanitize_text_field( wp_unslash( $_POST['template'] ) );
+	$category      = empty( $_POST['category'] ) ? 'all' : sanitize_text_field( wp_unslash( $_POST['category'] ) );
+	$subcategory   = empty( $_POST['subcategory'] ) ? 'all' : sanitize_text_field( wp_unslash( $_POST['subcategory'] ) );
 
 	if ( ! wpforms()->get( 'builder_templates' )->is_valid_template( $form_template ) ) {
 		wp_send_json_error(
@@ -178,7 +180,9 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 		$form_title,
 		[],
 		[
-			'template' => $form_template,
+			'template'    => $form_template,
+			'category'    => $category,
+			'subcategory' => $subcategory,
 		]
 	);
 
@@ -255,6 +259,8 @@ function wpforms_update_form_template() {
 	// Set initial variables.
 	$form_id       = absint( $_POST['form_id'] );
 	$form_template = empty( $_POST['template'] ) ? 'blank' : sanitize_text_field( wp_unslash( $_POST['template'] ) );
+	$category      = empty( $_POST['category'] ) ? 'all' : sanitize_text_field( wp_unslash( $_POST['category'] ) );
+	$subcategory   = empty( $_POST['subcategory'] ) ? 'all' : sanitize_text_field( wp_unslash( $_POST['subcategory'] ) );
 
 	// Check for valid template.
 	if ( ! wpforms()->get( 'builder_templates' )->is_valid_template( $form_template ) ) {
@@ -332,7 +338,9 @@ function wpforms_update_form_template() {
 		$form_id,
 		$data,
 		[
-			'template' => $form_template,
+			'template'    => $form_template,
+			'category'    => $category,
+			'subcategory' => $subcategory,
 		]
 	);
 
@@ -388,7 +396,7 @@ function wpforms_builder_increase_next_field_id() {
 	// In the case of duplicating the Layout field that contains a bunch of fields,
 	// we need to set the next `field_id` to the desired value which is passed via POST argument.
 	if ( ! empty( $_POST['field_id'] ) ) {
-		$args['field_id'] = absint( $_POST['field_id'] );
+		$args['field_id'] = sanitize_text_field( wp_unslash( $_POST['field_id'] ) );
 	}
 
 	wpforms()->get( 'form' )->next_field_id( absint( $_POST['form_id'] ), $args );
@@ -421,7 +429,7 @@ function wpforms_builder_dynamic_choices() {
 	}
 
 	$type = sanitize_key( $_POST['type'] );
-	$id   = absint( $_POST['field_id'] );
+	$id   = sanitize_text_field( wp_unslash( $_POST['field_id'] ) );
 
 	// Fetch the option row HTML to be returned to the builder.
 	$field      = new WPForms_Field_Select( false );
@@ -464,7 +472,7 @@ function wpforms_builder_dynamic_source() {
 
 	$type        = sanitize_key( $_POST['type'] );
 	$source      = sanitize_key( $_POST['source'] );
-	$id          = absint( $_POST['field_id'] );
+	$id          = sanitize_text_field( wp_unslash( $_POST['field_id'] ) );
 	$form_id     = absint( $_POST['form_id'] );
 	$items       = [];
 	$total       = 0;

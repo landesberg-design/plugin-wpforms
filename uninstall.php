@@ -97,10 +97,10 @@ if ( ! empty( $preview_page ) ) {
 	wp_delete_post( $preview_page, true );
 }
 
-// Delete wpforms and wpforms_log post type posts/post_meta.
+// Delete wpforms, wpforms-template and wpforms_log post type posts/post_meta.
 $wpforms_posts = get_posts(
 	[
-		'post_type'   => [ 'wpforms_log', 'wpforms' ],
+		'post_type'   => [ 'wpforms_log', 'wpforms', 'wpforms-template' ],
 		'post_status' => [ 'any', 'trash', 'auto-draft' ],
 		'numberposts' => -1,
 		'fields'      => 'ids',

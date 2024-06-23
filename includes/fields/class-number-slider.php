@@ -427,7 +427,7 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 	 * @since 1.5.7
 	 *
 	 * @param int              $field_id     Field ID.
-	 * @param int|float|string $field_submit Submitted field value.
+	 * @param int|float|string $field_submit Submitted field value (raw data).
 	 * @param array            $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -485,7 +485,7 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 			'name'      => sanitize_text_field( $name ),
 			'value'     => $value,
 			'value_raw' => $value_raw,
-			'id'        => absint( $field_id ),
+			'id'        => wpforms_validate_field_id( $field_id ),
 			'type'      => $this->type,
 		];
 	}
@@ -505,8 +505,15 @@ class WPForms_Field_Number_Slider extends WPForms_Field {
 		// with the num input, which then trips the is_numeric validation below.
 		// To get around this we remove all chars that are not expected.
 		$signed_value = preg_replace( '/[^-0-9.]/', '', $value );
-		$abs_value    = abs( $signed_value );
-		$value        = strpos( $signed_value, '-' ) === 0 ? '-' . $abs_value : $abs_value;
+
+		// If there's no number on the signed value we return zero.
+		// We have to do that because since PHP 8.0, the abs() function is allowed an argument with int|float type.
+		if ( ! is_numeric( $signed_value ) ) {
+			return 0;
+		}
+
+		$abs_value = abs( $signed_value );
+		$value     = strpos( $signed_value, '-' ) === 0 ? '-' . $abs_value : $abs_value;
 
 		return $value;
 	}

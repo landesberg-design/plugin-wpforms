@@ -1,4 +1,4 @@
-/* global wpforms_admin, wpforms_forms_locator, wpforms_admin_forms_overview, Choices */
+/* global wpforms_admin, wpforms_forms_locator, wpforms_admin_forms_overview, Choices, wpf */
 /**
  * WPForms Forms Overview.
  *
@@ -571,6 +571,9 @@ WPFormsForms.Overview = WPFormsForms.Overview || ( function( document, window, $
 			// when Tags Filter has many selected tags which overflow the Choices.js control.
 			config.callbackOnInit = function() {
 				$select.closest( '.choices__inner' ).append( '<div class="choices__arrow"></div>' );
+
+				wpf.initMultipleSelectWithSearch( this );
+				wpf.showMoreButtonForChoices( this.containerOuter.element );
 			};
 
 			// Init or get Choices.js object instance.
@@ -623,19 +626,6 @@ WPFormsForms.Overview = WPFormsForms.Overview || ( function( document, window, $
 
 			el.$tagsFilterSelect.each( function() {
 				app.initChoicesJS( $( this ) );
-			} );
-
-			el.$tagsFilterSelect.on( 'change', function() {
-
-				var $choicesObj = el.$tagsFilterSelect.data( 'choicesjs' ),
-					$inputText = el.$tagsFilterSelect.siblings( 'input[type="text"]' );
-
-				// Hide placeholder if the Tags Filter is not empty and vice versa.
-				if ( $choicesObj.getValue( true ).length > 0 ) {
-					$inputText.attr( 'placeholder', '' );
-				} else {
-					$inputText.attr( 'placeholder', wpforms_admin_forms_overview.strings.all_tags );
-				}
 			} );
 		},
 

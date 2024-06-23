@@ -62,6 +62,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 
 		// Define additional field properties.
 		add_filter( "wpforms_field_properties_{$this->type}", [ $this, 'field_properties' ], 5, 3 );
+		add_filter( 'wpforms_field_display_sublabel_skip_for', [ $this, 'skip_sublabel_for_attribute' ], 10, 3 );
 	}
 
 	/**
@@ -84,7 +85,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 
 		// Define data.
 		$form_id        = absint( $form_data['id'] );
-		$field_id       = absint( $field['id'] );
+		$field_id       = wpforms_validate_field_id( $field['id'] );
 		$field_format   = ! empty( $field['format'] ) ? $field['format'] : 'date-time';
 		$field_required = ! empty( $field['required'] ) ? 'required' : '';
 		$field_size_cls = 'wpforms-field-' . ( ! empty( $field['size'] ) ? $field['size'] : 'medium' );
@@ -1077,49 +1078,27 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 	}
 
 	/**
-	 * Display field input sublabel if present.
+	 * Do not add the `for` attribute to certain sublabels.
 	 *
-	 * @since 1.8.8
+	 * @since 1.8.9
 	 *
-	 * @param string $key      Input key.
-	 * @param string $position Sublabel position.
-	 * @param array  $field    Field data and settings.
+	 * @param bool   $skip  Whether to skip the `for` attribute.
+	 * @param string $key   Input key.
+	 * @param array  $field Field data and settings.
+	 *
+	 * @return bool
 	 */
-	public function field_display_sublabel( $key, $position, $field ) {
+	public function skip_sublabel_for_attribute( $skip, $key, $field ) {
 
-		if ( $key !== 'date' || empty( $field['date_type'] ) || $field['date_type'] !== 'dropdown' ) {
-			parent::field_display_sublabel( $key, $position, $field );
-
-			return;
+		if ( $field['type'] !== $this->type ) {
+			return $skip;
 		}
 
-		if ( empty( $field['properties']['inputs'][ $key ]['sublabel']['value'] ) ) {
-			parent::field_display_sublabel( $key, $position, $field );
-
-			return;
+		if ( $key === 'date' && $field['date_type'] === 'dropdown' ) {
+			return true;
 		}
 
-		$field_position = ! empty( $field['properties']['inputs'][ $key ]['sublabel']['position'] ) ? $field['properties']['inputs'][ $key ]['sublabel']['position'] : 'after';
-
-		// Used to prevent from displaying sublabel twice.
-		if ( $field_position !== $position ) {
-			return;
-		}
-
-		$classes = [
-			'wpforms-field-sublabel',
-			$field_position,
-		];
-
-		if ( ! empty( $field['properties']['inputs'][ $key ]['sublabel']['hidden'] ) ) {
-			$classes[] = 'wpforms-sublabel-hide';
-		}
-
-		printf(
-			'<label class="%1$s">%2$s</label>',
-			wpforms_sanitize_classes( $classes, true ),
-			esc_html( $field['properties']['inputs'][ $key ]['sublabel']['value'] )
-		);
+		return $skip;
 	}
 
 	/**
@@ -1261,7 +1240,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 	 * @since 1.0.0
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value.
+	 * @param array $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -1414,7 +1393,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 					wpforms()->get( 'process' )->fields[ $field_id ] = [
 						'name'  => sanitize_text_field( $name ),
 						'value' => sanitize_text_field( $value ),
-						'id'    => absint( $field_id ),
+						'id'    => wpforms_validate_field_id( $field_id ),
 						'type'  => $this->type,
 						'date'  => '',
 						'time'  => '',
@@ -1463,7 +1442,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $value ),
-			'id'    => absint( $field_id ),
+			'id'    => wpforms_validate_field_id( $field_id ),
 			'type'  => $this->type,
 			'date'  => sanitize_text_field( $date ),
 			'time'  => sanitize_text_field( $time ),

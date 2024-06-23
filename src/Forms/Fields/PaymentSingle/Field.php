@@ -627,7 +627,7 @@ class Field extends \WPForms_Field {
 	 * @since 1.8.2
 	 *
 	 * @param int    $field_id     Field ID.
-	 * @param string $field_submit Field data submitted by a user.
+	 * @param string $field_submit Submitted field value (raw data).
 	 * @param array  $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {

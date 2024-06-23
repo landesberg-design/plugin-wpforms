@@ -460,7 +460,7 @@ class Field extends \WPForms_Field {
 	 * @since 1.8.2
 	 *
 	 * @param int    $field_id     Field ID.
-	 * @param string $field_submit Submitted field value (selected option).
+	 * @param string $field_submit Submitted field value (raw data).
 	 * @param array  $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -619,23 +619,27 @@ class Field extends \WPForms_Field {
 	}
 
 	/**
-	 * Get field name for ajax error message.
+	 * Get field name for an ajax error message.
 	 *
 	 * @since 1.8.2
 	 *
-	 * @param string $name  Field name for error triggered.
-	 * @param array  $field Field settings.
-	 * @param array  $props List of properties.
-	 * @param string $error Error message.
+	 * @param string|mixed $name Field name for error triggered.
+	 * @param array $field Field settings.
+	 * @param array $props List of properties.
+	 * @param string|string[] $error Error message.
 	 *
 	 * @return string
+	 * @noinspection PhpMissingReturnTypeInspection
+	 * @noinspection ReturnTypeCanBeDeclaredInspection
 	 */
 	public function ajax_error_field_name( $name, $field, $props, $error ) {
+
+		$name = (string) $name;
 
 		if ( ! isset( $field['type'] ) || $field['type'] !== $this->type ) {
 			return $name;
 		}
 
-		return isset( $props['input_container']['attr']['name'] ) ? $props['input_container']['attr']['name'] : '';
+		return $props['input_container']['attr']['name'] ?? '';
 	}
 }

@@ -222,7 +222,7 @@ class WPForms_Conditional_Logic_Core {
 
 					// Define more data for this field.
 					$fields_instance = $args['instance'];
-					$field_id        = absint( $field['id'] );
+					$field_id        = wpforms_validate_field_id( $field['id'] );
 					$field_name      = "fields[{$field_id}]";
 					$groups_id       = "wpforms-conditional-groups-fields-{$field_id}";
 					$action_selected = ! empty( $field['conditional_type'] ) ? $field['conditional_type'] : '';
@@ -447,12 +447,12 @@ class WPForms_Conditional_Logic_Core {
 															? $form_field['label']
 															: sprintf( /* translators: %d - field ID. */
 																__( 'Field #%d', 'wpforms' ),
-																absint( $form_field['id'] )
+																wpforms_validate_field_id( $form_field['id'] )
 															);
 
 														$selected = selected( $selected, $form_field['id'], false );
 
-														printf( '<option value="%s" %s>%s</option>', absint( $form_field['id'] ), esc_attr( $selected ), esc_html( $field_label ) );
+														printf( '<option value="%s" %s>%s</option>', wpforms_validate_field_id( $form_field['id'] ), esc_attr( $selected ), esc_html( $field_label ) );
 													}
 												}
 

@@ -158,6 +158,9 @@ class Themes {
 				src="<?php echo esc_url( $video ); ?>"
 				title="<?php esc_attr_e( 'Form Themes', 'wpforms-lite' ); ?>"
 				allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+				width="640"
+				height="360"
+				loading="lazy"
 				allowfullscreen></iframe>
 		</div>
 		<?php

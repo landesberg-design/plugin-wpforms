@@ -259,7 +259,7 @@ function wpforms_is_rest() {
 	}
 
 	$rest_url      = wp_parse_url( trailingslashit( rest_url() ) );
-	$wpforms_route = $rest_url['path'] . 'wpforms/';
+	$wpforms_route = $rest_url['path'] !== '/index.php' ? $rest_url['path'] . 'wpforms/' : '/wpforms/';
 
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$rest_route = isset( $_GET['rest_route'] ) ? sanitize_text_field( wp_unslash( $_GET['rest_route'] ) ) : '';

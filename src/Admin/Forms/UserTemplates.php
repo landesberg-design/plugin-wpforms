@@ -391,6 +391,10 @@ class UserTemplates {
 	 */
 	public function process_before_form_data( $form_data ) {
 
+		if ( ! isset( $form_data['id'] ) ) {
+			return $form_data;
+		}
+
 		if ( wpforms_is_form_template( $form_data['id'] ) ) {
 			$form_data['payments'] = [];
 		}

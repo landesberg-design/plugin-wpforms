@@ -116,7 +116,7 @@ class WPForms_Entry_Meta_Handler extends WPForms_DB {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
+		$sql = "CREATE TABLE {$this->table_name} (
 			id bigint(20) NOT NULL AUTO_INCREMENT,
 			entry_id bigint(20) NOT NULL,
 			form_id bigint(20) NOT NULL,

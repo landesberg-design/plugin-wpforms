@@ -596,7 +596,7 @@ function wpforms_get_payment_items( $fields = [] ) {
  */
 function wpforms_payment_has_quantity( array $field, array $form_data ): bool {
 
-	if ( empty( $field ) ) {
+	if ( ! isset( $field['id'] ) ) {
 		return false;
 	}
 

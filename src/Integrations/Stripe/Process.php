@@ -819,7 +819,7 @@ class Process {
 
 		foreach ( $this->fields as $field ) {
 
-			if ( isset( $field['type'] ) && $this->api->get_config( 'field_slug' ) !== $field['type'] ) {
+			if ( empty( $field['type'] ) || $this->api->get_config( 'field_slug' ) !== $field['type'] ) {
 				continue;
 			}
 
@@ -1136,7 +1136,9 @@ class Process {
 			]
 		);
 
-		$submitted_amount = $this->amount * Helpers::get_decimals_amount();
+		// Round to the nearest whole number because $this->amount can contain a number close to,
+		// but slightly under it, due to how it is stored in the memory.
+		$submitted_amount = round( $this->amount * Helpers::get_decimals_amount() );
 
 		// Prevent form submission if a mismatch of the payment amount is detected.
 		if ( ! empty( $intent ) && (int) $submitted_amount !== (int) $intent->amount ) {

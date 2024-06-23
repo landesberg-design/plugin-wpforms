@@ -322,7 +322,7 @@ class WPForms_Field_Textarea extends WPForms_Field {
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => $name,
 			'value' => $value,
-			'id'    => absint( $field_id ),
+			'id'    => wpforms_validate_field_id( $field_id ),
 			'type'  => $this->type,
 		];
 	}
@@ -333,7 +333,7 @@ class WPForms_Field_Textarea extends WPForms_Field {
 	 * @since 1.6.2
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param mixed $field_submit Field value that was submitted.
+	 * @param mixed $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {

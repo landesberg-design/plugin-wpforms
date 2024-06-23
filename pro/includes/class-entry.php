@@ -890,7 +890,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		];
 
 		if ( empty( $args['advanced_search'] ) && is_numeric( $args['field_id'] ) ) {
-			$args['field_id']             = (int) $args['field_id'];
+			$args['field_id']             = wpforms_validate_field_id( $args['field_id'] );
 			$second_where['arg_field_id'] = "$fields_table.field_id = '{$args['field_id']}'";
 		}
 
@@ -1175,7 +1175,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$sql = "CREATE TABLE IF NOT EXISTS {$this->table_name} (
+		$sql = "CREATE TABLE {$this->table_name} (
 			entry_id bigint(20) NOT NULL AUTO_INCREMENT,
 			form_id bigint(20) NOT NULL,
 			post_id bigint(20) NOT NULL,

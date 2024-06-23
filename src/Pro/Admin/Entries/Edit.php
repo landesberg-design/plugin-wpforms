@@ -3,6 +3,9 @@
 namespace WPForms\Pro\Admin\Entries;
 
 use WPForms\Pro\Forms\Fields\Base\EntriesEdit;
+use WPForms\Pro\Forms\Fields\Layout\Helpers;
+use WPForms\Pro\Forms\Fields\Repeater\Helpers as RepeaterHelpers;
+use WPForms\Pro\Forms\Fields\Layout\Helpers as LayoutHelpers;
 
 /**
  * Single entry edit function.
@@ -225,6 +228,19 @@ class Edit {
 		// Get a list of unique field types used in a form.
 		$field_types = array_filter( wp_list_pluck( $this->form_data['fields'], 'type' ) );
 
+		// Add field types used in layout or repeater fields.
+		foreach ( $this->form_data['fields'] as $field ) {
+			if ( ! Helpers::is_layout_based_field( $field['type'] ) ) {
+				continue;
+			}
+
+			foreach ( $field['columns'] as $column ) {
+				foreach ( $column['fields'] as $field_data ) {
+					$field_types[] = $field_data['type'];
+				}
+			}
+		}
+
 		foreach ( $field_types as $field_type ) {
 			$obj = $this->get_entries_edit_field_object( $field_type );
 
@@ -446,10 +462,12 @@ class Edit {
 		 * Filter the form data before it's used in the entry edit page.
 		 *
 		 * @since 1.8.8
+		 * @since 1.8.9 Added the `$entry` parameter.
 		 *
-		 * @param array $form_data Form data.
+		 * @param array  $form_data Form data.
+		 * @param object $entry     Entry object.
 		 */
-		$form_data = apply_filters( 'wpforms_pro_admin_entries_edit_form_data', wpforms_decode( $form->post_content ) );
+		$form_data = apply_filters( 'wpforms_pro_admin_entries_edit_form_data', wpforms_decode( $form->post_content ), $entry );
 
 		$form->form_entries_url = add_query_arg(
 			[
@@ -718,7 +736,78 @@ class Edit {
 		}
 
 		foreach ( $form_data['fields'] as $field_id => $field ) {
-			$this->display_edit_form_field( $field_id, $field, $entry_fields, $form_data, $hide_empty );
+			if ( $field['type'] === 'repeater' ) {
+				$this->display_repeater( $field, $form_data, $entry_fields, $hide_empty );
+			} elseif ( $field['type'] === 'layout' ) {
+				$this->display_layout( $field, $form_data, $entry_fields, $hide_empty );
+			} else {
+				$this->display_edit_form_field( $field_id, $field, $entry_fields, $form_data, $hide_empty );
+			}
+		}
+	}
+
+	/**
+	 * Display repeater field.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $field        Field settings.
+	 * @param array $form_data    Form data.
+	 * @param array $entry_fields Entry fields data.
+	 * @param bool  $hide_empty   Flag to hide empty fields.
+	 */
+	private function display_repeater( array $field, array $form_data, array $entry_fields, bool $hide_empty ) { // phpcs:ignore Generic.Metrics.NestingLevel.MaxExceeded, Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		$blocks = RepeaterHelpers::get_blocks( $field, $form_data );
+
+		if ( ! $blocks ) {
+			return '';
+		}
+
+		?>
+
+		<?php foreach ( $blocks as $key => $rows ) : ?>
+			<div class="wpforms-field-repeater-block">
+				<?php
+				$block_number = $key >= 1 ? ' #' . ( $key + 1 ) : '';
+				?>
+
+				<p class="wpforms-entry-field-name">
+					<?php echo esc_html( $field['label'] . $block_number ); ?>
+				</p>
+
+				<?php foreach ( $rows as $row_data ) : ?>
+					<?php foreach ( $row_data as $data ) : ?>
+						<?php if ( $data['field'] ) : ?>
+							<?php $this->display_edit_form_field( $data['field']['id'], $data['field'], $entry_fields, $form_data, $hide_empty ); ?>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				<?php endforeach; ?>
+			</div>
+		<?php endforeach; ?>
+		<?php
+	}
+
+	/**
+	 * Display layout field.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param array $field        Field settings.
+	 * @param array $form_data    Form data.
+	 * @param array $entry_fields Entry fields data.
+	 * @param bool  $hide_empty   Flag to hide empty fields.
+	 */
+	private function display_layout( array $field, array $form_data, array $entry_fields, bool $hide_empty ) {
+
+		$rows = isset( $field['columns'] ) && is_array( $field['columns'] ) ? LayoutHelpers::get_row_data( $field ) : [];
+
+		foreach ( $rows as $row_data ) {
+			foreach ( $row_data as $data ) {
+				if ( $data['field'] ) {
+					$this->display_edit_form_field( $data['field']['id'], $data['field'], $entry_fields, $form_data, $hide_empty );
+				}
+			}
 		}
 	}
 
@@ -915,13 +1004,15 @@ class Edit {
 	 *
 	 * @since 1.6.0
 	 *
-	 * @param array $entry Form submission raw data ($_POST).
+	 * @param array|mixed $entry Form submission raw data ($_POST).
 	 */
 	private function process( $entry ) {
 
+		$entry = (array) $entry;
+
 		// Setup variables.
 		$this->fields = [];
-		$this->entry  = wpforms()->get( 'entry' )->get( $this->entry_id );
+		$this->entry  = (object) wpforms()->get( 'entry' )->get( $this->entry_id );
 		$form_id      = $this->form_id;
 		$this->form   = wpforms()->get( 'form' )->get( $this->form_id, [ 'cap' => 'edit_entries_form_single' ] );
 
@@ -939,8 +1030,17 @@ class Edit {
 			return;
 		}
 
-		// Formatted form data for hooks.
-		$this->form_data = apply_filters( 'wpforms_pro_admin_entries_edit_process_before_form_data', wpforms_decode( $this->form->post_content ), $entry );
+		/**
+		 * Filter the form data before it's used in the entry edit process.
+		 *
+		 * @since 1.6.0
+		 * @since 1.8.9 Added the `$saved_entry` parameter.
+		 *
+		 * @param array  $form_data      Form data and settings.
+		 * @param object $submited_entry Submitted entry values.
+		 * @param object $saved_entry    Existing entry values.
+		 */
+		$this->form_data = apply_filters( 'wpforms_pro_admin_entries_edit_process_before_form_data', (array) wpforms_decode( $this->form->post_content ), $entry, $this->entry );
 
 		$this->form_data['created'] = $this->form->post_date;
 
@@ -1138,21 +1238,31 @@ class Edit {
 
 			// Add field data to DB if it doesn't exist and isn't empty.
 			if ( ! $dbdata_value_exist && $save_field['value'] !== '' ) {
-				$entry_fields_obj->add(
-					[
-						'entry_id' => $this->entry_id,
-						'form_id'  => (int) $this->form_data['id'],
-						'field_id' => (int) $field_id,
-						'value'    => $save_field['value'],
-						'date'     => $this->date_modified,
-					]
-				);
+				$data = [
+					'entry_id' => $this->entry_id,
+					'form_id'  => (int) $this->form_data['id'],
+					'field_id' => wpforms_validate_field_id( $field_id ),
+					'value'    => $save_field['value'],
+					'date'     => $this->date_modified,
+				];
+
+				/**
+				 * Filter entry field data before saving.
+				 *
+				 * @since 1.8.9
+				 *
+				 * @param array $data  Field data.
+				 * @param array $field Field data.
+				 */
+				$data = apply_filters( 'wpforms_pro_admin_entries_edit_save_field_data', $data, $field );
+
+				$entry_fields_obj->add( $data );
 			}
 
 			// Update field data in DB if it exists and isn't empty.
 			if ( $dbdata_value_exist && $save_field['value'] !== '' ) {
 				$entry_fields_obj->update(
-					(int) $dbdata_fields[ $field_id ]['id'],
+					wpforms_validate_field_id( $dbdata_fields[ $field_id ]['id'] ),
 					[
 						'value' => $save_field['value'],
 						'date'  => $this->date_modified,
@@ -1164,7 +1274,7 @@ class Edit {
 
 			// Delete field data in DB if it exists and the value is empty.
 			if ( $dbdata_value_exist && $save_field['value'] === '' ) {
-				$entry_fields_obj->delete( (int) $dbdata_fields[ $field_id ]['id'] );
+				$entry_fields_obj->delete( wpforms_validate_field_id( $dbdata_fields[ $field_id ]['id'] ) );
 			}
 
 			$updated_fields[ $field_id ] = $field;
@@ -1632,7 +1742,7 @@ class Edit {
 		}
 
 		wpforms()->get( 'entry_fields' )->update(
-			(int) $dbdata_field_id[0]['id'],
+			wpforms_validate_field_id( $dbdata_field_id[0]['id'] ),
 			[
 				'value' => '',
 				'date'  => $this->date_modified,

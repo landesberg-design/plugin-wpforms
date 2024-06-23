@@ -373,6 +373,32 @@ class Loader {
 		$this->classes[] = [
 			'name' => 'Forms\Fields\CustomCaptcha\Field',
 		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Layout\Field',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Layout\Process',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Repeater\Field',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Repeater\Process',
+			'id'   => 'repeater_process',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Repeater\Notifications',
+			'hook' => 'init',
+		];
 	}
 
 	/**
@@ -760,6 +786,7 @@ class Loader {
 			],
 			[
 				'name' => 'AntiSpam\SpamEntry',
+				'id'   => 'spam_entry',
 				'hook' => 'init',
 			]
 		);

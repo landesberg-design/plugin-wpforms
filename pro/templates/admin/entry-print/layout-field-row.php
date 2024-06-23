@@ -18,26 +18,24 @@ $rows          = isset( $field['columns'] ) && is_array( $field['columns'] ) ? H
 
 ?>
 <div class="print-item field wpforms-field-layout-rows">
-	<?php
-	foreach ( $rows as $row ) {
-		$preset_width = ! empty( $column['width_preset'] ) ? (int) $column['width_preset'] : 50;
-
-		if ( $preset_width === 33 ) {
-			$preset_width = 33.33333;
-		}
-
-		if ( $preset_width === 67 ) {
-			$preset_width = 66.66666;
-		}
-
-		$custom_width = ! empty( $column['width_custom'] ) ? (int) $column['width_custom'] : 50;
-		$width        = min( $preset_width, $custom_width );
-
-		?>
+	<?php foreach ( $rows as $row ) { ?>
 		<div class="wpforms-layout-row">
 			<?php
 			foreach ( $row as $column ) {
-				$field_html = '';
+				$field_html   = '';
+				$preset_width = ! empty( $column['width_preset'] ) ? (int) $column['width_preset'] : 50;
+
+				if ( $preset_width === 33 ) {
+					$preset_width = 33.33333;
+				}
+
+				if ( $preset_width === 67 ) {
+					$preset_width = 66.66666;
+				}
+
+				if ( ! empty( $column['width_custom'] ) ) {
+					$preset_width = (int) $column['width_custom'];
+				}
 
 				if ( ! empty( $column['field'] ) ) {
 					$field_html = wpforms_render(
@@ -51,8 +49,8 @@ $rows          = isset( $field['columns'] ) && is_array( $field['columns'] ) ? H
 					);
 				}
 				printf(
-					'<div class="print-item wpforms-field-layout-column" style="width: %1$s">%2$s</div>',
-					esc_attr( (float) $width . '%' ),
+					'<div class="wpforms-field-layout-column" style="width: %1$s">%2$s</div>',
+					esc_attr( (float) $preset_width . '%' ),
 					$field_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				);
 			}

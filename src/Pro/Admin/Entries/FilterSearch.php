@@ -61,6 +61,8 @@ trait FilterSearch {
 
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
+		$term = $this->prepare_term( $term );
+
 		$args = [
 			'select'        => 'entry_ids',
 			'form_id'       => $form_id,
@@ -96,6 +98,31 @@ trait FilterSearch {
 		$this->prepare_entry_ids_for_get_entries_args( $entries );
 
 		add_filter( 'wpforms_entry_handler_get_entries_args', [ $this, 'get_filtered_entry_table_args' ] );
+	}
+
+	/**
+	 * Prepare the term for the search.
+	 *
+	 * Allows replacing currency symbols with their html entities.
+	 * This is needed because some currency symbols are stored in the database as html entities.
+	 *
+	 * @since 1.8.9
+	 *
+	 * @param string $term Search term.
+	 *
+	 * @return string
+	 */
+	protected function prepare_term( string $term ): string {
+
+		$currencies_map = [];
+
+		$currencies = wpforms_get_currencies();
+
+		foreach ( $currencies as $currency ) {
+			$currencies_map[ html_entity_decode( $currency['symbol'] ) ] = $currency['symbol'];
+		}
+
+		return str_replace( array_keys( $currencies_map ), array_values( $currencies_map ), $term );
 	}
 
 	/**

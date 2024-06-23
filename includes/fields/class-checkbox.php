@@ -86,7 +86,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 
 		// Define data.
 		$form_id  = absint( $form_data['id'] );
-		$field_id = absint( $field['id'] );
+		$field_id = wpforms_validate_field_id( $field['id'] );
 		$choices  = $field['choices'];
 		$dynamic  = wpforms_get_field_dynamic_choices( $field, $form_id, $form_data );
 
@@ -474,7 +474,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 		);
 
 			foreach ( $choices as $key => $choice ) {
-				$label = $this->get_choices_label( $choice['label']['text'] ?? '', $key );
+				$label = $this->get_choices_label( $choice['label']['text'] ?? '', $key, $field );
 
 				if ( wpforms_is_amp() && ( $using_image_choices || $using_icon_choices ) ) {
 					$choice['container']['attr']['[class]'] = sprintf(
@@ -516,6 +516,9 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 								wp_json_encode( $choice['id'] )
 							);
 							$choice['label']['attr']['role'] = 'button';
+						}
+						if ( is_array( $choice['label']['class'] ) && wpforms_is_empty_string( $label ) ) {
+							$choice['label']['class'][] = 'wpforms-field-label-inline-empty';
 						}
 
 						// Image choices.
@@ -575,6 +578,8 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 							$choice['label']['attr']['role'] = 'button';
 						}
 
+						$choice['attr']['autocomplete'] = 'off';
+
 						// Icon Choices.
 						wpforms()->get( 'icon_choices' )->field_display( $field, $choice, 'checkbox' );
 
@@ -615,7 +620,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 	 * @since 1.5.2
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted field value (selected option).
+	 * @param array $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -677,7 +682,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 			'name'      => $name,
 			'value'     => '',
 			'value_raw' => $value_raw,
-			'id'        => absint( $field_id ),
+			'id'        => wpforms_validate_field_id( $field_id ),
 			'type'      => $this->type,
 		];
 
@@ -734,7 +739,9 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 
 				foreach ( $field_submit as $item ) {
 					foreach ( $field['choices'] as $key => $choice ) {
-						if ( $item === $choice['value'] || ( empty( $choice['value'] ) && (int) str_replace( 'Choice ', '', $item ) === $key ) ) {
+						// Check if the submitted value is the same as the choice value or if the value is empty and the key matches.
+						// Skip if the submitted value is empty.
+						if ( ( ! empty( $item ) && $item === $choice['value'] ) || ( empty( $choice['value'] ) && (int) str_replace( 'Choice ', '', $item ) === $key ) ) {
 							$value[]       = $choice['label'];
 							$choice_keys[] = $key;
 

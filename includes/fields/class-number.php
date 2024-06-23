@@ -145,7 +145,7 @@ class WPForms_Field_Number extends WPForms_Field {
 	 * @since 1.0.0
 	 *
 	 * @param int    $field_id     Field id.
-	 * @param string $field_submit Submitted value.
+	 * @param string $field_submit Submitted field value (raw data).
 	 * @param array  $form_data    Form data.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {
@@ -194,7 +194,7 @@ class WPForms_Field_Number extends WPForms_Field {
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => $this->sanitize_value( $field_submit ),
-			'id'    => absint( $field_id ),
+			'id'    => wpforms_validate_field_id( $field_id ),
 			'type'  => $this->type,
 		];
 	}

@@ -465,10 +465,21 @@ class WPForms_Rating_Text extends WPForms_Field {
 		$scale   = ! empty( $rating['scale'] ) ? absint( $rating['scale'] ) : 5;
 
 		// Apply our customizations to the SVG.
-		$svg = str_replace( 'width=""', 'width="' . absint( $rating['size'] ) . '"', $svg );
-		$svg = str_replace( 'height=""', 'height="' . absint( $rating['size'] ) . '"', $svg );
-		$svg = str_replace( 'style=""', 'style="height:' . absint( $rating['size'] ) . 'px;width:' . absint( $rating['size'] ) . 'px;"', $svg );
-		$svg = str_replace( 'fill=""', 'fill="currentColor" color="' . wpforms_sanitize_hex_color( $rating['color'] ) . '"', $svg );
+		$svg = str_replace(
+			[
+				'width=""',
+				'height=""',
+				'style=""',
+				'fill=""',
+			],
+			[
+				'width="' . absint( $rating['size'] ) . '"',
+				'height="' . absint( $rating['size'] ) . '"',
+				'style="height:' . absint( $rating['size'] ) . 'px;width:' . absint( $rating['size'] ) . 'px;"',
+				'fill="currentColor" color="' . wpforms_sanitize_hex_color( $rating['color'] ) . '"',
+			],
+			$svg
+		);
 
 		echo '<div class="wpforms-field-rating-items">';
 
@@ -476,25 +487,29 @@ class WPForms_Rating_Text extends WPForms_Field {
 		for ( $i = 1; $i <= $scale; $i++ ) {
 
 			printf(
-				'<label class="wpforms-field-rating-item choice-%d" for="wpforms-%d-field_%d_%d">',
-				$i,
+				'<label class="wpforms-field-rating-item choice-%1$d" for="wpforms-%2$d-field_%3$s_%1$d">',
+				(int) $i,
 				absint( $form_data['id'] ),
-				$field['id'],
-				$i
+				wpforms_validate_field_id( $field['id'] )
 			);
 
 				// Hidden label for screen readers.
 				echo '<span class="wpforms-screen-reader-element">';
+
+				printf(
 					/* translators: %1$s - rating value, %2$s - rating scale. */
-					printf( esc_html__( 'Rate %1$d out of %2$d', 'wpforms' ), $i, $scale );
+					esc_html__( 'Rate %1$d out of %2$d','wpforms' ),
+					(int) $i,
+					(int) $scale
+				);
 				echo '</span>';
 
 				// Primary field.
 				$primary['id'] = sprintf(
-					'wpforms-%d-field_%d_%d',
+					'wpforms-%1$d-field_%2$s_%3$d',
 					absint( $form_data['id'] ),
-					$field['id'],
-					$i
+					wpforms_validate_field_id( $field['id'] ),
+					(int) $i
 				);
 
 				$primary['attr']['value'] = $i;
@@ -508,11 +523,11 @@ class WPForms_Rating_Text extends WPForms_Field {
 				printf(
 					'<input type="radio" %s %s>',
 					wpforms_html_attributes( $primary['id'], $primary['class'], $primary['data'], $primary['attr'] ),
-					$primary['required']
+					esc_html( $primary['required'] )
 				);
 
 				// SVG image.
-				echo $svg;
+				echo $svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			echo '</label>';
 		}
@@ -558,7 +573,7 @@ class WPForms_Rating_Text extends WPForms_Field {
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $value ),
-			'id'    => absint( $field_id ),
+			'id'    => wpforms_validate_field_id( $field_id ),
 			'type'  => $this->type,
 			'scale' => sanitize_text_field( $scale ),
 			'icon'  => sanitize_text_field( $form_data['fields'][ $field_id ]['icon'] ),

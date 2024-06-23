@@ -418,6 +418,7 @@ class Field extends \WPForms_Field {
 						echo '</label>';
 
 					} elseif ( empty( $field['dynamic_choices'] ) && ! empty( $field['choices_icons'] ) ) {
+						$choice['attr']['autocomplete'] = 'off';
 
 						// Icon Choices.
 						wpforms()->get( 'icon_choices' )->field_display( $field, $choice, 'radio', $label );
@@ -451,7 +452,7 @@ class Field extends \WPForms_Field {
 	 * @since 1.8.2
 	 *
 	 * @param int   $field_id     Field ID.
-	 * @param array $field_submit Submitted form data.
+	 * @param array $field_submit Submitted field value (raw data).
 	 * @param array $form_data    Form data and settings.
 	 */
 	public function validate( $field_id, $field_submit, $form_data ) {

@@ -288,7 +288,7 @@ class WPForms_Process {
 			 * @since 1.4.0
 			 *
 			 * @param int   $field_id     Field ID.
-			 * @param mixed $field_submit Field submitted value.
+			 * @param mixed $field_submit Submitted field value (raw data).
 			 * @param array $form_data    Form data.
 			 */
 			do_action( "wpforms_process_validate_{$field_type}", $field_id, $field_submit, $this->form_data );
@@ -459,7 +459,6 @@ class WPForms_Process {
 		 * @param array $form_data Form data and settings.
 		 */
 		$this->fields = apply_filters( 'wpforms_process_filter', $this->fields, $entry, $this->form_data );
-
 		/**
 		 * Process form fields.
 		 *
@@ -481,17 +480,6 @@ class WPForms_Process {
 		 * @param array $form_data Form data and settings.
 		 */
 		do_action( "wpforms_process_{$form_id}", $this->fields, $entry, $this->form_data );
-
-		/**
-		 * Filter fields after processing.
-		 *
-		 * @since 1.4.0
-		 *
-		 * @param array $fields    Form fields.
-		 * @param array $entry     Form submission raw data ($_POST).
-		 * @param array $form_data Form data and settings.
-		 */
-		$this->fields = apply_filters( 'wpforms_process_after_filter', $this->fields, $entry, $this->form_data );
 
 		if ( ! $this->is_bypass_spam_check( $entry ) ) {
 			// Check if the form was submitted too quickly.
@@ -515,6 +503,17 @@ class WPForms_Process {
 		if ( ! $store_spam_entries && ! empty( $this->spam_errors ) ) {
 			$this->errors = $this->spam_errors;
 		}
+
+		/**
+		 * Filter fields after processing.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @param array $fields    Form fields.
+		 * @param array $entry     Form submission raw data ($_POST).
+		 * @param array $form_data Form data and settings.
+		 */
+		$this->fields = apply_filters( 'wpforms_process_after_filter', $this->fields, $entry, $this->form_data );
 
 		// One last error check - don't proceed if there are any errors.
 		if ( ! empty( $this->errors[ $form_id ] ) ) {
@@ -1395,7 +1394,8 @@ class WPForms_Process {
 				continue;
 			}
 
-			$email = [];
+			$email                 = [];
+			$is_carboncopy_enabled = wpforms_setting( 'email-carbon-copy', false );
 
 			// Setup email properties.
 			$email['subject']        = ! empty( $notification['subject'] ) ?
@@ -1404,13 +1404,18 @@ class WPForms_Process {
 					esc_html__( 'New %s Entry', 'wpforms-lite' ),
 					$form_data['settings']['form_title']
 				);
-			$email['address']        = explode( ',', wpforms_process_smart_tags( $notification['email'], $form_data, $fields, $this->entry_id ) );
-			$email['address']        = array_map( 'sanitize_email', $email['address'] );
+			$email['address']        = explode( ',', wpforms_process_smart_tags( $notification['email'], $form_data, $fields, $this->entry_id, 'notification-send-to-email' ) );
+			$email['address']        = array_filter( array_map( 'sanitize_email', $email['address'] ) );
 			$email['sender_address'] = ! empty( $notification['sender_address'] ) ? $notification['sender_address'] : get_option( 'admin_email' );
 			$email['sender_name']    = ! empty( $notification['sender_name'] ) ? $notification['sender_name'] : get_bloginfo( 'name' );
 			$email['replyto']        = ! empty( $notification['replyto'] ) ? $notification['replyto'] : false;
 			$email['message']        = ! empty( $notification['message'] ) ? $notification['message'] : '{all_fields}';
 			$email['template']       = ! empty( $notification['template'] ) ? $notification['template'] : '';
+
+			if ( $is_carboncopy_enabled && ! empty( $notification['carboncopy'] ) ) {
+				$email['carboncopy'] = explode( ',', wpforms_process_smart_tags( $notification['carboncopy'], $form_data, $fields, $this->entry_id, 'notification-carboncopy' ) );
+				$email['carboncopy'] = array_filter( array_map( 'sanitize_email', $email['carboncopy'] ) );
+			}
 
 			/**
 			 * Filter entry email notifications attributes.
@@ -1426,7 +1431,7 @@ class WPForms_Process {
 			$email = apply_filters( 'wpforms_entry_email_atts', $email, $fields, $entry, $form_data, $notification_id ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 			// Create new email.
-			$emails = ( new WPForms\Emails\Notifications() )->init( $email['template'] );
+			$emails = WPForms\Emails\Notifications::get_instance()->init( $email['template'] );
 
 			$emails->__set( 'form_data', $form_data );
 			$emails->__set( 'fields', $fields );
@@ -1435,10 +1440,12 @@ class WPForms_Process {
 			$emails->__set( 'from_name', $email['sender_name'] );
 			$emails->__set( 'from_address', $email['sender_address'] );
 			$emails->__set( 'reply_to', $email['replyto'] );
+			// Reset headers to support multiple notifications. They will be set on send.
+			$emails->__set( 'headers', null );
 
 			// Maybe include CC.
-			if ( ! empty( $notification['carboncopy'] ) && wpforms_setting( 'email-carbon-copy', false ) ) {
-				$emails->__set( 'cc', $notification['carboncopy'] );
+			if ( $is_carboncopy_enabled && ! empty( $email['carboncopy'] ) ) {
+				$emails->__set( 'cc', $email['carboncopy'] );
 			}
 
 			/**
@@ -1652,6 +1659,7 @@ class WPForms_Process {
 		foreach ( $field_errors as $key => $error ) {
 
 			$name = $this->ajax_error_field_name( $fields[ $key ], $form_data, $error );
+
 			if ( $name ) {
 				$field_errors[ $name ] = $error;
 			}
@@ -1677,21 +1685,31 @@ class WPForms_Process {
 	}
 
 	/**
-	 * Get field name for ajax error message.
+	 * Get field name for an ajax error message.
 	 *
 	 * @since 1.6.3
 	 *
-	 * @param array  $field     Field settings.
-	 * @param array  $form_data Form data and settings.
-	 * @param string $error     Error message.
+	 * @param array           $field     Field settings.
+	 * @param array           $form_data Form data and settings.
+	 * @param string|string[] $error     Error message.
 	 *
 	 * @return string
 	 */
-	private function ajax_error_field_name( $field, $form_data, $error ) {
+	private function ajax_error_field_name( array $field, array $form_data, $error ): string {
 
 		$props = wpforms()->get( 'frontend' )->get_field_properties( $field, $form_data );
 
-		return apply_filters( 'wpforms_process_ajax_error_field_name', '', $field, $props, $error );
+		/**
+		 * Filter the field name for an ajax error message.
+		 *
+		 * @since 1.6.3
+		 *
+		 * @param string          $name  Error field name.
+		 * @param array           $field Field.
+		 * @param array           $props Field properties.
+		 * @param string|string[] $error Error message.
+		 */
+		return (string) apply_filters( 'wpforms_process_ajax_error_field_name', '', $field, $props, $error );
 	}
 
 	/**

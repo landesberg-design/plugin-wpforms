@@ -477,18 +477,28 @@ class Challenge {
 			$can_start = false;
 		}
 
-		// Challenge is only available for WPForms admin pages.
+		// Challenge is only available on WPForms admin pages or Builder page.
 		if ( ! wpforms_is_admin_page() && ! wpforms_is_admin_page( 'builder' ) ) {
 			$can_start = false;
 
-			return $can_start;
+			// No need to check something else in this case.
+			return false;
 		}
 
+		// The challenge should not start if this is the Forms' Overview page.
+		if ( wpforms_is_admin_page( 'overview' ) ) {
+			$can_start = false;
+
+			// No need to check something else in this case.
+			return false;
+		}
+
+		// Force start the Challenge.
 		if ( $this->challenge_force_start() && ! $this->is_builder_page() && ! $this->is_form_embed_page() ) {
 			$can_start = true;
 
 			// No need to check something else in this case.
-			return $can_start;
+			return true;
 		}
 
 		if ( $this->challenge_finished() ) {
