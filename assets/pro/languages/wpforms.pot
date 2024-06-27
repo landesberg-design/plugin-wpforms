@@ -1,19 +1,20 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms 1.8.9.2\n"
+"Project-Id-Version: WPForms 1.8.9.4\n"
 "Report-Msgid-Bugs-To: https://wpforms.com/support/\n"
 "Last-Translator: WPForms <support@wpforms.com>\n"
 "Language-Team: WPForms <support@wpforms.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-18T09:08:41+00:00\n"
+"POT-Creation-Date: 2024-06-27T10:50:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.7.1\n"
+"X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: wpforms\n"
 
 #. Plugin Name of the plugin
 #. Author of the plugin
+#: wpforms.php
 #: src/Pro/Access/Integrations.php:103
 #: src/Pro/Access/Integrations.php:160
 #: src/Pro/Admin/DashboardWidget.php:235
@@ -23,10 +24,12 @@ msgstr ""
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
+#: wpforms.php
 msgid "https://wpforms.com"
 msgstr ""
 
 #. Description of the plugin
+#: wpforms.php
 msgid "Beginner friendly WordPress contact form plugin. Use our Drag & Drop form builder to create your WordPress forms."
 msgstr ""
 
@@ -170,10 +173,10 @@ msgstr ""
 
 #: pro/includes/admin/entries/class-entries-export.php:221
 #: pro/includes/fields/class-date-time.php:127
-#: pro/includes/fields/class-date-time.php:338
-#: pro/includes/fields/class-date-time.php:412
-#: pro/includes/fields/class-date-time.php:939
-#: pro/includes/fields/class-date-time.php:945
+#: pro/includes/fields/class-date-time.php:344
+#: pro/includes/fields/class-date-time.php:418
+#: pro/includes/fields/class-date-time.php:969
+#: pro/includes/fields/class-date-time.php:975
 #: src/Pro/Admin/Entries/Table/Facades/Columns.php:145
 msgid "Date"
 msgstr ""
@@ -769,8 +772,8 @@ msgstr ""
 #: pro/includes/fields/class-address.php:534
 #: pro/includes/fields/class-address.php:588
 #: pro/includes/fields/class-address.php:642
-#: pro/includes/fields/class-date-time.php:451
-#: pro/includes/fields/class-date-time.php:555
+#: pro/includes/fields/class-date-time.php:457
+#: pro/includes/fields/class-date-time.php:561
 msgid "Placeholder"
 msgstr ""
 
@@ -811,146 +814,154 @@ msgstr ""
 msgid "Date / Time"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:174
-#: pro/includes/fields/class-date-time.php:339
-#: pro/includes/fields/class-date-time.php:518
-#: pro/includes/fields/class-date-time.php:952
+#: pro/includes/fields/class-date-time.php:180
+#: pro/includes/fields/class-date-time.php:345
+#: pro/includes/fields/class-date-time.php:524
+#: pro/includes/fields/class-date-time.php:982
 msgid "Time"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:325
-#: pro/includes/fields/class-date-time.php:484
-#: pro/includes/fields/class-date-time.php:578
+#: pro/includes/fields/class-date-time.php:331
+#: pro/includes/fields/class-date-time.php:490
+#: pro/includes/fields/class-date-time.php:584
 #: pro/includes/fields/class-phone.php:201
 msgid "Format"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:326
+#: pro/includes/fields/class-date-time.php:332
 msgid "Select format for the date field."
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:337
+#: pro/includes/fields/class-date-time.php:343
 msgid "Date and Time"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:413
+#: pro/includes/fields/class-date-time.php:419
 msgid "Advanced date options."
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:427
+#: pro/includes/fields/class-date-time.php:433
 msgid "Date Picker"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:432
+#: pro/includes/fields/class-date-time.php:438
 msgid "Date Dropdown"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:438
+#: pro/includes/fields/class-date-time.php:444
 #: src/Pro/Admin/Entries/Export/Ajax.php:1207
 #: src/Pro/Admin/Entries/Export/Export.php:156
 #: src/Pro/Forms/Fields/CustomCaptcha/Field.php:196
 msgid "Type"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:503
+#: pro/includes/fields/class-date-time.php:509
 msgid "15 minutes"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:504
+#: pro/includes/fields/class-date-time.php:510
 msgid "30 minutes"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:505
+#: pro/includes/fields/class-date-time.php:511
 msgid "1 hour"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:519
+#: pro/includes/fields/class-date-time.php:525
 msgid "Advanced time options."
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:542
+#: pro/includes/fields/class-date-time.php:548
 msgid "Interval"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:628
+#: pro/includes/fields/class-date-time.php:634
 msgid "Limit Days"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:629
+#: pro/includes/fields/class-date-time.php:635
 msgid "Check this option to adjust which days of the week can be selected."
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:646
+#: pro/includes/fields/class-date-time.php:652
 msgid "Sun"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:647
+#: pro/includes/fields/class-date-time.php:653
 msgid "Mon"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:648
+#: pro/includes/fields/class-date-time.php:654
 msgid "Tue"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:649
+#: pro/includes/fields/class-date-time.php:655
 msgid "Wed"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:650
+#: pro/includes/fields/class-date-time.php:656
 msgid "Thu"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:651
+#: pro/includes/fields/class-date-time.php:657
 msgid "Fri"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:652
+#: pro/includes/fields/class-date-time.php:658
 msgid "Sat"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:712
+#: pro/includes/fields/class-date-time.php:718
 msgid "Disable Past Dates"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:713
+#: pro/includes/fields/class-date-time.php:719
 msgid "Check this option to prevent any previous date from being selected."
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:745
+#: pro/includes/fields/class-date-time.php:741
+msgid "Disable Today's Date"
+msgstr ""
+
+#: pro/includes/fields/class-date-time.php:742
+msgid "Check this option to prevent today's date from being selected."
+msgstr ""
+
+#: pro/includes/fields/class-date-time.php:775
 #: pro/wpforms-pro.php:500
 msgid "Limit Hours"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:746
+#: pro/includes/fields/class-date-time.php:776
 msgid "Check this option to adjust the range of times that can be selected."
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:824
+#: pro/includes/fields/class-date-time.php:854
 msgid "Start Time"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:824
+#: pro/includes/fields/class-date-time.php:854
 msgid "End Time"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:1020
-#: pro/includes/fields/class-date-time.php:1062
+#: pro/includes/fields/class-date-time.php:1050
+#: pro/includes/fields/class-date-time.php:1092
 msgid "Clear Date"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:1153
+#: pro/includes/fields/class-date-time.php:1183
 msgid "MM"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:1154
+#: pro/includes/fields/class-date-time.php:1184
 msgid "DD"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:1155
+#: pro/includes/fields/class-date-time.php:1185
 msgid "YYYY"
 msgstr ""
 
-#: pro/includes/fields/class-date-time.php:1347
+#: pro/includes/fields/class-date-time.php:1377
 #: pro/wpforms-pro.php:502
 #: pro/wpforms-pro.php:1362
 msgid "Please enter time between {minTime} and {maxTime}."

@@ -28,29 +28,35 @@ class Notifications {
 	 */
 	private function hooks() {
 
-		add_filter( 'wpforms_emails_notifications_field_message_plain', [ $this, 'get_repeater_field_plain' ], 10, 5 );
-		add_filter( 'wpforms_emails_notifications_field_message_html', [ $this, 'get_repeater_field_html' ], 10, 6 );
+		add_filter( 'wpforms_emails_notifications_field_message_plain', [ $this, 'get_repeater_field_plain' ], 10, 6 );
+		add_filter( 'wpforms_emails_notifications_field_message_html', [ $this, 'get_repeater_field_html' ], 10, 7 );
 	}
 
 	/**
 	 * Get the repeater field HTML markup.
 	 *
 	 * @since 1.8.9
+	 * @since 1.8.9.3 The $notifications parameter was added.
 	 *
-	 * @param string|mixed $message           Field message.
-	 * @param array        $field             Field data.
-	 * @param bool         $show_empty_fields Whether to display empty fields in the email.
-	 * @param array        $other_fields      List of field types.
-	 * @param array        $form_data         Form data.
-	 * @param array        $fields            List of submitted fields.
+	 * @param string|mixed       $message           Field message.
+	 * @param array              $field             Field data.
+	 * @param bool               $show_empty_fields Whether to display empty fields in the email.
+	 * @param array              $other_fields      List of field types.
+	 * @param array              $form_data         Form data.
+	 * @param array              $fields            List of submitted fields.
+	 * @param EmailNotifications $notifications     Notifications instance.
 	 *
 	 * @return string
 	 */
-	public function get_repeater_field_html( $message, array $field, bool $show_empty_fields, array $other_fields, array $form_data, array $fields ): string { // phpcs:ignore Generic.Metrics.NestingLevel.MaxExceeded, Generic.Metrics.CyclomaticComplexity.TooHigh
+	public function get_repeater_field_html( $message, array $field, bool $show_empty_fields, array $other_fields, array $form_data, array $fields, $notifications ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity, Generic.Metrics.NestingLevel.MaxExceeded
 
 		$message = (string) $message;
 
 		if ( isset( $field['type'] ) && $field['type'] !== 'repeater' ) {
+			return $message;
+		}
+
+		if ( ! $notifications ) {
 			return $message;
 		}
 
@@ -59,8 +65,6 @@ class Notifications {
 		if ( ! $blocks ) {
 			return $message;
 		}
-
-		$notifications = EmailNotifications::get_instance();
 
 		$repeater_message = '';
 
@@ -96,20 +100,26 @@ class Notifications {
 	 * Get the repeater field plain text markup.
 	 *
 	 * @since 1.8.9
+	 * @since 1.8.9.3 The $notifications parameter was added.
 	 *
-	 * @param string|mixed $message           Field message.
-	 * @param array        $field             Field data.
-	 * @param bool         $show_empty_fields Whether to display empty fields in the email.
-	 * @param array        $form_data         Form data.
-	 * @param array        $fields            List of submitted fields.
+	 * @param string|mixed       $message           Field message.
+	 * @param array              $field             Field data.
+	 * @param bool               $show_empty_fields Whether to display empty fields in the email.
+	 * @param array              $form_data         Form data.
+	 * @param array              $fields            List of submitted fields.
+	 * @param EmailNotifications $notifications     Notifications instance.
 	 *
 	 * @return string
 	 */
-	public function get_repeater_field_plain( $message, array $field, bool $show_empty_fields, array $form_data, array $fields ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity, Generic.Metrics.NestingLevel.MaxExceeded
+	public function get_repeater_field_plain( $message, array $field, bool $show_empty_fields, array $form_data, array $fields, $notifications ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity, Generic.Metrics.NestingLevel.MaxExceeded
 
 		$message = (string) $message;
 
 		if ( isset( $field['type'] ) && $field['type'] !== 'repeater' ) {
+			return $message;
+		}
+
+		if ( ! $notifications ) {
 			return $message;
 		}
 
@@ -118,8 +128,6 @@ class Notifications {
 		if ( ! $blocks ) {
 			return $message;
 		}
-
-		$notifications = EmailNotifications::get_instance();
 
 		$repeater_message = '';
 

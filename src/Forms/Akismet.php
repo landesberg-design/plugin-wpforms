@@ -122,14 +122,15 @@ class Akismet {
 	 * Get field content.
 	 *
 	 * @since 1.8.5
+	 * @since 1.8.9.3 Changed $field_id type from string to int|string.
 	 *
-	 * @param array $field    Field data.
-	 * @param array $entry    Entry data.
-	 * @param int   $field_id Field ID.
+	 * @param array      $field    Field data.
+	 * @param array      $entry    Entry data.
+	 * @param int|string $field_id Field ID.
 	 *
 	 * @return string
 	 */
-	private function get_field_content( array $field, array $entry, int $field_id ): string {
+	private function get_field_content( array $field, array $entry, $field_id ): string {
 
 		if ( ! isset( $entry['fields'][ $field_id ] ) ) {
 			return '';

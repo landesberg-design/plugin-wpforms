@@ -1431,7 +1431,7 @@ class WPForms_Process {
 			$email = apply_filters( 'wpforms_entry_email_atts', $email, $fields, $entry, $form_data, $notification_id ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 			// Create new email.
-			$emails = WPForms\Emails\Notifications::get_instance()->init( $email['template'] );
+			$emails = ( new WPForms\Emails\Notifications() )->init( $email['template'] );
 
 			$emails->__set( 'form_data', $form_data );
 			$emails->__set( 'fields', $fields );
@@ -1440,8 +1440,6 @@ class WPForms_Process {
 			$emails->__set( 'from_name', $email['sender_name'] );
 			$emails->__set( 'from_address', $email['sender_address'] );
 			$emails->__set( 'reply_to', $email['replyto'] );
-			// Reset headers to support multiple notifications. They will be set on send.
-			$emails->__set( 'headers', null );
 
 			// Maybe include CC.
 			if ( $is_carboncopy_enabled && ! empty( $email['carboncopy'] ) ) {

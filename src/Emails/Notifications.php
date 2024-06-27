@@ -457,14 +457,16 @@ class Notifications extends Mailer {
 			 * Filter the field message before it is added to the email message.
 			 *
 			 * @since 1.8.9
+			 * @since 1.8.9.3 The $notifications parameter was added.
 			 *
-			 * @param string $field_message     Field message.
-			 * @param array  $field             Field data.
-			 * @param bool   $show_empty_fields Whether to display empty fields in the email.
-			 * @param array  $form_data         Form data.
-			 * @param array  $fields            List of submitted fields.
+			 * @param string        $field_message     Field message.
+			 * @param array         $field             Field data.
+			 * @param bool          $show_empty_fields Whether to display empty fields in the email.
+			 * @param array         $form_data         Form data.
+			 * @param array         $fields            List of submitted fields.
+			 * @param Notifications $notifications     Notifications instance.
 			 */
-			$message .= apply_filters( 'wpforms_emails_notifications_field_message_plain', $field_message, $field, $show_empty_fields, $this->form_data, $this->fields );
+			$message .= apply_filters( 'wpforms_emails_notifications_field_message_plain', $field_message, $field, $show_empty_fields, $this->form_data, $this->fields, $this );
 		}
 
 		// Trim the message and return.
@@ -594,15 +596,17 @@ class Notifications extends Mailer {
 			 * Filter the field message before it is added to the email message.
 			 *
 			 * @since 1.8.9
+			 * @since 1.8.9.3 The $notifications parameter was added.
 			 *
-			 * @param string $field_message     Field message.
-			 * @param array  $field             Field data.
-			 * @param bool   $show_empty_fields Whether to display empty fields in the email.
-			 * @param array  $other_fields      List of field types.
-			 * @param array  $form_data         Form data.
-			 * @param array  $fields            List of submitted fields.
+			 * @param string        $field_message     Field message.
+			 * @param array         $field             Field data.
+			 * @param bool          $show_empty_fields Whether to display empty fields in the email.
+			 * @param array         $other_fields      List of field types.
+			 * @param array         $form_data         Form data.
+			 * @param array         $fields            List of submitted fields.
+			 * @param Notifications $notifications     Notifications instance.
 			 */
-			$message .= apply_filters( 'wpforms_emails_notifications_field_message_html', $field_message, $field, $show_empty_fields, $other_fields, $this->form_data, $this->fields );
+			$message .= apply_filters( 'wpforms_emails_notifications_field_message_html', $field_message, $field, $show_empty_fields, $other_fields, $this->form_data, $this->fields, $this );
 		}
 
 		return $message;

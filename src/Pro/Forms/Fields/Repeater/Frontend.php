@@ -358,6 +358,30 @@ class Frontend {
 	}
 
 	/**
+	 * Get the Add icon SVG code.
+	 *
+	 * @since 1.8.9.4
+	 *
+	 * @return string
+	 */
+	private function get_add_icon_svg(): string {
+
+		return '<svg width="16" height="17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.129 7.984v1.032a.392.392 0 0 1-.387.387H8.903v2.839a.392.392 0 0 1-.387.387H7.484a.373.373 0 0 1-.387-.387V9.403H4.258a.373.373 0 0 1-.387-.387V7.984c0-.194.161-.387.387-.387h2.839V4.758c0-.193.161-.387.387-.387h1.032c.194 0 .387.194.387.387v2.839h2.839c.193 0 .387.193.387.387ZM16 8.5c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8 8 3.58 8 8Zm-1.548 0c0-3.548-2.904-6.452-6.452-6.452A6.45 6.45 0 0 0 1.548 8.5 6.43 6.43 0 0 0 8 14.952 6.45 6.45 0 0 0 14.452 8.5Z" fill="currentColor"/></svg>';
+	}
+
+	/**
+	 * Get the Remove icon SVG code.
+	 *
+	 * @since 1.8.9.4
+	 *
+	 * @return string
+	 */
+	private function get_remove_icon_svg(): string {
+
+		return '<svg width="16" height="17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.258 9.403a.373.373 0 0 1-.387-.387V7.984c0-.194.161-.387.387-.387h7.484c.193 0 .387.193.387.387v1.032a.392.392 0 0 1-.387.387H4.258ZM16 8.5c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8 8 3.58 8 8Zm-1.548 0c0-3.548-2.904-6.452-6.452-6.452A6.45 6.45 0 0 0 1.548 8.5 6.43 6.43 0 0 0 8 14.952 6.45 6.45 0 0 0 14.452 8.5Z" fill="currentColor"/></svg>';
+	}
+
+	/**
 	 * Get the row buttons.
 	 *
 	 * @since 1.8.9
@@ -370,11 +394,17 @@ class Frontend {
 
 		return sprintf(
 			'<div class="wpforms-field-repeater-display-rows-buttons">
-				<button type="button" class="dashicons dashicons-insert wpforms-field-repeater-button-add" title="%1$s"></button>
-				<button type="button" class="dashicons dashicons-remove wpforms-field-repeater-button-remove wpforms-disabled" title="%2$s"></button>
+				<button type="button" class="wpforms-field-repeater-button-add" title="%1$s">
+					%2$s
+				</button>
+				<button type="button" class="wpforms-field-repeater-button-remove wpforms-disabled" title="%3$s">
+					%4$s
+				</button>
 			</div>',
 			esc_attr( $field['button_add_label'] ?? $this->field_obj->defaults['button_add_label'] ),
-			esc_attr( $field['button_remove_label'] ?? $this->field_obj->defaults['button_remove_label'] )
+			$this->get_add_icon_svg(),
+			esc_attr( $field['button_remove_label'] ?? $this->field_obj->defaults['button_remove_label'] ),
+			$this->get_remove_icon_svg()
 		);
 	}
 
@@ -392,14 +422,16 @@ class Frontend {
 		return sprintf(
 			'<div class="wpforms-field-repeater-display-blocks-buttons" data-button-type="%1$s">
 				<button type="button" class="wpforms-field-repeater-button-add">
-					<i class="dashicons dashicons-insert"></i><span>%2$s</span>
+					%2$s<span>%3$s</span>
 				</button>
 				<button type="button" class="wpforms-field-repeater-button-remove wpforms-disabled">
-					<i class="dashicons dashicons-remove"></i><span>%3$s</span>
+					%4$s<span>%5$s</span>
 				</button>
 			</div>',
 			esc_attr( $field['button_type'] ?? $this->field_obj->defaults['button_type'] ),
+			$this->get_add_icon_svg(),
 			esc_html( $field['button_add_label'] ?? $this->field_obj->defaults['button_add_label'] ),
+			$this->get_remove_icon_svg(),
 			esc_html( $field['button_remove_label'] ?? $this->field_obj->defaults['button_remove_label'] )
 		);
 	}

@@ -950,6 +950,11 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 
 				if ( $input.data( 'disable-past-dates' ) === 1 ) {
 					properties.minDate = 'today';
+
+					if ( $input.data( 'disable-todays-date' ) === 1 ) {
+						const date = new Date();
+						properties.minDate = date.setDate( date.getDate() + 1 );
+					}
 				}
 
 				let limitDays = $input.data( 'limit-days' );

@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.9.4] - 2024-06-27
+### Added
+- Conditional option to exclude today's date from the date picker.
+- New filter wpforms_sanitize_amount_before to filter a raw price amount before sanitization.
+- New filter wpforms_sanitize_amount to filter a sanitized price amount.
+
+### Fixed
+- The Repeater field Add/Remove buttons were invisible in some themes.
+- The Fields hidden via Conditional Logic left empty div's when inside a Layout field.
+
+## [1.8.9.3] - 2024-06-24
+### Fixed
+- Fatal error was thrown when submitting a form with Akismet anti-spam protection containing a Repeater field.
+- When having more than one Notifications per form, the CC field wasn't working correctly.
+
 ## [1.8.9.2] - 2024-06-18
 ### Fixed
 - Reply-to field was not returning the correct email address.
@@ -8,6 +23,7 @@ All notable changes to this project will be documented in this file and formatte
 ## [1.8.9.1] - 2024-06-13
 ### Fixed
 - Fatal error was thrown if the Email > Carbon Copy option was enabled and CC field in Notifications contained multiple email addresses.
+- If the form had multiple notifications configured, first CC (carbon copy) value was applied to all notifications.
 
 ## [1.8.9] - 2024-06-11
 ### Added
@@ -130,7 +146,7 @@ All notable changes to this project will be documented in this file and formatte
 - The Paragraph field was allowed horizontal resizing.
 - Make sure we output valid robots.txt file rules if the file is empty.
 - PHP notices were thrown in some cases when Stripe subscription renewals were created.
-- Customer email was shown instead of customer name on the Payments Overview screen for Stipe subscription renewals in some cases.
+- Customer email was shown instead of customer name on the Payments Overview screen for Stripe subscription renewals in some cases.
 - Forms having many fields with conditional logic loaded slowly on the frontend.
 - The builder sidebar was hidden on the context menu edit actions.
 - File Upload field keyboard issue on some mobile devices.

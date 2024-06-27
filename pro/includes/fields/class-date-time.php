@@ -151,8 +151,14 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			}
 			$default_date['data']['limit-days'] = implode( ',', $limit_days );
 		}
+
 		if ( $limits_available && $date_type === 'datepicker' ) {
-			$default_date['data']['disable-past-dates'] = ! empty( $field['date_disable_past_dates'] ) ? '1' : '0';
+			$limit_past_days                            = ! empty( $field['date_disable_past_dates'] ) ? '1' : '0';
+			$default_date['data']['disable-past-dates'] = $limit_past_days;
+
+			if ( $limit_past_days ) {
+				$default_date['data']['disable-todays-date'] = ! empty( $field['date_disable_todays_date'] ) ? '1' : '0';
+			}
 		}
 
 		$default_time = [
@@ -714,6 +720,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			],
 			false
 		);
+
 		$this->field_element(
 			'row',
 			$field,
@@ -722,6 +729,29 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				'content' => $output,
 			],
 			true
+		);
+
+		// Disable Today's Date.
+		$output = $this->field_element(
+			'toggle',
+			$field,
+			[
+				'slug'    => 'date_disable_todays_date',
+				'value'   => ! empty( $field['date_disable_todays_date'] ) ? '1' : '0',
+				'desc'    => esc_html__( 'Disable Today\'s Date', 'wpforms' ),
+				'tooltip' => esc_html__( 'Check this option to prevent today\'s date from being selected.', 'wpforms' ),
+			],
+			false
+		);
+
+		$this->field_element(
+			'row',
+			$field,
+			[
+				'slug'    => 'date_disable_todays_date',
+				'content' => $output,
+				'class'   => ! isset( $field['date_disable_past_dates'] ) ? 'wpforms-hide' : '',
+			]
 		);
 	}
 

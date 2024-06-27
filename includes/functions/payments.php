@@ -236,10 +236,26 @@ function wpforms_sanitize_amount( $amount, $currency = '' ) { // phpcs:ignore Ge
 	if ( empty( $currency ) ) {
 		$currency = wpforms_get_currency();
 	}
+
+	$raw_amount    = $amount;
 	$currency      = strtoupper( $currency );
 	$currencies    = wpforms_get_currencies();
-	$thousands_sep = isset( $currencies[ $currency ]['thousands_separator'] ) ? $currencies[ $currency ]['thousands_separator'] : ',';
-	$decimal_sep   = isset( $currencies[ $currency ]['decimal_separator'] ) ? $currencies[ $currency ]['decimal_separator'] : '.';
+	$thousands_sep = $currencies[ $currency ]['thousands_separator'] ?? ',';
+	$decimal_sep   = $currencies[ $currency ]['decimal_separator'] ?? '.';
+
+	/**
+	 * Filter the raw price amount before sanitization.
+	 *
+	 * @since 1.8.9.4
+	 *
+	 * @param string $amount        Raw price amount.
+	 * @param string $currency      Currency ISO code (USD, EUR, etc).
+	 * @param string $thousands_sep Thousands separator.
+	 * @param string $decimal_sep   Decimal separator.
+	 *
+	 * @return string
+	 */
+	$amount = (string) apply_filters( 'wpforms_sanitize_amount_before', $amount, $currency, $thousands_sep, $decimal_sep );
 
 	// Sanitize the amount.
 	if ( $decimal_sep === ',' && strpos( $amount, $decimal_sep ) !== false ) {
@@ -261,23 +277,41 @@ function wpforms_sanitize_amount( $amount, $currency = '' ) { // phpcs:ignore Ge
 	 * . is decimal point.
 	 * - is minus sign.
 	 */
-	$amount = (string) preg_replace( '/[^E0-9.-]/', '', $amount );
+	$sanitized_amount = (string) preg_replace( '/[^E0-9.-]/', '', $amount );
 
 	/**
 	 * Set correct currency decimals.
 	 *
 	 * @since 1.6.6
 	 *
-	 * @param int     $decimals Default number of decimals.
-	 * @param string  $amount   Price amount.
+	 * @param int     $decimals         Default number of decimals.
+	 * @param string  $sanitized_amount Price amount.
 	 */
 	$decimals = (int) apply_filters(
 		'wpforms_sanitize_amount_decimals',
 		wpforms_get_currency_decimals( $currency ),
-		$amount
+		$sanitized_amount
 	);
 
-	return number_format( (float) $amount, $decimals, '.', '' );
+	/**
+	 * Filter the sanitized amount.
+	 *
+	 * @since 1.8.9.4
+	 *
+	 * @param string $sanitized_amount Sanitized price amount.
+	 * @param string $raw_amount       Raw price amount.
+	 * @param string $currency         Currency ISO code (USD, EUR, etc).
+	 * @param int    $decimals         Number of decimals.
+	 *
+	 * @return string
+	 */
+	return (string) apply_filters(
+		'wpforms_sanitize_amount',
+		number_format( (float) $sanitized_amount, $decimals, '.', '' ),
+		$raw_amount,
+		$currency,
+		$decimals
+	);
 }
 
 /**

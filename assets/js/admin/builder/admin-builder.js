@@ -1537,6 +1537,19 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		},
 
 		/**
+		 * Update disabling today's date controls by changing checkbox.
+		 *
+		 * @since 1.8.9.4
+		 *
+		 * @param {number}  id      Field id.
+		 * @param {boolean} checked Whether an option is checked or not.
+		 */
+		updateDisableTodaysDateControls( id, checked ) {
+			$( `#wpforms-field-option-row-${ id }-date_disable_todays_date` )
+				.toggleClass( 'wpforms-hide', ! checked );
+		},
+
+		/**
 		 * Update Password Strength controls by changing checkbox.
 		 *
 		 * @since 1.6.7
@@ -2893,6 +2906,14 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				'.wpforms-field-option-row-limit_enabled input',
 				function( event ) {
 					app.updateTextFieldsLimitControls( $( event.target ).closest( '.wpforms-field-option-row-limit_enabled' ).data().fieldId, event.target.checked );
+				}
+			);
+
+			$builder.on(
+				'change',
+				'.wpforms-field-option-row-date_disable_past_dates input',
+				function( event ) {
+					app.updateDisableTodaysDateControls( $( event.target ).closest( '.wpforms-field-option-row-date_disable_past_dates' ).data().fieldId, event.target?.checked );
 				}
 			);
 
