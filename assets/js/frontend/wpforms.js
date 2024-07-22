@@ -2015,6 +2015,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 			$destinationPage.show();
 
 			app.toggleReCaptchaAndSubmitDisplay( $form, action, $destinationPage );
+			app.checkTurnstileVisibility( $form );
 
 			const pageScroll = app.getPageScroll( $form );
 			if ( pageScroll ) {
@@ -2046,6 +2047,28 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 				$reCAPTCHA.hide();
 				$submit.hide();
 			}
+		},
+
+		/**
+		 * Update Turnstile container class if invisible mode is chosen.
+		 *
+		 * @since 1.8.9.6
+		 *
+		 * @param {jQuery} $form WPForms element object.
+		 */
+		checkTurnstileVisibility( $form ) {
+			const $turnstile = $form.find( '.wpforms-recaptcha-container' );
+
+			// Check if Turnstile captcha is enabled.
+			if ( ! $turnstile.hasClass( 'wpforms-is-turnstile' ) ) {
+				return;
+			}
+
+			const iframeWrapperHeight = $turnstile.find( '.g-recaptcha' ).height();
+
+			parseInt( iframeWrapperHeight, 10 ) === 0
+				? $turnstile.addClass( 'wpforms-is-turnstile-invisible' )
+				: $turnstile.removeClass( 'wpforms-is-turnstile-invisible' );
 		},
 
 		/**

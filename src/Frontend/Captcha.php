@@ -431,10 +431,11 @@ class Captcha {
 		// Update container class after changing Turnstile type.
 		$turnstile_update_class = /** @lang JavaScript */
 			'var turnstileUpdateContainer = function (el) {
-				let form = el.closest( "form" ),
-				iframeHeight = el.getElementsByTagName("iframe")[0].style.height;
 
-				parseInt(iframeHeight) === 0 ?
+				let form = el.closest( "form" ),
+				iframeWrapperHeight = el.offsetHeight;
+
+				parseInt(iframeWrapperHeight) === 0 ?
 					form.querySelector(".wpforms-is-turnstile").classList.add( "wpforms-is-turnstile-invisible" ) :
 					form.querySelector(".wpforms-is-turnstile").classList.remove( "wpforms-is-turnstile-invisible" );
 			};

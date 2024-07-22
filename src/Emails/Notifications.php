@@ -495,6 +495,10 @@ class Notifications extends Mailer {
 			return $message;
 		}
 
+		if ( $this->is_calculated_field_hidden( $field_id ) ) {
+			return $message;
+		}
+
 		$field_name = $field['name'] ?? '';
 		$field_val  = empty( $field['value'] ) && ! is_numeric( $field['value'] ) ? esc_html__( '(empty)', 'wpforms-lite' ) : $field['value'];
 
@@ -643,6 +647,10 @@ class Notifications extends Mailer {
 				return '';
 			}
 
+			if ( $this->is_calculated_field_hidden( $field_id ) ) {
+				return '';
+			}
+
 			$field_name = $this->fields[ $field_id ]['name'] ?? '';
 			$field_val  = empty( $this->fields[ $field_id ]['value'] ) && ! is_numeric( $this->fields[ $field_id ]['value'] ) ? '<em>' . esc_html__( '(empty)', 'wpforms-lite' ) . '</em>' : $this->fields[ $field_id ]['value'];
 		}
@@ -679,6 +687,23 @@ class Notifications extends Mailer {
 			[ $field_type, $field_name, $field_val ],
 			$this->field_template
 		);
+	}
+
+	/**
+	 * Check if a calculated field is hidden.
+	 *
+	 * @since 1.8.9.5
+	 *
+	 * @param int $field_id Field ID.
+	 *
+	 * @return bool
+	 */
+	private function is_calculated_field_hidden( $field_id ): bool {
+
+		return ! empty( $this->form_data['fields'][ $field_id ]['calculation_is_enabled'] ) &&
+			! empty( $this->form_data['fields'][ $field_id ]['calculation_code_php'] ) &&
+			isset( $this->fields[ $field_id ]['visible'] )
+			&& ! $this->fields[ $field_id ]['visible'];
 	}
 
 	/**

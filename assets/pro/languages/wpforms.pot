@@ -1,20 +1,19 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms 1.8.9.4\n"
+"Project-Id-Version: WPForms 1.8.9.6\n"
 "Report-Msgid-Bugs-To: https://wpforms.com/support/\n"
 "Last-Translator: WPForms <support@wpforms.com>\n"
 "Language-Team: WPForms <support@wpforms.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-06-27T10:50:48+00:00\n"
+"POT-Creation-Date: 2024-07-09T13:42:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.10.0\n"
+"X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: wpforms\n"
 
 #. Plugin Name of the plugin
 #. Author of the plugin
-#: wpforms.php
 #: src/Pro/Access/Integrations.php:103
 #: src/Pro/Access/Integrations.php:160
 #: src/Pro/Admin/DashboardWidget.php:235
@@ -24,12 +23,10 @@ msgstr ""
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
-#: wpforms.php
 msgid "https://wpforms.com"
 msgstr ""
 
 #. Description of the plugin
-#: wpforms.php
 msgid "Beginner friendly WordPress contact form plugin. Use our Drag & Drop form builder to create your WordPress forms."
 msgstr ""
 

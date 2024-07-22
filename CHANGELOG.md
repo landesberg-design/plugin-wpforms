@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.8.9.6] - 2024-07-09
+### Changed
+- Improved compatibility with OceanWP theme.
+
+### Fixed
+- Dropdown and phone fields in forms with the `inline-fields` class had cropped dropdowns.
+- Button's hover color was wrong on the Ocean WP theme.
+- Form couldn't be submitted when Cloudflare Turnstile anti-spam integration was configured.
+
+## [1.8.9.5] - 2024-07-03
+### Fixed
+- Stripe payment wasn't created when the Credit Card field was optional and users paid through Google Pay / Apple Pay.
+- The previously selected time of the Date & Time field was not correctly reset when selecting a new value.
+- Fatal error was thrown on updating translations.
+- Fields hidden with Conditional Logic were attached to notification emails if they contained calculation logic.
+
 ## [1.8.9.4] - 2024-06-27
 ### Added
 - Conditional option to exclude today's date from the date picker.

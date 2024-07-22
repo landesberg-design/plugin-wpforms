@@ -644,7 +644,8 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 			const valid = $form.validate().form(),
 				formId = $form.data( 'formid' ),
 				ccRequired = $stripeRow.data( 'required' ),
-				cardFilled = ( ! $stripeRow.data( 'link-email' ) && app.forms[ formId ].elementsModified ) || $stripeRow.data( 'completed' );
+				mobilePayment = [ 'google_pay', 'apple_pay' ].indexOf( app.forms[ formId ].paymentType ) !== -1,
+				cardFilled = ( ! $stripeRow.data( 'link-email' ) && app.forms[ formId ].elementsModified ) || $stripeRow.data( 'completed' ) || mobilePayment;
 			let	processCard = false;
 
 			if ( ! $stripeDiv.hasClass( 'wpforms-conditional-hide' ) ) {
