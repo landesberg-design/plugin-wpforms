@@ -145,12 +145,10 @@ WPFormsForms.Overview = WPFormsForms.Overview || ( function( document, window, $
 				type = $link.data( 'type' ) ?? '';
 
 			if ( msg === '' ) {
-				let duplicateMsg = wpforms_admin.form_duplicate_confirm;
-				if ( type === 'template' ) {
-					duplicateMsg = wpforms_admin.template_duplicate_confirm;
-				}
+				const duplicateMsg = type === 'template' ? wpforms_admin.template_duplicate_confirm : wpforms_admin.form_duplicate_confirm;
+				const deleteMsg = type === 'template' ? wpforms_admin.template_delete_confirm : wpforms_admin.form_delete_confirm;
 
-				msg = $link.parent().hasClass( 'delete' ) ? wpforms_admin.form_delete_confirm : duplicateMsg;
+				msg = $link.parent().hasClass( 'delete' ) ? deleteMsg : duplicateMsg;
 			}
 
 			app.confirmModal( msg, { url } );

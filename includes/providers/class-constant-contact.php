@@ -113,9 +113,10 @@ class WPForms_Constant_Contact extends WPForms_Provider {
 
 			// Check for conditionals.
 			$pass = $this->process_conditionals( $fields, $entry, $form_data, $connection );
+
 			if ( ! $pass ) {
 				wpforms_log(
-					'Constant Contact Subscription stopped by conditional logic',
+					sprintf( 'The Constant Contact connection %s was not processed due to conditional logic.', $connection['name'] ?? '' ),
 					$fields,
 					[
 						'type'    => [ 'provider', 'conditional_logic' ],

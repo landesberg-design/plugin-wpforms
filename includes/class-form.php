@@ -27,11 +27,22 @@ class WPForms_Form_Handler {
 	];
 
 	/**
+	 * Is form data slashing enabled.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @var bool
+	 */
+	private $is_form_data_slashing_enabled;
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
+
+		$this->is_form_data_slashing_enabled = wpforms_is_form_data_slashing_enabled();
 
 		$this->hooks();
 	}
@@ -521,6 +532,10 @@ class WPForms_Form_Handler {
 			],
 		];
 
+		if ( $this->is_form_data_slashing_enabled ) {
+			$form_content = wp_slash( $form_content );
+		}
+
 		$args_form_data = isset( $args['post_content'] ) ? json_decode( wp_unslash( $args['post_content'] ), true ) : null;
 
 		// Prevent $args['post_content'] from overwriting predefined $form_content.
@@ -574,7 +589,6 @@ class WPForms_Form_Handler {
 					),
 					'sender_name'    => get_bloginfo( 'name' ),
 					'sender_address' => '{admin_email}',
-					'replyto'        => '{field_id="1"}',
 					'message'        => '{all_fields}',
 				],
 			];
@@ -610,16 +624,15 @@ class WPForms_Form_Handler {
 	/**
 	 * Update form.
 	 *
-	 * @since    1.0.0
+	 * @since 1.0.0
 	 *
 	 * @param string|int $form_id Form ID.
 	 * @param array      $data    Data retrieved from $_POST and processed.
-	 * @param array      $args    Empty by default, may have custom data not intended to be saved.
+	 * @param array      $args    Empty by default. May have custom data not intended to be saved.
 	 *
-	 * @return mixed
-	 * @internal param string $title
+	 * @return int|false
 	 */
-	public function update( $form_id = '', $data = [], $args = [] ) {
+	public function update( $form_id = '', array $data = [], array $args = [] ) { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks, Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
 		if ( empty( $data ) ) {
 			return false;
@@ -643,7 +656,16 @@ class WPForms_Form_Handler {
 		// Add filter of the link rel attr to avoid JSON damage.
 		add_filter( 'wp_targeted_link_rel', '__return_empty_string', 50, 1 );
 
-		$data = wp_unslash( $data );
+		if ( $this->is_form_data_slashing_enabled ) {
+			// Even though we are not going to unslash some data,
+			// columns-json and calculation_code fields must be unslashed.
+			$data = $this->unslash_field_keys( $data, [ 'columns-json', 'calculation_code' ] );
+		} else {
+			// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
+			$data = wp_unslash( $data );
+		}
+
 
 		$title = empty( $data['settings']['form_title'] ) ? get_the_title( $form_id ) : $data['settings']['form_title'];
 		$desc  = empty( $data['settings']['form_desc'] ) ? '' : $data['settings']['form_desc'];
@@ -674,9 +696,8 @@ class WPForms_Form_Handler {
 			$data['fields'] = $this->update__preserve_fields_meta( $data['fields'], $form_id );
 		}
 
-		// Sanitize - don't allow tags for users who do not have appropriate cap.
-		// If we don't do this, forms for these users can get corrupt due to
-		// conflicts with wp_kses().
+		// Sanitize - don't allow tags for users who do not have the appropriate cap.
+		// If we don't do this, forms for these users can get corrupt due to conflicts with wp_kses().
 		if ( ! current_user_can( 'unfiltered_html' ) ) {
 			$data = map_deep( $data, 'wp_strip_all_tags' );
 		}
@@ -685,18 +706,19 @@ class WPForms_Form_Handler {
 		if ( isset( $data['settings']['notifications'] ) ) {
 			$data['settings']['notifications'] = $this->update__sanitize_notifications_names( $data['settings']['notifications'] );
 		}
+
 		unset( $notification );
 
-		if ( wpforms_is_form_template( $form_id ) ) {
-			$form_title = $data['settings']['form_title'];
-
-			// Set form slugs.
-			// We need setup slugs for the form template because these fields are hidden in the form builder.
-			$data['settings']['form_pages_page_slug']           = sanitize_title( $form_title );
-			$data['settings']['conversational_forms_page_slug'] = sanitize_title( $form_title );
-		}
-
-		$form = apply_filters(
+		/**
+		 * Allow changing post data before saving.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $post_data Post data.
+		 * @param array $form_data Form data.
+		 * @param array $args      Empty by default. May have custom data not intended to be saved.
+		 */
+		$form = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 			'wpforms_save_form_args',
 			[
 				'ID'           => $form_id,
@@ -710,7 +732,19 @@ class WPForms_Form_Handler {
 
 		$_form_id = wp_update_post( $form );
 
-		do_action( 'wpforms_save_form', $_form_id, $form );
+		if ( is_wp_error( $_form_id ) ) {
+			return false;
+		}
+
+		/**
+		 * Fires after saving the form.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int   $_form_id Form ID.
+		 * @param array $form     Form.
+		 */
+		do_action( 'wpforms_save_form', $_form_id, $form ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 		return $_form_id;
 	}
@@ -808,6 +842,10 @@ class WPForms_Form_Handler {
 			// Get the form data.
 			$new_form_data = wpforms_decode( $form->post_content );
 
+			if ( $this->is_form_data_slashing_enabled ) {
+				$new_form_data = wp_slash( $new_form_data );
+			}
+
 			// Remove form ID from title if present.
 			$new_form_data['settings']['form_title'] = str_replace( '(ID #' . absint( $id ) . ')', '', $new_form_data['settings']['form_title'] );
 
@@ -849,7 +887,7 @@ class WPForms_Form_Handler {
 			// Update new duplicate form.
 			$new_form_id = $this->update( $new_form_id, $new_form_data, [ 'cap' => 'create_forms' ] );
 
-			if ( ! $new_form_id || is_wp_error( $new_form_id ) ) {
+			if ( ! $new_form_id ) {
 				return false;
 			}
 
@@ -905,6 +943,10 @@ class WPForms_Form_Handler {
 		$new_form_id = current( $ids );
 		$form        = get_post( $new_form_id );
 		$form_data   = wpforms_decode( $form->post_content );
+
+		if ( $this->is_form_data_slashing_enabled ) {
+			$form_data = wp_slash( $form_data );
+		}
 
 		/**
 		 * Filters the form data before converting it to a template or vice versa.
@@ -1091,6 +1133,10 @@ class WPForms_Form_Handler {
 		}
 
 		$form = $this->get( $form_id, $defaults );
+
+		if ( $this->is_form_data_slashing_enabled ) {
+			$form = wp_slash( $form );
+		}
 
 		if ( empty( $form ) ) {
 			return false;
@@ -1359,5 +1405,49 @@ class WPForms_Form_Handler {
 		 */
 		return (int) apply_filters( 'wpforms_forms_per_page', 20 );
 		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
+	}
+
+	/**
+	 * Unslash field keys.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $data Form data.
+	 * @param array $keys Field keys.
+	 *
+	 * @return array
+	 */
+	private function unslash_field_keys( array $data, array $keys ): array {
+
+		if ( empty( $data['fields'] ) ) {
+			return $data;
+		}
+
+		/**
+		 * Filter field keys to be unslashed before saving.
+		 *
+		 * Works used with filter wpforms_enable_form_data_slashing set to true.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param array $keys Field keys.
+		 *
+		 * @return array
+		 */
+		$keys = (array) apply_filters( 'wpforms_form_handler_unslash_field_keys', $keys );
+
+		if ( empty( $keys ) ) {
+			return $data;
+		}
+
+		foreach ( $data['fields'] as $id => $field ) {
+			foreach ( $keys as $key ) {
+				if ( isset( $field[ $key ] ) ) {
+					$data['fields'][ $id ][ $key ] = wp_unslash( $field[ $key ] );
+				}
+			}
+		}
+
+		return $data;
 	}
 }

@@ -47,12 +47,7 @@ class Process {
 
 		// Form data: entry print.
 		add_filter( 'wpforms_pro_admin_entries_print_preview_form_data', [ $this, 'add_repeater_child_fields_to_form_data' ], 10, 2 );
-
-		// Form data: Notifications.
-		add_filter( 'wpforms_emails_notifications_form_data', [ $this, 'add_repeater_child_fields_to_form_data' ], 10, 2 );
-		add_filter( 'wpforms_emails_notifications_form_data', [ $this, 'move_child_fields_to_repeater_field' ], 20 );
-		add_filter( 'wpforms_emails_notifications_form_data', [ RepeaterHelpers::class, 'remove_child_fields_after_moving_to_repeater_field' ], 30 );
-		add_filter( 'wpforms_emails_notifications_form_data', [ $this, 'remove_rows_out_of_limit' ], 40 );
+		add_filter( 'wpforms_pro_admin_entries_print_preview_form_data', [ $this, 'populate_all_conditional_settings' ], 20, 2 );
 
 		// Export.
 		add_filter( 'wpforms_pro_admin_entries_export_ajax_form_data', [ $this, 'add_all_repeater_child_fields_to_form_data' ], 10, 2 );
@@ -99,7 +94,7 @@ class Process {
 		$form_data = (array) $form_data;
 
 		$form_data = $this->add_repeater_child_fields_to_form_data( $form_data, $entry );
-		$form_data = $this->populate_repeaters_conditional_settings( $form_data, $entry );
+		$form_data = $this->populate_all_conditional_settings( $form_data, $entry );
 		$form_data = $this->move_child_fields_to_repeater_field( $form_data );
 
 		return $this->remove_rows_out_of_limit( $form_data );
@@ -279,7 +274,7 @@ class Process {
 			foreach ( $fields as $layout_field_id => $layout_field_data ) {
 				if ( $layout_field_data['type'] === 'repeater' ) {
 					foreach ( $layout_field_data['columns'] as $column_key => $column ) {
-						if ( in_array( (int) $ids['original_id'], $column['fields'], true ) ) {
+						if ( in_array( $ids['original_id'], $column['fields'], false ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.FoundNonStrictFalse
 							$fields[ $layout_field_id ]['columns'][ $column_key ]['fields'][ $field_id ] = $field_id;
 						}
 					}
@@ -393,7 +388,7 @@ class Process {
 
 			$ids = wpforms_get_repeater_field_ids( $key );
 
-			if ( ! in_array( (int) $ids['original_id'], $original_fields, true ) ) {
+			if ( ! in_array( $ids['original_id'], $original_fields, false ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.FoundNonStrictFalse
 				continue;
 			}
 
@@ -411,6 +406,7 @@ class Process {
 	 * Will be used as a hook, so we should keep it public.
 	 *
 	 * @since 1.8.9
+	 * @deprecated 1.9.0
 	 *
 	 * @param array|mixed  $form_data Form data.
 	 * @param array|object $entry     Entry data.
@@ -421,59 +417,89 @@ class Process {
 	 */
 	public function populate_repeaters_conditional_settings( $form_data, $entry ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
+		_deprecated_function( __METHOD__, '1.9.0 of the WPForms plugin', '\WPForms\Pro\Forms\Fields\Repeater\Process::populate_all_conditional_settings' );
+
 		$form_data = (array) $form_data;
 		$fields    = $form_data['fields'] ?? [];
 
 		foreach ( $fields as $field_id => $field ) {
-			$form_data = $this->populate_repeater_conditional_settings( $form_data, $field_id );
+			$form_data = $this->populate_field_conditional_settings( $form_data, $field_id, 'repeater' );
 		}
 
 		return $form_data;
 	}
 
 	/**
-	 * Populate the Repeater field conditional settings to child fields.
+	 * Populate all the layout and repeater fields' conditional settings to child fields.
+	 * Will be used as a hook, so we should keep it public.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array|mixed  $form_data Form data.
+	 * @param array|object $entry     Entry data.
+	 *
+	 * @return array
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function populate_all_conditional_settings( $form_data, $entry ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+		$form_data = (array) $form_data;
+		$fields    = $form_data['fields'] ?? [];
+
+		foreach ( $fields as $field_id => $field ) {
+			$form_data = $this->populate_field_conditional_settings( $form_data, $field_id, 'layout' );
+			$form_data = $this->populate_field_conditional_settings( $form_data, $field_id, 'repeater' );
+		}
+
+		return $form_data;
+	}
+
+	/**
+	 * Populate the field conditional settings to child fields.
 	 * This is needed to process Conditional Logic on every child field and their clones on backend.
 	 *
-	 * @since 1.8.9
+	 * @since 1.9.0
 	 *
-	 * @param array      $form_data   Form data.
-	 * @param int|string $repeater_id Entry data.
+	 * @param array      $form_data  Form data.
+	 * @param int|string $field_id   Field ID.
+	 * @param string     $field_type Field type ('layout' or 'repeater').
 	 *
 	 * @return array
 	 */
-	private function populate_repeater_conditional_settings( array $form_data, $repeater_id ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+	private function populate_field_conditional_settings( array $form_data, $field_id, string $field_type ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
-		$repeater = $form_data['fields'][ $repeater_id ] ?? [];
+		$field = $form_data['fields'][ $field_id ] ?? [];
 
-		// Continue only for the Repeater field.
-		if ( ( $repeater['type'] ?? '' ) !== 'repeater' ) {
+		// Continue only for the specified field type.
+		if ( $field_type !== ( $field['type'] ?? '' ) ) {
 			return $form_data;
 		}
 
-		// The Repeater field's conditional logic settings.
-		$conditional_logic     = $repeater['conditional_logic'] ?? '';
-		$conditional_type      = $repeater['conditional_type'] ?? '';
-		$conditionals          = $repeater['conditionals'] ?? [];
+		// The field's conditional logic settings.
+		$conditional_logic     = $field['conditional_logic'] ?? '';
+		$conditional_type      = $field['conditional_type'] ?? '';
+		$conditionals          = $field['conditionals'] ?? [];
 		$has_conditional_logic = ! empty( $conditional_logic ) && ! empty( $conditionals );
 
+		if ( ! $has_conditional_logic ) {
+			return $form_data;
+		}
+
 		// All the child fields in a flat list.
-		$child_fields = array_merge( ...wp_list_pluck( $repeater['columns'] ?? [], 'fields' ) );
+		$child_fields = array_merge( ...wp_list_pluck( $field['columns'] ?? [], 'fields' ) );
 
 		// Populate CL settings to all child fields.
 		foreach ( $child_fields as $child_id ) {
-			foreach ( array_keys( $form_data['fields'] ) as $field_id ) {
-				if ( $child_id !== $field_id && strpos( $field_id, $child_id . '_' ) !== 0 ) {
+			foreach ( array_keys( $form_data['fields'] ) as $form_field_id ) {
+				if ( $child_id !== $form_field_id && ( $field_type !== 'repeater' || strpos( $form_field_id, $child_id . '_' ) !== 0 ) ) {
 					continue;
 				}
 
-				$form_data['fields'][ $field_id ]['conditional_logic'] = $conditional_logic;
-				$form_data['fields'][ $field_id ]['conditional_type']  = $conditional_type;
-				$form_data['fields'][ $field_id ]['conditionals']      = $conditionals;
-
-				if ( $has_conditional_logic ) {
-					$form_data['conditional_fields'][] = $field_id;
-				}
+				$form_data['fields'][ $form_field_id ]['conditional_logic'] = $conditional_logic;
+				$form_data['fields'][ $form_field_id ]['conditional_type']  = $conditional_type;
+				$form_data['fields'][ $form_field_id ]['conditionals']      = $conditionals;
+				$form_data['conditional_fields'][]                          = $form_field_id;
 			}
 		}
 

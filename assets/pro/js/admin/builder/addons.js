@@ -3,6 +3,7 @@
 /**
  * @param wpforms_builder.repeater.addons_requirements_alert_text
  * @param wpforms_builder.repeater.enabled_cf_alert_text
+ * @param wpforms_builder.repeater.is_google_sheets_has_connection
  * @param wpforms_builder.field_add_cf_alert_text
  */
 
@@ -111,7 +112,7 @@ WPForms.Admin.Builder.Addons = WPForms.Admin.Builder.Addons || ( function( docum
 				alertMessage = wpforms_builder.repeater.addons_requirements_alert_text[ 'wpforms-form-abandonment' ];
 			}
 
-			if ( ! $( '.wpforms-panel-sidebar-section-google-sheets' ).hasClass( 'education-modal' ) && type === 'repeater' && ! app.isInsideRepeaterAddonAllowed( 'wpforms-google-sheets' ) ) {
+			if ( ! $( '.wpforms-panel-sidebar-section-google-sheets' ).hasClass( 'education-modal' ) && type === 'repeater' && ! app.isInsideRepeaterAddonAllowed( 'wpforms-google-sheets' ) && app.isGoogleSheetsConnectionsExist() ) {
 				alertMessage = wpforms_builder.repeater.addons_requirements_alert_text[ 'wpforms-google-sheets' ];
 			}
 
@@ -216,11 +217,30 @@ WPForms.Admin.Builder.Addons = WPForms.Admin.Builder.Addons || ( function( docum
 				return;
 			}
 
+			if ( ! app.isGoogleSheetsConnectionsExist() ) {
+				return;
+			}
+
 			app.isGoogleSheetsVisited = true;
 
 			app.openModal( {
 				content: wpforms_builder.repeater.addons_requirements_alert_text[ 'wpforms-google-sheets' ],
 			} );
+		},
+
+		/**
+		 * Determine if Google Sheets connections exist.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @return {boolean} True if Google Sheets connections exist.
+		 */
+		isGoogleSheetsConnectionsExist() {
+			if ( ! WPForms.Admin.Builder.Providers.GoogleSheets.isReady ) {
+				return wpforms_builder.repeater.is_google_sheets_has_connection;
+			}
+
+			return Boolean( $( '.wpforms-builder-provider-connection', '#google-sheets-provider' ).length );
 		},
 
 		/**

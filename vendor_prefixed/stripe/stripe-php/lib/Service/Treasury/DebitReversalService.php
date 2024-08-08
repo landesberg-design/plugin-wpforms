@@ -5,8 +5,6 @@ namespace WPForms\Vendor\Stripe\Service\Treasury;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
- */
-/**
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class DebitReversalService extends \WPForms\Vendor\Stripe\Service\AbstractService

@@ -89,7 +89,8 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 				.on( 'wpformsFieldAdd wpformsFieldChoiceAdd wpformsFieldChoiceDelete wpformsFieldDynamicChoiceToggle wpformsFieldLayoutChangeDisplay', app.handleFieldOperations )
 				.on( 'wpformsFieldMoveRejected', app.handleFieldMoveRejected )
 				.on( 'wpformsFieldMove', app.handleFieldMove )
-				.on( 'wpformsFieldDragOver wpformsFieldDragChange', app.handleFieldDrag );
+				.on( 'wpformsFieldDragOver wpformsFieldDragChange', app.handleFieldDrag )
+				.on( 'change', '.wpforms-field-option-row-size select', app.handleFieldSizeChange );
 		},
 
 		/**
@@ -121,6 +122,24 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 			}
 
 			app.rowDisplayHeightBalance( $fieldLayoutWrapper );
+		},
+
+		/**
+		 * Field change size event handler.
+		 *
+		 * @since 1.9.0
+		 */
+		handleFieldSizeChange() {
+			const $this = $( this );
+			const fieldID = $this.parent().data( 'field-id' );
+			const $field = $( `#wpforms-field-${ fieldID }` );
+			const $rows = $field.parents( '.wpforms-layout-display-rows, .wpforms-layout-display-blocks' );
+
+			if ( ! $rows.length ) {
+				return;
+			}
+
+			app.rowDisplayHeightBalance( $rows );
 		},
 
 		/**
@@ -604,7 +623,6 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		fieldOptionsUpdate( e, fieldId ) {
 			app.fieldLegacyLayoutSelectorUpdate( fieldId );
 			app.fieldSizeOptionUpdate( fieldId );
-			app.fieldOptionGroupsToggle( fieldId );
 		},
 
 		/**
@@ -647,7 +665,9 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 		fieldSizeOptionUpdate( fieldId ) {
 			const $field = $( `#wpforms-field-${ fieldId }` ),
 				type = $field.data( 'field-type' ),
-				isFieldInColumn = $field.closest( '.wpforms-layout-column' ).length > 0;
+				$column = $field.closest( '.wpforms-layout-column' ),
+				isFieldInColumn = $column.length > 0,
+				parentType = $column.closest( '.wpforms-field' ).data( 'field-type' ) ?? 'layout';
 
 			// Do not touch the Field Size option for certain fields.
 			if ( [ 'textarea', 'richtext' ].indexOf( type ) > -1 ) {
@@ -656,45 +676,32 @@ WPForms.Admin.Builder.FieldLayout = WPForms.Admin.Builder.FieldLayout || ( funct
 
 			const $fieldSizeOptionRow = $( `#wpforms-field-option-row-${ fieldId }-size` );
 			let	$fieldSizeOptionNotice = $fieldSizeOptionRow.find( '.wpforms-notice-field-size' );
+			const isColumnFullWidth = $column.hasClass( 'wpforms-layout-column-100' ) && $field.closest( '.wpforms-field-layout' ).length;
 
 			// Add "Field size cannot be changed" notice.
-			if ( ! $fieldSizeOptionNotice.length ) {
-				$fieldSizeOptionNotice = $( `
-					<label class="sub-label wpforms-notice-field-size" title="${ wpforms_builder.layout.size_notice_tooltip }">
-						${ wpforms_builder.layout.size_notice_text }
-					</label>
-				` );
+			$fieldSizeOptionNotice.remove();
+			$fieldSizeOptionNotice = $( `
+				<label class="sub-label wpforms-notice-field-size" title="${ wpforms_builder[ parentType ].size_notice_tooltip }">
+					${ wpforms_builder[ parentType ].size_notice_text }
+				</label>
+			` );
 
-				$fieldSizeOptionRow.append( $fieldSizeOptionNotice );
-			}
+			$fieldSizeOptionRow.append( $fieldSizeOptionNotice );
 
 			const $fieldSizeOptionSelect = $fieldSizeOptionRow.find( 'select' );
 
 			// Toggle field size selector title attribute.
 			if ( isFieldInColumn ) {
-				$fieldSizeOptionSelect.attr( 'title', wpforms_builder.layout.size_notice_tooltip );
+				$fieldSizeOptionSelect.attr( 'title', wpforms_builder[ parentType ].size_notice_tooltip );
 			} else {
 				$fieldSizeOptionSelect.attr( 'title', '' );
 			}
 
 			// Toggle field size selector `disabled` attribute and notice visibility.
-			$fieldSizeOptionSelect.toggleClass( 'wpforms-disabled', isFieldInColumn );
-			$fieldSizeOptionNotice.toggleClass( 'wpforms-hidden', ! isFieldInColumn );
-		},
+			const isDisabled = isFieldInColumn && ! isColumnFullWidth;
 
-		/**
-		 * Toggle field option groups visibility.
-		 *
-		 * @since 1.7.7
-		 *
-		 * @param {number} fieldId Field ID.
-		 */
-		fieldOptionGroupsToggle( fieldId ) {
-			const $field = $( `#wpforms-field-${ fieldId }` ),
-				type = $field.data( 'field-type' );
-
-			// The Layout field (and only) should not have option group tabs Basic, Advanced, Smart Logic.
-			el.$fieldOptions.toggleClass( 'wpforms-hide-options-groups', type === 'layout' );
+			$fieldSizeOptionSelect.toggleClass( 'wpforms-disabled', isDisabled );
+			$fieldSizeOptionNotice.toggleClass( 'wpforms-hidden', ! isDisabled );
 		},
 
 		/**

@@ -1,5 +1,9 @@
 <?php
 
+// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+/** @noinspection PhpIllegalPsrClassPathInspection */
+
+// phpcs:ignore Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden
 namespace WPForms {
 
 	use AllowDynamicProperties;
@@ -7,6 +11,7 @@ namespace WPForms {
 	use WPForms\Helpers\DB;
 	use WPForms_Form_Handler;
 	use WPForms_Process;
+	use WPForms_Settings;
 
 	/**
 	 * Main WPForms class.
@@ -21,7 +26,7 @@ namespace WPForms {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @var \WPForms\WPForms
+		 * @var WPForms
 		 */
 		private static $instance;
 
@@ -81,6 +86,7 @@ namespace WPForms {
 		 * @param string $name Name of the object to get.
 		 *
 		 * @return mixed|null
+		 * @noinspection MagicMethodsValidityInspection
 		 */
 		public function __get( $name ) {
 
@@ -109,13 +115,14 @@ namespace WPForms {
 		 * Main WPForms Instance.
 		 *
 		 * Only one instance of WPForms exists in memory at any one time.
-		 * Also prevent the need to define globals all over the place.
+		 * Also, prevent the need to define globals all over the place.
 		 *
 		 * @since 1.0.0
 		 *
 		 * @return WPForms
+		 * @noinspection UsingInclusionOnceReturnValueInspection
 		 */
-		public static function instance() {
+		public static function instance(): WPForms {
 
 			if (
 				self::$instance === null ||
@@ -134,7 +141,7 @@ namespace WPForms {
 					require_once WPFORMS_PLUGIN_DIR . 'lite/wpforms-lite.php';
 				}
 
-				add_action( 'plugins_loaded', [ self::$instance, 'objects' ], 10 );
+				self::hooks();
 			}
 
 			return self::$instance;
@@ -142,7 +149,7 @@ namespace WPForms {
 
 		/**
 		 * Setup plugin constants.
-		 * All the path/URL related constants are defined in main plugin file.
+		 * All the path/URL related constants are defined in the main plugin file.
 		 *
 		 * @since 1.0.0
 		 */
@@ -208,6 +215,19 @@ namespace WPForms {
 		}
 
 		/**
+		 * Hooks.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @return void
+		 */
+		private static function hooks() {
+
+			add_action( 'plugins_loaded', [ self::$instance, 'objects' ] );
+			add_action( 'wpforms_settings_init', [ self::$instance, 'reinstall_custom_tables' ] );
+		}
+
+		/**
 		 * Include the error handler to suppress deprecated messages from vendor folders.
 		 *
 		 * @since 1.8.5
@@ -224,7 +244,7 @@ namespace WPForms {
 		 *
 		 * @since 1.4.7
 		 */
-		private function includes_magic() {
+		private function includes_magic() { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
 			// Action Scheduler requires a special loading procedure.
 			require_once WPFORMS_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
@@ -248,12 +268,12 @@ namespace WPForms {
 			}
 
 			/*
-			 * Properly init the providers loader, that will handle all the related logic and further loading.
+			 * Properly init the providers' loader, that will handle all the related logic and further loading.
 			 */
 			add_action( 'wpforms_loaded', [ '\WPForms\Providers\Providers', 'get_instance' ] );
 
 			/*
-			 * Properly init the integrations loader, that will handle all the related logic and further loading.
+			 * Properly init the integration loader, that will handle all the related logic and further loading.
 			 */
 			add_action( 'wpforms_loaded', [ '\WPForms\Integrations\Loader', 'get_instance' ] );
 		}
@@ -275,6 +295,30 @@ namespace WPForms {
 			 * @since 1.4.0
 			 */
 			do_action( 'wpforms_loaded' );
+		}
+
+		/**
+		 * Re-create plugin custom tables if don't exist.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param WPForms_Settings $wpforms_settings WPForms settings object.
+		 */
+		public function reinstall_custom_tables( WPForms_Settings $wpforms_settings ) {
+
+			if ( empty( $wpforms_settings->view ) ) {
+				return;
+			}
+
+			// Proceed on Settings plugin admin area page only.
+			if ( $wpforms_settings->view !== 'general' ) {
+				return;
+			}
+
+			// Install on a current site only.
+			if ( ! DB::custom_tables_exist() ) {
+				DB::create_custom_tables();
+			}
 		}
 
 		/**
@@ -384,7 +428,7 @@ namespace WPForms {
 			// Backward compatibility for old public properties.
 			// Return null to save old condition for these properties.
 			if ( in_array( $name, $this->legacy_properties, true ) ) {
-				return isset( $this->{$name} ) ? $this->{$name} : null;
+				return $this->{$name} ?? null;
 			}
 
 			return new stdClass();
@@ -424,6 +468,7 @@ namespace WPForms {
 	}
 }
 
+// phpcs:ignore Universal.Namespaces.DisallowCurlyBraceSyntax.Forbidden, Universal.Namespaces.DisallowDeclarationWithoutName.Forbidden, Universal.Namespaces.OneDeclarationPerFile.MultipleFound
 namespace {
 
 	/**
@@ -433,7 +478,7 @@ namespace {
 	 *
 	 * @return WPForms\WPForms
 	 */
-	function wpforms() {
+	function wpforms(): WPForms\WPForms { // phpcs:ignore Universal.Files.SeparateFunctionsFromOO.Mixed
 
 		return WPForms\WPForms::instance();
 	}
@@ -444,7 +489,7 @@ namespace {
 	 * instead of function_exists( 'wpforms' ), which is preferred.
 	 *
 	 * In 1.5.0 we removed support for PHP 5.2
-	 * and moved former WPForms class to a namespace: WPForms\WPForms.
+	 * and moved the former WPForms class to a namespace: WPForms\WPForms.
 	 *
 	 * @since 1.5.1
 	 */

@@ -101,6 +101,39 @@ class Builder {
 				'markup' => 'close',
 			]
 		);
+
+		// Advanced options open markup.
+		$this->field_obj->field_option(
+			'advanced-options',
+			$field,
+			[
+				'markup' => 'open',
+			]
+		);
+
+		$this->field_options_advanced( $field );
+
+		// Advanced options close markup.
+		$this->field_obj->field_option(
+			'advanced-options',
+			$field,
+			[
+				'markup' => 'close',
+			]
+		);
+	}
+
+	/**
+	 * The Advanced field options.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $field Field settings.
+	 */
+	private function field_options_advanced( array $field ) {
+
+		$this->field_obj->field_option( 'description', $field );
+		$this->field_obj->field_option( 'label_hide', $field );
 	}
 
 	/**

@@ -62,6 +62,31 @@ class Frontend {
 	}
 
 	/**
+	 * Excluded from the Entry Preview display.
+	 *
+	 * @since 1.8.9
+	 * @deprecated 1.9.0
+	 *
+	 * @param bool  $exclude   Exclude the field.
+	 * @param array $field     Field data.
+	 * @param array $form_data Form data.
+	 *
+	 * @return bool
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function entry_preview_exclude_field( $exclude, $field, $form_data ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+		_deprecated_function( __METHOD__, '1.9.0 of the WPForms plugin' );
+
+		if ( $field['type'] === $this->field_obj->type ) {
+			return true;
+		}
+
+		return (bool) $exclude;
+	}
+
+	/**
 	 * Frontend CSS enqueues.
 	 *
 	 * @since 1.8.9
@@ -107,13 +132,15 @@ class Frontend {
 			return;
 		}
 
-		$min = wpforms_get_min_suffix();
+		$min       = wpforms_get_min_suffix();
+		$in_footer = ! wpforms_is_frontend_js_header_force_load();
 
 		wp_enqueue_script(
 			$this->field_obj->style_handle,
 			WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/repeater{$min}.js",
 			[ 'jquery' ],
-			WPFORMS_VERSION
+			WPFORMS_VERSION,
+			$in_footer
 		);
 	}
 

@@ -14,7 +14,7 @@ use WPForms\Pro\Admin\Entries\Table\Facades\Columns;
 require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 
 /**
- * Generate the table on the entries overview page.
+ * Generate the table on the entries' overview page.
  *
  * @since 1.8.6
  */
@@ -95,7 +95,7 @@ class ListTable extends WP_List_Table {
 	 */
 	public function __construct() {
 
-		// Utilize the parent constructor to build the main class properties.
+		// Use the parent constructor to build the main class properties.
 		parent::__construct(
 			[
 				'singular' => 'entry',
@@ -182,47 +182,7 @@ class ListTable extends WP_List_Table {
 		$this->counts = [];
 		$entry_obj    = wpforms()->get( 'entry' );
 
-		$this->counts['total'] = $entry_obj->get_entries(
-			[
-				'form_id' => $this->form_id,
-			],
-			true
-		);
-
-		$this->counts['unread'] = $entry_obj->get_entries(
-			[
-				'form_id' => $this->form_id,
-				'viewed'  => '0',
-			],
-			true
-		);
-
-		$this->counts['starred'] = $entry_obj->get_entries(
-			[
-				'form_id' => $this->form_id,
-				'starred' => '1',
-			],
-			true
-		);
-
-		$this->counts['trash'] = $entry_obj->get_entries(
-			[
-				'form_id' => $this->form_id,
-				'status'  => Page::TRASH_ENTRY_STATUS,
-			],
-			true
-		);
-
-		// Only show the payment view if the form has a payment field.
-		if ( wpforms_has_payment( 'form', $this->form_data ) ) {
-			$this->counts['payment'] = wpforms()->get( 'entry' )->get_entries(
-				[
-					'form_id' => $this->form_id,
-					'type'    => 'payment',
-				],
-				true
-			);
-		}
+		$this->counts = $entry_obj->get_counts( [ 'form_id' => $this->form_id ] );
 
 		/**
 		 * Filters the array of entries counts in different views.
@@ -232,13 +192,27 @@ class ListTable extends WP_List_Table {
 		 * @param int[] $counts    An array of entries' counts.
 		 * @param array $form_data Form data.
 		 */
-		$this->counts = apply_filters( 'wpforms_entries_table_counts', $this->counts, $this->form_data ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+		$this->counts = (array) apply_filters( 'wpforms_entries_table_counts', $this->counts, $this->form_data ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+
+		$defaults = [
+			'total'   => 0,
+			'unread'  => 0,
+			'payment' => 0,
+			'starred' => 0,
+			'spam'    => 0,
+			'trash'   => 0,
+		];
+
+		$this->counts = wp_parse_args( $this->counts, $defaults );
 	}
 
 	/**
 	 * Retrieve the view types.
 	 *
 	 * @since 1.8.6
+	 *
+	 * @noinspection HtmlUnknownAttribute
+	 * @noinspection HtmlUnknownTarget
 	 */
 	public function get_views() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
@@ -309,6 +283,8 @@ class ListTable extends WP_List_Table {
 	 * @param array $views Entries table views.
 	 *
 	 * @return array $views Array of all the list table views.
+	 * @noinspection HtmlUnknownTarget
+	 * @noinspection HtmlUnknownAttribute
 	 */
 	public function add_trashed_views( $views ) {
 
@@ -384,7 +360,7 @@ class ListTable extends WP_List_Table {
 	public static function get_columns_form_disallowed_fields() {
 
 		/**
-		 * Filter the list of the disallowed fields in the entries table.
+		 * Filter the list of the disallowed fields in the entries' table.
 		 *
 		 * @since 1.4.4
 		 *
@@ -403,6 +379,7 @@ class ListTable extends WP_List_Table {
 	 * @param int   $display Number of columns to display.
 	 *
 	 * @return array
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function get_columns_form_fields( array $columns = [], int $display = 3 ): array {
 
@@ -443,6 +420,8 @@ class ListTable extends WP_List_Table {
 	 * @param string $column_name Current column name.
 	 *
 	 * @return string
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function column_status_field( $entry, $column_name ) {
 
@@ -474,6 +453,8 @@ class ListTable extends WP_List_Table {
 	 * @param string $column_name Current column name.
 	 *
 	 * @return string
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function column_payment_total_field( $entry, $column_name ) {
 
@@ -505,6 +486,8 @@ class ListTable extends WP_List_Table {
 	 * @param string $column_name Current column name.
 	 *
 	 * @return string
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function column_type_field( $entry, $column_name ) {
 
@@ -539,6 +522,7 @@ class ListTable extends WP_List_Table {
 	 * @param object $entry Current entry data.
 	 *
 	 * @return string
+	 * @noinspection HtmlUnknownTarget
 	 */
 	private function column_payment_field( $entry ) {
 
@@ -738,7 +722,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Render the indicators column.
+	 * Render the indicators' column.
 	 *
 	 * @since 1.8.6
 	 *
@@ -762,13 +746,14 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Render the actions column.
+	 * Render the actions' column.
 	 *
 	 * @since 1.8.6
 	 *
 	 * @param object $entry Entry data from DB.
 	 *
 	 * @return string
+	 * @noinspection HtmlUnknownTarget
 	 */
 	public function column_actions( $entry ) {
 
@@ -856,7 +841,7 @@ class ListTable extends WP_List_Table {
 			}
 
 			if ( wpforms_current_user_can( 'delete_entries_form_single', $this->form_id ) ) {
-				// Trash can share the same capabilites as delete.
+				// Trash can share the same capabilities as deleting.
 				$actions['trash'] = sprintf(
 					'<a href="%s" title="%s" class="trash">%s</a>',
 					esc_url(
@@ -1011,7 +996,7 @@ class ListTable extends WP_List_Table {
 
 	/**
 	 * Define additional bulk actions available for our table listing.
-	 * Additional settings are all related to delete/restore action.
+	 * Additional settings are all related to the delete/restore action.
 	 *
 	 * @since 1.8.5
 	 *
@@ -1068,22 +1053,6 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Get current action.
-	 *
-	 * @since 1.8.6
-	 *
-	 * @return string
-	 */
-	public function current_action() {
-
-		if ( isset( $_REQUEST['empty_spam'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return 'empty_spam';
-		}
-
-		return parent::current_action();
-	}
-
-	/**
 	 * Process single bulk action.
 	 *
 	 * @since 1.8.6
@@ -1110,14 +1079,14 @@ class ListTable extends WP_List_Table {
 			return;
 		}
 
-		// Check if it is Trash list.
+		// Check if it is a Trash list.
 		if ( $this->is_trash_list() ) {
 			$status = Page::TRASH_ENTRY_STATUS;
 		}
 
 		$spam_entry = wpforms()->get( 'spam_entry' );
 
-		// Check if it is Spam list.
+		// Check if it is a Spam list.
 		if ( $spam_entry->is_spam_list() ) {
 			$status = $spam_entry::ENTRY_STATUS;
 		}
@@ -1142,7 +1111,7 @@ class ListTable extends WP_List_Table {
 		 */
 		$entries_list = apply_filters( 'wpforms_entries_table_process_actions_entries_list', $entries_list, $args ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
-		$sendback = remove_query_arg( [ 'read', 'unread', 'spam', 'unspam', 'starred', 'unstarred', 'print', 'deleted', 'empty_spam', 'trashed', 'restored', 'paged' ], wp_get_referer() );
+		$sendback = remove_query_arg( [ 'read', 'unread', 'spam', 'unspam', 'starred', 'unstarred', 'print', 'deleted', 'trashed', 'restored', 'paged' ], wp_get_referer() );
 
 		switch ( $doaction ) {
 			// Mark as read.
@@ -1183,11 +1152,6 @@ class ListTable extends WP_List_Table {
 			// Restore entries.
 			case 'restore':
 				$sendback = $this->process_bulk_action_single_restore( $ids, $sendback );
-				break;
-
-			// Empty spam.
-			case 'empty_spam':
-				$sendback = $this->process_bulk_action_empty_spam( $sendback );
 				break;
 
 			// Mark as Spam.
@@ -1557,7 +1521,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Process the bulk action delete.
+	 * Process the bulk delete action.
 	 *
 	 * @since 1.8.5
 	 *
@@ -1594,7 +1558,7 @@ class ListTable extends WP_List_Table {
 				[ 'cap' => 'delete_entry_single' ] // Force the cap to trash the entry, since we cant provide edit cap here.
 			);
 
-			// If it didn't work continue.
+			// If it didn't work, continue.
 			if ( ! $success ) {
 				continue;
 			}
@@ -1632,7 +1596,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Process the bulk action restore.
+	 * Process the bulk action restores.
 	 *
 	 * @since 1.8.5
 	 *
@@ -1683,7 +1647,7 @@ class ListTable extends WP_List_Table {
 				[ 'cap' => 'delete_entry_single' ] // Force the cap to trash the entry, since we cant provide edit cap here.
 			);
 
-			// If it didn't work continue.
+			// If it didn't work, continue.
 			if ( ! $success ) {
 				continue;
 			}
@@ -1713,7 +1677,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Process the bulk action delete.
+	 * Process the bulk delete action.
 	 *
 	 * @since 1.8.6
 	 *
@@ -1744,45 +1708,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Process the bulk action empty spam.
-	 *
-	 * @since 1.8.6
-	 *
-	 * @param string $sendback URL query string.
-	 *
-	 * @return string
-	 */
-	protected function process_bulk_action_empty_spam( $sendback ) {
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false;
-
-		if ( empty( $form_id ) ) {
-			return $sendback;
-		}
-
-		$entries = wpforms()->get( 'entry' )->get_entries(
-			[
-				'form_id' => $form_id,
-				'select'  => 'entry_ids',
-				'status'  => 'spam',
-				'number'  => -1,
-			]
-		);
-
-		if ( ! $entries ) {
-			return $sendback;
-		}
-
-		foreach ( $entries as $entry ) {
-			wpforms()->get( 'entry' )->delete( $entry->entry_id );
-		}
-
-		return add_query_arg( 'deleted', count( $entries ), $sendback );
-	}
-
-	/**
-	 * Display bulk action result message.
+	 * Display a bulk action result message.
 	 *
 	 * @since 1.8.6
 	 */
@@ -1931,7 +1857,7 @@ class ListTable extends WP_List_Table {
 		$this->search_box_output( $text, $input_id, $filter_fields, $advanced_options, $cur_field, $cur_comparison, $cur_term );
 
 		/**
-		 * Allows developers output some HTML after the filter forms on the entries list page.
+		 * Allows developers output some HTML after the filter forms on the entries' list page.
 		 *
 		 * @since 1.4.4
 		 *
@@ -1952,7 +1878,8 @@ class ListTable extends WP_List_Table {
 	 * @param mixed  $cur_field               Current (selected) field or advanced option.
 	 * @param string $cur_comparison          Current comparison.
 	 * @param string $cur_term                Current search term.
-	 */
+	 *
+	 * @noinspection HtmlUnknownAttribute*/
 	private function search_box_output( $text, $input_id, $filter_fields, $search_advanced_options, $cur_field, $cur_comparison, $cur_term ) {
 
 		?>
@@ -2016,16 +1943,16 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Fetch and setup the final data for the table.
+	 * Fetch and set up the final data for the table.
 	 *
 	 * @since 1.8.6
 	 */
 	public function prepare_items() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		// Retrieve count.
+		// Retrieve the count.
 		$this->get_counts();
 
-		// Setup the columns.
+		// Set up the columns.
 		$columns = $this->get_columns();
 
 		// Hidden columns (none).
@@ -2034,7 +1961,7 @@ class ListTable extends WP_List_Table {
 		// Define which columns can be sorted.
 		$sortable = $this->get_sortable_columns();
 
-		// Get a primary column. It's will be a 3-rd column.
+		// Get a primary column. It will be a 3rd column.
 		$primary = key( array_slice( $columns, 2, 1 ) );
 
 		// Set column headers.
@@ -2133,7 +2060,7 @@ class ListTable extends WP_List_Table {
 	}
 
 	/**
-	 * Extending the `display_rows()` method in order to add hooks.
+	 * Extending the `display_rows()` method to add hooks.
 	 *
 	 * @since 1.8.6
 	 */

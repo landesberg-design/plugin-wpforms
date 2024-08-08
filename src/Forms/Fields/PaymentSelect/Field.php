@@ -554,7 +554,7 @@ class Field extends \WPForms_Field {
 				'wpforms-choicesjs',
 				WPFORMS_PLUGIN_URL . "assets/css/choices{$min}.css",
 				[],
-				'9.0.1'
+				'10.2.0'
 			);
 		}
 	}

@@ -25,6 +25,18 @@ class WPForms_Field_URL extends WPForms_Field {
 		$this->icon     = 'fa-link';
 		$this->order    = 90;
 		$this->group    = 'fancy';
+
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @since 1.9.0
+	 */
+	private function hooks() {
+
+		add_filter( 'wpforms_html_field_value', [ $this, 'output_field_value' ], 10, 4 );
 	}
 
 	/**
@@ -186,10 +198,35 @@ class WPForms_Field_URL extends WPForms_Field {
 		// Set field details.
 		wpforms()->get( 'process' )->fields[ $field_id ] = [
 			'name'  => ! empty( $form_data['fields'][ $field_id ]['label'] ) ? sanitize_text_field( $form_data['fields'][ $field_id ]['label'] ) : '',
-			'value' => trim( $field_submit ),
+			'value' => esc_url_raw( $field_submit ),
 			'id'    => wpforms_validate_field_id( $field_id ),
 			'type'  => $this->type,
 		];
+	}
+
+	/**
+	 * Filter the field value on output.
+	 *
+	 * This is necessary to perform escaping of non-sanitized values before output.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string|mixed $value     Field value.
+	 * @param array        $field     Entry field data.
+	 * @param array        $form_data Form data and settings.
+	 * @param string       $context   Value display context.
+	 *
+	 * @return string|mixed
+	 *
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function output_field_value( $value, array $field, array $form_data = [], string $context = '' ) {
+
+		if ( $this->type !== ( $field['type'] ?? '' ) ) {
+			return $value;
+		}
+
+		return esc_url( $field['value'] ?? $value );
 	}
 }
 

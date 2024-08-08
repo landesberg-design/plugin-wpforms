@@ -74,7 +74,8 @@ const WPSplash = window.WPSplash || ( function( document, window, $ ) {
 				onOpenBefore() {
 					const scrollbarWidth = ( window.innerWidth - document.body.clientWidth ) + 'px';
 
-					$( 'body' ).addClass( 'wpforms-splash-modal' )
+					$( 'body' )
+						.addClass( 'wpforms-splash-modal' )
 						.css( '--wpforms-body-scrollbar-width', scrollbarWidth );
 
 					$( '.wpforms-challenge-popup-container' ).addClass( 'wpforms-invisible' );
@@ -84,17 +85,38 @@ const WPSplash = window.WPSplash || ( function( document, window, $ ) {
 							$( 'html, body' ).animate( { scrollTop: 0 }, 0 );
 						}
 
-						$( '.jconfirm-box-container' ).css( 'padding-top', '50px' ).animate( { opacity: 1 }, 30 );
+						$( '.jconfirm-box-container' )
+							.css( 'padding-top', '50px' )
+							.animate( { opacity: 1 }, 30 );
 					}, 0 );
 				},
 				onOpen() {
 					$( '.jconfirm' ).css( 'bottom', 0 );
+					$( '.wpforms-dash-widget-welcome-block' ).remove();
+					app.dismissDashboardWidgetBanner();
 				},
 				onDestroy() {
-					$( 'body' ).removeClass( 'wpforms-splash-modal' )
+					$( 'body' )
+						.removeClass( 'wpforms-splash-modal' )
 						.css( '--wpforms-body-scrollbar-width', null );
 				},
 			} );
+		},
+
+		/**
+		 * Dismiss the dashboard widget banner.
+		 *
+		 * @since 1.9.0
+		 */
+		dismissDashboardWidgetBanner() {
+			const data = {
+				_wpnonce: wpforms_splash_data.nonce,
+				action  : 'wpforms_dash_widget_save_widget_meta',
+				meta: 'hide_welcome_block',
+				value: 1,
+			};
+
+			$.post( ajaxurl, data );
 		},
 	};
 

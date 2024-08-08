@@ -472,9 +472,9 @@ class Page {
 		// Get the screen first.
 		$screen = isset( $_REQUEST['page'] ) ? sanitize_key( $_REQUEST['page'] ) : '';
 
-		// The delete all functionality should only be available on the trash screen.
+		// The delete all functionality should only be available on the trash and spam screens.
 		// All other places the delete all button will be replaced by trash all button.
-		if ( $screen !== self::TRASH_ENTRY_STATUS ) {
+		if ( ! in_array( $screen, [ self::TRASH_ENTRY_STATUS, SpamEntry::ENTRY_STATUS ], true ) ) {
 			wp_send_json_error( esc_html__( 'Something went wrong while performing this action.', 'wpforms' ) );
 		}
 

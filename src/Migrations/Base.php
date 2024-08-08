@@ -1,10 +1,14 @@
 <?php
 
+// phpcs:disable Generic.Commenting.DocComment.MissingShort
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection AutoloadingIssuesInspection */
+// phpcs:enable Generic.Commenting.DocComment.MissingShort
+
 namespace WPForms\Migrations;
 
 use ReflectionClass;
 use WPForms\Helpers\DB;
-use WPForms\Helpers\Transient;
 
 /**
  * Class Migrations handles both Lite and Pro plugin upgrade routines.
@@ -56,13 +60,6 @@ abstract class Base {
 	 * @since 1.7.5
 	 */
 	const UPGRADE_CLASSES = [];
-
-	/**
-	 * Custom table handler classes.
-	 *
-	 * @since 1.7.6
-	 */
-	const CUSTOM_TABLE_HANDLER_CLASSES = [];
 
 	/**
 	 * Migration started status.
@@ -159,8 +156,8 @@ abstract class Base {
 	 */
 	public function migrate() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$classes    = $this->get_upgrade_classes();
-		$namespace  = $this->reflector->getNamespaceName() . '\\';
+		$classes   = $this->get_upgrade_classes();
+		$namespace = $this->reflector->getNamespaceName() . '\\';
 
 		foreach ( $classes as $class ) {
 			$upgrade_version = $this->get_upgrade_version( $class );
@@ -184,8 +181,7 @@ abstract class Base {
 			}
 
 			// Run upgrade.
-			$migrated   = ( new $class( $this ) )->run();
-			$is_upgrade = true;
+			$migrated = ( new $class( $this ) )->run();
 
 			// Some migration methods can be called several times to support AS action,
 			// so do not log their completion here.
@@ -402,22 +398,7 @@ abstract class Base {
 			return;
 		}
 
-		// We need actual information about existing tables, so drop the cache.
-		Transient::delete( DB::EXISTING_TABLES_TRANSIENT_NAME );
-
-		$custom_tables = DB::get_existing_custom_tables();
-
-		foreach ( static::CUSTOM_TABLE_HANDLER_CLASSES as $custom_table_handler_class ) {
-			if ( ! class_exists( $custom_table_handler_class ) ) {
-				continue;
-			}
-
-			$custom_table_handler = new $custom_table_handler_class();
-
-			if ( ! in_array( $custom_table_handler->table_name, $custom_tables, true ) ) {
-				$custom_table_handler->create_table();
-			}
-		}
+		DB::create_custom_tables( true );
 
 		$this->tables_check_done = true;
 	}

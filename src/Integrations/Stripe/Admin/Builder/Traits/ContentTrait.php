@@ -558,7 +558,6 @@ trait ContentTrait {
 			'parent'      => 'payments',
 			'field_map'   => [ 'address' ],
 			'placeholder' => esc_html__( '--- Select Address ---', 'wpforms-lite' ),
-			'tooltip'     => esc_html__( 'Select the field that contains the customer\'s address. This is optional but required for some regions.', 'wpforms-lite' ),
 		];
 
 		$is_subscription = ! is_null( $plan_id );
@@ -566,6 +565,22 @@ trait ContentTrait {
 		if ( $is_subscription ) {
 			$args['subsection'] = 'recurring';
 			$args['index']      = $plan_id;
+		}
+
+		$is_pro = wpforms()->is_pro();
+
+		if ( ! $is_pro ) {
+			$args['pro_badge']   = true;
+			$args['data']        = [
+				'action'      => 'upgrade',
+				'name'        => esc_html__( 'Customer Address', 'wpforms-lite' ),
+				'utm-content' => 'Builder Stripe Address Field',
+				'licence'     => 'pro',
+			];
+			$args['input_class'] = 'education-modal';
+			$args['readonly']    = true;
+		} else {
+			$args['tooltip'] = esc_html__( 'Select the field that contains the customer\'s address. This is optional but required for some regions.', 'wpforms-lite' );
 		}
 
 		$output = wpforms_panel_field(
@@ -582,7 +597,11 @@ trait ContentTrait {
 			return $output;
 		}
 
-		$args['tooltip'] = esc_html__( 'Select the field that contains the shipping address. This is optional but required for some regions.', 'wpforms-lite' );
+		if ( ! $is_pro ) {
+			$args['data']['name'] = esc_html__( 'Shipping Address', 'wpforms-lite' );
+		} else {
+			$args['tooltip'] = esc_html__( 'Select the field that contains the shipping address. This is optional but required for some regions.', 'wpforms-lite' );
+		}
 
 		$output .= wpforms_panel_field(
 			'select',

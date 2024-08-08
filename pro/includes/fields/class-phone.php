@@ -16,7 +16,7 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 *
 	 * @since 1.6.3
 	 */
-	const INTL_VERSION = '20.1.0';
+	const INTL_VERSION = '21.2.8';
 
 	/**
 	 * Primary class constructor.
@@ -58,6 +58,8 @@ class WPForms_Field_Phone extends WPForms_Field {
 	 * @return array
 	 */
 	public function field_properties( $properties, $field, $form_data ) {
+
+		$properties['inputs']['primary']['attr']['aria-label'] = $field['label'] ?? esc_html__( 'Phone number', 'wpforms' );
 
 		// Smart: add validation rule and class.
 		if ( $field['format'] === 'smart' ) {
@@ -121,10 +123,10 @@ class WPForms_Field_Phone extends WPForms_Field {
 		// Load International Telephone Input library - https://github.com/jackocnr/intl-tel-input.
 		wp_enqueue_script(
 			'wpforms-smart-phone-field',
-			WPFORMS_PLUGIN_URL . 'assets/pro/lib/intl-tel-input/jquery.intl-tel-input.min.js',
-			[ 'jquery' ],
+			WPFORMS_PLUGIN_URL . 'assets/pro/lib/intl-tel-input/module.intl-tel-input.min.js',
+			[],
 			self::INTL_VERSION,
-			true
+			$this->load_script_in_footer()
 		);
 	}
 

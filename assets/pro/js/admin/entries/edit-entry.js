@@ -456,9 +456,11 @@ var WPFormsEditEntry = window.WPFormsEditEntry || ( function( document, window, 
 				}
 
 				const fieldID = $( this ).closest( '.wpforms-field' ).data( 'field-id' );
+				const iti = window.intlTelInputGlobals?.getInstance( this );
+				const result = $( this ).triggerHandler( 'validate' ) || iti?.isValidNumberPrecise();
 
 				// If the phone number is not valid, prevent form submission and display an error.
-				if ( ! $( this ).intlTelInput( 'isValidNumber' ) ) {
+				if ( ! result ) {
 					event.preventDefault();
 					app.displayFieldError( fieldID, wpforms_settings.val_phone );
 				}

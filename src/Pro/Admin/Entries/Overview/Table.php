@@ -10,6 +10,8 @@ if ( ! class_exists( 'WP_List_Table', false ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
+// phpcs:ignore WPForms.PHP.UseStatement.UnusedUseStatement
+use wpdb;
 use WPForms\Admin\Helpers\Datepicker;
 use WP_List_Table;
 use WP_Post;
@@ -26,8 +28,7 @@ use WPForms_Entry_Handler;
 class Table extends WP_List_Table {
 
 	/**
-	 * Array of start and end dates
-	 * along with number of days in between.
+	 * Array of start and end dates along with the number of days in between.
 	 *
 	 * Responsible for generating "Last X Days".
 	 *
@@ -58,7 +59,7 @@ class Table extends WP_List_Table {
 
 	/**
 	 * An array of entire SQL result set cached for further data sorting and modifications.
-	 * The array contains form ids associated with number of entries count.
+	 * The array contains form ids associated with the number of entries count.
 	 *
 	 * @since 1.8.2
 	 *
@@ -71,10 +72,9 @@ class Table extends WP_List_Table {
 	 * the chart could display the queried form entries
 	 * according to the chosen or specified time period.
 	 *
-	 * The result of the initial database query will also
-	 * be used in the "Graph" column in order to avoid
-	 * running the database query more than once when
-	 * the "timespan" (Last X Days) column is present.
+	 * The result of the initial database query will also be used in the "Graph" column
+	 * to avoid running the database query more than once
+	 * when the "timespan" (Last X Days) column is present.
 	 *
 	 * @since 1.8.2
 	 *
@@ -121,7 +121,7 @@ class Table extends WP_List_Table {
 	}
 
 	/**
-	 * Determines whether current query has forms to loop over.
+	 * Determines whether a current query has forms to loop over.
 	 *
 	 * @since 1.8.2
 	 *
@@ -174,7 +174,8 @@ class Table extends WP_List_Table {
 			'created'    => __( 'Created', 'wpforms' ),
 			'last_entry' => __( 'Last Entry', 'wpforms' ),
 			'all_time'   => __( 'All Time', 'wpforms' ),
-			'timespan'   => isset( $this->timespan[3] ) ? esc_html( $this->timespan[3] ) : '', // 4th item in the array is always a label.
+			'timespan'   => isset( $this->timespan[3] ) ? esc_html( $this->timespan[3] ) : '',
+			// The 4th item in the array is always a label.
 			'graph'      => __( 'Graph', 'wpforms' ),
 		];
 	}
@@ -223,6 +224,7 @@ class Table extends WP_List_Table {
 	 * @param WP_Post $form Form object.
 	 *
 	 * @return string
+	 * @noinspection HtmlUnknownTarget
 	 */
 	public function column_last_entry( $form ) {
 
@@ -353,7 +355,7 @@ class Table extends WP_List_Table {
 	}
 
 	/**
-	 * Set _column_headers property for table list.
+	 * Set _column_headers property for a table list.
 	 *
 	 * @since 1.8.2
 	 */
@@ -551,14 +553,14 @@ class Table extends WP_List_Table {
 			]
 		);
 
-		// Form ids from the entries table should be combined with the main query.
+		// Form ids from the entries' table should be combined with the main query.
 		$form_ids = $order === 'ASC' ? array_merge( $form_ids, $exclude ) : array_merge( $exclude, $form_ids );
 
 		return wpforms()->get( 'access' )->filter_forms_by_current_user_capability( $form_ids, 'view_entries_form_single' );
 	}
 
 	/**
-	 * Retrieves an array of sorted forms based on number of entries.
+	 * Retrieves an array of sorted forms based on the number of entries.
 	 *
 	 * @global wpdb $wpdb Instantiation of the wpdb class.
 	 *
@@ -589,7 +591,7 @@ class Table extends WP_List_Table {
 	}
 
 	/**
-	 * Retrieves an array of sorted forms based on last entry.
+	 * Retrieves an array of sorted forms based on the last entry.
 	 *
 	 * @global wpdb $wpdb Instantiation of the wpdb class.
 	 *
@@ -623,7 +625,7 @@ class Table extends WP_List_Table {
 	}
 
 	/**
-	 * Retrieves an array of sorted forms based on number of entries.
+	 * Retrieves an array of sorted forms based on the number of entries.
 	 *
 	 * @global wpdb $wpdb Instantiation of the wpdb class.
 	 *
@@ -708,8 +710,6 @@ class Table extends WP_List_Table {
 	 * Retrieves an entire SQL result set from the entries table database (i.e., all applicable rows).
 	 * Executes a SQL query and returns the entire SQL result.
 	 *
-	 * @global wpdb $wpdb Instantiation of the wpdb class.
-	 *
 	 * @since 1.8.2
 	 *
 	 * @param array $form_ids An array of post IDs to retrieve.
@@ -723,14 +723,12 @@ class Table extends WP_List_Table {
 			return [];
 		}
 
-		global $wpdb;
-
 		$form_ids_in  = wpforms_wpdb_prepare_in( $form_ids, '%d' );
 		$spam_status  = SpamEntry::ENTRY_STATUS;
 		$trash_status = 'trash';
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return (array) $wpdb->get_results(
+		return (array) $this->entry_handler->get_results(
 			"SELECT DISTINCT form_id, COUNT(entry_id) as count
 			FROM {$this->entry_handler->table_name}
 			WHERE form_id IN ({$form_ids_in})
@@ -759,8 +757,8 @@ class Table extends WP_List_Table {
 
 		$form_ids = array_filter(
 			$form_ids,
-			static function( $form_id ) {
-
+			static function ( $form_id ) {
+				// phpcs:ignore WPForms.Formatting.EmptyLineBeforeReturn.AddEmptyLineBeforeReturnStatement
 				return get_post_status( $form_id ) === 'publish';
 			}
 		);
@@ -778,10 +776,11 @@ class Table extends WP_List_Table {
 	 * @param array   $query_string If provided, merge user defined arguments into defaults query parameters.
 	 *
 	 * @return string
+	 * @noinspection HtmlUnknownTarget
 	 */
 	private function get_form_entries_url( $form, $text = self::PLACEHOLDER, $query_string = [] ) {
 
-		// When display text is not provided, leave early.
+		// When a display text is not provided, leave early.
 		if ( $text === self::PLACEHOLDER ) {
 			return $text;
 		}

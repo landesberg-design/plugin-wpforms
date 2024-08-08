@@ -1,4 +1,4 @@
-/* global wpforms, tinyMCEPreInit, tinymce */
+/* global wpforms, tinyMCEPreInit, tinymce, WPFormsUtils */
 
 /**
  * @param tinymce.EditorManager
@@ -49,6 +49,8 @@ const WPFormsRepeaterField = window.WPFormsRepeaterField || ( function( document
 			app.updateAllFieldsCloneList( el.$doc );
 			app.initDescriptions( el.$doc, 'init' );
 			app.events();
+
+			$( window ).resize( WPFormsUtils.debounce( () => app.initDescriptions( el.$doc, 'init' ), 50 ) );
 		},
 
 		/**
@@ -58,7 +60,8 @@ const WPFormsRepeaterField = window.WPFormsRepeaterField || ( function( document
 		 */
 		events() {
 			el.$doc
-				.on( 'click', '.wpforms-field-repeater-button-add', app.buttonAddClick )
+				.off( 'click.WPFormsRepeaterAdd' )
+				.on( 'click.WPFormsRepeaterAdd', '.wpforms-field-repeater-button-add', app.buttonAddClick )
 				.on( 'click', '.wpforms-field-repeater-button-remove', app.buttonRemoveClick )
 				.on( 'wpformsProcessConditionalsField', app.processConditionalsField )
 				.on( 'wpformsPageChange', app.pageChange );
@@ -84,11 +87,6 @@ const WPFormsRepeaterField = window.WPFormsRepeaterField || ( function( document
 			$context
 				.find( '.wpforms-field-repeater-clone-wrap .wpforms-field-repeater-display-rows-buttons' )
 				.addClass( 'wpforms-init' );
-
-			// Remove labels.
-			$context
-				.find( '.wpforms-field-repeater-clone-wrap > .wpforms-field-repeater-display-rows .wpforms-field-label' )
-				.remove();
 
 			// Init Rich Text field clones.
 			app.initRichTextClones( $context.find( '.wpforms-field-repeater-clone-wrap' ) );
@@ -427,6 +425,11 @@ const WPFormsRepeaterField = window.WPFormsRepeaterField || ( function( document
 		 * @param {string} action   Action name, `init`, `add`, `remove` or `remove-last`.
 		 */
 		initDescriptions( $context, action ) {
+			// Do not show descriptions on mobile.
+			if ( $( window ).width() <= 600 ) {
+				return;
+			}
+
 			const $repeaters = $context.hasClass( 'wpforms-field-repeater' ) ? $context : $context.find( '.wpforms-field-repeater' );
 
 			$repeaters.each( function() {

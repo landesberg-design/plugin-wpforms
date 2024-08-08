@@ -597,7 +597,7 @@ class WPForms_Field_Password extends WPForms_Field {
 			WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/password{$min}.js",
 			[ 'jquery', 'password-strength-meter' ],
 			WPFORMS_VERSION,
-			true
+			$this->load_script_in_footer()
 		);
 	}
 

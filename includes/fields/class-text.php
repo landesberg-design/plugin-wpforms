@@ -178,6 +178,14 @@ class WPForms_Field_Text extends WPForms_Field {
 			$properties['inputs']['primary']['data']['inputmask-alias']       = 'datetime';
 			$properties['inputs']['primary']['data']['inputmask-inputformat'] = $mask;
 
+			/**
+			 * Some datetime formats include letters, so we need to switch inputmode to text.
+			 * For instance:
+			 * – tt is am/pm
+			 * – TT is AM/PM
+			 */
+			$properties['inputs']['primary']['data']['inputmask-inputmode'] = preg_match( '/[tT]/', $mask ) ? 'text' : 'numeric';
+
 			return $properties;
 		}
 
@@ -477,7 +485,7 @@ class WPForms_Field_Text extends WPForms_Field {
 				WPFORMS_PLUGIN_URL . "assets/js/frontend/fields/text-limit.es5{$min}.js",
 				[],
 				WPFORMS_VERSION,
-				true
+				$this->load_script_in_footer()
 			);
 		}
 	}

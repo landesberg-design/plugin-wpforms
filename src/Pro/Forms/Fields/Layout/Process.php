@@ -3,7 +3,7 @@
 namespace WPForms\Pro\Forms\Fields\Layout;
 
 /**
- * Repeater field's Process class.
+ * Layout field's Process class.
  *
  * @since 1.8.9
  */

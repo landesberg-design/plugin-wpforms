@@ -5,8 +5,6 @@ namespace WPForms\Vendor\Stripe\Service;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
- */
-/**
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class SetupIntentService extends \WPForms\Vendor\Stripe\Service\AbstractService
@@ -31,7 +29,9 @@ class SetupIntentService extends \WPForms\Vendor\Stripe\Service\AbstractService
      * <code>requires_action</code>.
      *
      * After you cancel it, setup is abandoned and any operations on the SetupIntent
-     * fail with an error.
+     * fail with an error. You can’t cancel the SetupIntent for a Checkout Session. <a
+     * href="/docs/api/checkout/sessions/expire">Expire the Checkout Session</a>
+     * instead.
      *
      * @param string $id
      * @param null|array $params

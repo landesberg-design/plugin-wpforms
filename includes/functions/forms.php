@@ -521,3 +521,50 @@ function wpforms_process_smart_tags( $content, $form_data, $fields = [], $entry_
 	 */
 	return apply_filters( 'wpforms_process_smart_tags',  $content, $form_data, $fields, $entry_id, $context );
 }
+
+/**
+ * Check if form data slashing enabled.
+ *
+ * @since 1.9.0
+ *
+ * @return bool
+ */
+function wpforms_is_form_data_slashing_enabled() {
+
+	static $enabled = null;
+
+	if ( $enabled !== null ) {
+		return $enabled;
+	}
+
+	/**
+	 * Filter to enable form data slashing.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param bool $enabled Form data slashing enabled.
+	 */
+	$enabled = (bool) apply_filters( 'wpforms_enable_form_data_slashing', $enabled );
+	$enabled = defined( 'WPFORMS_ENABLE_FORM_DATA_SLASHING' ) ? WPFORMS_ENABLE_FORM_DATA_SLASHING : $enabled;
+
+	return $enabled;
+}
+
+/**
+ * Check is frontend JS should be loaded in the header.
+ *
+ * @since 1.9.0
+ *
+ * @return bool
+ */
+function wpforms_is_frontend_js_header_force_load(): bool {
+
+	/**
+	 * Allow loading JS in header on various pages.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param bool $force_load Force loading JS in header, default `false`.
+	 */
+	return (bool) apply_filters( 'wpforms_frontend_js_header_force_load', false );
+}

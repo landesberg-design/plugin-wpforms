@@ -181,6 +181,7 @@ class Templates {
 			'cancel'                  => esc_html__( 'Cancel', 'wpforms-lite' ),
 			'heads_up'                => esc_html__( 'Heads Up!', 'wpforms-lite' ),
 			'install_confirm'         => esc_html__( 'Install and activate', 'wpforms-lite' ),
+			'activate_confirm'        => esc_html__( 'Activate', 'wpforms-lite' ),
 			'ok'                      => esc_html__( 'Ok', 'wpforms-lite' ),
 			'template_addons_error'   => esc_html__( 'Could not install OR activate all the required addons. Please download from wpforms.com and install them manually. Would you like to use the template anyway?', 'wpforms-lite' ),
 			'use_template'            => esc_html__( 'Yes, use template', 'wpforms-lite' ),
@@ -194,6 +195,8 @@ class Templates {
 			$strings['template_addon_prompt'] = esc_html( sprintf( __( 'The %1$s template requires the %2$s. Would you like to install and activate it?', 'wpforms-lite' ), '%template%', '%addons%' ) );
 			/* translators: %1$s - template name, %2$s - addon name(s). */
 			$strings['template_addons_prompt'] = esc_html( sprintf( __( 'The %1$s template requires the %2$s. Would you like to install and activate all the required addons?', 'wpforms-lite' ), '%template%', '%addons%' ) );
+			/* translators: %1$s - template name, %2$s - addon name(s). */
+			$strings['template_addon_activate'] = esc_html( sprintf( __( 'The %1$s template requires the %2$s addon. Would you like to activate it?', 'wpforms-lite' ), '%template%', '%addons%' ) );
 		} else {
 			/* translators: %s - addon name(s). */
 			$strings['template_addon_prompt'] = esc_html( sprintf( __( "To use all of the features in this template, you'll need the %s. Contact your site administrator to install it, then try opening this template again.", 'wpforms-lite' ), '%addons%' ) );
@@ -753,6 +756,16 @@ class Templates {
 				);
 			}
 		}
+
+		/**
+		 * Allow modifying form data when a template is applied to the new form.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param array $form_data New form data.
+		 * @param array $template  Template data.
+		 */
+		$template['data'] = (array) apply_filters( 'wpforms_admin_builder_templates_apply_to_new_form_modify_data', $template['data'], $template );
 
 		// Encode template data to post content.
 		$args['post_content'] = wpforms_encode( $template['data'] );

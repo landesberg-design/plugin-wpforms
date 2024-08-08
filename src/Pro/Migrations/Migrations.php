@@ -1,12 +1,14 @@
 <?php
 
+// phpcs:disable Generic.Commenting.DocComment.MissingShort
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection AutoloadingIssuesInspection */
+// phpcs:enable Generic.Commenting.DocComment.MissingShort
+
 namespace WPForms\Pro\Migrations;
 
 use WPForms\Migrations\Base;
 use WPForms\Migrations\Migrations as MigrationsLite;
-use WPForms_Entry_Fields_Handler;
-use WPForms_Entry_Handler;
-use WPForms_Entry_Meta_Handler;
 
 /**
  * Class Migrations handles Pro plugin upgrade routines.
@@ -48,17 +50,7 @@ class Migrations extends Base {
 		'Upgrade182',
 		'Upgrade183',
 		'Upgrade189',
-	];
-
-	/**
-	 * Custom table handler classes.
-	 *
-	 * @since 1.7.6
-	 */
-	const CUSTOM_TABLE_HANDLER_CLASSES = [
-		WPForms_Entry_Handler::class,
-		WPForms_Entry_Fields_Handler::class,
-		WPForms_Entry_Meta_Handler::class,
+		'Upgrade190',
 	];
 
 	/**

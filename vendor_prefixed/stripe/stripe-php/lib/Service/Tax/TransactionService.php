@@ -5,8 +5,6 @@ namespace WPForms\Vendor\Stripe\Service\Tax;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
- */
-/**
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class TransactionService extends \WPForms\Vendor\Stripe\Service\AbstractService
@@ -27,7 +25,8 @@ class TransactionService extends \WPForms\Vendor\Stripe\Service\AbstractService
         return $this->requestCollection('get', $this->buildPath('/v1/tax/transactions/%s/line_items', $id), $params, $opts);
     }
     /**
-     * Creates a Tax <code>Transaction</code> from a calculation.
+     * Creates a Tax Transaction from a calculation, if that calculation hasn’t
+     * expired. Calculations expire after 90 days.
      *
      * @param null|array $params
      * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts

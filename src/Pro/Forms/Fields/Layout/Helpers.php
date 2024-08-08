@@ -12,6 +12,66 @@ use WPForms\Pro\Forms\Fields\Repeater\Helpers as RepeaterHelpers;
 class Helpers {
 
 	/**
+	 * Remove child fields after moving to layout field.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $form_data Form data.
+	 *
+	 * @return array
+	 */
+	public static function remove_fields_after_moving_to_layout_field( array $form_data ): array {
+
+		$form_fields = $form_data['fields'] ?? [];
+
+		$layout_fields = self::get_layout_fields( $form_fields );
+
+		foreach ( $layout_fields as $layout_field ) {
+			$fields = self::get_layout_all_field_ids( $layout_field );
+
+			foreach ( $fields as $field_id ) {
+				unset( $form_data['fields'][ $field_id ] );
+			}
+		}
+
+		return $form_data;
+	}
+
+	/**
+	 * Get all field IDs from the Layout field settings.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $layout_fields Layout field settings.
+	 *
+	 * @return array
+	 */
+	public static function get_layout_all_field_ids( array $layout_fields ): array {
+
+		return array_merge( ...wp_list_pluck( $layout_fields['columns'] ?? [], 'fields' ) );
+	}
+
+	/**
+	 * Get all layout fields from the form fields.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $form_fields Form fields.
+	 *
+	 * @return array
+	 */
+	public static function get_layout_fields( array $form_fields ): array {
+
+		return array_filter(
+			$form_fields,
+			static function ( $field ) {
+
+				return $field['type'] === 'layout';
+			}
+		);
+	}
+
+	/**
 	 * Reorder fields within rows in the form data.
 	 *
 	 * @since 1.8.8
@@ -46,7 +106,7 @@ class Helpers {
 	/**
 	 * Check if the field type is layout-based.
 	 *
-	 * @since 1.8.9
+	 * @since 1.9.0
 	 *
 	 * @param string $field_type Field type.
 	 *
@@ -101,6 +161,32 @@ class Helpers {
 	}
 
 	/**
+	 * Check if the column is empty.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $column Column data.
+	 *
+	 * @return bool
+	 */
+	public static function is_column_empty( $column ): bool {
+
+		if ( empty( $column['fields'] ) ) {
+			return true;
+		}
+
+		$non_empty_fields = array_filter(
+			$column['fields'],
+			static function ( $field ) {
+
+				return ! wpforms_is_empty_string( $field['formatted_value'] ?? '' );
+			}
+		);
+
+		return ! $non_empty_fields;
+	}
+
+	/**
 	 * Reorders fields within rows and reconstructs the form data array.
 	 *
 	 * @since 1.8.8
@@ -140,19 +226,28 @@ class Helpers {
 	 *
 	 * @return array
 	 */
-	private static function get_current_fields( array $rows, array &$form_data ): array {
+	private static function get_current_fields( array $rows, array &$form_data ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		$current_fields = [];
 
 		foreach ( $rows as $row ) {
 			foreach ( $row as $column ) {
-				if ( empty( $column['field'] ) || ! isset( $form_data['fields'][ $column['field'] ] ) ) {
+				if ( empty( $column['field'] ) ) {
 					continue;
 				}
 
-				$current_fields[ $column['field'] ] = $form_data['fields'][ $column['field'] ];
+				// Extract field id from the column data.
+				$field_id = is_array( $column['field'] )
+					? ( $column['field']['id'] ?? '' )
+					: $column['field'];
 
-				unset( $form_data['fields'][ $column['field'] ] );
+				if ( ! isset( $form_data['fields'][ $field_id ] ) ) {
+					continue;
+				}
+
+				$current_fields[ $field_id ] = $form_data['fields'][ $field_id ];
+
+				unset( $form_data['fields'][ $field_id ] );
 			}
 		}
 

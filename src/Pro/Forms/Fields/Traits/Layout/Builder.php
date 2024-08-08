@@ -187,9 +187,6 @@ trait Builder {
 			esc_attr( $columns_class ),
 			$columns_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
-
-		// Description.
-		$this->field_obj->field_preview_option( 'description', $field );
 	}
 
 	/**
@@ -342,6 +339,8 @@ trait Builder {
 			'enabled_cf_alert_text'      => esc_html__( 'Conversational Forms cannot be enabled because your form contains a Layout field.', 'wpforms' ),
 			'field_add_cf_alert_text'    => esc_html__( 'The Layout field cannot be used when Conversational Forms is enabled.', 'wpforms' ),
 			'delete_confirm'             => esc_html__( 'Are you sure you want to delete the Layout field? Deleting this field will also delete the fields inside it.', 'wpforms' ),
+			'cl_notice_text'             => esc_html__( 'Cannot be enabled because the Layout field contains Conditional Logic.', 'wpforms' ),
+			'cl_notice_text_grp'         => esc_html__( 'Conditional Logic has been disabled because the Layout field contains Conditional Logic.', 'wpforms' ),
 		];
 
 		return $strings;

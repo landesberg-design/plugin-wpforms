@@ -31,6 +31,7 @@ trait Field {
 		add_filter( 'wpforms_pro_admin_entries_edit_form_data', [ $this, 'filter_entries_print_preview_fields' ], 40 );
 		add_filter( 'wpforms_entry_preview_fields', [ $this, 'filter_entries_print_preview_fields' ] );
 		add_filter( 'wpforms_admin_payments_views_single_fields', [ $this, 'filter_entries_print_preview_fields' ] );
+		add_filter( 'wpforms_emails_notifications_form_data', [ $this, 'filter_entries_print_preview_fields' ], 40 );
 
 		add_filter( 'register_block_type_args', [ $this, 'register_block_type_args' ], 20, 2 );
 		add_filter( 'wpforms_conversational_form_detected', [ $this, 'cf_frontend_hooks' ], 10, 2 );

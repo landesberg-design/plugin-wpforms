@@ -2,9 +2,10 @@
 /**
  * Field Layout template for the Entry Print page.
  *
- * @var object $entry     Entry.
- * @var array  $form_data Form data and settings.
- * @var array  $field     Entry field data.
+ * @var object $entry           Entry.
+ * @var array  $form_data       Form data and settings.
+ * @var array  $field           Entry field data.
+ * @var bool   $is_hidden_by_cl Whether the field is hidden by conditional logic.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,48 +14,65 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use WPForms\Pro\Forms\Fields\Layout\Helpers;
 
-$fields_layout = new WPForms_Field_Layout();
-$rows          = isset( $field['columns'] ) && is_array( $field['columns'] ) ? Helpers::get_row_data( $field ) : [];
+$fields_layout     = new WPForms_Field_Layout();
+$rows              = isset( $field['columns'] ) && is_array( $field['columns'] ) ? Helpers::get_row_data( $field ) : [];
+$field_description = $form_data['fields'][ $field['id'] ]['description'] ?? '';
 
+$classes = [ 'wpforms-field-layout-row' ];
+
+if ( $is_hidden_by_cl ) {
+	$classes[] = 'wpforms-conditional-hidden';
+}
 ?>
-<div class="print-item field wpforms-field-layout-rows">
-	<?php foreach ( $rows as $row ) { ?>
-		<div class="wpforms-layout-row">
-			<?php
-			foreach ( $row as $column ) {
-				$field_html   = '';
-				$preset_width = ! empty( $column['width_preset'] ) ? (int) $column['width_preset'] : 50;
+<div class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
+	<p class="print-item-title field-name">
+		<?php echo esc_html( $field['label'] ); ?>
 
-				if ( $preset_width === 33 ) {
-					$preset_width = 33.33333;
-				}
+		<span class="print-item-description field-description">
+			<?php echo esc_html( $field_description ); ?>
+		</span>
+	</p>
 
-				if ( $preset_width === 67 ) {
-					$preset_width = 66.66666;
-				}
+	<div class="print-item field wpforms-field-layout-rows">
+		<?php foreach ( $rows as $row ) { ?>
+			<div class="wpforms-layout-row">
+				<?php
+				foreach ( $row as $column ) {
+					$field_html   = '';
+					$preset_width = ! empty( $column['width_preset'] ) ? (int) $column['width_preset'] : 50;
 
-				if ( ! empty( $column['width_custom'] ) ) {
-					$preset_width = (int) $column['width_custom'];
-				}
+					if ( $preset_width === 33 ) {
+						$preset_width = 33.33333;
+					}
 
-				if ( ! empty( $column['field'] ) ) {
-					$field_html = wpforms_render(
-						'admin/entry-print/field',
-						[
-							'entry'     => $entry,
-							'form_data' => $form_data,
-							'field'     => $column['field'],
-						],
-						true
+					if ( $preset_width === 67 ) {
+						$preset_width = 66.66666;
+					}
+
+					if ( ! empty( $column['width_custom'] ) ) {
+						$preset_width = (int) $column['width_custom'];
+					}
+
+					if ( ! empty( $column['field'] ) ) {
+						$field_html = wpforms_render(
+							'admin/entry-print/field',
+							[
+								'entry'           => $entry,
+								'form_data'       => $form_data,
+								'field'           => $column['field'],
+								'is_hidden_by_cl' => $is_hidden_by_cl,
+							],
+							true
+						);
+					}
+					printf(
+						'<div class="wpforms-field-layout-column" style="width: %1$s">%2$s</div>',
+						esc_attr( (float) $preset_width . '%' ),
+						$field_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					);
 				}
-				printf(
-					'<div class="wpforms-field-layout-column" style="width: %1$s">%2$s</div>',
-					esc_attr( (float) $preset_width . '%' ),
-					$field_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				);
-			}
-			?>
-		</div>
-	<?php } ?>
+				?>
+			</div>
+		<?php } ?>
+	</div>
 </div>

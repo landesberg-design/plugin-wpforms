@@ -1,6 +1,111 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.9.0.1] 2024-08-08
+### Fixed
+- Issue where the WPForms widget was not available with the Avada theme.
+- Compatibility issue that prevented the WPForms widget from being added with certain page builders.
+- Entry fields could not be saved in some cases when Conditional Logic and Show Values were enabled in Choices.
+- Issue where the Reply-To email field was missing in the email header when the Simple Contact Form template was used.
+
+## [1.9.0] 2024-08-06
+### Added
+- Modern Antispam protection for new forms.
+- Support conditional logic in the Layout field and add the ability to render the label and description for this field.
+- One column preset for the Layout field.
+- The notification to check prices is added when the currency is switched.
+- The new filter `wpforms_sanitize_amount_before` to filter a raw price amount before sanitization.
+- The new filter `wpforms_sanitize_amount` to filter a sanitized price amount.
+- Display the activation modal on addons form templates if the addon was installed but not activated.
+- Conditional option to exclude today's date from the date picker.
+- The new filter `wpforms_enable_form_data_slashing` to enable the form data slashing.
+- The new filter `wpforms_field_file_upload_remove_webfiles_from_denylist_enabled` allows logged-in administrators to upload `.htm, .html, .js` files.
+- The new filter `wpforms_frontend_js_header_force_load`allows the loading of JS assets in the header.
+
+### Changed
+- Improved performance on Entries admin pages, including Entries Search.
+- Improved automatic recreation of custom database tables.
+- Inactive addons now display their updates on the Plugins and Updates pages.
+- Display a confirmation popup when clicking the "Empty Spam" button to prevent accidental clicks.
+- Improved RTL support of plugin admin pages on desktop and mobile screens.
+- Smart Tags for the Name, Date/Time and Address fields now allow retrieving partial data, such as Last Name or City.
+- Improved layout of the Settings > Integrations page on small screens.
+- Added notices for the Default value and Allowlist/Denylist settings on the Email field in case some values were invalid and have been removed.
+- Improved "File Upload" field error messages to be more helpful.
+- If both the Lite and Pro versions are installed and Pro is activated, the Lite version no longer has an activation link to avoid confusion.
+- Improved the multi-select dropdowns UI across the Builder UI.
+- Updated `stripe/stripe-php` library to v15.1.0.
+- Updated `woocommerce/action-scheduler` library to v3.8.1.
+- Allowed using the `&` symbol in Modern style Dropdown field choices.
+- Install the Lite version when the Pro version is active is not allowed.
+- Improved compatibility with the WP JobSearch plugin.
+- Updated `jQuery.Validate` library to v1.20.1.
+- Improved sanitization of the Website / URL field.
+- Prevented addons' updates if the WPForms version doesn't match the required version.
+- Updated addon compatibility error notices on the Plugins admin page.
+- Updated `inputmask` library to v5.0.9.
+
+### Fixed
+- Stripe payment form couldn't be submitted in the Elementor popup preview.
+- A fatal error occurred when the request to retrieve all addons was triggered by a non-authenticated user.
+- The Trash, Duplicate, Restore, and Delete actions for templates and forms now display a notice with the correct type.
+- Multiple Choice, Checkboxes, and Dropdown fields with empty values were displayed incorrectly in email notifications.
+- Database error on a single network site after creating a form if the plugin was network activated.
+- The W3C validation error was resolved for the Rich Text field.
+- Fields reacted by hovering over them with the cursor on the Elementor editor screen.
+- Modern Dropdown fields were not appropriately loaded on Block (Gutenberg) and Elementor editors.
+- Some field margins were missing or incorrect on the Entry Edit page.
+- Forms with hidden labels had a big horizontal scrollbar when displayed on mobile with RTL languages.
+- Conditional logic affected the print page, which did not display hidden fields.
+- The RTE field was broken in the Elementor editor preview when the left menu was collapsed.
+- Changing layouts kept on adding multiple layout classes in the layout selector.
+- Now, unique answers are supported in the Repeater Field.
+- Rare exception with how we registered translations for download using the respective transient.
+- It was possible to apply Gutenberg Themes for Lead Forms.
+- PHP Warnings were displayed when user-duplicated forms were created before Form Pages/Conversational Forms were activated for the first time.
+- Pre-populating fields from another form with confirmation redirect URL was not handling multi-select fields.
+- The Gutenberg editor was not displaying the page title using Smart Tags.
+- The {page_url}Smart Tag value was wrong on the Gutenberg editor's page.
+- When all the provider's connections were removed, the check icon remained in the provider title.
+- The fields hidden via Conditional Logic left empty div's inside a Layout field.
+- The optional password field with enabled strength could not submit an empty value.
+- The Smart Phone field has reported a validation error on valid Belgium and German phone numbers.
+- The Repeater field Add/Remove buttons were invisible in some themes.
+- Now, a warning popup is shown after adding or deleting the marketing addon connection.
+- The position of the Next and Previous buttons in the Page Break Field was incorrect in RTL languages.
+- The `{page_url}` Smart Tag was incorrect in the Divi builder.
+- PHP deprecated messages were fixed on the Entry page for non-default file extensions.
+- Modern Dropdown fields didn't preview correctly for multiple instances of WPForms block on the Gutenberg editor's page.
+- The Repeater field clones on the mobile had no labels.
+- The choice-based payment field Smart Tags didn't work in the prefilled URL.
+- Data from the repeater was not displayed when exporting and editing an entry in some cases.
+- In Dropdown, the & symbol was rendered as the corresponding HTML entity `&amp;` for Modern Style.
+- The modern dropdown field was not loading correctly on the Elementor popup.
+- Empty forms couldn't be submitted without enabling the "Minimum time for submit" setting.
+- Incorrect site URL was used during the Lite to Pro upgrade.
+- Switching to Live mode on the Payments Overview screen was impossible when all test payments were deleted.
+- In some cases, the fields' order on the Entries Overview page was incorrect when the form was created from a Simple contact form template.
+- A PHP error could be generated when submitting an imported Stripe payment form with the Address field configured in payment settings.
+- Fields hidden by Conditional Logic could affect the Total field amount in payment addons.
+- PHP Notices were logged when users visited a single entry page with empty values.
+- Dropdown and Checkbox fields with multiple values were inline in email notifications.
+- The Themes panel in the Block editor had a minor visual issue.
+- On the Form Builder's Templates panel, two "Upgrade to PRO" banners were displayed in Lite and Pro (Basic and Plus licenses).
+- Compatibility with OptinMonster when the multi-page form was inside the popup.
+- Pressing the Enter key triggered the WPForms Insert Form modal in the Classic editor.
+- Dropdown and phone fields in forms with the `inline-fields` class had cropped dropdowns on Safari.
+- The checkbox field with only one choice was not marked as selected in the entry export.
+- Payment quantity text was not centered on some themes.
+- Some fields were visible in the email notifications even if they were hidden by Conditional Logic.
+- Field labels set to be hidden were displayed in form entry previews.
+- The Robots.txt file wasn't valid due to the WPForms disallow rule.
+- Repeater empty fields were breaking the print preview layout.
+- It was impossible to fill in the AM/PM date format for fields on mobile devices with enabled input masks.
+- After embedding to the new page, the `{page_title}` Smart Tag was empty in the Block Editor (Gutenberg).
+- Incorrect note text inside Repeater fields having a size.
+- Conditional logic applied to the Repeater field was not reflected on single-entry views.
+- The repeater field didn't work in the Elementor popup.
+
 ## [1.8.9.6] - 2024-07-09
 ### Changed
 - Improved compatibility with OceanWP theme.

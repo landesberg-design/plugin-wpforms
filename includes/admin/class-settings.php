@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use WPForms\Admin\Notice;
 use WPForms\Migrations\Migrations as LiteMigration;
 use WPForms\Pro\Migrations\Migrations;
+use WPForms\Admin\Settings\Payments;
 
 /**
  * Settings class.
@@ -184,8 +185,9 @@ class WPForms_Settings {
 		$current_view = sanitize_key( $_POST['view'] );
 
 		// Get registered fields and current settings.
-		$fields   = $this->get_registered_settings( $current_view );
-		$settings = get_option( 'wpforms_settings', [] );
+		$fields            = $this->get_registered_settings( $current_view );
+		$settings          = get_option( 'wpforms_settings', [] );
+		$original_settings = $settings;
 
 		// Views excluded from saving list.
 		$exclude_views = apply_filters( 'wpforms_settings_exclude_view', [], $fields, $settings );
@@ -269,6 +271,11 @@ class WPForms_Settings {
 		wpforms_update_settings( $settings );
 
 		Notice::success( esc_html__( 'Settings were successfully saved.', 'wpforms-lite' ) );
+
+		if ( isset( $original_settings['currency'], $settings['currency'] ) && $original_settings['currency'] !== $settings['currency'] ) {
+
+			Notice::warning( esc_html__( "You've changed your currency. Please double-check the product prices in your forms and verify that they're correct.", 'wpforms-lite' ) );
+		}
 	}
 
 	/**

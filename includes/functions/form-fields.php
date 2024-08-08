@@ -547,13 +547,14 @@ function wpforms_is_repeater_child_field( $field ): bool {
  *
  * @param int|string|array $field Field ID.
  *
- * @return array
+ * @return int[]
  */
 function wpforms_get_repeater_field_ids( $field ): array {
 
-	$field_id = (string) ( is_array( $field ) ? $field['id'] : $field );
-
-	list( $original_id, $index_id ) = explode( '_', $field_id );
+	$field_id     = (string) ( is_array( $field ) ? $field['id'] : $field );
+	$field_id_arr = explode( '_', $field_id );
+	$original_id  = (int) $field_id_arr[0];
+	$index_id     = (int) ( $field_id_arr[1] ?? 0 );
 
 	return compact( 'original_id', 'index_id' );
 }
@@ -574,7 +575,7 @@ function wpforms_get_choices_value( array $field, array $form_data ): string {
 	$is_dynamic  = ! empty( $field['dynamic'] );
 	$value       = $field['value'];
 
-	if ( ! wpforms_is_empty_string( $field['value_raw'] ) && $show_values && ! $is_dynamic ) {
+	if ( ! wpforms_is_empty_string( $field['value_raw'] ?? '' ) && $show_values && ! $is_dynamic ) {
 		$value = $field['value_raw'];
 	}
 
@@ -606,4 +607,22 @@ function wpforms_is_repeated_field( int $field_id, array $fields ): bool {
 	}
 
 	return false;
+}
+
+/**
+ * Get field types where user can select more than one item.
+ *
+ * Note: this list does not include File Upload field, even thought it is a multi-field.
+ *
+ * @since 1.9.0
+ *
+ * @return array
+ */
+function wpforms_get_multi_fields(): array {
+
+	return [
+		'checkbox',
+		'select',
+		'payment-checkbox',
+	];
 }

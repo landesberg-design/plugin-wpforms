@@ -101,6 +101,8 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$this->order = 100;
 		$this->group = 'fancy';
 
+		$this->remove_webfiles_from_denylist();
+
 		// Init our upload helper & add the actions.
 		$this->upload = new Upload();
 
@@ -161,6 +163,34 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	}
 
 	/**
+	 * Remove web files from denylist.
+	 *
+	 * @since 1.9.0
+	 */
+	private function remove_webfiles_from_denylist() {
+
+		if (
+			! function_exists( 'current_user_can' ) ||
+			/**
+			 * Filter to enable removing web files from denylist.
+			 *
+			 * @since 1.9.0
+			 *
+			 * @param bool $enabled Default value is false.
+			 *
+			 * @return bool
+			 */
+			! (bool) apply_filters( 'wpforms_field_file_upload_remove_webfiles_from_denylist_enabled', false )
+		) {
+			return;
+		}
+
+		if ( current_user_can( 'unfiltered_html' ) ) {
+			$this->denylist = array_diff( $this->denylist, [ 'htm', 'html', 'js' ] );
+		}
+	}
+
+	/**
 	 * Enqueue frontend field js.
 	 *
 	 * @since 1.5.6
@@ -191,7 +221,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 				WPFORMS_PLUGIN_URL . 'assets/pro/lib/dropzone.min.js',
 				[ 'jquery' ],
 				self::DROPZONE_VERSION,
-				true
+				$this->load_script_in_footer()
 			);
 
 			wp_enqueue_script(
@@ -199,7 +229,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 				WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/file-upload.es5{$min}.js",
 				[ 'wpforms', 'wp-util', self::HANDLE ],
 				WPFORMS_VERSION,
-				true
+				$this->load_script_in_footer()
 			);
 
 			wp_localize_script(
@@ -1146,7 +1176,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 	private function validate_modern_files( $files ) {
 
 		if ( ! $this->has_missing_tmp_file( $files ) ) {
-			wpforms()->get( 'process' )->errors[ $this->form_id ][ $this->field_id ] = $this->validate_basic( 7 );
+			wpforms()->get( 'process' )->errors[ $this->form_id ][ $this->field_id ] = esc_html__( 'File(s) not uploaded. Remove and re-attach file(s).', 'wpforms' );
 
 			return;
 		}
@@ -1592,7 +1622,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 			wp_send_json_error( $default_error, 403 );
 		}
 		if ( empty( $_FILES['file']['tmp_name'] ) ) {
-			wp_send_json_error( $default_error, 403 );
+			wp_send_json_error( esc_html__( 'File upload failed, please try again.', 'wpforms' ), 403 );
 		}
 
 		$error          = empty( $_FILES['file']['error'] ) ? 0 : (int) $_FILES['file']['error'];
@@ -1618,7 +1648,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 		$tmp      = $this->move_file( $path, $tmp_path );
 
 		if ( ! $tmp ) {
-			wp_send_json_error( $default_error, 400 );
+			wp_send_json_error( esc_html__( 'File upload failed, please try again.', 'wpforms' ), 403 );
 		}
 
 		$this->clean_tmp_files();
@@ -2198,7 +2228,7 @@ class WPForms_Field_File_Upload extends WPForms_Field {
 
 		if ( ! in_array( $file_data['ext'], $ext_types['image'], true ) ) {
 
-			$src = wp_mime_type_icon( wp_ext2type( $file_data['ext'] ) );
+			$src = wp_mime_type_icon( wp_ext2type( $file_data['ext'] ) ?? '' );
 		} elseif ( $file_data['attachment_id'] ) {
 
 			$image = wp_get_attachment_image_src( $file_data['attachment_id'], [ 16, 16 ], true );

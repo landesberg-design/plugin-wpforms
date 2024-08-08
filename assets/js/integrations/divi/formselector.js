@@ -1,4 +1,4 @@
-/* global wpforms_divi_builder, WPFormsRepeaterField */
+/* global wpforms_divi_builder, WPFormsRepeaterField, ETBuilderBackendDynamic */
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -74,14 +74,14 @@ class WPFormsSelector extends Component {
 	 * @since 1.6.3
 	 */
 	componentDidMount() {
-
-		var formData = new FormData();
+		const formData = new FormData();
 
 		formData.append( 'nonce', wpforms_divi_builder.nonce );
 		formData.append( 'action', 'wpforms_divi_preview' );
 		formData.append( 'form_id', this.props.form_id );
 		formData.append( 'show_title', this.props.show_title );
 		formData.append( 'show_desc', this.props.show_desc );
+		formData.append( 'divi_post_id', ETBuilderBackendDynamic?.postId ?? 0 );
 
 		fetch(
 			wpforms_divi_builder.ajax_url,
@@ -96,17 +96,15 @@ class WPFormsSelector extends Component {
 				body: new URLSearchParams( formData ),
 			},
 		)
-			.then( res => res.json() )
+			.then( ( res ) => res.json() )
 			.then(
 				( result ) => {
-
 					this.setState( {
 						isLoading: false,
 						form: result.data,
 					} );
 				},
 				( error ) => {
-
 					this.setState( {
 						isLoading: false,
 						error,
@@ -199,5 +197,7 @@ jQuery( document )
 		} );
 
 		// Init Repeater fields.
-		WPFormsRepeaterField?.ready();
+		if ( 'undefined' !== typeof WPFormsRepeaterField ) {
+			WPFormsRepeaterField.ready();
+		}
 	} );

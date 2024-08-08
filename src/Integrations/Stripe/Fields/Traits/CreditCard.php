@@ -359,24 +359,6 @@ trait CreditCard {
 	}
 
 	/**
-	 * Checking if block editor is loaded.
-	 *
-	 * @since 1.8.2
-	 *
-	 * @return bool True if is block editor.
-	 */
-	private function is_block_editor() {
-
-		// phpcs:disable WordPress.Security.NonceVerification
-		$is_gutenberg = defined( 'REST_REQUEST' ) && REST_REQUEST && ! empty( $_REQUEST['context'] ) && $_REQUEST['context'] === 'edit';
-		$is_elementor = ( ! empty( $_POST['action'] ) && $_POST['action'] === 'elementor_ajax' ) || ( ! empty( $_GET['action'] ) && $_GET['action'] === 'elementor' );
-		$is_divi      = ! empty( $_GET['et_fb'] ) || ( ! empty( $_POST['action'] ) && $_POST['action'] === 'wpforms_divi_preview' );
-		// phpcs:enable WordPress.Security.NonceVerification
-
-		return $is_gutenberg || $is_elementor || $is_divi;
-	}
-
-	/**
 	 * Do not add the `for` attribute to certain sublabels.
 	 *
 	 * @since 1.8.9

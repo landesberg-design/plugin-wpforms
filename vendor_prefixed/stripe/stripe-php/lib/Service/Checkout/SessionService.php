@@ -5,8 +5,6 @@ namespace WPForms\Vendor\Stripe\Service\Checkout;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
- */
-/**
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class SessionService extends \WPForms\Vendor\Stripe\Service\AbstractService

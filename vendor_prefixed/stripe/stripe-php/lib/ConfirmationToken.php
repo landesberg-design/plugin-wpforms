@@ -8,12 +8,14 @@ namespace WPForms\Vendor\Stripe;
  * to your server for confirming a PaymentIntent or SetupIntent. If the confirmation
  * is successful, values present on the ConfirmationToken are written onto the Intent.
  *
- * To learn more or request access, visit the related guided: <a href="https://stripe.com/docs/payments/finalize-payments-on-the-server-confirmation-tokens">Finalize payments on the server using Confirmation Tokens</a>.
+ * To learn more about how to use ConfirmationToken, visit the related guides:
+ * - <a href="https://stripe.com/docs/payments/finalize-payments-on-the-server">Finalize payments on the server</a>
+ * - <a href="https://stripe.com/docs/payments/build-a-two-step-confirmation">Build two-step confirmation</a>.
  *
  * @property string $id Unique identifier for the object.
  * @property string $object String representing the object's type. Objects of the same type share the same value.
  * @property int $created Time at which the object was created. Measured in seconds since the Unix epoch.
- * @property null|int $expires_at Time at which this ConfirmationToken expires and can no longer be used to confirm a PaymentIntent or SetupIntent. This is set to null once this ConfirmationToken has been used.
+ * @property null|int $expires_at Time at which this ConfirmationToken expires and can no longer be used to confirm a PaymentIntent or SetupIntent.
  * @property bool $livemode Has the value <code>true</code> if the object exists in live mode or the value <code>false</code> if the object exists in test mode.
  * @property null|\Stripe\StripeObject $mandate_data Data used for generating a Mandate.
  * @property null|string $payment_intent ID of the PaymentIntent that this ConfirmationToken was used to confirm, or null if this ConfirmationToken has not yet been used.
@@ -27,7 +29,23 @@ namespace WPForms\Vendor\Stripe;
 class ConfirmationToken extends ApiResource
 {
     const OBJECT_NAME = 'confirmation_token';
-    use ApiOperations\Retrieve;
     const SETUP_FUTURE_USAGE_OFF_SESSION = 'off_session';
     const SETUP_FUTURE_USAGE_ON_SESSION = 'on_session';
+    /**
+     * Retrieves an existing ConfirmationToken object.
+     *
+     * @param array|string $id the ID of the API resource to retrieve, or an options array containing an `id` key
+     * @param null|array|string $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return \Stripe\ConfirmationToken
+     */
+    public static function retrieve($id, $opts = null)
+    {
+        $opts = \WPForms\Vendor\Stripe\Util\RequestOptions::parse($opts);
+        $instance = new static($id, $opts);
+        $instance->refresh();
+        return $instance;
+    }
 }

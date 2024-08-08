@@ -552,7 +552,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			WPFORMS_PLUGIN_URL . "assets/pro/js/frontend/fields/richtext{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
-			true
+			$this->load_script_in_footer()
 		);
 	}
 
@@ -635,7 +635,6 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			'textarea_name'    => "wpforms[fields][{$field['id']}]",
 			'editor_height'    => $this->get_size_value_for_field( $primary['data']['size'] ),
 			'editor_class'     => ! empty( $field['required'] ) ? 'wpforms-field-required' : '',
-			'editor_css'       => '<style>.wpforms-field-richtext .insert-media.add_media { display: none !important; } .mce-container * { color: initial; }</style>',
 			'tinymce'          => [
 				'plugins'                      => implode( ',', $this->get_tinymce_plugins( $field['id'], $primary ) ),
 				'toolbar1'                     => implode( ',', $this->get_toolbar1( $field['id'], $primary, $mce_mode ) ),

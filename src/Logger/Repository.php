@@ -1,5 +1,8 @@
 <?php
 
+// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+/** @noinspection PhpIllegalPsrClassPathInspection */
+
 namespace WPForms\Logger;
 
 use WPForms\Helpers\DB;
@@ -37,7 +40,7 @@ class Repository {
 	private $records;
 
 	/**
-	 * Get not-limited total query.
+	 * Get a not-limited total query.
 	 *
 	 * @since 1.6.4.1
 	 *
@@ -49,13 +52,12 @@ class Repository {
 	 * Log constructor.
 	 *
 	 * @since 1.6.3
-	 *
-	 * @param RecordQuery $records_query Records query.
+	 * @since 1.9.0 Removed the argument.
 	 */
-	public function __construct( $records_query ) {
+	public function __construct() {
 
-		$this->records_query = $records_query;
 		$this->full_total    = false;
+		$this->records_query = new RecordQuery();
 		$this->records       = new Records();
 	}
 
@@ -110,7 +112,7 @@ class Repository {
 	 *
 	 * @param string       $title    Record title.
 	 * @param string       $message  Record message.
-	 * @param array|string $types    Array, string, or string separated by commas types.
+	 * @param array|string $types    Array, string, or string separated by comma types.
 	 * @param int          $form_id  Record form ID.
 	 * @param int          $entry_id Record entry ID.
 	 * @param int          $user_id  Record user ID.
@@ -139,7 +141,8 @@ class Repository {
 		$data             = $this->records_query->get( $limit, $offset, $search, $type );
 		$this->full_total = true;
 		$records          = new Records();
-		// As we got raw data we need to convert to Record.
+
+		// As we got raw data, we need to convert to Record.
 		foreach ( $data as $row ) {
 			$records->push(
 				$this->prepare_record( $row )
@@ -200,7 +203,7 @@ class Repository {
 	}
 
 	/**
-	 * Save records to database.
+	 * Save records to the database.
 	 *
 	 * @since 1.6.3
 	 */
@@ -208,7 +211,7 @@ class Repository {
 
 		global $wpdb;
 
-		// We can't use the empty function because it doesn't work with Countable object.
+		// We can't use the empty function because it doesn't work with a Countable object.
 		if ( ! count( $this->records ) ) {
 			return;
 		}
@@ -274,7 +277,7 @@ class Repository {
 	}
 
 	/**
-	 * Clear all records in Database.
+	 * Clear all records in the Database.
 	 *
 	 * @since 1.6.3
 	 */

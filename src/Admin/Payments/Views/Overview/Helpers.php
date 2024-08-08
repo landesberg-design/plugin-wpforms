@@ -84,4 +84,36 @@ class Helpers {
 		);
 		echo '</span>';
 	}
+
+	/**
+	 * Look for at least one payment in test mode.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public static function is_test_payment_exists(): bool {
+
+		$published = wpforms()->get( 'payment' )->get_payments(
+			[
+				'mode'   => 'test',
+				'number' => 1,
+			]
+		);
+
+		if ( $published ) {
+			return true;
+		}
+
+		// Check for trashed payments.
+		return ! empty(
+			wpforms()->get( 'payment' )->get_payments(
+				[
+					'mode'         => 'test',
+					'number'       => 1,
+					'is_published' => 0,
+				]
+			)
+		);
+	}
 }

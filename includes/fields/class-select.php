@@ -16,7 +16,7 @@ class WPForms_Field_Select extends WPForms_Field {
 	 *
 	 * @since 1.6.3
 	 */
-	const CHOICES_VERSION = '9.0.1';
+	const CHOICES_VERSION = '10.2.0';
 
 	/**
 	 * Classic (old) style.

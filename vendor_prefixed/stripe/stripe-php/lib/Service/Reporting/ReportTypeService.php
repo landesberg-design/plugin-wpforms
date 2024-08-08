@@ -5,8 +5,6 @@ namespace WPForms\Vendor\Stripe\Service\Reporting;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
- */
-/**
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class ReportTypeService extends \WPForms\Vendor\Stripe\Service\AbstractService

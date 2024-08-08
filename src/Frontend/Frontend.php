@@ -1496,15 +1496,21 @@ class Frontend {
 	}
 
 	/**
-	 * Load the necessary CSS for single pages/posts earlier if possible.
+	 * Load the necessary assets for single pages/posts earlier if possible.
 	 *
 	 * If we are viewing a singular page, then we can check the content early
 	 * to see if the shortcode was used. If not, we fall back and load the assets
 	 * later on during the page (widgets, archives, etc.).
 	 *
 	 * @since 1.0.0
+	 * @since 1.9.0 Added load JS assets.
 	 */
 	public function assets_header() {
+
+		// Force loading JS assets in the header.
+		if ( ! $this->load_script_in_footer() ) {
+			$this->assets_js();
+		}
 
 		/**
 		 * Allow loading assets in header on various pages.
@@ -1524,9 +1530,9 @@ class Frontend {
 		 *
 		 * @param bool $force_load Force loading assets in header, default `false`.
 		 */
-		$force_load = (bool) apply_filters( 'wpforms_frontend_assets_header_force_load', false );
+		$force_load_css = (bool) apply_filters( 'wpforms_frontend_assets_header_force_load', false );
 
-		if ( $force_load ) {
+		if ( $force_load_css ) {
 			$this->assets_css();
 
 			return;
@@ -1599,15 +1605,16 @@ class Frontend {
 		 */
 		do_action( 'wpforms_frontend_js', $this->forms );
 
-		$min = wpforms_get_min_suffix();
+		$min       = wpforms_get_min_suffix();
+		$in_footer = $this->load_script_in_footer();
 
 		// Load jQuery validation library - https://jqueryvalidation.org/.
 		wp_enqueue_script(
 			'wpforms-validation',
 			WPFORMS_PLUGIN_URL . 'assets/lib/jquery.validate.min.js',
 			[ 'jquery' ],
-			'1.20.0',
-			true
+			'1.20.1',
+			$in_footer
 		);
 
 		// Load jQuery input mask library - https://github.com/RobinHerbots/jquery.inputmask.
@@ -1620,8 +1627,8 @@ class Frontend {
 				'wpforms-maskedinput',
 				WPFORMS_PLUGIN_URL . 'assets/lib/jquery.inputmask.min.js',
 				[ 'jquery' ],
-				'5.0.7-beta.29',
-				true
+				'5.0.9',
+				$in_footer
 			);
 		}
 
@@ -1635,7 +1642,7 @@ class Frontend {
 				WPFORMS_PLUGIN_URL . 'assets/lib/mailcheck.min.js',
 				false,
 				'1.1.2',
-				true
+				$in_footer
 			);
 
 			wp_enqueue_script(
@@ -1643,7 +1650,7 @@ class Frontend {
 				WPFORMS_PLUGIN_URL . 'assets/lib/punycode.min.js',
 				[],
 				'1.0.0',
-				true
+				$in_footer
 			);
 		}
 
@@ -1652,7 +1659,7 @@ class Frontend {
 			WPFORMS_PLUGIN_URL . "assets/js/share/utils{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
-			true
+			$in_footer
 		);
 
 		// Load base JS.
@@ -1661,7 +1668,7 @@ class Frontend {
 			WPFORMS_PLUGIN_URL . "assets/js/frontend/wpforms{$min}.js",
 			[ 'jquery' ],
 			WPFORMS_VERSION,
-			true
+			$in_footer
 		);
 
 		// Load JS additions needed in the Modern Markup mode.
@@ -1671,7 +1678,7 @@ class Frontend {
 				WPFORMS_PLUGIN_URL . "assets/js/frontend/wpforms-modern{$min}.js",
 				[ 'wpforms' ],
 				WPFORMS_VERSION,
-				true
+				$in_footer
 			);
 		}
 	}
@@ -1741,6 +1748,7 @@ class Frontend {
 
 		$form_data = (array) $form_data;
 		$min       = wpforms_get_min_suffix();
+		$in_footer = $this->load_script_in_footer();
 
 		// Base CSS only.
 		if ( (int) wpforms_setting( 'disable-css', '1' ) === 1 ) {
@@ -1759,7 +1767,7 @@ class Frontend {
 				WPFORMS_PLUGIN_URL . "assets/js/frontend/wpforms-confirmation{$min}.js",
 				[ 'jquery' ],
 				WPFORMS_VERSION,
-				true
+				$in_footer
 			);
 		}
 
@@ -1846,6 +1854,20 @@ class Frontend {
 			'val_inputmask_incomplete'   => wpforms_setting( 'validation-inputmask-incomplete', esc_html__( 'Please fill out the field in required format.', 'wpforms-lite' ) ),
 			'uuid_cookie'                => false,
 			'locale'                     => wpforms_get_language_code(),
+
+			/**
+			 * Filters the user's country code.
+			 *
+			 * Leave empty for most cases, it will be auto-detected.
+			 * If set it will make country recognition in wpforms.js frontend skipped.
+			 * Allows to test Phone Smart field with different countries.
+			 *
+			 * @since 1.9.0
+			 *
+			 * @param string|false $country Country code.
+			 */
+			'country'                    => apply_filters( 'wpforms_frontend_get_user_country_code', false ),
+			'country_list_label'         => esc_html__( 'Country list', 'wpforms-lite' ),
 			'wpforms_plugin_url'         => WPFORMS_PLUGIN_URL,
 			'gdpr'                       => wpforms_setting( 'gdpr' ),
 			'ajaxurl'                    => admin_url( 'admin-ajax.php' ),
@@ -2219,5 +2241,17 @@ class Frontend {
 		 * @param array $form_data Form data.
 		 */
 		do_action( 'wpforms_display_field_after', $field, $form_data ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+	}
+
+	/**
+	 * Whether to print the script in the footer.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	protected function load_script_in_footer(): bool {
+
+		return ! wpforms_is_frontend_js_header_force_load();
 	}
 }

@@ -301,7 +301,7 @@ class Edit {
 				'wpforms-maskedinput',
 				WPFORMS_PLUGIN_URL . 'assets/lib/jquery.inputmask.min.js',
 				[ 'jquery' ],
-				'5.0.7-beta.29',
+				'5.0.9',
 				true
 			);
 		}
@@ -996,7 +996,7 @@ class Edit {
 		do_action( 'wpforms_pro_admin_entries_edit_submit_before_processing', $this->form_id, $this->entry_id );
 
 		// Process the data.
-		$this->process( stripslashes_deep( wp_unslash( $_POST['wpforms'] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$this->process( stripslashes_deep( $_POST['wpforms'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	}
 
 	/**

@@ -4,8 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WPForms\Admin\Education\Helpers;
-
 /**
  * Form builder that contains magic.
  *
@@ -429,9 +427,7 @@ class WPForms_Builder {
 	 */
 	public function enqueues() {
 
-		// Remove conflicting scripts.
-		wp_deregister_script( 'serialize-object' );
-		wp_deregister_script( 'wpclef-ajax-settings' );
+		$this->suppress_conflicts();
 
 		do_action( 'wpforms_builder_enqueues_before', $this->view );
 
@@ -638,6 +634,21 @@ class WPForms_Builder {
 	}
 
 	/**
+	 * Remove conflicting scripts and styles.
+	 *
+	 * @since 1.9.0
+	 */
+	private function suppress_conflicts() {
+
+		// Remove conflicting styles (e.g., WP JobSearch plugin).
+		wp_deregister_style( 'font-awesome' );
+
+		// Remove conflicting scripts.
+		wp_deregister_script( 'serialize-object' );
+		wp_deregister_script( 'wpclef-ajax-settings' );
+	}
+
+	/**
 	 * Get localized strings.
 	 *
 	 * @since 1.6.8
@@ -742,7 +753,7 @@ class WPForms_Builder {
 			'template_modal_msg'                      => ! empty( $this->template['modal']['message'] ) ? $this->template['modal']['message'] : '',
 			'template_modal_display'                  => ! empty( $this->template['modal_display'] ) ? $this->template['modal_display'] : '',
 			'template_select'                         => esc_html__( 'Use Template', 'wpforms-lite' ),
-			'template_confirm'                        => esc_html__( 'Changing templates on an existing form will DELETE existing form fields. Are you sure you want apply the new template?', 'wpforms-lite' ),
+			'template_confirm'                        => esc_html__( 'Changing the template on this form will delete existing fields, reset external connections, and unsaved changes will be lost. Are you sure you want to apply the new template?', 'wpforms-lite' ),
 			'use_default_template'                    => esc_html__( 'Use Default Template', 'wpforms-lite' ),
 			'embed'                                   => esc_html__( 'Embed', 'wpforms-lite' ),
 			'exit'                                    => esc_html__( 'Exit', 'wpforms-lite' ),

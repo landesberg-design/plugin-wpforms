@@ -5,8 +5,6 @@ namespace WPForms\Vendor\Stripe\Service\Climate;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
- */
-/**
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class OrderService extends \WPForms\Vendor\Stripe\Service\AbstractService
@@ -27,7 +25,7 @@ class OrderService extends \WPForms\Vendor\Stripe\Service\AbstractService
         return $this->requestCollection('get', '/v1/climate/orders', $params, $opts);
     }
     /**
-     * Cancels a Climate order. You can cancel an order within 30 days of creation.
+     * Cancels a Climate order. You can cancel an order within 24 hours of creation.
      * Stripe refunds the reservation <code>amount_subtotal</code>, but not the
      * <code>amount_fees</code> for user-triggered cancellations. Frontier might cancel
      * reservations if suppliers fail to deliver. If Frontier cancels the reservation,

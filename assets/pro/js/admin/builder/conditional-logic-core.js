@@ -452,6 +452,33 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 			WPFormsConditionals.bindUIActions();
 		},
 
+		/**
+		 * Get layout fields to exclude.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param {Object} $element Element to get layout fields to exclude.
+		 *
+		 * @return {Object} Layout fields to exclude.
+		 */
+		getLayoutFieldsToExclude( $element ) {
+			const layoutID = $element.parents( '.wpforms-field-option' ).find( '.wpforms-field-option-hidden-id' ).val();
+			const formData = wpf.formObject( '#wpforms-field-options' );
+			const layoutFieldData = formData?.fields[ layoutID ] ?? [];
+			const fieldsToExclude = {};
+
+			Object.values( layoutFieldData[ 'columns-json' ] ?? {} ).forEach( ( column ) => {
+				Object.values( column?.fields ?? [] ).forEach( ( field ) => {
+					if ( ! formData.fields[ field ] ) {
+						return;
+					}
+
+					fieldsToExclude[ field ] = formData.fields[ field ];
+				} );
+			} );
+
+			return fieldsToExclude;
+		},
 
 		/**
 		 * Element bindings.
@@ -465,6 +492,20 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 			// Conditional support toggle.
 			$builder.on( 'change', '.wpforms-conditionals-enable-toggle input[type=checkbox]', function( e ) {
 				WPFormsConditionals.conditionalToggle( this, e );
+			} );
+
+			$builder.on( 'click', '.wpforms-field-option-group-conditionals', function() {
+				const $this = $( this );
+				const isAllowedLayoutFields = $this.parents( '.wpforms-field-option' ).find( '.wpforms-field-option-hidden-type' ).val() !== 'layout';
+
+				if ( isAllowedLayoutFields ) {
+					return;
+				}
+
+				const $block = $this.find( '.wpforms-conditional-block' );
+				const fields = wpf.getFields( false, true, false, app.getLayoutFieldsToExclude( $this ) );
+
+				WPFormsConditionals.conditionalUpdateOptions( false, fields, $block.find( '.wpforms-conditional-row' ) );
 			} );
 
 			// Conditional process field select.
@@ -549,7 +590,9 @@ var WPFormsConditionals = window.WPFormsConditionals || ( function( document, wi
 				$block.append( logicBlock( data ) );
 
 				// Update fields in the added rule.
-				WPFormsConditionals.conditionalUpdateOptions( false, wpf.getFields( false, true ), $block.find( '.wpforms-conditional-row' ) );
+				const fields = wpf.getFields( false, true, false, app.getLayoutFieldsToExclude( $this ) );
+
+				WPFormsConditionals.conditionalUpdateOptions( false, fields, $block.find( '.wpforms-conditional-row' ) );
 			} else {
 
 				// Remove conditional logic rules.

@@ -18,6 +18,8 @@ class Meta extends WPForms_DB {
 	 */
 	public function __construct() {
 
+		parent::__construct();
+
 		$this->table_name  = self::get_table_name();
 		$this->primary_key = 'id';
 		$this->type        = 'payment_meta';

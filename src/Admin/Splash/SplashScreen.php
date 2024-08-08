@@ -128,6 +128,7 @@ class SplashScreen {
 			'wpforms-splash-modal',
 			'wpforms_splash_data',
 			[
+				'nonce'            => wp_create_nonce( 'wpforms_dash_widget_nonce' ),
 				'triggerForceOpen' => $this->should_open_splash(),
 			]
 		);
@@ -286,7 +287,7 @@ class SplashScreen {
 	 */
 	public function is_allow_splash(): bool {
 
-		if ( ! $this->is_force_open() && $this->is_new_install() ) {
+		if ( ! $this->is_force_open() && ( $this->is_new_install() || $this->is_minor_update() ) ) {
 			return false;
 		}
 
@@ -335,11 +336,35 @@ class SplashScreen {
 			return false;
 		}
 
-		$splash_version = $this->get_latest_splash_version();
-
 		// Allow if a splash version different from the current plugin major version, and it's not a new installation.
-		return $splash_version !== $this->get_major_version( WPFORMS_VERSION ) &&
+		$should_open_splash = $this->get_latest_splash_version() !== $this->get_major_version( WPFORMS_VERSION ) &&
 			( ! $this->is_new_install() || $this->is_force_open() );
+
+		if ( ! $should_open_splash ) {
+			return false;
+		}
+
+		// Skip if user on the builder page and the Challenge can be started.
+		if ( wpforms_is_admin_page( 'builder' ) ) {
+			return $this->is_allow_builder_splash();
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if splash modal should be allowed on the builder page.
+	 * If the Challenge can be started, the splash modal should not be displayed.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool True if allowed, false otherwise.
+	 */
+	private function is_allow_builder_splash(): bool {
+
+		$challenge = wpforms()->get( 'challenge' );
+
+		return ! ( $challenge->challenge_force_start() || $challenge->challenge_can_start() );
 	}
 
 	/**
@@ -371,6 +396,22 @@ class SplashScreen {
 		$this->is_new_install = empty( end( $migrations_run ) );
 
 		return $this->is_new_install;
+	}
+
+	/**
+	 * Determine if the current update is a minor update.
+	 *
+	 * This method checks the version history of migrations run and compares
+	 * the last recorded version with the current version to determine if
+	 * the update is minor or major.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool True if it's a minor update, false otherwise.
+	 */
+	private function is_minor_update(): bool {
+
+		return $this->get_major_version( $this->get_previous_plugin_version() ) === $this->get_major_version( WPFORMS_VERSION );
 	}
 
 	/**

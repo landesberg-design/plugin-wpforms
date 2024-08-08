@@ -362,6 +362,17 @@ abstract class WPForms_Field {
 
 			if ( ! empty( $raw_value ) ) {
 				$this->field_prefill_remove_choices_defaults( $field, $properties );
+
+				if (
+					is_string( $raw_value ) &&
+					in_array(
+						$field['type'],
+						wpforms_get_multi_fields(),
+						true
+					)
+				) {
+					$raw_value = explode( '|', rawurldecode( $raw_value ) );
+				}
 			}
 
 			/*
@@ -378,6 +389,8 @@ abstract class WPForms_Field {
 			 *      ?wpf771_19[]=test1&wpf771_19[]=test2
 			 *      ?wpf771_19_value[]=test1&wpf771_19_value[]=test2
 			 *      ?wpf771_41_r3_c2[]=1&wpf771_41_r1_c4[]=1
+			 * We support also pipe-separated values like this:
+			 *      ?wpf771_19=test1|test2
 			 */
 			if ( is_array( $raw_value ) ) {
 				foreach ( $raw_value as $single_value ) {
@@ -571,15 +584,64 @@ abstract class WPForms_Field {
 		}
 
 		// Redefine default choice only if population value has changed anything.
-		if ( null !== $default_key ) {
-			foreach ( $field['choices'] as $choice_key => $choice_arr ) {
-				if ( $choice_key === $default_key ) {
-					$properties['inputs'][ $choice_key ]['default']              = true;
-					$properties['inputs'][ $choice_key ]['container']['class'][] = 'wpforms-selected';
-					break;
-				}
+		if ( $default_key === null ) {
+			return $properties;
+		}
+
+		foreach ( $field['choices'] as $choice_key => $choice_arr ) {
+			if ( $choice_key === $default_key ) {
+				$properties['inputs'][ $choice_key ]['default']              = true;
+				$properties['inputs'][ $choice_key ]['container']['class'][] = 'wpforms-selected';
+
+				$properties = $this->add_quantity_to_populated_field_properties( $properties, $field );
+
+				break;
 			}
 		}
+
+		return $properties;
+	}
+
+	/**
+	 * Handle dropdown items field with quantities.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $properties Field properties.
+	 * @param array $field      Current field specific data.
+	 *
+	 * @return array
+	 */
+	private function add_quantity_to_populated_field_properties( $properties, $field ): array {
+
+		$properties = (array) $properties;
+
+		if (
+			empty( $this->form_data['id'] ) ||
+			empty( $field['id'] ) ||
+			empty( $field['type'] ) ||
+			empty( $field['enable_quantity'] ) ||
+			! (bool) $field['enable_quantity'] ||
+			$field['type'] !== 'payment-select'
+		) {
+			return $properties;
+		}
+
+		$quantity_key = 'wpq' . $this->form_data['id'] . '_' . $field['id'];
+
+		// phpcs:disable WordPress.Security.NonceVerification
+		if ( empty( $_GET[ $quantity_key ] ) ) {
+			return $properties;
+		}
+
+		$quantity = absint( $_GET[ $quantity_key ] );
+		// phpcs:enable WordPress.Security.NonceVerification
+
+		if ( $quantity > ( $field['max_quantity'] ?? 10 ) || $quantity < ( $field['min_quantity'] ?? 0 ) ) {
+			return $properties;
+		}
+
+		$properties['quantity'] = $quantity;
 
 		return $properties;
 	}
@@ -3207,7 +3269,7 @@ abstract class WPForms_Field {
 			WPFORMS_PLUGIN_URL . 'assets/lib/choices.min.js',
 			[],
 			'10.2.0',
-			true
+			$this->load_script_in_footer()
 		);
 
 		$config = [
@@ -3619,5 +3681,17 @@ abstract class WPForms_Field {
 
 		// Otherwise return a minimum quantity.
 		return $min_quantity;
+	}
+
+	/**
+	 * Whether to print the script in the footer.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	protected function load_script_in_footer(): bool {
+
+		return ! wpforms_is_frontend_js_header_force_load();
 	}
 }

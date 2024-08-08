@@ -376,10 +376,10 @@ class Import extends View {
 			$desc   = ! empty( $form['settings']['form_desc'] ) ? $form['settings']['form_desc'] : '';
 			$new_id = wp_insert_post(
 				[
-					'post_title'   => $title,
+					'post_title'   => wp_slash( $title ),
 					'post_status'  => 'publish',
 					'post_type'    => 'wpforms',
-					'post_excerpt' => $desc,
+					'post_excerpt' => wp_slash( $desc ),
 				]
 			);
 
@@ -410,6 +410,10 @@ class Import extends View {
 	 * @return bool
 	 */
 	private static function update_form( array $form ): bool {
+
+		if ( wpforms_is_form_data_slashing_enabled() ) {
+			$form = wp_slash( $form );
+		}
 
 		$result = wp_update_post(
 			[

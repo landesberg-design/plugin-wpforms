@@ -104,7 +104,6 @@ class WPForms_Process {
 	private function hooks() {
 
 		add_action( 'wp', [ $this, 'listen' ] );
-
 		add_action( 'wp_ajax_wpforms_submit', [ $this, 'ajax_submit' ] );
 		add_action( 'wp_ajax_nopriv_wpforms_submit', [ $this, 'ajax_submit' ] );
 	}
@@ -137,12 +136,24 @@ class WPForms_Process {
 		$this->process( wp_unslash( $_POST['wpforms'] ) );
 		// phpcs:enable WordPress.Security.NonceVerification
 
+		/**
+		 * Runs right after the processing form entry.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param array  $fields    Entry fields data.
+		 * @param array  $entry_id  Entry ID.
+		 * @param array  $form_data Form data.
+		 */
+		do_action( 'wpforms_process_after', $this->fields, $this->entry_id, $this->form_data );
+
 		if ( ! wpforms_is_amp() ) {
 			return;
 		}
 
 		// Send 400 Bad Request when there are errors.
 		if ( empty( $this->errors[ $form_id ] ) ) {
+			$this->entry_confirmation_redirect( $this->form_data );
 			wp_send_json(
 				[
 					'message' => $this->get_confirmation_message( $this->form_data, $this->fields, $this->entry_id ),
@@ -153,15 +164,19 @@ class WPForms_Process {
 			return;
 		}
 
-		$message = $this->errors[ $form_id ]['header'];
+		$message_parts = [ $this->errors[ $form_id ]['header'] ];
+
+		if ( ! empty( $this->errors[ $form_id ]['recaptcha'] ) ) {
+			$message_parts[] = $this->errors[ $form_id ]['recaptcha'];
+		}
 
 		if ( ! empty( $this->errors[ $form_id ]['footer'] ) ) {
-			$message .= ' ' . $this->errors[ $form_id ]['footer'];
+			$message_parts[] = $this->errors[ $form_id ]['footer'];
 		}
 
 		wp_send_json(
 			[
-				'message' => $message,
+				'message' => implode( '<br>', $message_parts ),
 			],
 			400
 		);
@@ -200,6 +215,20 @@ class WPForms_Process {
 		 * @param array $entry     Form entry.
 		 */
 		$this->form_data = (array) apply_filters( 'wpforms_process_before_form_data', wpforms_decode( $form->post_content ), $entry );
+
+		$store_spam_entries = ! empty( $this->form_data['settings']['store_spam_entries'] );
+
+		/**
+		 * Check Anti-spam Modern (v3).
+		 * Run as early as possible to remove the honeypot field from the entry to prevent unnecessary field processing.
+		 * Bail early if the form is marked as spam and storing spam entries is disabled.
+		 * Important! We should check first on Anti-spam because it would be skipped in case $store_spam_entries === true.
+		 */
+		// phpcs:ignore Generic.Commenting.DocComment.MissingShort
+		/** @noinspection NotOptimalIfConditionsInspection */
+		if ( ! $this->modern_anti_spam_check( $entry ) && ! $store_spam_entries ) {
+			return;
+		}
 
 		if ( ! isset( $this->form_data['fields'], $this->form_data['id'] ) ) {
 			$error_id = uniqid( '', true );
@@ -481,15 +510,17 @@ class WPForms_Process {
 		 */
 		do_action( "wpforms_process_{$form_id}", $this->fields, $entry, $this->form_data );
 
+		// Detect direct POST requests when the AJAX submission is enabled.
+		$this->direct_post_request_check( $entry );
+
 		if ( ! $this->is_bypass_spam_check( $entry ) ) {
+
 			// Check if the form was submitted too quickly.
 			$this->time_limit_check();
 
 			// Check for spam.
 			$this->process_spam_check( $entry );
 		}
-
-		$store_spam_entries = ! empty( $this->form_data['settings']['store_spam_entries'] ) && $this->form_data['settings']['store_spam_entries'];
 
 		// Mark submission as spam if one of the spam checks failed and spam entries are stored.
 		$marked_as_spam = $this->spam_reason && $store_spam_entries;
@@ -591,6 +622,113 @@ class WPForms_Process {
 	}
 
 	/**
+	 * Check Anti-spam Modern (v3).
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $entry Form submission raw data ($_POST).
+	 *
+	 * @return bool True if the form Anti-spam check was passed, false otherwise.
+	 */
+	private function modern_anti_spam_check( array &$entry ): bool {
+
+		// Skip if spam was already detected.
+		if ( $this->spam_reason ) {
+			return false;
+		}
+
+		/**
+		 * Allow bypassing the honeypot check.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param bool  $bypass    Whether to bypass the honeypot check, default false.
+		 * @param array $form_data Form data.
+		 * @param array $entry     Form entry.
+		 *
+		 * @return bool
+		 */
+		if ( apply_filters( 'wpforms_process_anti_spam_honeypot_bypass', false, $this->form_data, $entry ) ) {
+			return true;
+		}
+
+		// Skip if the Anti-spam check was passed.
+		if ( wpforms()->get( 'anti_spam' )->validate( $this->form_data, $this->fields, $entry ) ) {
+			return true;
+		}
+
+		$form_id = $this->form_data['id'] ?? 0;
+
+		$this->spam_errors[ $form_id ]['header'] = esc_html__( 'Anti-spam Honeypot V2 verification was failed, please try again later.', 'wpforms-lite' );
+
+		$this->spam_reason = 'Honeypot V2';
+
+		// Log the spam entry depending on log levels set.
+		$this->log_spam_entry(
+			$entry,
+			'Anti-spam Honeypot V2 verification was failed.'
+		);
+
+		return false;
+	}
+
+	/**
+	 * Detect direct POST requests when the AJAX submission is enabled.
+	 * For Anti-spam Modern (v3) enabled forms only.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $entry Form submission raw data ($_POST).
+	 */
+	private function direct_post_request_check( array $entry ) {
+
+		if (
+			// Skip if spam was already detected.
+			$this->spam_reason ||
+
+			// Skip if the Anti-spam Modern (v3) is not enabled.
+			empty( $this->form_data['settings']['antispam_v3'] )
+		) {
+			return;
+		}
+
+		/**
+		 * Allow bypassing the direct POST request check.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param bool  $bypass    Whether to bypass the direct POST request check, default is false.
+		 * @param array $form_data Form data.
+		 * @param array $entry     Form entry.
+		 */
+		if ( apply_filters( 'wpforms_process_anti_spam_direct_post_bypass', false, $this->form_data, $entry ) ) {
+			return;
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		$is_ajax_form   = ! empty( $this->form_data['settings']['ajax_submit'] );
+		$is_post        = ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) === 'POST';
+		$is_direct_post = ! wpforms_is_frontend_ajax() && $is_post;
+		// phpcs:enable WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+
+		if ( ! ( $is_ajax_form && $is_direct_post ) ) {
+			return;
+		}
+
+		$form_id = $this->form_data['id'] ?? 0;
+
+		$this->spam_errors[ $form_id ]['header'] = esc_html__( 'Direct POST requests are not allowed when the AJAX submission is enabled.', 'wpforms-lite' );
+
+		$this->spam_reason = esc_html__( 'Direct POST request', 'wpforms-lite' );
+
+		// Log the spam entry depending on log levels set.
+		$this->log_spam_entry(
+			$entry,
+			'Direct POST request form submission'
+		);
+	}
+
+	/**
 	 * Save entry meta data.
 	 *
 	 * @since 1.8.7
@@ -629,15 +767,25 @@ class WPForms_Process {
 	 * @param array  $entry   Form submission raw data ($_POST).
 	 * @param string $message Spam message.
 	 */
-	private function log_spam_entry( $entry, $message ) {
+	private function log_spam_entry( $entry, $message ) { // phpcs:ignore WPForms.PHP.HooksMethod.InvalidPlaceForAddingHooks
 
-		wpforms_log(
-			'Spam Entry ' . uniqid( '', true ),
-			[ $message, $entry ],
-			[
-				'type'    => [ 'spam' ],
-				'form_id' => $this->form_data['id'],
-			]
+		// Log the spam entry message after processing the entry when the entry ID is generated.
+		add_action(
+			'wpforms_process_after',
+			static function ( $fields, $entry_id, $form_data ) use ( $entry, $message ) {
+
+				wpforms_log(
+					'Spam Entry ' . uniqid( '', true ),
+					[ $message, $entry ],
+					[
+						'type'    => [ 'spam' ],
+						'form_id' => $form_data['id'] ?? 0,
+						'parent'  => $entry_id,
+					]
+				);
+			},
+			10,
+			3
 		);
 	}
 
@@ -802,6 +950,11 @@ class WPForms_Process {
 	 * @return void
 	 */
 	private function process_captcha( $entry ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh,Generic.Metrics.CyclomaticComplexity.MaxExceeded
+
+		// Skip if spam was already detected.
+		if ( $this->spam_reason ) {
+			return;
+		}
 
 		$captcha_settings = wpforms_get_captcha_settings();
 
@@ -1195,7 +1348,11 @@ class WPForms_Process {
 
 				add_filter( 'wpforms_smarttags_process_field_id_value', $rawurlencode_callback );
 
-				$url = wpforms_process_smart_tags( $confirmations[ $confirmation_id ]['redirect'], $this->form_data, $this->fields, $this->entry_id );
+				$url = wpforms_process_smart_tags(
+					$confirmations[ $confirmation_id ]['redirect'],
+					$this->form_data, $this->fields, $this->entry_id,
+					'confirmation_redirect'
+				);
 
 				remove_filter( 'wpforms_smarttags_process_field_id_value', $rawurlencode_callback );
 			}
@@ -1440,6 +1597,8 @@ class WPForms_Process {
 			$emails->__set( 'from_name', $email['sender_name'] );
 			$emails->__set( 'from_address', $email['sender_address'] );
 			$emails->__set( 'reply_to', $email['replyto'] );
+			// Reset headers to support multiple notifications. They will be set on send.
+			$emails->__set( 'headers', null );
 
 			// Maybe include CC.
 			if ( $is_carboncopy_enabled && ! empty( $email['carboncopy'] ) ) {

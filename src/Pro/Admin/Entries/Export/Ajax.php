@@ -535,25 +535,6 @@ class Ajax {
 			$this->request_data['dynamic_columns']
 		);
 
-		/**
-		 * If field has only one choice, set label to 'Checked'.
-		 *
-		 * See field_properties method.
-		 * includes/fields/class-checkbox.php
-		 * src/Forms/Fields/PaymentCheckbox/Field.php
-		 */
-		if ( count( $choices ) === 1 ) {
-			$choices = array_map(
-				static function ( $choice ) {
-
-					$choice['label'] = __( 'Checked', 'wpforms' );
-
-					return $choice;
-				},
-				$choices
-			);
-		}
-
 		// Make sure that values array has the same length as choices array.
 		$values = array_pad( $values, count( $choices ), '' );
 
@@ -612,6 +593,17 @@ class Ajax {
 
 			// Set value.
 			if ( isset( $choices[ $value_index ] ) ) {
+				/**
+				 * If field has only one choice, set label to 'Checked'.
+				 *
+				 * See field_properties method.
+				 * includes/fields/class-checkbox.php
+				 * src/Forms/Fields/PaymentCheckbox/Field.php
+				 */
+				if ( count( $choices ) === 1 ) {
+					$choices[ $value_index ]['label'] = __( 'Checked', 'wpforms' );
+				}
+
 				$row_value = $choices[ $value_index ]['label'];
 
 				if ( $field['type'] === 'payment-checkbox' ) {

@@ -583,7 +583,9 @@ class WPForms_WP_Emails {
 				// field data, then it's a non-input based field, "other fields".
 				if ( empty( $this->fields[ $field_id ] ) ) {
 
-					if ( empty( $other_fields ) || ! in_array( $field['type'], $other_fields, true ) ) {
+					// Check if the field type is in $other_fields, otherwise skip.
+					// Skip if the field is conditionally hidden.
+					if ( empty( $other_fields ) || ! in_array( $field['type'], $other_fields, true ) || wpforms_conditional_logic_fields()->field_is_hidden( $this->form_data, $field_id ) ) {
 						continue;
 					}
 
@@ -598,17 +600,9 @@ class WPForms_WP_Emails {
 						$field_name = str_repeat( '&mdash;', 6 ) . ' ' . $title . ' ' . str_repeat( '&mdash;', 6 );
 					} elseif ( $field['type'] === 'html' ) {
 
-						if ( $this->is_field_conditionally_hidden( $field['id'] ) ) {
-							continue;
-						}
-
 						$field_name = ! empty( $field['name'] ) ? $field['name'] : esc_html__( 'HTML / Code Block', 'wpforms-lite' );
 						$field_val  = $field['code'];
 					} elseif ( $field['type'] === 'content' ) {
-
-						if ( $this->is_field_conditionally_hidden( $field['id'] ) ) {
-							continue;
-						}
 
 						$field_name = esc_html__( 'Content', 'wpforms-lite' );
 						$field_val  = $field['content'];
@@ -857,19 +851,5 @@ class WPForms_WP_Emails {
 		$subject = trim( str_replace( [ "\r\n", "\r", "\n" ], ' ', $subject ) );
 
 		return wpforms_decode_string( $subject );
-	}
-
-	/**
-	 * If CL is enabled and the field is conditionally hidden, hide it from message.
-	 *
-	 * @since 1.7.9
-	 *
-	 * @param int $field_id Field ID.
-	 *
-	 * @return bool
-	 */
-	private function is_field_conditionally_hidden( $field_id ) {
-
-		return ! empty( $this->form_data['fields'][ $field_id ]['conditionals'] ) && ! wpforms_conditional_logic_fields()->field_is_visible( $this->form_data, $field_id );
 	}
 }

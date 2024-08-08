@@ -292,13 +292,13 @@ abstract class FormBuilder implements FormBuilderInterface {
 	public function process_ajax() {
 
 		// Run a security check.
-		\check_ajax_referer( 'wpforms-builder', 'nonce' );
+		check_ajax_referer( 'wpforms-builder', 'nonce' );
 
 		// Check for permissions.
-		if ( ! \wpforms_current_user_can( 'edit_forms' ) ) {
-			\wp_send_json_error(
+		if ( ! wpforms_current_user_can( 'edit_forms' ) ) {
+			wp_send_json_error(
 				[
-					'error' => \esc_html__( 'You do not have permission to perform this action.', 'wpforms-lite' ),
+					'error' => esc_html__( 'You do not have permission to perform this action.', 'wpforms-lite' ),
 				]
 			);
 		}
@@ -310,7 +310,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 			empty( $_POST['id'] ) ||
 			empty( $_POST['task'] )
 		) {
-			\wp_send_json_error( $error );
+			wp_send_json_error( $error );
 		}
 
 		$form_id = (int) $_POST['id'];
@@ -330,19 +330,23 @@ abstract class FormBuilder implements FormBuilderInterface {
 
 		// Do not allow to proceed further, as form_id may be incorrect.
 		if ( empty( $this->form_data ) ) {
-			\wp_send_json_error( $error );
+			wp_send_json_error( $error );
 		}
 
-		$data = \apply_filters(
+		$data = apply_filters( // phpcs:ignore WPForms.Comments.PHPDocHooks.RequiredHookDocumentation, WPForms.PHP.ValidateHooks.InvalidHookName
 			'wpforms_providers_settings_builder_ajax_' . $task . '_' . $this->core->slug,
 			null
 		);
 
-		if ( null !== $data ) {
-			\wp_send_json_success( $data );
+		if ( ! empty( $data['error_msg'] ) ) {
+			wp_send_json_error( [ 'error_msg' => $data['error_msg'] ] );
 		}
 
-		\wp_send_json_error( $error );
+		if ( $data !== null ) {
+			wp_send_json_success( $data );
+		}
+
+		wp_send_json_error( $error );
 	}
 
 	/**

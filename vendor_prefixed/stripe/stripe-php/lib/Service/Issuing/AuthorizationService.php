@@ -5,8 +5,6 @@ namespace WPForms\Vendor\Stripe\Service\Issuing;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
- */
-/**
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class AuthorizationService extends \WPForms\Vendor\Stripe\Service\AbstractService
@@ -35,6 +33,8 @@ class AuthorizationService extends \WPForms\Vendor\Stripe\Service\AbstractServic
      * href="/docs/issuing/controls/real-time-authorizations#authorization-handling">respond
      * directly to the webhook request to approve an authorization</a>.
      *
+     * @deprecated  this method is deprecated, please refer to the description for details
+     *
      * @param string $id
      * @param null|array $params
      * @param null|RequestOptionsArray|\Stripe\Util\RequestOptions $opts
@@ -54,6 +54,8 @@ class AuthorizationService extends \WPForms\Vendor\Stripe\Service\AbstractServic
      * authorization</a> flow. This method is deprecated. Instead, <a
      * href="/docs/issuing/controls/real-time-authorizations#authorization-handling">respond
      * directly to the webhook request to decline an authorization</a>.
+     *
+     * @deprecated  this method is deprecated, please refer to the description for details
      *
      * @param string $id
      * @param null|array $params

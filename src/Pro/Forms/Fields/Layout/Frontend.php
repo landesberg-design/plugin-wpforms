@@ -24,28 +24,75 @@ class Frontend {
 
 		$this->trait_hooks();
 
-		add_filter( 'wpforms_pro_fields_entry_preview_print_entry_preview_exclude_field', [ $this, 'entry_preview_exclude_field' ], 10, 3 );
+		add_filter( "wpforms_field_properties_{$this->field_obj->type}", [ $this, 'field_properties' ], 10, 3 );
+		add_action( 'wpforms_display_field_before', [ $this, 'field_label' ], 15, 2 );
 	}
 
 	/**
-	 * Excluded from the Entry Preview display.
+	 * Define additional field properties.
 	 *
-	 * @since 1.8.9
+	 * @since 1.9.0
 	 *
-	 * @param bool  $exclude   Exclude the field.
-	 * @param array $field     Field data.
-	 * @param array $form_data Form data.
+	 * @param array $properties Field properties.
+	 * @param array $field      Field settings.
+	 * @param array $form_data  Form data and settings.
 	 *
-	 * @return bool
+	 * @return array
 	 * @noinspection PhpMissingParamTypeInspection
 	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function entry_preview_exclude_field( $exclude, $field, $form_data ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+	public function field_properties( $properties, $field, $form_data ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
-		if ( $field['type'] === $this->field_obj->type ) {
-			return true;
+		// Disable default label.
+		$properties['label']['disabled'] = true;
+
+		$properties['description']['position'] = 'before';
+
+		return $properties;
+	}
+
+	/**
+	 * Display the custom field label.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array|mixed $field     Field data and settings.
+	 * @param array       $form_data Form data and settings.
+	 *
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function field_label( $field, array $form_data ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+		$field = (array) $field;
+
+		if ( ! isset( $field['type'] ) || $field['type'] !== $this->field_obj->type ) {
+			return;
 		}
 
-		return (bool) $exclude;
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $this->get_title( $field );
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $field Field settings.
+	 *
+	 * @return string
+	 */
+	private function get_title( array $field ): string {
+
+		if ( ! empty( $field['label_hide'] ) ) {
+			return '';
+		}
+
+		return sprintf(
+			'<h3 class="wpforms-field-label">
+				%1$s
+			</h3>',
+			esc_html( $field['label'] )
+		);
 	}
 }

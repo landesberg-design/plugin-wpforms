@@ -8,7 +8,7 @@ namespace WPForms\Vendor\Stripe\Issuing;
  *
  * @property string $id Unique identifier for the object.
  * @property string $object String representing the object's type. Objects of the same type share the same value.
- * @property null|\Stripe\StripeObject $features
+ * @property \Stripe\StripeObject $features
  * @property bool $livemode Has the value <code>true</code> if the object exists in live mode or the value <code>false</code> if the object exists in test mode.
  * @property string $name Friendly display name.
  * @property string $status Whether this physical bundle can be used to create cards.
@@ -17,11 +17,42 @@ namespace WPForms\Vendor\Stripe\Issuing;
 class PhysicalBundle extends \WPForms\Vendor\Stripe\ApiResource
 {
     const OBJECT_NAME = 'issuing.physical_bundle';
-    use \WPForms\Vendor\Stripe\ApiOperations\All;
-    use \WPForms\Vendor\Stripe\ApiOperations\Retrieve;
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';
     const STATUS_REVIEW = 'review';
     const TYPE_CUSTOM = 'custom';
     const TYPE_STANDARD = 'standard';
+    /**
+     * Returns a list of physical bundle objects. The objects are sorted in descending
+     * order by creation date, with the most recently created object appearing first.
+     *
+     * @param null|array $params
+     * @param null|array|string $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return \Stripe\Collection<\Stripe\Issuing\PhysicalBundle> of ApiResources
+     */
+    public static function all($params = null, $opts = null)
+    {
+        $url = static::classUrl();
+        return static::_requestPage($url, \WPForms\Vendor\Stripe\Collection::class, $params, $opts);
+    }
+    /**
+     * Retrieves a physical bundle object.
+     *
+     * @param array|string $id the ID of the API resource to retrieve, or an options array containing an `id` key
+     * @param null|array|string $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return \Stripe\Issuing\PhysicalBundle
+     */
+    public static function retrieve($id, $opts = null)
+    {
+        $opts = \WPForms\Vendor\Stripe\Util\RequestOptions::parse($opts);
+        $instance = new static($id, $opts);
+        $instance->refresh();
+        return $instance;
+    }
 }

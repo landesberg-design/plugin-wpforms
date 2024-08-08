@@ -5,6 +5,8 @@
  * @since 1.0.0
  */
 
+use WPForms\Helpers\DB;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -32,7 +34,7 @@ function wpforms_save_form() {
 	}
 
 	// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$form_post = json_decode( wp_unslash( $_POST['data'] ) );
+	$form_post = json_decode( wp_unslash( $_POST['data'] ), false );
 	$data      = [
 		'fields' => [],
 	];
@@ -52,7 +54,7 @@ function wpforms_save_form() {
 			$new_post_data = [];
 
 			// Build the new array value from leaf to trunk.
-			for ( $i = count( $array_bits ) - 1; $i >= 0; $i -- ) {
+			for ( $i = count( $array_bits ) - 1; $i >= 0; $i-- ) {
 				if ( $i === count( $array_bits ) - 1 ) {
 					$new_post_data[ $array_bits[ $i ] ] = wp_slash( $post_input_data->value );
 				} else {
@@ -135,7 +137,7 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 
 	check_ajax_referer( 'wpforms-builder', 'nonce' );
 
-	// Prevent second form creating if user has no licence set.
+	// Prevent second form creating if a user has no license set.
 	// Redirect will lead to the warning page.
 	if ( wpforms()->is_pro() && empty( wpforms_get_license_type() ) && wp_count_posts( 'wpforms' )->publish >= 1 ) {
 		wp_send_json_success( [ 'redirect' => admin_url( 'admin.php?page=wpforms-builder&view=setup' ) ] );
@@ -199,7 +201,7 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 		);
 
 		// Restore the initial revisions state.
-		add_action( 'post_updated', 'wp_save_post_revision', 10, 1 );
+		add_action( 'post_updated', 'wp_save_post_revision' );
 	}
 
 	if ( ! $form_id ) {
@@ -304,7 +306,7 @@ function wpforms_update_form_template() {
 	$form_pages_slug          = ! empty( $template_data['data']['settings']['form_pages_page_slug'] ) ? $template_data['data']['settings']['form_pages_page_slug'] : $form_title;
 
 	// Loop over notifications.
-	$notifications = isset( $template_data['data']['settings']['notifications'] ) ? $template_data['data']['settings']['notifications'] : [];
+	$notifications = $template_data['data']['settings']['notifications'] ?? [];
 
 	foreach ( $notifications as $key => $notification ) {
 		// If the subject is empty, set it to an empty string.
@@ -314,7 +316,7 @@ function wpforms_update_form_template() {
 	}
 
 	// Loop over confirmations.
-	$confirmations = isset( $template_data['data']['settings']['confirmations'] ) ? $template_data['data']['settings']['confirmations'] : [];
+	$confirmations = $template_data['data']['settings']['confirmations'] ?? [];
 
 	foreach ( $confirmations as $key => $confirmation ) {
 
@@ -502,7 +504,6 @@ function wpforms_builder_dynamic_source() {
 		$total       = wp_count_posts( $source );
 		$total       = $total->publish;
 		$pt          = get_post_type_object( $source );
-		$source_name = '';
 
 		if ( $pt !== null ) {
 			$source_name = $pt->labels->name;
@@ -590,11 +591,50 @@ function wpforms_verify_ssl() {
 	wp_send_json_error(
 		[
 			'msg'   => esc_html__( 'There was an error and the connection failed. Please contact your web host with the technical details below.', 'wpforms-lite' ),
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 			'debug' => '<pre>' . print_r( map_deep( $response, 'wp_strip_all_tags' ), true ) . '</pre>',
 		]
 	);
 }
 add_action( 'wp_ajax_wpforms_verify_ssl', 'wpforms_verify_ssl' );
+
+/**
+ * Recreate custom database tables.
+ *
+ * @since 1.9.0
+ */
+function wpforms_recreate_tables() {
+
+	// Run a security check.
+	check_ajax_referer( 'wpforms-admin', 'nonce' );
+
+	// Check for permissions.
+	if ( ! wpforms_current_user_can() ) {
+		wp_send_json_error(
+			[
+				'msg' => esc_html__( 'You do not have permission to perform this operation.', 'wpforms-lite' ),
+			]
+		);
+	}
+
+	DB::create_custom_tables( true );
+
+	if ( DB::custom_tables_exist() ) {
+		wp_send_json_success(
+			[
+				'msg' => esc_html__( 'WPForms custom database tables are recreated.', 'wpforms-lite' ),
+			]
+		);
+	}
+
+	wp_send_json_error(
+		[
+			'msg' => esc_html__( 'Error recreating WPForms custom database tables.', 'wpforms-lite' ),
+		]
+	);
+}
+
+add_action( 'wp_ajax_wpforms_recreate_tables', 'wpforms_recreate_tables' );
 
 /**
  * Deactivate addon.
@@ -691,6 +731,8 @@ add_action( 'wp_ajax_wpforms_activate_addon', 'wpforms_activate_addon' );
  *
  * @since 1.0.0
  * @since 1.6.2.3 Updated the permissions checking.
+ *
+ * @noinspection HtmlUnknownTarget
  */
 function wpforms_install_addon() {
 
@@ -746,7 +788,7 @@ function wpforms_install_addon() {
 	);
 
 	ob_start();
-	$creds = request_filesystem_credentials( $url, '', false, false, null );
+	$creds = request_filesystem_credentials( $url, '', false, false );
 
 	// Hide the filesystem credentials form.
 	ob_end_clean();
@@ -811,7 +853,7 @@ function wpforms_install_addon() {
 		 *
 		 * @since 1.7.0
 		 *
-		 * @param string $plugin_basename Path to the plugin file relative to the plugins directory.
+		 * @param string $plugin_basename Path to the plugin file relative to the plugins' directory.
 		 */
 		do_action( 'wpforms_plugin_activated', $plugin_basename );
 

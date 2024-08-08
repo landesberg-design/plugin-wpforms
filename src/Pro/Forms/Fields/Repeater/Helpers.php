@@ -68,7 +68,7 @@ class Helpers {
 	 *
 	 * @return array
 	 */
-	private static function get_repeater_all_field_ids( array $repeater_field ): array {
+	public static function get_repeater_all_field_ids( array $repeater_field ): array {
 
 		return array_merge( ...wp_list_pluck( $repeater_field['columns'] ?? [], 'fields' ) );
 	}

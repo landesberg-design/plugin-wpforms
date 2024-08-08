@@ -244,6 +244,20 @@ abstract class SmartTag {
 
 		$value = $fields[ $field_id ][ $field_key ] ?? '';
 
+		/**
+		 * Allow to modify the formatted field value.
+		 *
+		 * @since 1.9.0
+		 *
+		 * @param string $value     Field value.
+		 * @param int    $field_id  Field ID.
+		 * @param array  $fields    List of fields.
+		 * @param string $field_key Field key to get value from.
+		 *
+		 * @return string
+		 */
+		$value = (string) apply_filters( 'wpforms_smart_tags_formatted_field_value', $value, $field_id, $fields, $field_key ); //phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+
 		if ( ! wpforms_is_repeated_field( $field_id, $fields ) ) {
 			return $value;
 		}

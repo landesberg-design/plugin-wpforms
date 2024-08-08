@@ -5,8 +5,6 @@ namespace WPForms\Vendor\Stripe\Service\TestHelpers\Issuing;
 
 /**
  * @phpstan-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
- */
-/**
  * @psalm-import-type RequestOptionsArray from \Stripe\Util\RequestOptions
  */
 class TransactionService extends \WPForms\Vendor\Stripe\Service\AbstractService

@@ -307,13 +307,14 @@ class Captcha {
 		 * @param string $captcha_api The CAPTCHA API URL.
 		 */
 		$captcha_api = apply_filters( 'wpforms_frontend_captcha_api', $captcha_api_array[ $captcha_settings['provider'] ] );
+		$in_footer   = ! wpforms_is_frontend_js_header_force_load();
 
 		wp_enqueue_script(
 			'wpforms-recaptcha',
 			$captcha_api,
 			$is_recaptcha_v3 ? [] : [ 'jquery' ],
 			null,
-			true
+			$in_footer
 		);
 
 		/**

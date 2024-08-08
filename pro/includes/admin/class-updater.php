@@ -1,5 +1,12 @@
 <?php
 
+// phpcs:disable Generic.Commenting.DocComment.MissingShort
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection AutoloadingIssuesInspection */
+// phpcs:enable Generic.Commenting.DocComment.MissingShort
+
+use WPForms\Pro\Admin\PluginList;
+
 /**
  * Updater class.
  *
@@ -89,6 +96,24 @@ class WPForms_Updater {
 	public $info = false;
 
 	/**
+	 * Core plugin info cache object.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @var object|null
+	 */
+	private $core_cache;
+
+	/**
+	 * Addons info cache object.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @var object|null
+	 */
+	private $addons_cache;
+
+	/**
 	 * Primary class constructor.
 	 *
 	 * @since 2.0.0
@@ -112,11 +137,17 @@ class WPForms_Updater {
 			$this->$arg = $config[ $arg ];
 		}
 
-		// If the user cannot update plugins, stop processing here. In WP-CLI context
-		// there is no user available, so we should ignore this check in CLI.
+		// If the user cannot update plugins, stop processing here.
+		// In WP-CLI context, there is no user available, so we should ignore this check in CLI.
 		if ( ! current_user_can( 'update_plugins' ) && ! wpforms_doing_wp_cli() ) {
 			return;
 		}
+
+		$this->core_cache = wpforms()->get( 'core_info_cache' );
+		$this->core_cache = $this->core_cache instanceof stdClass ? null : $this->core_cache;
+
+		$this->addons_cache = wpforms()->get( 'addons' );
+		$this->addons_cache = $this->addons_cache instanceof stdClass ? null : $this->addons_cache;
 
 		// Load the updater hooks and filters.
 		$this->hooks();
@@ -140,7 +171,7 @@ class WPForms_Updater {
 	 *
 	 * @param object $update_obj The WordPress update object.
 	 *
-	 * @return object $value Amended WordPress update object on success, default if object is empty.
+	 * @return object $value Amended WordPress update object on success, default if an object is empty.
 	 */
 	public function update_plugins_filter( $update_obj ) {
 
@@ -149,16 +180,14 @@ class WPForms_Updater {
 			return $update_obj;
 		}
 
-		$is_license_empty = empty( $this->key );
-
-		// Run update check by pinging the external API. If it fails, return the default update object.
-		if ( ! $is_license_empty && ! $this->update ) {
-			$this->update = $this->perform_remote_request( 'get-plugin-update', [ 'tgm-updater-plugin' => $this->plugin_slug ] );
+		if ( ! $this->is_transient_update_allowed() ) {
+			return $update_obj;
 		}
 
-		// For core plugin, if the license key is empty, we need to get the update from the cached core.json file.
-		if ( $is_license_empty && $this->plugin_slug === 'wpforms' && ! $this->update ) {
-			$this->update = $this->get_update_from_cached_core_json_file();
+		if ( $this->is_core_plugin() ) {
+			$this->update = $this->get_core_update();
+		} else {
+			$this->update = $this->get_addon_update();
 		}
 
 		// No update is available.
@@ -174,6 +203,7 @@ class WPForms_Updater {
 		if ( isset( $this->update->new_version ) && version_compare( $this->version, $this->update->new_version, '<' ) ) {
 
 			// The $this->update object contains new_version, package, slug and last_update keys.
+			$this->update->version                      = $this->version;
 			$this->update->old_version                  = $this->version;
 			$this->update->plugin                       = $this->plugin_path;
 			$update_obj->response[ $this->plugin_path ] = $this->update;
@@ -188,30 +218,116 @@ class WPForms_Updater {
 	}
 
 	/**
+	 * Get the core plugin update object.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return object|bool
+	 */
+	private function get_core_update() {
+
+		if ( $this->update ) {
+			return $this->update;
+		}
+
+		// Run update check by pinging the external API.
+		if ( $this->is_valid_license() ) {
+			return $this->perform_remote_request( 'get-plugin-update', [ 'tgm-updater-plugin' => $this->plugin_slug ] );
+		}
+
+		// For core plugin, if the license key is empty, we should get the update from the cached core.json file.
+		return $this->get_update_from_cached_json_file();
+	}
+
+	/**
+	 * Get the addon update object.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return object|bool
+	 */
+	private function get_addon_update() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		if ( $this->update ) {
+			return $this->update;
+		}
+
+		$cached_data   = $this->get_update_from_cached_json_file();
+		$is_compatible = $this->is_plugin_compatible( $cached_data );
+
+		if ( $is_compatible && $this->is_valid_license() ) {
+			// We should get the update from the external API to obtain the package URL.
+			$update_data = $this->perform_remote_request( 'get-plugin-update', [ 'tgm-updater-plugin' => $this->plugin_slug ] );
+		} else {
+			// For inactive licenses, we should get the update from the cached addons.json file.
+			$update_data = $cached_data;
+		}
+
+		// No update is available.
+		if ( ! $update_data || ! empty( $update_data->error ) ) {
+			return $update_data;
+		}
+
+		// Update from the API doesn't contain the icon URL, so we need to add it from the addons.json data.
+		$icon_url = WPFORMS_PLUGIN_URL . 'assets/images/' . ( $cached_data->icon ?? 'sullie.png' );
+
+		// The icons are used on the Dashboard > Updates page.
+		$update_data->icons = [
+			'1x'      => $icon_url,
+			'2x'      => $icon_url,
+			'default' => $icon_url,
+		];
+
+		// Before providing the download link, check if the plugin is compatible with the current environment.
+		$update_data->download_url = $is_compatible && isset( $update_data->download_url )
+			? $update_data->download_url
+			: '';
+
+		$update_data->download_link = $update_data->download_url;
+		$update_data->package       = $update_data->download_url;
+
+		return $update_data;
+	}
+
+	/**
 	 * Get the update object with details from the cached `core.json` file.
 	 *
 	 * @since 1.8.6
 	 *
 	 * @return object
 	 */
-	private function get_update_from_cached_core_json_file() {
+	private function get_update_from_cached_json_file() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
-		$core_info_obj = wpforms()->get( 'core_info_cache' );
-		$core_info     = $core_info_obj ? $core_info_obj->get() : [];
+		if ( $this->is_core_plugin() ) {
+			// Get the core info.
+			$plugin_info = $this->core_cache ? $this->core_cache->get() : [];
+		} else {
+			// Get the addon info.
+			$plugin_info = $this->addons_cache ? $this->addons_cache->get_addon( $this->plugin_slug ) : [];
+		}
 
-		// Mock the update object of the WPForms Pro plugin.
+		// Mock the update object of the WPForms Pro plugin or addon.
 		return (object) [
-			'id'           => $core_info['id'] ?? $this->plugin_path,
-			'slug'         => $this->plugin_slug,
-			'plugin'       => $this->plugin_path,
-			'new_version'  => $core_info['version'] ?? $this->version,
-			'tested'       => '',
-			'requires_php' => $core_info['required_versions']['php'] ?? '7.0',
-			'package'      => '',
-			'download_url' => '',
-			'icons'        => $core_info['icons'] ?? [],
-			'banners'      => [],
-			'banners_rtl'  => [],
+			'id'               => $this->plugin_path,
+			'slug'             => $this->plugin_slug,
+			'plugin'           => $this->plugin_path,
+			'name'             => $this->plugin_name,
+			'new_version'      => $plugin_info['version'] ?? $this->version,
+			'tested'           => '',
+			'requires'         => $plugin_info['required_versions']['wp'] ?? '5.5',
+			'requires_php'     => $plugin_info['required_versions']['php'] ?? '7.0',
+			'requires_wpforms' => $plugin_info['required_versions']['wpforms'] ?? WPFORMS_VERSION,
+			'active_installs'  => 5 * 1000 * 1000,
+			'package'          => '',
+			'download_url'     => '',
+			'changelog'        => implode( '', $plugin_info['changelog'] ?? [] ),
+			'icon'             => $plugin_info['icon'] ?? [],
+			'icons'            => $plugin_info['icons'] ?? [],
+			'banners'          => (object) [
+				'low'  => 'https://plugins.svn.wordpress.org/wpforms-lite/assets/banner-772x250.png',
+				'high' => 'https://plugins.svn.wordpress.org/wpforms-lite/assets/banner-1544x500.png',
+			],
+			'banners_rtl'      => [],
 		];
 	}
 
@@ -225,6 +341,8 @@ class WPForms_Updater {
 	 * @param string $url  The URL to be pinged.
 	 *
 	 * @return array $args Amended array of request args.
+	 * @noinspection PhpMissingParamTypeInspection
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function http_request_args( $args, $url ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 
@@ -234,23 +352,25 @@ class WPForms_Updater {
 	}
 
 	/**
-	 * Filter the plugins_api function to get our own custom plugin information
-	 * from our private repo.
+	 * Filter the plugins_api function to get our custom plugin information from a private repo.
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param object $api    The original plugins_api object.
-	 * @param string $action The action sent by plugins_api.
-	 * @param array  $args   Additional args to send to plugins_api.
+	 * @param object|mixed $api    The original plugins_api object.
+	 * @param string|mixed $action The action sent by plugins_api.
+	 * @param object       $args   Additional args to send to plugins_api.
 	 *
-	 * @return object $api   New stdClass with plugin information on success, default response on failure.
+	 * @return object New stdClass with plugin or addon information on success, default response on failure.
 	 */
 	public function plugins_api( $api, $action = '', $args = null ) {
 
-		$plugin = ( $action === 'plugin_information' ) && isset( $args->slug ) && ( $this->plugin_slug === $args->slug );
+		$wpforms_plugin =
+			(string) $action === 'plugin_information' &&
+			isset( $args->slug ) &&
+			$this->plugin_slug === $args->slug;
 
-		// If our plugin matches the request, set our own plugin data, else return the default response.
-		if ( $plugin ) {
+		// If plugin slug matches the request, set our own plugin data, else return the default response.
+		if ( $wpforms_plugin ) {
 			return $this->set_plugins_api( $api );
 		}
 
@@ -262,21 +382,27 @@ class WPForms_Updater {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param object $default_api The default API object.
+	 * @param object|mixed $default_api The default API object.
 	 *
-	 * @return object $api        Return custom plugin information to plugins_api.
+	 * @return object|mixed Return custom plugin or addon information to plugins_api.
 	 */
-	public function set_plugins_api( $default_api ) {
+	public function set_plugins_api( $default_api ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+
+		$cached_data = $this->get_update_from_cached_json_file();
 
 		// Perform the remote request to retrieve our plugin information. If it fails, return the default object.
-		if ( ! $this->info ) {
+		if ( ! $this->info && $this->is_valid_license() ) {
 			$this->info = $this->perform_remote_request( 'get-plugin-info', [ 'tgm-updater-plugin' => $this->plugin_slug ] );
+		}
 
-			if ( ! $this->info || ! empty( $this->info->error ) ) {
-				$this->info = false;
+		if ( ! $this->info ) {
+			$this->info = $cached_data;
+		}
 
-				return $default_api;
-			}
+		if ( ! $this->info || ! empty( $this->info->error ) ) {
+			$this->info = false;
+
+			return $default_api;
 		}
 
 		// Create a new stdClass object and populate it with our plugin information.
@@ -291,16 +417,20 @@ class WPForms_Updater {
 		$api->last_updated          = $this->info->last_updated ?? '';
 		$api->homepage              = $this->info->homepage ?? '';
 		$api->sections['changelog'] = $this->info->changelog ?? '';
-		$api->download_link         = $this->info->download_link ?? '';
 		$api->active_installs       = $this->info->active_installs ?? '';
 		$api->banners               = isset( $this->info->banners ) ? (array) $this->info->banners : '';
+
+		// Before providing the download link, check if the plugin is compatible with the current environment.
+		$api->download_link = isset( $this->info->download_link ) && $this->is_plugin_compatible( $cached_data )
+			? $this->info->download_link
+			: '';
 
 		// Return the new API object with our custom data.
 		return $api;
 	}
 
 	/**
-	 * Query the remote URL via wp_remote_get() and returns a json decoded response.
+	 * Query the remote URL via wp_remote_get() and returns a JSON decoded response.
 	 *
 	 * @since 2.0.0
 	 * @since 1.7.2 Switch from POST to GET request.
@@ -311,7 +441,7 @@ class WPForms_Updater {
 	 * @param array  $headers       The headers to send to the remote URL.
 	 * @param string $return_format The format for returning content from the remote URL.
 	 *
-	 * @return object               Json decoded response on success, false on failure.
+	 * @return object|false         Json-decoded response on success, false on failure.
 	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function perform_remote_request( string $action, array $body = [], array $headers = [], string $return_format = 'json' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
@@ -344,7 +474,7 @@ class WPForms_Updater {
 			$response_body = $this->get_real_remote_response( $action, $body, $headers );
 		}
 
-		// Return the json decoded content.
+		// Return the JSON decoded content.
 		return $this->repack_response( $response_body );
 	}
 
@@ -353,9 +483,10 @@ class WPForms_Updater {
 	 *
 	 * @since 1.8.7
 	 *
-	 * @param object $response_body The response body.
+	 * @param object|false $response_body The response body.
 	 *
-	 * @return object
+	 * @return object|false
+	 * @noinspection PhpMissingParamTypeInspection
 	 */
 	private function repack_response( $response_body ) {
 
@@ -386,7 +517,7 @@ class WPForms_Updater {
 	 * @param array  $body    The GET query attributes.
 	 * @param array  $headers The headers to send to the remote URL.
 	 *
-	 * @return bool|mixed     Json decoded response on success, false on failure.
+	 * @return object|false   Json-decoded response on success, false on failure.
 	 */
 	private function get_real_remote_response( string $action, array $body = [], array $headers = [] ) {
 
@@ -417,12 +548,12 @@ class WPForms_Updater {
 			return false;
 		}
 
-		return json_decode( $response_body, false );
+		return json_decode( $response_body, false ) ?? false;
 	}
 
 	/**
 	 * Prepare the "mock" item to the `no_update` property.
-	 * Is required for the enable/disable auto-updates links to correctly appear in UI.
+	 * Is required for the enable/disable auto-updates links to correctly appear in the UI.
 	 *
 	 * @since 1.6.4
 	 *
@@ -444,5 +575,73 @@ class WPForms_Updater {
 			'requires_php'  => '',
 			'compatibility' => new stdClass(),
 		];
+	}
+
+	/**
+	 * Check if we should allow transient update.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	private function is_transient_update_allowed(): bool {
+
+		static $is_allowed;
+
+		if ( ! is_null( $is_allowed ) ) {
+			return $is_allowed;
+		}
+
+		global $pagenow;
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$is_update_action = isset( $_POST['action'], $_POST['slug'] ) && $_POST['action'] === 'update-plugin' && $_POST['slug'] === $this->plugin_slug;
+		$is_updates_page  = in_array( $pagenow, [ 'update-core.php', 'plugins.php' ], true );
+
+		// We should only run the update check on the update-core.php or plugins.php page,
+		// or when the user is updating the plugin.
+		$is_allowed = $is_updates_page || $is_update_action;
+
+		return $is_allowed;
+	}
+
+	/**
+	 * Detect core plugin.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	private function is_core_plugin(): bool {
+
+		return $this->plugin_slug === 'wpforms';
+	}
+
+	/**
+	 * Check if the plugin is compatible with the current environment.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param object $data The plugin data.
+	 *
+	 * @return bool
+	 */
+	private function is_plugin_compatible( $data ): bool {
+
+		return is_php_version_compatible( $data->requires_php ?? '' ) &&
+			is_wp_version_compatible( $data->requires ?? '' ) &&
+			( $this->is_core_plugin() || PluginList::is_wpforms_version_compatible( $data->requires_wpforms ?? '' ) );
+	}
+
+	/**
+	 * Check if the license is valid.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	private function is_valid_license(): bool {
+
+		return ( new PluginList() )->is_valid_license();
 	}
 }

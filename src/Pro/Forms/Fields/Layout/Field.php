@@ -39,6 +39,7 @@ class Field extends WPForms_Field {
 	 * @var array
 	 */
 	const PRESETS = [
+		'100',
 		'50-50',
 		'67-33',
 		'33-67',
@@ -124,5 +125,37 @@ class Field extends WPForms_Field {
 		$this->layout_hooks();
 
 		add_filter( "wpforms_pro_admin_entries_edit_is_field_displayable_{$this->type}", '__return_false' );
+	}
+
+	/**
+	 * Format and sanitize field.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param int   $field_id     Field ID.
+	 * @param mixed $field_submit Field value that was submitted.
+	 * @param array $form_data    Form data and settings.
+	 */
+	public function format( $field_id, $field_submit, $form_data ) {
+
+		if ( is_array( $field_submit ) ) {
+			$field_submit = array_filter( $field_submit );
+			$field_submit = implode( "\r\n", $field_submit );
+		}
+
+		$name = ! empty( $form_data['fields'][ $field_id ]['label'] ) ? sanitize_text_field( $form_data['fields'][ $field_id ]['label'] ) : '';
+
+		// Sanitize but keep line breaks.
+		$value = wpforms_sanitize_textarea_field( $field_submit );
+
+		wpforms()->get( 'process' )->fields[ $field_id ] = [
+			'name'    => $name,
+			'value'   => $value,
+			'id'      => absint( $field_id ),
+			'columns' => ! empty( $form_data['fields'][ $field_id ]['columns'] ) ? $form_data['fields'][ $field_id ]['columns'] : [],
+			'preset'  => ! empty( $form_data['fields'][ $field_id ]['preset'] ) ? $form_data['fields'][ $field_id ]['preset'] : '50-50',
+			'label'   => ! empty( $form_data['fields'][ $field_id ]['label'] ) ? $form_data['fields'][ $field_id ]['label'] : '',
+			'type'    => $this->type,
+		];
 	}
 }

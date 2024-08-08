@@ -117,6 +117,11 @@ class Loader {
 			'name' => 'Forms\IconChoices',
 			'id'   => 'icon_choices',
 		];
+
+		$this->classes[] = [
+			'name' => 'Forms\AntiSpam',
+			'id'   => 'anti_spam',
+		];
 	}
 
 	/**
@@ -293,6 +298,7 @@ class Loader {
 			],
 			[
 				'name' => 'Admin\PluginList',
+				'id'   => 'plugin_list',
 				'hook' => 'admin_init',
 			],
 			[
@@ -381,6 +387,11 @@ class Loader {
 
 		$this->classes[] = [
 			'name' => 'Forms\Fields\Layout\Process',
+			'hook' => 'init',
+		];
+
+		$this->classes[] = [
+			'name' => 'Forms\Fields\Layout\Notifications',
 			'hook' => 'init',
 		];
 
@@ -782,6 +793,7 @@ class Loader {
 			],
 			[
 				'name' => 'AntiSpam\KeywordFilter',
+				'id'   => 'antispam_keyword_filter',
 				'hook' => 'init',
 			],
 			[

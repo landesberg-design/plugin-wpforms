@@ -18,9 +18,24 @@ namespace WPForms\Vendor\Stripe\Tax;
 class Settings extends \WPForms\Vendor\Stripe\SingletonApiResource
 {
     const OBJECT_NAME = 'tax.settings';
-    use \WPForms\Vendor\Stripe\ApiOperations\SingletonRetrieve;
     const STATUS_ACTIVE = 'active';
     const STATUS_PENDING = 'pending';
+    /**
+     * Retrieves Tax <code>Settings</code> for a merchant.
+     *
+     * @param null|array|string $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return \Stripe\Tax\Settings
+     */
+    public static function retrieve($opts = null)
+    {
+        $opts = \WPForms\Vendor\Stripe\Util\RequestOptions::parse($opts);
+        $instance = new static(null, $opts);
+        $instance->refresh();
+        return $instance;
+    }
     /**
      * @param null|array $params
      * @param null|array|string $opts
@@ -37,5 +52,26 @@ class Settings extends \WPForms\Vendor\Stripe\SingletonApiResource
         $obj = \WPForms\Vendor\Stripe\Util\Util::convertToStripeObject($response->json, $opts);
         $obj->setLastResponse($response);
         return $obj;
+    }
+    /**
+     * @param null|array|string $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return static the saved resource
+     *
+     * @deprecated The `save` method is deprecated and will be removed in a
+     *     future major version of the library. Use the static method `update`
+     *     on the resource instead.
+     */
+    public function save($opts = null)
+    {
+        $params = $this->serializeParameters();
+        if (\count($params) > 0) {
+            $url = $this->instanceUrl();
+            list($response, $opts) = $this->_request('post', $url, $params, $opts, ['save']);
+            $this->refreshFrom($response, $opts);
+        }
+        return $this;
     }
 }

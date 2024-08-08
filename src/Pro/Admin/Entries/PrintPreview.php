@@ -145,6 +145,8 @@ class PrintPreview {
 		// Continue store a first entry for backward compatibility.
 		$this->entry = $this->entries[0];
 
+		wpforms()->get( 'process' )->fields = wpforms_decode( $this->entry->fields );
+
 		// Fetch the current form data with "content_only" flag.
 		// Note that form-id and data will be the same across all entries.
 		$this->form_data = wpforms()->get( 'form' )->get(

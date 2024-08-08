@@ -664,7 +664,20 @@ class SpamEntry {
 			return;
 		}
 
-		submit_button( esc_html__( 'Empty Spam', 'wpforms' ), 'apply', 'empty_spam', false );
+		$base = add_query_arg(
+			[
+				'page'    => 'wpforms-entries',
+				'view'    => 'list',
+				'form_id' => absint( $form_id ),
+			],
+			admin_url( 'admin.php' )
+		);
+
+		printf(
+			'<a href="%1$s" class="button delete-all form-details-actions-removeall" data-page="spam">%2$s</a>',
+			esc_url( wp_nonce_url( $base, 'bulk-entries' ) ),
+			esc_html__( 'Empty Spam', 'wpforms' )
+		);
 	}
 
 	/**

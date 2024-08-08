@@ -66,6 +66,10 @@ class ErrorObject extends StripeObject
     const CODE_BANK_ACCOUNT_UNVERIFIED = 'bank_account_unverified';
     const CODE_BANK_ACCOUNT_VERIFICATION_FAILED = 'bank_account_verification_failed';
     const CODE_BILLING_INVALID_MANDATE = 'billing_invalid_mandate';
+    const CODE_BILLING_POLICY_REMOTE_FUNCTION_RESPONSE_INVALID = 'billing_policy_remote_function_response_invalid';
+    const CODE_BILLING_POLICY_REMOTE_FUNCTION_TIMEOUT = 'billing_policy_remote_function_timeout';
+    const CODE_BILLING_POLICY_REMOTE_FUNCTION_UNEXPECTED_STATUS_CODE = 'billing_policy_remote_function_unexpected_status_code';
+    const CODE_BILLING_POLICY_REMOTE_FUNCTION_UNREACHABLE = 'billing_policy_remote_function_unreachable';
     const CODE_BITCOIN_UPGRADE_REQUIRED = 'bitcoin_upgrade_required';
     const CODE_CAPTURE_CHARGE_AUTHORIZATION_EXPIRED = 'capture_charge_authorization_expired';
     const CODE_CAPTURE_UNAUTHORIZED_PAYMENT = 'capture_unauthorized_payment';
@@ -139,6 +143,7 @@ class ErrorObject extends StripeObject
     const CODE_PARAMETERS_EXCLUSIVE = 'parameters_exclusive';
     const CODE_PAYMENT_INTENT_ACTION_REQUIRED = 'payment_intent_action_required';
     const CODE_PAYMENT_INTENT_AUTHENTICATION_FAILURE = 'payment_intent_authentication_failure';
+    const CODE_PAYMENT_INTENT_FX_QUOTE_INVALID = 'payment_intent_fx_quote_invalid';
     const CODE_PAYMENT_INTENT_INCOMPATIBLE_PAYMENT_METHOD = 'payment_intent_incompatible_payment_method';
     const CODE_PAYMENT_INTENT_INVALID_PARAMETER = 'payment_intent_invalid_parameter';
     const CODE_PAYMENT_INTENT_KONBINI_REJECTED_CONFIRMATION_NUMBER = 'payment_intent_konbini_rejected_confirmation_number';
@@ -190,6 +195,7 @@ class ErrorObject extends StripeObject
     const CODE_SETUP_INTENT_MANDATE_INVALID = 'setup_intent_mandate_invalid';
     const CODE_SETUP_INTENT_SETUP_ATTEMPT_EXPIRED = 'setup_intent_setup_attempt_expired';
     const CODE_SETUP_INTENT_UNEXPECTED_STATE = 'setup_intent_unexpected_state';
+    const CODE_SHIPPING_ADDRESS_INVALID = 'shipping_address_invalid';
     const CODE_SHIPPING_CALCULATION_FAILED = 'shipping_calculation_failed';
     const CODE_SKU_INACTIVE = 'sku_inactive';
     const CODE_STATE_UNSUPPORTED = 'state_unsupported';
@@ -200,6 +206,7 @@ class ErrorObject extends StripeObject
     const CODE_TERMINAL_LOCATION_COUNTRY_UNSUPPORTED = 'terminal_location_country_unsupported';
     const CODE_TERMINAL_READER_BUSY = 'terminal_reader_busy';
     const CODE_TERMINAL_READER_HARDWARE_FAULT = 'terminal_reader_hardware_fault';
+    const CODE_TERMINAL_READER_INVALID_LOCATION_FOR_PAYMENT = 'terminal_reader_invalid_location_for_payment';
     const CODE_TERMINAL_READER_OFFLINE = 'terminal_reader_offline';
     const CODE_TERMINAL_READER_TIMEOUT = 'terminal_reader_timeout';
     const CODE_TESTMODE_CHARGES_ONLY = 'testmode_charges_only';

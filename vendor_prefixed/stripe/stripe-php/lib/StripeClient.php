@@ -15,6 +15,7 @@ namespace WPForms\Vendor\Stripe;
  * @property \Stripe\Service\Apps\AppsServiceFactory $apps
  * @property \Stripe\Service\BalanceService $balance
  * @property \Stripe\Service\BalanceTransactionService $balanceTransactions
+ * @property \Stripe\Service\Billing\BillingServiceFactory $billing
  * @property \Stripe\Service\BillingPortal\BillingPortalServiceFactory $billingPortal
  * @property \Stripe\Service\ChargeService $charges
  * @property \Stripe\Service\Checkout\CheckoutServiceFactory $checkout
@@ -26,6 +27,7 @@ namespace WPForms\Vendor\Stripe;
  * @property \Stripe\Service\CustomerService $customers
  * @property \Stripe\Service\CustomerSessionService $customerSessions
  * @property \Stripe\Service\DisputeService $disputes
+ * @property \Stripe\Service\Entitlements\EntitlementsServiceFactory $entitlements
  * @property \Stripe\Service\EphemeralKeyService $ephemeralKeys
  * @property \Stripe\Service\EventService $events
  * @property \Stripe\Service\ExchangeRateService $exchangeRates

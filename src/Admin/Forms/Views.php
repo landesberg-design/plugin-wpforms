@@ -231,6 +231,7 @@ class Views {
 				'restored',
 				'deleted',
 				'duplicated',
+				'type',
 			]
 		);
 
@@ -695,7 +696,7 @@ class Views {
 
 		// Delete permanently.
 		$row_actions['delete'] = sprintf(
-			'<a href="%s" title="%s">%s</a>',
+			'<a href="%1$s" title="%2$s" data-type="%3$s">%4$s</a>',
 			esc_url(
 				wp_nonce_url(
 					add_query_arg(
@@ -710,6 +711,7 @@ class Views {
 				)
 			),
 			$is_form_template ? esc_attr__( 'Delete this template permanently', 'wpforms-lite' ) : esc_attr__( 'Delete this form permanently', 'wpforms-lite' ),
+			$is_form_template ? 'template' : 'form',
 			esc_html__( 'Delete Permanently', 'wpforms-lite' )
 		);
 

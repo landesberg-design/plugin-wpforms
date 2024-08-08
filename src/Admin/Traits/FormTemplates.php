@@ -442,6 +442,7 @@ trait FormTemplates {
 
 		$addons_attributes = '';
 		$required_addons   = false;
+		$already_installed = [];
 
 		if ( ! empty( $template['addons'] ) && is_array( $template['addons'] ) ) {
 			$required_addons = $this->addons_obj->get_by_slugs( $template['addons'] );
@@ -453,17 +454,23 @@ trait FormTemplates {
 				) {
 					unset( $required_addons[ $i ] );
 				}
+
+				if ( $addon['action'] === 'activate' ) {
+					$already_installed[] = $addon['slug'];
+				}
 			}
 		}
 
 		if ( ! empty( $required_addons ) ) {
-			$addons_names = implode( ', ', wp_list_pluck( $required_addons, 'title' ) );
-			$addons_slugs = implode( ',', wp_list_pluck( $required_addons, 'slug' ) );
+			$addons_names    = implode( ', ', wp_list_pluck( $required_addons, 'title' ) );
+			$addons_slugs    = implode( ',', wp_list_pluck( $required_addons, 'slug' ) );
+			$installed_slugs = implode( ',', $already_installed );
 
 			$addons_attributes = sprintf(
-				' data-addons-names="%1$s" data-addons="%2$s"',
+				' data-addons-names="%1$s" data-addons="%2$s" data-installed="%3$s"',
 				esc_attr( $addons_names ),
-				esc_attr( $addons_slugs )
+				esc_attr( $addons_slugs ),
+				esc_attr( $installed_slugs )
 			);
 		}
 

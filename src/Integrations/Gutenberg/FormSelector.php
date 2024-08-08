@@ -67,6 +67,7 @@ abstract class FormSelector implements IntegrationInterface {
 		'containerShadowSize'   => CSSVars::CONTAINER_SHADOW_SIZE['none']['box-shadow'],
 		'customCss'             => '',
 		'copyPasteJsonValue'    => '',
+		'pageTitle'             => '',
 	];
 
 	/**
@@ -171,6 +172,25 @@ abstract class FormSelector implements IntegrationInterface {
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_block_editor_assets' ] );
 		add_action( 'wpforms_frontend_output_container_after', [ $this, 'replace_wpforms_frontend_container_class_filter' ] );
 		add_filter( 'wpforms_frontend_form_action', [ $this, 'form_action_filter' ], 10, 2 );
+		add_filter( 'wpforms_forms_anti_spam_v3_is_honeypot_enabled', [ $this, 'filter_is_honeypot_enabled' ] );
+	}
+
+	/**
+	 * Disable honeypot in Gutenberg/Block editor.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param bool|mixed $is_enabled True if the honeypot is enabled, false otherwise.
+	 *
+	 * @return bool Whether to disable the honeypot.
+	 */
+	public function filter_is_honeypot_enabled( $is_enabled ): bool {
+
+		if ( wpforms_is_rest() ) {
+			return false;
+		}
+
+		return (bool) $is_enabled;
 	}
 
 	/**
@@ -335,6 +355,9 @@ abstract class FormSelector implements IntegrationInterface {
 				'type' => 'string',
 			],
 			'copyPasteJsonValue'    => [
+				'type' => 'string',
+			],
+			'pageTitle'             => [
 				'type' => 'string',
 			],
 		];

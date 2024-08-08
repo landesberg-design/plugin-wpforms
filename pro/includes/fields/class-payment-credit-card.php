@@ -69,7 +69,7 @@ class WPForms_Field_CreditCard extends WPForms_Field {
 				WPFORMS_PLUGIN_URL . 'assets/pro/lib/jquery.payment.min.js',
 				[ 'jquery' ],
 				WPFORMS_VERSION,
-				true
+				$this->load_script_in_footer()
 			);
 		}
 	}

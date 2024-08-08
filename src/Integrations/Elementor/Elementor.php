@@ -57,8 +57,8 @@ class Elementor implements IntegrationInterface {
 			add_action( 'elementor/widgets/widgets_registered', [ $this, 'register_widget' ] );
 
 		add_action( 'wp_ajax_wpforms_admin_get_form_selector_options', [ $this, 'ajax_get_form_selector_options' ] );
-
 		add_filter( 'wpforms_integrations_gutenberg_form_selector_allow_render', [ $this, 'disable_gutenberg_block_render' ] );
+		add_filter( 'wpforms_forms_anti_spam_v3_is_honeypot_enabled', [ $this, 'filter_is_honeypot_enabled' ] );
 	}
 
 	/**
@@ -207,6 +207,15 @@ class Elementor implements IntegrationInterface {
 			null,
 			WPFORMS_VERSION
 		);
+
+		// Choices.js.
+		wp_enqueue_script(
+			'choicesjs',
+			WPFORMS_PLUGIN_URL . 'assets/lib/choices.min.js',
+			[],
+			'10.2.0',
+			false
+		);
 	}
 
 	/**
@@ -265,5 +274,30 @@ class Elementor implements IntegrationInterface {
 		}
 
 		return $allow_render;
+	}
+
+	/**
+	 * Disable honeypot on the preview panel.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param bool|mixed $is_enabled True if the honeypot is enabled, false otherwise.
+	 *
+	 * @return bool Whether to disable the honeypot.
+	 * @noinspection PhpUndefinedFieldInspection
+	 */
+	public function filter_is_honeypot_enabled( $is_enabled ): bool {
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$action = sanitize_key( $_REQUEST['action'] ?? '' );
+
+		if (
+			in_array( $action, [ 'elementor', 'elementor_ajax' ], true ) ||
+			ElementorPlugin::$instance->preview->is_preview_mode()
+		) {
+			return false;
+		}
+
+		return (bool) $is_enabled;
 	}
 }

@@ -149,7 +149,7 @@
 						}
 
 						if ( $field.is( ':checked' ) ) {
-							$field.prop( 'checked', false ).trigger( 'change' );
+							$field.prop( 'checked', false ).triggerHandler( 'change' );
 						}
 						break;
 					case 'select':
@@ -252,7 +252,7 @@
 				// Remove all selected choices or items.
 				if ( selectedChoices && selectedChoices.length ) {
 					choicesjsInstance.removeActiveItems();
-					this.$field.trigger( 'change' );
+					this.$field.triggerHandler( 'change' );
 				}
 
 				// Show a placeholder input for a modern multiple select.
@@ -283,7 +283,7 @@
 					selectedIndex = placeholder.length ? 0 : -1; // The value -1 indicates that no element is selected.
 
 				if ( selectedIndex !== this.$field.prop( 'selectedIndex' ) ) {
-					this.$field.prop( 'selectedIndex', selectedIndex ).trigger( 'change' );
+					this.$field.prop( 'selectedIndex', selectedIndex ).triggerHandler( 'change' );
 				}
 			},
 		},
@@ -321,7 +321,7 @@
 					case 'radio':
 						if ( defval === 'checked' ) {
 							$field.prop( 'checked', true ).closest( 'li' ).addClass( 'wpforms-selected' );
-							$field.trigger( 'change' );
+							$field.triggerHandler( 'change' );
 						}
 						break;
 					case 'select':
@@ -332,7 +332,7 @@
 						// Determine if it modern select.
 						if ( ! choicesjsInstance ) {
 							if ( $field.val() !== defval ) {
-								$field.val( defval ).trigger( 'change' );
+								$field.val( defval ).triggerHandler( 'change' );
 							}
 
 						} else {
@@ -344,7 +344,7 @@
 
 							if ( choicesjsInstance.getValue( true ) !== defval ) {
 								choicesjsInstance.setChoiceByValue( defval );
-								$field.trigger( 'change' );
+								$field.triggerHandler( 'change' );
 							}
 						}
 						break;

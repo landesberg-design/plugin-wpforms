@@ -28,6 +28,7 @@ WPForms.FrontendModern = WPForms.FrontendModern || ( function( document, window,
 		init() {
 			// Document ready.
 			$( app.ready );
+			app.bindOptinMonster();
 		},
 
 		/**
@@ -67,6 +68,26 @@ WPForms.FrontendModern = WPForms.FrontendModern || ( function( document, window,
 			// Reset timepicker dropdown styles.
 			$( document )
 				.on( 'focusout', '.wpforms-render-modern .wpforms-timepicker', app.resetTimepickerDropdown );
+		},
+
+		/**
+		 * OptinMonster compatibility.
+		 *
+		 * Re-initialize after OptinMonster loads to accommodate changes that
+		 * have occurred to the DOM.
+		 *
+		 * @since 1.9.0
+		 */
+		bindOptinMonster() {
+			// OM v5.
+			document.addEventListener( 'om.Campaign.load', function() {
+				app.ready();
+			} );
+
+			// OM Legacy.
+			$( document ).on( 'OptinMonsterOnShow', function() {
+				app.ready();
+			} );
 		},
 
 		/**

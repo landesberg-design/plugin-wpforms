@@ -62,6 +62,75 @@ const builderCloseButtonEvent = function( clientID ) {
 };
 
 /**
+ * Init Modern style Dropdown fields (<select>) with choiceJS.
+ *
+ * @since 1.9.0
+ *
+ * @param {Object} e Block Details.
+ */
+const loadChoiceJS = function( e ) {
+	if ( typeof window.Choices !== 'function' ) {
+		return;
+	}
+
+	const $form = jQuery( e.detail.block.querySelector( `#wpforms-${ e.detail.formId }` ) );
+	const config = window.wpforms_choicesjs_config || {};
+
+	$form.find( '.choicesjs-select' ).each( function( index, element ) {
+		if ( ! ( element instanceof HTMLSelectElement ) ) {
+			return;
+		}
+
+		const $el = jQuery( element );
+
+		if ( $el.data( 'choicesjs' ) ) {
+			return;
+		}
+
+		const $field = $el.closest( '.wpforms-field' );
+
+		config.callbackOnInit = function() {
+			const self = this,
+				$element = jQuery( self.passedElement.element ),
+				$input = jQuery( self.input.element ),
+				sizeClass = $element.data( 'size-class' );
+
+			// Add CSS-class for size.
+			if ( sizeClass ) {
+				jQuery( self.containerOuter.element ).addClass( sizeClass );
+			}
+
+			/**
+			 * If a multiple select has selected choices - hide a placeholder text.
+			 * In case if select is empty - we return placeholder text.
+			 */
+			if ( $element.prop( 'multiple' ) ) {
+				// On init event.
+				$input.data( 'placeholder', $input.attr( 'placeholder' ) );
+
+				if ( self.getValue( true ).length ) {
+					$input.removeAttr( 'placeholder' );
+				}
+			}
+
+			this.disable();
+			$field.find( '.is-disabled' ).removeClass( 'is-disabled' );
+		};
+
+		$el.data( 'choicesjs', new window.Choices( element, config ) );
+
+		// Placeholder fix on iframes.
+		if ( $el.val() ) {
+			$el.parent().find( '.choices__input' ).attr( 'style', 'display: none !important' );
+		}
+	} );
+};
+
+// on document ready
+jQuery( function() {
+	jQuery( window ).on( 'wpformsFormSelectorFormLoaded', loadChoiceJS );
+} );
+/**
  * Open builder popup.
  *
  * @since 1.6.2
@@ -108,6 +177,9 @@ registerBlockType( 'wpforms/form-selector', {
 		},
 		preview: {
 			type: 'boolean',
+		},
+		pageTitle: {
+			type: 'string',
 		},
 	},
 	example: {
@@ -278,6 +350,8 @@ registerBlockType( 'wpforms/form-selector', {
 		];
 
 		if ( formId ) {
+			props.setAttributes( { pageTitle: document.querySelector( '.editor-post-title__input' )?.textContent ?? '' } );
+
 			jsx.push(
 				<ServerSideRender
 					key="wpforms-gutenberg-form-selector-server-side-renderer"

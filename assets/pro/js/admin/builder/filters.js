@@ -108,7 +108,7 @@ WPForms.Admin.Builder.Filters = WPForms.Admin.Builder.Filters || ( function( doc
 				.on( 'click', '.wpforms-btn-keyword-filter-reformat', app.reformatKeywords )
 				.on( 'change keyup paste cut', '.wpforms-panel-field-keyword-keywords textarea', app.updateKeywordsCount )
 				.on( 'paste keyup', '.wpforms-panel-field-keyword-keywords textarea', app.showReformatWarning )
-				.on( 'change', '#wpforms-panel-field-anti_spam-country_filter-country_codes',  app.changeCountryCodes )
+				.on( 'change', '#wpforms-panel-field-anti_spam-country_filter-country_codes', app.changeCountryCodes )
 				.on( 'wpformsSaved', app.saveKeywords );
 		},
 
@@ -150,6 +150,7 @@ WPForms.Admin.Builder.Filters = WPForms.Admin.Builder.Filters || ( function( doc
 				},
 				callbackOnInit() {
 					wpf.initMultipleSelectWithSearch( this );
+					wpf.showMoreButtonForChoices( this.containerOuter.element );
 				},
 			} ) );
 

@@ -4,9 +4,10 @@
  *
  * @since 1.8.9
  *
- * @var array                  $field          Field data.
- * @var array                  $form_data      Form data and settings.
- * @var WPForms_Entries_Single $entries_single Single entry object.
+ * @var array                  $field           Field data.
+ * @var array                  $form_data       Form data and settings.
+ * @var WPForms_Entries_Single $entries_single  Single entry object.
+ * @var bool                   $is_hidden_by_cl Is the field hidden by conditional logic.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,9 +25,14 @@ if ( empty( $rows ) ) {
 $field_description = $form_data['fields'][ $field['id'] ]['description'] ?? '';
 $hide              = $entries_single->entry_view_settings['fields']['show_field_descriptions']['value'] === 1 ? '' : ' wpforms-hide';
 
+$classes = [ 'wpforms-field-repeater-row' ];
+
+if ( $is_hidden_by_cl ) {
+	$classes[] = 'wpforms-conditional-hidden';
+}
 ?>
 
-<div class="wpforms-field-repeater-row">
+<div class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
 	<?php if ( isset( $field['label_hide'] ) && ! $field['label_hide'] ) : ?>
 		<p class="wpforms-entry-field-name">
 			<?php echo esc_html( $field['label'] ); ?>
@@ -49,6 +55,7 @@ $hide              = $entries_single->entry_view_settings['fields']['show_field_
 						'row_data'       => $row_data,
 						'form_data'      => $form_data,
 						'entries_single' => $entries_single,
+						'rows'           => $rows,
 					],
 					true
 				);
