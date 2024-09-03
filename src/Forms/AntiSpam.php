@@ -3,7 +3,7 @@
 namespace WPForms\Forms;
 
 /**
- * Class Anti Spam V3.
+ * Class Anti-Spam v3.
  *
  * This class is used for modern Anti-Spam approach.
  *
@@ -21,25 +21,16 @@ class AntiSpam {
 	private $insert_before_field_id = 1;
 
 	/**
-	 * Honeypot field id.
+	 * Array with IDs of all honeypot fields on the current page grouped by form IDs ([form_id => field_id]).
 	 *
-	 * @since 1.9.0
+	 * @since 1.9.0.3
 	 *
-	 * @var int
+	 * @var array
 	 */
-	private $honeypot_field_id = 0;
+	private $forms_data = [];
 
 	/**
-	 * Current form ID.
-	 *
-	 * @since 1.9.0
-	 *
-	 * @var int
-	 */
-	private $current_form_id = 0;
-
-	/**
-	 * Initialise the actions for the Anti-spam.
+	 * Initialise the actions for the modern Anti-Spam.
 	 *
 	 * @since 1.9.0
 	 */
@@ -59,9 +50,9 @@ class AntiSpam {
 		add_filter( 'wpforms_frontend_strings', [ $this, 'add_frontend_strings' ] );
 		add_filter( 'wpforms_frontend_fields_base_level', [ $this, 'get_random_field' ], 20 );
 		add_action( 'wpforms_display_field_before', [ $this, 'maybe_insert_honeypot_field' ], 1, 2 );
-		add_action( 'wpforms_display_field_after', [ $this, 'maybe_insert_honeypot_init_js' ], 1, 2 );
+		add_action( 'wpforms_display_fields_after', [ $this, 'maybe_insert_honeypot_init_js' ] );
 
-		// The Form Builder hooks.
+		// Builder hooks.
 		add_filter( 'wpforms_builder_panel_settings_init_form_data', [ $this, 'init_builder_settings_form_data' ] );
 		add_filter( 'wpforms_admin_builder_templates_apply_to_new_form_modify_data', [ $this, 'update_template_form_data' ] );
 		add_filter( 'wpforms_admin_builder_templates_apply_to_existing_form_modify_data', [ $this, 'update_template_form_data' ] );
@@ -111,11 +102,12 @@ class AntiSpam {
 			return;
 		}
 
-		$this->honeypot_field_id = $this->get_honeypot_field_id( $form_data );
-		$this->current_form_id   = (int) $form_data['id'];
-		$label                   = $this->get_honeypot_label( $form_data );
-		$id_attr                 = $this->get_honeypot_id_attr();
-		$is_amp                  = wpforms_is_amp();
+		$honeypot_field_id            = $this->get_honeypot_field_id( $form_data );
+		$form_id                      = (int) $form_data['id'];
+		$label                        = $this->get_honeypot_label( $form_data );
+		$id_attr                      = sprintf( 'wpforms-%1$s-field_%2$s', $form_id, $honeypot_field_id );
+		$is_amp                       = wpforms_is_amp();
+		$this->forms_data[ $form_id ] = $honeypot_field_id;
 
 		if ( $is_amp ) {
 			echo '<amp-layout layout="nodisplay">';
@@ -125,10 +117,10 @@ class AntiSpam {
 		<div id="<?php echo esc_attr( $id_attr ); ?>-container"
 			class="wpforms-field wpforms-field-text"
 			data-field-type="text"
-			data-field-id="<?php echo esc_attr( $this->honeypot_field_id ); ?>"
+			data-field-id="<?php echo esc_attr( $honeypot_field_id ); ?>"
 			>
 			<label class="wpforms-field-label" for="<?php echo esc_attr( $id_attr ); ?>" ><?php echo esc_html( $label ); ?></label>
-			<input type="text" id="<?php echo esc_attr( $id_attr ); ?>" class="wpforms-field-medium" name="wpforms[fields][<?php echo esc_attr( $this->honeypot_field_id ); ?>]" >
+			<input type="text" id="<?php echo esc_attr( $id_attr ); ?>" class="wpforms-field-medium" name="wpforms[fields][<?php echo esc_attr( $honeypot_field_id ); ?>]" >
 		</div>
 		<?php
 
@@ -138,80 +130,51 @@ class AntiSpam {
 	}
 
 	/**
-	 * Insert honeypot field before a random field.
+	 * Insert the inline styles.
 	 *
 	 * @since 1.9.0
 	 *
-	 * @param array $field     Field.
 	 * @param array $form_data Form data.
 	 */
-	public function maybe_insert_honeypot_init_js( array $field, array $form_data ) {
+	public function maybe_insert_honeypot_init_js( array $form_data ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 
 		if (
-			$this->insert_before_field_id !== (int) $field['id'] ||
-			! $this->is_honeypot_enabled( $form_data ) ||
+			! $this->forms_data ||
 			wpforms_is_amp()
 		) {
 			return;
 		}
 
-		$this->output_honeypot_init_js();
-	}
+		$ids = [];
 
-	/**
-	 * Output honeypot init javascript.
-	 *
-	 * @since 1.9.0
-	 */
-	private function output_honeypot_init_js() {
+		foreach ( $this->forms_data as $form_id => $honeypot_field_id ) {
+			$ids[] = sprintf(
+				'#wpforms-%1$d-field_%2$d-container',
+				$form_id,
+				$honeypot_field_id
+			);
+		}
 
-		$id_attr = $this->get_honeypot_id_attr();
+		if ( ! $ids ) {
+			return;
+		}
 
-		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
-		$encoded_id = base64_encode( $id_attr . '-container' );
+		$styles = sprintf(
+			'%s { position: absolute !important; overflow: hidden !important; display: inline !important; height: 1px !important; width: 1px !important; z-index: -1000 !important; padding: 0 !important; input { visibility: hidden; } }',
+			esc_attr( implode( ',', $ids ) )
+		);
 
 		printf(
 			"<script>
 				( function() {
-					const form  = document.currentScript?.closest( '.wpforms-form' );
-					const field = form?.querySelector( '#' + atob( '%s' ) );
+					const style = document.createElement( 'style' );
 
-					if ( ! field ) {
-						document.currentScript.remove();
-						return;
-					}
-
-					field.setAttribute( 'style', 'position: absolute !important; overflow: hidden !important; display: inline !important; height: 1px !important; width: 1px !important; z-index: -1000 !important; padding: 0 !important;' );
-					field.getElementsByTagName( 'label' )?.[0]?.setAttribute( 'aria-hidden', 'true' );
-
-					const input = field.getElementsByTagName( 'input' )?.[0];
-
-					if ( input ) {
-						input.setAttribute( 'style', 'visibility: hidden;' );
-						input.setAttribute( 'tabindex', '-1' );
-						input.setAttribute( 'aria-hidden', 'true' );
-					}
-
+					style.appendChild( document.createTextNode( '%s' ) );
+					document.head.appendChild( style );
 					document.currentScript?.remove();
 				} )();
 			</script>",
-			esc_html( $encoded_id )
-		);
-	}
-
-	/**
-	 * Get honeypot field ID attribute.
-	 *
-	 * @since 1.9.0
-	 *
-	 * @return string
-	 */
-	private function get_honeypot_id_attr(): string {
-
-		return sprintf(
-			'wpforms-%1$s-field_%2$s',
-			$this->current_form_id,
-			$this->honeypot_field_id
+			esc_js( $styles )
 		);
 	}
 
@@ -263,26 +226,26 @@ class AntiSpam {
 		$strings = (array) $strings;
 
 		// Store the honeypot field ID for validation and adding inline styles.
-		$strings['hn_data'][ $this->current_form_id ] = $this->honeypot_field_id;
+		$strings['hn_data'] = $this->forms_data;
 
 		return $strings;
 	}
 
 	/**
-	 * Validate Anti-spam if enabled.
+	 * Validate whether the modern Anti-Spam is enabled.
 	 *
 	 * @since 1.9.0
 	 *
 	 * @param array $form_data Form data.
 	 * @param array $fields    Fields.
-	 * @param array $entry     Form entry.
+	 * @param array $entry     Form submission raw data ($_POST).
 	 *
 	 * @return bool True if the entry is valid, false otherwise.
 	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function validate( array $form_data, array $fields, array &$entry ): bool { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		// Bail out if we don't have the antispam setting.
+		// Bail out if the modern Anti-Spam is not enabled.
 		if ( ! $this->is_honeypot_enabled( $form_data ) ) {
 			return true;
 		}
@@ -304,13 +267,13 @@ class AntiSpam {
 	}
 
 	/**
-	 * Check if the honeypot is enabled.
+	 * Check if the modern Anti-Spam is enabled.
 	 *
 	 * @since 1.9.0
 	 *
 	 * @param array $form_data Form data.
 	 *
-	 * @return bool True if the honeypot is enabled, false otherwise.
+	 * @return bool True if the modern Anti-Spam is enabled, false otherwise.
 	 */
 	private function is_honeypot_enabled( array $form_data ): bool {
 
@@ -321,11 +284,11 @@ class AntiSpam {
 		}
 
 		/**
-		 * Filters whether the Anti Spam v3 honeypot is enabled.
+		 * Filters whether the modern Anti-Spam is enabled.
 		 *
 		 * @since 1.9.0
 		 *
-		 * @param bool $is_enabled True if the honeypot is enabled, false otherwise.
+		 * @param bool $is_enabled True if the modern Anti-Spam is enabled, false otherwise.
 		 */
 		$is_enabled = (bool) apply_filters( 'wpforms_forms_anti_spam_v3_is_honeypot_enabled', ! empty( $form_data['settings']['antispam_v3'] ) );
 
@@ -380,7 +343,7 @@ class AntiSpam {
 	}
 
 	/**
-	 * Update the template form data. Set Anti spam modern settings.
+	 * Update the template form data. Set the modern Anti-Spam setting.
 	 *
 	 * @since 1.9.0
 	 *
@@ -392,10 +355,10 @@ class AntiSpam {
 
 		$form_data = (array) $form_data;
 
-		// Unset the old antispam setting.
+		// Unset the old Anti-Spam setting.
 		unset( $form_data['settings']['antispam'] );
 
-		// Enable the antispam modern setting.
+		// Enable the modern Anti-Spam setting.
 		$form_data['settings']['antispam_v3'] = $form_data['settings']['antispam_v3'] ?? '1';
 		$form_data['settings']['anti_spam']   = $form_data['settings']['anti_spam'] ?? [];
 

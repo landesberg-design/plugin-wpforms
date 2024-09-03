@@ -233,6 +233,10 @@ class PluginList {
 			return $this->update_addons_cache;
 		}
 
+		if ( ! is_object( $value ) ) {
+			$value = new stdClass();
+		}
+
 		$addons = $this->addons_cache_obj ? $this->addons_cache_obj->get() : [];
 
 		foreach ( get_plugins() as $name => $plugin ) {

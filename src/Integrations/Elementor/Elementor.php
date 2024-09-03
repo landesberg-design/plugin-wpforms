@@ -112,7 +112,7 @@ class Elementor implements IntegrationInterface {
 		wp_enqueue_script(
 			'wpforms-elementor',
 			WPFORMS_PLUGIN_URL . "assets/js/integrations/elementor/editor{$min}.js",
-			[ 'elementor-frontend', 'jquery', 'wp-util' ],
+			[ 'elementor-frontend', 'jquery', 'wp-util', 'wpforms' ],
 			WPFORMS_VERSION,
 			true
 		);
@@ -173,7 +173,7 @@ class Elementor implements IntegrationInterface {
 		wp_enqueue_script(
 			'wpforms-elementor',
 			WPFORMS_PLUGIN_URL . "assets/js/integrations/elementor/frontend{$min}.js",
-			[ 'elementor-frontend', 'jquery', 'wp-util' ],
+			[ 'elementor-frontend', 'jquery', 'wp-util', 'wpforms' ],
 			WPFORMS_VERSION,
 			true
 		);

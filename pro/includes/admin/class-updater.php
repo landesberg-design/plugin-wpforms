@@ -10,14 +10,14 @@ use WPForms\Pro\Admin\PluginList;
 /**
  * Updater class.
  *
- * @since 1.0.0
+ * @since 1.5.4.2
  */
 class WPForms_Updater {
 
 	/**
 	 * Plugin name.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @var bool|string
 	 */
@@ -26,7 +26,7 @@ class WPForms_Updater {
 	/**
 	 * Plugin slug.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @var bool|string
 	 */
@@ -35,7 +35,7 @@ class WPForms_Updater {
 	/**
 	 * Plugin path.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @var bool|string
 	 */
@@ -44,7 +44,7 @@ class WPForms_Updater {
 	/**
 	 * URL of the plugin.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @var bool|string
 	 */
@@ -53,7 +53,7 @@ class WPForms_Updater {
 	/**
 	 * Remote URL for getting plugin updates.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @var bool|string
 	 */
@@ -62,9 +62,9 @@ class WPForms_Updater {
 	/**
 	 * Version number of the plugin.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
-	 * @var bool|int
+	 * @var string
 	 */
 	public $version = false;
 
@@ -116,7 +116,7 @@ class WPForms_Updater {
 	/**
 	 * Primary class constructor.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @param array $config Array of updater config args.
 	 */
@@ -162,12 +162,13 @@ class WPForms_Updater {
 
 		add_filter( 'plugins_api', [ $this, 'plugins_api' ], 10, 3 );
 		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'update_plugins_filter' ] );
+		add_action( 'upgrader_process_complete', [ $this, 'upgrader_process_complete' ], 10, 2 );
 	}
 
 	/**
 	 * Infuse plugin update details when WordPress runs its update checker.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @param object $update_obj The WordPress update object.
 	 *
@@ -215,6 +216,29 @@ class WPForms_Updater {
 
 		// Return the update object.
 		return $update_obj;
+	}
+
+	/**
+	 * Actions to run after the upgrader process is complete.
+	 *
+	 * @since 1.9.0.2
+	 *
+	 * @param WP_Upgrader $upgrader   WP_Upgrader instance.
+	 * @param array       $hook_extra Array of bulk item update data.
+	 *
+	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function upgrader_process_complete( WP_Upgrader $upgrader, array $hook_extra ) {
+
+		$upgraded_plugins = $hook_extra['plugins'] ?? [];
+
+		if ( in_array( $this->plugin_path, $upgraded_plugins, true ) ) {
+			$all_plugins      = get_plugins();
+			$upgraded_version = $all_plugins[ $this->plugin_path ]['Version'] ?? null;
+
+			$this->version = $upgraded_version ? (string) $upgraded_version : $this->version;
+		}
 	}
 
 	/**
@@ -321,7 +345,7 @@ class WPForms_Updater {
 			'package'          => '',
 			'download_url'     => '',
 			'changelog'        => implode( '', $plugin_info['changelog'] ?? [] ),
-			'icon'             => $plugin_info['icon'] ?? [],
+			'icon'             => $plugin_info['icon'] ?? '',
 			'icons'            => $plugin_info['icons'] ?? [],
 			'banners'          => (object) [
 				'low'  => 'https://plugins.svn.wordpress.org/wpforms-lite/assets/banner-772x250.png',
@@ -334,7 +358,7 @@ class WPForms_Updater {
 	/**
 	 * Disable SSL verification to prevent download package failures.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 * @deprecated 1.8.6
 	 *
 	 * @param array  $args Array of request args.
@@ -354,7 +378,7 @@ class WPForms_Updater {
 	/**
 	 * Filter the plugins_api function to get our custom plugin information from a private repo.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @param object|mixed $api    The original plugins_api object.
 	 * @param string|mixed $action The action sent by plugins_api.
@@ -380,7 +404,7 @@ class WPForms_Updater {
 	/**
 	 * Ping a remote API to retrieve plugin information for WordPress to display.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 *
 	 * @param object|mixed $default_api The default API object.
 	 *
@@ -432,7 +456,7 @@ class WPForms_Updater {
 	/**
 	 * Query the remote URL via wp_remote_get() and returns a JSON decoded response.
 	 *
-	 * @since 2.0.0
+	 * @since 1.5.4.2
 	 * @since 1.7.2 Switch from POST to GET request.
 	 * @since 1.8.7 Added caching.
 	 *
@@ -596,7 +620,7 @@ class WPForms_Updater {
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$is_update_action = isset( $_POST['action'], $_POST['slug'] ) && $_POST['action'] === 'update-plugin' && $_POST['slug'] === $this->plugin_slug;
-		$is_updates_page  = in_array( $pagenow, [ 'update-core.php', 'plugins.php' ], true );
+		$is_updates_page  = in_array( $pagenow, [ 'update-core.php', 'plugins.php', 'admin-ajax.php', 'update.php' ], true );
 
 		// We should only run the update check on the update-core.php or plugins.php page,
 		// or when the user is updating the plugin.

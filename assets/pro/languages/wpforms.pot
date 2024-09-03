@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms 1.9.0.1\n"
+"Project-Id-Version: WPForms 1.9.0.4\n"
 "Report-Msgid-Bugs-To: https://wpforms.com/support/\n"
 "Last-Translator: WPForms <support@wpforms.com>\n"
 "Language-Team: WPForms <support@wpforms.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-08-08T14:26:12+00:00\n"
+"POT-Creation-Date: 2024-08-23T10:22:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: wpforms\n"
@@ -3649,68 +3649,68 @@ msgid "Install Addon"
 msgstr ""
 
 #. translators: %1$s - WPForms Pro URL; %2$s - WPForms Pro purchase link.
-#: src/Pro/Admin/PluginList.php:572
+#: src/Pro/Admin/PluginList.php:576
 msgid "<a href=\"%1$s\">Activate WPForms Pro</a> to receive features, updates, and support. Don't have a license? <a target=\"_blank\" href=\"%2$s\" rel=\"noopener noreferrer\">Purchase one now</a>."
 msgstr ""
 
 #. translators: %1$s - WPForms Pro URL; %2$s - WPForms Pro purchase link.
-#: src/Pro/Admin/PluginList.php:584
+#: src/Pro/Admin/PluginList.php:588
 msgid "<a href=\"%1$s\">Activate</a> your license to access this update, new features, and support. Don't have a license? <a target=\"_blank\" href=\"%2$s\" rel=\"noopener noreferrer\">Purchase one now</a>."
 msgstr ""
 
 #. translators: %s - WPForms Pro renew link.
-#: src/Pro/Admin/PluginList.php:608
+#: src/Pro/Admin/PluginList.php:612
 msgid "<a target=\"_blank\" href=\"%1$s\" rel=\"noopener noreferrer\">Renew now</a> to receive new features, updates, and support."
 msgstr ""
 
-#: src/Pro/Admin/PluginList.php:616
+#: src/Pro/Admin/PluginList.php:620
 msgid "Your WPForms Pro license is expired."
 msgstr ""
 
-#: src/Pro/Admin/PluginList.php:617
+#: src/Pro/Admin/PluginList.php:621
 msgid "Your WPForms Pro license is disabled."
 msgstr ""
 
-#: src/Pro/Admin/PluginList.php:618
+#: src/Pro/Admin/PluginList.php:622
 msgid "Your WPForms Pro license is invalid."
 msgstr ""
 
 #. translators: %1$s - WPForms Pro Changelog link; %2$s - WPForms Pro latest version.
-#: src/Pro/Admin/PluginList.php:651
+#: src/Pro/Admin/PluginList.php:655
 msgid "There is a new version of WPForms available. <a target=\"_blank\" href=\"%1$s\" rel=\"noopener noreferrer\">View version %2$s details</a>"
 msgstr ""
 
 #. translators: %1$s - WPForms Pro upgrade URL; %2$s - Update now link aria-label attribute.
-#: src/Pro/Admin/PluginList.php:666
+#: src/Pro/Admin/PluginList.php:670
 msgid "or <a href=\"%1$s\" class=\"update-link\" aria-label=\"%2$s\">update now</a>."
 msgstr ""
 
-#: src/Pro/Admin/PluginList.php:671
+#: src/Pro/Admin/PluginList.php:675
 msgid "Update Now"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Version number.
-#: src/Pro/Admin/PluginList.php:739
+#: src/Pro/Admin/PluginList.php:743
 msgid "View %1$s version %2$s details"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Details URL, 3: Link attributes, 4: Version number, 5: Components.
-#: src/Pro/Admin/PluginList.php:780
+#: src/Pro/Admin/PluginList.php:784
 msgid "Sorry, the %1$s addon can't be updated to <a href=\"%2$s\" %3$s>version %4$s</a> because it requires %5$s."
 msgstr ""
 
 #. translators: 1: Details URL, 2: Additional link attributes, 3: Version number.
-#: src/Pro/Admin/PluginList.php:801
+#: src/Pro/Admin/PluginList.php:805
 msgid "If no update is available, try <a href=\"%1$s\">checking for new plugin updates</a>."
 msgstr ""
 
 #. translators: 1:URL to Update PHP page.
-#: src/Pro/Admin/PluginList.php:817
+#: src/Pro/Admin/PluginList.php:821
 msgid "Learn more about <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">updating PHP</a>."
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Details URL, 3: Additional link attributes, 4: Version number, 5: Update URL, 6: Additional link attributes.
-#: src/Pro/Admin/PluginList.php:870
+#: src/Pro/Admin/PluginList.php:874
 msgid "There is a new version of %1$s available. <a href=\"%2$s\" %3$s>View version %4$s details</a>%5$s."
 msgstr ""
 

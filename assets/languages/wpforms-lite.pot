@@ -1,13 +1,13 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WPForms Lite 1.9.0.1\n"
+"Project-Id-Version: WPForms Lite 1.9.0.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpforms-lite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-08-08T14:26:03+00:00\n"
+"POT-Creation-Date: 2024-08-23T10:22:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: wpforms-lite\n"
@@ -2941,7 +2941,7 @@ msgid "New Entry: %s"
 msgstr ""
 
 #: includes/class-form.php:598
-#: includes/class-process.php:1292
+#: includes/class-process.php:1294
 #: includes/templates/class-simple-contact-form.php:73
 #: lite/wpforms-lite.php:474
 #: lite/wpforms-lite.php:536
@@ -2965,74 +2965,74 @@ msgid "Invalid form."
 msgstr ""
 
 #. translators: %s - error unique ID.
-#: includes/class-process.php:239
+#: includes/class-process.php:241
 msgid "Missing form data on form submission process %s"
 msgstr ""
 
-#: includes/class-process.php:240
+#: includes/class-process.php:242
 msgid "Form data is not an array in `\\WPForms_Process::process()`. It might be caused by incorrect data returned by `wpforms_process_before_form_data` filter. Verify whether you have a custom code using this filter and debug value it is returning."
 msgstr ""
 
-#: includes/class-process.php:247
+#: includes/class-process.php:249
 msgid "Your form has not been submitted because data is missing from the entry."
 msgstr ""
 
 #. translators: %s - URL to the WForms Logs admin page.
-#: includes/class-process.php:252
+#: includes/class-process.php:254
 msgid "Check the WPForms &raquo; Tools &raquo; <a href=\"%s\">Logs</a> for more details."
 msgstr ""
 
 #. translators: %s - error unique ID.
-#: includes/class-process.php:267
+#: includes/class-process.php:269
 msgid "Error ID: %s."
 msgstr ""
 
-#: includes/class-process.php:394
-#: includes/class-process.php:553
-#: includes/class-process.php:1457
+#: includes/class-process.php:396
+#: includes/class-process.php:555
+#: includes/class-process.php:1459
 msgid "Form has not been submitted, please see the errors below."
 msgstr ""
 
-#: includes/class-process.php:662
+#: includes/class-process.php:664
 msgid "Anti-spam Honeypot V2 verification was failed, please try again later."
 msgstr ""
 
-#: includes/class-process.php:720
+#: includes/class-process.php:722
 msgid "Direct POST requests are not allowed when the AJAX submission is enabled."
 msgstr ""
 
-#: includes/class-process.php:722
+#: includes/class-process.php:724
 msgid "Direct POST request"
 msgstr ""
 
-#: includes/class-process.php:846
+#: includes/class-process.php:848
 msgid "Please wait a little longer before submitting. We’re running a quick security check."
 msgstr ""
 
-#: includes/class-process.php:915
+#: includes/class-process.php:917
 msgid "Akismet"
 msgstr ""
 
 #. translators: %s - The CAPTCHA provider name.
-#: includes/class-process.php:978
+#: includes/class-process.php:980
 msgid "%s verification failed, please try again later."
 msgstr ""
 
-#: includes/class-process.php:1191
+#: includes/class-process.php:1193
 msgid "Uploaded files combined size exceeds allowed maximum."
 msgstr ""
 
-#: includes/class-process.php:1375
+#: includes/class-process.php:1377
 msgid "Redirecting…"
 msgstr ""
 
 #. translators: %1$.3f - total size of the selected files in megabytes, %2$.3f - allowed file upload limit in megabytes.
-#: includes/class-process.php:1459
+#: includes/class-process.php:1461
 msgid "The total size of the selected files %1$.3f MB exceeds the allowed limit %2$.3f MB."
 msgstr ""
 
 #. translators: %s - form name.
-#: includes/class-process.php:1561
+#: includes/class-process.php:1563
 #: lite/wpforms-lite.php:123
 msgid "New %s Entry"
 msgstr ""
@@ -5432,7 +5432,7 @@ msgstr ""
 
 #: includes/providers/class-base.php:750
 #: includes/providers/class-base.php:1369
-#: includes/providers/class-constant-contact.php:543
+#: includes/providers/class-constant-contact.php:504
 #: src/Providers/Provider/Settings/FormBuilder.php:509
 #: src/Providers/Provider/Settings/PageIntegrations.php:208
 msgid "Add New Account"
@@ -5523,70 +5523,66 @@ msgstr ""
 msgid "Please fill out all of the fields below to add your new provider account."
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:450
-msgid "API list error: Constant API error"
-msgstr ""
-
-#: includes/providers/class-constant-contact.php:546
+#: includes/providers/class-constant-contact.php:507
 msgid "Please fill out all of the fields below to register your new Constant Contact account."
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:549
-#: includes/providers/class-constant-contact.php:688
+#: includes/providers/class-constant-contact.php:510
+#: includes/providers/class-constant-contact.php:649
 msgid "Click here for documentation on connecting WPForms with Constant Contact."
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:554
-#: includes/providers/class-constant-contact.php:693
+#: includes/providers/class-constant-contact.php:515
+#: includes/providers/class-constant-contact.php:654
 msgid "Because Constant Contact requires external authentication, you will need to register WPForms with Constant Contact before you can proceed."
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:560
-#: includes/providers/class-constant-contact.php:699
+#: includes/providers/class-constant-contact.php:521
+#: includes/providers/class-constant-contact.php:660
 msgid "Click here to register with Constant Contact"
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:569
-#: includes/providers/class-constant-contact.php:708
+#: includes/providers/class-constant-contact.php:530
+#: includes/providers/class-constant-contact.php:669
 msgid "Authorization Code"
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:575
-#: includes/providers/class-constant-contact.php:714
+#: includes/providers/class-constant-contact.php:536
+#: includes/providers/class-constant-contact.php:675
 msgid "Account Nickname"
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:581
+#: includes/providers/class-constant-contact.php:542
 msgid "Connect"
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:623
-#: includes/providers/class-constant-contact.php:774
+#: includes/providers/class-constant-contact.php:584
+#: includes/providers/class-constant-contact.php:735
 msgid "Try Constant Contact for Free"
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:631
+#: includes/providers/class-constant-contact.php:592
 msgid "Learn more about the power of email marketing."
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:662
+#: includes/providers/class-constant-contact.php:623
 msgid "The \"Authorization Code\" is required."
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:670
+#: includes/providers/class-constant-contact.php:631
 msgid "The \"Account Nickname\" is required."
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:765
+#: includes/providers/class-constant-contact.php:726
 msgid "Get the most out of the <strong>WPForms</strong> plugin &mdash; use it with an active Constant Contact account."
 msgstr ""
 
-#: includes/providers/class-constant-contact.php:777
+#: includes/providers/class-constant-contact.php:738
 msgid "Connect your existing account"
 msgstr ""
 
 #. translators: %s - WPForms Constant Contact internal URL.
-#: includes/providers/class-constant-contact.php:782
+#: includes/providers/class-constant-contact.php:743
 msgid "Learn More about the <a href=\"%s\">power of email marketing</a>"
 msgstr ""
 

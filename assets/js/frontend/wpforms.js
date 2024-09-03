@@ -177,6 +177,16 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 						</div>`;
 
 				$insertBeforeField.before( fieldHTML );
+
+				// Add inline properties for honeypot field on the form.
+				const $fieldContainer = $( `#wpforms-${ formId }-field_${ wpforms_settings.hn_data[ formId ] }-container`, $form );
+
+				$fieldContainer.find( 'input' ).attr( {
+					tabindex: '-1',
+					'aria-hidden': 'true',
+				} );
+
+				$fieldContainer.find( 'label' ).attr( 'aria-hidden', 'true' );
 			} );
 		},
 

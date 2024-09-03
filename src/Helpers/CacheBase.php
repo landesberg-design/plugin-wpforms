@@ -435,7 +435,8 @@ abstract class CacheBase {
 		}
 
 		$response_code     = wp_remote_retrieve_response_code( $request );
-		$response_headers  = wp_remote_retrieve_headers( $request )->getAll();
+		$raw_headers       = wp_remote_retrieve_headers( $request );
+		$response_headers  = is_object( $raw_headers ) ? $raw_headers->getAll() : (array) $raw_headers;
 		$response_body     = wp_remote_retrieve_body( $request );
 		$response_body_len = strlen( $response_body );
 		$response_body_log = $response_body_len > 1024 ? "(First 1 kB):\n" . substr( trim( $response_body ), 0, 1024 ) . '...' : trim( $response_body );

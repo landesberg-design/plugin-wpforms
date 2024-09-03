@@ -1,6 +1,23 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.9.0.4] 2024-08-23
+### Fixed
+- Unable to send a form with Constant Contact integration and fatal errors in the admin.
+- The order of fields in Notifications was incorrect when using the Rows style field Layout.
+
+## [1.9.0.3] 2024-08-20
+### Fixed
+- Compatibility issues with menus and popups on Elementor.
+- A fatal error with wp_remote_retrieve_headers occurred in CacheBase.php in some cases.
+- Compatibility with the Jetpack Boost plugin.
+
+## [1.9.0.2] 2024-08-13
+### Fixed
+- Update Now button was not available in Plugin Details modal on WordPress Updates page in some cases.
+- WPForms was not updated on WordPress Updates page in some cases.
+- Fatal error could occur during update process in rare cases.
+
 ## [1.9.0.1] 2024-08-08
 ### Fixed
 - Issue where the WPForms widget was not available with the Avada theme.
@@ -34,7 +51,7 @@ All notable changes to this project will be documented in this file and formatte
 - Improved "File Upload" field error messages to be more helpful.
 - If both the Lite and Pro versions are installed and Pro is activated, the Lite version no longer has an activation link to avoid confusion.
 - Improved the multi-select dropdowns UI across the Builder UI.
-- Updated `stripe/stripe-php` library to v15.1.0.
+- Updated `stripe/stripe-php` library to v15.5.0.
 - Updated `woocommerce/action-scheduler` library to v3.8.1.
 - Allowed using the `&` symbol in Modern style Dropdown field choices.
 - Install the Lite version when the Pro version is active is not allowed.
@@ -44,6 +61,7 @@ All notable changes to this project will be documented in this file and formatte
 - Prevented addons' updates if the WPForms version doesn't match the required version.
 - Updated addon compatibility error notices on the Plugins admin page.
 - Updated `inputmask` library to v5.0.9.
+- Disable the activation toggle for the addon that is not compatible with the core version.
 
 ### Fixed
 - Stripe payment form couldn't be submitted in the Elementor popup preview.
@@ -105,6 +123,7 @@ All notable changes to this project will be documented in this file and formatte
 - Incorrect note text inside Repeater fields having a size.
 - Conditional logic applied to the Repeater field was not reflected on single-entry views.
 - The repeater field didn't work in the Elementor popup.
+- The `wpforms_weekly_entries_count_cron` task was reporting an error in the debug log.
 
 ## [1.8.9.6] - 2024-07-09
 ### Changed

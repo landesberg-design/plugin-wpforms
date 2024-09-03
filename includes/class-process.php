@@ -219,10 +219,12 @@ class WPForms_Process {
 		$store_spam_entries = ! empty( $this->form_data['settings']['store_spam_entries'] );
 
 		/**
-		 * Check Anti-spam Modern (v3).
+		 * Check the modern Anti-Spam (v3) protection.
+		 *
 		 * Run as early as possible to remove the honeypot field from the entry to prevent unnecessary field processing.
 		 * Bail early if the form is marked as spam and storing spam entries is disabled.
-		 * Important! We should check first on Anti-spam because it would be skipped in case $store_spam_entries === true.
+		 *
+		 * Important! We should check first on modern Anti-Spam because it is skipped in case $store_spam_entries === true.
 		 */
 		// phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		/** @noinspection NotOptimalIfConditionsInspection */
@@ -622,13 +624,13 @@ class WPForms_Process {
 	}
 
 	/**
-	 * Check Anti-spam Modern (v3).
+	 * Run the modern Anti-Spam check.
 	 *
 	 * @since 1.9.0
 	 *
 	 * @param array $entry Form submission raw data ($_POST).
 	 *
-	 * @return bool True if the form Anti-spam check was passed, false otherwise.
+	 * @return bool True if the modern Anti-Spam check was passed, false otherwise.
 	 */
 	private function modern_anti_spam_check( array &$entry ): bool {
 
@@ -638,21 +640,21 @@ class WPForms_Process {
 		}
 
 		/**
-		 * Allow bypassing the honeypot check.
+		 * Allow bypassing the modern Anti-Spam check.
 		 *
 		 * @since 1.9.0
 		 *
-		 * @param bool  $bypass    Whether to bypass the honeypot check, default false.
+		 * @param bool  $bypass    Whether to bypass the modern Anti-Spam check, default false.
 		 * @param array $form_data Form data.
-		 * @param array $entry     Form entry.
+		 * @param array $entry     Form submission raw data ($_POST).
 		 *
 		 * @return bool
 		 */
-		if ( apply_filters( 'wpforms_process_anti_spam_honeypot_bypass', false, $this->form_data, $entry ) ) {
+		if ( (bool) apply_filters( 'wpforms_process_anti_spam_honeypot_bypass', false, $this->form_data, $entry ) ) {
 			return true;
 		}
 
-		// Skip if the Anti-spam check was passed.
+		// Skip if the modern Anti-Spam check was passed.
 		if ( wpforms()->get( 'anti_spam' )->validate( $this->form_data, $this->fields, $entry ) ) {
 			return true;
 		}

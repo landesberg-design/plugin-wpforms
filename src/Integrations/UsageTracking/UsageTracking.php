@@ -190,6 +190,11 @@ class UsageTracking implements IntegrationInterface {
 			'wpforms_settings'               => $this->get_settings(),
 			'wpforms_integration_active'     => $this->get_forms_integrations( $forms ),
 			'wpforms_payments_active'        => $this->get_payments_active( $forms ),
+			'wpforms_product_quantities'     => [
+				'payment-single' => $this->count_fields_with_setting( $forms, 'payment-single', 'enable_quantity' ),
+				'payment-select' => $this->count_fields_with_setting( $forms, 'payment-select', 'enable_quantity' ),
+			],
+			'wpforms_order_summaries'        => $this->count_fields_with_setting( $forms, 'payment-total', 'summary' ),
 			'wpforms_multiple_confirmations' => count( $this->get_forms_with_multiple_confirmations( $forms ) ),
 			'wpforms_multiple_notifications' => count( $this->get_forms_with_multiple_notifications( $forms ) ),
 			'wpforms_ajax_form_submissions'  => count( $this->get_ajax_form_submissions( $forms ) ),
@@ -886,5 +891,46 @@ class UsageTracking implements IntegrationInterface {
 		$stat['keywords'] = count( $keywords );
 
 		return $stat;
+	}
+
+	/**
+	 * Count how many field have a specific setting enabled.
+	 *
+	 * @since 1.9.0.3
+	 *
+	 * @param array  $forms         Published forms.
+	 * @param string $field_type    Field type.
+	 * @param string $field_setting Field setting.
+	 *
+	 * @return int
+	 */
+	private function count_fields_with_setting( array $forms, string $field_type, string $field_setting ): int { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
+
+		$counter = 0;
+
+		// Bail early, in case there are no forms.
+		if ( empty( $forms ) ) {
+			return $counter;
+		}
+
+		// Go through all forms.
+		foreach ( $forms as $form ) {
+
+			$fields = $form->post_content['fields'] ?? [];
+
+			if ( empty( $fields ) ) {
+				continue;
+			}
+
+			// Go through all fields on the form.
+			foreach ( $fields as $field ) {
+
+				if ( ! empty( $field['type'] ) && $field['type'] === $field_type && ! empty( $field[ $field_setting ] ) ) {
+					++$counter;
+				}
+			}
+		}
+
+		return $counter;
 	}
 }

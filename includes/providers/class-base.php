@@ -51,9 +51,9 @@ abstract class WPForms_Provider {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @var mixed
+	 * @var array
 	 */
-	public $api = false;
+	public $api = [];
 
 	/**
 	 * Service icon.
