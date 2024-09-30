@@ -36,7 +36,7 @@ class Templates {
 	 *
 	 * @var array
 	 */
-	private $api_templates;
+	private $api_templates = [];
 
 	/**
 	 * Template categories data.
@@ -161,7 +161,8 @@ class Templates {
 			'listjs',
 			WPFORMS_PLUGIN_URL . 'assets/lib/list.min.js',
 			[ 'jquery' ],
-			'2.3.0'
+			'2.3.0',
+			false
 		);
 
 		wp_enqueue_script(
@@ -226,7 +227,7 @@ class Templates {
 	 */
 	private function get_localized_addons() {
 
-		return wpforms_chain( wpforms()->get( 'addons' )->get_available() )
+		return wpforms_chain( wpforms()->obj( 'addons' )->get_available() )
 			->map(
 				static function( $addon ) {
 
@@ -265,66 +266,18 @@ class Templates {
 	private function init_templates_data() {
 
 		// Get cached templates data.
-		$cache_data          = wpforms()->get( 'builder_templates_cache' )->get();
+		$cache_obj = wpforms()->obj( 'builder_templates_cache' );
+
+		if ( ! $cache_obj ) {
+			return;
+		}
+
+		$cache_data          = $cache_obj->get();
 		$templates_all       = ! empty( $cache_data['templates'] ) ? $this->sort_templates_by_created_at( $cache_data['templates'] ) : [];
 		$this->categories    = ! empty( $cache_data['categories'] ) ? $cache_data['categories'] : [];
 		$this->subcategories = ! empty( $cache_data['subcategories'] ) ? $cache_data['subcategories'] : [];
 
-		// Higher priority templates slugs.
-		// These remote templates are the replication of the default templates,
-		// which were previously included with the WPForms plugin.
-		$higher_templates_slugs = [
-			'simple-contact-form-template',
-			'request-a-quote-form-template',
-			'donation-form-template',
-			'billing-order-form-template',
-			'newsletter-signup-form-template',
-			'suggestion-form-template',
-		];
-
-		$templates_higher = [];
-		$templates_access = [];
-		$templates_denied = [];
-
-		/**
-		 * The form template was moved to wpforms/includes/templates/class-simple-contact-form.php file.
-		 *
-		 * @since 1.7.5.3
-		 */
-		unset( $templates_all['simple-contact-form-template'] );
-
-		foreach ( $templates_all as $i => $template ) {
-			$template['has_access'] = $this->has_access( $template );
-			$template['favorite']   = $this->is_favorite( $i );
-			$template['license']    = $this->get_license_level( $template );
-			$template['source']     = 'wpforms-api';
-			$template['categories'] = ! empty( $template['categories'] ) ? array_keys( $template['categories'] ) : [];
-
-			$is_higher = in_array( $i, $higher_templates_slugs, true );
-
-			if ( $template['has_access'] ) {
-
-				if ( $is_higher ) {
-					$templates_higher[ $i ] = $template;
-				} else {
-					$templates_access[ $i ] = $template;
-				}
-			} else {
-
-				if ( $is_higher ) {
-					$templates_denied = array_merge( [ $i => $template ], $templates_denied );
-				} else {
-					$templates_denied[ $i ] = $template;
-				}
-			}
-		}
-
-		// Sort higher priority templates according to the slugs order.
-		$templates_higher = array_replace( array_flip( $higher_templates_slugs ), $templates_higher );
-		$templates_higher = array_filter( $templates_higher, 'is_array' );
-
-		// Finally, merge templates from API.
-		$this->api_templates = array_merge( $templates_higher, $templates_access, $templates_denied );
+		$this->init_api_templates( $templates_all );
 	}
 
 	/**
@@ -467,7 +420,7 @@ class Templates {
 		update_option( self::FAVORITE_TEMPLATES_OPTION, $favorites );
 
 		// Update and save the template content cache.
-		wpforms()->get( 'builder_templates_cache' )->wipe_content_cache();
+		wpforms()->obj( 'builder_templates_cache' )->wipe_content_cache();
 
 		wp_send_json_success();
 	}
@@ -489,7 +442,7 @@ class Templates {
 			return ! empty( $this->get_template_by_slug( $slug ) );
 		}
 
-		$has_cache = wpforms()->get( 'builder_template_single' )->instance( $template['id'], $this->license )->get();
+		$has_cache = wpforms()->obj( 'builder_template_single' )->instance( $template['id'], $this->license )->get();
 
 		return $this->has_access( $template ) && $has_cache;
 	}
@@ -637,7 +590,7 @@ class Templates {
 
 		// Attempt to get template with form data (if available).
 		$full_template = wpforms()
-			->get( 'builder_template_single' )
+			->obj( 'builder_template_single' )
 			->instance( $template['id'], $this->license )
 			->get();
 
@@ -875,7 +828,7 @@ class Templates {
 			]
 		);
 		$title_exists = $title_query->post_count > 0;
-		$form_id      = wpforms()->get( 'form' )->add(
+		$form_id      = wpforms()->obj( 'form' )->add(
 			$form_title,
 			[],
 			[
@@ -890,7 +843,7 @@ class Templates {
 
 		// Update form title if duplicated.
 		if ( $title_exists ) {
-			wpforms()->get( 'form' )->update(
+			wpforms()->obj( 'form' )->update(
 				$form_id,
 				[
 					'settings' => [
@@ -998,7 +951,7 @@ class Templates {
 			return false;
 		}
 
-		$required_addons = wpforms()->get( 'addons' )->get_by_slugs( $template['addons'] );
+		$required_addons = wpforms()->obj( 'addons' )->get_by_slugs( $template['addons'] );
 
 		foreach ( $required_addons as $i => $addon ) {
 			if ( empty( $addon['action'] ) || ! in_array( $addon['action'], [ 'install', 'activate' ], true ) ) {
@@ -1063,17 +1016,17 @@ class Templates {
 	public function add_addons_templates( array $templates ): array {
 
 		// Add User Registration templates only if the addon is not active.
-		if ( ! wpforms()->get( 'addons' )->is_active( 'user-registration' ) ) {
+		if ( ! wpforms()->obj( 'addons' )->is_active( 'user-registration' ) ) {
 			$templates = $this->add_user_registration_templates( $templates );
 		}
 
 		// Add Post Submissions templates only if the addon is not active.
-		if ( ! wpforms()->get( 'addons' )->is_active( 'post-submissions' ) ) {
+		if ( ! wpforms()->obj( 'addons' )->is_active( 'post-submissions' ) ) {
 			$templates = $this->add_post_submissions_templates( $templates );
 		}
 
 		// Add Survey and Poll templates only if the addon is not active.
-		if ( ! wpforms()->get( 'addons' )->is_active( 'surveys-polls' ) ) {
+		if ( ! wpforms()->obj( 'addons' )->is_active( 'surveys-polls' ) ) {
 			$templates = $this->add_surveys_polls_templates( $templates );
 		}
 
@@ -1201,5 +1154,75 @@ class Templates {
 		];
 
 		return array_merge( $templates, $surveys_polls_templates );
+	}
+
+	/**
+	 * Init API templates.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param array $templates_all All templates.
+	 *
+	 * @return void
+	 */
+	private function init_api_templates( array $templates_all ) {
+
+		// Higher priority templates slugs.
+		// These remote templates are the replication of the default templates,
+		// which were previously included with the WPForms plugin.
+		$higher_templates_slugs = [
+			'simple-contact-form-template',
+			'request-a-quote-form-template',
+			'donation-form-template',
+			'billing-order-form-template',
+			'newsletter-signup-form-template',
+			'suggestion-form-template',
+		];
+
+		$templates_access_higher = [];
+		$templates_access        = [];
+		$templates_deny_higher   = [];
+		$templates_deny          = [];
+
+		/**
+		 * The form template was moved to wpforms/includes/templates/class-simple-contact-form.php file.
+		 *
+		 * @since 1.7.5.3
+		 */
+		unset( $templates_all['simple-contact-form-template'] );
+
+		foreach ( $templates_all as $i => $template ) {
+			$template['has_access'] = $this->has_access( $template );
+			$template['favorite']   = $this->is_favorite( $i );
+			$template['license']    = $this->get_license_level( $template );
+			$template['source']     = 'wpforms-api';
+			$template['categories'] = ! empty( $template['categories'] ) ? array_keys( $template['categories'] ) : [];
+
+			$is_higher = in_array( $i, $higher_templates_slugs, true );
+
+			if ( $template['has_access'] ) {
+				if ( $is_higher ) {
+					$templates_access_higher[ $i ] = $template;
+				} else {
+					$templates_access[ $i ] = $template;
+				}
+			} elseif ( $is_higher ) {
+				$templates_deny_higher[ $i ] = $template;
+			} else {
+				$templates_deny[ $i ] = $template;
+			}
+		}
+
+		// Sort higher priority templates according to the slug order.
+		$templates_access_higher = array_replace( array_flip( $higher_templates_slugs ), $templates_access_higher );
+		$templates_access_higher = array_filter( $templates_access_higher, 'is_array' );
+
+		// Finally, merge templates from API.
+		$this->api_templates = array_merge(
+			$templates_access_higher,
+			$templates_access,
+			$templates_deny_higher,
+			$templates_deny
+		);
 	}
 }

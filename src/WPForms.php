@@ -94,7 +94,7 @@ namespace WPForms {
 				_deprecated_argument(
 					'wpforms()->smart_tags',
 					'1.6.7 of the WPForms plugin',
-					"Please use `wpforms()->get( 'smart_tags' )` instead."
+					"Please use `wpforms()->obj( 'smart_tags' )` instead."
 				);
 			}
 
@@ -179,7 +179,6 @@ namespace WPForms {
 
 			require_once WPFORMS_PLUGIN_DIR . 'includes/class-db.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/functions.php';
-			require_once WPFORMS_PLUGIN_DIR . 'includes/compat.php';
 			require_once WPFORMS_PLUGIN_DIR . 'includes/fields/class-base.php';
 
 			$this->includes_magic();
@@ -412,8 +411,10 @@ namespace WPForms {
 
 		/**
 		 * Get a class instance from a registry.
+		 * Use \WPForms\WPForms::obj() instead.
 		 *
 		 * @since 1.5.7
+		 * @deprecated 1.9.1
 		 *
 		 * @param string $name Class name or an alias.
 		 *
@@ -432,6 +433,20 @@ namespace WPForms {
 			}
 
 			return new stdClass();
+		}
+
+		/**
+		 * Get a class instance from a registry.
+		 *
+		 * @since 1.9.1
+		 *
+		 * @param string $name Class name or an alias.
+		 *
+		 * @return object|null
+		 */
+		public function obj( string $name ) {
+
+			return $this->registry[ $name ] ?? null;
 		}
 
 		/**

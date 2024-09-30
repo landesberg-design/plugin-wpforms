@@ -25,15 +25,17 @@ if ( isset( $field['display'] ) && $field['display'] === 'rows' ) {
 		],
 		true
 	);
-} else {
-	echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		'admin/entries/single-entry/repeater-blocks',
-		[
-			'field'           => $field,
-			'form_data'       => $form_data,
-			'entries_single'  => $entries_single,
-			'is_hidden_by_cl' => $is_hidden_by_cl,
-		],
-		true
-	);
+
+	return;
 }
+
+echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	'admin/entries/single-entry/repeater-blocks',
+	[
+		'field'           => $field,
+		'form_data'       => $form_data,
+		'entries_single'  => $entries_single,
+		'is_hidden_by_cl' => $is_hidden_by_cl,
+	],
+	true
+);

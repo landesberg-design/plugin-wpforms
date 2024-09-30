@@ -128,7 +128,7 @@ abstract class SmartTag {
 			return '';
 		}
 
-		$entry = wpforms()->get( 'entry' );
+		$entry = wpforms()->obj( 'entry' );
 
 		if ( empty( $entry ) ) {
 			return '';
@@ -212,7 +212,7 @@ abstract class SmartTag {
 			return '';
 		}
 
-		$entry_meta = wpforms()->get( 'entry_meta' );
+		$entry_meta = wpforms()->obj( 'entry_meta' );
 
 		if ( empty( $entry_meta ) ) {
 			return '';
@@ -245,7 +245,7 @@ abstract class SmartTag {
 		$value = $fields[ $field_id ][ $field_key ] ?? '';
 
 		/**
-		 * Allow to modify the formatted field value.
+		 * Allow modifying the formatted field value.
 		 *
 		 * @since 1.9.0
 		 *

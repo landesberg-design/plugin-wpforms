@@ -16,7 +16,7 @@
  */
 function wpforms_display( $form_id = false, $title = false, $desc = false ) {
 
-	$frontend = wpforms()->get( 'frontend' );
+	$frontend = wpforms()->obj( 'frontend' );
 
 	if ( empty( $frontend ) ) {
 		return;
@@ -322,7 +322,7 @@ function wpforms_get_form_fields( $form = false, $allowlist = [] ) {
 	if ( is_object( $form ) ) {
 		$form = wpforms_decode( $form->post_content );
 	} elseif ( is_numeric( $form ) ) {
-		$form = wpforms()->get( 'form' )->get(
+		$form = wpforms()->obj( 'form' )->get(
 			absint( $form ),
 			[
 				'content_only' => true,

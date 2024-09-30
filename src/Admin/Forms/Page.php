@@ -39,7 +39,7 @@ class Page {
 					[
 						'label'   => esc_html__( 'Number of forms per page:', 'wpforms-lite' ),
 						'option'  => 'per_page',
-						'default' => wpforms()->get( 'form' )->get_count_per_page(),
+						'default' => wpforms()->obj( 'form' )->get_count_per_page(),
 						'type'    => 'number',
 						'args'    => [
 							'min'       => 1,
@@ -237,7 +237,7 @@ class Page {
 			! isset( $_GET['search']['term'] ) &&
 			! isset( $_GET['status'] ) &&
 			! isset( $_GET['tags'] ) &&
-			array_sum( wpforms()->get( 'forms_views' )->get_count() ) === 0;
+			array_sum( wpforms()->obj( 'forms_views' )->get_count() ) === 0;
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
@@ -310,9 +310,9 @@ class Page {
 	 */
 	public function notices() {
 
-		_deprecated_function( __METHOD__, '1.7.3 of the WPForms', "wpforms()->get( 'forms_bulk_actions' )->notices()" );
+		_deprecated_function( __METHOD__, '1.7.3 of the WPForms', "wpforms()->obj( 'forms_bulk_actions' )->notices()" );
 
-		wpforms()->get( 'forms_bulk_actions' )->notices();
+		wpforms()->obj( 'forms_bulk_actions' )->notices();
 	}
 
 	/**
@@ -323,9 +323,9 @@ class Page {
 	 */
 	public function process_bulk_actions() {
 
-		_deprecated_function( __METHOD__, '1.7.3 of the WPForms', "wpforms()->get( 'forms_bulk_actions' )->process()" );
+		_deprecated_function( __METHOD__, '1.7.3 of the WPForms', "wpforms()->obj( 'forms_bulk_actions' )->process()" );
 
-		wpforms()->get( 'forms_bulk_actions' )->process();
+		wpforms()->obj( 'forms_bulk_actions' )->process();
 	}
 
 	/**
@@ -340,9 +340,9 @@ class Page {
 	 */
 	public function removable_query_args( $removable_query_args ) {
 
-		_deprecated_function( __METHOD__, '1.7.3 of the WPForms', "wpforms()->get( 'forms_bulk_actions' )->removable_query_args()" );
+		_deprecated_function( __METHOD__, '1.7.3 of the WPForms', "wpforms()->obj( 'forms_bulk_actions' )->removable_query_args()" );
 
-		return wpforms()->get( 'forms_bulk_actions' )->removable_query_args( $removable_query_args );
+		return wpforms()->obj( 'forms_bulk_actions' )->removable_query_args( $removable_query_args );
 	}
 
 	/**

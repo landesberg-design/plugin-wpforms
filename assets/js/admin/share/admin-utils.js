@@ -234,11 +234,11 @@ const wpf = {
 	 * @param {Array|boolean|undefined} allowedFields           Allowed fields.
 	 * @param {boolean|undefined}       useCache                Use cache.
 	 * @param {boolean|undefined}       isAllowedRepeaterFields Is repeater fields allowed?
-	 * @param {Object|undefined}         fieldsToExclude         Fields to exclude.
+	 * @param {Object|undefined}        fieldsToExclude         Fields to exclude.
 	 *
 	 * @return {Object} Fields.
 	 */
-	getFields( allowedFields, useCache, isAllowedRepeaterFields, fieldsToExclude ) { // eslint-disable-line complexity, max-lines-per-function
+	getFields( allowedFields = undefined, useCache = undefined, isAllowedRepeaterFields = undefined, fieldsToExclude = undefined ) { // eslint-disable-line complexity, max-lines-per-function
 		useCache = useCache || false;
 
 		let fields;
@@ -326,7 +326,19 @@ const wpf = {
 			return false;
 		}
 
-		return fields;
+		const orderedFields = [];
+
+		for ( const fieldKey in wpf.orders.fields ) {
+			const fieldId = wpf.orders.fields[ fieldKey ];
+
+			if ( ! fields[ fieldId ] ) {
+				continue;
+			}
+
+			orderedFields.push( fields[ fieldId ] );
+		}
+
+		return Object.assign( {}, orderedFields );
 	},
 
 	/**
@@ -376,6 +388,10 @@ const wpf = {
 	 */
 	getField( id ) {
 		const field = wpf.formObject( '#wpforms-field-option-' + id );
+
+		if ( ! Object.keys( field ).length ) {
+			return {};
+		}
 
 		return field.fields[ Object.keys( field.fields )[ 0 ] ];
 	},
@@ -551,8 +567,8 @@ const wpf = {
 	 * @return {string} Sanitized amount.
 	 */
 	amountSanitize( amount ) { // eslint-disable-line complexity
-		// Convert to string and allow only numbers, dots, and commas.
-		amount = String( amount ).replace( /[^0-9.,]/g, '' );
+		// Convert to string, remove a currency symbol, and allow only numbers, dots, and commas.
+		amount = String( amount ).replace( wpforms_builder.currency_symbol, '' ).replace( /[^0-9.,]/g, '' );
 
 		if ( wpforms_builder.currency_decimal === ',' ) {
 			if ( wpforms_builder.currency_thousands === '.' && amount.indexOf( wpforms_builder.currency_thousands ) !== -1 ) {
@@ -835,15 +851,21 @@ const wpf = {
 		}
 
 		const isRTL = jQuery( 'body' ).hasClass( 'rtl' );
+		const position = isRTL ? 'left' : 'right';
 
-		jQuery( '.wpforms-help-tooltip' ).tooltipster( {
-			contentAsHTML: true,
-			position: isRTL ? 'left' : 'right',
-			maxWidth: 300,
-			multiple: true,
-			interactive: true,
-			debug: false,
-			IEmin: 11,
+		jQuery( '.wpforms-help-tooltip' ).each( function() {
+			const $this = jQuery( this );
+
+			$this.tooltipster( {
+				contentAsHTML: true,
+				position: $this.data( 'tooltip-position' ) || position,
+				maxWidth: 300,
+				multiple: true,
+				interactive: true,
+				debug: false,
+				IEmin: 11,
+				zIndex: 99999999,
+			} );
 		} );
 	},
 

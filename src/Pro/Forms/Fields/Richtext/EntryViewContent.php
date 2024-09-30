@@ -82,10 +82,10 @@ class EntryViewContent {
 		}
 
 		// Find the entry.
-		$entry = wpforms()->get( 'entry' )->get( $this->entry_id );
+		$entry = wpforms()->obj( 'entry' )->get( $this->entry_id );
 
 		// Find the form information.
-		$form_data = wpforms()->get( 'form' )->get(
+		$form_data = wpforms()->obj( 'form' )->get(
 			$entry->form_id,
 			[
 				'cap'          => 'view_entries_form_single',

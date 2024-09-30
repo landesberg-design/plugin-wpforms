@@ -160,7 +160,7 @@ class AntiSpam {
 		}
 
 		$styles = sprintf(
-			'%s { position: absolute !important; overflow: hidden !important; display: inline !important; height: 1px !important; width: 1px !important; z-index: -1000 !important; padding: 0 !important; input { visibility: hidden; } }',
+			'%1$s { position: absolute !important; overflow: hidden !important; display: inline !important; height: 1px !important; width: 1px !important; z-index: -1000 !important; padding: 0 !important; } %1$s input { visibility: hidden; } #wpforms-conversational-form-page %1$s label { counter-increment: none; }',
 			esc_attr( implode( ',', $ids ) )
 		);
 

@@ -99,7 +99,7 @@ class WPForms_Review {
 	public function review() {
 
 		// Fetch total entries.
-		$entries = wpforms()->get( 'entry' )->get_entries( [ 'number' => 50 ], true );
+		$entries = wpforms()->obj( 'entry' )->get_entries( [ 'number' => 50 ], true );
 
 		// Only show review request if the site has collected at least 50 entries.
 		if ( empty( $entries ) || $entries < 50 ) {

@@ -1,31 +1,102 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
-## [1.9.0.4] 2024-08-23
+## [1.9.1.2] - 2024-09-27
+### Fixed
+- There was a conflict with the WooCommerce Subscriptions plugin.
+
+## [1.9.1.1] - 2024-09-26
+### Fixed
+- Issue where addon update attempts failed, incorrectly reporting that the addon was already at the latest version.
+
+## [1.9.1] - 2024-09-24
+### Added
+- State-of-the-art generative AI can help to build forms even faster.
+- New supported currencies.
+- New `wpforms_html_field_name` filter that allows modifying field labels in email notifications and on Entry Single/Print screens.
+- Notice in the Form Builder when a user attempts to move a field with existing mapping to a Repeater field.
+- Functionality to delete old spam entries automatically.
+
+### Changed
+- Improved the UI for multiple dropdown elements in various places of the admin area.
+- Updated Stripe Subscription to use the plan name as the description.
+- Notice in the WPForms > Settings > Payments admin page when a selected currency is not supported by Stripe.
+- WPForms admin notices are now sorted by type.
+- Improved the Modern Dropdown field UI across the Block and Elementor editors.
+- Updated DOMPurify library to 3.1.6.
+- Updated `stripe/stripe-php` library to 15.8.0.
+- Improved RTL support of plugin admin pages.
+- Improved compatibility with Full Site Editor and Gutenberg plugin.
+- Removed extra spacing for Layout and Repeater with empty label.
+- Improved performance on admin pages.
+- Form Builder: Alt+S shortcut toggles the sidebar on Windows and Linux. Ctrl+F shortcut has been improved to always open search field.
+
+### Fixed
+- Fixed overlap issue between tooltip text and Country filtering dropdown options in Form Builder > Settings > Spam Protection and Security.
+- Resolved W3C validation error for the Order Summary table.
+- The Richtext field value had extra new lines in the Email Notifications and Confirmation page.
+- Fixed RTL display issues for submit spinner and payment fields with quantity enabled.
+- Corrected the WPForms disallow rule in the physical robots.txt file to ensure validity.
+- Resolved pagination button issues for WordPress versions 6.6 and higher.
+- Incorrect price was displayed in the Order Summary table for some currencies when the Single Item field with 'user defined' type was used.
+- Improved mobile responsiveness of the price column in the Order Summary table.
+- Rich Text Field in Preview Entry was shown as a plain text.
+- "The cron event list could not be saved" error could appear in the debug.log file in certain cases.
+- Fixed display of '+' and '-' buttons in repeater fields within OptinMonster popups.
+- WPForms script was not defined in the Elementor popup.
+- Fixed visibility issues with Layout and Repeater fields on View Entry and Print pages when hidden by Conditional Logic.
+- Layout field on single entry view were ignoring compact view toggle setting.
+- Compatibility with the Jetpack Boost plugin.
+- Email notifications didn't have styles for tables inserted in the Content field.
+- PHP notice generated on the Single Payment screen in some cases.
+- There was a conflict between the default media uploader and the Rich Text field uploader on the Block Editor screen.
+- Field label was always visible in single entry view and print preview.
+- Search on WPForms –> Tools –> Scheduled Actions page redirected users to the Import Screen.
+- The `wpforms_weekly_entries_count_cron` task was reporting an error in the debug log.
+- Order of fields inside layout with rows display was incorrect for entry preview and confirmation.
+- Predefined options hidden by Conditional Logic were displayed in Order Summary table.
+- Resolved W3C errors and warnings reported for the Standard fields.
+- The browser tab could crash if the WPForms block was used with patterns.
+- Deprecation errors appeared in the debug.log while using AWeber Legacy API.
+- The Order Summary text was not readable in some form themes when the `{order_summary}` smart tag was used in the Confirmation message.
+- Complex fields had the shifted layout inside the single-column Repeater and Layout fields.
+- Submit button hover styles were overridden in some themes and Elementor.
+- Repeater and Layout fields were visible inside Entry Print field even when hidden by Smart Logic.
+- The deny list option for the Email field was not working inside the Repeater field.
+- Fields looked cropped when dragging inside/outside multi-column Layout or Repeater.
+- The fields added by the `wpforms_email_display_other_fields` filter inside Layout and Repeater have not been added to email notifications.
+- The Repeater field failed to function when the "Defer Non-Essential JavaScript" option was enabled in the Jetpack Boost plugin.
+- The Layout field label was always visible in the Entry Preview and Confirmations.
+- Page Breaks and Section Dividers toggles didn't work in the Field Settings menu on the Single Entry admin screen.
+- The "Missing 'wpforms' dependency" error appeared on pages without a form.
+- The Dropdown field was cut off on mobiles when nested in the Repeater field.
+- Smart Phone field prevented form submission in some cases.
+
+## [1.9.0.4] - 2024-08-23
 ### Fixed
 - Unable to send a form with Constant Contact integration and fatal errors in the admin.
 - The order of fields in Notifications was incorrect when using the Rows style field Layout.
 
-## [1.9.0.3] 2024-08-20
+## [1.9.0.3] - 2024-08-20
 ### Fixed
 - Compatibility issues with menus and popups on Elementor.
 - A fatal error with wp_remote_retrieve_headers occurred in CacheBase.php in some cases.
 - Compatibility with the Jetpack Boost plugin.
 
-## [1.9.0.2] 2024-08-13
+## [1.9.0.2] - 2024-08-13
 ### Fixed
 - Update Now button was not available in Plugin Details modal on WordPress Updates page in some cases.
 - WPForms was not updated on WordPress Updates page in some cases.
 - Fatal error could occur during update process in rare cases.
 
-## [1.9.0.1] 2024-08-08
+## [1.9.0.1] - 2024-08-08
 ### Fixed
 - Issue where the WPForms widget was not available with the Avada theme.
 - Compatibility issue that prevented the WPForms widget from being added with certain page builders.
 - Entry fields could not be saved in some cases when Conditional Logic and Show Values were enabled in Choices.
 - Issue where the Reply-To email field was missing in the email header when the Simple Contact Form template was used.
 
-## [1.9.0] 2024-08-06
+## [1.9.0] - 2024-08-06
 ### Added
 - Modern Antispam protection for new forms.
 - Support conditional logic in the Layout field and add the ability to render the label and description for this field.
@@ -123,7 +194,6 @@ All notable changes to this project will be documented in this file and formatte
 - Incorrect note text inside Repeater fields having a size.
 - Conditional logic applied to the Repeater field was not reflected on single-entry views.
 - The repeater field didn't work in the Elementor popup.
-- The `wpforms_weekly_entries_count_cron` task was reporting an error in the debug log.
 
 ## [1.8.9.6] - 2024-07-09
 ### Changed

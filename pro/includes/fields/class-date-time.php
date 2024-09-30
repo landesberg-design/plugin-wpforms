@@ -130,7 +130,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				'wpforms-field-date-time-date',
 				'wpforms-datepicker',
 				! empty( $field_required ) ? 'wpforms-field-required' : '',
-				! empty( wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['date'] ) ? 'wpforms-error' : '',
+				! empty( wpforms()->obj( 'process' )->errors[ $form_id ][ $field_id ]['date'] ) ? 'wpforms-error' : '',
 			],
 			'data'      => [
 				'date-format' => $date_format,
@@ -183,7 +183,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				'wpforms-field-date-time-time',
 				'wpforms-timepicker',
 				! empty( $field_required ) ? 'wpforms-field-required' : '',
-				! empty( wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['time'] ) ? 'wpforms-error' : '',
+				! empty( wpforms()->obj( 'process' )->errors[ $form_id ][ $field_id ]['time'] ) ? 'wpforms-error' : '',
 			],
 			'data'      => [
 				'time-format' => $time_format,
@@ -388,6 +388,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		$this->field_option( 'size', $field );
 
 		// Custom options.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '<div class="format-selected-' . $format . ' format-selected">';
 
 			// Date.
@@ -1256,7 +1257,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 		$atts['class']   = isset( $properties['class'] ) ? $properties['class'] : [];
 		$atts['class'][] = 'wpforms-field-date-time-date-' . $element;
 		$atts['class'][] = ! empty( $field_required ) ? 'wpforms-field-required' : '';
-		$atts['class'][] = ! empty( wpforms()->get( 'process' )->errors[ $form_id ][ $field['id'] ]['date'] ) ? 'wpforms-error' : '';
+		$atts['class'][] = ! empty( wpforms()->obj( 'process' )->errors[ $form_id ][ $field['id'] ]['date'] ) ? 'wpforms-error' : '';
 
 		$atts['data'] = isset( $properties['data'] ) ? $properties['data'] : [];
 		$atts['attr'] = isset( $properties['attr'] ) ? $properties['attr'] : [];
@@ -1297,14 +1298,14 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				$is_date_format &&
 				( empty( $field_submit['date']['m'] ) || empty( $field_submit['date']['d'] ) || empty( $field_submit['date']['y'] ) )
 			) {
-				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['date'] = $required;
+				wpforms()->obj( 'process' )->errors[ $form_id ][ $field_id ]['date'] = $required;
 			}
 		} else {
 			if (
 				$is_date_format &&
 				empty( $field_submit['date'] )
 			) {
-				wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['date'] = $required;
+				wpforms()->obj( 'process' )->errors[ $form_id ][ $field_id ]['date'] = $required;
 			}
 		}
 
@@ -1312,7 +1313,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			$is_time_format &&
 			empty( $field_submit['time'] )
 		) {
-			wpforms()->get( 'process' )->errors[ $form_id ][ $field_id ]['time'] = $required;
+			wpforms()->obj( 'process' )->errors[ $form_id ][ $field_id ]['time'] = $required;
 		}
 	}
 
@@ -1377,7 +1378,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			$error = wpforms_setting( 'validation-time-limit', esc_html__( 'Please enter time between {minTime} and {maxTime}.', 'wpforms' ) );
 			$error = str_replace( [ '{minTime}', '{maxTime}' ], [ $min_time, $max_time ], $error );
 
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ]['time'] = $error;
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ]['time'] = $error;
 		}
 	}
 
@@ -1420,7 +1421,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 				} else {
 					// So we are missing some of the values.
 					// We can't process date further, as we won't be able to retrieve its unix time.
-					wpforms()->get( 'process' )->fields[ $field_id ] = [
+					wpforms()->obj( 'process' )->fields[ $field_id ] = [
 						'name'  => sanitize_text_field( $name ),
 						'value' => sanitize_text_field( $value ),
 						'id'    => wpforms_validate_field_id( $field_id ),
@@ -1451,6 +1452,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 
 		// Always store the raw time in 12H format.
 		if ( ( 'H:i A' === $time_format || 'H:i' === $time_format ) && ! empty( $time ) ) {
+			// phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 			$time = date( 'g:i A', strtotime( $time ) );
 		}
 
@@ -1469,7 +1471,7 @@ class WPForms_Field_Date_Time extends WPForms_Field {
 			$unix = strtotime( trim( "$date $time" ) );
 		}
 
-		wpforms()->get( 'process' )->fields[ $field_id ] = [
+		wpforms()->obj( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $value ),
 			'id'    => wpforms_validate_field_id( $field_id ),

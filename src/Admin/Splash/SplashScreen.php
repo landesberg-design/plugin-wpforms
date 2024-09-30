@@ -67,7 +67,7 @@ class SplashScreen {
 		}
 
 		if ( empty( $this->splash_data ) ) {
-			$cached_data_obj = wpforms()->get( 'splash_cache' );
+			$cached_data_obj = wpforms()->obj( 'splash_cache' );
 			$cached_data     = $cached_data_obj ? $cached_data_obj->get() : null;
 
 			if ( empty( $cached_data ) ) {
@@ -362,7 +362,7 @@ class SplashScreen {
 	 */
 	private function is_allow_builder_splash(): bool {
 
-		$challenge = wpforms()->get( 'challenge' );
+		$challenge = wpforms()->obj( 'challenge' );
 
 		return ! ( $challenge->challenge_force_start() || $challenge->challenge_can_start() );
 	}

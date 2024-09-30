@@ -12,10 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WPForms\Pro\Forms\Fields\Layout\Helpers;
+use WPForms\Pro\Forms\Fields\Layout\Helpers as LayoutHelpers;
 
-$fields_layout     = new WPForms_Field_Layout();
-$rows              = isset( $field['columns'] ) && is_array( $field['columns'] ) ? Helpers::get_row_data( $field ) : [];
+$rows              = isset( $field['columns'] ) && is_array( $field['columns'] ) ? LayoutHelpers::get_row_data( $field ) : [];
 $field_description = $form_data['fields'][ $field['id'] ]['description'] ?? '';
 
 $classes = [ 'wpforms-field-layout-row' ];
@@ -23,14 +22,24 @@ $classes = [ 'wpforms-field-layout-row' ];
 if ( $is_hidden_by_cl ) {
 	$classes[] = 'wpforms-conditional-hidden';
 }
+
+if ( LayoutHelpers::is_layout_empty( $field ) ) {
+	$classes[] = 'wpforms-field-layout-empty';
+}
 ?>
 <div class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
 	<p class="print-item-title field-name">
-		<?php echo esc_html( $field['label'] ); ?>
+		<?php if ( isset( $field['label_hide'] ) && ! $field['label_hide'] && ! empty( $field['label'] ) ) { ?>
+			<span class="print-item-title-wrapper">
+				<?php echo esc_html( $field['label'] ); ?>
+			</span>
+		<?php } ?>
 
-		<span class="print-item-description field-description">
-			<?php echo esc_html( $field_description ); ?>
-		</span>
+		<?php if ( ! empty( $field_description ) ) : ?>
+			<span class="print-item-description field-description">
+				<?php echo esc_html( $field_description ); ?>
+			</span>
+		<?php endif; ?>
 	</p>
 
 	<div class="print-item field wpforms-field-layout-rows">
@@ -65,8 +74,16 @@ if ( $is_hidden_by_cl ) {
 							true
 						);
 					}
+
+					$column_classes = [ 'wpforms-field-layout-column' ];
+
+					if ( LayoutHelpers::is_column_empty( $column ) ) {
+						$column_classes[] = 'wpforms-field-layout-column-empty';
+					}
+
 					printf(
-						'<div class="wpforms-field-layout-column" style="width: %1$s">%2$s</div>',
+						'<div class="%1$s" style="width: %2$s">%3$s</div>',
+						wpforms_sanitize_classes( $column_classes, true ),
 						esc_attr( (float) $preset_width . '%' ),
 						$field_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					);

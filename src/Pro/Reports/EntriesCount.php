@@ -99,10 +99,10 @@ class EntriesCount {
 
 		global $wpdb;
 
-		$table_name = wpforms()->get( 'entry' )->table_name;
+		$table_name = wpforms()->obj( 'entry' )->table_name;
 		$forms      = $this->get_allowed_forms( $form_id );
 
-		$access_obj = wpforms()->get( 'access' );
+		$access_obj = wpforms()->obj( 'access' );
 
 		if ( $access_obj ) {
 			$forms = $access_obj->filter_forms_by_current_user_capability( $forms, 'view_entries_form_single' );
@@ -120,7 +120,8 @@ class EntriesCount {
 		$sql .= $this->prepare_where_conditions( $forms, $utc_date_start, $utc_date_end );
 		$sql .= ' GROUP BY day ORDER BY day;';
 
-		return (array) $wpdb->get_results( $sql, OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		return (array) $wpdb->get_results( $sql, OBJECT_K );
 	}
 
 	/**
@@ -143,7 +144,7 @@ class EntriesCount {
 
 		global $wpdb;
 
-		$table_name = wpforms()->get( 'entry' )->table_name;
+		$table_name = wpforms()->obj( 'entry' )->table_name;
 		$forms      = $this->get_allowed_forms( $form_id );
 
 		if ( empty( $forms ) ) {
@@ -155,7 +156,8 @@ class EntriesCount {
 		$sql .= $this->prepare_where_conditions( $forms, $utc_date_start, $utc_date_end );
 		$sql .= ' GROUP BY form_id ORDER BY count DESC;';
 
-		$results = (array) $wpdb->get_results( $sql, OBJECT_K ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$results = (array) $wpdb->get_results( $sql, OBJECT_K );
 
 		return $this->fill_forms_list_form_data( $results );
 	}
@@ -200,7 +202,7 @@ class EntriesCount {
 
 		list( $prev_utc_date_start_immutable, $prev_utc_date_end_immutable ) = $prev_utc_dates;
 
-		$table_name = wpforms()->get( 'entry' )->table_name;
+		$table_name = wpforms()->obj( 'entry' )->table_name;
 
 		// Build the SQL query.
 		// ! Note that extra spaces are added for readability purposes and are removed before the query is executed.
@@ -237,7 +239,7 @@ class EntriesCount {
 		$query[] = ')';
 		$query[] = 'SELECT * FROM WeeklyCounts ORDER BY count DESC;';
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$results = $wpdb->get_results( implode( ' ', $query ), OBJECT_K );
 
 		// Get results.
@@ -262,7 +264,7 @@ class EntriesCount {
 		$processed = [];
 
 		foreach ( $results as $form_id => $result ) {
-			$form = wpforms()->get( 'form' )->get( $form_id );
+			$form = wpforms()->obj( 'form' )->get( $form_id );
 
 			if ( empty( $form ) ) {
 				continue;
@@ -379,9 +381,9 @@ class EntriesCount {
 	private function get_allowed_forms( $form_id = 0 ) {
 
 		if ( $form_id ) {
-			return wpforms()->get( 'form' )->get( $form_id ) && get_post_status( $form_id ) === 'publish' ? [ $form_id ] : [];
+			return wpforms()->obj( 'form' )->get( $form_id ) && get_post_status( $form_id ) === 'publish' ? [ $form_id ] : [];
 		}
 
-		return wpforms()->get( 'form' )->get( '', [ 'fields' => 'ids' ] );
+		return wpforms()->obj( 'form' )->get( '', [ 'fields' => 'ids' ] );
 	}
 }

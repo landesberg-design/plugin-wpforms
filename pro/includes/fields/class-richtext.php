@@ -111,6 +111,8 @@ class WPForms_Field_Richtext extends WPForms_Field {
 
 		add_filter( 'wpforms_html_field_value', [ $this, 'allow_tags_for_richtext_entry_view' ], 7, 4 );
 
+		add_filter( 'wpforms_smart_tags_formatted_field_value', [ $this, 'smart_tags_formatted_field_value' ], 7, 4 );
+
 		add_action( 'wpforms_process_before', [ $this, 'process_submitted_images' ], 10, 2 );
 
 		if ( $this->is_valid_request() ) {
@@ -446,6 +448,16 @@ class WPForms_Field_Richtext extends WPForms_Field {
 
 		$this->is_media_enabled = $primary['data']['media_enabled'] ?? false;
 
+		/**
+		 * Allow filtering whether the media is enabled before displaying in the editor.
+		 *
+		 * @since 1.9.1
+		 *
+		 * @param bool  $is_media_enabled Whether the media is enabled for the field.
+		 * @param array $field            Field data.
+		 */
+		$this->is_media_enabled = (bool) apply_filters( 'wpforms_field_richtext_display_editor_is_media_enabled', $this->is_media_enabled, $field );
+
 		$this->current_user_can_upload = current_user_can( 'upload_files' );
 
 		$this->before_editor();
@@ -481,6 +493,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		// Make sure that the "editor.css" style is not dequeued by the Divi builder.
 		if ( ! wp_style_is( 'editor-buttons' ) ) {
 			// Added "wpforms" prefix to the handle to avoid conflicts between the Gutenberg and Elementor #9064.
+			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 			wp_enqueue_style(
 				'wpforms-editor-buttons',
 				includes_url( "css/editor{$min}.css" ),
@@ -492,6 +505,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		// is displayed. Default dashicons library with the system handle `dashicons-css` will
 		// be loaded in the markup of the Rich Text field and removed after form submission.
 		if ( is_admin_bar_showing() ) {
+			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 			wp_enqueue_style(
 				'wpforms-dashicons',
 				includes_url( "css/dashicons{$min}.css" )
@@ -567,7 +581,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 */
 	private function is_enqueue_assets( $forms ) {
 
-		return wpforms_has_field_type( 'richtext', $forms, true ) || wpforms()->get( 'frontend' )->assets_global();
+		return wpforms_has_field_type( 'richtext', $forms, true ) || wpforms()->obj( 'frontend' )->assets_global();
 	}
 
 	/**
@@ -986,7 +1000,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			$field_submit = implode( "\r\n", array_filter( $field_submit ) );
 		}
 
-		wpforms()->get( 'process' )->fields[ $field_id ] = [
+		wpforms()->obj( 'process' )->fields[ $field_id ] = [
 			'name'  => ! empty( $form_data['fields'][ $field_id ]['label'] ) ? sanitize_text_field( $form_data['fields'][ $field_id ]['label'] ) : '',
 			'value' => wpforms_sanitize_richtext_field( $field_submit ),
 			'id'    => wpforms_validate_field_id( $field_id ),
@@ -1009,10 +1023,10 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			return;
 		}
 
-		$value = wpforms_esc_richtext_field( $field_submit );
+		$value = wpforms_sanitize_richtext_field( $field_submit );
 
 		if ( ! empty( $form_data['fields'][ $field_id ]['required'] ) && empty( $value ) ) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
 		}
 	}
 
@@ -1068,7 +1082,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			}
 
 			wpforms()
-				->get( 'tasks' )
+				->obj( 'tasks' )
 				->create( self::MEDIA_CLEANUP_ACTION )
 				->params( absint( $attachment_id ) )
 				->cancel();
@@ -1084,7 +1098,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 	 */
 	public function delete_attachment( $meta_id ) {
 
-		$task_meta = wpforms()->get( 'tasks_meta' );
+		$task_meta = wpforms()->obj( 'tasks_meta' );
 		$meta      = $task_meta->get( (int) $meta_id );
 
 		if ( empty( $meta ) || empty( $meta->data ) ) {
@@ -1156,11 +1170,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			return $this->get_entry_single_field_value_iframe( $field );
 		}
 
-		if ( $context === 'email-html' ) {
-			return wpforms_esc_richtext_field( $field['value'] );
-		}
-
-		return wpforms_sanitize_richtext_field( $field['value'] );
+		return wpforms_esc_richtext_field( $field['value'] );
 	}
 
 	/**
@@ -1225,7 +1235,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 		$time = (int) apply_filters( 'wpforms_richtext_override_auth_for_ajax_media_calls_time', time() + DAY_IN_SECONDS ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 
 		wpforms()
-			->get( 'tasks' )
+			->obj( 'tasks' )
 			->create( self::MEDIA_CLEANUP_ACTION )
 			->once( $time )
 			->params(
@@ -1265,7 +1275,7 @@ class WPForms_Field_Richtext extends WPForms_Field {
 			wp_send_json_error();
 		}
 
-		$form = wpforms()->get( 'form' )
+		$form = wpforms()->obj( 'form' )
 			->get(
 				absint( $form_id ),
 				[
@@ -1673,6 +1683,26 @@ class WPForms_Field_Richtext extends WPForms_Field {
 
 		return WPFORMS_PLUGIN_URL . "assets/pro/css/fields/richtext/editor-content{$min}.css";
 	}
-}
 
+	/**
+	 * Allow modifying the formatted field value.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string $value     Field value.
+	 * @param int    $field_id  Field ID.
+	 * @param array  $fields    List of fields.
+	 * @param string $field_key Field key to get value from.
+	 *
+	 * @return string
+	 */
+	public function smart_tags_formatted_field_value( $value, $field_id, $fields, $field_key ) {
+
+		if ( empty( $fields[ $field_id ]['type'] ) || $fields[ $field_id ]['type'] !== $this->type ) {
+			return $value;
+		}
+
+		return wpforms_esc_richtext_field( $value );
+	}
+}
 new WPForms_Field_RichText();

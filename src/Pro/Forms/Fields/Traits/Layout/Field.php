@@ -31,7 +31,7 @@ trait Field {
 		add_filter( 'wpforms_pro_admin_entries_edit_form_data', [ $this, 'filter_entries_print_preview_fields' ], 40 );
 		add_filter( 'wpforms_entry_preview_fields', [ $this, 'filter_entries_print_preview_fields' ] );
 		add_filter( 'wpforms_admin_payments_views_single_fields', [ $this, 'filter_entries_print_preview_fields' ] );
-		add_filter( 'wpforms_emails_notifications_form_data', [ $this, 'filter_entries_print_preview_fields' ], 40 );
+		add_filter( 'wpforms_pro_fields_entry_preview_print_entry_preview_exclude_field', [ $this, 'exclude_hidden_fields' ], 10, 3 );
 
 		add_filter( 'register_block_type_args', [ $this, 'register_block_type_args' ], 20, 2 );
 		add_filter( 'wpforms_conversational_form_detected', [ $this, 'cf_frontend_hooks' ], 10, 2 );
@@ -287,6 +287,32 @@ trait Field {
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Exclude hidden fields from the entry preview field.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param bool  $hide      Hide the field.
+	 * @param array $field     Field data.
+	 * @param array $form_data Form data.
+	 *
+	 * @return bool
+	 */
+	public function exclude_hidden_fields( $hide, array $field, array $form_data ): bool {
+
+		$hide = (bool) $hide;
+
+		if ( ! isset( $field['type'] ) || $field['type'] !== $this->type ) {
+			return $hide;
+		}
+
+		if ( isset( $field['id'] ) && wpforms_conditional_logic_fields()->field_is_hidden( $form_data, $field['id'] ) ) {
+			return true;
+		}
+
+		return $hide;
 	}
 
 	/**

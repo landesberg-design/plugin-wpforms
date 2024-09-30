@@ -5,13 +5,15 @@
  *
  * @since 1.6.7
  *
- * @var string $image             Image URL.
- * @var array  $addon             Addon data.
- * @var string $url               Addon page URL.
- * @var string $button            Button HTML.
- * @var bool   $has_settings_link Flag for addons with settings link.
- * @var string $settings_url      Addon settings link.
- * @var bool   $has_cap           Check is user has capability to manage addon.
+ * @var string $image                 Image URL.
+ * @var array  $addon                 Addon data.
+ * @var string $url                   Addon page URL.
+ * @var string $button                Button HTML.
+ * @var bool   $has_settings_link     Flag for addons with settings link.
+ * @var string $settings_url          Addon settings link.
+ * @var string $is_version_compatible Is addon version compatible with WPForms version.
+ * @var string $upgrade_url           Addon upgrade URL.
+ * @var bool   $has_cap               Check is user has capability to manage addon.
  */
 
 use WPForms\Admin\Education\Helpers;
@@ -72,6 +74,12 @@ $item_classes = [
 				<?php if ( $has_settings_link && $addon['action'] !== 'upgrade' ) : ?>
 					<a href="<?php echo esc_url( $settings_url ); ?>" class="wpforms-addons-list-item-footer-settings-link">
 						<?php esc_html_e( 'Settings', 'wpforms' ); ?>
+					</a>
+				<?php endif; ?>
+
+				<?php if ( ! $is_version_compatible && $addon['action'] === 'activate' ) : ?>
+					<a href="<?php echo esc_url( $upgrade_url ); ?>" class="wpforms-addons-list-item-footer-upgrade-link">
+						<?php esc_html_e( 'Update Required', 'wpforms' ); ?>
 					</a>
 				<?php endif; ?>
 			</div>

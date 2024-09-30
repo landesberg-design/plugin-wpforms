@@ -14,28 +14,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$field_description = $form_data['fields'][ $field['id'] ]['description'] ?? '';
-$hide              = $entries_single->entry_view_settings['fields']['show_field_descriptions']['value'] === 1 ? '' : ' wpforms-hide';
+use WPForms\Pro\Forms\Fields\Layout\Helpers as LayoutHelpers;
 
 $classes = [ 'wpforms-field-layout-column' ];
 
 if ( $is_hidden_by_cl ) {
 	$classes[] = 'wpforms-conditional-hidden';
 }
+
+if ( LayoutHelpers::is_layout_empty( $field ) ) {
+	$classes[] = 'empty';
+
+	if ( empty( $entries_single->entry_view_settings['fields']['show_empty_fields']['value'] ) ) {
+		$classes[] = 'wpforms-hide';
+	}
+}
 ?>
 
 <div class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
-	<?php if ( isset( $field['label_hide'] ) && ! $field['label_hide'] ) : ?>
-		<p class="wpforms-entry-field-name">
-			<?php echo esc_html( $field['label'] ); ?>
-
-			<?php if ( $field_description ) : ?>
-				<span class="wpforms-entry-field-description<?php echo esc_attr( $hide ); ?>">
-					<?php echo wp_kses_post( $field_description ); ?>
-				</span>
-			<?php endif; ?>
-		</p>
-	<?php endif; ?>
+	<?php
+	echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'admin/entries/single-entry/block-header',
+		[
+			'field'          => $field,
+			'form_data'      => $form_data,
+			'entries_single' => $entries_single,
+		],
+		true
+	);
+	?>
 
 	<div class="wpforms-entry-field-layout">
 		<?php foreach ( $field['columns'] as $column ) : ?>

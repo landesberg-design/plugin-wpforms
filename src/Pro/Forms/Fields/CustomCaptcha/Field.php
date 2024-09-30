@@ -569,13 +569,13 @@ class Field extends \WPForms_Field {
 				$field_submit['a'] !== '0'
 			)
 		) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
 
 			return;
 		}
 
 		if ( strtolower( trim( $field_submit['a'] ) ) !== strtolower( trim( $form_data['fields'][ $field_id ]['questions'][ $field_submit['q'] ]['answer'] ) ) ) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Incorrect answer', 'wpforms' );
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Incorrect answer', 'wpforms' );
 		}
 	}
 
@@ -597,7 +597,7 @@ class Field extends \WPForms_Field {
 			empty( $field_submit['cal'] ) ||
 			empty( $field_submit['n2'] )
 		) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
 
 			return;
 		}
@@ -608,7 +608,7 @@ class Field extends \WPForms_Field {
 		$answer   = (int) trim( $field_submit['a'] );
 
 		if ( ! in_array( $operator, [ '-', '+', '*' ], true ) ) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Incorrect operation', 'wpforms' );
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Incorrect operation', 'wpforms' );
 
 			return;
 		}
@@ -628,7 +628,7 @@ class Field extends \WPForms_Field {
 		$calculated = $operations[ $operator ]( $number_1, $number_2 );
 
 		if ( $calculated !== $answer ) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Incorrect answer', 'wpforms' );
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Incorrect answer', 'wpforms' );
 		}
 	}
 

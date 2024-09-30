@@ -251,7 +251,7 @@ class Notifications {
 		// Update notifications using async task.
 		if ( empty( $option['update'] ) || time() > $option['update'] + DAY_IN_SECONDS ) {
 
-			$tasks = wpforms()->get( 'tasks' );
+			$tasks = wpforms()->obj( 'tasks' );
 
 			if ( ! $tasks->is_scheduled( 'wpforms_admin_notifications_update' ) !== false ) {
 				$tasks
@@ -436,11 +436,7 @@ class Notifications {
 
 		$data['update'] = time();
 
-		// Flush the cache after the option has been updated
-		// for the case when it earlier returns an old value without the new data from DB.
-		if ( update_option( 'wpforms_notifications', $data ) ) {
-			wp_cache_flush();
-		}
+		update_option( 'wpforms_notifications', $data );
 	}
 
 	/**
@@ -519,7 +515,7 @@ class Notifications {
 	public function output() {
 
 		// Leave early if there are no forms.
-		if ( ! wpforms()->get( 'form' )->forms_exist() ) {
+		if ( ! wpforms()->obj( 'form' )->forms_exist() ) {
 			return;
 		}
 

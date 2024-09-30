@@ -50,6 +50,7 @@ class Loader {
 			'DefaultContent\DefaultContent',
 			'PopupMaker\PopupMaker',
 			'WooCommerce\Notifications',
+			'AI\AI',
 		];
 
 		$class_names = (array) apply_filters( 'wpforms_integrations_available', $core_class_names );

@@ -92,7 +92,7 @@ trait FilterSearch {
 		$entries = '';
 
 		if ( empty( $args['advanced_search'] ) && $field !== 'any' ) {
-			$entries = wpforms()->get( 'entry_fields' )->get_fields( $args );
+			$entries = wpforms()->obj( 'entry_fields' )->get_fields( $args );
 		}
 
 		$this->prepare_entry_ids_for_get_entries_args( $entries );

@@ -123,6 +123,49 @@ class File {
 	}
 
 	/**
+	 * Determine whether a file or directory exists.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string $path Path to file or directory.
+	 *
+	 * @return bool Whether $path exists or not.
+	 */
+	public static function exists( string $path ): bool {
+
+		$filesystem = self::get_filesystem();
+
+		if ( ! $filesystem ) {
+			return false;
+		}
+
+		return $filesystem->exists( $path );
+	}
+
+	/**
+	 * Copies a file.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string $source      Path to the source file.
+	 * @param string $destination Path to the destination file.
+	 * @param bool   $overwrite   Optional. Whether to overwrite the destination file if it exists.
+	 *                            Default false.
+	 *
+	 * @return bool True on success, false on failure.
+	 */
+	public static function copy( string $source, string $destination, bool $overwrite = false ): bool {
+
+		$filesystem = self::get_filesystem();
+
+		if ( ! $filesystem ) {
+			return false;
+		}
+
+		return $filesystem->copy( $source, $destination, $overwrite, false );
+	}
+
+	/**
 	 * Move a file or files from source to destination.
 	 *
 	 * @since 1.8.8

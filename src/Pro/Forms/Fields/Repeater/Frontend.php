@@ -167,7 +167,7 @@ class Frontend {
 		 */
 		$this->populate_entry = apply_filters( 'wpforms_pro_forms_fields_repeater_frontend_clones_populate_entry', [], $form_data );
 
-		$process = wpforms()->get( 'repeater_process' );
+		$process = wpforms()->obj( 'repeater_process' );
 
 		if ( ! $process ) {
 			return $form_data;
@@ -300,7 +300,9 @@ class Frontend {
 		$clone_list = $this->get_clone_list_hidden_input( $field );
 
 		$template_html = sprintf(
-			'<script type="text/html" class="tmpl-wpforms-field-repeater-template">%1$s</script>',
+			'<script type="text/html" class="tmpl-wpforms-field-repeater-template-%1$d-%2$d">%3$s</script>',
+			$field['id'] ?? 0,
+			$this->field_obj->form_data['id'] ?? 0,
 			$clone_tpl // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
 
@@ -476,6 +478,10 @@ class Frontend {
 	private function get_blocks_title( array $field, $block_number ): string {
 
 		if ( ! empty( $field['label_hide'] ) ) {
+			return '';
+		}
+
+		if ( ! isset( $field['label'] ) || wpforms_is_empty_string( $field['label'] ) ) {
 			return '';
 		}
 

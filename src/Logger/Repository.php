@@ -164,7 +164,7 @@ class Repository {
 	public function record( $id ) {
 
 		global $wpdb;
-		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$item = $wpdb->get_row(
 			$wpdb->prepare(
 				'SELECT * FROM ' . self::get_table_name() . ' WHERE id = %d', //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
@@ -233,11 +233,9 @@ class Repository {
 
 		$sql = rtrim( $sql, ',' );
 
-		//phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
-		//phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+		//phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$wpdb->query( $sql );
-		//phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
-		//phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+		//phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		wp_cache_delete( self::CACHE_TOTAL_KEY );
 	}
 
@@ -267,9 +265,9 @@ class Repository {
 		$total = wp_cache_get( self::CACHE_TOTAL_KEY );
 
 		if ( ! $total ) {
-			//phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+			//phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 			$total = $this->full_total ? $wpdb->get_var( 'SELECT FOUND_ROWS()' ) : $wpdb->get_var( 'SELECT COUNT( ID ) FROM ' . self::get_table_name() );
-			//phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
+			//phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 			wp_cache_set( self::CACHE_TOTAL_KEY, $total, 'wpforms', DAY_IN_SECONDS );
 		}
 

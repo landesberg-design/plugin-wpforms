@@ -42,7 +42,7 @@ trait Frontend {
 	public function __construct( $field_obj ) {
 
 		$this->field_obj = $field_obj;
-		$this->frontend  = wpforms()->get( 'frontend' );
+		$this->frontend  = wpforms()->obj( 'frontend' );
 
 		$this->hooks();
 	}
@@ -78,11 +78,37 @@ trait Frontend {
 
 		$min = wpforms_get_min_suffix();
 
+		/**
+		 * Filter the breakpoint (as viewport width in pixels) for the layout and repeater fields.
+		 *
+		 * @since 1.9.1
+		 *
+		 * @param int   $viewport_breakpoint The viewport width in pixels.
+		 * @param array $forms               Form data.
+		 */
+		$viewport_breakpoint = (int) apply_filters( 'wpforms_frontend_enqueue_css_layout_field_viewport_breakpoint', 600, $forms );
+
 		wp_enqueue_style(
 			'wpforms-layout',
 			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/layout{$min}.css",
 			[],
 			WPFORMS_VERSION
+		);
+
+		wp_enqueue_style(
+			'wpforms-layout-screen-big',
+			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/layout-screen-big{$min}.css",
+			[],
+			WPFORMS_VERSION,
+			sprintf( '(min-width: %dpx)', $viewport_breakpoint + 1 )
+		);
+
+		wp_enqueue_style(
+			'wpforms-layout-screen-small',
+			WPFORMS_PLUGIN_URL . "assets/pro/css/fields/layout-screen-small{$min}.css",
+			[],
+			WPFORMS_VERSION,
+			sprintf( '(max-width: %dpx)', $viewport_breakpoint )
 		);
 	}
 

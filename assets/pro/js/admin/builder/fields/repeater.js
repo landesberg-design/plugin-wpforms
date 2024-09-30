@@ -1,4 +1,4 @@
-/* global wpforms_builder, wpforms_addons */
+/* global wpforms_builder, wpforms_addons, wpf */
 
 /**
  * @param strings.calculation_notice_text
@@ -12,6 +12,8 @@
  * @param strings.not_allowed_alert_text
  * @param strings.not_allowed_fields
  * @param strings.rows_limit_max
+ * @param wpforms_builder.repeater.fields_mapping.title
+ * @param wpforms_builder.repeater.fields_mapping.content
  * @param wpforms_builder.repeater.addons_requirements
  * @param wpforms_builder.repeater.wpforms_builder.repeater.addons_requirements_alert
  */
@@ -170,6 +172,122 @@ WPForms.Admin.Builder.FieldRepeater = WPForms.Admin.Builder.FieldRepeater || ( f
 
 			$( window )
 				.on( 'resize', _.debounce( app.handleWindowResize, 50 ) );
+		},
+
+		/**
+		 * Fields mapping notice.
+		 *
+		 * @since 1.9.1
+		 *
+		 * @param {string} fieldId Field ID.
+		 */
+		// eslint-disable-next-line max-lines-per-function
+		fieldsMappingNotice( fieldId ) {
+			/**
+			 * Check if the field is mapped to the select.
+			 *
+			 * @param {string} selectedFieldID Selected field ID.
+			 *
+			 * @return {boolean} True if the field is mapped.
+			 */
+			function isFieldMappedToSelect( selectedFieldID ) {
+				return parseInt( selectedFieldID, 10 ) === parseInt( fieldId, 10 );
+			}
+
+			/**
+			 * Get the section title.
+			 *
+			 * @param {Object} $select Field map select element.
+			 *
+			 * @return {string} Section title.
+			 */
+			function getSectionTitle( $select ) {
+				return $select.closest( '.wpforms-panel-content-section' ).find( '.wpforms-panel-content-section-title' )[ 0 ].firstChild.nodeValue.trim();
+			}
+
+			/**
+			 * Show the confirmation dialog.
+			 *
+			 * @param {string} sectionTitle Section title.
+			 * @param {Object} $field       Field element.
+			 */
+			function showConfirmationDialog( sectionTitle, $field ) {
+				el.$builder.on( 'wpformsBeforeFieldMapSelectUpdate', ( e ) => e.preventDefault() );
+
+				$.confirm( {
+					title: wpforms_builder.repeater.fields_mapping.title,
+					content: wpforms_builder.repeater.fields_mapping.content.replace( '%s', sectionTitle ),
+					icon: 'fa fa-exclamation-circle',
+					type: 'orange',
+					buttons: {
+						confirm: {
+							text: wpforms_builder.ok,
+							btnClass: 'btn-confirm',
+							keys: [ 'enter' ],
+							action: () => {
+								el.$builder.off( 'wpformsBeforeFieldMapSelectUpdate' );
+								const fields = wpf.getFields( false, true, false, false );
+
+								$( document ).trigger( 'wpformsFieldUpdate', [ fields ] );
+							},
+						},
+						cancel: {
+							text: wpforms_builder.cancel,
+							action: () => {
+								WPForms.Admin.Builder.DragFields.revertMoveFieldToColumn( $field );
+								WPForms.Admin.Builder.FieldLayout.removeFieldFromColumns( $field.data( 'field-id' ) );
+								app.initFields();
+							},
+						},
+					},
+				} );
+			}
+
+			/**
+			 * Check and handle the field mapping.
+			 *
+			 * @param {Object} $field Field element.
+			 */
+			function checkAndHandleFieldMapping( $field ) {
+				const data = {
+					sections: [],
+					$field: null,
+				};
+
+				// Check if the field is mapped to the select.
+				$( 'select[data-field-map-allowed], select.wpforms-builder-provider-connection-field-value' ).each( function() {
+					const $select = $( this );
+
+					if ( isFieldMappedToSelect( $select.val() ) ) {
+						data.sections.push( getSectionTitle( $select ) );
+						data.$field = $field;
+					}
+				} );
+
+				if ( data.$field ) {
+					const sectionTitle = [ ...new Set( data.sections ) ].join( ' ' + wpforms_builder.repeater.fields_mapping.and + ' ' );
+					showConfirmationDialog( sectionTitle, data.$field );
+				}
+			}
+
+			/**
+			 * Check if the field is inside the repeater and show the notice.
+			 */
+			function showNotice() {
+				const $field = $( '#wpforms-field-' + fieldId );
+
+				if ( ! $field.length || $field.hasClass( 'wpforms-field-repeater' ) || $field.hasClass( 'wpforms-field-layout' ) ) {
+					return;
+				}
+
+				if ( ! $field.closest( '.wpforms-field-repeater' ).length ) {
+					return;
+				}
+
+				checkAndHandleFieldMapping( $field );
+			}
+
+			showNotice();
 		},
 
 		/**
@@ -563,6 +681,7 @@ WPForms.Admin.Builder.FieldRepeater = WPForms.Admin.Builder.FieldRepeater || ( f
 			app.updateFieldCalculationOption( fieldId );
 			app.updateFieldGeolocationRequirementsAlerts( fieldId );
 			app.updateFieldSignatureRequirementsAlerts( fieldId );
+			app.fieldsMappingNotice( fieldId );
 		},
 
 		/**

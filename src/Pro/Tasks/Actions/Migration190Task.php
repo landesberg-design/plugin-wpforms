@@ -9,7 +9,7 @@ use WPForms\Tasks\Task;
 use WPForms\Tasks\Tasks;
 
 /**
- * Class Migration175Task.
+ * Class Migration190Task.
  *
  * @since 1.9.0
  */
@@ -76,8 +76,8 @@ class Migration190Task extends Task {
 	 */
 	public function init() {
 
-		$entry_handler        = wpforms()->get( 'entry' );
-		$entry_fields_handler = wpforms()->get( 'entry_fields' );
+		$entry_handler        = wpforms()->obj( 'entry' );
+		$entry_fields_handler = wpforms()->obj( 'entry_fields' );
 
 		if ( ! $entry_handler || ! $entry_fields_handler ) {
 			return;
@@ -172,7 +172,7 @@ class Migration190Task extends Task {
 	 */
 	public function after_process_queue() {
 
-		$tasks = wpforms()->get( 'tasks' );
+		$tasks = wpforms()->obj( 'tasks' );
 
 		if ( ! $tasks || $tasks->is_scheduled( self::ACTION ) ) {
 			return;
@@ -225,7 +225,7 @@ class Migration190Task extends Task {
 		global $wpdb;
 
 		// Check if the index already exists.
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->get_var(
 			"SELECT COUNT(1) IndexIsThere
 					FROM INFORMATION_SCHEMA.STATISTICS
@@ -237,11 +237,11 @@ class Migration190Task extends Task {
 		if ( $result === '1' ) {
 			return;
 		}
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		// Change the column length for the wp_wpforms_entry_meta.type column to 255 and add an index.
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( "CREATE INDEX $index_name ON $table_name ( $key_part )" );
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 }

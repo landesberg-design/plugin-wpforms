@@ -31,16 +31,29 @@ if ( $is_hidden_by_cl ) {
 }
 ?>
 
-<?php foreach ( $blocks as $key => $rows ) : ?>
-	<div class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
+<?php
+foreach ( $blocks as $key => $rows ) :
+	$block_classes = $classes;
+
+	if ( RepeaterHelpers::is_empty_block( $rows ) ) {
+		$block_classes[] = 'wpforms-field-repeater-block-empty';
+	}
+	?>
+	<div class="<?php echo wpforms_sanitize_classes( $block_classes, true ); ?>">
 		<?php $block_number = $key >= 1 ? ' #' . ( $key + 1 ) : ''; ?>
 
 		<p class="print-item-title field-name">
-			<?php echo esc_html( $field['label'] . $block_number ); ?>
+			<?php if ( isset( $field['label_hide'] ) && ! $field['label_hide'] && ! empty( $field['label'] ) ) { ?>
+				<span class="print-item-title-wrapper">
+					<?php echo esc_html( $field['label'] . $block_number ); ?>
+				</span>
+			<?php } ?>
 
-			<span class="print-item-description field-description">
-				<?php echo esc_html( $field_description ); ?>
-			</span>
+			<?php if ( ! empty( $field_description ) ) : ?>
+				<span class="print-item-description field-description">
+					<?php echo esc_html( $field_description ); ?>
+				</span>
+			<?php endif; ?>
 		</p>
 
 		<div class="wpforms-field-repeater-blocks">
@@ -53,6 +66,7 @@ if ( $is_hidden_by_cl ) {
 							'entry'           => $entry,
 							'row_data'        => $row_data,
 							'form_data'       => $form_data,
+							'columns'         => $field['columns'] ?? [],
 							'is_hidden_by_cl' => $is_hidden_by_cl,
 						],
 						true

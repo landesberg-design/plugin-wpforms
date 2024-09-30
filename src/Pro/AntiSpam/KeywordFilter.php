@@ -153,7 +153,7 @@ class KeywordFilter {
 		if ( $this->is_blocked_submission( $fields ) ) {
 			$form_id = ! empty( $form_data['id'] ) ? $form_data['id'] : 0;
 
-			wpforms()->get( 'process' )->errors[ $form_id ]['footer'] = $this->get_error_message( $form_data );
+			wpforms()->obj( 'process' )->errors[ $form_id ]['footer'] = $this->get_error_message( $form_data );
 		}
 
 		return $fields;

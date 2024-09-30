@@ -24,7 +24,10 @@ class Summaries {
 		}
 
 		if ( ! $summaries_disabled && ! wp_next_scheduled( 'wpforms_email_summaries_cron' ) ) {
-			wp_schedule_event( $this->get_first_cron_date_gmt(), 'wpforms_email_summaries_weekly', 'wpforms_email_summaries_cron' );
+			// Since v1.9.1 we use a single event and manually reoccur it
+			// because a recurring event cannot guarantee
+			// its firing at the same time during WP_CLI execution.
+			wp_schedule_single_event( $this->get_next_launch_time(), 'wpforms_email_summaries_cron' );
 		}
 	}
 
@@ -59,8 +62,6 @@ class Summaries {
 			return;
 		}
 
-		// phpcs:ignore WordPress.WP.CronInterval.ChangeDetected
-		add_filter( 'cron_schedules', [ $this, 'add_weekly_cron_schedule' ] );
 		add_action( 'init', [ $this, 'preview' ] );
 		add_action( 'wpforms_email_summaries_cron', [ $this, 'cron' ] );
 		add_filter( 'wpforms_tasks_get_tasks', [ $this, 'register_fetch_info_blocks_task' ] );
@@ -192,20 +193,54 @@ class Summaries {
 	 * Get next cron occurrence date.
 	 *
 	 * @since 1.5.4
+	 * @deprecated 1.9.1
 	 *
 	 * @return int
 	 */
 	protected function get_first_cron_date_gmt(): int {
 
-		$date = absint( strtotime( 'next monday 2pm' ) - ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) );
+		_deprecated_function( __METHOD__, '1.9.1 of the WPForms plugin', __CLASS__ . '::get_next_launch_time()' );
 
-		return $date ? $date : time();
+		return $this->get_next_launch_time();
+	}
+
+	/**
+	 * Get next Monday 2p.m with WordPress offset.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @return int
+	 */
+	private function get_next_launch_time(): int {
+
+		$datetime = date_create( 'now', wp_timezone() );
+
+		if ( ! $datetime ) {
+			return time() + WEEK_IN_SECONDS;
+		}
+
+		$hours = 14;
+
+		// If today is Monday and the current time is less than 2 p.m.,
+		// we can launch the cron for today.
+		if (
+			(int) $datetime->format( 'N' ) !== 1 ||
+			(int) $datetime->format( 'H' ) > $hours ||
+			( (int) $datetime->format( 'H' ) === $hours && (int) $datetime->format( 'i' ) !== 0 )
+		) {
+			$datetime->modify( 'next monday' );
+		}
+
+		$datetime->setTime( $hours, 0 );
+
+		return absint( $datetime->getTimestamp() );
 	}
 
 	/**
 	 * Add custom Email Summaries cron schedule.
 	 *
-	 * @since 1.5.4
+	 * @since      1.5.4
+	 * @deprecated 1.9.1
 	 *
 	 * @param array $schedules WP cron schedules.
 	 *
@@ -213,9 +248,10 @@ class Summaries {
 	 */
 	public function add_weekly_cron_schedule( $schedules ) {
 
+		_deprecated_function( __METHOD__, '1.9.1 of the WPForms plugin' );
+
 		$schedules['wpforms_email_summaries_weekly'] = [
-			// Make sure the cron job runs on Monday at 2pm.
-			'interval' => $this->get_first_cron_date_gmt() - time(),
+			'interval' => $this->get_next_launch_time() - time(),
 			'display'  => esc_html__( 'Weekly WPForms Email Summaries', 'wpforms-lite' ),
 		];
 

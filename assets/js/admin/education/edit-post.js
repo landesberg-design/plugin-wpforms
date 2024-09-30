@@ -100,7 +100,7 @@ const WPFormsEditPostEducation = window.WPFormsEditPostEducation || ( function( 
 			const $document = $( document );
 
 			if ( ! app.isNoticeVisible ) {
-				$document.on( 'input', '#title', app.maybeShowClassicNotice );
+				$document.on( 'input', '#title', _.debounce( app.maybeShowClassicNotice, 1000 ) );
 			}
 
 			$document.on( 'click', '.wpforms-edit-post-education-notice-close', app.closeNotice );
@@ -123,8 +123,8 @@ const WPFormsEditPostEducation = window.WPFormsEditPostEducation || ( function( 
 			}
 
 			$document
-				.on( 'input', '.editor-post-title__input', app.maybeShowGutenbergNotice )
-				.on( 'DOMSubtreeModified', '.editor-post-title__input', app.maybeShowGutenbergNotice );
+				.on( 'input', '.editor-post-title__input', _.debounce( app.maybeShowGutenbergNotice, 1000 ) )
+				.on( 'DOMSubtreeModified', '.editor-post-title__input', _.debounce( app.maybeShowGutenbergNotice, 1000 ) );
 		},
 
 		/**
@@ -140,7 +140,7 @@ const WPFormsEditPostEducation = window.WPFormsEditPostEducation || ( function( 
 				.on( 'DOMSubtreeModified', '.edit-post-layout', app.distractionFreeModeToggle );
 
 			$iframe.contents()
-				.on( 'DOMSubtreeModified', '.editor-post-title__input', app.maybeShowGutenbergNotice );
+				.on( 'DOMSubtreeModified', '.editor-post-title__input', _.debounce( app.maybeShowGutenbergNotice, 1000 ) );
 		},
 
 		/**
@@ -172,8 +172,7 @@ const WPFormsEditPostEducation = window.WPFormsEditPostEducation || ( function( 
 		 *
 		 * @since 1.8.1
 		 */
-		showGutenbergNotice: function() {
-
+		showGutenbergNotice() {
 			wp.data.dispatch( 'core/notices' ).createInfoNotice(
 				wpforms_edit_post_education.gutenberg_notice.template,
 				app.getGutenbergNoticeSettings()
@@ -191,6 +190,14 @@ const WPFormsEditPostEducation = window.WPFormsEditPostEducation || ( function( 
 				const $notice = noticeBody.closest( '.components-notice' );
 				$notice.addClass( 'wpforms-edit-post-education-notice' );
 				$notice.find( '.is-secondary, .is-link' ).removeClass( 'is-secondary' ).removeClass( 'is-link' ).addClass( 'is-primary' );
+
+				// We can't use onDismiss callback as it was introduced in WordPress 6.0 only.
+				const dismissButton = $notice.find( '.components-notice__dismiss' );
+				if ( dismissButton ) {
+					dismissButton.on( 'click', function() {
+						app.updateUserMeta();
+					} );
+				}
 
 				clearInterval( hasNotice );
 			}, 100 );
@@ -252,7 +259,6 @@ const WPFormsEditPostEducation = window.WPFormsEditPostEducation || ( function( 
 				);
 			};
 
-			noticeSettings.onDismiss = app.updateUserMeta;
 			noticeSettings.actions[0].onClick = () => registerPlugin( pluginName, { render: GutenbergTutorial } );
 
 			return noticeSettings;

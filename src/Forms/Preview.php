@@ -79,7 +79,7 @@ class Preview {
 		}
 
 		// Fetch form details.
-		$this->form_data = wpforms()->get( 'form' )->get( $form_id, [ 'content_only' => true ] );
+		$this->form_data = wpforms()->obj( 'form' )->get( $form_id, [ 'content_only' => true ] );
 
 		// Get the post type for preview item.
 		$this->post_type = get_post_type( $form_id );
@@ -242,7 +242,7 @@ class Preview {
 		if (
 			! $this->is_form_template &&
 			wpforms_current_user_can( wpforms_get_capability_manage_options(), $this->form_data['id'] ) &&
-			wpforms()->get( 'payment' )->get_by( 'form_id', $this->form_data['id'] )
+			wpforms()->obj( 'payment' )->get_by( 'form_id', $this->form_data['id'] )
 		) {
 				$links[] = [
 					'url'  => esc_url(

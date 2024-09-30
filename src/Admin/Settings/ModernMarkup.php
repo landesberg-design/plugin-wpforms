@@ -96,7 +96,7 @@ class ModernMarkup {
 
 		// Transient doesn't set or expired.
 		if ( $is_disabled_transient === false ) {
-			$forms                 = wpforms()->get( 'form' )->get( '', [ 'post_status' => 'publish' ] );
+			$forms                 = wpforms()->obj( 'form' )->get( '', [ 'post_status' => 'publish' ] );
 			$is_disabled_transient = ( ! empty( $forms ) && wpforms_has_field_type( 'credit-card', $forms, true ) ) ? '1' : '0';
 
 			// Re-check all the forms for the CC field once per day.

@@ -192,7 +192,9 @@ class Requirements {
 			self::EXT     => 'curl',
 			self::LICENSE => self::PLUS_PRO_AND_TOP,
 		],
-		'wpforms-calculations/wpforms-calculations.php'                 => [],
+		'wpforms-calculations/wpforms-calculations.php'                 => [
+			self::ADDON  => '1.3.0',
+		],
 		'wpforms-campaign-monitor/wpforms-campaign-monitor.php'         => [
 			self::LICENSE => self::PLUS_PRO_AND_TOP,
 		],
@@ -229,7 +231,9 @@ class Requirements {
 			self::LICENSE => self::PLUS_PRO_AND_TOP,
 			self::PHP     => '7.3',
 		],
-		'wpforms-google-sheets/wpforms-google-sheets.php'               => [],
+		'wpforms-google-sheets/wpforms-google-sheets.php'               => [
+			self::ADDON  => '2.2.0',
+		],
 		'wpforms-hubspot/wpforms-hubspot.php'                           => [
 			self::LICENSE => self::TOP,
 		],

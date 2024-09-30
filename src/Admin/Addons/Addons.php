@@ -70,15 +70,6 @@ class Addons {
 	private $addons;
 
 	/**
-	 * Available addons data.
-	 *
-	 * @since 1.6.6
-	 *
-	 * @var array
-	 */
-	private $available_addons = [];
-
-	/**
 	 * Determine if the class is allowed to load.
 	 *
 	 * @since 1.6.6
@@ -109,17 +100,17 @@ class Addons {
 			return;
 		}
 
-		$this->cache  = wpforms()->get( 'addons_cache' );
-		$this->addons = $this->cache->get();
+		$this->cache = wpforms()->obj( 'addons_cache' );
 
 		global $pagenow;
 
 		// Force update addons cache if we are on the update-core.php page.
-		// This is needed to update addons data while checking for all available updates.
+		// This is necessary to update addons data while checking for all available updates.
 		if ( $pagenow === 'update-core.php' ) {
 			$this->cache->update( true );
-			$this->addons = $this->cache->get();
 		}
+
+		$this->addons = $this->cache->get();
 
 		$this->hooks();
 	}
@@ -130,8 +121,6 @@ class Addons {
 	 * @since 1.6.6
 	 */
 	protected function hooks() {
-
-		add_action( 'admin_init', [ $this, 'get_available' ] );
 
 		/**
 		 * Fire before admin addons init.
@@ -268,7 +257,7 @@ class Addons {
 	 */
 	public function get_by_category( string $category ) {
 
-		return $this->get_filtered( $this->available_addons, [ 'category' => $category ] );
+		return $this->get_filtered( $this->get_available(), [ 'category' => $category ] );
 	}
 
 	/**
@@ -283,7 +272,7 @@ class Addons {
 	 */
 	public function get_by_license( string $license ) {
 
-		return $this->get_filtered( $this->available_addons, [ 'license' => $license ] );
+		return $this->get_filtered( $this->get_available(), [ 'license' => $license ] );
 	}
 
 	/**
@@ -328,7 +317,7 @@ class Addons {
 		$slug = (string) $slug;
 		$slug = 'wpforms-' . str_replace( 'wpforms-', '', sanitize_key( $slug ) );
 
-		$addon = ! empty( $this->available_addons[ $slug ] ) ? $this->available_addons[ $slug ] : [];
+		$addon = $this->get_available()[ $slug ] ?? [];
 
 		// In case if addon is "not available" let's try to get and prepare addon data from all addons.
 		if ( empty( $addon ) ) {
@@ -428,22 +417,26 @@ class Addons {
 	 */
 	public function get_available() {
 
+		static $available_addons = [];
+
+		if ( $available_addons ) {
+			return $available_addons;
+		}
+
 		if ( empty( $this->addons ) || ! is_array( $this->addons ) ) {
 			return [];
 		}
 
-		if ( empty( $this->available_addons ) ) {
-			$this->available_addons = array_map( [ $this, 'prepare_addon_data' ], $this->addons );
-			$this->available_addons = array_filter(
-				$this->available_addons,
-				static function ( $addon ) {
+		$available_addons = array_map( [ $this, 'prepare_addon_data' ], $this->addons );
+		$available_addons = array_filter(
+			$available_addons,
+			static function ( $addon ) {
 
-					return isset( $addon['status'], $addon['plugin_allow'] ) && ( $addon['status'] !== 'active' || ! $addon['plugin_allow'] );
-				}
-			);
-		}
+				return isset( $addon['status'], $addon['plugin_allow'] ) && ( $addon['status'] !== 'active' || ! $addon['plugin_allow'] );
+			}
+		);
 
-		return $this->available_addons;
+		return $available_addons;
 	}
 
 	/**

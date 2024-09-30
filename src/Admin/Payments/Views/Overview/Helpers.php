@@ -24,7 +24,7 @@ class Helpers {
 	public static function get_subscription_description( $payment_id, $amount ) {
 
 		// Get the subscription period for the payment.
-		$period    = wpforms()->get( 'payment_meta' )->get_single( $payment_id, 'subscription_period' );
+		$period    = wpforms()->obj( 'payment_meta' )->get_single( $payment_id, 'subscription_period' );
 		$intervals = ValueValidator::get_allowed_subscription_intervals();
 
 		// If the subscription period is not set or not allowed, return the amount only.
@@ -94,7 +94,7 @@ class Helpers {
 	 */
 	public static function is_test_payment_exists(): bool {
 
-		$published = wpforms()->get( 'payment' )->get_payments(
+		$published = wpforms()->obj( 'payment' )->get_payments(
 			[
 				'mode'   => 'test',
 				'number' => 1,
@@ -107,7 +107,7 @@ class Helpers {
 
 		// Check for trashed payments.
 		return ! empty(
-			wpforms()->get( 'payment' )->get_payments(
+			wpforms()->obj( 'payment' )->get_payments(
 				[
 					'mode'         => 'test',
 					'number'       => 1,

@@ -2,6 +2,9 @@
 
 // phpcs:disable Generic.Commenting.DocComment.MissingShort
 /** @noinspection PhpIllegalPsrClassPathInspection */
+
+use WPForms\Pro\AntiSpam\Helpers as AntiSpamHelpers;
+
 /** @noinspection AutoloadingIssuesInspection */
 // phpcs:enable Generic.Commenting.DocComment.MissingShort
 
@@ -130,7 +133,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 */
 	public function get( $entry_id, $args = [] ) {
 
-		$access = wpforms()->get( 'access' );
+		$access = wpforms()->obj( 'access' );
 
 		if ( ! isset( $args['cap'] ) && $access && $access->init_allowed() ) {
 			$args['cap'] = 'view_entry_single';
@@ -197,8 +200,8 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		WPForms_Field_File_Upload::delete_uploaded_files_from_entry( $entry_id );
 
 		$entry        = parent::delete( $entry_id );
-		$entry_meta   = wpforms()->get( 'entry_meta' );
-		$entry_fields = wpforms()->get( 'entry_fields' );
+		$entry_meta   = wpforms()->obj( 'entry_meta' );
+		$entry_fields = wpforms()->obj( 'entry_fields' );
 		$meta         = null;
 		$fields       = null;
 
@@ -213,6 +216,52 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		WPForms\Pro\Admin\DashboardWidget::clear_widget_cache();
 
 		return ( $entry && $meta && $fields );
+	}
+
+	/**
+	 * Purge spam entries.
+	 *
+	 * @since 1.9.1
+	 */
+	public function purge_spam() {
+
+		global $wpdb;
+
+		$last_n_days = AntiSpamHelpers::get_delete_spam_entries_days();
+
+		if ( ! $last_n_days ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$entry_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT entry_id FROM {$wpdb->prefix}wpforms_entries WHERE date < DATE_SUB(NOW(), INTERVAL %d DAY) AND status = 'spam'",
+				$last_n_days
+			)
+		);
+
+		if ( ! $entry_ids ) {
+			return;
+		}
+
+		foreach ( $entry_ids as $entry_id ) {
+			WPForms_Field_File_Upload::delete_uploaded_files_from_entry( $entry_id );
+		}
+
+		wpforms()->obj( 'entry_meta' )->delete_where_in( 'entry_id', $entry_ids );
+		wpforms()->obj( 'entry_fields' )->delete_where_in( 'entry_id', $entry_ids );
+
+		$where_ids = wpforms_wpdb_prepare_in( $entry_ids, '%d' );
+
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->prefix}wpforms_entries WHERE entry_id IN ( {$where_ids} ) AND status = %s",
+				'spam'
+			)
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -362,11 +411,11 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return false;
 		}
 
-		$status       = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$status       = isset( $_GET['status'] ) ? sanitize_key( $_GET['status'] ) : '';
 		$where_status = $this->get_status_where_clause( $status );
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->query(
 			$wpdb->prepare(
 				"UPDATE $this->table_name
@@ -376,9 +425,9 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				(int) $form_id
 			)
 		);
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-		return (bool) $result; // phpcs:ignore WordPress.DB
+		return (bool) $result;
 	}
 
 	/**
@@ -588,7 +637,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 				! empty( $args['field_id'] )
 			)
 		) {
-			$fields_table     = wpforms()->get( 'entry_fields' )->table_name;
+			$fields_table     = wpforms()->obj( 'entry_fields' )->table_name;
 			$second_sql_from .= " JOIN $fields_table ON $this->table_name.`entry_id` = $fields_table.`entry_id`";
 		}
 
@@ -647,7 +696,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 */
 	protected function second_query_where( array $args ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$fields_table = wpforms()->get( 'entry_fields' )->table_name;
+		$fields_table = wpforms()->obj( 'entry_fields' )->table_name;
 
 		$second_where = [
 			'arg_value' => $this->second_query_where_arg_value( $args ),
@@ -749,7 +798,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		$condition_value = $this->get_condition_value( $args );
 
 		if ( empty( $args['advanced_search'] ) ) {
-			$fields_table = wpforms()->get( 'entry_fields' )->table_name;
+			$fields_table = wpforms()->obj( 'entry_fields' )->table_name;
 
 			return "$fields_table.`value` $condition_value";
 		}
@@ -881,7 +930,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	 */
 	private function second_query_where_entry_notes_result_ids( $args, $form_ids ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
-		$meta_table     = wpforms()->get( 'entry_meta' )->table_name;
+		$meta_table     = wpforms()->obj( 'entry_meta' )->table_name;
 		$escaped_value  = strtolower( esc_sql( $args['value'] ) );
 		$data           = str_replace( [ '  ', ' ' ], [ ' ', '%' ], $escaped_value );
 		$data           = "AND data LIKE '%$data%'";
@@ -1000,7 +1049,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 			return false;
 		}
 
-		$form      = wpforms()->get( 'form' );
+		$form      = wpforms()->obj( 'form' );
 		$form_data = $form ? $form->get( (int) $entry->form_id, [ 'content_only' => true ] ) : null;
 
 		if ( ! is_array( $form_data ) || empty( $form_data['fields'] ) ) {
@@ -1063,7 +1112,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		global $wpdb;
 
-		$entry_meta_handler = wpforms()->get( 'entry_meta' );
+		$entry_meta_handler = wpforms()->obj( 'entry_meta' );
 		$wpforms_entry      = $this->get( $entry_id );
 
 		if ( ! $entry_meta_handler || ! $wpforms_entry ) {
@@ -1097,13 +1146,13 @@ class WPForms_Entry_Handler extends WPForms_DB {
 
 		$values = implode( ', ', $values );
 
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			"INSERT INTO {$entry_meta_handler->table_name}
 			( entry_id, form_id, user_id, status, type, data, date )
 			VALUES {$values}"
 		);
-		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -1152,7 +1201,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		}
 
 		// Create payment.
-		$payment    = wpforms()->get( 'payment' );
+		$payment    = wpforms()->obj( 'payment' );
 		$payment_id = $payment ? $payment->add( $payment_data ) : null;
 
 		if ( ! $payment_id ) {
@@ -1171,7 +1220,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 		];
 
 		// Insert payment meta.
-		$payment_meta_object = wpforms()->get( 'payment_meta' );
+		$payment_meta_object = wpforms()->obj( 'payment_meta' );
 
 		if ( $payment_meta_object ) {
 			$payment_meta_object->bulk_add( $payment_id, $payment_meta );
@@ -1529,7 +1578,7 @@ class WPForms_Entry_Handler extends WPForms_DB {
 	private function prepare_from_sql( array $args ): string {
 
 		$from_sql   = $this->table_name;
-		$meta_table = wpforms()->get( 'entry_meta' )->table_name;
+		$meta_table = wpforms()->obj( 'entry_meta' )->table_name;
 
 		// Add a LEFT OUTER JOIN for retrieve a notes' count.
 		if ( $args['notes_count'] ) {

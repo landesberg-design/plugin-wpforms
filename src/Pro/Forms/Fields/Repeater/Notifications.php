@@ -109,10 +109,16 @@ class Notifications {
 
 			$fields_message = '';
 
-			foreach ( $rows as $row_data ) {
-				foreach ( $row_data as $data ) {
-					if ( is_array( $data['field'] ) ) {
-						$fields_message .= $notifications->get_field_html( $data['field'], $show_empty_fields, $other_fields );
+			foreach ( $rows as $row ) {
+				foreach ( $row as $column ) {
+					if ( ! isset( $column['field'] ) ) {
+						continue;
+					}
+
+					$field_id = $column['field'];
+
+					if ( isset( $form_data['fields'][ $field_id ] ) ) {
+						$fields_message .= $notifications->get_field_html( $form_data['fields'][ $field_id ], $show_empty_fields, $other_fields );
 					}
 				}
 			}
@@ -172,8 +178,8 @@ class Notifications {
 
 			foreach ( $rows as $row_data ) {
 				foreach ( $row_data as $data ) {
-					if ( is_array( $data['field'] ) ) {
-						$fields_message .= $notifications->get_field_plain( $data['field'], $show_empty_fields );
+					if ( isset( $data['field'], $form_data['fields'][ $data['field'] ] ) ) {
+						$fields_message .= $notifications->get_field_plain( $form_data['fields'][ $data['field'] ], $show_empty_fields );
 					}
 				}
 			}

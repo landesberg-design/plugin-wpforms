@@ -256,7 +256,7 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 					mode: 'payment',
 					// eslint-disable-next-line
 					// See min amount for different currencies https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts.
-					amount: 77777,
+					amount: 7777777,
 					loader: 'always',
 					locale: wpforms_stripe.data.element_locale,
 					appearance: app.getElementAppearanceOptions( $form ),
@@ -271,6 +271,8 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 
 			// Update styles in Modern Markup mode.
 			app.updatePaymentElementStylesModern( $form );
+
+			WPFormsUtils.triggerEvent( $( document ), 'wpformsStripePaymentElementInitialized', [ $form, app.forms ] );
 		},
 
 		/**
@@ -355,6 +357,8 @@ var WPFormsStripePaymentElement = window.WPFormsStripePaymentElement || ( functi
 					borderRadius: inputStyle.borderRadius,
 					colorTextPlaceholder: inputStyle.colorTextPlaceholder,
 					colorIcon: inputStyle.colorText,
+					focusColor: inputStyle.focusColor,
+					borderColorWithOpacity: WPFormsUtils.cssColorsUtils.getColorWithOpacity( inputStyle.colorPrimary, '0.1' ),
 				},
 				rules: {
 					'.Input--invalid': {

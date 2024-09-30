@@ -462,7 +462,7 @@ class API {
 		// Store actual attempt counter value to the option.
 		// We need here an atomic operation to avoid race conditions with getting site key via callback.
 		// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				"INSERT INTO $wpdb->options

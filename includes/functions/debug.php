@@ -188,7 +188,7 @@ function wpforms_log( $title = '', $message = '', $args = [] ) { // phpcs:ignore
 		return;
 	}
 
-	$log = wpforms()->get( 'log' );
+	$log = wpforms()->obj( 'log' );
 
 	if ( ! method_exists( $log, 'add' ) ) {
 		return;

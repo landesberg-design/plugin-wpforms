@@ -94,7 +94,7 @@ class Tags {
 	 */
 	private function update_view_vars() {
 
-		$views_object       = wpforms()->get( 'forms_views' );
+		$views_object       = wpforms()->obj( 'forms_views' );
 		$this->current_view = $views_object->get_current_view();
 		$view_config        = $views_object->get_view_by_slug( $this->current_view );
 		$this->base_url     = remove_query_arg(

@@ -148,7 +148,7 @@ class Field extends WPForms_Field {
 		// Sanitize but keep line breaks.
 		$value = wpforms_sanitize_textarea_field( $field_submit );
 
-		wpforms()->get( 'process' )->fields[ $field_id ] = [
+		wpforms()->obj( 'process' )->fields[ $field_id ] = [
 			'name'    => $name,
 			'value'   => $value,
 			'id'      => absint( $field_id ),

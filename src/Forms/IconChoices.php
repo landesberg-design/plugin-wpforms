@@ -557,6 +557,7 @@ class IconChoices {
 			return '';
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$svg = file_get_contents( $filename );
 
 		if ( ! $svg ) {
@@ -582,6 +583,7 @@ class IconChoices {
 			return [];
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$icons = file_get_contents( $this->icons_data_file );
 
 		if ( ! $icons ) {

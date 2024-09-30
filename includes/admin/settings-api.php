@@ -459,7 +459,7 @@ function wpforms_settings_email_template_callback( array $args ): string {
  */
 function wpforms_settings_toggle_callback( array $args ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
 
-	$value      = wpforms_setting( $args['id'] );
+	$value      = ! empty( $args['value'] ) ? $args['value'] : wpforms_setting( $args['id'] );
 	$id         = wpforms_sanitize_key( $args['id'] );
 	$class      = ! empty( $args['control-class'] ) ? $args['control-class'] : '';
 	$class     .= ! empty( $args['is-important'] ) ? ' wpforms-important' : '';

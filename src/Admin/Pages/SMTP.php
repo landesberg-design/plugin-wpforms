@@ -70,7 +70,8 @@ class SMTP {
 		}
 
 		// Check what page we are on.
-		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.CSRF.NonceVerification
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
 
 		// Only load if we are actually on the SMTP page.
 		if ( $page !== self::SLUG ) {

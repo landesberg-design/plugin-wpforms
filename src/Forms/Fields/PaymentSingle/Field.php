@@ -639,7 +639,7 @@ class Field extends \WPForms_Field {
 			empty( $field_submit ) &&
 			$is_required
 		) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = wpforms_get_required_label();
 
 			return;
 		}
@@ -667,7 +667,7 @@ class Field extends \WPForms_Field {
 			$submit = wpforms_sanitize_amount( $field_submit );
 
 			if ( $price !== $submit ) {
-				wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount mismatch', 'wpforms-lite' );
+				wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount mismatch', 'wpforms-lite' );
 			}
 		}
 
@@ -680,7 +680,7 @@ class Field extends \WPForms_Field {
 			$submit = wpforms_sanitize_amount( $field_submit );
 
 			if ( $submit < 0 ) {
-				wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount can\'t be negative' , 'wpforms-lite' );
+				wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount can\'t be negative' , 'wpforms-lite' );
 			}
 
 			if ( empty( $form_data['fields'][ $field_id ]['min_price'] ) && ! $is_required ) {
@@ -690,7 +690,7 @@ class Field extends \WPForms_Field {
 			$min_price = wpforms_sanitize_amount( $form_data['fields'][ $field_id ]['min_price'] );
 
 			if ( $submit < $min_price ) {
-				wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount can\'t be less than the required minimum.' , 'wpforms-lite' );
+				wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = esc_html__( 'Amount can\'t be less than the required minimum.' , 'wpforms-lite' );
 			}
 		}
 	}
@@ -709,8 +709,8 @@ class Field extends \WPForms_Field {
 		$field = $form_data['fields'][ $field_id ];
 		$name  = ! empty( $field['label'] ) ? sanitize_text_field( $field['label'] ) : '';
 
-		// Only trust the value if the field is user format.
-		if ( $this->is_user_defined( $field ) ) {
+		// Only trust the value if the field has the user defined format OR it is the entry preview.
+		if ( $this->is_user_defined( $field ) || wpforms_is_ajax( 'wpforms_get_entry_preview' ) ) {
 			$amount = wpforms_sanitize_amount( $field_submit );
 		} else {
 			$amount = wpforms_sanitize_amount( $field['price'] );
@@ -730,7 +730,7 @@ class Field extends \WPForms_Field {
 			$field_data['quantity'] = $this->get_submitted_field_quantity( $field, $form_data );
 		}
 
-		wpforms()->get( 'process' )->fields[ $field_id ] = $field_data;
+		wpforms()->obj( 'process' )->fields[ $field_id ] = $field_data;
 	}
 
 	/**

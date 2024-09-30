@@ -74,7 +74,7 @@ class Logs extends View {
 	private function get_list_table(): ListTable {
 
 		if ( empty( $this->list_table ) ) {
-			$log_obj = wpforms()->get( 'log' );
+			$log_obj = wpforms()->obj( 'log' );
 
 			if ( $log_obj ) {
 				$this->list_table = $log_obj->get_list_table();

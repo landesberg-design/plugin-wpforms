@@ -424,7 +424,7 @@ class WPForms_WP_Emails {
 			$this
 		);
 
-		$entry_obj = wpforms()->get( 'entry' );
+		$entry_obj = wpforms()->obj( 'entry' );
 
 		// phpcs:ignore WPForms.Comments.PHPDocHooks.RequiredHookDocumentation, WPForms.PHP.ValidateHooks.InvalidHookName
 		$send_same_process = apply_filters(
@@ -585,7 +585,14 @@ class WPForms_WP_Emails {
 
 					// Check if the field type is in $other_fields, otherwise skip.
 					// Skip if the field is conditionally hidden.
-					if ( empty( $other_fields ) || ! in_array( $field['type'], $other_fields, true ) || wpforms_conditional_logic_fields()->field_is_hidden( $this->form_data, $field_id ) ) {
+					if (
+						empty( $other_fields ) ||
+						! in_array( $field['type'], $other_fields, true ) ||
+						(
+							wpforms()->is_pro() &&
+							wpforms_conditional_logic_fields()->field_is_hidden( $this->form_data, $field_id )
+						)
+					) {
 						continue;
 					}
 
@@ -646,6 +653,25 @@ class WPForms_WP_Emails {
 				if ( 1 === $x ) {
 					$field_item = str_replace( 'border-top:1px solid #dddddd;', '', $field_item );
 				}
+
+				/**
+				 * Filter the field name before it is added to the email message.
+				 *
+				 * @since 1.9.1
+				 *
+				 * @param string $field_name Field name.
+				 * @param array  $field      Field data.
+				 * @param array  $form_data  Form data and settings.
+				 * @param string $context    Context of the field name.
+				 */
+				$field_name = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+					'wpforms_html_field_name',
+					$field_name,
+					$this->fields[ $field_id ] ?? $field,
+					$this->form_data,
+					'email-html'
+				);
+
 				$field_item = str_replace( '{field_name}', $field_name, $field_item );
 				$field_item = str_replace(
 					'{field_value}',

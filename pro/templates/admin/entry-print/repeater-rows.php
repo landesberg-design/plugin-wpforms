@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WPForms\Pro\Forms\Fields\Layout\Helpers as LayoutHelpers;
+use WPForms\Pro\Forms\Fields\Repeater\Helpers as RepeaterHelpers;
 
 $rows = isset( $field['columns'] ) && is_array( $field['columns'] ) ? LayoutHelpers::get_row_data( $field ) : [];
 
@@ -29,15 +30,25 @@ $classes = [ 'wpforms-field-repeater-row' ];
 if ( $is_hidden_by_cl ) {
 	$classes[] = 'wpforms-conditional-hidden';
 }
+
+if ( RepeaterHelpers::is_empty_block( $rows ) ) {
+	$classes[] = 'wpforms-field-repeater-block-empty';
+}
 ?>
 <div class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
 
 	<p class="print-item-title field-name">
-		<?php echo esc_html( $field['label'] ); ?>
+		<?php if ( isset( $field['label_hide'] ) && ! $field['label_hide'] && ! empty( $field['label'] ) ) { ?>
+			<span class="print-item-title-wrapper">
+				<?php echo esc_html( $field['label'] ); ?>
+			</span>
+		<?php } ?>
 
-		<span class="print-item-description field-description">
-			<?php echo esc_html( $field_description ); ?>
-		</span>
+		<?php if ( ! empty( $field_description ) ) : ?>
+			<span class="print-item-description field-description">
+				<?php echo esc_html( $field_description ); ?>
+			</span>
+		<?php endif; ?>
 	</p>
 
 	<div class="wpforms-field-repeater-rows">

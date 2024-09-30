@@ -281,7 +281,8 @@ trait ContentInput {
 			true
 		);
 
-		// Enqueue editor styles explicitly. Hack for broken styles when Content field is deleted and Settings > Confirmation editor get broken.
+		// Enqueue editor styles explicitly. Hack for broken styles when the Content field is deleted and Settings > Confirmation editor get broken.
+		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 		wp_enqueue_style(
 			'wpforms-editor-styles',
 			includes_url( 'css/editor.css' )

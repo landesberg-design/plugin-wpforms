@@ -13,7 +13,7 @@ use WPForms\Pro\Forms\Fields\Layout\Helpers as LayoutHelpers;
 class Notifications {
 
 	/**
-	 * Email type (plain or html).
+	 * Email type (Plain or HTML).
 	 *
 	 * @since 1.9.0.4
 	 *
@@ -29,6 +29,24 @@ class Notifications {
 	 * @var array
 	 */
 	private $field;
+
+	/**
+	 * Fields data.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @var array
+	 */
+	private $fields;
+
+	/**
+	 * Form data.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @var array
+	 */
+	private $form_data;
 
 	/**
 	 * Email notification object.
@@ -76,6 +94,43 @@ class Notifications {
 
 		add_filter( 'wpforms_emails_notifications_field_message_html', [ $this, 'get_layout_field_html' ], 10, 7 );
 		add_filter( 'wpforms_emails_notifications_field_message_plain', [ $this, 'get_layout_field_plain' ], 10, 6 );
+		add_filter( 'wpforms_emails_notifications_field_ignored', [ $this, 'notifications_field_ignored' ], 10, 3 );
+	}
+
+	/**
+	 * Ignore the field if it is part of the layout field.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param bool  $ignore    Whether to ignore the field.
+	 * @param array $field     Field data.
+	 * @param array $form_data Form data.
+	 *
+	 * @return bool
+	 */
+	public function notifications_field_ignored( $ignore, array $field, array $form_data ): bool {
+
+		$ignore = (bool) $ignore;
+
+		if ( empty( $field['id'] ) || strpos( $field['id'], '_' ) ) {
+			return $ignore;
+		}
+
+		if ( empty( $form_data['fields'] ) ) {
+			return $ignore;
+		}
+
+		$layout_fields = LayoutHelpers::get_layout_fields( $form_data['fields'] );
+
+		foreach ( $layout_fields as $layout_field ) {
+			$fields = LayoutHelpers::get_layout_all_field_ids( $layout_field );
+
+			if ( in_array( (int) $field['id'], $fields, true ) ) {
+				return true;
+			}
+		}
+
+		return $ignore;
 	}
 
 	/**
@@ -117,6 +172,8 @@ class Notifications {
 
 		$this->type              = 'html';
 		$this->field             = $field;
+		$this->fields            = $fields;
+		$this->form_data         = $form_data;
 		$this->notifications     = $notifications;
 		$this->show_empty_fields = $show_empty_fields;
 		$this->other_fields      = $other_fields;
@@ -148,6 +205,8 @@ class Notifications {
 
 		$this->type              = 'plain';
 		$this->field             = $field;
+		$this->fields            = $fields;
+		$this->form_data         = $form_data;
 		$this->notifications     = $notifications;
 		$this->show_empty_fields = $show_empty_fields;
 
@@ -212,8 +271,8 @@ class Notifications {
 
 		foreach ( $rows as $row ) {
 			foreach ( $row as $column ) {
-				if ( ! empty( $column['field'] ) ) {
-					$fields_message .= $this->get_subfield_message( $column['field'] );
+				if ( isset( $column['field'], $this->form_data['fields'][ $column['field'] ] ) ) {
+					$fields_message .= $this->get_subfield_message( $this->form_data['fields'][ $column['field'] ] );
 				}
 			}
 		}
@@ -237,8 +296,14 @@ class Notifications {
 		$fields_message = '';
 
 		foreach ( $this->field['columns'] as $column ) {
-			foreach ( $column['fields'] as $child_field ) {
-				$fields_message .= $this->get_subfield_message( $child_field );
+			if ( ! isset( $column['fields'] ) ) {
+				continue;
+			}
+
+			foreach ( $column['fields'] as $child_field_id ) {
+				if ( isset( $this->form_data['fields'][ $child_field_id ] ) ) {
+					$fields_message .= $this->get_subfield_message( $this->form_data['fields'][ $child_field_id ] );
+				}
 			}
 		}
 

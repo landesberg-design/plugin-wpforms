@@ -137,7 +137,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 	 */
 	private function is_page_has_entry_preview( $forms ) {
 
-		if ( ! empty( wpforms()->get( 'process' )->form_data ) && $this->is_form_has_entry_preview_confirmation( wpforms()->get( 'process' )->form_data ) ) {
+		if ( ! empty( wpforms()->obj( 'process' )->form_data ) && $this->is_form_has_entry_preview_confirmation( wpforms()->obj( 'process' )->form_data ) ) {
 			return true;
 		}
 
@@ -214,7 +214,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 			wp_send_json_error();
 		}
 
-		if ( ! wpforms()->get( 'form' ) ) {
+		if ( ! wpforms()->obj( 'form' ) ) {
 			wp_send_json_error();
 		}
 
@@ -241,7 +241,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 		 *
 		 * @return array
 		 */
-		$form_data = apply_filters( 'wpforms_entry_preview_form_data', wpforms()->get( 'form' )->get( $form_id, [ 'content_only' => true ] ), $submitted_fields );
+		$form_data = apply_filters( 'wpforms_entry_preview_form_data', wpforms()->obj( 'form' )->get( $form_id, [ 'content_only' => true ] ), $submitted_fields );
 
 		if ( ! $form_data ) {
 			wp_send_json_error();
@@ -366,7 +366,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 		$start_with_page_break_id           = $this->get_start_page_break_id( $form_data, $end_with_page_break_id );
 		$is_current_range                   = $current_entry_preview_id === 0;
 		$entry_preview_fields               = [];
-		wpforms()->get( 'process' )->fields = [];
+		wpforms()->obj( 'process' )->fields = [];
 
 		foreach ( (array) $form_data['fields'] as $field_properties ) {
 			$field_id    = wpforms_validate_field_id( $field_properties['id'] );
@@ -380,8 +380,8 @@ class WPForms_Entry_Preview extends WPForms_Field {
 				$is_current_range = false;
 			}
 
-			if ( $is_current_range && ! empty( wpforms()->get( 'process' )->fields[ $field_id ] ) ) {
-				$entry_preview_fields[ $field_id ] = wpforms()->get( 'process' )->fields[ $field_id ];
+			if ( $is_current_range && ! empty( wpforms()->obj( 'process' )->fields[ $field_id ] ) ) {
+				$entry_preview_fields[ $field_id ] = wpforms()->obj( 'process' )->fields[ $field_id ];
 			}
 
 			if ( $field_type === 'pagebreak' && $field_id === $start_with_page_break_id ) {
@@ -420,7 +420,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 			return;
 		}
 
-		wpforms()->get( 'process' )->fields[ $field_id ] = [
+		wpforms()->obj( 'process' )->fields[ $field_id ] = [
 			'name'  => ! empty( $form_data['fields'][ $field_id ]['label'] ) ? sanitize_text_field( $form_data['fields'][ $field_id ]['label'] ) : '',
 			'value' => '',
 			'id'    => $field_id,
@@ -687,7 +687,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 	 *
 	 * @return string
 	 */
-	private function get_repeater_field( array $field, array $form_data, array $entry_fields ): string { // phpcs:ignore Generic.Metrics.NestingLevel.MaxExceeded, Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function get_repeater_field( array $field, array $form_data, array $entry_fields ): string { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh
 
 		$blocks = RepeaterHelpers::get_blocks( $field, $form_data );
 
@@ -705,17 +705,7 @@ class WPForms_Entry_Preview extends WPForms_Field {
 
 			foreach ( $rows as $row_data ) {
 				foreach ( $row_data as $data ) {
-					$row_field = null;
-
-					if ( isset( $data['field']['id'] ) ) {
-						$row_field = $data['field'];
-					} elseif ( isset( $data['field'], $entry_fields[ $data['field'] ] ) ) {
-						$row_field = $entry_fields[ $data['field'] ];
-					}
-
-					if ( $row_field ) {
-						$fields_content .= $this->get_field( $row_field, $form_data );
-					}
+					$fields_content .= $this->get_subfield( $data['field'], $form_data, $entry_fields );
 				}
 			}
 
@@ -738,10 +728,17 @@ class WPForms_Entry_Preview extends WPForms_Field {
 	 *
 	 * @return string
 	 */
-	private function get_layout_field( array $field, array $form_data, array $entry_fields ): string { // phpcs:ignore Generic.Metrics.NestingLevel.MaxExceeded, Generic.Metrics.CyclomaticComplexity.TooHigh
+	private function get_layout_field( array $field, array $form_data, array $entry_fields ): string {
 
-		$content     = '';
-		$label       = $this->get_field_label( $field, $form_data );
+		$fields_content = isset( $form_data['fields'][ $field['id'] ]['display'] ) && $form_data['fields'][ $field['id'] ]['display'] === 'columns'
+			? $this->get_layout_subfields_columns( $field, $form_data, $entry_fields )
+			: $this->get_layout_subfields_rows( $field, $form_data, $entry_fields );
+
+		if ( ! $fields_content ) {
+			return '';
+		}
+
+		$label       = $this->is_field_label_hidden( $field, $form_data ) ? '' : wp_strip_all_tags( $field['label'] );
 		$empty_class = empty( $label ) ? self::EMPTY_LABEL_CLASS . ' wpforms-entry-preview-label-not-displayed' : '';
 
 		$divider = sprintf(
@@ -751,29 +748,97 @@ class WPForms_Entry_Preview extends WPForms_Field {
 			esc_html( $label )
 		);
 
+		return $divider . $fields_content;
+	}
+
+	/**
+	 * Display column style layout subfields.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param array $field        Field settings.
+	 * @param array $form_data    Form data.
+	 * @param array $entry_fields Entry fields.
+	 *
+	 * @return string
+	 */
+	private function get_layout_subfields_columns( array $field, array $form_data, array $entry_fields ): string {
+
+		if ( ! isset( $field['columns'] ) ) {
+			return '';
+		}
+
 		$fields_content = '';
 
 		foreach ( $field['columns'] as $column ) {
-			foreach ( $column['fields'] as $field_data ) {
-				$child_field = null;
+			if ( empty( $column['fields'] ) ) {
+				continue;
+			}
 
-				if ( isset( $field_data['id'] ) ) {
-					$child_field = $field_data;
-				} elseif ( isset( $entry_fields[ $field_data ] ) ) {
-					$child_field = $entry_fields[ $field_data ];
-				}
-
-				if ( $child_field ) {
-					$fields_content .= $this->get_field( $child_field, $form_data );
-				}
+			foreach ( $column['fields'] as $child_field ) {
+				$fields_content .= $this->get_subfield( $child_field, $form_data, $entry_fields );
 			}
 		}
 
-		if ( $fields_content ) {
-			$content .= $divider . $fields_content;
+		return $fields_content;
+	}
+
+	/**
+	 * Display rows style layout subfields.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param array $field        Field settings.
+	 * @param array $form_data    Form data.
+	 * @param array $entry_fields Entry fields.
+	 *
+	 * @return string
+	 */
+	private function get_layout_subfields_rows( array $field, array $form_data, array $entry_fields ): string {
+
+		$rows = LayoutHelpers::get_row_data( $field );
+
+		if ( empty( $rows ) ) {
+			return '';
 		}
 
-		return $content;
+		$fields_content = '';
+
+		foreach ( $rows as $row ) {
+			foreach ( $row as $column ) {
+				if ( empty( $column['field'] ) ) {
+					continue;
+				}
+
+				$fields_content .= $this->get_subfield( $column['field'], $form_data, $entry_fields );
+			}
+		}
+
+		return $fields_content;
+	}
+
+	/**
+	 * Get layout subfield.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param int|array $child_field  On the confirmation page the child field is ID, on AJAX request it's array.
+	 * @param array     $form_data    Form data.
+	 * @param array     $entry_fields Entry fields.
+	 *
+	 * @return string
+	 */
+	private function get_subfield( $child_field, array $form_data, array $entry_fields ): string {
+
+		if ( is_array( $child_field ) ) {
+			return $this->get_field( $child_field, $form_data );
+		}
+
+		if ( ! isset( $entry_fields[ $child_field ] ) ) {
+			return '';
+		}
+
+		return $this->get_field( $entry_fields[ $child_field ], $form_data );
 	}
 
 	/**

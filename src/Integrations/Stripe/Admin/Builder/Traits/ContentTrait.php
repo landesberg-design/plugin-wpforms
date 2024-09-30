@@ -199,7 +199,7 @@ trait ContentTrait {
 		$label = __( 'Add New Plan', 'wpforms-lite' );
 
 		if ( Helpers::is_allowed_license_type() ) {
-			$addon = wpforms()->get( 'addons' )->get_addon( 'wpforms-stripe' );
+			$addon = wpforms()->obj( 'addons' )->get_addon( 'wpforms-stripe' );
 
 			if ( empty( $addon ) ) {
 				return;

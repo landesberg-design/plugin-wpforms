@@ -173,7 +173,7 @@ class Single implements PaymentsViewsInterface {
 			return;
 		}
 
-		$this->payment = wpforms()->get( 'payment' )->get( $payment_id );
+		$this->payment = wpforms()->obj( 'payment' )->get( $payment_id );
 
 		// No payment was found.
 		if ( empty( $this->payment ) ) {
@@ -191,15 +191,15 @@ class Single implements PaymentsViewsInterface {
 			return;
 		}
 
-		$this->payment_meta = wpforms()->get( 'payment_meta' )->get_all( $payment_id );
+		$this->payment_meta = wpforms()->obj( 'payment_meta' )->get_all( $payment_id );
 
 		// Retrieve the subscription renewal payments, if applicable.
 		if ( ! empty( $this->payment->subscription_id ) ) {
 			// Assign renewals to reduce queries and reuse later.
-			list( $this->subscription, $this->renewals ) = wpforms()->get( 'payment_queries' )->get_subscription_payment_history( $this->payment->subscription_id, $this->payment->currency );
+			list( $this->subscription, $this->renewals ) = wpforms()->obj( 'payment_queries' )->get_subscription_payment_history( $this->payment->subscription_id, $this->payment->currency );
 
 			if ( ! empty( $this->subscription ) ) {
-				$this->subscription_meta = wpforms()->get( 'payment_meta' )->get_all( $this->subscription->id );
+				$this->subscription_meta = wpforms()->obj( 'payment_meta' )->get_all( $this->subscription->id );
 			}
 		}
 	}
@@ -227,8 +227,8 @@ class Single implements PaymentsViewsInterface {
 			return;
 		}
 
-		$payment_prev = wpforms()->get( 'payment_queries' )->get_prev( $this->payment->id, [ 'mode' => $this->payment->mode ] );
-		$payment_next = wpforms()->get( 'payment_queries' )->get_next( $this->payment->id, [ 'mode' => $this->payment->mode ] );
+		$payment_prev = wpforms()->obj( 'payment_queries' )->get_prev( $this->payment->id, [ 'mode' => $this->payment->mode ] );
+		$payment_next = wpforms()->obj( 'payment_queries' )->get_next( $this->payment->id, [ 'mode' => $this->payment->mode ] );
 		$prev_url     = ! empty( $payment_prev ) ? add_query_arg(
 			[
 				'page'       => 'wpforms-payments',
@@ -250,8 +250,8 @@ class Single implements PaymentsViewsInterface {
 		echo wpforms_render(
 			'admin/payments/single/heading-navigation',
 			[
-				'count'        => (int) wpforms()->get( 'payment_queries' )->count_all( [ 'mode' => $this->payment->mode ] ),
-				'prev_count'   => (int) wpforms()->get( 'payment_queries' )->get_prev_count( $this->payment->id, [ 'mode' => $this->payment->mode ] ),
+				'count'        => (int) wpforms()->obj( 'payment_queries' )->count_all( [ 'mode' => $this->payment->mode ] ),
+				'prev_count'   => (int) wpforms()->obj( 'payment_queries' )->get_prev_count( $this->payment->id, [ 'mode' => $this->payment->mode ] ),
 				'prev_url'     => $prev_url,
 				'prev_class'   => empty( $payment_prev ) ? 'inactive' : '',
 				'next_url'     => $next_url,
@@ -805,7 +805,7 @@ class Single implements PaymentsViewsInterface {
 
 		// Grab submitted values from the entry if it exists.
 		if ( ! empty( $this->payment->entry_id ) && wpforms()->is_pro() ) {
-			$entry = wpforms()->get( 'entry' )->get( $this->payment->entry_id );
+			$entry = wpforms()->obj( 'entry' )->get( $this->payment->entry_id );
 
 			if ( $entry ) {
 				$fields          = wpforms_decode( $entry->fields );
@@ -834,7 +834,7 @@ class Single implements PaymentsViewsInterface {
 		 */
 		$form_data = apply_filters(
 			'wpforms_admin_payments_views_single_form_data',
-			wpforms()->get( 'form' )->get( $this->payment->form_id, [ 'content_only' => true ] ),
+			wpforms()->obj( 'form' )->get( $this->payment->form_id, [ 'content_only' => true ] ),
 			$fields
 		);
 
@@ -916,7 +916,7 @@ class Single implements PaymentsViewsInterface {
 
 			$field = $fields[ $field_data['id'] ] ?? [];
 
-			if ( empty( $field ) ) {
+			if ( empty( $field ) || ! isset( $field['id'] ) ) {
 				continue;
 			}
 
@@ -1031,7 +1031,7 @@ class Single implements PaymentsViewsInterface {
 		echo wpforms_render(
 			'admin/payments/single/log',
 			[
-				'logs' => wpforms()->get( 'payment_meta' )->get_all_by( 'log', $this->payment->id ),
+				'logs' => wpforms()->obj( 'payment_meta' )->get_all_by( 'log', $this->payment->id ),
 			],
 			true
 		);
@@ -1322,7 +1322,7 @@ class Single implements PaymentsViewsInterface {
 			return '';
 		}
 
-		$form = wpforms()->get( 'form' )->get( $this->payment->form_id );
+		$form = wpforms()->obj( 'form' )->get( $this->payment->form_id );
 
 		// Leave early if form is no longer available.
 		if ( ! $form || $form->post_status !== 'publish' ) {

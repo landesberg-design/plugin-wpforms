@@ -63,7 +63,7 @@ class PageOptions {
 			[
 				'label'   => esc_html__( 'Number of entries per page:', 'wpforms' ),
 				'option'  => 'wpforms_entries_per_page',
-				'default' => wpforms()->get( 'entry' )->get_count_per_page(),
+				'default' => wpforms()->obj( 'entry' )->get_count_per_page(),
 			]
 		);
 

@@ -121,14 +121,14 @@ class PrintPreview {
 		$entry_ids = array_map( 'absint', explode( ',', wp_unslash( $_GET['entry_id'] ) ) );
 
 		foreach ( $entry_ids as $entry_id ) {
-			$_entry = wpforms()->get( 'entry' )->get( $entry_id );
+			$_entry = wpforms()->obj( 'entry' )->get( $entry_id );
 
 			// Filter entries to ensure the current user can access their details.
 			if ( ! is_object( $_entry ) ) {
 				continue;
 			}
 
-			$_entry->entry_notes = wpforms()->get( 'entry_meta' )->get_meta(
+			$_entry->entry_notes = wpforms()->obj( 'entry_meta' )->get_meta(
 				[
 					'type'     => 'note',
 					'entry_id' => $entry_id,
@@ -145,11 +145,11 @@ class PrintPreview {
 		// Continue store a first entry for backward compatibility.
 		$this->entry = $this->entries[0];
 
-		wpforms()->get( 'process' )->fields = wpforms_decode( $this->entry->fields );
+		wpforms()->obj( 'process' )->fields = wpforms_decode( $this->entry->fields );
 
 		// Fetch the current form data with "content_only" flag.
 		// Note that form-id and data will be the same across all entries.
-		$this->form_data = wpforms()->get( 'form' )->get(
+		$this->form_data = wpforms()->obj( 'form' )->get(
 			$this->entry->form_id,
 			[
 				'content_only' => true,

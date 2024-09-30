@@ -34,7 +34,7 @@ namespace WPForms\Vendor\Stripe\Checkout;
  * @property null|\Stripe\StripeObject $consent_collection When set, provides configuration for the Checkout Session to gather active consent from customers.
  * @property int $created Time at which the object was created. Measured in seconds since the Unix epoch.
  * @property null|string $currency Three-letter <a href="https://www.iso.org/iso-4217-currency-codes.html">ISO currency code</a>, in lowercase. Must be a <a href="https://stripe.com/docs/currencies">supported currency</a>.
- * @property null|\Stripe\StripeObject $currency_conversion Currency conversion details for automatic currency conversion sessions
+ * @property null|\Stripe\StripeObject $currency_conversion Currency conversion details for <a href="https://docs.stripe.com/payments/checkout/adaptive-pricing">Adaptive Pricing</a> sessions
  * @property \Stripe\StripeObject[] $custom_fields Collect additional information from your customer using custom fields. Up to 3 fields are supported.
  * @property \Stripe\StripeObject $custom_text
  * @property null|string|\Stripe\Customer $customer The ID of the customer for this Session. For Checkout Sessions in <code>subscription</code> mode or Checkout Sessions with <code>customer_creation</code> set as <code>always</code> in <code>payment</code> mode, Checkout will create a new customer object based on information provided during the payment flow unless an existing customer was provided when the Session was created.
@@ -78,6 +78,7 @@ namespace WPForms\Vendor\Stripe\Checkout;
 class Session extends \WPForms\Vendor\Stripe\ApiResource
 {
     const OBJECT_NAME = 'checkout.session';
+    use \WPForms\Vendor\Stripe\ApiOperations\Update;
     const BILLING_ADDRESS_COLLECTION_AUTO = 'auto';
     const BILLING_ADDRESS_COLLECTION_REQUIRED = 'required';
     const CUSTOMER_CREATION_ALWAYS = 'always';
@@ -152,6 +153,26 @@ class Session extends \WPForms\Vendor\Stripe\ApiResource
         $instance = new static($id, $opts);
         $instance->refresh();
         return $instance;
+    }
+    /**
+     * Updates a Session object.
+     *
+     * @param string $id the ID of the resource to update
+     * @param null|array $params
+     * @param null|array|string $opts
+     *
+     * @throws \Stripe\Exception\ApiErrorException if the request fails
+     *
+     * @return \Stripe\Checkout\Session the updated resource
+     */
+    public static function update($id, $params = null, $opts = null)
+    {
+        self::_validateParams($params);
+        $url = static::resourceUrl($id);
+        list($response, $opts) = static::_staticRequest('post', $url, $params, $opts);
+        $obj = \WPForms\Vendor\Stripe\Util\Util::convertToStripeObject($response->json, $opts);
+        $obj->setLastResponse($response);
+        return $obj;
     }
     /**
      * @param null|array $params

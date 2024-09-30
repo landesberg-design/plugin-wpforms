@@ -200,13 +200,13 @@ class Process {
 	protected function is_process_entry_error() {
 
 		// Check for processing errors.
-		if ( ! empty( wpforms()->get( 'process' )->errors[ $this->form_id ] ) || ! $this->is_card_field_visibility_ok() ) {
+		if ( ! empty( wpforms()->obj( 'process' )->errors[ $this->form_id ] ) || ! $this->is_card_field_visibility_ok() ) {
 			return true;
 		}
 
 		// Check rate limit.
 		if ( ! $this->is_rate_limit_ok() ) {
-			wpforms()->get( 'process' )->errors[ $this->form_id ]['footer'] = esc_html__( 'Unable to process payment, please try again later.', 'wpforms-lite' );
+			wpforms()->obj( 'process' )->errors[ $this->form_id ]['footer'] = esc_html__( 'Unable to process payment, please try again later.', 'wpforms-lite' );
 
 			return true;
 		}
@@ -352,7 +352,7 @@ class Process {
 			$subscription->update( $subscription->id, $subscription->serializeParameters(), Helpers::get_auth_opts() );
 		}
 
-		wpforms()->get( 'payment_meta' )->add_log(
+		wpforms()->obj( 'payment_meta' )->add_log(
 			$payment_id,
 			sprintf(
 				'Stripe charge processed. (Charge ID: %1$s)',
@@ -543,7 +543,7 @@ class Process {
 			return;
 		}
 
-		wpforms()->get( 'entry' )->update(
+		wpforms()->obj( 'entry' )->update(
 			$entry_id,
 			[
 				'type' => 'payment',
@@ -743,8 +743,9 @@ class Process {
 				continue;
 			}
 
-			$args['email']    = sanitize_email( $this->fields[ $recurring['email'] ]['value'] );
-			$args['settings'] = $recurring;
+			$args['email']       = sanitize_email( $this->fields[ $recurring['email'] ]['value'] );
+			$args['settings']    = $recurring;
+			$args['description'] = sanitize_text_field( $recurring['name'] );
 
 			// Customer name.
 			if ( isset( $recurring['customer_name'] ) && $recurring['customer_name'] !== '' && ! empty( $this->fields[ $recurring['customer_name'] ]['value'] ) ) {
@@ -821,7 +822,7 @@ class Process {
 			 * @param array  $details Card details.
 			 * @param object $payment Stripe payment objects.
 			 */
-			wpforms()->get( 'process' )->fields[ $field_id ]['value'] = apply_filters( 'wpforms_stripe_creditcard_value', $details, $this->api->get_payment() ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+			wpforms()->obj( 'process' )->fields[ $field_id ]['value'] = apply_filters( 'wpforms_stripe_creditcard_value', $details, $this->api->get_payment() ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 		}
 	}
 
@@ -941,7 +942,7 @@ class Process {
 			}
 
 			if ( ! empty( $field['required'] ) ) {
-				wpforms()->get( 'process' )->errors[ $this->form_id ]['footer'] = $error;
+				wpforms()->obj( 'process' )->errors[ $this->form_id ]['footer'] = $error;
 
 				return;
 			}
@@ -1143,8 +1144,8 @@ class Process {
 
 		// We must prevent a processing if payment intent was identified as corrupted.
 		// Also if the transaction ID exists in DB (transaction ID is unique value).
-		if ( in_array( $entry['payment_intent_id'], $corrupted_intents, true ) || wpforms()->get( 'payment' )->get_by( 'transaction_id', $entry['payment_intent_id'] ) ) {
-			wpforms()->get( 'process' )->errors[ $this->form_id ]['footer'] = esc_html__( 'Secondary form submission was declined.', 'wpforms-lite' );
+		if ( in_array( $entry['payment_intent_id'], $corrupted_intents, true ) || wpforms()->obj( 'payment' )->get_by( 'transaction_id', $entry['payment_intent_id'] ) ) {
+			wpforms()->obj( 'process' )->errors[ $this->form_id ]['footer'] = esc_html__( 'Secondary form submission was declined.', 'wpforms-lite' );
 
 			return true;
 		}
@@ -1162,7 +1163,7 @@ class Process {
 
 		// Prevent form submission if a mismatch of the payment amount is detected.
 		if ( ! empty( $intent ) && (int) $submitted_amount !== (int) $intent->amount ) {
-			wpforms()->get( 'process' )->errors[ $this->form_id ]['footer'] = esc_html__( 'Irregular activity detected. Your submission has been declined and payment refunded.', 'wpforms-lite' );
+			wpforms()->obj( 'process' )->errors[ $this->form_id ]['footer'] = esc_html__( 'Irregular activity detected. Your submission has been declined and payment refunded.', 'wpforms-lite' );
 
 			$args = [
 				'reason' => 'fraudulent',

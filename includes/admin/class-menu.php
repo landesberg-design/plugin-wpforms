@@ -36,7 +36,7 @@ class WPForms_Admin_Menu {
 	public function register_menus() {
 
 		$manage_cap = wpforms_get_capability_manage_options();
-		$access     = wpforms()->get( 'access' );
+		$access     = wpforms()->obj( 'access' );
 
 		if ( ! method_exists( $access, 'get_menu_cap' ) ) {
 			return;

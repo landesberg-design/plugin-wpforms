@@ -101,6 +101,12 @@ class Builder {
 				'wpforms-signatures'  => RequirementsAlerts::get_repeater_alert( 'Signatures', 'wpforms-signatures' ),
 				'wpforms-lead-forms'  => esc_html__( 'The Repeater field cannot be used when Lead Forms is enabled.', 'wpforms' ),
 			],
+			'fields_mapping'                  => [
+				'title'   => esc_html__( 'Are you sure you want to move this field?', 'wpforms' ),
+				'and'     => esc_html__( 'and', 'wpforms' ),
+				/* translators: %s - Addon name. */
+				'content' => esc_html__( 'It\'s currently mapped to %s, which will be reset if you add this field to a repeater.', 'wpforms' ),
+			],
 		];
 
 		return $strings;

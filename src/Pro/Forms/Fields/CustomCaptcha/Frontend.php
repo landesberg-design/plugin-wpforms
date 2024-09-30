@@ -62,7 +62,7 @@ class Frontend {
 
 		if (
 			wpforms_has_field_type( $this->field::TYPE, $forms, true ) === true ||
-			wpforms()->get( 'frontend' )->assets_global()
+			wpforms()->obj( 'frontend' )->assets_global()
 		) {
 
 			$min       = wpforms_get_min_suffix();

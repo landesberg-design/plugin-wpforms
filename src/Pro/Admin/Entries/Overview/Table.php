@@ -104,7 +104,7 @@ class Table extends WP_List_Table {
 			]
 		);
 
-		$this->entry_handler = wpforms()->get( 'entry' );
+		$this->entry_handler = wpforms()->obj( 'entry' );
 	}
 
 	/**
@@ -134,10 +134,10 @@ class Table extends WP_List_Table {
 		}
 
 		// Check to see if at least one form with respect to user access control has been published.
-		$one_published_form = wpforms()->get( 'form' )->get(
+		$one_published_form = wpforms()->obj( 'form' )->get(
 			'',
 			[
-				'post_type'              => wpforms()->get( 'form' )::POST_TYPES,
+				'post_type'              => wpforms()->obj( 'form' )::POST_TYPES,
 				'fields'                 => 'ids',
 				'post_status'            => 'publish',
 				'numberposts'            => 1,
@@ -228,7 +228,7 @@ class Table extends WP_List_Table {
 	 */
 	public function column_last_entry( $form ) {
 
-		$last_entry = wpforms()->get( 'entry' )->get_last( $form->ID, '', 'date' );
+		$last_entry = wpforms()->obj( 'entry' )->get_last( $form->ID, '', 'date' );
 
 		if ( ! $last_entry ) {
 			return self::PLACEHOLDER;
@@ -496,11 +496,11 @@ class Table extends WP_List_Table {
 			return [];
 		}
 
-		return wpforms()->get( 'form' )->get(
+		return wpforms()->obj( 'form' )->get(
 			'',
 			[
 				'orderby'                => 'post__in',
-				'post_type'              => wpforms()->get( 'form' )::POST_TYPES,
+				'post_type'              => wpforms()->obj( 'form' )::POST_TYPES,
 				'post__in'               => $form_ids,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
@@ -537,8 +537,8 @@ class Table extends WP_List_Table {
 			$exclude = $this->sort_by_last_entry( $order );
 		}
 
-		$form_handler = wpforms()->get( 'form' );
-		$post_type    = wpforms()->get( 'entries_overview' )->overview_show_form_templates() ? $form_handler::POST_TYPES : [ 'wpforms' ];
+		$form_handler = wpforms()->obj( 'form' );
+		$post_type    = wpforms()->obj( 'entries_overview' )->overview_show_form_templates() ? $form_handler::POST_TYPES : [ 'wpforms' ];
 
 		$form_ids = (array) $form_handler->get(
 			'',
@@ -547,7 +547,7 @@ class Table extends WP_List_Table {
 				'fields'                 => 'ids',
 				'order'                  => $order,
 				'orderby'                => $orderby,
-				'exclude'                => $exclude,
+				'exclude'                => $exclude, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 			]
@@ -556,7 +556,7 @@ class Table extends WP_List_Table {
 		// Form ids from the entries' table should be combined with the main query.
 		$form_ids = $order === 'ASC' ? array_merge( $form_ids, $exclude ) : array_merge( $exclude, $form_ids );
 
-		return wpforms()->get( 'access' )->filter_forms_by_current_user_capability( $form_ids, 'view_entries_form_single' );
+		return wpforms()->obj( 'access' )->filter_forms_by_current_user_capability( $form_ids, 'view_entries_form_single' );
 	}
 
 	/**
@@ -577,7 +577,7 @@ class Table extends WP_List_Table {
 		$spam_status  = SpamEntry::ENTRY_STATUS;
 		$trash_status = 'trash';
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
 			"SELECT DISTINCT form_id, COUNT(entry_id) as count
 			FROM {$this->entry_handler->table_name}
@@ -585,7 +585,7 @@ class Table extends WP_List_Table {
 			GROUP BY form_id
 			ORDER BY count {$order}"
 		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return $this->filter_published_form_ids( $form_ids );
 	}
@@ -605,7 +605,7 @@ class Table extends WP_List_Table {
 
 		global $wpdb;
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT form_id
@@ -619,7 +619,7 @@ class Table extends WP_List_Table {
 				]
 			)
 		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return $this->filter_published_form_ids( $form_ids );
 	}
@@ -641,7 +641,7 @@ class Table extends WP_List_Table {
 
 		list( $start_date, $end_date ) = $this->timespan_mysql;
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$form_ids = $wpdb->get_col(
 			$wpdb->prepare(
 				"SELECT DISTINCT form_id, COUNT(entry_id) as count
@@ -659,7 +659,7 @@ class Table extends WP_List_Table {
 				]
 			)
 		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return $this->filter_published_form_ids( $form_ids );
 	}
@@ -681,7 +681,7 @@ class Table extends WP_List_Table {
 
 		list( $start_date, $end_date ) = $this->timespan_mysql;
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$total_entries = (int) $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(entry_id) as count
@@ -699,7 +699,7 @@ class Table extends WP_List_Table {
 				]
 			)
 		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		$this->form_has_entries_timespan = $total_entries > 0;
 

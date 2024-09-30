@@ -214,7 +214,7 @@ class WPForms_Field_Content extends WPForms_Field {
 		 * then bail out.
 		 */
 		if (
-			! wpforms()->get( 'frontend' )->assets_global()
+			! wpforms()->obj( 'frontend' )->assets_global()
 			&& ( ! wpforms_has_field_type( $this->type, $forms, true ) || (int) wpforms_setting( 'disable-css', '1' ) !== 1 )
 		) {
 			return;

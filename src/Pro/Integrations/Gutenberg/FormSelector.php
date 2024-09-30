@@ -175,7 +175,7 @@ class FormSelector extends FormSelectorBase {
 			'pictures' => $this->stock_photos_obj->get_pictures(),
 		];
 
-		$data['isLicenseActive'] = wpforms()->is_pro() && wpforms_get_license_key() && wpforms()->get( 'license' )->is_active();
+		$data['isLicenseActive'] = wpforms()->is_pro() && wpforms_get_license_key() && wpforms()->obj( 'license' )->is_active();
 
 		return $data;
 	}

@@ -104,8 +104,7 @@ class PluginList {
 
 		$this->plugin_slug      = defined( 'WPFORMS_PLUGIN_DIR' ) ? plugin_basename( WPFORMS_PLUGIN_DIR ) : 'wpforms';
 		$this->plugin_path      = $this->plugin_slug . '/wpforms.php';
-		$this->addons_cache_obj = wpforms()->get( 'addons_cache' );
-		$this->addons_cache_obj = $this->addons_cache_obj instanceof stdClass ? null : $this->addons_cache_obj;
+		$this->addons_cache_obj = wpforms()->obj( 'addons_cache' );
 
 		$this->hooks();
 	}

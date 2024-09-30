@@ -363,7 +363,8 @@ class Challenge {
 	 */
 	public function website_has_forms() {
 
-		return (bool) wpforms()->get( 'form' )->get(
+		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
+		return (bool) wpforms()->obj( 'form' )->get(
 			'',
 			[
 				'numberposts'            => 1,
@@ -372,7 +373,7 @@ class Challenge {
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-				'suppress_filters'       => true,
+				'suppress_filters'       => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
 			]
 		);
 	}

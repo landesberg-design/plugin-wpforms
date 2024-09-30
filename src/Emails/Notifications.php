@@ -255,7 +255,7 @@ class Notifications extends Mailer {
 			'wpforms_tasks_entry_emails_trigger_send_same_process',
 			false,
 			$this->fields,
-			! empty( wpforms()->get( 'entry' ) ) ? wpforms()->get( 'entry' )->get( $this->entry_id ) : [],
+			! empty( wpforms()->obj( 'entry' ) ) ? wpforms()->obj( 'entry' )->get( $this->entry_id ) : [],
 			$this->form_data,
 			$this->entry_id,
 			'entry'
@@ -675,7 +675,14 @@ class Notifications extends Mailer {
 		if ( empty( $this->fields[ $field_id ] ) ) {
 			// Check if the field type is in $other_fields, otherwise skip.
 			// Skip if the field is conditionally hidden.
-			if ( empty( $other_fields ) || ! in_array( $field_type, $other_fields, true ) || wpforms_conditional_logic_fields()->field_is_hidden( $this->form_data, $field_id ) ) {
+			if (
+				empty( $other_fields ) ||
+				! in_array( $field_type, $other_fields, true ) ||
+				(
+					wpforms()->is_pro() &&
+					wpforms_conditional_logic_fields()->field_is_hidden( $this->form_data, $field_id )
+				)
+			) {
 				return '';
 			}
 
@@ -700,8 +707,26 @@ class Notifications extends Mailer {
 			$field_name = $this->get_default_field_name( $field_id );
 		}
 
+		/**
+		 * Filter the field name before it is added to the email message.
+		 *
+		 * @since 1.9.1
+		 *
+		 * @param string $field_name Field name.
+		 * @param array  $field      Field data.
+		 * @param array  $form_data  Form data.
+		 * @param string $context    Context of the field name.
+		 */
+		$field_name = (string) apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+			'wpforms_html_field_name',
+			$field_name,
+			$this->fields[ $field_id ] ?? $field,
+			$this->form_data,
+			'email-html'
+		);
+
 		/** This filter is documented in src/SmartTags/SmartTag/FieldHtmlId.php.*/
-		$field_val = apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+		$field_val = (string) apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
 			'wpforms_html_field_value',
 			$field_val,
 			$this->fields[ $field_id ] ?? $field,
@@ -709,10 +734,7 @@ class Notifications extends Mailer {
 			'email-html'
 		);
 
-		// If it's not and RTE field - replace new lines with <br/> tags.
-		if ( $field_type !== 'richtext' ) {
-			$field_val = str_replace( [ "\r\n", "\r", "\n" ], '<br/>', $field_val );
-		}
+		$field_val = str_replace( [ "\r\n", "\r", "\n" ], '<br/>', $field_val );
 
 		// Replace the payment total value if an order summary is enabled.
 		// Ideally, it could be done through the `wpforms_html_field_value` filter,
@@ -799,7 +821,7 @@ class Notifications extends Mailer {
 
 			case 'content':
 				$field_name = esc_html__( 'Content', 'wpforms-lite' );
-				$field_val  = $field['content'];
+				$field_val  = wpforms_esc_richtext_field( $field['content'] );
 				break;
 
 			default:

@@ -140,7 +140,7 @@ class Payment extends WPForms_DB {
 	 */
 	public function get( $payment_id, $args = [] ) {
 
-		if ( ! $this->current_user_can( $payment_id, $args ) && wpforms()->get( 'access' )->init_allowed() ) {
+		if ( ! $this->current_user_can( $payment_id, $args ) && wpforms()->obj( 'access' )->init_allowed() ) {
 			return null;
 		}
 
@@ -237,7 +237,7 @@ class Payment extends WPForms_DB {
 		}
 
 		$is_payment_deleted = parent::delete( $payment_id );
-		$is_meta_deleted    = wpforms()->get( 'payment_meta' )->delete_by( 'payment_id', $payment_id );
+		$is_meta_deleted    = wpforms()->obj( 'payment_meta' )->delete_by( 'payment_id', $payment_id );
 
 		return $is_payment_deleted && $is_meta_deleted;
 	}
@@ -300,7 +300,7 @@ class Payment extends WPForms_DB {
 		// Limit.
 		$query[] = $wpdb->prepare( 'LIMIT %d, %d', $args['offset'], $args['number'] );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$result = $wpdb->get_results( implode( ' ', $query ), ARRAY_A );
 
 		// Get results.

@@ -59,7 +59,7 @@ class Captcha {
 			return;
 		}
 
-		$frontend = wpforms()->get( 'frontend' );
+		$frontend = wpforms()->obj( 'frontend' );
 
 		$container_classes = [ 'wpforms-recaptcha-container', 'wpforms-is-' . $captcha_settings['provider'] ];
 
@@ -206,7 +206,7 @@ class Captcha {
 
 		$is_recaptcha_v3 = $captcha_settings['provider'] === 'recaptcha' && $captcha_settings['recaptcha_type'] === 'v3';
 
-		if ( wpforms()->get( 'amp' )->output_captcha( $is_recaptcha_v3, $captcha_settings, $form_data ) ) {
+		if ( wpforms()->obj( 'amp' )->output_captcha( $is_recaptcha_v3, $captcha_settings, $form_data ) ) {
 			return null;
 		}
 
@@ -313,16 +313,16 @@ class Captcha {
 			'wpforms-recaptcha',
 			$captcha_api,
 			$is_recaptcha_v3 ? [] : [ 'jquery' ],
-			null,
+			null, // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 			$in_footer
 		);
 
 		/**
-		 * Filter the string containing the CAPTCHA javascript to be added.
+		 * Filter the string containing the CAPTCHA JavaScript to be added.
 		 *
 		 * @since 1.6.4
 		 *
-		 * @param string $captcha_inline The CAPTCHA javascript.
+		 * @param string $captcha_inline The CAPTCHA JavaScript.
 		 */
 		$captcha_inline = apply_filters(
 			'wpforms_frontend_captcha_inline_script',
@@ -380,7 +380,7 @@ class Captcha {
 		}
 
 		// Return early.
-		if ( ! $captcha && ! wpforms()->get( 'frontend' )->assets_global() ) {
+		if ( ! $captcha && ! wpforms()->obj( 'frontend' )->assets_global() ) {
 			return null;
 		}
 

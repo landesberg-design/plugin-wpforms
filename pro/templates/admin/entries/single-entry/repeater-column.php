@@ -7,7 +7,7 @@
  * @var array                  $row_data       Row data.
  * @var array                  $form_data      Form data and settings.
  * @var WPForms_Entries_Single $entries_single Single entry object.
- * @var array                  $rows           Rows data.
+ * @var array                  $columns        Columns data.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,24 +21,25 @@ if ( empty( $form_data['fields'] ) || empty( $row_data ) ) {
 }
 
 $current_column = 0;
-$rows           = $rows ?? [];
 
 ?>
 <?php foreach ( $row_data as $data ) : ?>
 	<?php
-		$column = [];
-
-		foreach ( $rows as $row_id => $row ) {
-			$column['fields'][] = $row[ $current_column ]['field'] ?? [];
-		}
-
 		$width           = $entries_single->get_layout_col_width( $data );
-		$is_empty_column = LayoutHelpers::is_column_empty( $column );
+		$is_empty_column = ! isset( $columns[ $current_column ] ) || LayoutHelpers::is_column_empty( $columns[ $current_column ] );
 		$column_classes  = [
 			'wpforms-entry-field-layout-inner',
 			'wpforms-field-layout-column',
-			$is_empty_column ? 'wpforms-field-layout-column-empty' : '',
 		];
+
+		if ( $is_empty_column ) {
+			$column_classes[] = 'wpforms-field-layout-column-empty';
+			$column_classes[] = 'empty';
+
+			if ( empty( $entries_single->entry_view_settings['fields']['show_empty_fields']['value'] ) ) {
+				$column_classes[] = 'wpforms-hide';
+			}
+		}
 	?>
 
 	<div class="<?php echo wpforms_sanitize_classes( $column_classes, true ); ?>" style="width: <?php echo esc_attr( $width ); ?>%">

@@ -82,13 +82,13 @@ class PurgeTemplateEntryTask extends Task {
 		// Determine when the entry should be purged.
 		$purge_timestamp = time() + $delay;
 
-		$action_id = wpforms()->get( 'tasks' )
+		$action_id = wpforms()->obj( 'tasks' )
 			->create( self::ACTION )
 			->once( $purge_timestamp )
 			->params( $entry_id )
 			->register();
 
-		wpforms()->get( 'entry_meta' )->add(
+		wpforms()->obj( 'entry_meta' )->add(
 			[
 				'entry_id' => $entry_id,
 				'form_id'  => $form_data['id'] ?? 0,
@@ -128,7 +128,7 @@ class PurgeTemplateEntryTask extends Task {
 		$this->process_before_delete( $entry_id );
 
 		// Delete the entry.
-		wpforms()->get( 'entry' )->delete( $entry_id );
+		wpforms()->obj( 'entry' )->delete( $entry_id );
 	}
 
 	/**
@@ -145,7 +145,7 @@ class PurgeTemplateEntryTask extends Task {
 	 */
 	private function process_before_delete( int $entry_id ) {
 
-		$registered_user_id = wpforms()->get( 'entry_meta' )->get_meta(
+		$registered_user_id = wpforms()->obj( 'entry_meta' )->get_meta(
 			[
 				'entry_id' => $entry_id,
 				'type'     => 'registered_user_id',

@@ -52,7 +52,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 		$this->core = $core;
 
 		if ( ! empty( $_GET['form_id'] ) ) { // phpcs:ignore
-			$this->form_data = wpforms()->get( 'form' )->get(
+			$this->form_data = wpforms()->obj( 'form' )->get(
 				\absint( $_GET['form_id'] ), // phpcs:ignore
 				[
 					'content_only' => true,
@@ -316,7 +316,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 		$form_id = (int) $_POST['id'];
 		$task    = sanitize_key( $_POST['task'] );
 
-		$revisions = wpforms()->get( 'revisions' );
+		$revisions = wpforms()->obj( 'revisions' );
 		$revision  = $revisions ? $revisions->get_revision() : null;
 
 		if ( $revision ) {
@@ -324,7 +324,7 @@ abstract class FormBuilder implements FormBuilderInterface {
 			$this->form_data = wpforms_decode( $revision->post_content );
 		} else {
 			// Setup form data based on the ID, that we got from AJAX request.
-			$form_handler    = wpforms()->get( 'form' );
+			$form_handler    = wpforms()->obj( 'form' );
 			$this->form_data = $form_handler ? $form_handler->get( $form_id, [ 'content_only' => true ] ) : [];
 		}
 
@@ -487,6 +487,9 @@ abstract class FormBuilder implements FormBuilderInterface {
 	protected function display_content_header() {
 
 		$is_configured = Status::init( $this->core->slug )->is_configured();
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$form_id       = isset( $_GET['form_id'] ) ? sanitize_text_field( wp_unslash( $_GET['form_id'] ) ) : 0;
 		?>
 
 		<div class="wpforms-builder-provider-title wpforms-panel-content-section-title">
@@ -498,13 +501,13 @@ abstract class FormBuilder implements FormBuilderInterface {
 			</span>
 
 			<button class="wpforms-builder-provider-title-add js-wpforms-builder-provider-connection-add <?php echo $is_configured ? '' : 'hidden'; ?>"
-			        data-form_id="<?php echo \absint( $_GET['form_id'] ); ?>"
+			        data-form_id="<?php echo esc_attr( $form_id ); ?>"
 			        data-provider="<?php echo \esc_attr( $this->core->slug ); ?>">
 				<?php \esc_html_e( 'Add New Connection', 'wpforms-lite' ); ?>
 			</button>
 
 			<button class="wpforms-builder-provider-title-add js-wpforms-builder-provider-account-add <?php echo ! $is_configured ? '' : 'hidden'; ?>"
-			        data-form_id="<?php echo \absint( $_GET['form_id'] ); ?>"
+			        data-form_id="<?php echo esc_attr( $form_id ); ?>"
 			        data-provider="<?php echo \esc_attr( $this->core->slug ); ?>">
 				<?php \esc_html_e( 'Add New Account', 'wpforms-lite' ); ?>
 			</button>

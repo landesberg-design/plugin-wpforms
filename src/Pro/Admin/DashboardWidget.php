@@ -257,11 +257,11 @@ class DashboardWidget extends Widget {
 	 */
 	public function widget_content() {
 
-		$form_obj = wpforms()->get( 'form' );
+		$form_obj = wpforms()->obj( 'form' );
 		$forms    = $form_obj ? $form_obj->get( '', [ 'fields' => 'ids' ] ) : [];
 
 		$hide_welcome        = $this->widget_meta( 'get', 'hide_welcome_block' );
-		$splash              = wpforms()->get( 'splash_screen' );
+		$splash              = wpforms()->obj( 'splash_screen' );
 		$is_splash_available = $splash && $splash->is_available_for_display();
 		$is_splash_allowed   = $splash && $splash->is_allow_splash();
 
@@ -490,7 +490,7 @@ class DashboardWidget extends Widget {
 					continue;
 				}
 
-				$form_data = $form['form_id'] ? wpforms()->get( 'form' )->get( $form['form_id'], [ 'content_only' => true ] ) : [];
+				$form_data = $form['form_id'] ? wpforms()->obj( 'form' )->get( $form['form_id'], [ 'content_only' => true ] ) : [];
 
 				$classes = [
 					$key >= $show_forms && $show_forms > 0 ? 'wpforms-dash-widget-forms-list-hidden-el' : '',
@@ -957,7 +957,7 @@ class DashboardWidget extends Widget {
 			$forms = $this->fill_forms_list_form_data( $results );
 		}
 
-		$access_obj = wpforms()->get( 'access' );
+		$access_obj = wpforms()->obj( 'access' );
 
 		return (
 		$access_obj ?
@@ -1036,7 +1036,7 @@ class DashboardWidget extends Widget {
 
 		foreach ( $results as $form_id => $result ) {
 
-			$form_obj = wpforms()->get( 'form' );
+			$form_obj = wpforms()->obj( 'form' );
 			$form     = $form_obj ? $form_obj->get( $form_id ) : null;
 
 			if ( empty( $form ) ) {
@@ -1069,7 +1069,7 @@ class DashboardWidget extends Widget {
 			return [];
 		}
 
-		$form_obj = wpforms()->get( 'form' );
+		$form_obj = wpforms()->obj( 'form' );
 		$forms    = $form_obj ? $form_obj->get() : null;
 
 		if ( empty( $forms ) ) {
@@ -1174,7 +1174,7 @@ class DashboardWidget extends Widget {
 
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM $wpdb->options WHERE option_name LIKE %s",

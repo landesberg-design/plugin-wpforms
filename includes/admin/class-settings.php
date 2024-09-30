@@ -578,6 +578,20 @@ class WPForms_Settings {
 					'no_label' => true,
 					'class'    => [ 'section-heading', 'no-desc' ],
 				],
+				'delete-spam-entries' => [
+					'id'        => 'delete-spam-entries',
+					'name'      => esc_html__( 'Delete Spam Entries', 'wpforms-lite' ),
+					'desc'      => esc_html__( 'Choose the frequency spam entries are automatically deleted.', 'wpforms-lite' ),
+					'type'      => 'select',
+					'default'   => 90,
+					'is_hidden' => ! $this->show_spam_entries_setting(),
+					'options'   => [
+						7  => esc_html__( '7 Days', 'wpforms-lite' ),
+						15 => esc_html__( '15 Days', 'wpforms-lite' ),
+						30 => esc_html__( '30 Days', 'wpforms-lite' ),
+						90 => esc_html__( '90 Days', 'wpforms-lite' ),
+					],
+				],
 				'hide-announcements' => [
 					'id'     => 'hide-announcements',
 					'name'   => esc_html__( 'Hide Announcements', 'wpforms-lite' ),
@@ -675,7 +689,7 @@ class WPForms_Settings {
 
 			<?php
 			if ( wpforms()->is_pro() && class_exists( 'WPForms_License', false ) ) {
-				wpforms()->get( 'license' )->notices( true );
+				wpforms()->obj( 'license' )->notices( true );
 			}
 			?>
 
@@ -768,6 +782,20 @@ class WPForms_Settings {
 		}
 
 		return isset( $field['default'] ) ? $field['default'] : $value_prev;
+	}
+
+	/**
+	 * Check if spam entries setting should be shown.
+	 *
+	 * Show setting only if WPFORMS_DELETE_SPAM_ENTRIES is not defined, and the plugin is Pro.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @return bool
+	 */
+	private function show_spam_entries_setting(): bool {
+
+		return ! defined( 'WPFORMS_DELETE_SPAM_ENTRIES' ) && wpforms()->is_pro();
 	}
 }
 

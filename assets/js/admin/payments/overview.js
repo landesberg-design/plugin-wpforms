@@ -265,6 +265,13 @@ const WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( do
 		 * @return {Object} Scriptable options as a function which is called for the chart instances.
 		 */
 		get settings() { /* eslint max-lines-per-function: ["error", 200] */
+			/**
+			 * Check if the site is RTL.
+			 *
+			 * @since 1.9.1
+			 */
+			const isRTL = $( 'body' ).hasClass( 'rtl' );
+
 			return {
 
 				type: this.type,
@@ -308,7 +315,7 @@ const WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( do
 								},
 								distribution: 'series',
 								ticks: {
-									reverse: $( 'body' ).hasClass( 'rtl' ),
+									reverse: isRTL,
 									beginAtZero: true,
 									padding: 10,
 									fontColor: '#a7aaad',
@@ -370,6 +377,7 @@ const WPFormsPaymentsOverview = window.WPFormsPaymentsOverview || ( function( do
 					},
 					tooltips: {
 						displayColors: false,
+						rtl: isRTL,
 						callbacks: {
 							label: ( { yLabel: value } ) => {
 								let label = `${ this.datasetLabel } `;

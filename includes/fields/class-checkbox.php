@@ -95,8 +95,8 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 			$field['show_values'] = true;
 		}
 
-		// Remove primary input.
-		unset( $properties['inputs']['primary'] );
+		// Remove primary input, unset for attribute for label.
+		unset( $properties['inputs']['primary'], $properties['label']['attr']['for'] );
 
 		// Set input container (ul) properties.
 		$properties['input_container'] = [
@@ -186,7 +186,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 				}
 			}
 		} elseif ( ! $dynamic && ! empty( $field['choices_icons'] ) ) {
-			$properties = wpforms()->get( 'icon_choices' )->field_properties( $properties, $field );
+			$properties = wpforms()->obj( 'icon_choices' )->field_properties( $properties, $field );
 		}
 
 		// Custom properties for disclaimer format display.
@@ -232,6 +232,16 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 
 		// Choices.
 		$this->field_option( 'choices', $field );
+
+		// AI Feature.
+		$this->field_option(
+			'ai_modal_button',
+			$field,
+			[
+				'value' => esc_html__( 'Generate Choices', 'wpforms-lite' ),
+				'type'  => 'choices',
+			]
+		);
 
 		// Choices Images.
 		$this->field_option( 'choices_images', $field );
@@ -578,10 +588,8 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 							$choice['label']['attr']['role'] = 'button';
 						}
 
-						$choice['attr']['autocomplete'] = 'off';
-
 						// Icon Choices.
-						wpforms()->get( 'icon_choices' )->field_display( $field, $choice, 'checkbox' );
+						wpforms()->obj( 'icon_choices' )->field_display( $field, $choice, 'checkbox' );
 
 					} else {
 
@@ -657,7 +665,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 		}
 
 		if ( ! empty( $error ) ) {
-			wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] = $error;
+			wpforms()->obj( 'process' )->errors[ $form_data['id'] ][ $field_id ] = $error;
 		}
 	}
 
@@ -781,7 +789,7 @@ class WPForms_Field_Checkbox extends WPForms_Field {
 		}
 
 		// Push field details to be saved.
-		wpforms()->get( 'process' )->fields[ $field_id ] = $data;
+		wpforms()->obj( 'process' )->fields[ $field_id ] = $data;
 	}
 }
 

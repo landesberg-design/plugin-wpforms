@@ -170,7 +170,7 @@ class Elementor implements IntegrationInterface {
 
 		$min = wpforms_get_min_suffix();
 
-		wp_enqueue_script(
+		wp_register_script(
 			'wpforms-elementor',
 			WPFORMS_PLUGIN_URL . "assets/js/integrations/elementor/frontend{$min}.js",
 			[ 'elementor-frontend', 'jquery', 'wp-util', 'wpforms' ],

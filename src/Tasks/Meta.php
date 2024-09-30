@@ -139,7 +139,7 @@ class Meta extends WPForms_DB {
 		$action = sanitize_key( $action );
 		$date   = gmdate( 'Y-m-d H:i:s', time() - (int) $interval );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM $table WHERE action = %s AND date < %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -254,7 +254,8 @@ class Meta extends WPForms_DB {
 		$data   = $this->prepare_data( array_values( $params ) );
 
 		return absint(
-			$wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT id FROM $table WHERE action = %s AND data = %s LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$action,

@@ -268,7 +268,7 @@ class Amp {
 			return false;
 		}
 
-		$frontend = wpforms()->get( 'frontend' );
+		$frontend = wpforms()->obj( 'frontend' );
 
 		if ( ! $frontend ) {
 			return false;

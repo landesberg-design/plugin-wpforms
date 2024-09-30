@@ -127,13 +127,13 @@ class WPForms_Admin_Editor {
 						);
 						echo '</p>';
 						$args  = apply_filters( 'wpforms_modal_select', [] );
-						$forms = wpforms()->get( 'form' )->get( '', $args );
+						$forms = wpforms()->obj( 'form' )->get( '', $args );
 
 						if ( ! empty( $forms ) ) {
 							printf( '<p><label for="wpforms-modal-select-form">%s</label></p>', esc_html__( 'Select a form below to insert', 'wpforms-lite' ) );
 							echo '<select id="wpforms-modal-select-form">';
 							foreach ( $forms as $form ) {
-								printf( '<option value="%d">%s</option>', $form->ID, esc_html( $form->post_title ) );
+								printf( '<option value="%d">%s</option>', esc_html( $form->ID ), esc_html( $form->post_title ) );
 							}
 							echo '</select><br>';
 							printf( '<p class="wpforms-modal-inline"><input type="checkbox" id="wpforms-modal-checkbox-title"><label for="wpforms-modal-checkbox-title">%s</label></p>', esc_html__( 'Show form name', 'wpforms-lite' ) );
@@ -150,7 +150,7 @@ class WPForms_Admin_Editor {
 										],
 									]
 								),
-								admin_url( 'admin.php?page=wpforms-builder' )
+								esc_url( admin_url( 'admin.php?page=wpforms-builder' ) )
 							);
 							echo '</p>';
 						}

@@ -122,7 +122,7 @@ class QuoteService extends \WPForms\Vendor\Stripe\Service\AbstractService
     }
     /**
      * Download the PDF for a finalized quote. Explanation for special handling can be
-     * found <a href="https://docs.corp.stripe.com/quotes/overview#quote_pdf">here</a>.
+     * found <a href="https://docs.stripe.com/quotes/overview#quote_pdf">here</a>.
      *
      * @param string $id
      * @param callable $readBodyChunkCallable

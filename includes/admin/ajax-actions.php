@@ -78,7 +78,7 @@ function wpforms_save_form() {
 	$data['settings']['form_tags'] = wp_list_pluck( $form_tags, 'label' );
 
 	// Update form data.
-	$form_id = wpforms()->get( 'form' )->update( $data['id'], $data, [ 'context' => 'save_form' ] );
+	$form_id = wpforms()->obj( 'form' )->update( $data['id'], $data, [ 'context' => 'save_form' ] );
 
 	/**
 	 * Fires after updating form data.
@@ -97,7 +97,7 @@ function wpforms_save_form() {
 	// Update form tags.
 	wp_set_post_terms(
 		$form_id,
-		wpforms()->get( 'forms_tags_ajax' )->get_processed_tags( $form_tags ),
+		wpforms()->obj( 'forms_tags_ajax' )->get_processed_tags( $form_tags ),
 		WPForms_Form_Handler::TAGS_TAXONOMY
 	);
 
@@ -157,7 +157,7 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 	$category      = empty( $_POST['category'] ) ? 'all' : sanitize_text_field( wp_unslash( $_POST['category'] ) );
 	$subcategory   = empty( $_POST['subcategory'] ) ? 'all' : sanitize_text_field( wp_unslash( $_POST['subcategory'] ) );
 
-	if ( ! wpforms()->get( 'builder_templates' )->is_valid_template( $form_template ) ) {
+	if ( ! wpforms()->obj( 'builder_templates' )->is_valid_template( $form_template ) ) {
 		wp_send_json_error(
 			[
 				'error_type' => 'invalid_template',
@@ -178,7 +178,7 @@ function wpforms_new_form() { // phpcs:ignore Generic.Metrics.CyclomaticComplexi
 		]
 	);
 	$title_exists = $title_query->post_count > 0;
-	$form_id      = wpforms()->get( 'form' )->add(
+	$form_id      = wpforms()->obj( 'form' )->add(
 		$form_title,
 		[],
 		[
@@ -265,7 +265,7 @@ function wpforms_update_form_template() {
 	$subcategory   = empty( $_POST['subcategory'] ) ? 'all' : sanitize_text_field( wp_unslash( $_POST['subcategory'] ) );
 
 	// Check for valid template.
-	if ( ! wpforms()->get( 'builder_templates' )->is_valid_template( $form_template ) ) {
+	if ( ! wpforms()->obj( 'builder_templates' )->is_valid_template( $form_template ) ) {
 		wp_send_json_error(
 			[
 				'error_type' => 'invalid_template',
@@ -275,7 +275,7 @@ function wpforms_update_form_template() {
 	}
 
 	// Get current form data.
-	$data = wpforms()->get( 'form' )->get(
+	$data = wpforms()->obj( 'form' )->get(
 		$form_id,
 		[
 			'content_only' => true,
@@ -283,7 +283,7 @@ function wpforms_update_form_template() {
 	);
 
 	// Get the cached data from the form template JSON.
-	$template_data = wpforms()->get( 'builder_templates' )->get_template( $form_template );
+	$template_data = wpforms()->obj( 'builder_templates' )->get_template( $form_template );
 
 	// If the template title is set, use it. Otherwise, clear the form title.
 	$template_title = ! empty( $template_data['name'] ) ? $template_data['name'] : '';
@@ -294,7 +294,7 @@ function wpforms_update_form_template() {
 	// Check if the current form title is equal to the previous template name.
 	// If so, set the form title equal to the new template name.
 	$prev_template_slug = $data['meta']['template'] ?? '';
-	$prev_template      = wpforms()->get( 'builder_templates' )->get_template( $prev_template_slug );
+	$prev_template      = wpforms()->obj( 'builder_templates' )->get_template( $prev_template_slug );
 	$form_title         = isset( $prev_template['name'] ) && $prev_template['name'] === $form_title ? $template_title : $form_title;
 
 	// If the these template titles are empty, use the form title.
@@ -336,7 +336,7 @@ function wpforms_update_form_template() {
 	$data['settings']['conversational_forms_page_slug'] = sanitize_title( $form_conversational_slug );
 
 	// Try to update the form.
-	$updated = (bool) wpforms()->get( 'form' )->update(
+	$updated = (bool) wpforms()->obj( 'form' )->update(
 		$form_id,
 		$data,
 		[
@@ -401,7 +401,7 @@ function wpforms_builder_increase_next_field_id() {
 		$args['field_id'] = sanitize_text_field( wp_unslash( $_POST['field_id'] ) );
 	}
 
-	wpforms()->get( 'form' )->next_field_id( absint( $_POST['form_id'] ), $args );
+	wpforms()->obj( 'form' )->next_field_id( absint( $_POST['form_id'] ), $args );
 
 	wp_send_json_success();
 }

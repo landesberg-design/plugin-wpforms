@@ -54,7 +54,7 @@ class Page {
 					[
 						'label'   => esc_html__( 'Number of forms per page:', 'wpforms' ),
 						'option'  => 'per_page',
-						'default' => wpforms()->get( 'entry' )->get_count_per_page(),
+						'default' => wpforms()->obj( 'entry' )->get_count_per_page(),
 						'type'    => 'number',
 						'args'    => [
 							'min'       => 1,
@@ -371,7 +371,7 @@ class Page {
 		$graph_style    = get_user_meta( $user_id, 'wpforms_dash_widget_graph_style', true );
 		$color_scheme   = get_user_meta( $user_id, 'wpforms_dash_widget_color_scheme', true );
 		$active_form_id = get_user_meta( $user_id, 'wpforms_dash_widget_active_form_id', true );
-		$active_form    = empty( $active_form_id ) ? false : wpforms()->get( 'form' )->get( $active_form_id );
+		$active_form    = empty( $active_form_id ) ? false : wpforms()->obj( 'form' )->get( $active_form_id );
 
 		return [
 			'active_form_id' => $active_form instanceof WP_Post && $active_form->post_status === 'publish' ? $active_form->ID : '',

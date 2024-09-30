@@ -112,7 +112,7 @@ var WPFormsElementor = window.WPFormsElementor || ( function( document, window, 
 						$input.data( 'placeholder', $input.attr( 'placeholder' ) );
 
 						if ( self.getValue( true ).length ) {
-							$input.removeAttr( 'placeholder' );
+							$input.hide();
 						}
 					}
 

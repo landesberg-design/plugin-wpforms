@@ -3,6 +3,7 @@
 namespace WPForms\Integrations\UsageTracking;
 
 use WPForms\Admin\Builder\Templates;
+use WPForms\Integrations\AI\Helpers as AIHelpers;
 use WPForms\Integrations\IntegrationInterface;
 use WPForms\Integrations\LiteConnect\Integration;
 
@@ -198,8 +199,10 @@ class UsageTracking implements IntegrationInterface {
 			'wpforms_multiple_confirmations' => count( $this->get_forms_with_multiple_confirmations( $forms ) ),
 			'wpforms_multiple_notifications' => count( $this->get_forms_with_multiple_notifications( $forms ) ),
 			'wpforms_ajax_form_submissions'  => count( $this->get_ajax_form_submissions( $forms ) ),
-			'wpforms_notification_count'     => wpforms()->get( 'notifications' )->get_count(),
+			'wpforms_notification_count'     => wpforms()->obj( 'notifications' )->get_count(),
 			'wpforms_stats'                  => $this->get_additional_stats(),
+			'wpforms_ai'                     => AIHelpers::is_used(),
+			'wpforms_ai_killswitch'          => AIHelpers::is_disabled(),
 		];
 
 		if ( ! empty( $first_form_date ) ) {
@@ -305,6 +308,9 @@ class UsageTracking implements IntegrationInterface {
 					'hcaptcha-site-key',
 					'hcaptcha-secret-key',
 					'hcaptcha-fail-msg',
+					'turnstile-site-key',
+					'turnstile-secret-key',
+					'turnstile-fail-msg',
 					'pdf-ninja-api_key',
 				]
 			)
@@ -576,7 +582,7 @@ class UsageTracking implements IntegrationInterface {
 				break;
 		}
 
-		$entry_obj = wpforms()->get( 'entry' );
+		$entry_obj = wpforms()->obj( 'entry' );
 
 		return $entry_obj ? $entry_obj->get_entries( $args, true ) : 0;
 	}
@@ -599,7 +605,8 @@ class UsageTracking implements IntegrationInterface {
 
 		global $wpdb;
 
-		$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$count = $wpdb->get_var(
 			"SELECT SUM(meta_value)
 				FROM $wpdb->postmeta
 				WHERE meta_key = 'wpforms_entries_count';"
@@ -692,7 +699,7 @@ class UsageTracking implements IntegrationInterface {
 	 */
 	private function get_all_forms( $post_type = 'wpforms' ): array {
 
-		$forms = wpforms()->get( 'form' )->get( '', [ 'post_type' => $post_type ] );
+		$forms = wpforms()->obj( 'form' )->get( '', [ 'post_type' => $post_type ] );
 
 		if ( ! is_array( $forms ) ) {
 			return [];
@@ -886,7 +893,7 @@ class UsageTracking implements IntegrationInterface {
 		}
 
 		// Count the list of keywords for the keyword filter.
-		$keyword_filter   = wpforms()->get( 'antispam_keyword_filter' );
+		$keyword_filter   = wpforms()->obj( 'antispam_keyword_filter' );
 		$keywords         = method_exists( $keyword_filter, 'get_keywords' ) ? $keyword_filter->get_keywords() : [];
 		$stat['keywords'] = count( $keywords );
 

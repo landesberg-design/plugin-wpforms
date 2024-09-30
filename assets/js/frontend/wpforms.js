@@ -1,4 +1,4 @@
-/* global wpforms_settings, grecaptcha, hcaptcha, turnstile, wpformsRecaptchaCallback, wpformsRecaptchaV3Execute, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices, WPFormsPasswordField, WPFormsEntryPreview, punycode, tinyMCE, WPFormsUtils, JQueryDeferred, JQueryXHR */
+/* global wpforms_settings, grecaptcha, hcaptcha, turnstile, wpformsRecaptchaCallback, wpformsRecaptchaV3Execute, wpforms_validate, wpforms_datepicker, wpforms_timepicker, Mailcheck, Choices, WPFormsPasswordField, WPFormsEntryPreview, punycode, tinyMCE, WPFormsUtils, JQueryDeferred, JQueryXHR, WPFormsRepeaterField */
 
 /* eslint-disable no-unused-expressions, no-shadow, no-unused-vars */
 
@@ -170,9 +170,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 					honeypotIdAttr = `wpforms-${ formId }-field_${ honeypotFieldId }`,
 					$insertBeforeField = $( `#wpforms-${ formId }-field_${ insertBeforeId }-container`, $form ),
 					inlineStyles = 'position: absolute !important; overflow: hidden !important; display: inline !important; height: 1px !important; width: 1px !important; z-index: -1000 !important; padding: 0 !important;',
+					labelInlineStyles = 'counter-increment: none;',
 					fieldHTML = `
 						<div id="${ honeypotIdAttr }-container" class="wpforms-field wpforms-field-text" data-field-type="text" data-field-id="${ honeypotFieldId }" style="${ inlineStyles }">
-							<label class="wpforms-field-label" for="${ honeypotIdAttr }" aria-hidden="true">${ label }</label>
+							<label class="wpforms-field-label" for="${ honeypotIdAttr }" aria-hidden="true" style="${ labelInlineStyles }">${ label }</label>
 							<input type="text" id="${ honeypotIdAttr }" class="wpforms-field-medium" name="wpforms[fields][${ honeypotFieldId }]" aria-hidden="true" style="visibility: hidden;" tabindex="-1">
 						</div>`;
 
@@ -1280,6 +1281,11 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 					return false;
 				}
 
+				if ( typeof $el.data( 'plugin_intlTelInput' ) === 'object' ) {
+					// Skip if it was already initialized.
+					return;
+				}
+
 				// Hidden input allows to include country code into submitted data.
 				inputOptions.hiddenInput = function( telInputName ) {
 					return {
@@ -1288,7 +1294,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 				};
 				inputOptions.utilsScript = wpforms_settings.wpforms_plugin_url + 'assets/pro/lib/intl-tel-input/module.intl-tel-input-utils.min.js';
 
-				const iti = window.intlTelInput(
+				let iti = window.intlTelInput(
 					$el.get( 0 ),
 					inputOptions
 				);
@@ -1334,6 +1340,10 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 				// Validation is done separately, so we shouldn't worry about it.
 				// Previously "blur" only was used, which is broken in case Enter was used to submit the form.
 				$el.on( 'blur input', function() {
+					// We need to be sure that we are using the latest instance of the library attached to this element.
+					// For example if library was reinit by custom snippet.
+					iti = window.intlTelInputGlobals.getInstance( $el[ 0 ] );
+
 					$el.siblings( 'input[type="hidden"]' ).val( iti.getNumber() );
 				} );
 			} );
@@ -1521,6 +1531,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 						if ( self.getValue( true ).length ) {
 							$input.removeAttr( 'placeholder' );
 						}
+
+						$input.css( 'width', '1ch' );
 					}
 
 					// On change event.
@@ -2362,10 +2374,22 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 				app.optinMonsterRecaptchaReset( event.detail.Campaign.data.id );
 			} );
 
+			document.addEventListener( 'om.Campaign.afterShow', function( event ) {
+				// Init Repeater fields.
+				if ( 'undefined' !== typeof WPFormsRepeaterField ) {
+					WPFormsRepeaterField.ready();
+				}
+			} );
+
 			// OM Legacy.
 			$( document ).on( 'OptinMonsterOnShow', function( event, data, object ) {
 				app.ready();
 				app.optinMonsterRecaptchaReset( data.optin );
+
+				// Init Repeater fields.
+				if ( 'undefined' !== typeof WPFormsRepeaterField ) {
+					WPFormsRepeaterField.ready();
+				}
 			} );
 		},
 
@@ -2453,16 +2477,9 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 					$summary.find( '.wpforms-order-summary-preview-total .wpforms-order-summary-item-price' ).text( total );
 				}
 
-				if ( $paymentField.hasClass( 'wpforms-payment-total' ) ) {
-					// Update each payment field price in case it was changed while total calculation.
-					$form.find( '.wpforms-payment-price' ).each( function() {
-						app.updateOrderSummaryItem( $( this ), $summary );
-					} );
-
-					return;
-				}
-
-				app.updateOrderSummaryItem( $paymentField, $summary );
+				$form.find( '.wpforms-payment-price' ).each( function() {
+					app.updateOrderSummaryItem( $( this ), $summary );
+				} );
 			} );
 		},
 
@@ -2482,27 +2499,25 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 
 			const $field = $paymentField.closest( '.wpforms-field' ),
 				fieldId = $field.data( 'field-id' ),
-				type = $paymentField.prop( 'type' );
+				type = $paymentField.prop( 'type' ),
+				isFieldVisible = $field.is( ':visible' );
 
-			if ( type === 'checkbox' ) {
-				$summary.find( `tr[data-field="${ fieldId }"][data-choice="${ $paymentField.val() }"]` ).toggle( $paymentField.is( ':checked' ) );
-			} else if ( type === 'radio' || type === 'select-one' ) {
+			if ( type === 'checkbox' || type === 'radio' || type === 'select-one' ) {
 				// Show only selected items.
 				$summary.find( `tr[data-field="${ fieldId }"]` ).each( function() {
 					const choiceID = $( this ).data( 'choice' );
+					const isChoiceChecked = type === 'select-one'
+						? choiceID === parseInt( $field.find( 'select' ).val(), 10 )
+						: $field.find( `input[value="${ choiceID }"]` ).is( ':checked' );
 
-					if ( type === 'radio' ) {
-						$( this ).toggle( $field.find( `input[value="${ choiceID }"]` ).is( ':checked' ) );
-					} else {
-						$( this ).toggle( choiceID === parseInt( $field.find( 'select' ).val(), 10 ) );
-					}
+					$( this ).toggle( isFieldVisible && isChoiceChecked );
 				} );
 			} else {
 				const $item = $summary.find( `tr[data-field="${ fieldId }"]` ),
 					amount = $paymentField.val();
 
-				$item.find( '.wpforms-order-summary-item-price' ).text( app.amountFormatSymbol( amount ) );
-				$item.toggle( $field.css( 'display' ) === 'block' );
+				$item.find( '.wpforms-order-summary-item-price' ).text( app.amountFormatSymbol( app.amountSanitize( amount ) ) );
+				$item.toggle( isFieldVisible );
 			}
 
 			if ( ! $field.hasClass( 'wpforms-payment-quantities-enabled' ) ) {
@@ -2705,7 +2720,8 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 		amountSanitize( amount ) {
 			const currency = app.getCurrency();
 
-			amount = amount.toString().replace( /[^0-9.,]/g, '' );
+			// Convert to string, remove a currency symbol, and allow only numbers, dots, and commas.
+			amount = amount.toString().replace( currency.symbol, '' ).replace( /[^0-9.,]/g, '' );
 
 			if ( currency.decimal_sep === ',' ) {
 				if ( currency.thousands_sep === '.' && amount.indexOf( currency.thousands_sep ) !== -1 ) {
@@ -2717,6 +2733,7 @@ var wpforms = window.wpforms || ( function( document, window, $ ) { // eslint-di
 			} else if ( currency.thousands_sep === ',' && ( amount.indexOf( currency.thousands_sep ) !== -1 ) ) {
 				amount = amount.replace( new RegExp( '\\' + currency.thousands_sep, 'g' ), '' );
 			}
+
 			return app.numberFormat( amount, currency.decimals, '.', '' );
 		},
 

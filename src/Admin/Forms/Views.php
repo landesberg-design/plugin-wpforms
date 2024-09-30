@@ -84,7 +84,7 @@ class Views {
 			],
 		];
 
-		$this->show_form_templates = wpforms()->get( 'forms_overview' )->overview_show_form_templates();
+		$this->show_form_templates = wpforms()->obj( 'forms_overview' )->overview_show_form_templates();
 
 		// Add Forms and Templates views if Show Templates setting is enabled.
 		if ( $this->show_form_templates ) {
@@ -128,7 +128,7 @@ class Views {
 		 *        @param string $title         View title.
 		 *        @param string $get_var       URL query variable name.
 		 *        @param string $get_var_value URL query variable value.
-		 *        @param array $args           Additional arguments to be passed to `wpforms()->get( 'form' )->get()` method.
+		 *        @param array $args           Additional arguments to be passed to `wpforms()->obj( 'form' )->get()` method.
 		 *    }
 		 *    ...
 		 * }
@@ -295,7 +295,7 @@ class Views {
 			'update_post_term_cache' => false,
 			'fields'                 => 'ids',
 			'post_status'            => 'publish',
-			'post_type'              => wpforms()->get( 'form' )::POST_TYPES,
+			'post_type'              => wpforms()->obj( 'form' )::POST_TYPES,
 		];
 
 		$args = array_merge( $args, $defaults );
@@ -333,7 +333,7 @@ class Views {
 			$args['post_type'] = 'wpforms';
 		}
 
-		$all_items = wpforms()->get( 'form' )->get( '', $args );
+		$all_items = wpforms()->obj( 'form' )->get( '', $args );
 
 		return is_array( $all_items ) ? count( $all_items ) : 0;
 	}
@@ -351,7 +351,7 @@ class Views {
 
 		$args['post_type'] = 'wpforms';
 
-		$forms = wpforms()->get( 'form' )->get( '', $args );
+		$forms = wpforms()->obj( 'form' )->get( '', $args );
 
 		return is_array( $forms ) ? count( $forms ) : 0;
 	}
@@ -369,7 +369,7 @@ class Views {
 
 		$args['post_type'] = 'wpforms-template';
 
-		$templates = wpforms()->get( 'form' )->get( '', $args );
+		$templates = wpforms()->obj( 'form' )->get( '', $args );
 
 		return is_array( $templates ) ? count( $templates ) : 0;
 	}
@@ -394,7 +394,7 @@ class Views {
 
 		$args['post_status'] = 'trash';
 
-		$forms = wpforms()->get( 'form' )->get( '', $args );
+		$forms = wpforms()->obj( 'form' )->get( '', $args );
 
 		return is_array( $forms ) ? count( $forms ) : 0;
 	}
@@ -575,7 +575,7 @@ class Views {
 		// Payments.
 		if (
 			wpforms_current_user_can( wpforms_get_capability_manage_options(), $form->ID ) &&
-			wpforms()->get( 'payment' )->get_by( 'form_id', $form->ID )
+			wpforms()->obj( 'payment' )->get_by( 'form_id', $form->ID )
 		) {
 			$row_actions['payments'] = sprintf(
 				'<a href="%s" title="%s">%s</a>',

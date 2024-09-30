@@ -27,7 +27,7 @@ class Upgrade189 extends UpgradeBase {
 
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		$wpdb->query( "ALTER TABLE {$wpdb->prefix}wpforms_entry_fields MODIFY COLUMN field_id VARCHAR(16);" );
 
 		return true;

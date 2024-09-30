@@ -189,7 +189,7 @@ abstract class WPForms_DB {
 			return $row;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT * FROM $this->table_name WHERE $this->primary_key = %d LIMIT 1;", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -230,7 +230,7 @@ abstract class WPForms_DB {
 			return $row;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT * FROM $this->table_name WHERE $column = %s LIMIT 1;", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -269,7 +269,7 @@ abstract class WPForms_DB {
 			return $var;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$var = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT $column FROM $this->table_name WHERE $this->primary_key = %d LIMIT 1;", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -315,7 +315,7 @@ abstract class WPForms_DB {
 			return $var;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$var = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT $column FROM $this->table_name WHERE $column_where = %s LIMIT 1;", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -345,7 +345,7 @@ abstract class WPForms_DB {
 		global $wpdb;
 
 		if ( ! $this->is_select( $query ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			return $wpdb->query( $query );
 		}
 
@@ -356,7 +356,7 @@ abstract class WPForms_DB {
 			return $results;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$results = $wpdb->query( $query );
 
 		$this->cache_set( $key, $results );
@@ -380,7 +380,7 @@ abstract class WPForms_DB {
 		global $wpdb;
 
 		if ( ! $this->is_select( $query ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			return $wpdb->get_results( $query, $output );
 		}
 
@@ -391,7 +391,7 @@ abstract class WPForms_DB {
 			return $results;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$results = $wpdb->get_results( $query, $output );
 
 		$this->cache_set( $key, $results );
@@ -418,7 +418,7 @@ abstract class WPForms_DB {
 		global $wpdb;
 
 		if ( ! $query ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			return $wpdb->get_row( $query, $output, $y );
 		}
 
@@ -429,7 +429,7 @@ abstract class WPForms_DB {
 			return $row;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$row = $wpdb->get_row( $query, $output, $y );
 
 		$this->cache_set( $key, $row );
@@ -455,7 +455,7 @@ abstract class WPForms_DB {
 		global $wpdb;
 
 		if ( ! $query ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			return $wpdb->get_var( $query, $x, $y );
 		}
 
@@ -466,7 +466,7 @@ abstract class WPForms_DB {
 			return $var;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$var = $wpdb->get_var( $query, $x, $y );
 
 		$this->cache_set( $key, $var );
@@ -506,6 +506,7 @@ abstract class WPForms_DB {
 		$data_keys      = array_keys( $data );
 		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->insert( $this->table_name, $data, $column_formats );
 
 		do_action( 'wpforms_post_insert_' . $type, $wpdb->insert_id, $data );
@@ -572,7 +573,7 @@ abstract class WPForms_DB {
 		$data_keys      = array_keys( $data );
 		$column_formats = array_merge( array_flip( $data_keys ), $column_formats );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $wpdb->update( $this->table_name, $data, [ $where => $row_id ], $column_formats ) === false ) {
 			return false;
 		}
@@ -622,7 +623,7 @@ abstract class WPForms_DB {
 		 */
 		do_action( 'wpforms_pre_delete_' . $this->type, $row_id, $this->primary_key );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM $this->table_name WHERE $this->primary_key = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -668,7 +669,7 @@ abstract class WPForms_DB {
 		// This action is documented in includes/class-db.php method delete().
 		do_action( 'wpforms_pre_delete_' . $this->type, $column_value, $column );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM $this->table_name WHERE $column = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -724,7 +725,7 @@ abstract class WPForms_DB {
 		$placeholders = isset( $placeholders ) ? implode( ',', $placeholders ) : '';
 		$sql          = "DELETE FROM $this->table_name WHERE $column IN ( $placeholders )";
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		return $wpdb->query( $wpdb->prepare( $sql, $values ) );
 	}
 

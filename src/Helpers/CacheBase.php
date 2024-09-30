@@ -162,7 +162,7 @@ abstract class CacheBase {
 		// Prevent infinite loop.
 		if ( $this->syncing_updates ) {
 			foreach ( (array) static::SYNC_WITH as $classname ) {
-				$cache = wpforms()->get( $classname );
+				$cache = wpforms()->obj( $classname );
 
 				if ( ! $cache instanceof self ) {
 					continue;
@@ -518,7 +518,7 @@ abstract class CacheBase {
 			return;
 		}
 
-		$tasks = wpforms()->get( 'tasks' );
+		$tasks = wpforms()->obj( 'tasks' );
 
 		if (
 			! $tasks instanceof Tasks ||

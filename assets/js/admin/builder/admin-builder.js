@@ -7,7 +7,8 @@
 var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) { // eslint-disable-line no-var
 	let s,
 		$builder;
-	const elements = {};
+	const elements = {},
+		browser = {};
 
 	/**
 	 * Whether to show the close confirmation dialog or not.
@@ -143,6 +144,10 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			// Cache builder element.
 			$builder = $( '#wpforms-builder' );
 
+			browser.isWindows = /Win/.test( navigator.userAgent );
+			browser.isLinux = /Linux/.test( navigator.userAgent );
+			browser.isMac = /Mac/.test( navigator.userAgent );
+
 			// Action buttons.
 			elements.$helpButton = $( '#wpforms-help' );
 			elements.$previewButton = $( '#wpforms-preview-btn' );
@@ -160,6 +165,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			elements.$focusOutTarget = null;
 
 			elements.$nextFieldId = $( '#wpforms-field-id' );
+			elements.$addFieldsTab = $( '#add-fields a' );
 			elements.$fieldOptions = $( '#wpforms-field-options' );
 			elements.$fieldsPreviewWrap = $( '#wpforms-panel-fields .wpforms-panel-content-wrap' );
 			elements.$sortableFieldsWrap = $( '#wpforms-panel-fields .wpforms-field-wrap' );
@@ -322,10 +328,9 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * @since 1.6.8
 		 */
 		loadMsWinCSS() {
-			const ua = navigator.userAgent;
 
 			// Detect OS & browsers.
-			if ( ua.indexOf( 'Macintosh' ) !== -1 ) {
+			if ( browser.isMac ) {
 				return;
 			}
 
@@ -4872,6 +4877,17 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		},
 
 		/**
+		 * Trigger $builder event.
+		 *
+		 * @since 1.9.1
+		 *
+		 * @param {string} event Event name.
+		 */
+		triggerBuilderEvent( event ) {
+			$builder.trigger( event );
+		},
+
+		/**
 		 * Toggle fields tabs (Add Fields, Field Options.
 		 *
 		 * @since 1.0.0
@@ -4892,7 +4908,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 			$( '.wpforms-field, .wpforms-title-desc' ).removeClass( 'active' );
 
 			if ( id === 'add-fields' ) {
-				$( '#add-fields a' ).addClass( 'active' );
+				elements.$addFieldsTab.addClass( 'active' );
 				$( '.wpforms-field-options' ).hide();
 				$( '.wpforms-add-fields' ).show();
 			} else {
@@ -5060,7 +5076,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				id = $thisOption.data( 'field-id' );
 			const $choices = $( '#wpforms-field-option-row-' + id + '-choices' ),
 				$images = $( '#wpforms-field-option-' + id + '-choices_images' ),
-				$icons = $( '#wpforms-field-option-' + id + '-choices_icons' );
+				$icons = $( '#wpforms-field-option-' + id + '-choices_icons' ),
+				$basicOptions = $( `#wpforms-field-option-basic-${ id }` );
 
 			// Hide image and icon choices if "dynamic choices" is not off.
 			app.fieldDynamicChoiceToggleImageChoices();
@@ -5086,6 +5103,9 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				// Hide `Bulk Add` toggle.
 				$choices.find( '.toggle-bulk-add-display' ).addClass( 'wpforms-hidden' );
+
+				// Hide AI Choices button.
+				$basicOptions.find( '.wpforms-ai-choices-button' ).addClass( 'wpforms-hidden' );
 
 				const data = {
 					type: value,
@@ -5132,6 +5152,9 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			// Show `Bulk Add` toggle.
 			$choices.find( '.toggle-bulk-add-display' ).removeClass( 'wpforms-hidden' );
+
+			// Show AI Choices button.
+			$basicOptions.find( '.wpforms-ai-choices-button' ).removeClass( 'wpforms-hidden' );
 
 			$( '#wpforms-field-' + id ).find( '.wpforms-alert' ).remove();
 
@@ -7623,14 +7646,8 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 			smartTagListElements += '<li class="heading">' + wpforms_builder.fields_available + '</li>';
 
-			for ( const fieldKey in wpf.orders.fields ) {
-				const fieldId = wpf.orders.fields[ fieldKey ];
-
-				if ( ! fields[ fieldId ] ) {
-					continue;
-				}
-
-				smartTagListElements += app.getSmartTagsListFieldsElement( fields[ fieldId ] );
+			for ( const fieldKey in fields ) {
+				smartTagListElements += app.getSmartTagsListFieldsElement( fields[ fieldKey ] );
 			}
 
 			return smartTagListElements;
@@ -7820,6 +7837,14 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * @param {Object} fields Fields.
 		 */
 		fieldMapSelect( e, fields ) { // eslint-disable-line max-lines-per-function
+			const event = WPFormsUtils.triggerEvent( $builder, 'wpformsBeforeFieldMapSelectUpdate' );
+
+			// Allow callbacks on `wpformsBeforeFieldMapSelectUpdate` to cancel adding field
+			// by triggering `event.preventDefault()`.
+			if ( event.isDefaultPrevented() ) {
+				return;
+			}
+
 			$( '.wpforms-field-map-select' ).each( function( index, el ) { // eslint-disable-line complexity, no-unused-vars
 				const $this = $( this );
 				let allowedFields = $this.data( 'field-map-allowed' ),
@@ -7844,12 +7869,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 
 				// Loop through the current fields, if we have fields for the form.
 				if ( fields && ! $.isEmptyObject( fields ) ) {
-					for ( const key in wpf.orders.fields ) {
-						if ( ! Object.prototype.hasOwnProperty.call( wpf.orders.fields, key ) ) {
-							continue;
-						}
-
-						const fieldID = wpf.orders.fields[ key ];
+					for ( const fieldID in fields ) {
 						let label = '';
 
 						if ( ! fields[ fieldID ] ) {
@@ -8571,12 +8591,20 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 		 * Ctrl+Q - Exit.
 		 * Ctrl+/ - Keyboard Shortcuts modal.
 		 * Ctrl+F - Focus search fields input.
-		 * Ctrl+T - Toggle sidebar.
+		 * Ctrl+T - Toggle sidebar (Alt+S on Windows and Linux).
 		 *
 		 * @since 1.2.4
 		 */
 		builderHotkeys() {
 			$( document ).on( 'keydown', function( e ) { // eslint-disable-line complexity
+
+				// Toggle sidebar on Alt+S (on Windows and Linux).
+				if ( ( browser.isLinux || browser.isWindows ) && e.altKey && e.keyCode === 83 ) {
+					$( elements.$sidebarToggle, $builder ).trigger( 'click' );
+
+					return;
+				}
+
 				if ( ! e.ctrlKey ) {
 					return;
 				}
@@ -8615,6 +8643,7 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 						break;
 
 					case 70: // Focus search fields input on Ctrl+F.
+						elements.$addFieldsTab.trigger( 'click' );
 						elements.$fieldsSidebar.scrollTop( 0 );
 						elements.$searchInput.focus();
 						break;
@@ -8656,6 +8685,10 @@ var WPFormsBuilder = window.WPFormsBuilder || ( function( document, window, $ ) 
 				},
 				onOpenBefore() {
 					this.$body.addClass( 'wpforms-builder-keyboard-shortcuts' );
+					// Dynamically change the shortcut key documentation on Windows/Linux.
+					if ( browser.isLinux || browser.isWindows ) {
+						this.$body.find( '.shortcut-key.shortcut-key-ctrl-t' ).html( '<i>alt</i><i>s</i>' );
+					}
 				},
 			} );
 		},

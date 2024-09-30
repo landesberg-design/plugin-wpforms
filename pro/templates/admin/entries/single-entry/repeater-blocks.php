@@ -22,9 +22,6 @@ if ( ! $blocks ) {
 	return '';
 }
 
-$field_description = $form_data['fields'][ $field['id'] ]['description'] ?? '';
-$hide              = $entries_single->entry_view_settings['fields']['show_field_descriptions']['value'] === 1 ? '' : ' wpforms-hide';
-
 $classes = [ 'wpforms-field-repeater-block' ];
 
 if ( $is_hidden_by_cl ) {
@@ -32,23 +29,32 @@ if ( $is_hidden_by_cl ) {
 }
 ?>
 
-<?php foreach ( $blocks as $key => $rows ) : ?>
-	<div class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
+<?php
+foreach ( $blocks as $key => $rows ) :
+	$block_classes = $classes;
+
+	if ( RepeaterHelpers::is_empty_block( $rows ) ) {
+		$block_classes[] = 'empty';
+
+		if ( empty( $entries_single->entry_view_settings['fields']['show_empty_fields']['value'] ) ) {
+			$block_classes[] = 'wpforms-hide';
+		}
+	}
+	?>
+	<div class="<?php echo wpforms_sanitize_classes( $block_classes, true ); ?>">
 		<?php
 		$block_number = $key >= 1 ? ' #' . ( $key + 1 ) : '';
+
+		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'admin/entries/single-entry/block-header',
+			[
+				'field'          => $field,
+				'form_data'      => $form_data,
+				'entries_single' => $entries_single,
+			],
+			true
+		);
 		?>
-
-		<?php if ( isset( $field['label_hide'] ) && ! $field['label_hide'] ) : ?>
-			<p class="wpforms-entry-field-name">
-				<?php echo esc_html( $field['label'] . $block_number ); ?>
-
-				<?php if ( $field_description ) : ?>
-					<span class="wpforms-entry-field-description<?php echo esc_attr( $hide ); ?>">
-						<?php echo wp_kses_post( $field_description ); ?>
-					</span>
-				<?php endif; ?>
-			</p>
-		<?php endif; ?>
 
 		<div class="wpforms-field-repeater-blocks">
 			<?php foreach ( $rows as $row_data ) : ?>
@@ -60,6 +66,7 @@ if ( $is_hidden_by_cl ) {
 							'row_data'       => $row_data,
 							'form_data'      => $form_data,
 							'entries_single' => $entries_single,
+							'columns'        => $field['columns'] ?? [],
 						],
 						true
 					);

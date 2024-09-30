@@ -150,8 +150,14 @@ class WPForms_Pro {
 		wpforms()->entry_fields = new WPForms_Entry_Fields_Handler();
 		wpforms()->entry_meta   = new WPForms_Entry_Meta_Handler();
 
-		if ( is_admin() && ! wpforms()->get( 'license' ) instanceof WPForms_License ) {
+		wpforms()->register_instance( 'entry', wpforms()->entry );
+		wpforms()->register_instance( 'entry_fields', wpforms()->entry_fields );
+		wpforms()->register_instance( 'entry_meta', wpforms()->entry_meta );
+
+		if ( is_admin() && ! wpforms()->obj( 'license' ) instanceof WPForms_License ) {
 			wpforms()->license = new WPForms_License();
+
+			wpforms()->register_instance( 'license', wpforms()->license );
 		}
 	}
 
@@ -162,7 +168,7 @@ class WPForms_Pro {
 	 */
 	public function updater() {
 
-		if ( ! is_admin() && ! wpforms_doing_wp_cli() ) {
+		if ( ! is_admin() && ! wp_doing_cron() && ! wpforms_doing_wp_cli() ) {
 			return;
 		}
 
@@ -184,37 +190,22 @@ class WPForms_Pro {
 		// Register the updater instance.
 		wpforms()->register_instance( 'updater', $updater_obj );
 
-		$addons_cache_obj = wpforms()->get( 'addons_cache' );
+		$addons_cache_obj = wpforms()->obj( 'addons_cache' );
 
-		if ( $addons_cache_obj instanceof stdClass ) {
+		if ( ! $addons_cache_obj ) {
 			return;
 		}
 
-		if ( ! function_exists( 'get_plugins' ) ) {
-			require_once ABSPATH . '/wp-admin/includes/plugin.php';
-		}
+		$addons = $addons_cache_obj->get();
 
-		$plugins = get_plugins();
-		$addons  = $addons_cache_obj->get();
-
-		foreach ( $plugins as $plugin_path => $plugin ) {
-			$slug = explode( '/', $plugin_path )[0];
-
-			if ( ! array_key_exists( $slug, $addons ) ) {
-				continue;
-			}
-
-			$addon = $addons[ $slug ];
-
+		foreach ( $addons as $addon ) {
 			// Initialize the addon updater class.
 			new WPForms_Updater(
 				[
 					'plugin_name' => $addon['title'],
 					'plugin_slug' => $addon['slug'],
-					'plugin_path' => $plugin_path,
 					'plugin_url'  => trailingslashit( $addon['url'] ),
 					'remote_url'  => WPFORMS_UPDATER_API,
-					'version'     => $plugin['Version'],
 					'key'         => $key,
 				]
 			);
@@ -222,7 +213,7 @@ class WPForms_Pro {
 
 		/**
 		 * Remove all addon updater actions.
-		 * This is needed for backward compatibility with outdated addons.
+		 * This is necessary for backward compatibility with outdated addons.
 		 */
 		$this->remove_action_regex( '/^WPForms/', 'wpforms_updater' );
 
@@ -409,11 +400,11 @@ class WPForms_Pro {
 		}
 
 		if ( $action === 'get-plugin-update' ) {
-			return (object) wpforms()->get( 'license_api_plugin_update_cache' )->get();
+			return (object) wpforms()->obj( 'license_api_plugin_update_cache' )->get();
 		}
 
 		if ( $action === 'get-plugin-info' ) {
-			return (object) wpforms()->get( 'license_api_plugin_info_cache' )->get();
+			return (object) wpforms()->obj( 'license_api_plugin_info_cache' )->get();
 		}
 
 		return $response;
@@ -612,7 +603,7 @@ class WPForms_Pro {
 	 */
 	public function settings_license_callback( $html ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity, Generic.CodeAnalysis.UnusedFunctionParameter.Found
 
-		$license      = wpforms()->get( 'license' );
+		$license      = wpforms()->obj( 'license' );
 		$key          = $license->get();
 		$type         = $license->type();
 		$is_constant  = $license->get_key_location() === 'constant';
@@ -888,7 +879,7 @@ class WPForms_Pro {
 		}
 
 		// Register the Submission class.
-		$submission = wpforms()->get( 'submission' );
+		$submission = wpforms()->obj( 'submission' );
 
 		$submission->register( $fields, $entry, $form_id, $form_data );
 
@@ -896,7 +887,7 @@ class WPForms_Pro {
 		$entry_args = $submission->prepare_entry_data();
 
 		// Create entry.
-		$entry_id = wpforms()->get( 'entry' )->add( $entry_args );
+		$entry_id = wpforms()->obj( 'entry' )->add( $entry_args );
 
 		// Create fields.
 		$submission->create_fields( $entry_id );
@@ -987,7 +978,7 @@ class WPForms_Pro {
 		}
 
 		$form_data = wpforms_decode( $form->post_content );
-		$count     = wpforms()->get( 'entry' )->get_entries(
+		$count     = wpforms()->obj( 'entry' )->get_entries(
 			[
 				'form_id' => $form->ID,
 			],
@@ -1950,7 +1941,7 @@ class WPForms_Pro {
 	protected function get_wpforms_plugins() {
 
 		$plugins = [];
-		$license = wpforms()->get( 'license' );
+		$license = wpforms()->obj( 'license' );
 
 		if ( empty( $license ) ) {
 			return $plugins;

@@ -125,7 +125,7 @@ class Addons {
 
 		$this->refresh = ! empty( $_GET['wpforms_refresh_addons'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		$this->addons = wpforms()->get( 'addons' )->get_all( $this->refresh );
+		$this->addons = wpforms()->obj( 'addons' )->get_all( $this->refresh );
 	}
 
 	/**
@@ -140,7 +140,8 @@ class Addons {
 			'listjs',
 			WPFORMS_PLUGIN_URL . 'assets/lib/list.min.js',
 			[ 'jquery' ],
-			'1.5.0'
+			'1.5.0',
+			false
 		);
 	}
 
@@ -224,7 +225,7 @@ class Addons {
 	 */
 	public function notices() {
 
-		$errors = wpforms()->get( 'license' )->get_errors();
+		$errors = wpforms()->obj( 'license' )->get_errors();
 
 		if ( empty( $this->addons ) ) {
 			Notice::error( esc_html__( 'There was an issue retrieving Addons for this site. Please click on the button above to refresh.', 'wpforms' ) );
@@ -277,7 +278,7 @@ class Addons {
 
 		foreach ( $this->addons as $addon ) {
 			$addon = (array) $addon;
-			$addon = wpforms()->get( 'addons' )->get_addon( $addon['slug'] );
+			$addon = wpforms()->obj( 'addons' )->get_addon( $addon['slug'] );
 
 			// Prepare activated addons.
 			if ( $this->should_display_addon( $addon, 'activated' ) ) {
@@ -347,13 +348,15 @@ class Addons {
 		echo wpforms_render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			'admin/addons-item',
 			[
-				'addon'             => $addon,
-				'image'             => WPFORMS_PLUGIN_URL . 'assets/images/' . $image,
-				'url'               => $url,
-				'button'            => $this->get_addon_button_html( $addon ),
-				'has_settings_link' => $this->has_settings_link( $addon['slug'] ),
-				'settings_url'      => $this->get_settings_link( $addon['slug'] ),
-				'has_cap'           => current_user_can( 'manage_options' ),
+				'addon'                 => $addon,
+				'image'                 => WPFORMS_PLUGIN_URL . 'assets/images/' . $image,
+				'url'                   => $url,
+				'button'                => $this->get_addon_button_html( $addon ),
+				'has_settings_link'     => $this->has_settings_link( $addon['slug'] ),
+				'settings_url'          => $this->get_settings_link( $addon['slug'] ),
+				'is_version_compatible' => wpforms()->obj( 'plugin_list' )::is_wpforms_version_compatible( $addon['required_versions']['wpforms'] ?? '' ),
+				'upgrade_url'           => esc_url( admin_url( 'update-core.php' ) ),
+				'has_cap'               => current_user_can( 'manage_options' ),
 			],
 			true
 		);
@@ -383,6 +386,8 @@ class Addons {
 			);
 		}
 
+		$is_version_compatible = wpforms()->obj( 'plugin_list' )::is_wpforms_version_compatible( $addon['required_versions']['wpforms'] ?? '' );
+
 		ob_start();
 
 		?>
@@ -394,7 +399,14 @@ class Addons {
 						<?php esc_html_e( 'Deactivated', 'wpforms' ); ?>
 					<?php endif; ?>
 				</label>
-				<input type="checkbox" id="wpforms-addons-toggle-<?php echo esc_attr( $addon['slug'] ); ?>" name="wpforms-addons-toggle" value="1" <?php echo checked( $addon['status'] === 'active' ); ?>>
+				<input
+					type="checkbox"
+					id="wpforms-addons-toggle-<?php echo esc_attr( $addon['slug'] ); ?>"
+					name="wpforms-addons-toggle"
+					value="1"
+					<?php echo checked( $addon['status'] === 'active' ); ?>
+					<?php echo $addon['status'] === 'active' ? '' : disabled( ! $is_version_compatible ); ?>
+				>
 				<label class="wpforms-toggle-control-icon" for="wpforms-addons-toggle-<?php echo esc_attr( $addon['slug'] ); ?>"></label>
 			</span>
 

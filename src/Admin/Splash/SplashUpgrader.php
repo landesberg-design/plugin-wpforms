@@ -91,7 +91,7 @@ class SplashUpgrader {
 		$this->update_splash_data_version( $version );
 
 		// Force update splash data cache.
-		wpforms()->get( 'splash_cache' )->update( true );
+		wpforms()->obj( 'splash_cache' )->update( true );
 
 		// Reset hide_welcome_block widget meta for all users.
 		$this->remove_hide_welcome_block_widget_meta();
@@ -121,7 +121,7 @@ class SplashUpgrader {
 		}
 
 		// Force update splash data cache.
-		wpforms()->get( 'splash_cache' )->update( true );
+		wpforms()->obj( 'splash_cache' )->update( true );
 
 		// Reset hide_welcome_block widget meta for all users.
 		$this->remove_hide_welcome_block_widget_meta();

@@ -66,10 +66,6 @@ class ErrorObject extends StripeObject
     const CODE_BANK_ACCOUNT_UNVERIFIED = 'bank_account_unverified';
     const CODE_BANK_ACCOUNT_VERIFICATION_FAILED = 'bank_account_verification_failed';
     const CODE_BILLING_INVALID_MANDATE = 'billing_invalid_mandate';
-    const CODE_BILLING_POLICY_REMOTE_FUNCTION_RESPONSE_INVALID = 'billing_policy_remote_function_response_invalid';
-    const CODE_BILLING_POLICY_REMOTE_FUNCTION_TIMEOUT = 'billing_policy_remote_function_timeout';
-    const CODE_BILLING_POLICY_REMOTE_FUNCTION_UNEXPECTED_STATUS_CODE = 'billing_policy_remote_function_unexpected_status_code';
-    const CODE_BILLING_POLICY_REMOTE_FUNCTION_UNREACHABLE = 'billing_policy_remote_function_unreachable';
     const CODE_BITCOIN_UPGRADE_REQUIRED = 'bitcoin_upgrade_required';
     const CODE_CAPTURE_CHARGE_AUTHORIZATION_EXPIRED = 'capture_charge_authorization_expired';
     const CODE_CAPTURE_UNAUTHORIZED_PAYMENT = 'capture_unauthorized_payment';
@@ -80,6 +76,7 @@ class ErrorObject extends StripeObject
     const CODE_CHARGE_ALREADY_REFUNDED = 'charge_already_refunded';
     const CODE_CHARGE_DISPUTED = 'charge_disputed';
     const CODE_CHARGE_EXCEEDS_SOURCE_LIMIT = 'charge_exceeds_source_limit';
+    const CODE_CHARGE_EXCEEDS_TRANSACTION_LIMIT = 'charge_exceeds_transaction_limit';
     const CODE_CHARGE_EXPIRED_FOR_CAPTURE = 'charge_expired_for_capture';
     const CODE_CHARGE_INVALID_PARAMETER = 'charge_invalid_parameter';
     const CODE_CHARGE_NOT_REFUNDABLE = 'charge_not_refundable';
@@ -117,6 +114,7 @@ class ErrorObject extends StripeObject
     const CODE_INVALID_CVC = 'invalid_cvc';
     const CODE_INVALID_EXPIRY_MONTH = 'invalid_expiry_month';
     const CODE_INVALID_EXPIRY_YEAR = 'invalid_expiry_year';
+    const CODE_INVALID_MANDATE_REFERENCE_PREFIX_FORMAT = 'invalid_mandate_reference_prefix_format';
     const CODE_INVALID_NUMBER = 'invalid_number';
     const CODE_INVALID_SOURCE_USAGE = 'invalid_source_usage';
     const CODE_INVALID_TAX_LOCATION = 'invalid_tax_location';
@@ -143,7 +141,6 @@ class ErrorObject extends StripeObject
     const CODE_PARAMETERS_EXCLUSIVE = 'parameters_exclusive';
     const CODE_PAYMENT_INTENT_ACTION_REQUIRED = 'payment_intent_action_required';
     const CODE_PAYMENT_INTENT_AUTHENTICATION_FAILURE = 'payment_intent_authentication_failure';
-    const CODE_PAYMENT_INTENT_FX_QUOTE_INVALID = 'payment_intent_fx_quote_invalid';
     const CODE_PAYMENT_INTENT_INCOMPATIBLE_PAYMENT_METHOD = 'payment_intent_incompatible_payment_method';
     const CODE_PAYMENT_INTENT_INVALID_PARAMETER = 'payment_intent_invalid_parameter';
     const CODE_PAYMENT_INTENT_KONBINI_REJECTED_CONFIRMATION_NUMBER = 'payment_intent_konbini_rejected_confirmation_number';

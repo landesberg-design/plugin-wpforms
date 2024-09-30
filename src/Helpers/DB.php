@@ -79,12 +79,12 @@ class DB {
 			return $tables;
 		}
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$tables = $wpdb->get_results(
 			$wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ),
 			'ARRAY_N'
 		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$tables = ! empty( $tables ) ? wp_list_pluck( $tables, 0 ) : [];
 

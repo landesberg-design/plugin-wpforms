@@ -31,14 +31,7 @@ if ( $is_hidden_by_cl ) {
 
 <div class="<?php echo wpforms_sanitize_classes( $field_class, true ); ?>">
 	<p class="print-item-title field-name">
-		<?php
-		echo empty( $field['formatted_label'] )
-			? sprintf( /* translators: %d - field ID. */
-				esc_html__( 'Field ID #%s', 'wpforms' ),
-				wpforms_validate_field_id( $field['id'] )
-			)
-			: esc_html( wp_strip_all_tags( $field['formatted_label'] ) );
-		?>
+		<?php echo esc_html( $field['formatted_label'] ); ?>
 		<span class="print-item-description field-description"><?php echo esc_html( $field_description ); ?></span>
 	</p>
 	<?php if ( ! in_array( $field['type'], [ 'divider', 'pagebreak' ], true ) ) { ?>

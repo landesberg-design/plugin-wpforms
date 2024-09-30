@@ -368,12 +368,11 @@ class WPForms_Rating_Text extends WPForms_Field {
 	public function field_preview( $field ) {
 
 		// Define data.
-		$scale         = ! empty( $field['scale'] ) ? esc_attr( $field['scale'] ) : 5;
-		$icon          = ! empty( $field['icon'] ) ? esc_attr( $field['icon'] ) : 'star';
-		$icon_size     = ! empty( $field['icon_size'] ) ? esc_attr( $field['icon_size'] ) : 'medium';
-		$icon_color    = ! empty( $field['icon_color'] ) ? esc_attr( $field['icon_color'] ) : $this->get_default_icon_color();
-		$icon_class    = '';
-		$icon_size_css = '';
+		$scale      = ! empty( $field['scale'] ) ? esc_attr( $field['scale'] ) : 5;
+		$icon       = ! empty( $field['icon'] ) ? esc_attr( $field['icon'] ) : 'star';
+		$icon_size  = ! empty( $field['icon_size'] ) ? esc_attr( $field['icon_size'] ) : 'medium';
+		$icon_color = ! empty( $field['icon_color'] ) ? esc_attr( $field['icon_color'] ) : $this->get_default_icon_color();
+		$icon_class = '';
 
 		// Set icon class.
 		switch ( $icon ) {
@@ -404,11 +403,11 @@ class WPForms_Rating_Text extends WPForms_Field {
 		for ( $i = 1; $i <= 10; $i++ ) {
 			printf(
 				'<i class="fa %s %s rating-icon" aria-hidden="true" style="margin-right:5px; color:%s; display:%s; font-size:%dpx;"></i>',
-				$icon_class,
-				$icon_size,
-				$icon_color,
+				esc_attr( $icon_class ),
+				esc_attr( $icon_size ),
+				esc_attr( $icon_color ),
 				$i <= $scale ? 'inline-block' : 'none',
-				$icon_size_css
+				esc_attr( $icon_size_css )
 			);
 		}
 
@@ -570,7 +569,7 @@ class WPForms_Rating_Text extends WPForms_Field {
 		}
 
 		// Set final field details.
-		wpforms()->get( 'process' )->fields[ $field_id ] = [
+		wpforms()->obj( 'process' )->fields[ $field_id ] = [
 			'name'  => sanitize_text_field( $name ),
 			'value' => sanitize_text_field( $value ),
 			'id'    => wpforms_validate_field_id( $field_id ),

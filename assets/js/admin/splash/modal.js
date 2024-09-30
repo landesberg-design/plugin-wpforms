@@ -1,4 +1,4 @@
-/* global wpforms_splash_data */
+/* global wpforms_splash_data, ajaxurl */
 /**
  * WPForms What's New.
  *

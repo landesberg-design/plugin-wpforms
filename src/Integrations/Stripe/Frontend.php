@@ -146,7 +146,7 @@ class Frontend {
 			'stripe-js',
 			$config['remote_js_url'],
 			[ 'jquery' ],
-			null,
+			null, // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 			$in_footer
 		);
 

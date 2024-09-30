@@ -77,7 +77,7 @@ class BulkActions {
 			return;
 		}
 
-		$this->view = wpforms()->get( 'forms_views' )->get_current_view();
+		$this->view = wpforms()->obj( 'forms_views' )->get_current_view();
 
 		$this->hooks();
 	}
@@ -201,7 +201,7 @@ class BulkActions {
 	 */
 	private function process_action_trash( $id ) {
 
-		return wpforms()->get( 'form' )->update_status( $id, 'trash' );
+		return wpforms()->obj( 'form' )->update_status( $id, 'trash' );
 	}
 
 	/**
@@ -215,7 +215,7 @@ class BulkActions {
 	 */
 	private function process_action_restore( $id ) {
 
-		return wpforms()->get( 'form' )->update_status( $id, 'publish' );
+		return wpforms()->obj( 'form' )->update_status( $id, 'publish' );
 	}
 
 	/**
@@ -229,7 +229,7 @@ class BulkActions {
 	 */
 	private function process_action_delete( $id ) {
 
-		return wpforms()->get( 'form' )->delete( $id );
+		return wpforms()->obj( 'form' )->delete( $id );
 	}
 
 	/**
@@ -251,7 +251,7 @@ class BulkActions {
 			return false;
 		}
 
-		return wpforms()->get( 'form' )->duplicate( $id );
+		return wpforms()->obj( 'form' )->duplicate( $id );
 	}
 
 	/**
@@ -271,7 +271,7 @@ class BulkActions {
 		// So, after the execution we should display the same notice as for the `delete` action.
 		$this->action = 'delete';
 
-		return wpforms()->get( 'form' )->empty_trash();
+		return wpforms()->obj( 'form' )->empty_trash();
 	}
 
 	/**

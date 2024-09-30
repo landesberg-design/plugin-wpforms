@@ -24,6 +24,8 @@ class ObjectTypes
         \WPForms\Vendor\Stripe\Balance::OBJECT_NAME => \WPForms\Vendor\Stripe\Balance::class,
         \WPForms\Vendor\Stripe\BalanceTransaction::OBJECT_NAME => \WPForms\Vendor\Stripe\BalanceTransaction::class,
         \WPForms\Vendor\Stripe\BankAccount::OBJECT_NAME => \WPForms\Vendor\Stripe\BankAccount::class,
+        \WPForms\Vendor\Stripe\Billing\Alert::OBJECT_NAME => \WPForms\Vendor\Stripe\Billing\Alert::class,
+        \WPForms\Vendor\Stripe\Billing\AlertTriggered::OBJECT_NAME => \WPForms\Vendor\Stripe\Billing\AlertTriggered::class,
         \WPForms\Vendor\Stripe\Billing\Meter::OBJECT_NAME => \WPForms\Vendor\Stripe\Billing\Meter::class,
         \WPForms\Vendor\Stripe\Billing\MeterEvent::OBJECT_NAME => \WPForms\Vendor\Stripe\Billing\MeterEvent::class,
         \WPForms\Vendor\Stripe\Billing\MeterEventAdjustment::OBJECT_NAME => \WPForms\Vendor\Stripe\Billing\MeterEventAdjustment::class,

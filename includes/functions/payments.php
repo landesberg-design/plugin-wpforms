@@ -55,6 +55,14 @@ function wpforms_get_currencies() {
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
 		],
+		'BGN' => [
+			'name'                => esc_html__( 'Bulgarian Lev', 'wpforms-lite' ),
+			'symbol'              => 'лв',
+			'symbol_pos'          => 'right',
+			'thousands_separator' => ' ',
+			'decimal_separator'   => ',',
+			'decimals'            => 2,
+		],
 		'CAD' => [
 			'name'                => esc_html__( 'Canadian Dollar', 'wpforms-lite' ),
 			'symbol'              => '&#36;',
@@ -62,6 +70,22 @@ function wpforms_get_currencies() {
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
+		],
+		'CRC' => [
+			'name'                => esc_html__( 'Costa Rican Colón', 'wpforms-lite' ),
+			'symbol'              => '&#8353;',
+			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '.',
+			'decimals'            => 2,
+		],
+		'XAF' => [
+			'name'                => esc_html__( 'Central African CFA Franc', 'wpforms-lite' ),
+			'symbol'              => 'F.CFA ',
+			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '',
+			'decimals'            => 0,
 		],
 		'CZK' => [
 			'name'                => esc_html__( 'Czech Koruna', 'wpforms-lite' ),
@@ -95,6 +119,14 @@ function wpforms_get_currencies() {
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
 		],
+		'INR' => [
+			'name'                => esc_html__( 'Indian Rupiah', 'wpforms-lite' ),
+			'symbol'              => '&#8377;',
+			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '.',
+			'decimals'            => 2,
+		],
 		'ILS' => [
 			'name'                => esc_html__( 'Israeli New Sheqel', 'wpforms-lite' ),
 			'symbol'              => '&#8362;',
@@ -102,6 +134,14 @@ function wpforms_get_currencies() {
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
+		],
+		'JPY' => [
+			'name'                => esc_html__( 'Japanese Yen', 'wpforms-lite' ),
+			'symbol'              => '&#165;',
+			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '',
+			'decimals'            => 0,
 		],
 		'MYR' => [
 			'name'                => esc_html__( 'Malaysian Ringgit', 'wpforms-lite' ),
@@ -151,11 +191,27 @@ function wpforms_get_currencies() {
 			'decimal_separator'   => ',',
 			'decimals'            => 2,
 		],
+		'RON' => [
+			'name'                => esc_html__( 'Romanian Leu', 'wpforms-lite' ),
+			'symbol'              => 'lei',
+			'symbol_pos'          => 'right',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '.',
+			'decimals'            => 2,
+		],
 		'RUB' => [
 			'name'                => esc_html__( 'Russian Ruble', 'wpforms-lite' ),
 			'symbol'              => 'pyб',
 			'symbol_pos'          => 'right',
 			'thousands_separator' => ' ',
+			'decimal_separator'   => '.',
+			'decimals'            => 2,
+		],
+		'SAR' => [
+			'name'                => esc_html__( 'Saudi Arabian Riyal', 'wpforms-lite' ),
+			'symbol'              => '&#65020;',
+			'symbol_pos'          => 'right',
+			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
 		],
@@ -167,9 +223,33 @@ function wpforms_get_currencies() {
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
 		],
+		'RSD' => [
+			'name'                => esc_html__( 'Serbian Dinar', 'wpforms-lite' ),
+			'symbol'              => 'din. ',
+			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '.',
+			'decimals'            => 2,
+		],
 		'ZAR' => [
 			'name'                => esc_html__( 'South African Rand', 'wpforms-lite' ),
 			'symbol'              => 'R',
+			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '.',
+			'decimals'            => 2,
+		],
+		'KRW' => [
+			'name'                => esc_html__( 'South Korean Won', 'wpforms-lite' ),
+			'symbol'              => '&#8361;',
+			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '',
+			'decimals'            => 0,
+		],
+		'LKR' => [
+			'name'                => esc_html__( 'Sri Lankan Rupee', 'wpforms-lite' ),
+			'symbol'              => 'Rs ',
 			'symbol_pos'          => 'left',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
@@ -203,6 +283,22 @@ function wpforms_get_currencies() {
 			'name'                => esc_html__( 'Thai Baht', 'wpforms-lite' ),
 			'symbol'              => '&#3647;',
 			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '.',
+			'decimals'            => 2,
+		],
+		'TRY' => [
+			'name'                => esc_html__( 'Turkish Lira', 'wpforms-lite' ),
+			'symbol'              => '&#8378;',
+			'symbol_pos'          => 'left',
+			'thousands_separator' => ',',
+			'decimal_separator'   => '.',
+			'decimals'            => 2,
+		],
+		'AED' => [
+			'name'                => esc_html__( 'United Arab Emirates Dirham', 'wpforms-lite' ),
+			'symbol'              => '&#1583;.&#1573;',
+			'symbol_pos'          => 'right',
 			'thousands_separator' => ',',
 			'decimal_separator'   => '.',
 			'decimals'            => 2,
@@ -269,10 +365,12 @@ function wpforms_sanitize_amount( $amount, $currency = '' ) { // phpcs:ignore Ge
 		$amount = str_replace( $thousands_sep, '', $amount );
 	}
 
+	// Remove current symbol.
+	$amount = str_replace( $currencies[ $currency ]['symbol'], '', $amount );
 	/**
 	 * Remove any characters that are not a digit, a decimal point, or a minus sign.
 	 *
-	 * E is exponent notation. Float number can be written in the form 2E-13, which means 2 * 10^-13.
+	 * E is an exponent notation. Float number can be written in the form 2E-13, which means 2 * 10^-13.
 	 * 0-9 is digits.
 	 * . is decimal point.
 	 * - is minus sign.

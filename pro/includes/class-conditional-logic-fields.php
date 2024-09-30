@@ -241,7 +241,7 @@ class WPForms_Conditional_Logic_Fields {
 		if (
 			! $this->conditional_logic &&
 			! $this->force_load_frontend_js &&
-			! wpforms()->get( 'frontend' )->assets_global()
+			! wpforms()->obj( 'frontend' )->assets_global()
 		) {
 			return;
 		}
@@ -429,11 +429,17 @@ class WPForms_Conditional_Logic_Fields {
 	 *
 	 * @param array $form_data Form data and settings.
 	 */
-	public function process_field_visibility( $form_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Metrics.NestingLevel.MaxExceeded
+	public function process_field_visibility( $form_data ) { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded, Generic.Metrics.NestingLevel.MaxExceeded
 
 		// If the form contains no fields with conditional logic,
 		// no need to continue processing.
 		if ( empty( $form_data['conditional_fields'] ) ) {
+			return;
+		}
+
+		$process_obj = wpforms()->obj( 'process' );
+
+		if ( ! $process_obj ) {
 			return;
 		}
 
@@ -443,7 +449,7 @@ class WPForms_Conditional_Logic_Fields {
 			$conditionals = $this->clear_empty_rules( $form_data['fields'][ $field_id ]['conditionals'] );
 
 			// Determine the field visibility.
-			$visible = wpforms_conditional_logic()->process( wpforms()->get( 'process' )->fields, $form_data, $conditionals );
+			$visible = wpforms_conditional_logic()->process( $process_obj->fields, $form_data, $conditionals );
 
 			if ( $form_data['fields'][ $field_id ]['conditional_type'] === 'hide' ) {
 				$visible = ! $visible;
@@ -453,27 +459,28 @@ class WPForms_Conditional_Logic_Fields {
 			if ( ! $visible ) {
 
 				// Remove any errors associated with the field.
-				if ( ! empty( wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] ) ) {
-					unset( wpforms()->get( 'process' )->errors[ $form_data['id'] ][ $field_id ] );
+				if ( ! empty( $process_obj->errors[ $form_data['id'] ][ $field_id ] ) ) {
+					unset( $process_obj->errors[ $form_data['id'] ][ $field_id ] );
 				}
 
 				$allowed_keys = [ 'name', 'id', 'type' ];
 
-				$fields = ! empty( wpforms()->get( 'process' )->fields[ $field_id ] ) ? wpforms()->get( 'process' )->fields[ $field_id ] : false;
+				$fields = ! empty( $process_obj->fields[ $field_id ] ) ? $process_obj->fields[ $field_id ] : false;
 
 				if ( is_array( $fields ) ) {
 					// Remove any values.
 					foreach ( $fields as $key => $value ) {
 						if ( ! in_array( $key, $allowed_keys, true ) ) {
-							wpforms()->get( 'process' )->fields[ $field_id ][ $key ] = '';
+							$process_obj->fields[ $field_id ][ $key ] = '';
 						}
 					}
 				}
 			}
 
-			// Save the visibility state so other addons can easily access it
-			// during processing if needed.
-			wpforms()->get( 'process' )->fields[ $field_id ]['visible'] = $visible;
+			// Save the visibility state so other addons can easily access it during processing if needed.
+			if ( isset( $process_obj->fields[ $field_id ] ) ) {
+				$process_obj->fields[ $field_id ]['visible'] = $visible;
+			}
 		}
 	}
 
@@ -525,7 +532,7 @@ class WPForms_Conditional_Logic_Fields {
 				$settings['notifications'][ $id ],
 				[
 					'type'    => [ 'entry', 'conditional_logic' ],
-					'parent'  => wpforms()->get( 'process' )->entry_id,
+					'parent'  => wpforms()->obj( 'process' )->entry_id,
 					'form_id' => $form_data['id'],
 				]
 			);
@@ -582,7 +589,7 @@ class WPForms_Conditional_Logic_Fields {
 				$settings['confirmations'][ $id ],
 				[
 					'type'    => [ 'entry', 'conditional_logic' ],
-					'parent'  => wpforms()->get( 'process' )->entry_id,
+					'parent'  => wpforms()->obj( 'process' )->entry_id,
 					'form_id' => $form_data['id'],
 				]
 			);
@@ -774,7 +781,7 @@ class WPForms_Conditional_Logic_Fields {
 		$conditionals = $this->clear_empty_rules( $form_data['fields'][ $field_id ]['conditionals'] );
 
 		// Determine the field visibility.
-		$visible = wpforms_conditional_logic()->process( wpforms()->get( 'process' )->fields, $form_data, $conditionals );
+		$visible = wpforms_conditional_logic()->process( wpforms()->obj( 'process' )->fields, $form_data, $conditionals );
 
 		if ( $form_data['fields'][ $field_id ]['conditional_type'] === 'hide' ) {
 			$visible = ! $visible;
@@ -806,7 +813,7 @@ class WPForms_Conditional_Logic_Fields {
 			return false;
 		}
 
-		if ( wpforms()->get( 'process' )->fields === null ) {
+		if ( wpforms()->obj( 'process' )->fields === null ) {
 			return false;
 		}
 

@@ -39,11 +39,11 @@ class EditPost implements EducationInterface {
 		}
 
 		// Skip it if it's the Challenge flow.
-		if ( wpforms()->get( 'challenge' )->is_form_embed_page() ) {
+		if ( wpforms()->obj( 'challenge' )->is_form_embed_page() ) {
 			return false;
 		}
 
-		$form_embed_wizard = wpforms()->get( 'form_embed_wizard' );
+		$form_embed_wizard = wpforms()->obj( 'form_embed_wizard' );
 
 		// Skip it if it's the Form Embed Wizard flow.
 		if ( $form_embed_wizard->is_form_embed_page( 'edit' ) && $form_embed_wizard->get_meta() ) {
@@ -67,7 +67,8 @@ class EditPost implements EducationInterface {
 			return;
 		}
 
-		$this->has_forms = (bool) wpforms()->get( 'form' )->get(
+		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
+		$this->has_forms = (bool) wpforms()->obj( 'form' )->get(
 			'',
 			[
 				'numberposts'            => 1,
@@ -76,7 +77,7 @@ class EditPost implements EducationInterface {
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-				'suppress_filters'       => true,
+				'suppress_filters'       => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
 			]
 		);
 
@@ -136,7 +137,7 @@ class EditPost implements EducationInterface {
 		wp_enqueue_script(
 			'wpforms-edit-post-education',
 			WPFORMS_PLUGIN_URL . "assets/js/admin/education/edit-post.es5{$min}.js",
-			[ 'jquery' ],
+			[ 'jquery', 'underscore' ],
 			WPFORMS_VERSION,
 			true
 		);

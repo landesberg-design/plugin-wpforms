@@ -347,6 +347,7 @@ class Import extends View {
 			return new WP_Error( 'no_permission', __( 'The unfiltered HTML permissions are required to import form.', 'wpforms-lite' ) );
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$forms = json_decode( File::remove_utf8_bom( file_get_contents( $filename ) ), true );
 
 		if ( empty( $forms ) || ! is_array( $forms ) ) {

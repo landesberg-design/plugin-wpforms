@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use WPForms\Pro\Forms\Fields\Layout\Helpers as LayoutHelpers;
+
 $field_description = $form_data['fields'][ $field['id'] ]['description'] ?? '';
 
 $classes = [ 'wpforms-field-layout-column' ];
@@ -19,20 +21,32 @@ $classes = [ 'wpforms-field-layout-column' ];
 if ( $is_hidden_by_cl ) {
 	$classes[] = 'wpforms-conditional-hidden';
 }
+
+if ( LayoutHelpers::is_layout_empty( $field ) ) {
+	$classes[] = 'wpforms-field-layout-empty';
+}
+
 ?>
 
 <div class="<?php echo wpforms_sanitize_classes( $classes, true ); ?>">
 	<p class="print-item-title field-name">
-		<?php echo esc_html( $field['label'] ); ?>
+		<?php if ( isset( $field['label_hide'] ) && ! $field['label_hide'] && ! empty( $field['label'] ) ) { ?>
+			<span class="print-item-title-wrapper">
+				<?php echo esc_html( $field['label'] ); ?>
+			</span>
+		<?php } ?>
 
-		<span class="print-item-description field-description">
-			<?php echo esc_html( $field_description ); ?>
-		</span>
+		<?php if ( ! empty( $field_description ) ) : ?>
+			<span class="print-item-description field-description">
+				<?php echo esc_html( $field_description ); ?>
+			</span>
+		<?php endif; ?>
 	</p>
 
 	<div class="print-item field wpforms-field-layout">
 		<?php
 		foreach ( $field['columns'] as $column ) {
+
 			$preset_width = ! empty( $column['width_preset'] ) ? (int) $column['width_preset'] : 50;
 
 			if ( $preset_width === 33 ) {
@@ -47,8 +61,14 @@ if ( $is_hidden_by_cl ) {
 				$preset_width = (int) $column['width_custom'];
 			}
 
+			$column_classes = [ 'wpforms-field-layout-column' ];
+
+			if ( LayoutHelpers::is_column_empty( $column ) ) {
+				$column_classes[] = 'wpforms-field-layout-column-empty';
+			}
+
 			?>
-			<div class="wpforms-field-layout-column" style="width: <?php echo (float) $preset_width; ?>%">
+			<div class="<?php echo wpforms_sanitize_classes( $column_classes, true ); ?>" style="width: <?php echo (float) $preset_width; ?>%">
 				<?php
 				foreach ( $column['fields'] as $child_field ) {
 					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

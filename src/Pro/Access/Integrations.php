@@ -132,7 +132,7 @@ class Integrations {
 	 */
 	public function members_register_caps() {
 
-		$caps = wpforms()->get( 'access' )->get_caps();
+		$caps = wpforms()->obj( 'access' )->get_caps();
 
 		foreach ( $caps as $cap => $label ) {
 			members_register_cap(
@@ -186,7 +186,7 @@ class Integrations {
 	public function ure_custom_capability_groups( $groups = [], $cap_id = '' ) {
 
 		// Get WPForms capabilities.
-		$caps = array_keys( wpforms()->get( 'access' )->get_caps() );
+		$caps = array_keys( wpforms()->obj( 'access' )->get_caps() );
 
 		// If capability belongs to WPForms, register it to a group.
 		if ( \in_array( $cap_id, $caps, true ) ) {
@@ -207,7 +207,7 @@ class Integrations {
 	 */
 	public function ure_full_capabilities( $list ) {
 
-		$caps = wpforms()->get( 'access' )->get_caps();
+		$caps = wpforms()->obj( 'access' )->get_caps();
 
 		foreach ( $caps as $cap_id => $cap_name ) {
 			$list[ $cap_id ] = [

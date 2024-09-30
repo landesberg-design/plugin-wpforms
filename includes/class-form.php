@@ -180,7 +180,7 @@ class WPForms_Form_Handler {
 				'posts_per_page'         => 1,
 				'nopaging'               => false,
 				'fields'                 => 'ids',
-				'post__not_in'           => [ $form_id ],
+				'post__not_in'           => [ $form_id ], // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 				'cap'                    => false,
@@ -263,7 +263,7 @@ class WPForms_Form_Handler {
 
 		// phpcs:enable WPForms.PHP.ValidateHooks.InvalidHookName
 
-		if ( ! isset( $args['cap'] ) && wpforms()->get( 'access' )->init_allowed() ) {
+		if ( ! isset( $args['cap'] ) && wpforms()->obj( 'access' )->init_allowed() ) {
 			$args['cap'] = 'view_form_single';
 		}
 
@@ -428,7 +428,7 @@ class WPForms_Form_Handler {
 				'post_type'        => self::POST_TYPES,
 				'post_status'      => 'trash',
 				'fields'           => 'ids',
-				'suppress_filters' => true,
+				'suppress_filters' => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
 			]
 		);
 
@@ -464,9 +464,9 @@ class WPForms_Form_Handler {
 			}
 
 			if ( class_exists( 'WPForms_Entry_Handler', false ) ) {
-				wpforms()->get( 'entry' )->delete_by( 'form_id', $id );
-				wpforms()->get( 'entry_meta' )->delete_by( 'form_id', $id );
-				wpforms()->get( 'entry_fields' )->delete_by( 'form_id', $id );
+				wpforms()->obj( 'entry' )->delete_by( 'form_id', $id );
+				wpforms()->obj( 'entry_meta' )->delete_by( 'form_id', $id );
+				wpforms()->obj( 'entry_fields' )->delete_by( 'form_id', $id );
 			}
 
 			$form = wp_delete_post( $id, true );
@@ -1378,7 +1378,7 @@ class WPForms_Form_Handler {
 				'numberposts'            => 1,
 				'fields'                 => 'ids',
 				'no_found_rows'          => true,
-				'suppress_filters'       => true,
+				'suppress_filters'       => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters
 				'nopaging'               => false,
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,

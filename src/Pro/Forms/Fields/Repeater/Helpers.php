@@ -332,4 +332,24 @@ class Helpers {
 			];
 		}
 	}
+
+	/**
+	 * Determine if the block has only empty fields.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param array $block Block settings.
+	 *
+	 * @return bool
+	 */
+	public static function is_empty_block( array $block ): bool {
+
+		foreach ( $block as $rows ) {
+			if ( ! LayoutHelpers::is_layout_empty( [ 'columns' => $rows ] ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

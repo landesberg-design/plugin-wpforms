@@ -51,6 +51,7 @@ class Migrations extends Base {
 		'Upgrade183',
 		'Upgrade189',
 		'Upgrade190',
+		'Upgrade1_9_1',
 	];
 
 	/**
@@ -63,7 +64,7 @@ class Migrations extends Base {
 		// Run Lite migrations first.
 		( new MigrationsLite() )->init();
 
-		$wpforms_pro = wpforms()->get( 'pro' );
+		$wpforms_pro = wpforms()->obj( 'pro' );
 
 		if ( ! $wpforms_pro ) {
 			return;

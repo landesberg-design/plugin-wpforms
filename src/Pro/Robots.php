@@ -80,7 +80,7 @@ class Robots {
 	 *
 	 * @return false|string
 	 */
-	private function get_upload_root() {
+	public function get_upload_root() {
 
 		if ( ! empty( $this->upload_root ) ) {
 			return $this->upload_root;
@@ -117,7 +117,7 @@ class Robots {
 	 *
 	 * @return string
 	 */
-	private function get_rule_block( bool $wrap = true ): string {
+	public function get_rule_block( bool $wrap = true ): string {
 
 		$rule_block  = 'User-agent: *' . PHP_EOL;
 		$rule_block .= 'Disallow: ' . $this->get_upload_root();

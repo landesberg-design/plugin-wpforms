@@ -244,7 +244,7 @@ class WPForms_Entries_Single {
 
 		// Check for starring.
 		if ( ! empty( $_GET['entry_id'] ) && ! empty( $_GET['action'] ) && $_GET['action'] === 'star' ) {
-			wpforms()->get( 'entry' )->update(
+			wpforms()->obj( 'entry' )->update(
 				absint( $_GET['entry_id'] ),
 				[
 					'starred' => '1',
@@ -252,7 +252,7 @@ class WPForms_Entries_Single {
 			);
 
 			if ( ! empty( $_GET['form'] ) ) {
-				wpforms()->get( 'entry_meta' )->add(
+				wpforms()->obj( 'entry_meta' )->add(
 					[
 						'entry_id' => absint( $_GET['entry_id'] ),
 						'form_id'  => absint( $_GET['form'] ),
@@ -275,7 +275,7 @@ class WPForms_Entries_Single {
 
 		// Check for unstarring.
 		if ( ! empty( $_GET['entry_id'] ) && ! empty( $_GET['action'] ) && $_GET['action'] === 'unstar' ) {
-			wpforms()->get( 'entry' )->update(
+			wpforms()->obj( 'entry' )->update(
 				absint( $_GET['entry_id'] ),
 				[
 					'starred' => '0',
@@ -283,7 +283,7 @@ class WPForms_Entries_Single {
 			);
 
 			if ( ! empty( $_GET['form'] ) ) {
-				wpforms()->get( 'entry_meta' )->add(
+				wpforms()->obj( 'entry_meta' )->add(
 					[
 						'entry_id' => absint( $_GET['entry_id'] ),
 						'form_id'  => absint( $_GET['form'] ),
@@ -338,7 +338,7 @@ class WPForms_Entries_Single {
 			return;
 		}
 
-		$is_success = wpforms()->get( 'entry' )->update(
+		$is_success = wpforms()->obj( 'entry' )->update(
 			$entry_id,
 			[
 				'viewed' => '0',
@@ -350,7 +350,7 @@ class WPForms_Entries_Single {
 		}
 
 		if ( ! empty( $_GET['form'] ) ) {
-			wpforms()->get( 'entry_meta' )->add(
+			wpforms()->obj( 'entry_meta' )->add(
 				[
 					'entry_id' => $entry_id,
 					'form_id'  => absint( $_GET['form'] ),
@@ -394,7 +394,7 @@ class WPForms_Entries_Single {
 		$note_id    = absint( $_GET['note_id'] );
 		$entry_id   = absint( $_GET['entry_id'] );
 		$message    = esc_html__( 'Note deleted.', 'wpforms' );
-		$entry_meta = wpforms()->get( 'entry_meta' );
+		$entry_meta = wpforms()->obj( 'entry_meta' );
 
 		// Capability check.
 		if ( ! wpforms_current_user_can( 'edit_entry_single', $entry_id ) ) {
@@ -486,7 +486,7 @@ class WPForms_Entries_Single {
 		$entry_id   = absint( $_POST['entry_id'] );
 		$form_id    = absint( $_POST['form_id'] );
 		$message    = esc_html__( 'Note added.', 'wpforms' );
-		$entry_meta = wpforms()->get( 'entry_meta' );
+		$entry_meta = wpforms()->obj( 'entry_meta' );
 
 		// Add note.
 		$entry_meta->add(
@@ -547,7 +547,7 @@ class WPForms_Entries_Single {
 		$fields    = wpforms_decode( $this->entry->fields );
 		$form_data = wpforms_decode( $this->form->post_content );
 
-		wpforms()->get( 'process' )->entry_email( $fields, [], $form_data, $this->entry->entry_id );
+		wpforms()->obj( 'process' )->entry_email( $fields, [], $form_data, $this->entry->entry_id );
 
 		$this->alerts[] = [
 			'type'    => 'success',
@@ -573,8 +573,8 @@ class WPForms_Entries_Single {
 			return;
 		}
 
-		$form_handler  = wpforms()->get( 'form' );
-		$entry_handler = wpforms()->get( 'entry' );
+		$form_handler  = wpforms()->obj( 'form' );
+		$entry_handler = wpforms()->obj( 'entry' );
 
 		// Find the entry.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -636,7 +636,7 @@ class WPForms_Entries_Single {
 		$entry->entry_prev_url = ! empty( $entry->entry_prev ) ? add_query_arg( [ 'entry_id' => absint( $entry->entry_prev->entry_id ) ], $base_url ) : '#';
 
 		// Define entry meta.
-		$entry_meta_handler = wpforms()->get( 'entry_meta' );
+		$entry_meta_handler = wpforms()->obj( 'entry_meta' );
 
 		$entry->entry_notes = $entry_meta_handler->get_meta(
 			[
@@ -673,7 +673,7 @@ class WPForms_Entries_Single {
 		$this->entry = $entry;
 		$this->form  = $form;
 
-		wpforms()->get( 'process' )->fields = wpforms_decode( $entry->fields );
+		wpforms()->obj( 'process' )->fields = wpforms_decode( $entry->fields );
 
 		// Lastly, mark the entry as read if needed.
 		if ( $entry->viewed !== '1' && empty( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -935,7 +935,7 @@ class WPForms_Entries_Single {
 		$form_title = $form_data['settings']['form_title'] ?? '';
 
 		if ( empty( $form_title ) ) {
-			$form = wpforms()->get( 'form' )->get( $entry->form_id );
+			$form = wpforms()->obj( 'form' )->get( $entry->form_id );
 
 			$form_title = $form->post_title ?? sprintf( /* translators: %d - form ID. */
 				esc_html__( 'Form (#%d)', 'wpforms' ),
@@ -1172,12 +1172,7 @@ class WPForms_Entries_Single {
 		// Field name.
 		echo '<p class="wpforms-entry-field-name">';
 			/* translators: %d - field ID. */
-			echo ! empty( $field['formatted_label'] )
-				? esc_html( wp_strip_all_tags( $field['formatted_label'] ) )
-				: sprintf( /* translators: %d - field ID. */
-					esc_html__( 'Field ID #%s', 'wpforms' ),
-					wpforms_validate_field_id( $field['id'] )
-				);
+			echo esc_html( $field['formatted_label'] );
 			echo ! empty( $field_description )
 				? '<span class="wpforms-entry-field-description' . esc_attr( $hide ) . '">' . wp_kses_post( $field_description ) . '</span>'
 				: '';
@@ -1763,7 +1758,7 @@ class WPForms_Entries_Single {
 			return;
 		}
 
-		$payment = wpforms()->get( 'payment' )->get_by( 'entry_id', $entry->entry_id );
+		$payment = wpforms()->obj( 'payment' )->get_by( 'entry_id', $entry->entry_id );
 
 		if ( ! $payment ) {
 			return;
@@ -2375,18 +2370,58 @@ class WPForms_Entries_Single {
 		$field_label = $field['name'] ?? '';
 
 		if ( $field['type'] === 'divider' ) {
-			return isset( $field['label'] ) && ! wpforms_is_empty_string( $field['label'] ) ? $field['label'] : esc_html__( 'Section Divider', 'wpforms' );
+			$field_label = isset( $field['label'] ) && ! wpforms_is_empty_string( $field['label'] ) ? $field['label'] : esc_html__( 'Section Divider', 'wpforms' );
 		}
 
 		if ( $field['type'] === 'pagebreak' ) {
-			return isset( $field['title'] ) && ! wpforms_is_empty_string( $field['title'] ) ? $field['title'] : esc_html__( 'Page Break', 'wpforms' );
+			$field_label = isset( $field['title'] ) && ! wpforms_is_empty_string( $field['title'] ) ? $field['title'] : esc_html__( 'Page Break', 'wpforms' );
 		}
 
 		if ( $field['type'] === 'content' ) {
-			return esc_html__( 'Content Field', 'wpforms' );
+			$field_label = esc_html__( 'Content Field', 'wpforms' );
 		}
 
-		return $field_label;
+		return $this->get_field_name( $field_label, $field );
+	}
+
+	/**
+	 * Get field name.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string $field_label Field label.
+	 * @param array  $field       Entry field.
+	 *
+	 * @return string
+	 */
+	private function get_field_name( string $field_label, array $field ): string {
+
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$context     = isset( $_GET['view'] ) && $_GET['view'] === 'print' ? 'single-print' : 'single-entry';
+		$field_label = empty( $field_label )
+			? sprintf( /* translators: %d - field ID. */
+				esc_html__( 'Field ID #%s', 'wpforms' ),
+				wpforms_validate_field_id( $field['id'] )
+			)
+			: esc_html( wp_strip_all_tags( $field_label ) );
+
+		/**
+		 * Filters the field label for the single entry view.
+		 *
+		 * @since 1.9.1
+		 *
+		 * @param string $field_label Field label.
+		 * @param array  $field       Entry field.
+		 * @param array  $form_data   Form data.
+		 * @param string $context     Context.
+		 */
+		return apply_filters( // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
+			'wpforms_html_field_name',
+			$field_label,
+			$field,
+			$this->form_data,
+			$context
+		);
 	}
 
 	/**

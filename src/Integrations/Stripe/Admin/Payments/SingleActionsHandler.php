@@ -99,7 +99,7 @@ class SingleActionsHandler {
 		check_ajax_referer( 'wpforms-admin', 'nonce' );
 
 		$payment_id = (int) $_POST['payment_id'];
-		$payment_db = wpforms()->get( 'payment' )->get( $payment_id );
+		$payment_db = wpforms()->obj( 'payment' )->get( $payment_id );
 
 		if ( empty( $payment_db ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Payment not found in the database.', 'wpforms-lite' ) ] );
@@ -120,7 +120,7 @@ class SingleActionsHandler {
 
 		if ( $payment_db->status === 'partrefund' ) {
 
-			$already_refunded = wpforms()->get( 'payment_meta' )->get_single( $payment_db->id, 'refunded_amount' );
+			$already_refunded = wpforms()->obj( 'payment_meta' )->get_single( $payment_db->id, 'refunded_amount' );
 			$amount_to_log    = $payment_db->total_amount - $already_refunded;
 		} else {
 			$amount_to_log = $payment_db->total_amount;
@@ -155,7 +155,7 @@ class SingleActionsHandler {
 		check_ajax_referer( 'wpforms-admin', 'nonce' );
 
 		$payment_id = (int) $_POST['payment_id'];
-		$payment_db = wpforms()->get( 'payment' )->get( $payment_id );
+		$payment_db = wpforms()->obj( 'payment' )->get( $payment_id );
 
 		if ( empty( $payment_db ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Subscription not found in the database.', 'wpforms-lite' ) ] );

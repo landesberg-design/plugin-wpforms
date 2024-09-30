@@ -136,7 +136,7 @@ class Process {
 	 */
 	private function add_missing_fields_to_entry( array $fields, $entry, array $form_data ): array { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded, Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
-		$form_obj = wpforms()->get( 'form' );
+		$form_obj = wpforms()->obj( 'form' );
 
 		if ( ! method_exists( $form_obj, 'get' ) ) {
 			return $fields;
@@ -519,7 +519,7 @@ class Process {
 	public function add_all_repeater_child_fields_to_form_data( $form_data, $entry_id ): array {
 
 		$form_data = (array) $form_data;
-		$entry_obj = wpforms()->get( 'entry' );
+		$entry_obj = wpforms()->obj( 'entry' );
 
 		if ( $entry_id ) {
 			$entry = $entry_obj->get( $entry_id );

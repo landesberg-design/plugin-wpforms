@@ -75,7 +75,7 @@ class Payment extends Pointer {
 		}
 
 		// Bail early if there are no published forms.
-		if ( ! wpforms()->get( 'form' )->forms_exist() ) {
+		if ( ! wpforms()->obj( 'form' )->forms_exist() ) {
 			return false;
 		}
 

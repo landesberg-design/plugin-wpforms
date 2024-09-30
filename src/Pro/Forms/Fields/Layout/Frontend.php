@@ -88,6 +88,10 @@ class Frontend {
 			return '';
 		}
 
+		if ( ! isset( $field['label'] ) || wpforms_is_empty_string( $field['label'] ) ) {
+			return '';
+		}
+
 		return sprintf(
 			'<h3 class="wpforms-field-label">
 				%1$s

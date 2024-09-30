@@ -161,7 +161,32 @@ class Helpers {
 	}
 
 	/**
+	 * Check if the layout is empty.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param array $layout Layout data.
+	 *
+	 * @return bool
+	 */
+	public static function is_layout_empty( array $layout ): bool {
+
+		if ( empty( $layout['columns'] ) ) {
+			return true;
+		}
+
+		foreach ( $layout['columns'] as $column ) {
+			if ( ! self::is_column_empty( $column ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Check if the column is empty.
+	 * Repeater field column has only one field.
 	 *
 	 * @since 1.9.0
 	 *
@@ -169,17 +194,19 @@ class Helpers {
 	 *
 	 * @return bool
 	 */
-	public static function is_column_empty( $column ): bool {
+	public static function is_column_empty( array $column ): bool {
 
-		if ( empty( $column['fields'] ) ) {
+		if ( empty( $column['fields'] ) && empty( $column['field'] ) ) {
 			return true;
 		}
 
+		$fields = isset( $column['field'] ) ? [ $column['field'] ] : $column['fields'];
+
 		$non_empty_fields = array_filter(
-			$column['fields'],
+			$fields,
 			static function ( $field ) {
 
-				return ! wpforms_is_empty_string( $field['formatted_value'] ?? '' );
+				return ! wpforms_is_empty_string( $field['value'] ?? '' );
 			}
 		);
 

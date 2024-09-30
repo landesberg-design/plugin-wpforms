@@ -106,7 +106,7 @@ class ListTable extends WP_List_Table {
 		);
 
 		// Default number of forms to show per page.
-		$this->per_page = wpforms()->get( 'entry' )->get_count_per_page();
+		$this->per_page = wpforms()->obj( 'entry' )->get_count_per_page();
 
 		// Date and time formats.
 		$this->datetime_format = [
@@ -180,7 +180,7 @@ class ListTable extends WP_List_Table {
 	public function get_counts() {
 
 		$this->counts = [];
-		$entry_obj    = wpforms()->get( 'entry' );
+		$entry_obj    = wpforms()->obj( 'entry' );
 
 		$this->counts = $entry_obj->get_counts( [ 'form_id' => $this->form_id ] );
 
@@ -291,7 +291,7 @@ class ListTable extends WP_List_Table {
 		if (
 			! $this->counts['trash'] &&
 			( ! isset( $_GET['status'] ) || $_GET['status'] !== 'trash' ) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! wpforms()->get( 'entry' )->get_trash_count( $this->form_id )
+			! wpforms()->obj( 'entry' )->get_trash_count( $this->form_id )
 		) {
 			return $views;
 		}
@@ -493,7 +493,7 @@ class ListTable extends WP_List_Table {
 
 		// Show the original type if is trash.
 		if ( isset( $_GET['status'] ) && $_GET['status'] === Page::TRASH_ENTRY_STATUS ) { //phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$meta = wpforms()->get( 'entry_meta' )->get_meta(
+			$meta = wpforms()->obj( 'entry_meta' )->get_meta(
 				[
 					'entry_id' => $entry->entry_id,
 					'type'     => 'status_prev',
@@ -821,7 +821,7 @@ class ListTable extends WP_List_Table {
 
 			if (
 				wpforms_current_user_can( 'edit_entries_form_single', $this->form_id ) &&
-				wpforms()->get( 'entry' )->has_editable_fields( $entry )
+				wpforms()->obj( 'entry' )->has_editable_fields( $entry )
 			) {
 				// Edit.
 				$actions['edit'] = sprintf(
@@ -1012,7 +1012,7 @@ class ListTable extends WP_List_Table {
 
 		$bulk_actions['null'] = esc_html__( '----------', 'wpforms' );
 
-		if ( wpforms()->get( 'spam_entry' )->is_spam_list() ) {
+		if ( wpforms()->obj( 'spam_entry' )->is_spam_list() ) {
 			$bulk_actions['unspam'] = esc_html__( 'Mark as Not Spam', 'wpforms' );
 		} else {
 			$bulk_actions['spam'] = esc_html__( 'Mark as Spam', 'wpforms' );
@@ -1084,7 +1084,7 @@ class ListTable extends WP_List_Table {
 			$status = Page::TRASH_ENTRY_STATUS;
 		}
 
-		$spam_entry = wpforms()->get( 'spam_entry' );
+		$spam_entry = wpforms()->obj( 'spam_entry' );
 
 		// Check if it is a Spam list.
 		if ( $spam_entry->is_spam_list() ) {
@@ -1099,7 +1099,7 @@ class ListTable extends WP_List_Table {
 		];
 
 		// Get entries, that would be affected.
-		$entries_list = wpforms()->get( 'entry' )->get_entries( $args );
+		$entries_list = wpforms()->obj( 'entry' )->get_entries( $args );
 
 		/**
 		 * Filter entries list.
@@ -1205,7 +1205,7 @@ class ListTable extends WP_List_Table {
 				continue;
 			}
 
-			$success = wpforms()->get( 'entry' )->update(
+			$success = wpforms()->obj( 'entry' )->update(
 				$id,
 				[
 					'viewed' => '1',
@@ -1214,7 +1214,7 @@ class ListTable extends WP_List_Table {
 
 			if ( $success ) {
 
-				wpforms()->get( 'entry_meta' )->add(
+				wpforms()->obj( 'entry_meta' )->add(
 					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
@@ -1266,7 +1266,7 @@ class ListTable extends WP_List_Table {
 				continue;
 			}
 
-			$success = wpforms()->get( 'entry' )->update(
+			$success = wpforms()->obj( 'entry' )->update(
 				$id,
 				[
 					'viewed' => '0',
@@ -1274,7 +1274,7 @@ class ListTable extends WP_List_Table {
 			);
 
 			if ( $success ) {
-				wpforms()->get( 'entry_meta' )->add(
+				wpforms()->obj( 'entry_meta' )->add(
 					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
@@ -1312,7 +1312,7 @@ class ListTable extends WP_List_Table {
 
 		$user       = get_user_by( 'id', get_current_user_id() );
 		$entries    = wp_list_pluck( $entries_list, 'status', 'entry_id' );
-		$spam_entry = wpforms()->get( 'spam_entry' );
+		$spam_entry = wpforms()->obj( 'spam_entry' );
 		$spam       = 0;
 
 		foreach ( $ids as $id ) {
@@ -1354,7 +1354,7 @@ class ListTable extends WP_List_Table {
 		}
 
 		$entries    = wp_list_pluck( $entries_list, 'status', 'entry_id' );
-		$spam_entry = wpforms()->get( 'spam_entry' );
+		$spam_entry = wpforms()->obj( 'spam_entry' );
 		$unspam     = 0;
 
 		foreach ( $ids as $id ) {
@@ -1367,7 +1367,7 @@ class ListTable extends WP_List_Table {
 				continue;
 			}
 
-			$entry = wpforms()->get( 'entry' )->get( $id );
+			$entry = wpforms()->obj( 'entry' )->get( $id );
 
 			$spam_entry->set_as_not_spam( $entry );
 
@@ -1410,7 +1410,7 @@ class ListTable extends WP_List_Table {
 				continue;
 			}
 
-			$success = wpforms()->get( 'entry' )->update(
+			$success = wpforms()->obj( 'entry' )->update(
 				$id,
 				[
 					'starred' => '1',
@@ -1418,7 +1418,7 @@ class ListTable extends WP_List_Table {
 			);
 
 			if ( $success ) {
-				wpforms()->get( 'entry_meta' )->add(
+				wpforms()->obj( 'entry_meta' )->add(
 					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
@@ -1470,7 +1470,7 @@ class ListTable extends WP_List_Table {
 				continue;
 			}
 
-			$success = wpforms()->get( 'entry' )->update(
+			$success = wpforms()->obj( 'entry' )->update(
 				$id,
 				[
 					'starred' => '0',
@@ -1478,7 +1478,7 @@ class ListTable extends WP_List_Table {
 			);
 
 			if ( $success ) {
-				wpforms()->get( 'entry_meta' )->add(
+				wpforms()->obj( 'entry_meta' )->add(
 					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
@@ -1538,7 +1538,7 @@ class ListTable extends WP_List_Table {
 
 		foreach ( $ids as $id ) {
 			// Get the entry first.
-			$entry = wpforms()->get( 'entry' )->get( $id );
+			$entry = wpforms()->obj( 'entry' )->get( $id );
 
 			if ( ! $entry ) {
 				continue;
@@ -1550,7 +1550,7 @@ class ListTable extends WP_List_Table {
 			 * TODO :: After the support for PHP 7 ends,
 			 * we can update the following code to use named arguments and skip the optional params.
 			 */
-			$success = wpforms()->get( 'entry' )->update(
+			$success = wpforms()->obj( 'entry' )->update(
 				$id,
 				[ 'status' => Page::TRASH_ENTRY_STATUS ],
 				'',
@@ -1564,7 +1564,7 @@ class ListTable extends WP_List_Table {
 			}
 
 			if ( $status !== '' ) {
-				wpforms()->get( 'entry_meta' )->add(
+				wpforms()->obj( 'entry_meta' )->add(
 					[
 						'entry_id' => $id,
 						'form_id'  => $form_id,
@@ -1614,13 +1614,13 @@ class ListTable extends WP_List_Table {
 			$status = '';
 
 			// Get the entry first.
-			$entry = wpforms()->get( 'entry' )->get( $id );
+			$entry = wpforms()->obj( 'entry' )->get( $id );
 
 			if ( ! $entry ) {
 				continue;
 			}
 
-			$meta = wpforms()->get( 'entry_meta' )->get_meta(
+			$meta = wpforms()->obj( 'entry_meta' )->get_meta(
 				[
 					'entry_id' => $id,
 					'type'     => 'status_prev',
@@ -1632,14 +1632,14 @@ class ListTable extends WP_List_Table {
 				$status = $meta[0]->status;
 
 				// After taking status from meta, delete the meta.
-				wpforms()->get( 'entry_meta' )->delete_by( 'id', $meta[0]->id );
+				wpforms()->obj( 'entry_meta' )->delete_by( 'id', $meta[0]->id );
 			}
 
 			/**
 			 * TODO :: After the support for PHP 7 ends,
 			 * we can update the following code to use named arguments and skip the optional params.
 			 */
-			$success = wpforms()->get( 'entry' )->update(
+			$success = wpforms()->obj( 'entry' )->update(
 				$id,
 				[ 'status' => $status ],
 				'',
@@ -1655,7 +1655,7 @@ class ListTable extends WP_List_Table {
 			++$restored;
 		}
 
-		$trash_count = wpforms()->get( 'entry' )->get_entries(
+		$trash_count = wpforms()->obj( 'entry' )->get_entries(
 			[
 				'form_id' => $this->form_id,
 				'status'  => Page::TRASH_ENTRY_STATUS,
@@ -1692,7 +1692,7 @@ class ListTable extends WP_List_Table {
 		$form_id = ! empty( $_GET['form_id'] ) ? absint( $_GET['form_id'] ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		foreach ( $ids as $id ) {
-			if ( wpforms()->get( 'entry' )->delete( $id ) ) {
+			if ( wpforms()->obj( 'entry' )->delete( $id ) ) {
 				++$deleted;
 			}
 		}
@@ -2016,7 +2016,7 @@ class ListTable extends WP_List_Table {
 		 * @return array
 		 */
 		$data_args = apply_filters( 'wpforms_entry_table_args', $data_args ); // phpcs:ignore WPForms.PHP.ValidateHooks.InvalidHookName
-		$data      = wpforms()->get( 'entry' )->get_entries( $data_args );
+		$data      = wpforms()->obj( 'entry' )->get_entries( $data_args );
 
 		// Giddy up.
 		$this->items = $data;
@@ -2025,7 +2025,7 @@ class ListTable extends WP_List_Table {
 		$this->set_pagination_args(
 			[
 				'total_items' => $total_items,
-				'total_pages' => ceil( $total_items / $per_page ),
+				'total_pages' => (int) ceil( $total_items / $per_page ),
 				'per_page'    => $per_page,
 			]
 		);
@@ -2141,7 +2141,7 @@ class ListTable extends WP_List_Table {
 	private function get_payment_status_by_entry_id( $entry_id ) {
 
 		// Get payment data.
-		$payment = wpforms()->get( 'payment' )->get_by( 'entry_id', $entry_id );
+		$payment = wpforms()->obj( 'payment' )->get_by( 'entry_id', $entry_id );
 
 		// If payment data is not found, return N/A.
 		if ( ! $payment ) {
@@ -2171,7 +2171,7 @@ class ListTable extends WP_List_Table {
 	 */
 	private function should_delete( $entry_id ) {
 
-		$entry = wpforms()->get( 'entry' )->get( $entry_id );
+		$entry = wpforms()->obj( 'entry' )->get( $entry_id );
 
 		if ( ! $entry ) {
 			return false;

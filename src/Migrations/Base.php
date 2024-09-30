@@ -315,7 +315,7 @@ abstract class Base {
 	 *
 	 * @return string
 	 */
-	protected function get_upgrade_version( string $class_name ): string {
+	public function get_upgrade_version( string $class_name ): string {
 
 		// Find only the digits and underscores to get version number.
 		if ( ! preg_match( '/(\d_?)+/', $class_name, $matches ) ) {
@@ -349,22 +349,22 @@ abstract class Base {
 	}
 
 	/**
-	 * Log message to WPForms logger and standard debug.log file.
+	 * Force log message to WPForms logger.
 	 *
 	 * @since 1.7.5
 	 *
 	 * @param string $message The error message that should be logged.
-	 *
-	 * @noinspection ForgottenDebugOutputInspection
-	 * @noinspection PhpUndefinedConstantInspection
 	 */
 	protected function log( string $message ) {
 
-		if ( defined( 'WPFORMS_DEBUG' ) && WPFORMS_DEBUG ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			error_log( $message );
-			wpforms_log( 'Migration', $message, [ 'type' => 'log' ] );
-		}
+		wpforms_log(
+			'Migration',
+			$message,
+			[
+				'type'  => 'log',
+				'force' => true,
+			]
+		);
 	}
 
 	/**

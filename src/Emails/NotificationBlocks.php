@@ -29,7 +29,7 @@ class NotificationBlocks {
 	public function __construct() {
 
 		// Store the instance of the "Notifications" class.
-		$this->notifications = wpforms()->get( 'notifications' );
+		$this->notifications = wpforms()->obj( 'notifications' );
 	}
 
 	/**

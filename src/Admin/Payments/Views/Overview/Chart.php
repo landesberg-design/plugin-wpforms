@@ -242,7 +242,7 @@ class Chart {
 			],
 			'total_subscription'         => [
 				'label'          => esc_html__( 'New Subscriptions', 'wpforms-lite' ),
-				'condition'      => wpforms()->get( 'payment_queries' )->has_subscription(),
+				'condition'      => wpforms()->obj( 'payment_queries' )->has_subscription(),
 				'has_count'      => true,
 				'funnel'         => [
 					'in'     => [
@@ -259,7 +259,7 @@ class Chart {
 			],
 			'total_renewal_subscription' => [
 				'label'          => esc_html__( 'Subscription Renewals', 'wpforms-lite' ),
-				'condition'      => wpforms()->get( 'payment_queries' )->has_subscription(),
+				'condition'      => wpforms()->obj( 'payment_queries' )->has_subscription(),
 				'has_count'      => true,
 				'funnel'         => [
 					'in'     => [

@@ -384,7 +384,7 @@ class Page implements PaymentsViewsInterface {
 		}
 
 		$has_any_mode_payment = count(
-			wpforms()->get( 'payment' )->get_payments(
+			wpforms()->obj( 'payment' )->get_payments(
 				[
 					'mode'   => 'any',
 					'number' => 1,
@@ -395,7 +395,7 @@ class Page implements PaymentsViewsInterface {
 		// Check on trashed payments.
 		if ( ! $has_any_mode_payment ) {
 			$has_any_mode_payment = count(
-				wpforms()->get( 'payment' )->get_payments(
+				wpforms()->obj( 'payment' )->get_payments(
 					[
 						'mode'         => 'any',
 						'number'       => 1,

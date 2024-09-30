@@ -117,7 +117,7 @@ class UserTemplates {
 		}
 
 		// No need to show template states on the templates page.
-		if ( wpforms_is_admin_page( 'overview' ) && wpforms()->get( 'forms_views' )->get_current_view() === 'templates' ) {
+		if ( wpforms_is_admin_page( 'overview' ) && wpforms()->obj( 'forms_views' )->get_current_view() === 'templates' ) {
 			return $post_states;
 		}
 
@@ -168,7 +168,7 @@ class UserTemplates {
 		}
 
 		// If there are no entries, we don't need to display the notice on the empty state page.
-		$entries = wpforms()->get( 'entry' )->get_entries(
+		$entries = wpforms()->obj( 'entry' )->get_entries(
 			[
 				'form_id' => $form_id,
 				'limit'   => 1,
@@ -206,7 +206,7 @@ class UserTemplates {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$entry_id = ! empty( $_REQUEST['entry_id'] ) ? absint( $_REQUEST['entry_id'] ) : 0;
 
-		$entry = wpforms()->get( 'entry' )->get( $entry_id );
+		$entry = wpforms()->obj( 'entry' )->get( $entry_id );
 
 		// If entry does not exist, we don't need to display the notice on the empty state page.
 		if ( empty( $entry ) ) {
@@ -218,7 +218,7 @@ class UserTemplates {
 			return;
 		}
 
-		$meta = wpforms()->get( 'entry_meta' )->get_meta(
+		$meta = wpforms()->obj( 'entry_meta' )->get_meta(
 			[
 				'entry_id' => absint( $entry_id ),
 				'type'     => 'purge_template_entry_task',
@@ -282,8 +282,8 @@ class UserTemplates {
 
 		// Only add the template post type if the Show Templates screen option is enabled
 		// and `post_type` is not already set.
-		if ( ! isset( $args['post_type'] ) && wpforms()->get( 'forms_overview' )->overview_show_form_templates() ) {
-			$args['post_type'] = wpforms()->get( 'form' )::POST_TYPES;
+		if ( ! isset( $args['post_type'] ) && wpforms()->obj( 'forms_overview' )->overview_show_form_templates() ) {
+			$args['post_type'] = wpforms()->obj( 'form' )::POST_TYPES;
 		}
 
 		return $args;
@@ -300,7 +300,7 @@ class UserTemplates {
 	 */
 	public function add_form_templates( array $templates ): array {
 
-		$user_templates = wpforms()->get( 'form' )->get( '', [ 'post_type' => 'wpforms-template' ] );
+		$user_templates = wpforms()->obj( 'form' )->get( '', [ 'post_type' => 'wpforms-template' ] );
 
 		if ( empty( $user_templates ) ) {
 			return $templates;
