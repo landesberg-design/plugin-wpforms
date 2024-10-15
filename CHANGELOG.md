@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.9.1.3] - 2024-10-02
+- The Repeater field had a drag-and-drop issue in the form builder.
+- HTML tags didn't work in an agreement text of the GDPR field when a field's label was hidden.
+- HTML tags in choices of the Checkboxes, Multiple Choice, and Dropdown fields were escaped and didn't work as expected.
+- Update bubble notification was still showing up after plugin or addon update.
+
 ## [1.9.1.2] - 2024-09-27
 ### Fixed
 - There was a conflict with the WooCommerce Subscriptions plugin.

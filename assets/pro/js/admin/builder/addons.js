@@ -236,7 +236,7 @@ WPForms.Admin.Builder.Addons = WPForms.Admin.Builder.Addons || ( function( docum
 		 * @return {boolean} True if Google Sheets connections exist.
 		 */
 		isGoogleSheetsConnectionsExist() {
-			if ( ! WPForms.Admin.Builder.Providers.GoogleSheets.isReady ) {
+			if ( ! WPForms.Admin.Builder.Providers?.GoogleSheets?.isReady ) {
 				return wpforms_builder.repeater.is_google_sheets_has_connection;
 			}
 

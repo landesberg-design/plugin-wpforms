@@ -191,8 +191,10 @@ class WPForms_Updater {
 			$this->version     = $plugin['Version'];
 		}
 
-		// Load the updater hooks and filters.
-		$this->hooks();
+		// Load the updater hooks and filters if the plugin path and version are set.
+		if ( $this->version ) {
+			$this->hooks();
+		}
 	}
 
 	/**
@@ -239,7 +241,7 @@ class WPForms_Updater {
 		}
 
 		// Infuse the update object with our data if the version from the remote API is newer.
-		if ( isset( $this->update->new_version ) && version_compare( $this->version, $this->update->new_version, '<' ) ) {
+		if ( $this->version && isset( $this->update->new_version ) && version_compare( $this->version, $this->update->new_version, '<' ) ) {
 
 			// The $this->update object contains new_version, package, slug and last_update keys.
 			$this->update->version                      = $this->version;

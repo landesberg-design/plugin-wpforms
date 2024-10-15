@@ -283,7 +283,7 @@ class WPForms_Field_GDPR_Checkbox extends WPForms_Field {
 						'<label %s>%s%s</label>',
 						wpforms_html_attributes( $choice['label']['id'], $choice['label']['class'], $choice['label']['data'], $choice['label']['attr'] ),
 						wp_kses_post( $choice['label']['text'] ),
-						esc_attr( $required )
+						wp_kses_post( $required )
 					);
 
 				echo '</li>';

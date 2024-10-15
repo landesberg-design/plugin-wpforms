@@ -1340,7 +1340,7 @@ abstract class WPForms_Field {
 					$fld .= sprintf(
 						'<input type="text" name="%s[label]" value="%s" class="label">',
 						esc_attr( $base ),
-						$this->esc_attr_brackets( $label )
+						esc_attr( $label )
 					);
 					$fld .= '<a class="add" href="#"><i class="fa fa-plus-circle"></i></a><a class="remove" href="#"><i class="fa fa-minus-circle"></i></a>';
 					$fld .= sprintf(
@@ -3725,33 +3725,5 @@ abstract class WPForms_Field {
 	protected function load_script_in_footer(): bool {
 
 		return ! wpforms_is_frontend_js_header_force_load();
-	}
-
-	/**
-	 * Wrapper for esc_html() to prevent conversion of `<>` special chars to brackets.
-	 *
-	 * @since 1.9.1
-	 *
-	 * @param string $str String to escape.
-	 *
-	 * @return string
-	 */
-	protected function esc_attr_brackets( $str ): string {
-
-		return str_replace(
-			[
-				'&lt;',
-				'&gt;',
-				'&#060;',
-				'&#062;',
-			],
-			[
-				'&amp;lt;',
-				'&amp;gt;',
-				'&amp;#060;',
-				'&amp;#062;',
-			],
-			esc_html( $str )
-		);
 	}
 }
