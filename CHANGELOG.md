@@ -1,7 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file and formatted via [this recommendation](https://keepachangelog.com/).
 
+## [1.9.1.4] - 2024-10-17
+### Fixed
+- Multiple sending of weekly summary emails.
+
 ## [1.9.1.3] - 2024-10-02
+### Fixed
 - The Repeater field had a drag-and-drop issue in the form builder.
 - HTML tags didn't work in an agreement text of the GDPR field when a field's label was hidden.
 - HTML tags in choices of the Checkboxes, Multiple Choice, and Dropdown fields were escaped and didn't work as expected.
